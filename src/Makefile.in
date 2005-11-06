@@ -72,7 +72,7 @@ DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir)
 
 bin_PROGRAMS = euroconq
-euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp
+euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp Config.cpp Outils.cpp
 euroconq_LDADD = 
 
 SUBDIRS = pics
@@ -84,7 +84,8 @@ PROGRAMS =  $(bin_PROGRAMS)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-euroconq_OBJECTS =  Main.o Menu.o Timer.o Resources.o Sockets.o
+euroconq_OBJECTS =  Main.o Menu.o Timer.o Resources.o Sockets.o Config.o \
+Outils.o
 euroconq_DEPENDENCIES = 
 euroconq_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
@@ -98,8 +99,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/Main.P .deps/Menu.P .deps/Resources.P .deps/Sockets.P \
-.deps/Timer.P
+DEP_FILES =  .deps/Config.P .deps/Main.P .deps/Menu.P .deps/Outils.P \
+.deps/Resources.P .deps/Sockets.P .deps/Timer.P
 SOURCES = $(euroconq_SOURCES)
 OBJECTS = $(euroconq_OBJECTS)
 

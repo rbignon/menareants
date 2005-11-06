@@ -16,7 +16,7 @@ AC_CHECK_LIB(clanApp,main,,echo "Europe Conquest requires ClanLib to run."; exit
 AC_CHECK_LIB(clanDisplay,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
 AC_CHECK_LIB(clanNetwork,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
 # AC_CHECK_LIB(clanSound,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-# AC_CHECK_LIB(png,main,,echo "Europe Conquest requires PNG library to run."; exit 1)
+AC_CHECK_LIB(png,main,,echo "Europe Conquest requires PNG library to run."; exit 1)
 AC_CHECK_LIB(clanPNG,main,,echo "Europe Conquest requires ClanLib PNG support to run."; exit1)
 # AC_CHECK_LIB(clanMikMod,main,
 # [
