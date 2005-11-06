@@ -1,8 +1,8 @@
 À faire:
 
 * Urgent
-- support des sockets complet.
 
 * Moyen
 
 * Faible
+-voir problèmes de l'édition de chaine (menu) avec '0123456789.'
