@@ -1,3 +1,25 @@
+2005-11-06  Romain Bignon <progs@headfucking.net>
+
+	* Menu.cpp: Gestion de flags:
+	M_READ_ONLY: Champ non modifiable ou lien inactif, change la couleur du focus en gris.
+	M_NOFMAJ: Ne pas mettre une maj automatique au début d'une chaine pour un MenuItem_String.
+	M_RETOUR: Gère comme étant un bouton de retour: légèrement séparé, et retourne au menu supérieur.
+
+	* Sockets.c (connect_to_server): Affichage d'un message d'erreur si la connexion echoue.
+
+	* Sockets.c: Utilisation des sockets "de bases" avant de se servir de CL_Socket: permet d'éviter
+	un bug bizare qui ne permet de se connecter qu'en local.
+
+	* Outils.cpp (stringtok): Équivalent de strtok pour les chaines.
+
+	* Outils.cpp: Outils
+
+	* Config.cpp: Création de la configuration.
+
+	* API: Reflexion sur le protocole.
+
+	* Sockets.cpp: Correction bug du blockage du socket.
+
 2005-11-05  Romain Bignon <progs@headfucking.net>
 
 	* Sockets.cpp: Création d'un support sockets.
