@@ -102,4 +102,3 @@ CL_Surface* Resources::Titlescreen()
 	}
 	return sur_titlescreen;
 }
-
