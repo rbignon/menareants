@@ -22,8 +22,14 @@
 #define Menu_h
 
 #include "array.h"
+#include "Main.h"
 
-typedef bool (*EC_MenuFunc) (void);
+/* Flags */
+#define M_READ_ONLY		0x001
+#define M_NOFMAJ		0x002
+#define M_RETOUR		0x004
+
+typedef bool (*EC_MenuFunc) (bool in);
 
 class ClanBomberApplication;
 
@@ -36,7 +42,7 @@ class MenuItem
 friend class Menu;
 
 public:
-	MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func );
+	MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags );
 	virtual ~MenuItem() {};
 
 	void add_child( MenuItem* child );
@@ -62,13 +68,15 @@ protected:
 	int					parent;
 	CL_List<MenuItem>	children;
 	EC_MenuFunc			func;
+	unsigned int flags;
 };
 
 class MenuItem_Value : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value, EC_MenuFunc _func = NULL );
+	MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value,
+	                EC_MenuFunc _func = NULL, unsigned int _flags = 0 );
 	virtual ~MenuItem_Value() {};
 
 	int get_value();
@@ -93,7 +101,8 @@ class MenuItem_String : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_String( const CL_String _text, int _id, int _parent, CL_String _string, EC_MenuFunc _func = NULL);
+	MenuItem_String( const CL_String _text, int _id, int _parent, CL_String _string,
+	                 EC_MenuFunc _func = NULL, unsigned int _flags = 0);
 	virtual ~MenuItem_String() {};
 
 	CL_String& get_string();
@@ -109,7 +118,8 @@ class MenuItem_StringList : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_StringList( const CL_String _text, int _id, int _parent, CL_Array<CL_String> _string_list, int _value, EC_MenuFunc _func = 0 );
+	MenuItem_StringList( const CL_String _text, int _id, int _parent, CL_Array<CL_String> _string_list,
+	                     int _value, EC_MenuFunc _func = 0, unsigned int _flags = 0 );
 	virtual ~MenuItem_StringList() {};
 
 	CL_String get_string();
@@ -136,11 +146,13 @@ public:
 	Menu( const CL_String& name, EuroConqApp* _app );
 	~Menu();
 
-	void add_item( const CL_String& text, int id, int parent=-1 );
-	void add_item( const CL_String& text, int id, EC_MenuFunc func, int parent=-1 );
-	void add_value( const CL_String& text, int id, int parent, int min, int max, int value );
-	void add_string( const CL_String& text, int id, int parent, CL_String string );
-	void add_stringlist( const CL_String& text, int id, int parent, CL_Array<CL_String> string_list, int cur_string );
+	void add_item( const CL_String& text, int id, unsigned int flags, int parent=-1 );
+	void add_item( const CL_String& text, int id, EC_MenuFunc func, unsigned int flags, int parent=-1 );
+	void add_value(const CL_String& text, int id, unsigned int flags, int parent, int min, int max,
+	               int value);
+	void add_string( const CL_String& text, int id, unsigned int flags, int parent, CL_String string);
+	void add_stringlist( const CL_String& text, int id, unsigned int flags, int parent,
+	                     CL_Array<CL_String> string_list, int cur_string );
 	int execute();
 	void scroll_in();
 	void scroll_out();

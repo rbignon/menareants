@@ -32,12 +32,13 @@
 
 #include "Timer.h"
 
-MenuItem::MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func )
+MenuItem::MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags )
 {
 	text = _text;
 	id = _id;
 	parent = _parent;
 	func = _func;
+	flags = _flags;
 }
 
 bool MenuItem::has_children()
@@ -71,7 +72,7 @@ void MenuItem::set_text(const CL_String _text)
 }
 
 
-MenuItem_Value::MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value, EC_MenuFunc _func ) : MenuItem( _text, _id, _parent, _func )
+MenuItem_Value::MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value, EC_MenuFunc _func, unsigned int _flags ) : MenuItem( _text, _id, _parent, _func, _flags )
 {
 	value = _value;
 	min = _min;
@@ -137,7 +138,7 @@ void MenuItem_Value::test_value()
 }
 
 // *********************
-MenuItem_String::MenuItem_String(const CL_String _text, int _id, int _parent, CL_String _string, EC_MenuFunc _func) : MenuItem(_text, _id, _parent, _func)
+MenuItem_String::MenuItem_String(const CL_String _text, int _id, int _parent, CL_String _string, EC_MenuFunc _func, unsigned int _flags) : MenuItem(_text, _id, _parent, _func, _flags)
 {
 	string = _string;
 }
@@ -153,7 +154,9 @@ void MenuItem_String::set_string( CL_String  _string )
 }
 
 // *********************
-MenuItem_StringList::MenuItem_StringList(const CL_String _text, int _id, int _parent, CL_Array<CL_String> _string_list, int _value, EC_MenuFunc _func) : MenuItem(_text, _id, _parent, _func)
+MenuItem_StringList::MenuItem_StringList(const CL_String _text, int _id, int _parent, CL_Array<CL_String>
+                                        _string_list, int _value, EC_MenuFunc _func, unsigned int _flags)
+  : MenuItem(_text, _id, _parent, _func, _flags)
 {
 	set_strings( _string_list );
 	value = _value;
@@ -222,7 +225,7 @@ Menu::Menu( const CL_String& name, EuroConqApp* _app )
 
 	key_buffer = new CL_InputBuffer( CL_Input::keyboards[0] );
 
-	items.add( new MenuItem(name, -1, -2, NULL) );
+	items.add( new MenuItem(name, -1, -2, NULL, 0) );
 }
 
 Menu::~Menu()
@@ -256,7 +259,7 @@ void Menu::redraw( int yoffset )
 	}
 	width += 30;
 
-	int height = current->children.get_num_items()*40 + 100;
+	int height = current->children.get_num_items()*40 + 110;
 
 	int left_border = 400 - width/2;
 	int right_border = 400 + width/2   +10;//bug in print_right?
@@ -273,9 +276,16 @@ void Menu::redraw( int yoffset )
 	while (item_counter.next() != NULL)
 	{
 		act_draw++;
+		if((item_counter()->flags & M_RETOUR))
+			vert += 10;
 		if (act_draw==current_selection)
 		{
-			CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35, 0.5f,0.1f,0.1f,0.55f);
+			if((item_counter()->flags & M_READ_ONLY))
+				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
+				                       0.1f,0.1f,0.2f,0.55f);
+			else
+				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
+				                       0.5f,0.1f,0.1f,0.55f);
 		}
 		if (item_counter()->get_type() == MenuItem::MT_VALUE)
 		{
@@ -348,40 +358,44 @@ int Menu::execute()
 				must_redraw = true;
 			break;
 			case CL_KEY_RIGHT:
-				if (selected->get_type() == MenuItem::MT_VALUE)
+				if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
 				{
 					((MenuItem_Value*)(selected))->inc_value();
 					return selected->get_id();
 				}
-				if (selected->get_type() == MenuItem::MT_STRINGLIST)
+				if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
 				{
 					((MenuItem_StringList*)(selected))->inc_value();
 					return selected->get_id();
 				}
 			break;
 			case CL_KEY_LEFT:
-				if (selected->get_type() == MenuItem::MT_VALUE)
+				if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
 				{
 					((MenuItem_Value*)(selected))->dec_value();
 					return selected->get_id();
 				}
-				if (selected->get_type() == MenuItem::MT_STRINGLIST)
+				if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
 				{
 					((MenuItem_StringList*)(selected))->dec_value();
 					return selected->get_id();
 				}
 			break;
 			case CL_KEY_ENTER:
+				if((selected->flags & M_READ_ONLY)) break;
 				if (selected->has_children())
 				{
-					if(!selected->func || selected->func())
+					if(!selected->func || selected->func(true))
 					{
 						current_run_id = selected->get_id();
 						current_selection = 1;
 						must_redraw = true;
+						break;
 					}
-
-				} else
+					else
+						return -1;
+				}
+				else if(!(selected->flags & M_RETOUR))
 				{
 					if (selected->get_type() == MenuItem::MT_STRING)
 					{
@@ -389,10 +403,12 @@ int Menu::execute()
 					}
 					return selected->get_id();
 				}
-			break;
+				/* WARN: Pas de break ici c'est *normal*/
 			case CL_KEY_ESCAPE:
 				if (current->get_id() != -1)
 				{
+					if(current->func)
+						current->func(false);
 					current_run_id = current->get_parent();
 					current_selection = 1;
 					must_redraw = true;
@@ -549,9 +565,42 @@ void Menu::enter_string(MenuItem_String* item)
 				break;
 				case CL_KEY_Z:
 					new_string += "z";
-				break;
+					break;
+				case CL_KEY_KP_0:
+					new_string += "0";
+					break;
+				case CL_KEY_KP_1:
+					new_string += "1";
+					break;
+				case CL_KEY_2:
+					new_string += "2";
+					break;
+				case CL_KEY_3:
+					new_string += "3";
+					break;
+				case CL_KEY_4:
+					new_string += "4";
+					break;
+				case CL_KEY_5:
+					new_string += "5";
+					break;
+				case CL_KEY_6:
+					new_string += "6";
+					break;
+				case CL_KEY_7:
+					new_string += "7";
+					break;
+				case CL_KEY_8:
+					new_string += "8";
+					break;
+				case CL_KEY_9:
+					new_string += "9";
+					break;
+				case CL_KEY_KP_DECIMAL:
+					new_string += ".";
+					break;
 			}
-			if (new_string.get_length() == 1)
+			if (new_string.get_length() == 1 && !(item->flags & M_NOFMAJ))
 			{
 				new_string.to_upper();
 			}
@@ -559,42 +608,44 @@ void Menu::enter_string(MenuItem_String* item)
 	}
 }
 
-void Menu::add_item( const CL_String& text, int id, int parent )
+void Menu::add_item( const CL_String& text, int id, unsigned int flags, int parent )
 {
-	MenuItem* new_item = new MenuItem( text, id, parent, NULL );
+	MenuItem* new_item = new MenuItem( text, id, parent, NULL, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
 	items.add( new_item );
 }
 
 /* Cette fonction permet de passer une fonction en argument */
-void Menu::add_item( const CL_String& text, int id, EC_MenuFunc func, int parent )
+void Menu::add_item( const CL_String& text, int id, EC_MenuFunc func, unsigned int flags, int parent )
 {
-	MenuItem* new_item = new MenuItem( text, id, parent, func );
+	MenuItem* new_item = new MenuItem( text, id, parent, func, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
 	items.add( new_item );
 }
 
-void Menu::add_value( const CL_String& text, int id, int parent, int min, int max, int value )
+void Menu::add_value( const CL_String& text, int id, unsigned int flags, int parent, int min, int max,
+                      int value )
 {
-	MenuItem_Value* new_item = new MenuItem_Value( text, id, parent, min, max, value );
+	MenuItem_Value* new_item = new MenuItem_Value( text, id, parent, min, max, value, NULL, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
 	items.add( new_item );
 }
 
-void Menu::add_string( const CL_String& text, int id, int parent, CL_String string )
+void Menu::add_string( const CL_String& text, int id, unsigned int flags, int parent, CL_String string )
 {
-	MenuItem_String*  new_item = new MenuItem_String( text, id, parent, string);
+	MenuItem_String*  new_item = new MenuItem_String( text, id, parent, string, NULL, flags);
 
 	get_item_by_id(parent)->add_child(new_item);
 	items.add( new_item );
 }
 
-void Menu::add_stringlist( const CL_String& text, int id, int parent, CL_Array<CL_String> string_list, int cur_string )
+void Menu::add_stringlist( const CL_String& text, int id, unsigned int flags, int parent,
+                           CL_Array<CL_String> string_list, int cur_string )
 {
-	MenuItem_StringList*  new_item = new MenuItem_StringList( text, id, parent, string_list, cur_string );
+	MenuItem_StringList*  new_item = new MenuItem_StringList( text, id, parent, string_list, cur_string, NULL, flags);
 
 	get_item_by_id(parent)->add_child(new_item);
 	items.add( new_item );

@@ -33,6 +33,7 @@
 #include "link.h"
 
 #include "Defines.h"
+#include "Config.h"
 #include "Sockets.h"
 
 #ifndef WIN32
@@ -44,10 +45,17 @@ class Menu;
 
 enum {
 	MENU_JOUER,
+	MENU_OPTIONS,
 	MENU_EXIT,
 
 	JOUER_LISTER,
-	JOUER_CREER
+	JOUER_CREER,
+	JOUER_RETOUR,
+
+	OPTIONS_HOST,
+	OPTIONS_PORT,
+	OPTIONS_NICK,
+	OPTIONS_RETOUR
 };
 
 class EuroConqApp : public CL_ClanApplication
@@ -55,6 +63,7 @@ class EuroConqApp : public CL_ClanApplication
 protected:
 	Menu* menu;
 	EC_Client* client;
+	Config *conf;
 
 public:
 	virtual int main(int argc, char** argv);
@@ -81,7 +90,7 @@ public:
 		CL_SetupCore::deinit();
 	}
 
-	static bool connect_to_server();
+	static bool connect_to_server(bool);
 };
 
 #endif
