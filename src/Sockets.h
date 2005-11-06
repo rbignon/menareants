@@ -32,15 +32,15 @@ public:
 
 public:
 
-	bool connected;
-
-	void conn();
 	void read_sock();
-	void write_sock();
 	void err_sock();
+
+	bool IsConnected() { return connected; }
 
 protected:
 	CL_Socket *sock;
+
+	bool connected;
 };
 
 #endif

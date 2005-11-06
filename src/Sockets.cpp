@@ -19,17 +19,31 @@
  */
 
 #include "Sockets.h"
+#include "Menu.h"
 #include "Main.h"
+#include <arpa/inet.h>
+#include <errno.h>
 
-bool EuroConqApp::connect_to_server()
+bool EuroConqApp::connect_to_server(bool entered)
 {
-	try
-	{
-		((EuroConqApp *)app)->client = new EC_Client(CL_String("127.0.0.1"), 6667);
+	if(entered)
+	{ /* IN */
+		try
+		{
+			((EuroConqApp *)app)->client = new EC_Client(((EuroConqApp *)app)->conf->hostname, ((EuroConqApp *)app)->conf->port);
+		}
+		catch (CL_Error err)
+		{
+			Menu menu_err( "Impossible de se connecter :\n" + err.message, ((EuroConqApp *)app));
+			menu_err.add_item("Retour", 0, 0);
+			menu_err.execute();
+			delete ((EuroConqApp *)app)->client;
+			return false;
+		}
 	}
-	catch (CL_Error err)
-	{
-		return false;
+	else
+	{ /* OUT */
+		delete ((EuroConqApp *)app)->client;
 	}
 
 	return true;
@@ -38,16 +52,22 @@ bool EuroConqApp::connect_to_server()
 EC_Client::EC_Client(const char *hostname, unsigned short port)
 {
 	connected = false;
-	CL_IPAddress ip;
-	ip.set_port(port);
-	ip.set_address(hostname);
 
-	sock = new CL_Socket(CL_Socket::tcp);
+	struct sockaddr_in fsocket = {0};
+	int socki = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	sock->connect(ip);
-	sock->sig_read_triggered().connect(this,&EC_Client::conn);
-	sock->sig_write_triggered().connect(this,&EC_Client::conn);
-	sock->sig_exception_triggered().connect(this,&EC_Client::conn);
+	fsocket.sin_family = AF_INET;
+	fsocket.sin_addr.s_addr = inet_addr(hostname);
+	fsocket.sin_port = htons(port);
+
+	if(connect(socki, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
+		throw CL_Error(strerror(errno));
+
+	sock = new CL_Socket(socki);
+
+	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
+	//sock->sig_write_triggered().connect(this,&EC_Client::conn);
+	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
 }
 
 EC_Client::~EC_Client()
@@ -55,39 +75,19 @@ EC_Client::~EC_Client()
 	delete sock;
 }
 
-void EC_Client::conn()
-{
-	std::cout << "Connected !" << std::endl;
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_write_triggered().connect(this,&EC_Client::write_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
-
-	connected = true;
-}
-
-void EC_Client::write_sock()
-{
-	char buf[128];
-	memset(buf,0,128);
-	sock->recv(buf,127);
-	std::cout << "Command Received on write: " << buf << std::endl;
-	//process_cmd(buf);
-
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_write_triggered().connect(this,&EC_Client::write_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
-}
-
 void EC_Client::read_sock()
 {
 	char buf[128];
 	memset((void*)&buf,0,127);
+
 	sock->recv(buf,127);
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_write_triggered().connect(this,&EC_Client::write_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
+
+	if(!connected) connected = true;
 
 	std::cout << "Command Received on read: " << buf << std::endl;
+	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
+	//sock->sig_write_triggered().connect(this,&EC_Client::write_sock);
+	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
 	//process_cmd(buf);
 }
 
