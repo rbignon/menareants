@@ -2,7 +2,7 @@ DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir)
 
 bin_PROGRAMS = euroconq
-euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp
+euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp
 euroconq_LDADD   =
 
 SUBDIRS = pics

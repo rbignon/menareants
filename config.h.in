@@ -9,6 +9,9 @@
 /* Define to 1 if you have the `clanDisplay' library (-lclanDisplay). */
 #undef HAVE_LIBCLANDISPLAY
 
+/* Define to 1 if you have the `clanNetwork' library (-lclanNetwork). */
+#undef HAVE_LIBCLANNETWORK
+
 /* Define to 1 if you have the `clanPNG' library (-lclanPNG). */
 #undef HAVE_LIBCLANPNG
 

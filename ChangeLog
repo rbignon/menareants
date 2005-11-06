@@ -1,5 +1,7 @@
 2005-11-05  Romain Bignon <progs@headfucking.net>
 
+	* Sockets.cpp: Création d'un support sockets.
+
 	* Utilisation d'un repositery CVS.
 
 	* Menu.cpp: Possibilité d'une fonction à appeler lors de l'utilisation d'un Item.

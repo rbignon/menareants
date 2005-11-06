@@ -18,6 +18,9 @@
  * $Id$
  */
 
+#ifndef EC_Main_h
+#define EC_Main_h
+
 #include "Resources.h"
 
 #include <ClanLib/Core/System/setupcore.h>
@@ -25,10 +28,12 @@
 #include <ClanLib/Sound/setupsound.h>
 #include <ClanLib/Application/clanapp.h>
 #include <ClanLib/Core/System/clanstring.h>
+#include <ClanLib/Network/setupnetwork.h>
 #include <ClanLib/png.h>
 #include "link.h"
 
 #include "Defines.h"
+#include "Sockets.h"
 
 #ifndef WIN32
 	#include <config.h>
@@ -49,6 +54,8 @@ class EuroConqApp : public CL_ClanApplication
 {
 protected:
 	Menu* menu;
+	EC_Client* client;
+
 public:
 	virtual int main(int argc, char** argv);
 	virtual char *get_title() { return APP_NAME; }
@@ -63,18 +70,18 @@ public:
 		CL_SetupCore::init();
 		CL_SetupPNG::init();
 		CL_SetupDisplay::init();
+		CL_SetupNetwork::init();
 	}
 
 	virtual void deinit_modules()
 	{
-		CL_SetupCore::deinit();
+		CL_SetupNetwork::deinit();
 		CL_SetupDisplay::deinit();
 		CL_SetupPNG::deinit();
+		CL_SetupCore::deinit();
 	}
 
-	static bool connect_to_server()
-	{
-		std::cout << "prout" << std::endl;
-		return false;
-	}
+	static bool connect_to_server();
 };
+
+#endif
