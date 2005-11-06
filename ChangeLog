@@ -1,0 +1,25 @@
+2005-11-05  Romain Bignon <progs@headfucking.net>
+
+	* Utilisation d'un repositery CVS.
+
+	* Menu.cpp: Possibilité d'une fonction à appeler lors de l'utilisation d'un Item.
+
+	* pics/smallfont.pcs: Modification de la fonte.
+
+	* pics/: Utilisations d'un beau background. (By Thomas)
+
+	* Defines.h: Création du fichier et d'un super système de gestion des versions.
+
+	* Main.cpp (main): Création fonction avec menu.
+
+	* Menu.cpp: Reprise du fichier de clanbomber pour la création de menus.
+
+	* Timer.cpp: Reprise du fichier de clanbomber pour la création de timers.
+
+	* Resources.cpp: Inspiration de clanbomber pour l'utilisation des fichiers de ressources.
+
+	* array.h,link.h: Utilisation de ces fichiers d'origine clanlib.
+
+2005-11-04  Romain Bignon <progs@headfucking.net>
+
+	* Initialisation du projet.
