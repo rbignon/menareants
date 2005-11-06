@@ -4,4 +4,39 @@
                          [ API ]
 
 Sommaire:
-1) Protocole
+1) Principe du jeu
+2) Protocole
+
+1) Principe du jeu
+
+
+2) Protocole
+      a) Client -> Server
+         - Général
+              IAM <nick> <version>              :je me présente
+              LSP                               :lister les parties
+              CRE <nom>                         :créé une partie
+         - Dans une pré-partie
+              SET <param> <value>               :met un paramètre
+                  POS <1/2/3/4>                   :se positionne
+                  COL <couleur>                   :définit sa couleur
+                  OK                              :indique que l'on est pret
+              KIK <nick>                        :l'owner peut kicker
+              GO!                               :l'owner lance le jeu
+         - En cours de jeu
+
+      b) Serveur -> Client
+         - Général
+              HEL <version>                     :welcome
+              AIM <nick>                        :confirmation du IAM
+              LSP <nom> <nbjoueurs>             :liste une partie
+              EOL                               :fin de la liste
+         - Dans une pré-partie
+              JND <sets>
+              :<nick> JOI <sets>                :un user join
+              :<nick> SET <param> <value>       :un user met un paramètre
+              :<nick> LEA [raison]              :un user part (ou a été kické)
+              CGO <message>                     :l'owner ne peut pas lancer le jeu
+              :<nick> WGO                       :l'owner veut lancer le jeu
+              :<nick> AGO                       :l'owner lance le jeu
+         - En cours de jeu
