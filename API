@@ -16,6 +16,7 @@ Sommaire:
               IAM <nick> <version>              :je me présente
               LSP                               :lister les parties
               CRE <nom>                         :créé une partie
+              JOI <nom>                         :joindre une partie
          - Dans une pré-partie
               SET <param> <value>               :met un paramètre
                   POS <1/2/3/4>                   :se positionne
