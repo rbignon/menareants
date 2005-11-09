@@ -80,6 +80,7 @@ int EuroConqApp::main(int argc, char **argv)
 			}
 		}
 
+		srand( (long)time(NULL) );
 		Resources::init();
 
 		CL_Display::set_videomode(800, 600, 16, fullscreen);
