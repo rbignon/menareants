@@ -7,6 +7,8 @@ AM_INIT_AUTOMAKE(euroconq,1)
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Checks for libraries.
 AC_CHECK_LIB(z,main,,echo "Europe Conquest requires zlib to run."; exit 1)
@@ -34,4 +36,16 @@ AC_ARG_ENABLE(  warnings,
                 ],
                 )
 
-AC_OUTPUT(Makefile src/Makefile src/pics/Makefile)
+# COMPILER ET INSTALLER LE SERVEUR
+
+AC_ARG_ENABLE(  server,
+                [AC_HELP_STRING([--enable-server],[compilation of Europe Conquest's server])],
+                [
+                        if test "x${enableval}" != "xno"; then
+                                INSTALL_SERVER=server
+                                AC_SUBST(INSTALL_SERVER)
+                        fi
+                ],
+        )
+
+AC_OUTPUT(Makefile src/Makefile src/pics/Makefile lib/Makefile server/Makefile)

@@ -1,8 +1,10 @@
 2005-11-08  Romain Bignon <progs@headfucking.net>
 
-	* server/: création du serveur.
+	* pics/loading.png: Utilisation d'un png pour le loading.
 
-	* euroconq.src: Rajout d'une image.
+	* server/: Création du serveur (option --enable-server dans configure pour compiler).
+
+	* lib/: Utilisation maintenant de ce rep pour mettre le code utilisé par les deux programmes.
 
 	* Sockets.cpp: Theoriquement plus aucun bug.
 
