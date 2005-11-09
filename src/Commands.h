@@ -1,4 +1,4 @@
-/* src/Sockets.h- Header of Sockets.cpp
+/* src/Commands.h - Command list
  *
  * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
  *
@@ -18,48 +18,37 @@
  * $Id$
  */
 
-#ifndef EC_Sockets_h
-#define EC_Sockets_h
-
-#include <ClanLib/Network/socket.h>
 #include <ClanLib/Core/System/clanstring.h>
-#include "link.h"
-#include "Defines.h"
+#include "array.h"
+#include "Sockets.h"
 
-class EC_ACommand;
-
-class EC_Client
+class EC_ACommand
 {
+friend class EC_Client;
 public:
-	EC_Client(const char *hostname, unsigned short port);
+	EC_ACommand(const CL_String _CmdName, unsigned short _flags, unsigned short _args)
+		: CmdName(_CmdName), flags(_flags), args(_args)
+	{}
 
-	~EC_Client();
+	virtual ~EC_ACommand() {}
 
-public:
+	virtual int Exec(EC_Client *me, CL_Array<CL_String> string_list) = 0;
 
-	enum msg {  /* mettre à jour systematiquement msgTab[] dans Sockets.cpp */
-		HEL, /* Hello */
-
-		NONE
-	};
-
-	void read_sock();
-	void err_sock();
-	int send(const char *pattern, ...);
-	char *rpl(msg t);
-
-	bool IsConnected() { return connected; }
-
-protected:
-	CL_Socket *sock;
-
-	CL_List<EC_ACommand> Commands;
-	void parse_message(CL_String buf);
-
-	bool connected;
-
-	char readQ[MAXBUFFER + 1];
-	unsigned int readQi;
+private:
+	CL_String CmdName;
+	unsigned short flags;
+	unsigned short args;
 };
 
-#endif
+#define DECLARE_CMD(commName) \
+class commName##Command : public EC_ACommand \
+{ \
+public: \
+	commName##Command(const char *_CmdName, unsigned short _flags, unsigned short _args) \
+		: EC_ACommand(_CmdName, _flags, _args) \
+	{} \
+	virtual ~commName##Command() {} \
+	virtual int Exec(EC_Client *me, CL_Array<CL_String> string_list); \
+}
+
+DECLARE_CMD ( HEL );

@@ -21,6 +21,12 @@
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Europa Conquest"
 #define APP_SMALLNAME "EuroConq"
+#define SERV_SMALLNAME "EuroConqD"
+
+/* Version protocolaire
+ * À incrémenter en cas de modification du protocole
+ */
+#define APP_PVERSION	"1"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
@@ -34,6 +40,9 @@
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
 
+/* Tailles */
+#define MAXBUFFER 512
+#define COMLEN 10
 
 /*
  * Il n'est pas nécessaire d'éditer la suite

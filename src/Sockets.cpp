@@ -18,11 +18,154 @@
  * $Id$
  */
 
+#include "Commands.h"
 #include "Sockets.h"
 #include "Menu.h"
 #include "Main.h"
+#include "array.h"
 #include <arpa/inet.h>
 #include <errno.h>
+#include <cstdarg>
+
+/* Messages à envoyer */
+const char* msgTab[] = {
+     "HEL " APP_SMALLNAME " " APP_PVERSION, // HELLO
+     0
+};
+
+char *EC_Client::rpl(EC_Client::msg t)
+{
+  if(t<0 || t>EC_Client::NONE)
+    //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
+    throw CL_Error("Sort de la table"); /* TODO: utiliser une exception à nous */
+  return (char *)msgTab[t];
+}
+
+int HELCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
+{
+	cout << "hello! " << *(parv[1]) << endl;
+	me->send("PSS apzoeiruty");
+	return 0;
+}
+
+int EC_Client::send(const char *pattern, ...)
+{
+	if(!sock) return -1;
+
+	static char buf[MAXBUFFER + 20];
+	va_list vl;
+	int len;
+
+	va_start(vl, pattern);
+	len = vsnprintf(buf, sizeof buf -2, pattern, vl);
+	if(len < 0) len = sizeof buf-2;
+
+	buf[len++] = '\r';
+	buf[len++] = '\n';
+	buf[len] = 0;
+	va_end(vl);
+
+	sock->send(buf);
+	std::cout << "S - " << buf << std::endl;
+
+	return 0;
+}
+
+void EC_Client::parse_message(CL_String buf)
+{
+	char s[MAXBUFFER + 20], cmdname[COMLEN+1];
+	int i, j, len = buf.get_length();
+
+	cout << "R - " << buf << endl;
+
+	CL_Array<CL_String> parv;
+	for(i=0; i <= len; )
+	{
+		bool slash;
+		while(buf[i] == ' ') i++;
+		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
+			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
+				slash = true;
+			else
+				s[j++]=buf[i], slash=false;
+		s[j]='\0';
+		if(s[0] != ':')
+		{
+			if(!parv.get_num_items())
+				strncpy(cmdname, s, COMLEN);
+			parv.add(new CL_String(s));
+		}
+	}
+
+	std::cout << "Com: " << cmdname << std::endl;
+	for(i=0;i<parv.get_num_items();i++)
+		std::cout << "parv[" << i << "]=" << *(parv[i]) << std::endl;
+
+	EC_ACommand *cmd = NULL;
+	for(i=0;i<Commands.get_num_items() && !cmd;i++)
+		if(Commands[i]->CmdName == cmdname)
+			cmd = Commands[i];
+
+	if(!cmd || parv.get_num_items() < cmd->args)
+		/* ATTENTION: la commande est inconnu ou donnée incorrectement, donc on exit
+		 *            mais on ne quit pas (?). À voir, quand il y aurra un système
+		 *            de debugage, si on le fait remarquer à l'user. Au pire je pense
+		 *            qu'il faudrait au moins en informer le serveur. Ceci permettrait
+		 *            de noter les bugs qu'il voit et les écrire dans un fichier.
+		 */
+		return;
+
+	try
+	{
+		cmd->Exec(this, parv);
+	}
+	catch(...)
+	{
+		std::cout << "Erreur du parsage !!" << std::endl;
+	//	delete parv;
+	}
+	//delete parv;
+
+	return;
+}
+
+void EC_Client::read_sock()
+{
+	char buf[MAXBUFFER + 1];
+	register char *ptr;
+	int r;
+	memset((void*)&buf,0,MAXBUFFER);
+
+	r = sock->recv(buf,MAXBUFFER);
+
+	if(!connected) connected = true;
+
+	ptr = buf;
+	buf[r] = 0;
+
+	while(*ptr)
+	{
+		if(*ptr == '\n')
+		{
+			readQ[readQi] = 0;
+			parse_message(readQ);
+			readQi = 0;
+		}
+		else readQ[readQi++] = *ptr;
+		++ptr;
+	}
+
+	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
+	sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
+	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
+}
+
+void EC_Client::err_sock()
+{
+	std::cout << "Erreur !" << std::endl;
+
+	connected = false;
+}
 
 bool EuroConqApp::connect_to_server(bool entered)
 {
@@ -51,8 +194,14 @@ bool EuroConqApp::connect_to_server(bool entered)
 
 EC_Client::EC_Client(const char *hostname, unsigned short port)
 {
+	/* Initialisation des variables */
 	connected = false;
+	readQi = 0;
 
+	/* Ajout des commandes */
+	Commands.add(new HELCommand("HEL", 0,	1));
+
+	/* Création du socket*/
 	struct sockaddr_in fsocket = {0};
 	int socki = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -60,40 +209,20 @@ EC_Client::EC_Client(const char *hostname, unsigned short port)
 	fsocket.sin_addr.s_addr = inet_addr(hostname);
 	fsocket.sin_port = htons(port);
 
+	/* Connexion */
 	if(connect(socki, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 		throw CL_Error(strerror(errno));
 
+	/* Création d'un CL_Socket qui sert juste d'interface avec le socket existant */
 	sock = new CL_Socket(socki);
 
+	/* Timers */
 	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_write_triggered().connect(this,&EC_Client::conn);
+	//sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
 	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
 }
 
 EC_Client::~EC_Client()
 {
 	delete sock;
-}
-
-void EC_Client::read_sock()
-{
-	char buf[128];
-	memset((void*)&buf,0,127);
-
-	sock->recv(buf,127);
-
-	if(!connected) connected = true;
-
-	std::cout << "Command Received on read: " << buf << std::endl;
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_write_triggered().connect(this,&EC_Client::write_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
-	//process_cmd(buf);
-}
-
-void EC_Client::err_sock()
-{
-	std::cout << "Erreur !" << std::endl;
-
-	connected = false;
 }
