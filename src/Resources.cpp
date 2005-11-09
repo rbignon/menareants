@@ -98,7 +98,15 @@ CL_Surface* Resources::Titlescreen()
 {
 	if (!sur_titlescreen)
 	{
-		sur_titlescreen = CL_Surface::load("Titlescreen/main", res);
+		if (rand()%2)
+		{
+			sur_titlescreen = CL_Surface::load("Titlescreen/main2", res);
+		}
+		else
+		{
+			sur_titlescreen = CL_Surface::load("Titlescreen/main", res);
+		}
 	}
 	return sur_titlescreen;
+
 }

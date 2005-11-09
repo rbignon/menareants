@@ -7,4 +7,5 @@ section Font
 section Titlescreen
 {
 	main	= pics/menu.png (type=surface);
+	main2	= pics/menu2.png (type=surface);
 }
