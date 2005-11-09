@@ -267,7 +267,7 @@ void Menu::redraw( int yoffset )
 	int vert = yoffset + 300 - height / 2;
 
 	Resources::Titlescreen()->put_screen( 0, 0 );
-	CL_Display::fill_rect( left_border-30,vert-20, right_border+20,vert+20+height, 0,0,0,0.5f);
+	//CL_Display::fill_rect( left_border-30,vert-20, right_border+20,vert+20+height, 0,0,0,0.0f);
 
 	Resources::Font_big()->print_center( 400, vert, current->get_text() );
 	vert += 80;
