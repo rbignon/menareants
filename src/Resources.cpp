@@ -38,6 +38,7 @@ CL_Font*			Resources::fnt_big = NULL;
 CL_Font*			Resources::fnt_small = NULL;
 
 CL_Surface*			Resources::sur_titlescreen = NULL;
+CL_Surface*			Resources::sur_loadscreen = NULL;
 
 
 Resources::Resources()
@@ -97,16 +98,15 @@ CL_Font* Resources::Font_small()
 CL_Surface* Resources::Titlescreen()
 {
 	if (!sur_titlescreen)
-	{
-		if (rand()%2)
-		{
-			sur_titlescreen = CL_Surface::load("Titlescreen/main2", res);
-		}
-		else
-		{
-			sur_titlescreen = CL_Surface::load("Titlescreen/main", res);
-		}
-	}
+		sur_titlescreen = CL_Surface::load("Titlescreen/main", res);
 	return sur_titlescreen;
+
+}
+
+CL_Surface* Resources::Loadscreen()
+{
+	if (!sur_loadscreen)
+		sur_loadscreen = CL_Surface::load("Titlescreen/loading", res);
+	return sur_loadscreen;
 
 }

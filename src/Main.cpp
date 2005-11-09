@@ -110,6 +110,7 @@ int EuroConqApp::main(int argc, char **argv)
 
 		CL_Display::clear_display();
 		Resources::Font_big()->print_center( 400, 300, "Loading..." );
+		Resources::Loadscreen()->put_screen( 0, 0 );
 		CL_Display::flip_display();
 		Resources::load_all();
 		conf->load();

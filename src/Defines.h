@@ -18,6 +18,9 @@
  * $Id$
  */
 
+#ifndef EC_Defines_h
+#define EC_Defines_h
+
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Europa Conquest"
 #define APP_SMALLNAME "EuroConq"
@@ -52,3 +55,5 @@
 #else
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
 #endif
+
+#endif /* EC_Defines_h */

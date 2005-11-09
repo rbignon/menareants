@@ -62,18 +62,20 @@ host_triplet = @host@
 CC = @CC@
 CXX = @CXX@
 HAVE_LIB = @HAVE_LIB@
+INSTALL_SERVER = @INSTALL_SERVER@
 LIB = @LIB@
 LTLIB = @LTLIB@
 MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
 VERSION = @VERSION@
 
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
-INCLUDES = -I. -I$(top_srcdir)
+INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 
 bin_PROGRAMS = euroconq
-euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp Config.cpp Outils.cpp
-euroconq_LDADD = 
+euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp Config.cpp
+euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
 
 SUBDIRS = pics
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -84,9 +86,8 @@ PROGRAMS =  $(bin_PROGRAMS)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-euroconq_OBJECTS =  Main.o Menu.o Timer.o Resources.o Sockets.o Config.o \
-Outils.o
-euroconq_DEPENDENCIES = 
+euroconq_OBJECTS =  Main.o Menu.o Timer.o Resources.o Sockets.o Config.o
+euroconq_DEPENDENCIES =  ${top_builddir}/lib/libeuroconq.a
 euroconq_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
 CXXCOMPILE = $(CXX) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -99,8 +100,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/Config.P .deps/Main.P .deps/Menu.P .deps/Outils.P \
-.deps/Resources.P .deps/Sockets.P .deps/Timer.P
+DEP_FILES =  .deps/Config.P .deps/Main.P .deps/Menu.P .deps/Resources.P \
+.deps/Sockets.P .deps/Timer.P
 SOURCES = $(euroconq_SOURCES)
 OBJECTS = $(euroconq_OBJECTS)
 

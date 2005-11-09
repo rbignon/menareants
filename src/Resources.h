@@ -45,7 +45,8 @@ public:
 	static CL_Font*		Font_big();
 	static CL_Font*		Font_small();
 
-	static CL_Surface*              Titlescreen();
+	static CL_Surface*	Titlescreen();
+	static CL_Surface*	Loadscreen();
 
 	static CL_ResourceManager *res;
 
@@ -54,6 +55,7 @@ protected:
 	static CL_Font *fnt_small;
 
 	static CL_Surface *sur_titlescreen;
+	static CL_Surface *sur_loadscreen;
 };
 
 #endif
