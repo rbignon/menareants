@@ -18,6 +18,9 @@
  * $Id$
  */
 
+#ifndef EC_COMMANDS_H
+#define EC_COMMANDS_H
+
 #include <ClanLib/Core/System/clanstring.h>
 #include "array.h"
 #include "Sockets.h"
@@ -44,7 +47,7 @@ private:
 class commName##Command : public EC_ACommand \
 { \
 public: \
-	commName##Command(const char *_CmdName, unsigned short _flags, unsigned short _args) \
+	commName##Command(const CL_String _CmdName, unsigned short _flags, unsigned short _args) \
 		: EC_ACommand(_CmdName, _flags, _args) \
 	{} \
 	virtual ~commName##Command() {} \
@@ -52,3 +55,7 @@ public: \
 }
 
 DECLARE_CMD ( HEL );
+DECLARE_CMD ( PIG );
+
+#endif
+
