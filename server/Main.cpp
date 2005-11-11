@@ -29,24 +29,24 @@ ECServer app;
 
 void ECServer::sig_alarm(int c)
 {
-/* TODO: support des ping/pong
 	int i;
 
-	CurrentTS = time(NULL);
-	for(i = 0; i<= highsock;i++)
+	app.CurrentTS = time(NULL);
+	for(i = 0; i<= app.highsock;i++)
 	{
-		if(myUser[i].flag & TDKD_FREE) continue;
-		if(IsPing(&myUser[i]))
+		if(app.Clients[i].flag & ECD_FREE) continue;
+		TClient *cl = &app.Clients[i];
+		if(IsPing(cl))
 		{
-			DelPing(&myUser[i]);
-			exit_client(&myUser[i], MSG_QUIT " :Ping Timeout");
+			DelPing(cl);
+			cl->exit(app.rpl(ECServer::BYE), "Ping Timeout");
 		}
-		else if((myUser[i].lastread + PINGINTERVAL) <= CurrentTS)
+		else if((cl->lastread + PINGINTERVAL) <= app.CurrentTS)
 		{
-			sendrpl(&myUser[i], MSG_PING);
-			SetPing(&myUser[i]);
+			cl->sendrpl(app.rpl(ECServer::PING));
+			SetPing(cl);
 		}
-	}*/
+	}
 
 	alarm(PINGINTERVAL);
 }
@@ -82,6 +82,13 @@ try {
 	}
 
 	CurrentTS = time(NULL);
+
+	/* Déclarations des commandes */
+	/*                                 NOM		flag	args */
+	Commands.push_back(new IAMCommand("IAM",	0,		2));
+	Commands.push_back(new PIGCommand("PIG",	0,		0));
+	Commands.push_back(new POGCommand("POG",	0,		0));
+
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);
 

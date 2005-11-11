@@ -44,9 +44,11 @@
 #endif
 
 /* Interval */
-#define PINGINTERVAL 60
+#define PINGINTERVAL 30
 
 /* Tailles */
+#define NICKLEN 20
+
 #define MAXBUFFER 512
 #define ECD_SENDSIZE 1024
 #define ECD_RECVSIZE 256

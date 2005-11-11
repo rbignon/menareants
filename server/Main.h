@@ -23,10 +23,26 @@
 
 #include "Config.h"
 #include "Server.h"
+#include "Commands.h"
 #include <fcntl.h>
+#include <vector>
 
 class ECServer
 {
+friend int TClient::exit(const char *, ...);
+public:
+	enum msg {  /* mettre à jour systematiquement msgTab[] dans Server.cpp */
+		HELLO, /* HEL */
+		MAJ,   /* MAJ */
+		ERR,   /* ERR */
+		BYE,   /* BYE */
+		AIM,   /* AIM */
+		PING,  /* PIG */
+		PONG,  /* POG */
+
+		NONE
+	};
+
 public:
 	int main(int argc, char** argv);
 
@@ -34,6 +50,7 @@ public:
 	bool running;
 
 	time_t get_uptime() { return uptime; }
+	char *rpl(ECServer::msg t);
 
 	TClient Clients[MAXCONNEX+1];
 
@@ -44,8 +61,7 @@ protected:
 	int parse_this(int);
 	TClient *addclient(int fd, const char *ip);
 	void delclient(TClient *del);
-
-	inline int dequeue(TClient *cl);
+	int parsemsg(TClient *cl);
 
 	static void sig_alarm(int c);
 
@@ -53,6 +69,8 @@ protected:
 	int sock;
 	int highsock;
 	fd_set global_fd_set;
+
+	std::vector<EC_ACommand*> Commands;
 };
 
 extern ECServer app;
