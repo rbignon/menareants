@@ -13,10 +13,11 @@ Sommaire:
 2) Protocole
       a) Client -> Server
          - Général
-              IAM <nick> <version>              :je me présente
+              IAM <nick> <prog> <version>       :je me présente
               LSP                               :lister les parties
               CRE <nom>                         :créé une partie
               JOI <nom>                         :joindre une partie
+              BYE                               :au revoir
          - Dans une pré-partie
               SET <param> <value>               :met un paramètre
                   POS <1/2/3/4>                   :se positionne
@@ -28,10 +29,12 @@ Sommaire:
 
       b) Serveur -> Client
          - Général
-              HEL <version>                     :welcome
+              HEL <progs> <version>             :welcome
               AIM <nick>                        :confirmation du IAM
               LSP <nom> <nbjoueurs>             :liste une partie
               EOL                               :fin de la liste
+              MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
+              BYE [raison]                      :au revoir
          - Dans une pré-partie
               JND <sets>
               :<nick> JOI <sets>                :un user join
