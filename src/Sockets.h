@@ -24,9 +24,12 @@
 #include <ClanLib/Network/socket.h>
 #include <ClanLib/Core/System/clanstring.h>
 #include "link.h"
+#include "Main.h"
 #include "Defines.h"
 
 class EC_ACommand;
+
+class EuroConqApp;
 
 class EC_Client
 {
@@ -38,7 +41,8 @@ public:
 public:
 
 	enum msg {  /* mettre à jour systematiquement msgTab[] dans Sockets.cpp */
-		HEL, /* Hello */
+		IAM,  /* IAM */
+		PONG, /* POG */
 
 		NONE
 	};
@@ -49,6 +53,9 @@ public:
 	char *rpl(msg t);
 
 	bool IsConnected() { return connected; }
+	CL_String get_nick() { return nick; }
+
+	EuroConqApp *app;
 
 protected:
 	CL_Socket *sock;
@@ -60,6 +67,7 @@ protected:
 
 	char readQ[MAXBUFFER + 1];
 	unsigned int readQi;
+	CL_String nick;
 };
 
 #endif

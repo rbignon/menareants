@@ -43,6 +43,8 @@
 
 class Menu;
 
+class EC_Client;
+
 enum {
 	MENU_JOUER,
 	MENU_OPTIONS,
@@ -89,6 +91,9 @@ public:
 		CL_SetupPNG::deinit();
 		CL_SetupCore::deinit();
 	}
+
+	Config* getconf() { return conf; }
+	EC_Client* getclient() { return client; }
 
 	static bool connect_to_server(bool);
 };

@@ -29,7 +29,8 @@
 
 /* Messages à envoyer */
 const char* msgTab[] = {
-     "HEL " APP_SMALLNAME " " APP_PVERSION, // HELLO
+	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
+	"POG",                                    /* POG - PONG */
      0
 };
 
@@ -39,13 +40,6 @@ char *EC_Client::rpl(EC_Client::msg t)
     //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
     throw CL_Error("Sort de la table"); /* TODO: utiliser une exception à nous */
   return (char *)msgTab[t];
-}
-
-int HELCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
-{
-	cout << "hello! " << *(parv[1]) << endl;
-	me->send("PSS apzoeiruty");
-	return 0;
 }
 
 int EC_Client::send(const char *pattern, ...)
@@ -73,8 +67,9 @@ int EC_Client::send(const char *pattern, ...)
 
 void EC_Client::parse_message(CL_String buf)
 {
-	char s[MAXBUFFER + 20], cmdname[COMLEN+1];
-	int i, j, len = buf.get_length();
+	char s[MAXBUFFER + 20];
+	CL_String cmdname;
+	int i, len = buf.get_length();
 
 	cout << "R - " << buf << endl;
 
@@ -82,6 +77,7 @@ void EC_Client::parse_message(CL_String buf)
 	for(i=0; i <= len; )
 	{
 		bool slash;
+		int j;
 		while(buf[i] == ' ') i++;
 		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
 			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
@@ -89,10 +85,10 @@ void EC_Client::parse_message(CL_String buf)
 			else
 				s[j++]=buf[i], slash=false;
 		s[j]='\0';
-		if(s[0] != ':')
+		if(s[0] != ':' || parv.get_num_items())
 		{
 			if(!parv.get_num_items())
-				strncpy(cmdname, s, COMLEN);
+				cmdname = s;
 			parv.add(new CL_String(s));
 		}
 	}
@@ -104,7 +100,10 @@ void EC_Client::parse_message(CL_String buf)
 	EC_ACommand *cmd = NULL;
 	for(i=0;i<Commands.get_num_items() && !cmd;i++)
 		if(Commands[i]->CmdName == cmdname)
+		{
 			cmd = Commands[i];
+			break;
+		}
 
 	if(!cmd || parv.get_num_items() < cmd->args)
 		/* ATTENTION: la commande est inconnu ou donnée incorrectement, donc on exit
@@ -113,7 +112,7 @@ void EC_Client::parse_message(CL_String buf)
 		 *            qu'il faudrait au moins en informer le serveur. Ceci permettrait
 		 *            de noter les bugs qu'il voit et les écrire dans un fichier.
 		 */
-		return;
+		{ printf("erreur de pars ! %s\n", cmd ? "arg" : "cmd introuvable"); return; }
 
 	try
 	{
@@ -122,9 +121,7 @@ void EC_Client::parse_message(CL_String buf)
 	catch(...)
 	{
 		std::cout << "Erreur du parsage !!" << std::endl;
-	//	delete parv;
 	}
-	//delete parv;
 
 	return;
 }
@@ -147,7 +144,7 @@ void EC_Client::read_sock()
 	{
 		if(*ptr == '\n')
 		{
-			readQ[readQi] = 0;
+			readQ[readQi-1] = 0; /* pour le \r devant le \n */
 			parse_message(readQ);
 			readQi = 0;
 		}
@@ -174,6 +171,7 @@ bool EuroConqApp::connect_to_server(bool entered)
 		try
 		{
 			((EuroConqApp *)app)->client = new EC_Client(((EuroConqApp *)app)->conf->hostname, ((EuroConqApp *)app)->conf->port);
+			((EuroConqApp *)app)->client->app = ((EuroConqApp *)app);
 		}
 		catch (CL_Error err)
 		{
@@ -200,6 +198,7 @@ EC_Client::EC_Client(const char *hostname, unsigned short port)
 
 	/* Ajout des commandes */
 	Commands.add(new HELCommand("HEL", 0,	1));
+	Commands.add(new PIGCommand("PIG", 0,	0));
 
 	/* Création du socket*/
 	struct sockaddr_in fsocket = {0};
@@ -225,4 +224,7 @@ EC_Client::EC_Client(const char *hostname, unsigned short port)
 EC_Client::~EC_Client()
 {
 	delete sock;
+	for(int i=0;i<Commands.get_num_items();i++)
+		delete Commands[i];
+	Commands.clear();
 }
