@@ -20,5 +20,17 @@
 
 #ifndef Outils_hpp
 #define Outils_hpp
+#include <sstream>
+
 std::string stringtok(std::string &, const char * const);
+
+template<typename T>
+bool StrToInt( const std::string & Str, T & Dest )
+{
+    // créer un flux à partir de la chaîne donnée
+    std::istringstream iss( Str );
+    // tenter la conversion vers Dest
+    return iss >> Dest != 0;
+}
+
 #endif
