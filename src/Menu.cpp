@@ -282,10 +282,10 @@ void Menu::redraw( int yoffset )
 		{
 			if((item_counter()->flags & M_READ_ONLY))
 				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
-				                       0.1f,0.1f,0.2f,0.55f);
+				                       0.1f,0.1f,0.1f,0.55f);
 			else
 				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
-				                       0.5f,0.1f,0.1f,0.55f);
+				                       0.1f,0.5f,0.1f,0.55f);
 		}
 		if (item_counter()->get_type() == MenuItem::MT_VALUE)
 		{
