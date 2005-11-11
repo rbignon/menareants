@@ -2,7 +2,7 @@ DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 
 bin_PROGRAMS = euroconq
-euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp Config.cpp
+euroconq_SOURCES = Main.cpp Menu.cpp Timer.cpp Resources.cpp Sockets.cpp Config.cpp Login.cpp
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 
 

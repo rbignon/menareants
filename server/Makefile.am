@@ -3,7 +3,7 @@ INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
 LIBS =
 
 bin_PROGRAMS = euroconqserver
-euroconqserver_SOURCES = Main.cpp Server.cpp Config.cpp
+euroconqserver_SOURCES = Main.cpp Server.cpp Config.cpp Login.cpp
 euroconqserver_LDADD =$(top_srcdir)/lib/libeuroconq.a
 
 install-data-local:
