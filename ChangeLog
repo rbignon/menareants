@@ -1,3 +1,23 @@
+2005-11-11  Romain Bignon <progs@headfucking.net>
+
+	* server/Login.cpp: Rajout du fichier avec les fonctions de logging.
+	(PIGCommand::Exec): Fonction PING
+	(POGCommand::Exec): Fonction PONG
+	(IAMCommand::Exec): Fonction IAM
+
+	* src/Login.cpp: Rajout du fichier avec les fonctions de logging.
+	(HELCommand::Exec): Fonction HELLO
+	(PIGCommand::Exec): Fonction PING
+	(POGCommand::Exec): Fonction PONG
+
+	* src/Sockets.c: corrections
+
+	* server/Commands.h, server/Server.c: Parsage des commandes correct.
+
+	* server/Server.c (ECServer::parsemsg): Création de cette fonction de parsage.
+	(ECServer::sendrpl): Création de cette fonction pour envoyer un message
+	(ECServer::rpl): Création de cette fonction qui renvoie le pattern à partir d'un enumérateur.
+
 2005-11-08  Romain Bignon <progs@headfucking.net>
 
 	* pics/loading.png: Utilisation d'un png pour le loading.
