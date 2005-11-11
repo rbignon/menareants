@@ -27,15 +27,17 @@
 /* - Client */
 #define SetFlush(x) 	(x)->flag |= ECD_FLUSH
 #define SetPing(x)		(x)->flag |= ECD_PING
+#define SetAuth(x)		(x)->flag |= ECD_AUTH
 #define DelFlush(x) 	(x)->flag &= ~ECD_FLUSH
 #define DelPing(x)		(x)->flag &= ~ECD_PING
 #define IsFlush(x)		((x)->flag & ECD_FLUSH)
 #define IsPing(x)		((x)->flag & ECD_PING)
+#define IsAuth(x)		((x)->flag & ECD_AUTH)
 
 class TClient
 {
 public:
-	std::string nick;
+	char nick[NICKLEN + 1];
 	int fd;
 	unsigned int flag;	/* divers infos */
 #define ECD_AUTH 	0x01
@@ -48,6 +50,11 @@ public:
 	time_t lastread;
 	char QBuf[ECD_SENDSIZE+1];
 	char RecvBuf[ECD_RECVSIZE+1];
+
+public:
+	int sendrpl(const char *pattern, ...);
+	int exit(const char *, ...);
+	inline int dequeue();
 };
 
 #endif

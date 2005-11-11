@@ -28,6 +28,129 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <cstdarg>
+
+/* Messages à envoyer */
+const char* msgTab[] = {
+     "HEL " APP_SMALLNAME " " APP_PVERSION, /* HEL - Hello */
+     "MAJ %c",                              /* MAJ - Nécessite une mise à jour du client */
+     "ERR",                                 /* ERR - Erreur en provenance theorique du client */
+     "BYE %s",                              /* BYE - Dis adieu à un client */
+     "AIM %s",                              /* AIM - Logué */
+     "PIG",                                 /* PIG - Envoie un ping */
+     "POG",                                 /* POG - Reçoit un pong */
+     0
+};
+
+int TClient::exit(const char *pattern, ...)
+{
+	static char buf[MAXBUFFER + 1];
+	va_list vl;
+	int len;
+
+	va_start(vl, pattern);
+	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
+	if(len < 0) len = sizeof buf -2;
+
+	buf[len++] = '\r';
+	buf[len++] = '\n';
+	buf[len] = 0;
+	va_end(vl);
+
+	printf("S(%s@%s) - %s", this->nick, this->ip, buf);
+
+	if(this->buflen + len >= ECD_SENDSIZE) this->dequeue(); /* would overflow, flush it */
+	strcpy(this->QBuf + this->buflen, buf); /* append reply to buffer */
+	this->buflen += len;
+	this->dequeue();
+
+	app.delclient(this);
+	return 0;
+}
+
+int TClient::sendrpl(const char *pattern, ...)
+{
+	static char buf[MAXBUFFER + 1];
+	va_list vl;
+	int len;
+
+	va_start(vl, pattern);
+	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
+	if(len < 0) len = sizeof buf -2;
+
+	buf[len++] = '\r';
+	buf[len++] = '\n';
+	buf[len] = 0;
+	va_end(vl);
+
+	//if(strncasecmp(buf, "PING", 4) && strncasecmp(buf, "PONG", 4))
+		printf("S(%s@%s) - %s", this->nick, this->ip, buf);
+
+	if(this->buflen + len >= ECD_SENDSIZE) this->dequeue(); /* would overflow, flush it */
+	strcpy(this->QBuf + this->buflen, buf); /* append reply to buffer */
+	this->buflen += len;
+	this->dequeue();
+
+	return 0;
+}
+
+char *ECServer::rpl(ECServer::msg t)
+{
+  if(t<0 || t>ECServer::NONE)
+    //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
+    throw "Sort de la table"; /* TODO: utiliser une exception à nous */
+  return (char *)msgTab[t];
+}
+
+int ECServer::parsemsg(TClient *cl)
+{
+	char s[MAXBUFFER + 20], cmdname[COMLEN+1];
+	std::string buf(cl->RecvBuf);
+	unsigned int i, j, len = buf.length();
+
+	std::vector<std::string> parv;
+	for(i=0; i <= len; )
+	{
+		bool slash;
+		while(buf[i] == ' ') i++;
+		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
+			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
+				slash = true;
+			else
+				s[j++]=buf[i], slash=false;
+		s[j]='\0';
+		if(s[0] != ':')
+		{
+			if(!parv.size())
+				strncpy(cmdname, s, COMLEN);
+			parv.push_back(std::string(s));
+		}
+	}
+
+	std::cout << "Com: " << cmdname << std::endl;
+	for(i=0;i<parv.size();i++)
+		std::cout << "parv[" << i << "]=" << parv[i] << std::endl;
+
+	EC_ACommand *cmd = NULL;
+	for(i=0;i<Commands.size() && !cmd;i++)
+		if(Commands[i]->CmdName == cmdname)
+			cmd = Commands[i];
+
+	if(!cmd || parv.size() < cmd->args)
+		/* TODO: voir si on vire ou non l'user du serveur */
+		return 0;
+
+	try
+	{
+		cmd->Exec(cl, parv);
+	}
+	catch(...)
+	{
+		std::cout << "Erreur du parsage !!" << std::endl;
+	}
+
+	return 0;
+}
 
 int ECServer::parse_this(int fd)
 {
@@ -65,8 +188,8 @@ int ECServer::parse_this(int fd)
 				cl->RecvBuf[cl->recvlen-1] = 0;
 				cl->lastread = CurrentTS;
 				if(strncasecmp(cl->RecvBuf, "PING", 4) && strncasecmp(cl->RecvBuf, "PONG", 4))
-					printf("R(%s@%s) - %s\n", cl->nick.c_str(), cl->ip, cl->RecvBuf);
-				//parsemsg(cl);
+					printf("R(%s@%s) - %s\n", cl->nick, cl->ip, cl->RecvBuf);
+				parsemsg(cl);
 				if(cl->flag & ECD_FREE) break; /* in case of failed pass */
 
 				if(cl->recvlen >= ECD_RECVSIZE && !(ptr = strchr(ptr + 1, '\n')))
@@ -84,11 +207,11 @@ int ECServer::parse_this(int fd)
 	return 0;
 }
 
-inline int ECServer::dequeue(TClient *cl)
+inline int TClient::dequeue()
 {
-	send(cl->fd, cl->QBuf, cl->buflen, 0);
-	DelFlush(cl);
-	cl->buflen = 0;
+	send(this->fd, this->QBuf, this->buflen, 0);
+	DelFlush(this);
+	this->buflen = 0;
 	return 0;
 }
 
@@ -96,11 +219,12 @@ TClient *ECServer::addclient(int fd, const char *ip)
 {
 	TClient *newC = NULL;
 
+	printf("Ajout d'un client\n");
 	if((unsigned) fd >= ASIZE(Clients))
-		printf("Trop de clients connectés! (Dernier %d sur %s, Max: %d)",
+		printf("Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
 			fd, ip, ASIZE(Clients));
 	else if(!(Clients[fd].flag & ECD_FREE))
-		printf("Connexion sur un slot déjà occupé!? (%s -> %d[%s])",
+		printf("Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
 			ip, fd, Clients[fd].ip);
 	else
 	{	/* register the socket in client list */
@@ -110,6 +234,7 @@ TClient *ECServer::addclient(int fd, const char *ip)
 		FD_SET(fd, &global_fd_set);
 		strcpy(newC->ip, ip);
 		newC->flag = 0;
+		newC->sendrpl(rpl(ECServer::HELLO));
 	}
 
 	return newC;
@@ -121,7 +246,7 @@ void ECServer::delclient(TClient *del)
 		for(;highsock >= sock;--highsock) /* loop only till bot.sock */
 			if(!(Clients[highsock].flag & ECD_FREE)) break;
 
-	if(del->buflen) dequeue(del); /* flush data if any */
+	if(del->buflen) del->dequeue(); /* flush data if any */
 	FD_CLR(del->fd, &global_fd_set);
 
 	close(del->fd);
@@ -159,6 +284,8 @@ int ECServer::init_socket(void)
 		return 0;
 	}
 
+	highsock = 0;
+
 	listen(sock, 5);
 	if(sock > highsock) highsock = sock;
 	FD_SET(sock, &global_fd_set);
@@ -169,8 +296,6 @@ int ECServer::init_socket(void)
 
 	for(reuse_addr = 0;reuse_addr < ASIZE(Clients);++reuse_addr)
 		Clients[reuse_addr].flag = ECD_FREE;
-
-	highsock = 0;
 
 	alarm(PINGINTERVAL);
 
@@ -190,7 +315,7 @@ int ECServer::run_server(void)
 		{
 			if(errno != EINTR)
 			{
-				printf("Erreur lors de select() (%d: %s)", errno, strerror(errno));
+				printf("Erreur lors de select() (%d: %s)\n", errno, strerror(errno));
 				break;
 			}
 		}
