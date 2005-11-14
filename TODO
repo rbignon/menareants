@@ -1,7 +1,35 @@
 À faire:
 
+* En cours
+-client: Remanier pour utiliser SDL plutot que ClanLib (j'en étais à main.cpp:101, mais avant toute chose il faut voir comment gérer les ressources (si il est encore possible de faire ça via un fichier pour sinon devoir installer tous les fichiers))
+
 * Urgent
--Serveur
+-client: Pour le menu, à mon avis il faudrait en faire deux, un "normal" avec la page principal et les options, et lancer une autre instance pour le menu une fois connecté. Ça permettrait je pense d'éviter tous les problèmes actuels pour la deconnexion etc.
+-client: Pour le network, il faut trouver une alternative à CL_Socket donc, bien sur penser à SDL mais bon juste pour dire qu'il faut chercher quoi !
+
+* Bof
+-gérer le listing de parties, création, et tout ce qui s'en suit niveau graphique avant le jeu
+-lib: faire donc dans la lib un fichier où il y a les elements de jeux utilisés par les DEUX programmes.
+
+* Objectif actuel
+-Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
+
+* En parallèle (on s'en fou un peu de quand on les fait)
+
+* Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
+-client: Faire la partie de jeu vraiment
+
+* Sur le très long terme
+-bosser
+
+
+***********************************************************
+
+EX VERSION - VOIR SI ON A LES MÊMES PROBLÈMES PAR LA SUITE,
+MAIS NE PAS LES SORTIR DE NOTRE (ENFIN DE MA) TÊTE !!
+
+* Urgent
+-Gérer les deconnexions du client
 
 * Moyen
 
