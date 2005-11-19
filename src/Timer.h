@@ -28,6 +28,7 @@ public:
 
 	static void reset();
 	static float time_elapsed(bool update=false);
+	static long get_time();
 
 protected:
 

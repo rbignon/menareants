@@ -21,12 +21,10 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
+#include "tools/Images.h"
+
 class CL_Font;
 class CL_Surface;
-#if 0 /* TODO: later */
-class CL_SoundBuffer;
-class CL_SoundBuffer_Session;
-#endif
 class CL_ResourceManager;
 
 /**
@@ -39,23 +37,15 @@ public:
 	Resources();
 	~Resources();
 
-	static void init();
-	static void load_all();
+	static ECImage*	Titlescreen();
+	static ECImage*	Loadscreen();
 
-	static CL_Font*		Font_big();
-	static CL_Font*		Font_small();
-
-	static CL_Surface*	Titlescreen();
-	static CL_Surface*	Loadscreen();
-
-	static CL_ResourceManager *res;
+	static void Unload();
 
 protected:
-	static CL_Font *fnt_big;
-	static CL_Font *fnt_small;
 
-	static CL_Surface *sur_titlescreen;
-	static CL_Surface *sur_loadscreen;
+	static ECImage *sur_titlescreen;
+	static ECImage *sur_loadscreen;
 };
 
 #endif

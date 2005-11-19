@@ -23,18 +23,11 @@
 
 #include "Resources.h"
 
-#include <ClanLib/Core/System/setupcore.h>
-#include <ClanLib/Display/setupdisplay.h>
-#include <ClanLib/Sound/setupsound.h>
-#include <ClanLib/Application/clanapp.h>
-#include <ClanLib/Core/System/clanstring.h>
-#include <ClanLib/Network/setupnetwork.h>
-#include <ClanLib/png.h>
-#include "link.h"
-
 #include "Defines.h"
 #include "Config.h"
 #include "Sockets.h"
+
+#include <iostream>
 
 #ifndef WIN32
 	#include <config.h>
@@ -60,7 +53,7 @@ enum {
 	OPTIONS_RETOUR
 };
 
-class EuroConqApp : public CL_ClanApplication
+class EuroConqApp
 {
 protected:
 	Menu* menu;
@@ -68,34 +61,23 @@ protected:
 	Config *conf;
 
 public:
-	virtual int main(int argc, char** argv);
-	virtual char *get_title() { return APP_NAME; }
+	int main(int argc, char** argv);
+	char *get_title() { return APP_NAME; }
 #ifndef WIN32
-	virtual void quit_app(int value) __attribute__ ((noreturn));
+	void quit_app(int value) __attribute__ ((noreturn));
 #else
-	virtual void quit_app(int value);
+	void quit_app(int value);
 #endif
-
-	virtual void init_modules()
-	{
-		CL_SetupCore::init();
-		CL_SetupPNG::init();
-		CL_SetupDisplay::init();
-		CL_SetupNetwork::init();
-	}
-
-	virtual void deinit_modules()
-	{
-		CL_SetupNetwork::deinit();
-		CL_SetupDisplay::deinit();
-		CL_SetupPNG::deinit();
-		CL_SetupCore::deinit();
-	}
 
 	Config* getconf() { return conf; }
 	EC_Client* getclient() { return client; }
+	Menu* getmenu() { return menu; }
 
 	static bool connect_to_server(bool);
+
+	SDL_Surface* sdlwindow;
 };
+
+extern EuroConqApp app;
 
 #endif

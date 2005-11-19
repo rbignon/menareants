@@ -21,24 +21,24 @@
 #ifndef EC_Config_h
 #define EC_Config_h
 
-#include <ClanLib/Core/System/clanstring.h>
+#include <string>
 
 class Config
 {
 public:
-	Config(CL_String _filename);
+	Config(std::string _filename);
 
 public:
 	bool load();
 	bool save();
 
 public:
-	CL_String hostname;
+	std::string hostname;
 	int port;
-	CL_String nick;
+	std::string nick;
 
 private:
-	CL_String filename;
+	std::string filename;
 	bool set_defaults();
 };
 

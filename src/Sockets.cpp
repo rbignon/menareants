@@ -18,11 +18,12 @@
  * $Id$
  */
 
-#include "Commands.h"
 #include "Sockets.h"
-#include "Menu.h"
 #include "Main.h"
-#include "array.h"
+
+#ifndef NOSOCK /* TODO: implementer */
+#include "Menu.h"
+#include "Commands.h"
 #include <arpa/inet.h>
 #include <errno.h>
 #include <cstdarg>
@@ -60,6 +61,7 @@ int EC_Client::send(const char *pattern, ...)
 	va_end(vl);
 
 	sock->send(buf);
+	sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
 	std::cout << "S - " << buf << std::endl;
 
 	return 0;
@@ -133,7 +135,17 @@ void EC_Client::read_sock()
 	int r;
 	memset((void*)&buf,0,MAXBUFFER);
 
-	r = sock->recv(buf,MAXBUFFER);
+	if((r = sock->recv(buf,MAXBUFFER)) <= 0)
+	{
+		printf("Erreur lors de recv\n");
+		delete sock;
+		Menu menu_err("Vous avez ete deconnecte", ((EuroConqApp *)app));
+		menu_err.add_item("Retour", 0, 0);
+		menu_err.execute();
+		((EuroConqApp *)app)->getmenu()->go_main_menu();
+		delete this;
+		return;
+	}
 
 	if(!connected) connected = true;
 
@@ -153,8 +165,8 @@ void EC_Client::read_sock()
 	}
 
 	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
+	//sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
+	//sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
 }
 
 void EC_Client::err_sock()
@@ -164,8 +176,11 @@ void EC_Client::err_sock()
 	connected = false;
 }
 
+#endif
+
 bool EuroConqApp::connect_to_server(bool entered)
 {
+#ifndef NOSOCK /* TODO: implementer */
 	if(entered)
 	{ /* IN */
 		try
@@ -186,10 +201,12 @@ bool EuroConqApp::connect_to_server(bool entered)
 	{ /* OUT */
 		delete ((EuroConqApp *)app)->client;
 	}
+#endif
 
 	return true;
 }
 
+#ifndef NOSOCK /* TODO: implementer */
 EC_Client::EC_Client(const char *hostname, unsigned short port)
 {
 	/* Initialisation des variables */
@@ -218,13 +235,21 @@ EC_Client::EC_Client(const char *hostname, unsigned short port)
 	/* Timers */
 	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
 	//sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
-	sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
+	//sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
 }
 
 EC_Client::~EC_Client()
 {
-	delete sock;
+	try
+	{
+		if(sock) delete sock;
+	}
+	catch(...)
+	{
+		printf("impossible de détruire le sock\n");
+	}
 	for(int i=0;i<Commands.get_num_items();i++)
 		delete Commands[i];
 	Commands.clear();
 }
+#endif

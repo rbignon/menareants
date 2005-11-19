@@ -25,7 +25,7 @@
 #include "Outils.h"
 #include "Config.h"
 
-Config::Config(CL_String _filename)
+Config::Config(std::string _filename)
 {
 	filename = _filename;
 }
@@ -40,7 +40,7 @@ bool Config::set_defaults()
 
 bool Config::load()
 {
-	std::ifstream fp(filename);
+	std::ifstream fp(filename.c_str());
 
 	if(!fp)
 		return set_defaults();
@@ -70,7 +70,7 @@ bool Config::load()
 
 bool Config::save()
 {
-    std::ofstream fp(filename);
+    std::ofstream fp(filename.c_str());
     if (!fp)
     {
         std::cerr << "Impossible de créer le fichier de configuration" << std::endl;

@@ -21,33 +21,35 @@
 #ifndef EC_COMMANDS_H
 #define EC_COMMANDS_H
 
-#include <ClanLib/Core/System/clanstring.h>
-#include "array.h"
+#include <string>
+#include <vector>
 #include "Sockets.h"
 
 class EC_ACommand
 {
 friend class EC_Client;
 public:
-	EC_ACommand(const CL_String _CmdName, unsigned short _flags, unsigned short _args)
+	EC_ACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)
 		: CmdName(_CmdName), flags(_flags), args(_args)
 	{}
 
 	virtual ~EC_ACommand() {}
-
+#if 0 /* TODO: implementer */
 	virtual int Exec(EC_Client *me, CL_Array<CL_String> string_list) = 0;
+#endif
 
 private:
-	CL_String CmdName;
+	std::string CmdName;
 	unsigned short flags;
 	unsigned short args;
 };
 
+#if 0 /* TODO: implementer */
 #define DECLARE_CMD(commName) \
 class commName##Command : public EC_ACommand \
 { \
 public: \
-	commName##Command(const CL_String _CmdName, unsigned short _flags, unsigned short _args) \
+	commName##Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) \
 		: EC_ACommand(_CmdName, _flags, _args) \
 	{} \
 	virtual ~commName##Command() {} \
@@ -56,6 +58,8 @@ public: \
 
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
+
+#endif
 
 #endif
 

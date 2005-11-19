@@ -18,27 +18,18 @@
  * $Id$
  */
 
-#include <stdlib.h>
-
-#include <ClanLib/Display/Font/font.h>
-#include <ClanLib/Core/Resources/resource_manager.h>
-#include <ClanLib/Core/System/error.h>
-#include <ClanLib/Display/Display/surface.h>
-#include <ClanLib/Sound/soundbuffer.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 #include "Resources.h"
+#include "Defines.h"
 
 #ifdef WIN32
 #	define PKGDATADIR
 #endif
 
-CL_ResourceManager*	Resources::res = NULL;
-
-CL_Font*			Resources::fnt_big = NULL;
-CL_Font*			Resources::fnt_small = NULL;
-
-CL_Surface*			Resources::sur_titlescreen = NULL;
-CL_Surface*			Resources::sur_loadscreen = NULL;
+ECImage*				Resources::sur_titlescreen = NULL;
+ECImage*				Resources::sur_loadscreen = NULL;
 
 
 Resources::Resources()
@@ -47,66 +38,27 @@ Resources::Resources()
 
 Resources::~Resources()
 {
+
 }
 
-void Resources::init()
+void Resources::Unload()
 {
-	try
-	{
-		res = new CL_ResourceManager(PKGDATADIR "euroconq.dat", true);
-	}
-	catch (CL_Error err)
-	{
-		try
-		{
-			res = new CL_ResourceManager(
-				"/usr/share/euroconq/euroconq.dat",
-				true);
-		}
-		catch (CL_Error err)
-		{
-			res = new CL_ResourceManager(
-				"/usr/local/share/euroconq/euroconq.dat",
-				true);
-		}
-	}
+	if(sur_titlescreen) delete sur_titlescreen;
+	if(sur_loadscreen) delete sur_loadscreen;
 }
 
-void Resources::load_all()
-{
-	res->load_all();
-}
-
-CL_Font* Resources::Font_big()
-{
-	if (!fnt_big)
-	{
-		fnt_big = CL_Font::load("Font/big", res);
-	}
-	return fnt_big;
-}
-
-CL_Font* Resources::Font_small()
-{
-	if (!fnt_small)
-	{
-		fnt_small = CL_Font::load("Font/small", res);
-	}
-	return fnt_small;
-}
-
-CL_Surface* Resources::Titlescreen()
+ECImage* Resources::Titlescreen()
 {
 	if (!sur_titlescreen)
-		sur_titlescreen = CL_Surface::load("Titlescreen/main", res);
+		sur_titlescreen = new ECImage(PKGDATADIR_PICS "menu.png");
 	return sur_titlescreen;
 
 }
 
-CL_Surface* Resources::Loadscreen()
+ECImage* Resources::Loadscreen()
 {
 	if (!sur_loadscreen)
-		sur_loadscreen = CL_Surface::load("Titlescreen/loading", res);
+		sur_loadscreen = new ECImage(PKGDATADIR_PICS "loading.png");
 	return sur_loadscreen;
 
 }

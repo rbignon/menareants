@@ -18,20 +18,9 @@
  * $Id$
  */
 
-#include <ClanLib/Core/System/system.h>
-#include <ClanLib/Display/setupdisplay.h>
-#include <ClanLib/Core/System/setupcore.h>
-#include <ClanLib/Core/System/error.h>
-#include <ClanLib/Core/Resources/datafile_compiler.h>
-#include <ClanLib/Display/Input/input.h>
-#include <ClanLib/Display/Input/inputbuffer.h>
-#include <ClanLib/Display/Input/keyboard.h>
-#include <ClanLib/Display/Input/key.h>
-#include <ClanLib/Display/Display/display.h>
-#include <ClanLib/Display/Display/surface.h>
-#include <ClanLib/Core/IOData/inputsource.h>
-#include <ClanLib/Display/Font/font.h>
-#include <ClanLib/display.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <cerrno>
 
 #ifndef WIN32
 #include <sys/stat.h>
@@ -40,11 +29,15 @@
 
 #include "Main.h"
 #include "Menu.h"
+#include "tools/Font.h"
+#include "tools/Images.h"
+
+EuroConqApp app;
 
 void EuroConqApp::quit_app(int value)
 {
-		deinit_modules();
 		if(conf) delete conf;
+		Resources::Unload();
         exit(value);
 }
 
@@ -52,22 +45,23 @@ int EuroConqApp::main(int argc, char **argv)
 {
 	try
 	{
-		init_modules();
-		bool fullscreen = false;
+		if(SDL_Init(SDL_INIT_VIDEO) < 0)
+		{
+			std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
+			return 0;
+		}
+		atexit(SDL_Quit);
+		int sdlflags = SDL_SWSURFACE|SDL_HWPALETTE;
 #ifdef WIN32
-		fullscreen = true;
+		sdlflags |= SDL_FULLSCREEN;
 #endif
 
 		if (argc > 1) {
-			if (strcmp (argv[1], "-datafile") == 0) {
-				CL_DatafileCompiler::write("euroconq.scr", "euroconq.dat");
-				quit_app(0);
-			}
-			else if (strcmp (argv[1], "-fullscreen") == 0) {
-				fullscreen = true;
+			if (strcmp (argv[1], "-fullscreen") == 0) {
+				sdlflags |= SDL_FULLSCREEN;
 			}
 			else if (strcmp (argv[1], "-window") == 0) {
-				fullscreen = false;
+				sdlflags &= ~SDL_FULLSCREEN;
 			}
 			else if (strcmp (argv[1], "-h") == 0 ||
 					strcmp (argv[1], "-help") == 0 ||
@@ -75,31 +69,25 @@ int EuroConqApp::main(int argc, char **argv)
 					strcmp (argv[1], "-?") == 0 ||
 					strcmp (argv[1], "/?") == 0 ||
 					strcmp (argv[1], "/h") == 0) {
-				cout << "usage: " << argv[0] << " [-fullscreen | -window]" << endl;
+				std::cout << "usage: " << argv[0] << " [-fullscreen | -window]" << std::endl;
 				quit_app(0);
 			}
 		}
 
 		srand( (long)time(NULL) );
-		Resources::init();
 
-		CL_Display::set_videomode(800, 600, 16, fullscreen);
-
-		CL_Display::clear_display();
-		CL_Display::flip_display();
-		CL_Display::clear_display();
-		CL_Display::flip_display();
-		CL_MouseCursor::hide();
+  		app.sdlwindow = SDL_SetVideoMode(800,600,32, sdlflags);
+  		SDL_WM_SetCaption(get_title(), NULL);
 
 #ifndef WIN32
 		if (getenv("HOME"))
 		{
-			CL_String path;
+			std::string path;
 			path = getenv("HOME");
 			path += "/.euroconq";
-			if (!opendir(path))
+			if (!opendir(path.c_str()))
 			{
-				mkdir( path, 0755 );
+				mkdir( path.c_str(), 0755 );
 			}
 
 			conf = new Config( path + "/euroconq.cfg" );
@@ -108,38 +96,33 @@ int EuroConqApp::main(int argc, char **argv)
 		conf = new Config("euroconq.cfg");
 #endif
 
-		CL_Display::clear_display();
-		Resources::Font_big()->print_center( 400, 300, "Loading..." );
-		Resources::Loadscreen()->put_screen( 0, 0 );
-		CL_Display::flip_display();
-		Resources::load_all();
-		conf->load();
+		ECImage *loading_image = Resources::Loadscreen();
 
-#if 0
-		CL_Surface *Image = CL_PNGProvider::create("pics/prout.png", NULL);
+		loading_image->Draw();
 
-		while(!CL_Keyboard::get_keycode(CL_KEY_ESCAPE))
-		{
-			CL_Display::clear_display();
-			Image->put_screen(0, 0);
-			CL_Display::flip_display();
-			CL_System::keep_alive();
+		if (TTF_Init()==-1) {
+			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;
+			return false;
 		}
 
-		delete Image;
-#endif
+		Font::InitAllFonts();
 
-		menu = new Menu( CL_String("Menu principal"), this);
-		menu->add_item(CL_String("Jouer"), MENU_JOUER, &connect_to_server, 0);
-			menu->add_item(  CL_String("Creer une partie"), JOUER_CREER, M_READ_ONLY, MENU_JOUER );
-			menu->add_item(  CL_String("Lister les parties"), JOUER_LISTER, M_READ_ONLY, MENU_JOUER );
-			menu->add_item(  CL_String("Se deconnecter"), JOUER_RETOUR, M_RETOUR, MENU_JOUER);
-		menu->add_item(CL_String("Options"), MENU_OPTIONS, 0);
-			menu->add_string(CL_String("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
-			menu->add_value( CL_String("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
-			menu->add_string(CL_String("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
-			menu->add_item(  CL_String("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
-		menu->add_item(CL_String("Quitter"), MENU_EXIT, 0 );
+		SDL_UpdateRect(app.sdlwindow, 0, 0, 0, 0);
+		SDL_Flip(app.sdlwindow);
+
+		conf->load();
+
+		menu = new Menu( std::string("Menu principal"), this);
+		menu->add_item(std::string("Jouer"), MENU_JOUER, &connect_to_server, 0);
+			menu->add_item(  std::string("Creer une partie"), JOUER_CREER, M_READ_ONLY, MENU_JOUER );
+			menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, M_READ_ONLY, MENU_JOUER );
+			menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, M_RETOUR, MENU_JOUER);
+		menu->add_item(std::string("Options"), MENU_OPTIONS, 0);
+			menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
+			menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
+			menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
+			menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
+		menu->add_item(std::string("Quitter"), MENU_EXIT, 0 );
 
 		menu->scroll_in();
 
@@ -175,10 +158,10 @@ int EuroConqApp::main(int argc, char **argv)
 	     				break;
 				}
 			}
-			catch (CL_Error err)
+			catch (const std::exception &err)
 			{
 				Menu menu_err( "Shit", this);
-				menu_err.add_item(err.message, 0, 0);
+				menu_err.add_item(err.what(), 0, 0);
 				menu_err.scroll_in();
 				menu_err.execute();
 				menu_err.scroll_out();
@@ -187,10 +170,10 @@ int EuroConqApp::main(int argc, char **argv)
 
 		quit_app(1);
 	}
-	catch (CL_Error err)
+	catch (const std::exception &err)
 	{
-		std::cout << std::endl << "Exception caught from ClanLib:" << std::endl;
-		std::cout << err.message << std::endl;
+		std::cout << std::endl << "Exception caught from STL:" << std::endl;
+		std::cout << err.what() << std::endl;
 		quit_app(255);
 	}
 
@@ -198,4 +181,7 @@ int EuroConqApp::main(int argc, char **argv)
 
 }
 
-EuroConqApp app;
+int main (int argc, char **argv)
+{
+  app.main(argc,argv);
+}

@@ -18,7 +18,8 @@
  * $Id$
  */
 
-#include <ClanLib/Core/System/system.h>
+#include <stddef.h>
+#include <sys/time.h>
 #include "Timer.h"
 
 int Timer::begin_time = 0;
@@ -35,7 +36,7 @@ Timer::~Timer()
 
 void Timer::reset()
 {
-	begin_time = CL_System::get_time();
+	begin_time = Timer::get_time();
 	elapsed = 0;
 }
 
@@ -43,14 +44,18 @@ float Timer::time_elapsed(bool update)
 {
 	if (update)
 	{
-		elapsed = (CL_System::get_time() - begin_time)/1000.0f;
-		begin_time = CL_System::get_time();
+		elapsed = (Timer::get_time() - begin_time)/1000.0f;
+		begin_time = Timer::get_time();
 	}
 
 	return elapsed;
 }
 
+long Timer::get_time()
+{
+        struct timeval tv;
 
+        gettimeofday( &tv, NULL );
 
-
-
+        return (tv.tv_sec*1000  +  tv.tv_usec/1000);
+}

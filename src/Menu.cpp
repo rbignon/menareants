@@ -18,21 +18,16 @@
  * $Id$
  */
 
-#include <ClanLib/Core/System/system.h>
-#include <ClanLib/Display/Input/input.h>
-#include <ClanLib/Display/Input/inputbuffer.h>
-#include <ClanLib/Display/Input/keyboard.h>
-#include <ClanLib/Sound/soundbuffer.h>
-#include <ClanLib/Display/Display/display.h>
-#include <ClanLib/Display/Display/surface.h>
-#include <ClanLib/Display/Font/font.h>
+#include <algorithm>
 
 #include "Main.h"
 #include "Menu.h"
+#include "../lib/Outils.h"
+#include "tools/Font.h"
 
 #include "Timer.h"
 
-MenuItem::MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags )
+MenuItem::MenuItem(const std::string _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags)
 {
 	text = _text;
 	id = _id;
@@ -43,12 +38,12 @@ MenuItem::MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _fu
 
 bool MenuItem::has_children()
 {
-	return children.get_num_items() > 0;
+	return children.size() > 0;
 }
 
 void MenuItem::add_child( MenuItem* child )
 {
-	children.add( child );
+	children.push_back(child);
 }
 
 int MenuItem::get_id() const
@@ -61,18 +56,18 @@ int MenuItem::get_parent() const
 	return parent;
 }
 
-CL_String MenuItem::get_text()
+std::string MenuItem::get_text()
 {
 	return text;
 }
 
-void MenuItem::set_text(const CL_String _text)
+void MenuItem::set_text(const std::string _text)
 {
 	text = _text;
 }
 
 
-MenuItem_Value::MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value, EC_MenuFunc _func, unsigned int _flags ) : MenuItem( _text, _id, _parent, _func, _flags )
+MenuItem_Value::MenuItem_Value(const std::string _text, int _id, int _parent, int _min, int _max, int _value, EC_MenuFunc _func, unsigned int _flags ) : MenuItem( _text, _id, _parent, _func, _flags )
 {
 	value = _value;
 	min = _min;
@@ -138,24 +133,24 @@ void MenuItem_Value::test_value()
 }
 
 // *********************
-MenuItem_String::MenuItem_String(const CL_String _text, int _id, int _parent, CL_String _string, EC_MenuFunc _func, unsigned int _flags) : MenuItem(_text, _id, _parent, _func, _flags)
+MenuItem_String::MenuItem_String(const std::string _text, int _id, int _parent, std::string _string, EC_MenuFunc _func, unsigned int _flags) : MenuItem(_text, _id, _parent, _func, _flags)
 {
 	string = _string;
 }
 
-CL_String& MenuItem_String::get_string()
+std::string& MenuItem_String::get_string()
 {
 	return string;
 }
 
-void MenuItem_String::set_string( CL_String  _string )
+void MenuItem_String::set_string( std::string  _string )
 {
 	string = _string;
 }
 
 // *********************
-MenuItem_StringList::MenuItem_StringList(const CL_String _text, int _id, int _parent, CL_Array<CL_String>
-                                        _string_list, int _value, EC_MenuFunc _func, unsigned int _flags)
+MenuItem_StringList::MenuItem_StringList(const std::string _text, int _id, int _parent,
+	        std::vector<std::string> _string_list, int _value, EC_MenuFunc _func, unsigned int _flags)
   : MenuItem(_text, _id, _parent, _func, _flags)
 {
 	set_strings( _string_list );
@@ -163,12 +158,12 @@ MenuItem_StringList::MenuItem_StringList(const CL_String _text, int _id, int _pa
 	test_value();
 }
 
-CL_String MenuItem_StringList::get_string()
+std::string MenuItem_StringList::get_string()
 {
-	return *(string_list[value]);
+	return string_list[value];
 }
 
-CL_Array<CL_String> MenuItem_StringList::get_strings()
+std::vector<std::string> MenuItem_StringList::get_strings()
 {
 	return string_list;
 }
@@ -184,12 +179,12 @@ int MenuItem_StringList::get_value()
 	return value;
 }
 
-void MenuItem_StringList::set_strings( CL_Array<CL_String>  _string_list )
+void MenuItem_StringList::set_strings( std::vector<std::string>  _string_list )
 {
 	min = 0;
-	max = _string_list.get_num_items() - 1;
+	max = _string_list.size() - 1;
 	for (int i=min; i<=max; i++)
-		string_list.add( new CL_String( *(_string_list[i]) ) );
+		string_list.push_back( std::string( _string_list[i] ) );
 }
 
 void MenuItem_StringList::inc_value()
@@ -217,112 +212,125 @@ void MenuItem_StringList::test_value()
 }
 
 // ************************
-Menu::Menu( const CL_String& name, EuroConqApp* _app )
+Menu::Menu( const std::string& name, EuroConqApp* _app )
 {
 	app = _app;
 	current_run_id = -1;
 	current_selection = 1;
 
-	key_buffer = new CL_InputBuffer( CL_Input::keyboards[0] );
-
-	items.add( new MenuItem(name, -1, -2, NULL, 0) );
+	items.push_back( new MenuItem(name, -1, -2, NULL, 0) );
 }
 
-Menu::~Menu()
+void Menu::go_main_menu()
 {
-	delete key_buffer;
+	current_run_id = -1;
+	redraw();
 }
 
 void Menu::redraw( int yoffset )
 {
 	MenuItem* current = get_item_by_id(current_run_id);
 
-	int width = Resources::Font_big()->get_text_width( current->get_text() );
+	int width = big_font.GetWidth(current->get_text());
 
-	CL_Iterator<MenuItem> item_counter( current->children );
-	while (item_counter.next() != NULL)
+	std::vector<MenuItem*>::iterator item_counter = current->children.begin();
+	for(;item_counter != current->children.end(); ++item_counter)
 	{
-		int w = Resources::Font_big()->get_text_width( item_counter()->get_text() );
-		if (item_counter()->get_type() == MenuItem::MT_VALUE)
+		int w = big_font.GetWidth( (*item_counter)->get_text() );
+		if ((*item_counter)->get_type() == MenuItem::MT_VALUE)
 		{
 			w += 50;
 		}
-		if (item_counter()->get_type()==MenuItem::MT_STRING)
+		if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
-			w += Resources::Font_big()->get_text_width( ((MenuItem_String*)item_counter())->get_string() );
+			w += big_font.GetWidth( ((MenuItem_String*)(*item_counter))->get_string() );
 		}
-		if (item_counter()->get_type()==MenuItem::MT_STRINGLIST)
+		if ((*item_counter)->get_type()==MenuItem::MT_STRINGLIST)
 		{
-			w += Resources::Font_big()->get_text_width( ((MenuItem_StringList*)item_counter())->get_string() );
+			w += big_font.GetWidth( ((MenuItem_StringList*)(*item_counter))->get_string() );
 		}
-		width = max( w, width );
+		width = std::max( w, width );
 	}
 	width += 30;
+#ifdef DEBUG
+	printf("width=%d\n", width);
+#endif
 
-	int height = current->children.get_num_items()*40 + 110;
+	int height = current->children.size()*40 + 110;
 
 	int left_border = 400 - width/2;
-	int right_border = 400 + width/2   +10;//bug in print_right?
+	int right_border = 400 + width/2 + 30;
 
 	int vert = yoffset + 300 - height / 2;
 
-	Resources::Titlescreen()->put_screen( 0, 0 );
+	//Resources::Titlescreen()->Draw();
+	SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app->sdlwindow,NULL);
 	//CL_Display::fill_rect( left_border-30,vert-20, right_border+20,vert+20+height, 0,0,0,0.0f);
 
-	Resources::Font_big()->print_center( 400, vert, current->get_text() );
+	big_font.WriteCenter(400,vert, current->get_text(), black_color);
 	vert += 80;
 
-	int act_draw = 0;
-	while (item_counter.next() != NULL)
+	unsigned int act_draw = 0;
+	for(item_counter = current->children.begin();item_counter != current->children.end(); ++item_counter)
 	{
 		act_draw++;
-		if((item_counter()->flags & M_RETOUR))
+		if(((*item_counter)->flags & M_RETOUR))
 			vert += 10;
 		if (act_draw==current_selection)
 		{
-			if((item_counter()->flags & M_READ_ONLY))
-				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
-				                       0.1f,0.1f,0.1f,0.55f);
+#ifdef DEBUG
+			printf("%d-30=%d, %d-5=%d, %d+20=%d, %d+35=%d\n", left_border, left_border-30, vert, vert-10, right_border, right_border+20, vert, vert+35);
+#endif
+			SDL_Rect r_back = {left_border-30,vert-15, right_border-left_border+30,35};
+			if(((*item_counter)->flags & M_READ_ONLY))
+				SDL_FillRect(app->sdlwindow, &r_back, SDL_MapRGBA(app->sdlwindow->format, 15,15,15,55));
 			else
-				CL_Display::fill_rect( left_border-30,vert-5, right_border+20,vert+35,
-				                       0.1f,0.5f,0.1f,0.55f);
+				SDL_FillRect(app->sdlwindow, &r_back, SDL_MapRGBA(app->sdlwindow->format, 10,60,10,55));
+
 		}
-		if (item_counter()->get_type() == MenuItem::MT_VALUE)
+		if ((*item_counter)->get_type() == MenuItem::MT_VALUE)
 		{
-			if ((((MenuItem_Value*)item_counter())->get_min() == 0) && (((MenuItem_Value*)item_counter())->get_max() == 1))
+			if ((((MenuItem_Value*)(*item_counter))->get_min() == 0) &&
+			    (((MenuItem_Value*)(*item_counter))->get_max() == 1))
 			{
-				Resources::Font_big()->print_right( right_border, vert, CL_String( ((MenuItem_Value*)item_counter())->get_value() ? "Oui" : "Non" ) );
+				big_font.WriteRight( right_border, vert,
+			                std::string(((MenuItem_Value*)(*item_counter))->get_value() ? "Oui" : "Non"),
+			                black_color);
 			}
 			else
 			{
-				Resources::Font_big()->print_right( right_border, vert, CL_String( ((MenuItem_Value*)item_counter())->get_value() ) );
+				big_font.WriteRight(right_border, vert,
+				                 TypToStr(((MenuItem_Value*)(*item_counter))->get_value()), black_color);
 			}
-			Resources::Font_big()->print_left( left_border, vert, item_counter()->get_text() );
-		} else
-		if (item_counter()->get_type()==MenuItem::MT_STRING)
+			big_font.WriteLeft( left_border, vert, (*item_counter)->get_text(), black_color );
+		}
+		else if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
-			Resources::Font_big()->print_right( right_border, vert, ((MenuItem_String*)item_counter())->get_string() );
-			Resources::Font_big()->print_left( left_border, vert, item_counter()->get_text() );
-		} else
-		if (item_counter()->get_type()==MenuItem::MT_STRINGLIST)
+			if(!((MenuItem_String*)(*item_counter))->get_string().empty())
+				big_font.WriteRight(right_border, vert,
+				                    ((MenuItem_String*)(*item_counter))->get_string(), black_color);
+			big_font.WriteLeft(left_border, vert, (*item_counter)->get_text(), black_color);
+		}
+		else if ((*item_counter)->get_type()==MenuItem::MT_STRINGLIST)
 		{
-			Resources::Font_big()->print_right( right_border, vert, ((MenuItem_StringList*)item_counter())->get_string() );
-			Resources::Font_big()->print_left( left_border, vert, item_counter()->get_text() );
-		} else
+			big_font.WriteRight(right_border, vert,
+			                    ((MenuItem_StringList*)(*item_counter))->get_string(), black_color);
+			big_font.WriteLeft( left_border, vert, (*item_counter)->get_text(), black_color);
+		}
+		else
 		{
-			Resources::Font_big()->print_center( 400, vert, item_counter()->get_text() );
+			big_font.WriteCenter( 400, vert, (*item_counter)->get_text(), black_color );
 		}
 		vert += 40;
 	}
-	Resources::Font_small()->print_right( right_border+0, vert+20, "v "APP_VERSION );
-	CL_Display::flip_display(true);
+	normal_font.WriteRight( right_border+0, vert+20, "v "APP_VERSION, white_color );
+	SDL_Flip(app->sdlwindow);
 }
 
 int Menu::execute()
 {
 	bool must_redraw = true;
-
-	key_buffer->clear();
+	SDL_Event event;
 
 	while (1)
 	{
@@ -334,87 +342,92 @@ int Menu::execute()
 
 		MenuItem* current = get_item_by_id(current_run_id);
 
-		while (key_buffer->keys_left() == 0)
+		MenuItem *selected;
+		while( SDL_PollEvent( &event) )
 		{
-			CL_System::sleep( 10 );
-			CL_System::keep_alive();
-		}
-		if (key_buffer->peek_key().state != CL_Key::Pressed)
-		{
-			key_buffer->get_key();
-			continue;
-		}
-		MenuItem *selected = current->children.get_item(current_selection-1);
-		switch (key_buffer->get_key().id)
-		{
-			case CL_KEY_DOWN:
-				current_selection++;
-				if (current_selection > current->children.get_num_items()) current_selection = 1;
-				must_redraw = true;
-			break;
-			case CL_KEY_UP:
-				current_selection--;
-				if (current_selection < 1) current_selection = current->children.get_num_items();
-				must_redraw = true;
-			break;
-			case CL_KEY_RIGHT:
-				if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
-				{
-					((MenuItem_Value*)(selected))->inc_value();
-					return selected->get_id();
-				}
-				if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
-				{
-					((MenuItem_StringList*)(selected))->inc_value();
-					return selected->get_id();
-				}
-			break;
-			case CL_KEY_LEFT:
-				if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
-				{
-					((MenuItem_Value*)(selected))->dec_value();
-					return selected->get_id();
-				}
-				if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
-				{
-					((MenuItem_StringList*)(selected))->dec_value();
-					return selected->get_id();
-				}
-			break;
-			case CL_KEY_ENTER:
-				if((selected->flags & M_READ_ONLY)) break;
-				if (selected->has_children())
-				{
-					if(!selected->func || selected->func(true))
+			switch(event.type)
+			{
+				case SDL_KEYUP:
+					selected = current->children[current_selection-1];
+					switch (event.key.keysym.sym)
 					{
-						current_run_id = selected->get_id();
-						current_selection = 1;
-						must_redraw = true;
+						case SDLK_DOWN:
+							current_selection++;
+							if (current_selection > current->children.size()) current_selection = 1;
+							must_redraw = true;
 						break;
+						case SDLK_UP:
+							current_selection--;
+							if (current_selection < 1) current_selection = current->children.size();
+							must_redraw = true;
+						break;
+						case SDLK_RIGHT:
+							if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
+							{
+								((MenuItem_Value*)(selected))->inc_value();
+								return selected->get_id();
+							}
+							if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
+							{
+								((MenuItem_StringList*)(selected))->inc_value();
+								return selected->get_id();
+							}
+						break;
+						case SDLK_LEFT:
+							if (selected->get_type() == MenuItem::MT_VALUE && !(selected->flags & M_READ_ONLY))
+							{
+								((MenuItem_Value*)(selected))->dec_value();
+								return selected->get_id();
+							}
+							if (selected->get_type() == MenuItem::MT_STRINGLIST && !(selected->flags & M_READ_ONLY))
+							{
+								((MenuItem_StringList*)(selected))->dec_value();
+								return selected->get_id();
+							}
+						break;
+						case SDLK_RETURN:
+							if((selected->flags & M_READ_ONLY)) break;
+							if (selected->has_children())
+							{
+								if(!selected->func || selected->func(true))
+								{
+									current_run_id = selected->get_id();
+									current_selection = 1;
+									must_redraw = true;
+									break;
+								}
+								else
+									return -1;
+							}
+							else if(!(selected->flags & M_RETOUR))
+							{
+								if (selected->get_type() == MenuItem::MT_STRING)
+								{
+									enter_string( (MenuItem_String*)(selected) );
+								}
+								return selected->get_id();
+							}
+							/* WARN: Pas de break ici c'est *normal*/
+						case SDLK_ESCAPE:
+							if (current->get_id() != -1)
+							{
+								if(current->func)
+									current->func(false);
+								current_run_id = current->get_parent();
+								current_selection = 1;
+								//must_redraw = true;
+								return -1;
+							}
+							break;
+						default:
+							break;
 					}
-					else
-						return -1;
-				}
-				else if(!(selected->flags & M_RETOUR))
-				{
-					if (selected->get_type() == MenuItem::MT_STRING)
-					{
-						enter_string( (MenuItem_String*)(selected) );
-					}
-					return selected->get_id();
-				}
-				/* WARN: Pas de break ici c'est *normal*/
-			case CL_KEY_ESCAPE:
-				if (current->get_id() != -1)
-				{
-					if(current->func)
-						current->func(false);
-					current_run_id = current->get_parent();
-					current_selection = 1;
-					must_redraw = true;
-				}
-			break;
+					break;
+				default:
+					break;
+			}
 		}
+//		event.key.keysym.sym = 0;
 	}
 	return -1;
 }
@@ -424,7 +437,6 @@ void Menu::scroll_in()
 	Timer timer;
 	float i = -600;
 
-	Resources::Font_big();
 	Resources::Titlescreen();
 
 	while (i<0)
@@ -448,217 +460,210 @@ void Menu::scroll_out()
 
 void Menu::enter_string(MenuItem_String* item)
 {
-	while (CL_Keyboard::get_keycode(CL_KEY_ENTER))
-	{
-		CL_System::keep_alive();
-	}
-
-	key_buffer->clear();
-	CL_String new_string = item->get_string();
+	std::string new_string = item->get_string();
+	SDL_Event event;
 
 	while (1)
 	{
-		Resources::Titlescreen()->put_screen(0, 0, 0 );
-		CL_Display::fill_rect( 200,300, 600,400, 0,0,0,0.5f);
+		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app->sdlwindow,NULL);
 
-		Resources::Font_big()->print_left( 230, 330, item->get_text() );
+		big_font.WriteLeft( 230, 330, item->get_text(), black_color );
+		big_font.WriteLeft( 380, 330, new_string+"_", black_color );
 
-		Resources::Font_big()->print_left( 380, 330, new_string );
+		SDL_Flip(app->sdlwindow);
 
-		CL_Display::flip_display();
-		CL_System::keep_alive();
-
-		while (key_buffer->peek_key().state != CL_Key::NoKey)
+		while (SDL_PollEvent( &event))
 		{
-	                if (key_buffer->peek_key().state != CL_Key::Pressed)
-        	        {
-                	        key_buffer->get_key();
+			if (event.type != SDL_KEYUP)
 				continue;
-	                }
 
-			switch (key_buffer->get_key().id)
+			switch (event.key.keysym.sym)
 			{
-				case CL_KEY_ENTER:
+				case SDLK_RETURN:
 					item->set_string( new_string );
 					return;
-				break;
-				case CL_KEY_BACKSPACE:
-					new_string = new_string.mid( 0, new_string.get_length()-1 );
-				break;
-				case CL_KEY_SPACE:
+					break;
+				case SDLK_ESCAPE:
+					return; /* S'enfuie sans faire le changement */
+					break;
+				case SDLK_BACKSPACE:
+					new_string = std::string(new_string, 0, new_string.size()-1 );
+					break;
+				case SDLK_SPACE:
 					new_string += " ";
-				break;
-				case CL_KEY_A:
+					break;
+				case SDLK_a:
 					new_string += "a";
-				break;
-				case CL_KEY_B:
+					break;
+				case SDLK_b:
 					new_string += "b";
-				break;
-				case CL_KEY_C:
+					break;
+				case SDLK_c:
 					new_string += "c";
-				break;
-				case CL_KEY_D:
+					break;
+				case SDLK_d:
 					new_string += "d";
-				break;
-				case CL_KEY_E:
+					break;
+				case SDLK_e:
 					new_string += "e";
-				break;
-				case CL_KEY_F:
+					break;
+				case SDLK_f:
 					new_string += "f";
-				break;
-				case CL_KEY_G:
+					break;
+				case SDLK_g:
 					new_string += "g";
-				break;
-				case CL_KEY_H:
+					break;
+				case SDLK_h:
 					new_string += "h";
-				break;
-				case CL_KEY_I:
+					break;
+				case SDLK_i:
 					new_string += "i";
-				break;
-				case CL_KEY_J:
+					break;
+				case SDLK_j:
 					new_string += "j";
-				break;
-				case CL_KEY_K:
+					break;
+				case SDLK_k:
 					new_string += "k";
-				break;
-				case CL_KEY_L:
+					break;
+				case SDLK_l:
 					new_string += "l";
-				break;
-				case CL_KEY_M:
+					break;
+				case SDLK_m:
 					new_string += "m";
-				break;
-				case CL_KEY_N:
+					break;
+				case SDLK_n:
 					new_string += "n";
-				break;
-				case CL_KEY_O:
+					break;
+				case SDLK_o:
 					new_string += "o";
-				break;
-				case CL_KEY_P:
+					break;
+				case SDLK_p:
 					new_string += "p";
-				break;
-				case CL_KEY_Q:
+					break;
+				case SDLK_q:
 					new_string += "q";
-				break;
-				case CL_KEY_R:
+					break;
+				case SDLK_r:
 					new_string += "r";
-				break;
-				case CL_KEY_S:
+					break;
+				case SDLK_s:
 					new_string += "s";
-				break;
-				case CL_KEY_T:
+					break;
+				case SDLK_t:
 					new_string += "t";
-				break;
-				case CL_KEY_U:
+					break;
+				case SDLK_u:
 					new_string += "u";
-				break;
-				case CL_KEY_V:
+					break;
+				case SDLK_v:
 					new_string += "v";
-				break;
-				case CL_KEY_W:
+					break;
+				case SDLK_w:
 					new_string += "w";
-				break;
-				case CL_KEY_X:
+					break;
+				case SDLK_x:
 					new_string += "x";
-				break;
-				case CL_KEY_Y:
+					break;
+				case SDLK_y:
 					new_string += "y";
-				break;
-				case CL_KEY_Z:
+					break;
+				case SDLK_z:
 					new_string += "z";
 					break;
-				case CL_KEY_KP_0:
+				case SDLK_KP0:
 					new_string += "0";
 					break;
-				case CL_KEY_KP_1:
+				case SDLK_KP1:
 					new_string += "1";
 					break;
-				case CL_KEY_2:
+				case SDLK_KP2:
 					new_string += "2";
 					break;
-				case CL_KEY_3:
+				case SDLK_KP3:
 					new_string += "3";
 					break;
-				case CL_KEY_4:
+				case SDLK_KP4:
 					new_string += "4";
 					break;
-				case CL_KEY_5:
+				case SDLK_KP5:
 					new_string += "5";
 					break;
-				case CL_KEY_6:
+				case SDLK_KP6:
 					new_string += "6";
 					break;
-				case CL_KEY_7:
+				case SDLK_KP7:
 					new_string += "7";
 					break;
-				case CL_KEY_8:
+				case SDLK_KP8:
 					new_string += "8";
 					break;
-				case CL_KEY_9:
+				case SDLK_KP9:
 					new_string += "9";
 					break;
-				case CL_KEY_KP_DECIMAL:
+				case SDLK_KP_PERIOD:
 					new_string += ".";
 					break;
+				default:
+					break;
 			}
-			if (new_string.get_length() == 1 && !(item->flags & M_NOFMAJ))
-			{
-				new_string.to_upper();
-			}
+			if (new_string.size() == 1 && !(item->flags & M_NOFMAJ))
+				std::transform( new_string.begin(), new_string.end(), new_string.begin(), static_cast<int (*)(int)>(toupper) );
 		}
 	}
 }
 
-void Menu::add_item( const CL_String& text, int id, unsigned int flags, int parent )
+void Menu::add_item( const std::string& text, int id, unsigned int flags, int parent )
 {
 	MenuItem* new_item = new MenuItem( text, id, parent, NULL, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
-	items.add( new_item );
+	items.push_back( new_item );
 }
 
 /* Cette fonction permet de passer une fonction en argument */
-void Menu::add_item( const CL_String& text, int id, EC_MenuFunc func, unsigned int flags, int parent )
+void Menu::add_item( const std::string& text, int id, EC_MenuFunc func, unsigned int flags, int parent )
 {
 	MenuItem* new_item = new MenuItem( text, id, parent, func, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
-	items.add( new_item );
+	items.push_back( new_item );
 }
 
-void Menu::add_value( const CL_String& text, int id, unsigned int flags, int parent, int min, int max,
+void Menu::add_value( const std::string& text, int id, unsigned int flags, int parent, int min, int max,
                       int value )
 {
 	MenuItem_Value* new_item = new MenuItem_Value( text, id, parent, min, max, value, NULL, flags );
 
 	get_item_by_id(parent)->add_child(new_item);
-	items.add( new_item );
+	items.push_back( new_item );
 }
 
-void Menu::add_string( const CL_String& text, int id, unsigned int flags, int parent, CL_String string )
+void Menu::add_string( const std::string& text, int id, unsigned int flags, int parent,
+                       std::string string )
 {
 	MenuItem_String*  new_item = new MenuItem_String( text, id, parent, string, NULL, flags);
 
 	get_item_by_id(parent)->add_child(new_item);
-	items.add( new_item );
+	items.push_back( new_item );
 }
 
-void Menu::add_stringlist( const CL_String& text, int id, unsigned int flags, int parent,
-                           CL_Array<CL_String> string_list, int cur_string )
+void Menu::add_stringlist( const std::string& text, int id, unsigned int flags, int parent,
+                           std::vector<std::string> string_list, int cur_string )
 {
 	MenuItem_StringList*  new_item = new MenuItem_StringList( text, id, parent, string_list, cur_string, NULL, flags);
 
 	get_item_by_id(parent)->add_child(new_item);
-	items.add( new_item );
+	items.push_back( new_item );
 }
 
 MenuItem* Menu::get_item_by_id( int id )
 {
-	CL_Iterator<MenuItem> item_counter(items);
-	while (item_counter.next() != NULL)
+	std::vector<MenuItem*>::iterator item_counter = items.begin();
+	for(;item_counter != items.end(); ++item_counter)
 	{
-		if (item_counter()->get_id() == id)
+		if ((*item_counter)->get_id() == id)
 		{
-			return item_counter();
+			return *item_counter;
 		}
 	}
 	return NULL;

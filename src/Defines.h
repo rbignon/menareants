@@ -56,4 +56,18 @@
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
 #endif
 
+#if defined(WIN32) || defined(__MINGW32__)
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
+#ifdef PKGDATADIR /* Définition des chemins */
+#define PKGDATADIR_PICS PKGDATADIR PATH_SEPARATOR "pics" PATH_SEPARATOR
+#define PKGDATADIR_FONTS PKGDATADIR PATH_SEPARATOR "font" PATH_SEPARATOR
+#else
+#define PKGDATADIR_PICS "pics" PATH_SEPARATOR
+#define PKGDATADIR_FONTS "font" PATH_SEPARATOR
+#endif /* PKGDATADIR */
+
 #endif /* EC_Defines_h */

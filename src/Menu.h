@@ -21,8 +21,9 @@
 #ifndef Menu_h
 #define Menu_h
 
-#include "array.h"
 #include "Main.h"
+#include <string>
+#include <vector>
 
 /* Flags */
 #define M_READ_ONLY		0x001
@@ -30,8 +31,6 @@
 #define M_RETOUR		0x004
 
 typedef bool (*EC_MenuFunc) (bool in);
-
-class ClanBomberApplication;
 
 class CL_InputBuffer;
 
@@ -42,15 +41,15 @@ class MenuItem
 friend class Menu;
 
 public:
-	MenuItem( const CL_String _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags );
+	MenuItem( const std::string _text, int _id, int _parent, EC_MenuFunc _func, unsigned int _flags );
 	virtual ~MenuItem() {};
 
 	void add_child( MenuItem* child );
 	bool has_children();
 	int get_id() const;
 	int get_parent() const;
-	CL_String get_text();
-	void set_text( const CL_String _text );
+	std::string get_text();
+	void set_text( const std::string _text );
 
 	typedef enum
 	{
@@ -63,19 +62,19 @@ public:
 	virtual MENUTYPE get_type() { return MT_NORMAL; };
 
 protected:
-	CL_String			text;
-	int					id;
-	int					parent;
-	CL_List<MenuItem>	children;
-	EC_MenuFunc			func;
-	unsigned int flags;
+	std::string				text;
+	int						id;
+	int						parent;
+	std::vector<MenuItem*>	children;
+	EC_MenuFunc				func;
+	unsigned int			flags;
 };
 
 class MenuItem_Value : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_Value( const CL_String _text, int _id, int _parent, int _min, int _max, int _value,
+	MenuItem_Value( const std::string _text, int _id, int _parent, int _min, int _max, int _value,
 	                EC_MenuFunc _func = NULL, unsigned int _flags = 0 );
 	virtual ~MenuItem_Value() {};
 
@@ -101,30 +100,30 @@ class MenuItem_String : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_String( const CL_String _text, int _id, int _parent, CL_String _string,
+	MenuItem_String( const std::string _text, int _id, int _parent, std::string _string,
 	                 EC_MenuFunc _func = NULL, unsigned int _flags = 0);
 	virtual ~MenuItem_String() {};
 
-	CL_String& get_string();
-	void set_string(CL_String _string);
+	std::string& get_string();
+	void set_string(std::string _string);
 
 	virtual MENUTYPE get_type() { return MT_STRING; };
 
 protected:
-	CL_String string;
+	std::string string;
 };
 
 class MenuItem_StringList : public MenuItem
 {
 friend class Menu;
 public:
-	MenuItem_StringList( const CL_String _text, int _id, int _parent, CL_Array<CL_String> _string_list,
-	                     int _value, EC_MenuFunc _func = 0, unsigned int _flags = 0 );
+	MenuItem_StringList( const std::string _text, int _id, int _parent, std::vector<std::string>
+	                     _string_list, int _value, EC_MenuFunc _func = 0, unsigned int _flags = 0 );
 	virtual ~MenuItem_StringList() {};
 
-	CL_String get_string();
-	CL_Array<CL_String> get_strings();
-	void set_strings(CL_Array<CL_String> _string_list);
+	std::string get_string();
+	std::vector<std::string> get_strings();
+	void set_strings(std::vector<std::string> _string_list);
 	void inc_value();
 	void dec_value();
 	int get_value();
@@ -133,7 +132,7 @@ public:
 	virtual MENUTYPE get_type() { return MT_STRINGLIST; };
 
 protected:
-	CL_Array<CL_String> string_list;
+	std::vector<std::string> string_list;
 	void test_value();
 	int value;
 	int min;
@@ -143,29 +142,28 @@ protected:
 class Menu
 {
 public:
-	Menu( const CL_String& name, EuroConqApp* _app );
-	~Menu();
+	Menu( const std::string& name, EuroConqApp* _app );
+	~Menu() {}
 
-	void add_item( const CL_String& text, int id, unsigned int flags, int parent=-1 );
-	void add_item( const CL_String& text, int id, EC_MenuFunc func, unsigned int flags, int parent=-1 );
-	void add_value(const CL_String& text, int id, unsigned int flags, int parent, int min, int max,
+	void add_item( const std::string& text, int id, unsigned int flags, int parent=-1);
+	void add_item( const std::string& text, int id, EC_MenuFunc func, unsigned int flags, int parent=-1);
+	void add_value(const std::string& text, int id, unsigned int flags, int parent, int min, int max,
 	               int value);
-	void add_string( const CL_String& text, int id, unsigned int flags, int parent, CL_String string);
-	void add_stringlist( const CL_String& text, int id, unsigned int flags, int parent,
-	                     CL_Array<CL_String> string_list, int cur_string );
+	void add_string(const std::string& text, int id, unsigned int flags, int parent, std::string string);
+	void add_stringlist( const std::string& text, int id, unsigned int flags, int parent,
+	                     std::vector<std::string> string_list, int cur_string );
 	int execute();
 	void scroll_in();
 	void scroll_out();
 	void redraw(int yoffset=0);
 	MenuItem* get_item_by_id( int id );
+	void go_main_menu(); /* Afficher le menu principal */
 protected:
 	EuroConqApp* app;
-	CL_List<MenuItem> items;
+	std::vector<MenuItem*> items;
 	int current_run_id;
-	int current_selection;
+	unsigned int current_selection;
 	void enter_string(MenuItem_String* _item);
-
-	CL_InputBuffer* key_buffer;
 };
 
 #endif

@@ -21,6 +21,8 @@
 #include "Commands.h"
 #include "Sockets.h"
 
+#ifndef NOSOCK
+
 /* HEL <prog> <version> */
 int HELCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
 {
@@ -34,3 +36,5 @@ int PIGCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
 
 	return 0;
 }
+
+#endif

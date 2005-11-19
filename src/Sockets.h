@@ -21,8 +21,6 @@
 #ifndef EC_Sockets_h
 #define EC_Sockets_h
 
-#include <ClanLib/Network/socket.h>
-#include <ClanLib/Core/System/clanstring.h>
 #include "link.h"
 #include "Main.h"
 #include "Defines.h"
@@ -31,6 +29,9 @@ class EC_ACommand;
 
 class EuroConqApp;
 
+#define NOSOCK
+
+#ifndef NOSOCK /* TODO: implementer */
 class EC_Client
 {
 public:
@@ -53,21 +54,23 @@ public:
 	char *rpl(msg t);
 
 	bool IsConnected() { return connected; }
-	CL_String get_nick() { return nick; }
+	std::string get_nick() { return nick; }
 
 	EuroConqApp *app;
 
 protected:
-	CL_Socket *sock;
+	//CL_Socket *sock;
 
-	CL_List<EC_ACommand> Commands;
+	std::vector<EC_ACommand> Commands;
 	void parse_message(CL_String buf);
 
 	bool connected;
 
 	char readQ[MAXBUFFER + 1];
 	unsigned int readQi;
-	CL_String nick;
+	std::string nick;
 };
 
-#endif
+#endif /* NOSOCK */
+
+#endif /* EC_Sockets_h */
