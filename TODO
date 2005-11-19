@@ -1,7 +1,7 @@
 À faire:
 
 * En cours
--client: Remanier pour utiliser SDL plutot que ClanLib (j'en étais à main.cpp:101, mais avant toute chose il faut voir comment gérer les ressources (si il est encore possible de faire ça via un fichier pour sinon devoir installer tous les fichiers))
+-client: Problème de la position de la selection dans le menu à certains moments
 
 * Urgent
 -client: Pour le menu, à mon avis il faudrait en faire deux, un "normal" avec la page principal et les options, et lancer une autre instance pour le menu une fois connecté. Ça permettrait je pense d'éviter tous les problèmes actuels pour la deconnexion etc.

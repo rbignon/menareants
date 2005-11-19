@@ -1,3 +1,27 @@
+2005-11-18  Romain Bignon <progs@headfucking.net>
+
+	* autogen.sh, configure.ac: prise en compte sdl, ajout DEBUG, changement autogen.sh (©wormux), etc.
+
+	* Reorganisation des dossiers
+
+	* Passage à SDL terminé (mais il faut debuguer !)
+
+	* src/Menu.cpp: Passage normalement correct à SDL.
+
+	* src/tools/Images.h, src/tools/Images.c: Création du fichier (reprise de fonctions d'un tuto)
+	(ECImage): classe pour les images
+	(ECSpriteBase): classe pour la base des animations
+	(ECSprite): classe pour les animations
+
+	* src/tools/Font.cpp, src/tools/Font.h: Reprise du fichier de Wormux.
+
+	* lib/Outils.h (StrToInt): changement en StrToTyp()
+	(TypToStr): fonction pour transformer en une chaine.
+
+2005-11-16  Romain Bignon <progs@headfucking.net>
+
+	* Transcription de ClanLib vers SDL en cours...
+
 2005-11-11  Romain Bignon <progs@headfucking.net>
 
 	* server/Login.cpp: Rajout du fichier avec les fonctions de logging.
