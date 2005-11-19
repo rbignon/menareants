@@ -1,25 +1,16 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `clanApp' library (-lclanApp). */
-#undef HAVE_LIBCLANAPP
+/* Defined if debug is enabled */
+#undef DEBUG
 
-/* Define to 1 if you have the `clanCore' library (-lclanCore). */
-#undef HAVE_LIBCLANCORE
+/* Define to 1 if you have the `SDL_gfx' library (-lSDL_gfx). */
+#undef HAVE_LIBSDL_GFX
 
-/* Define to 1 if you have the `clanDisplay' library (-lclanDisplay). */
-#undef HAVE_LIBCLANDISPLAY
+/* Define to 1 if you have the `SDL_image' library (-lSDL_image). */
+#undef HAVE_LIBSDL_IMAGE
 
-/* Define to 1 if you have the `clanNetwork' library (-lclanNetwork). */
-#undef HAVE_LIBCLANNETWORK
-
-/* Define to 1 if you have the `clanPNG' library (-lclanPNG). */
-#undef HAVE_LIBCLANPNG
-
-/* Define to 1 if you have the `png' library (-lpng). */
-#undef HAVE_LIBPNG
-
-/* Define to 1 if you have the `z' library (-lz). */
-#undef HAVE_LIBZ
+/* Define to 1 if you have the `SDL_ttf' library (-lSDL_ttf). */
+#undef HAVE_LIBSDL_TTF
 
 /* Name of package */
 #undef PACKAGE

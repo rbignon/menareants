@@ -1,11 +1,48 @@
 #! /bin/sh
 
-# Régénère les fichiers autoconf / automake
+# Clean up
+./clean.sh
 
-rm -f config.cache
-rm -f config.log
-aclocal
-autoconf
+#-----------------------------------------------------------------------------
+
+function find_tool_version
+{
+    TOOL=$1
+    for i in 1.9 1.8 1.7 1.6 1.5; do
+        if $TOOL-$i --version >/dev/null 2>&1; then
+            echo "$TOOL-$i"
+            exit
+        fi
+    done
+    if $TOOL --version > /dev/null 2>&1; then
+    case "$($TOOL --version | sed -e '1s/[^0-9]*//' -e q)" in
+        0|0.*|1|1.[0-4]|1.[0-4][-.]*) 
+        echo "You need $TOOL version (at least) 1.5 !" 1>&2
+        exit 1;;
+    esac
+    fi
+    echo "$TOOL"
+}
+
+#-----------------------------------------------------------------------------
+
+AUTOMAKE=$(find_tool_version automake 1.5) || exit 1
+ACLOCAL=$(find_tool_version aclocal 1.5) || exit 1
+AUTOCONF=autoconf
+
+#-----------------------------------------------------------------------------
+
+echo "Run aclocal"
+$ACLOCAL -I m4
+
 autoheader
-automake -a -c
+
+echo "Run automake"
+$AUTOMAKE --add-missing --copy
+
+echo "Run autoconf"
+$AUTOCONF
+
+echo
 echo "Now run ./configure"
+
