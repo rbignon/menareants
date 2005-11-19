@@ -25,12 +25,23 @@
 std::string stringtok(std::string &, const char * const);
 
 template<typename T>
-bool StrToInt( const std::string & Str, T & Dest )
+bool StrToTyp( const std::string & Str, T & Dest )
 {
     // créer un flux à partir de la chaîne donnée
     std::istringstream iss( Str );
     // tenter la conversion vers Dest
     return iss >> Dest != 0;
+}
+
+template<typename T>
+std::string TypToStr( const T & Value )
+{
+    // utiliser un flux de sortie pour créer la chaîne
+    std::ostringstream oss;
+    // écrire la valeur dans le flux
+    oss << Value;
+    // renvoyer une string
+    return oss.str();
 }
 
 #endif
