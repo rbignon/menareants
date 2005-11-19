@@ -219,7 +219,6 @@ TClient *ECServer::addclient(int fd, const char *ip)
 {
 	TClient *newC = NULL;
 
-	printf("Ajout d'un client\n");
 	if((unsigned) fd >= ASIZE(Clients))
 		printf("Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
 			fd, ip, ASIZE(Clients));
