@@ -1,11 +1,10 @@
 À faire:
 
 * En cours
--client: Problème de la position de la selection dans le menu à certains moments
+-client: problème dans read_sock: le EC_Client ne tient pas en compte l'appel à Connect() !
 
 * Urgent
--client: Pour le menu, à mon avis il faudrait en faire deux, un "normal" avec la page principal et les options, et lancer une autre instance pour le menu une fois connecté. Ça permettrait je pense d'éviter tous les problèmes actuels pour la deconnexion etc.
--client: Pour le network, il faut trouver une alternative à CL_Socket donc, bien sur penser à SDL mais bon juste pour dire qu'il faut chercher quoi !
+-client: Problème de la position de la selection dans le menu à certains moments (options)
 
 * Bof
 -gérer le listing de parties, création, et tout ce qui s'en suit niveau graphique avant le jeu
@@ -15,6 +14,9 @@
 -Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
 
 * En parallèle (on s'en fou un peu de quand on les fait)
+-client: système d'exception
+-serveur: système d'exception (logage)
+-c/s: envoie des erreurs du client au serveur
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -client: Faire la partie de jeu vraiment
