@@ -28,6 +28,7 @@
 #include "Sockets.h"
 
 #include <iostream>
+#include <SDL_thread.h>
 
 #ifndef WIN32
 	#include <config.h>
@@ -59,6 +60,9 @@ protected:
 	Menu* menu;
 	EC_Client* client;
 	Config *conf;
+	SDL_Thread* Thread;
+
+	void request_game();
 
 public:
 	int main(int argc, char** argv);
@@ -71,9 +75,8 @@ public:
 
 	Config* getconf() { return conf; }
 	EC_Client* getclient() { return client; }
+	void setclient(EC_Client* c);
 	Menu* getmenu() { return menu; }
-
-	static bool connect_to_server(bool);
 
 	SDL_Surface* sdlwindow;
 };

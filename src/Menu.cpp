@@ -252,7 +252,7 @@ void Menu::redraw( int yoffset )
 		width = std::max( w, width );
 	}
 	width += 30;
-#ifdef DEBUG
+#ifdef DEBUG_MENU
 	printf("width=%d\n", width);
 #endif
 
@@ -278,7 +278,7 @@ void Menu::redraw( int yoffset )
 			vert += 10;
 		if (act_draw==current_selection)
 		{
-#ifdef DEBUG
+#ifdef DEBUG_MENU
 			printf("%d-30=%d, %d-5=%d, %d+20=%d, %d+35=%d\n", left_border, left_border-30, vert, vert-10, right_border, right_border+20, vert, vert+35);
 #endif
 			SDL_Rect r_back = {left_border-30,vert-15, right_border-left_border+30,35};

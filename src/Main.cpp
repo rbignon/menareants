@@ -34,11 +34,93 @@
 
 EuroConqApp app;
 
+void EuroConqApp::setclient(EC_Client* c)
+{
+	client = c;
+	c->lapp = this;
+}
+
 void EuroConqApp::quit_app(int value)
 {
 		if(conf) delete conf;
 		Resources::Unload();
         exit(value);
+}
+
+void EuroConqApp::request_game()
+{
+	try
+	{
+		SDL_mutex *Mutex = SDL_CreateMutex();
+
+		Thread = SDL_CreateThread(&EC_Client::read_sock, Mutex);
+	}
+	catch (std::string err)
+	{
+		std::string msg = "Impossible de se connecter :\n";
+		msg += err;
+		Menu menu_err(msg, this);
+		menu_err.add_item("Retour", 0, 0);
+		menu_err.execute();
+		delete client;
+		return;
+	}
+
+	Menu* menu;
+
+	menu = new Menu( std::string("Jouer"), this);
+	menu->add_item(  std::string("Creer une partie"), JOUER_CREER, M_READ_ONLY);
+	menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, M_READ_ONLY);
+	menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, 0);
+
+	try
+	{
+		bool alive = true;
+		while (alive)
+		{
+			int result = menu->execute();
+
+			try
+			{
+				/* MenuItem* item = menu->get_item_by_id( result ); TODO: utilisation de item */
+				switch (result)
+				{
+					case JOUER_RETOUR:
+						client->SetWantDisconnect();
+						client->sendrpl(client->rpl(EC_Client::QUIT));
+						alive = false;
+						break;
+					case -1: break; /**normal**/
+					default:
+						std::cout << result << std::endl;
+						break;
+				}
+			}
+			catch (const std::string err)
+			{
+				Menu menu_err( err, this);
+				menu_err.add_item("Retour", 0, 0);
+				menu_err.scroll_in();
+				menu_err.execute();
+				menu_err.scroll_out();
+			}
+			if(client && !client->IsConnected()) alive = false;
+		}
+		delete client;
+		SDL_WaitThread(Thread, 0); /* Attend la fin du thread
+		                            *  TODO: voir pour un moyen de le forcer à finir
+		                            */
+		delete menu;
+	}
+	catch(const std::string err)
+	{
+		std::cout << err << std::endl;
+		if(menu) delete menu;
+		SDL_KillThread(Thread); /* En cas d'erreur, clore arbitrairement le thread */
+		if(client) delete client;
+	}
+
+	return;
 }
 
 int EuroConqApp::main(int argc, char **argv)
@@ -79,6 +161,10 @@ int EuroConqApp::main(int argc, char **argv)
   		app.sdlwindow = SDL_SetVideoMode(800,600,32, sdlflags);
   		SDL_WM_SetCaption(get_title(), NULL);
 
+		ECImage *loading_image = Resources::Loadscreen();
+
+		loading_image->Draw();
+
 #ifndef WIN32
 		if (getenv("HOME"))
 		{
@@ -96,10 +182,6 @@ int EuroConqApp::main(int argc, char **argv)
 		conf = new Config("euroconq.cfg");
 #endif
 
-		ECImage *loading_image = Resources::Loadscreen();
-
-		loading_image->Draw();
-
 		if (TTF_Init()==-1) {
 			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;
 			return false;
@@ -113,10 +195,7 @@ int EuroConqApp::main(int argc, char **argv)
 		conf->load();
 
 		menu = new Menu( std::string("Menu principal"), this);
-		menu->add_item(std::string("Jouer"), MENU_JOUER, &connect_to_server, 0);
-			menu->add_item(  std::string("Creer une partie"), JOUER_CREER, M_READ_ONLY, MENU_JOUER );
-			menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, M_READ_ONLY, MENU_JOUER );
-			menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, M_RETOUR, MENU_JOUER);
+		menu->add_item(std::string("Jouer"), MENU_JOUER, 0);
 		menu->add_item(std::string("Options"), MENU_OPTIONS, 0);
 			menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
 			menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
@@ -135,6 +214,9 @@ int EuroConqApp::main(int argc, char **argv)
 				MenuItem* item = menu->get_item_by_id( result );
 				switch (result)
 				{
+					case MENU_JOUER:
+						request_game(); /* Entre dans le menu de jeu (socket) */
+						break;
 					case MENU_EXIT:
 						menu->scroll_out();
 						delete menu;
@@ -158,10 +240,10 @@ int EuroConqApp::main(int argc, char **argv)
 	     				break;
 				}
 			}
-			catch (const std::exception &err)
+			catch (const std::string err)
 			{
 				Menu menu_err( "Shit", this);
-				menu_err.add_item(err.what(), 0, 0);
+				menu_err.add_item(err, 0, 0);
 				menu_err.scroll_in();
 				menu_err.execute();
 				menu_err.scroll_out();
