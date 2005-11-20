@@ -24,18 +24,17 @@
 #include "link.h"
 #include "Main.h"
 #include "Defines.h"
+#include "Commands.h"
 
 class EC_ACommand;
 
 class EuroConqApp;
 
-#define NOSOCK
-
-#ifndef NOSOCK /* TODO: implementer */
 class EC_Client
 {
 public:
 	EC_Client(const char *hostname, unsigned short port);
+	EC_Client();
 
 	~EC_Client();
 
@@ -44,33 +43,42 @@ public:
 	enum msg {  /* mettre à jour systematiquement msgTab[] dans Sockets.cpp */
 		IAM,  /* IAM */
 		PONG, /* POG */
+		QUIT, /* BYE */
 
 		NONE
 	};
 
-	void read_sock();
-	void err_sock();
-	int send(const char *pattern, ...);
+	static int read_sock(void *data);
+
+	bool Connect(const char *hostname, unsigned short port);
+
+	int sendrpl(const char *pattern, ...);
 	char *rpl(msg t);
 
 	bool IsConnected() { return connected; }
+	void SetWantDisconnect() { want_disconnect = true; }
+	bool WantDisconnect() { return want_disconnect; }
 	std::string get_nick() { return nick; }
 
-	EuroConqApp *app;
+	EuroConqApp *lapp;
 
 protected:
-	//CL_Socket *sock;
+	int sock;
 
-	std::vector<EC_ACommand> Commands;
-	void parse_message(CL_String buf);
+	std::vector<EC_ACommand*> Commands;
+	void parse_message(std::string buf);
 
 	bool connected;
+	bool want_disconnect;
 
 	char readQ[MAXBUFFER + 1];
 	unsigned int readQi;
-	std::string nick;
-};
+	fd_set global_fd_set;
 
-#endif /* NOSOCK */
+	std::string nick;
+
+private:
+	void Init();
+};
 
 #endif /* EC_Sockets_h */

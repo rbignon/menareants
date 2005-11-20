@@ -21,20 +21,16 @@
 #include "Commands.h"
 #include "Sockets.h"
 
-#ifndef NOSOCK
-
 /* HEL <prog> <version> */
-int HELCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
+int HELCommand::Exec(EC_Client *me, std::vector<std::string> parv)
 {
-	me->send(me->rpl(EC_Client::IAM), me->app->getconf()->nick.get_string());
+	me->sendrpl(me->rpl(EC_Client::IAM), me->lapp->getconf()->nick.c_str());
 	return 0;
 }
 
-int PIGCommand::Exec(EC_Client *me, CL_Array<CL_String> parv)
+int PIGCommand::Exec(EC_Client *me, std::vector<std::string> parv)
 {
-	me->send(me->rpl(EC_Client::PONG));
+	me->sendrpl(me->rpl(EC_Client::PONG));
 
 	return 0;
 }
-
-#endif

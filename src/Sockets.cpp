@@ -20,10 +20,9 @@
 
 #include "Sockets.h"
 #include "Main.h"
-
-#ifndef NOSOCK /* TODO: implementer */
 #include "Menu.h"
 #include "Commands.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <cstdarg>
@@ -32,6 +31,7 @@
 const char* msgTab[] = {
 	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
 	"POG",                                    /* POG - PONG */
+	"BYE",                                    /* BYE - Quit le serveur */
      0
 };
 
@@ -39,11 +39,11 @@ char *EC_Client::rpl(EC_Client::msg t)
 {
   if(t<0 || t>EC_Client::NONE)
     //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
-    throw CL_Error("Sort de la table"); /* TODO: utiliser une exception à nous */
+    throw std::string("Sort de la table"); /* TODO: utiliser une exception à nous */
   return (char *)msgTab[t];
 }
 
-int EC_Client::send(const char *pattern, ...)
+int EC_Client::sendrpl(const char *pattern, ...)
 {
 	if(!sock) return -1;
 
@@ -60,22 +60,25 @@ int EC_Client::send(const char *pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	sock->send(buf);
-	sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
+	send(sock, buf, len, 0);
+#ifdef DEBUG
 	std::cout << "S - " << buf << std::endl;
+#endif
 
 	return 0;
 }
 
-void EC_Client::parse_message(CL_String buf)
+void EC_Client::parse_message(std::string buf)
 {
 	char s[MAXBUFFER + 20];
-	CL_String cmdname;
-	int i, len = buf.get_length();
+	std::string cmdname;
+	unsigned int i, len = buf.size();
 
-	cout << "R - " << buf << endl;
+#ifdef DEBUG
+	std::cout << "R - " << buf << std::endl;
+#endif
 
-	CL_Array<CL_String> parv;
+	std::vector<std::string> parv;
 	for(i=0; i <= len; )
 	{
 		bool slash;
@@ -87,27 +90,29 @@ void EC_Client::parse_message(CL_String buf)
 			else
 				s[j++]=buf[i], slash=false;
 		s[j]='\0';
-		if(s[0] != ':' || parv.get_num_items())
+		if(s[0] != ':' || parv.size())
 		{
-			if(!parv.get_num_items())
+			if(!parv.size())
 				cmdname = s;
-			parv.add(new CL_String(s));
+			parv.push_back(std::string(s));
 		}
 	}
 
+#ifdef DEBUG
 	std::cout << "Com: " << cmdname << std::endl;
-	for(i=0;i<parv.get_num_items();i++)
-		std::cout << "parv[" << i << "]=" << *(parv[i]) << std::endl;
+	for(i=0;i<parv.size();i++)
+		std::cout << "parv[" << i << "]=" << parv[i] << std::endl;
+#endif
 
 	EC_ACommand *cmd = NULL;
-	for(i=0;i<Commands.get_num_items() && !cmd;i++)
+	for(i=0;i<Commands.size() && !cmd;i++)
 		if(Commands[i]->CmdName == cmdname)
 		{
 			cmd = Commands[i];
 			break;
 		}
 
-	if(!cmd || parv.get_num_items() < cmd->args)
+	if(!cmd || parv.size() < cmd->args)
 		/* ATTENTION: la commande est inconnu ou donnée incorrectement, donc on exit
 		 *            mais on ne quit pas (?). À voir, quand il y aurra un système
 		 *            de debugage, si on le fait remarquer à l'user. Au pire je pense
@@ -128,128 +133,135 @@ void EC_Client::parse_message(CL_String buf)
 	return;
 }
 
-void EC_Client::read_sock()
+int EC_Client::read_sock(void *data)
 {
-	char buf[MAXBUFFER + 1];
-	register char *ptr;
-	int r;
-	memset((void*)&buf,0,MAXBUFFER);
+	SDL_LockMutex((SDL_mutex*)data);
 
-	if((r = sock->recv(buf,MAXBUFFER)) <= 0)
-	{
-		printf("Erreur lors de recv\n");
-		delete sock;
-		Menu menu_err("Vous avez ete deconnecte", ((EuroConqApp *)app));
-		menu_err.add_item("Retour", 0, 0);
-		menu_err.execute();
-		((EuroConqApp *)app)->getmenu()->go_main_menu();
-		delete this;
-		return;
-	}
+	EC_Client* cl = new EC_Client;
+	cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port);
+	printf("s=%d\n", cl->sock);
+	app.setclient(cl);
 
-	if(!connected) connected = true;
+	fd_set tmp_fdset;
+	struct timeval timeout = {0};
 
-	ptr = buf;
-	buf[r] = 0;
-
-	while(*ptr)
-	{
-		if(*ptr == '\n')
-		{
-			readQ[readQi-1] = 0; /* pour le \r devant le \n */
-			parse_message(readQ);
-			readQi = 0;
-		}
-		else readQ[readQi++] = *ptr;
-		++ptr;
-	}
-
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
-}
-
-void EC_Client::err_sock()
-{
-	std::cout << "Erreur !" << std::endl;
-
-	connected = false;
-}
-
+#ifdef DEBUG
+	printf("je suis bien dans le thread !\n");
 #endif
+	while(cl != NULL)
+	{
+		char buf[MAXBUFFER + 1];
+		register char *ptr;
+		int r;
+		memset((void*)&buf,0,MAXBUFFER);
 
-bool EuroConqApp::connect_to_server(bool entered)
-{
-#ifndef NOSOCK /* TODO: implementer */
-	if(entered)
-	{ /* IN */
-		try
-		{
-			((EuroConqApp *)app)->client = new EC_Client(((EuroConqApp *)app)->conf->hostname, ((EuroConqApp *)app)->conf->port);
-			((EuroConqApp *)app)->client->app = ((EuroConqApp *)app);
-		}
-		catch (CL_Error err)
-		{
-			Menu menu_err( "Impossible de se connecter :\n" + err.message, ((EuroConqApp *)app));
-			menu_err.add_item("Retour", 0, 0);
-			menu_err.execute();
-			delete ((EuroConqApp *)app)->client;
-			return false;
-		}
-	}
-	else
-	{ /* OUT */
-		delete ((EuroConqApp *)app)->client;
-	}
+		tmp_fdset = cl->global_fd_set;
+		timeout.tv_sec = 1;
+		timeout.tv_usec = 0;
+
+#ifdef DEBUG
+		printf("attente du select %d (%s)\n", cl->sock, FD_ISSET(cl->sock, &cl->global_fd_set) ? "setted" : "unsetted");
 #endif
+		if(select(cl->sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
+		{
+			if(errno != EINTR)
+			{
+				printf("Erreur lors de select() (%d: %s)\n", errno, strerror(errno));
+				cl->connected = false;
+				break;
+			}
+			printf("continue\n");
+			continue;
+		}
+		if(cl->WantDisconnect()) break;
+		printf("selected !\n");
 
-	return true;
+		if(!FD_ISSET(cl->sock, &tmp_fdset)) continue;
+
+		printf("reception !\n");
+
+		if((r = recv(cl->sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
+		{
+			cl->connected = false;
+			printf("Erreur lors de recv() (%d: %s)\n", errno, strerror(errno));
+			break;
+		}
+
+		if(!cl->connected) cl->connected = true;
+
+		ptr = buf;
+		buf[r] = 0;
+
+		while(*ptr)
+		{
+			if(*ptr == '\n')
+			{
+				cl->readQ[cl->readQi-1] = 0; /* pour le \r devant le \n */
+				cl->parse_message(cl->readQ);
+				cl->readQi = 0;
+			}
+			else cl->readQ[cl->readQi++] = *ptr;
+			++ptr;
+		}
+		if(cl->WantDisconnect()) break;
+	}
+
+	SDL_UnlockMutex((SDL_mutex*)data);
+	return 0;
 }
 
-#ifndef NOSOCK /* TODO: implementer */
-EC_Client::EC_Client(const char *hostname, unsigned short port)
+void EC_Client::Init()
 {
 	/* Initialisation des variables */
 	connected = false;
 	readQi = 0;
+	want_disconnect = false;
+	FD_ZERO(&global_fd_set);
 
 	/* Ajout des commandes */
-	Commands.add(new HELCommand("HEL", 0,	1));
-	Commands.add(new PIGCommand("PIG", 0,	0));
+	Commands.push_back(new HELCommand("HEL", 0,	1));
+	Commands.push_back(new PIGCommand("PIG", 0,	0));
+}
+
+EC_Client::EC_Client()
+{
+	Init();
+}
+
+EC_Client::EC_Client(const char *hostname, unsigned short port)
+{
+	Init();
+	Connect(hostname, port);
+}
+
+bool EC_Client::Connect(const char *hostname, unsigned short port)
+{
+	if(connected) return false;
 
 	/* Création du socket*/
 	struct sockaddr_in fsocket = {0};
-	int socki = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_addr.s_addr = inet_addr(hostname);
 	fsocket.sin_port = htons(port);
 
 	/* Connexion */
-	if(connect(socki, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
-		throw CL_Error(strerror(errno));
+	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
+		throw strerror(errno);
 
-	/* Création d'un CL_Socket qui sert juste d'interface avec le socket existant */
-	sock = new CL_Socket(socki);
+	printf("on paramètre le sock %d à globalmachin\n", sock);
+	FD_SET(sock, &global_fd_set);
+	printf("ok ? %s\n", FD_ISSET(sock, &global_fd_set) ? "oui" : "non");
 
-	/* Timers */
-	sock->sig_read_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_write_triggered().connect(this,&EC_Client::read_sock);
-	//sock->sig_exception_triggered().connect(this,&EC_Client::err_sock);
+#ifdef DEBUG
+	printf("Bien connecté !\n");
+#endif
+
+	return true;
 }
 
 EC_Client::~EC_Client()
 {
-	try
-	{
-		if(sock) delete sock;
-	}
-	catch(...)
-	{
-		printf("impossible de détruire le sock\n");
-	}
-	for(int i=0;i<Commands.get_num_items();i++)
-		delete Commands[i];
-	Commands.clear();
+	if(connected) close(sock);
 }
-#endif

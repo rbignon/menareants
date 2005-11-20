@@ -25,6 +25,8 @@
 #include <vector>
 #include "Sockets.h"
 
+class EC_Client;
+
 class EC_ACommand
 {
 friend class EC_Client;
@@ -34,9 +36,7 @@ public:
 	{}
 
 	virtual ~EC_ACommand() {}
-#if 0 /* TODO: implementer */
-	virtual int Exec(EC_Client *me, CL_Array<CL_String> string_list) = 0;
-#endif
+	virtual int Exec(EC_Client *me, std::vector<std::string> string_list) = 0;
 
 private:
 	std::string CmdName;
@@ -44,7 +44,6 @@ private:
 	unsigned short args;
 };
 
-#if 0 /* TODO: implementer */
 #define DECLARE_CMD(commName) \
 class commName##Command : public EC_ACommand \
 { \
@@ -53,13 +52,11 @@ public: \
 		: EC_ACommand(_CmdName, _flags, _args) \
 	{} \
 	virtual ~commName##Command() {} \
-	virtual int Exec(EC_Client *me, CL_Array<CL_String> string_list); \
+	virtual int Exec(EC_Client *me, std::vector<std::string> string_list); \
 }
 
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
-
-#endif
 
 #endif
 
