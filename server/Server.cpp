@@ -98,7 +98,7 @@ char *ECServer::rpl(ECServer::msg t)
 {
   if(t<0 || t>ECServer::NONE)
     //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
-    throw "Sort de la table"; /* TODO: utiliser une exception à nous */
+    throw std::string("Sort de la table"); /* TODO: utiliser une exception à nous */
   return (char *)msgTab[t];
 }
 
@@ -143,6 +143,10 @@ int ECServer::parsemsg(TClient *cl)
 	try
 	{
 		cmd->Exec(cl, parv);
+	}
+	catch(std::string err)
+	{
+		std::cout << "Erreur d'une commande : " << err << std::endl;
 	}
 	catch(...)
 	{
