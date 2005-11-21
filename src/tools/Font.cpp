@@ -56,7 +56,6 @@ Font tiny_font;
 
 void Font::InitAllFonts()
 {
-  std::cout << PKGDATADIR_FONTS << std::endl;
   huge_font.Load(PKGDATADIR_FONTS"Vera.ttf", 40);
   large_font.Load(PKGDATADIR_FONTS"Vera.ttf", 32);
   big_font.Load(PKGDATADIR_FONTS"Vera.ttf", 24);
