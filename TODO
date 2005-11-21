@@ -1,7 +1,7 @@
 À faire:
 
 * En cours
--client: problème dans read_sock: le EC_Client ne tient pas en compte l'appel à Connect() !
+-lib/serveur: classes channels et players
 
 * Urgent
 -client: Problème de la position de la selection dans le menu à certains moments (options)
