@@ -62,6 +62,10 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(euroconqserver_SOURCES)
 DIST_SOURCES = $(euroconqserver_SOURCES)
 ETAGS = etags
@@ -162,7 +166,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
-euroconqserver_SOURCES = Main.cpp Server.cpp Config.cpp Login.cpp
+euroconqserver_SOURCES = Main.cpp Server.cpp Config.cpp Login.cpp Channels.h
 euroconqserver_LDADD = $(top_srcdir)/lib/libeuroconq.a
 all: all-am
 
