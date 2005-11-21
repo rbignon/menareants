@@ -28,6 +28,13 @@ int HELCommand::Exec(EC_Client *me, std::vector<std::string> parv)
 	return 0;
 }
 
+/* AIM <nick> */
+int AIMCommand::Exec(EC_Client *me, std::vector<std::string> parv)
+{
+	me->set_nick(parv[1]);
+	return 0;
+}
+
 int PIGCommand::Exec(EC_Client *me, std::vector<std::string> parv)
 {
 	me->sendrpl(me->rpl(EC_Client::PONG));

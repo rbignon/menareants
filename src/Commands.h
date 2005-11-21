@@ -57,6 +57,7 @@ public: \
 
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
+DECLARE_CMD ( AIM );
 
 #endif
 
