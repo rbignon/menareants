@@ -1,0 +1,47 @@
+                   ********************
+                   *  Europa Conquest *
+                   ********************
+                        [ INSTALL ]
+
+Sommaire:
+1) Nécessite
+2) ./configure
+3) make
+4) sudo make install
+5) Jouer
+
+1) Nécessite
+	EuroConq nécessite les librairies SDL suivantes :
+	- SDL_image
+	- SDL_ttf
+	- lSDL_gfx
+
+2) ./configure
+	Veuillez lancer la commande suivante:
+	$ ./configure
+	Vous pouvez utiliser --help pour voir les différentes options proposées:
+	$ ./configure --help
+	Et vous pouvez les mettre d'affilés dans la ligne de commande, par exemple:
+	$ ./configure --enable-debug --enable-server
+	Le script risque de s'arrêter si jamais il ne trouve pas sur votre système un programme
+	auquel Europa Conquest est dépendant pour fonctionner. Dans ce cas veuillez l'installer
+	et relancer le script.
+
+3) make
+	Veuillez utiliser la simple commande:
+	$ make
+	Si il y a une erreur de compilation, veuillez voir le fichier BUGS
+
+4) sudo make install
+	Pour finir d'installer le jeu, veuillez tapez:
+	$ sudo make install
+	Il risque de vous être demandé un mot de passe, veuillez entrer celui du root (administrateur).
+
+5) Jouer
+	Maintenant vous pouvez jouer tout simplement en tapant à n'importe quelle moment en console:
+	$ euroconq
+
+
+Bon jeu !
+
+Progs <progs@coderz.info>
