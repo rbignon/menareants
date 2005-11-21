@@ -1,4 +1,20 @@
-2005-11-30  Romain Bignon <progs@headfucking.net>
+2005-11-21  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp, lib/Channels.h: Création des fichiers.
+
+	* lib/Channels.cpp, lib/Channels.h: Création des fichiers.
+	(EChannel): classe channel par default.
+	(ECPlayer): classe player par default.
+
+	* src/Sockets.cpp: Correction du bug de la connexion.
+
+	* src/Login.cpp: Prise en charge de la commande AIM.
+
+	* API: Mise à jour.
+
+	* INSTALL: Remplissage.
+
+2005-11-20  Romain Bignon <progs@headfucking.net>
 
 	* src/Sockets.cpp: réécriture des sockets. Utilisation de SDL_Thread.
 
