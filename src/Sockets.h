@@ -59,6 +59,7 @@ public:
 	void SetWantDisconnect() { want_disconnect = true; }
 	bool WantDisconnect() { return want_disconnect; }
 	std::string get_nick() { return nick; }
+	void set_nick(std::string _nick) { nick = _nick; }
 
 	EuroConqApp *lapp;
 

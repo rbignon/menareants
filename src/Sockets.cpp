@@ -139,16 +139,12 @@ int EC_Client::read_sock(void *data)
 
 	EC_Client* cl = new EC_Client;
 	cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port);
-	printf("s=%d\n", cl->sock);
 	app.setclient(cl);
 
 	fd_set tmp_fdset;
 	struct timeval timeout = {0};
 
-#ifdef DEBUG
-	printf("je suis bien dans le thread !\n");
-#endif
-	while(cl != NULL)
+	while(cl != NULL && !cl->WantDisconnect())
 	{
 		char buf[MAXBUFFER + 1];
 		register char *ptr;
@@ -156,12 +152,10 @@ int EC_Client::read_sock(void *data)
 		memset((void*)&buf,0,MAXBUFFER);
 
 		tmp_fdset = cl->global_fd_set;
-		timeout.tv_sec = 1;
-		timeout.tv_usec = 0;
 
-#ifdef DEBUG
-		printf("attente du select %d (%s)\n", cl->sock, FD_ISSET(cl->sock, &cl->global_fd_set) ? "setted" : "unsetted");
-#endif
+		timeout.tv_sec = 1; /*  Nécessaire pour être au courant du WantDisconnect() */
+		timeout.tv_usec = 0; /* quand il y a une inactivité au niveau des sockets */
+
 		if(select(cl->sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
@@ -170,15 +164,11 @@ int EC_Client::read_sock(void *data)
 				cl->connected = false;
 				break;
 			}
-			printf("continue\n");
 			continue;
 		}
 		if(cl->WantDisconnect()) break;
-		printf("selected !\n");
 
 		if(!FD_ISSET(cl->sock, &tmp_fdset)) continue;
-
-		printf("reception !\n");
 
 		if((r = recv(cl->sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
 		{
@@ -203,7 +193,6 @@ int EC_Client::read_sock(void *data)
 			else cl->readQ[cl->readQi++] = *ptr;
 			++ptr;
 		}
-		if(cl->WantDisconnect()) break;
 	}
 
 	SDL_UnlockMutex((SDL_mutex*)data);
@@ -221,6 +210,7 @@ void EC_Client::Init()
 	/* Ajout des commandes */
 	Commands.push_back(new HELCommand("HEL", 0,	1));
 	Commands.push_back(new PIGCommand("PIG", 0,	0));
+	Commands.push_back(new AIMCommand("AIM", 0,	1));
 }
 
 EC_Client::EC_Client()
@@ -240,7 +230,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 	/* Création du socket*/
 	struct sockaddr_in fsocket = {0};
-	int sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_addr.s_addr = inet_addr(hostname);
@@ -250,13 +240,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 		throw strerror(errno);
 
-	printf("on paramètre le sock %d à globalmachin\n", sock);
 	FD_SET(sock, &global_fd_set);
-	printf("ok ? %s\n", FD_ISSET(sock, &global_fd_set) ? "oui" : "non");
-
-#ifdef DEBUG
-	printf("Bien connecté !\n");
-#endif
 
 	return true;
 }
