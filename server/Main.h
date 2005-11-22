@@ -30,6 +30,7 @@
 class ECServer
 {
 friend int TClient::exit(const char *, ...);
+friend int TClient::parse_this();
 public:
 	enum msg {  /* mettre à jour systematiquement msgTab[] dans Server.cpp */
 		HELLO, /* HEL */
@@ -37,8 +38,13 @@ public:
 		ERR,   /* ERR */
 		BYE,   /* BYE */
 		AIM,   /* AIM */
+
 		PING,  /* PIG */
 		PONG,  /* POG */
+
+		JOIN,  /* JOI */
+		SETS,  /* SETS */
+		PLIST, /* PLS */
 
 		NONE
 	};
@@ -53,6 +59,8 @@ public:
 	char *rpl(ECServer::msg t);
 
 	TClient Clients[MAXCONNEX+1];
+
+	std::vector<EC_ACommand*> GetCommands() { return Commands; }
 
 protected:
 	Config *conf;

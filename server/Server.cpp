@@ -39,6 +39,10 @@ const char* msgTab[] = {
      "AIM %s",                              /* AIM - Logué */
      "PIG",                                 /* PIG - Envoie un ping */
      "POG",                                 /* POG - Reçoit un pong */
+
+     ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
+     "SETS %s",                             /* SETS - Les paramètres du salon */
+     "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
      0
 };
 
@@ -102,10 +106,10 @@ char *ECServer::rpl(ECServer::msg t)
   return (char *)msgTab[t];
 }
 
-int ECServer::parsemsg(TClient *cl)
+int TClient::parsemsg()
 {
 	char s[MAXBUFFER + 20], cmdname[COMLEN+1];
-	std::string buf(cl->RecvBuf);
+	std::string buf(RecvBuf);
 	unsigned int i, j, len = buf.length();
 
 	std::vector<std::string> parv;
@@ -132,9 +136,9 @@ int ECServer::parsemsg(TClient *cl)
 		std::cout << "parv[" << i << "]=" << parv[i] << std::endl;
 
 	EC_ACommand *cmd = NULL;
-	for(i=0;i<Commands.size() && !cmd;i++)
-		if(Commands[i]->CmdName == cmdname)
-			cmd = Commands[i];
+	for(i=0;i<app.GetCommands().size() && !cmd;i++)
+		if(app.GetCommands()[i]->CmdName == cmdname)
+			cmd = app.GetCommands()[i];
 
 	if(!cmd || parv.size() < cmd->args)
 		/* TODO: voir si on vire ou non l'user du serveur */
@@ -142,7 +146,7 @@ int ECServer::parsemsg(TClient *cl)
 
 	try
 	{
-		cmd->Exec(cl, parv);
+		cmd->Exec(this, parv);
 	}
 	catch(std::string err)
 	{
@@ -156,22 +160,16 @@ int ECServer::parsemsg(TClient *cl)
 	return 0;
 }
 
-int ECServer::parse_this(int fd)
+int TClient::parse_this()
 {
-	TClient *cl;
 	char buf[MAXBUFFER];
 	int read;
-
-	if((unsigned) fd >= ASIZE(Clients))
-		return printf("reading data from sock #%d, not registered ?", fd);
-
-	cl = &Clients[fd];
 
 	if((read = recv(fd, buf, sizeof buf -1, 0)) <= 0)
 	{
 		printf("Erreur lors de recv(%s): [%s] (%d)\n",
-			cl->ip, strerror(errno), errno);
-		delclient(cl);
+			ip, strerror(errno), errno);
+		app.delclient(this);
 	}
 	else
 	{
@@ -187,23 +185,23 @@ int ECServer::parse_this(int fd)
 		  */
 		while(*ptr)
 		{
-			if(*ptr == '\n' || cl->recvlen >= ECD_RECVSIZE)
+			if(*ptr == '\n' || recvlen >= ECD_RECVSIZE)
 			{
-				cl->RecvBuf[cl->recvlen-1] = 0;
-				cl->lastread = CurrentTS;
-				if(strncasecmp(cl->RecvBuf, "PING", 4) && strncasecmp(cl->RecvBuf, "PONG", 4))
-					printf("R(%s@%s) - %s\n", cl->nick, cl->ip, cl->RecvBuf);
-				parsemsg(cl);
-				if(cl->flag & ECD_FREE) break; /* in case of failed pass */
+				RecvBuf[recvlen-1] = 0;
+				lastread = app.CurrentTS;
+				if(strncasecmp(RecvBuf, "PING", 4) && strncasecmp(RecvBuf, "PONG", 4))
+					printf("R(%s@%s) - %s\n", nick, ip, RecvBuf);
+				parsemsg();
+				if(flag & ECD_FREE) break; /* in case of failed pass */
 
-				if(cl->recvlen >= ECD_RECVSIZE && !(ptr = strchr(ptr + 1, '\n')))
+				if(recvlen >= ECD_RECVSIZE && !(ptr = strchr(ptr + 1, '\n')))
 				{ 	/* line exceeds size and no newline found */
-					cl->recvlen = 0;
+					recvlen = 0;
 					break; /* abort parsing */
 				}
-				cl->recvlen = 0; /* go on on newline */
+				recvlen = 0; /* go on on newline */
 			}
-			else cl->RecvBuf[cl->recvlen++] = *ptr; /* copy */
+			else RecvBuf[recvlen++] = *ptr; /* copy */
 			/*next char, Note that if line was to long but newline was found, it drops the \n */
 			++ptr;
 		}
@@ -219,6 +217,14 @@ inline int TClient::dequeue()
 	return 0;
 }
 
+void TClient::Init(int _fd, const char *_ip)
+{
+	if(!(flag & ECD_FREE)) return;
+	fd = _fd;
+	strcpy(ip, _ip);
+	flag = 0;
+}
+
 TClient *ECServer::addclient(int fd, const char *ip)
 {
 	TClient *newC = NULL;
@@ -226,35 +232,38 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	if((unsigned) fd >= ASIZE(Clients))
 		printf("Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
 			fd, ip, ASIZE(Clients));
-	else if(!(Clients[fd].flag & ECD_FREE))
+	else if(!(Clients[fd].HasFlag(ECD_FREE)))
 		printf("Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
-			ip, fd, Clients[fd].ip);
+			ip, fd, Clients[fd].GetIp());
 	else
 	{	/* register the socket in client list */
 		newC = &Clients[fd];
-		newC->fd = fd;
 		if(fd > highsock) highsock = fd;
 		FD_SET(fd, &global_fd_set);
-		strcpy(newC->ip, ip);
-		newC->flag = 0;
+		newC->Init(fd, ip);
 		newC->sendrpl(rpl(ECServer::HELLO));
 	}
 
 	return newC;
 }
 
+void TClient::Free()
+{
+	if(buflen) dequeue(); /* flush data if any */
+
+	close(fd);
+	memset(this, 0, sizeof *this); /* clean up */
+	flag = ECD_FREE; /* now available for a new con */
+}
+
 void ECServer::delclient(TClient *del)
 {
-	if(del->fd >= highsock) /* Was the highest..*/
+	if(del->GetFd() >= highsock) /* Was the highest..*/
 		for(;highsock >= sock;--highsock) /* loop only till bot.sock */
-			if(!(Clients[highsock].flag & ECD_FREE)) break;
+			if(!(Clients[highsock].HasFlag(ECD_FREE))) break;
 
-	if(del->buflen) del->dequeue(); /* flush data if any */
-	FD_CLR(del->fd, &global_fd_set);
-
-	close(del->fd);
-	memset(del, 0, sizeof *del); /* clean up */
-	del->flag = ECD_FREE; /* now available for a new con */
+	FD_CLR(del->GetFd(), &global_fd_set);
+	del->Free();
 	return;
 }
 
@@ -298,7 +307,7 @@ int ECServer::init_socket(void)
 	uptime = CurrentTS;
 
 	for(reuse_addr = 0;reuse_addr < ASIZE(Clients);++reuse_addr)
-		Clients[reuse_addr].flag = ECD_FREE;
+		Clients[reuse_addr].SetFlag(ECD_FREE);
 
 	alarm(PINGINTERVAL);
 
@@ -337,7 +346,17 @@ int ECServer::run_server(void)
 						if(!addclient(newfd, inet_ntoa(newcon.sin_addr))) close(newfd);
 					}
 				}
-				else parse_this(i);
+				else
+				{
+					if((unsigned) i >= ASIZE(Clients))
+					{
+						printf("reading data from sock #%d, not registered ?", i);
+						break;
+					}
+
+					TClient *cl = &Clients[i];
+					cl->parse_this();
+				}
 			}
 		}
 	}

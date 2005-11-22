@@ -56,10 +56,10 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(*nick == '\0') return cl->exit(app.rpl(ECServer::ERR));
 
-	strncpy(cl->nick, nick, NICKLEN);
+	cl->SetNick(nick);
 	SetAuth(cl);
 
-	cl->sendrpl(app.rpl(ECServer::AIM), cl->nick);
+	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
 	return 0;
 }
 

@@ -34,14 +34,14 @@ void ECServer::sig_alarm(int c)
 	app.CurrentTS = time(NULL);
 	for(i = 0; i<= app.highsock;i++)
 	{
-		if(app.Clients[i].flag & ECD_FREE) continue;
+		if(app.Clients[i].GetFlags() & ECD_FREE) continue;
 		TClient *cl = &app.Clients[i];
 		if(IsPing(cl))
 		{
 			DelPing(cl);
 			cl->exit(app.rpl(ECServer::BYE), "Ping Timeout");
 		}
-		else if((cl->lastread + PINGINTERVAL) <= app.CurrentTS)
+		else if((cl->GetLastRead() + PINGINTERVAL) <= app.CurrentTS)
 		{
 			cl->sendrpl(app.rpl(ECServer::PING));
 			SetPing(cl);
@@ -84,10 +84,11 @@ try {
 	CurrentTS = time(NULL);
 
 	/* Déclarations des commandes */
-	/*                                 NOM		flag	args */
-	Commands.push_back(new IAMCommand("IAM",	0,		2));
-	Commands.push_back(new PIGCommand("PIG",	0,		0));
-	Commands.push_back(new POGCommand("POG",	0,		0));
+	/*                                 NOM		flag		args */
+	Commands.push_back(new IAMCommand("IAM",	0,			2));
+	Commands.push_back(new PIGCommand("PIG",	0,			0));
+	Commands.push_back(new POGCommand("POG",	0,			0));
+	Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);

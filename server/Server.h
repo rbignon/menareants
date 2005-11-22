@@ -25,19 +25,81 @@
 #include <string>
 
 /* - Client */
-#define SetFlush(x) 	(x)->flag |= ECD_FLUSH
-#define SetPing(x)		(x)->flag |= ECD_PING
-#define SetAuth(x)		(x)->flag |= ECD_AUTH
-#define DelFlush(x) 	(x)->flag &= ~ECD_FLUSH
-#define DelPing(x)		(x)->flag &= ~ECD_PING
-#define IsFlush(x)		((x)->flag & ECD_FLUSH)
-#define IsPing(x)		((x)->flag & ECD_PING)
-#define IsAuth(x)		((x)->flag & ECD_AUTH)
+#define SetFlush(x) 	(x)->SetFlag(ECD_FLUSH)
+#define SetPing(x)		(x)->SetFlag(ECD_PING)
+#define SetAuth(x)		(x)->SetFlag(ECD_AUTH)
+#define DelFlush(x) 	(x)->DelFlag(ECD_FLUSH)
+#define DelPing(x)		(x)->DelFlag(ECD_PING)
+#define IsFlush(x)		((x)->HasFlag(ECD_FLUSH))
+#define IsPing(x)		((x)->HasFlag(ECD_PING))
+#define IsAuth(x)		((x)->HasFlag(ECD_AUTH))
+
+class ECPlayer;
 
 class TClient
 {
+/* Constructeurs/Deconstructeurs */
 public:
+
+/* Methodes */
+public:
+
+	/* Parsage du dernier message */
+	int parse_this();
+
+	/* Envoyer un message au client */
+	int sendrpl(const char *pattern, ...);
+
+	/* Fermer le client */
+	int exit(const char *, ...);
+
+	/* Met le client en etat "Libre" */
+	void Free();
+
+	/* Initialisation d'un client */
+	void Init(int fd, const char *ip);
+
+/* Attributs */
+public:
+
+	/* Obtient le pseudo */
+	char* GetNick() { return nick; }
+
+	/* Paramètre le nick */
+	void SetNick(char* _nick) { strncpy(nick, _nick, NICKLEN); }
+
+	/* Obtient l'ip */
+	char* GetIp() { return ip; }
+
+	/* Obtient les flags */
+	unsigned int GetFlags() { return flag; }
+
+	/* Paramètre un flag */
+	void SetFlag(unsigned int f) { flag |= f; }
+
+	/* Retire un flag */
+	void DelFlag(unsigned int f) { flag &= ~f; }
+
+	/* A le flag ? */
+	bool HasFlag(unsigned int f) { return (flag & f); }
+
+	/* Dernière lecture */
+	time_t GetLastRead() { return lastread; }
+
+	/* Obtient le sock */
+	int GetFd() { return fd; }
+
+	/* Obtient la sturcture player si il fait partit d'un jeu */
+	ECPlayer *Player() { return pl; }
+
+/* Variables et fonctions privées */
+protected:
 	char nick[NICKLEN + 1];
+	size_t buflen;
+	size_t recvlen;
+	time_t lastread;
+	char QBuf[ECD_SENDSIZE+1];
+	char RecvBuf[ECD_RECVSIZE+1];
 	int fd;
 	unsigned int flag;	/* divers infos */
 #define ECD_AUTH 	0x01
@@ -45,16 +107,12 @@ public:
 #define ECD_FLUSH	0x04
 #define ECD_PING	0x08
 	char ip[16];
-	size_t buflen;
-	size_t recvlen;
-	time_t lastread;
-	char QBuf[ECD_SENDSIZE+1];
-	char RecvBuf[ECD_RECVSIZE+1];
+	ECPlayer *pl;
+
+	inline int dequeue();
 
 public:
-	int sendrpl(const char *pattern, ...);
-	int exit(const char *, ...);
-	inline int dequeue();
+	int parsemsg();
 };
 
 #endif
