@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  * $Id$
  */
 
@@ -25,17 +26,17 @@
 #include <vector>
 
 /********************************************************************************************
- *                               ECPlayer                                                   *
+ *                               ECBPlayer                                                   *
  ********************************************************************************************/
 
-class TClient;
+class ECBChannel;
 
-class ECPlayer
+class ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
-	ECPlayer() {}
-	~ECPlayer() {}
+	ECBPlayer(ECBChannel *_chan, bool _owner);
+	~ECBPlayer() {}
 
 /* Méthodes */
 public:
@@ -43,33 +44,35 @@ public:
 /* Attributs */
 public:
 
-	/* Obtient l'objet du client du *serveur* !! */
-	TClient *ServerClient() { return SClient; }
+	/* Salon auquel appartient le player */
+	ECBChannel *Channel() { return chan; }
 
-	/* Obtenir le pseudo du joueur */
-	std::string GetNick() { return nick; }
+	/* Argent détenu par le joueur */
+	int fric;
+
+	/* Est le créateur de la partie  ? */
+	bool IsOwner() { return owner; }
 
 /* Variables privées */
 protected:
-	TClient *SClient;
-
-	std::string nick;
+	ECBChannel *chan;
+	bool owner;
 };
 
 /********************************************************************************************
- *                               EChannel                                                   *
+ *                               ECBChannel                                                   *
  ********************************************************************************************/
 
-class EChannel
+class ECBChannel
 {
 /* Constructeurs/Deconstructeurs */
 public:
 
 	/* Constructeur en donnant le nom du salon */
-	EChannel(std::string _name);
+	ECBChannel(std::string _name);
 
 	/* Deconstructeur par default */
-	~EChannel() {}
+	~ECBChannel() {}
 
 /* Methodes */
 public:
@@ -80,21 +83,21 @@ public:
 	/* Obtient le nom du channel */
 	std::string GetName() { return name; }
 
-	/* Obtient un joueur par son pseudo */
-	ECPlayer *GetPlayer(std::string);
+	/* Récupère la liste des joueurs */
+	std::vector<ECBPlayer*> Players() { return players; }
 
 	/* Ajoute un player */
-	bool AddPlayer(ECPlayer*);
+	bool AddPlayer(ECBPlayer*);
 
 	/* Supprime un player
 	 * use_delete: si true, supprime lui meme le ECPlayer
 	 */
-	bool RemovePlayer(ECPlayer*, bool use_delete);
+	bool RemovePlayer(ECBPlayer*, bool use_delete);
 
 /* Variables privées */
 protected:
 	std::string name;
-	std::vector<ECPlayer*> players;
+	std::vector<ECBPlayer*> players;
 };
 
 #endif /* ECLIB_CHANNELS_H */

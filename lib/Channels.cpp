@@ -15,30 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  * $Id$
  */
 
 #include "Channels.h"
 
 /********************************************************************************************
- *                               EChannel                                                   *
+ *                               ECBPlayer                                                   *
  ********************************************************************************************/
 
-EChannel::EChannel(std::string _name)
+ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
+	: chan(_chan), owner(_owner)
+{
+
+}
+
+/********************************************************************************************
+ *                               ECBChannel                                                   *
+ ********************************************************************************************/
+
+ECBChannel::ECBChannel(std::string _name)
 	: name(_name)
 {
 
 }
 
-ECPlayer *EChannel::GetPlayer(std::string nick)
-{
-	for(unsigned int i=0;i<players.size();i++)
-		if(players[i]->GetNick() == nick)
-			return players[i];
-	return NULL;
-}
-
-bool EChannel::AddPlayer(ECPlayer* pl)
+bool ECBChannel::AddPlayer(ECBPlayer* pl)
 {
 	if(!pl) return false;
 
@@ -46,9 +49,9 @@ bool EChannel::AddPlayer(ECPlayer* pl)
 	return true;
 }
 
-bool EChannel::RemovePlayer(ECPlayer* pl, bool use_delete)
+bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
-	for (std::vector<ECPlayer*>::iterator it = players.begin(); it != players.end(); )
+	for (std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); )
 	{
 		if (*it == pl)
 		{
