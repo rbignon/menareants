@@ -9,6 +9,7 @@ $Id$
 Sommaire:
 1) Principe du jeu
 2) Protocole
+3) Particularités des commandes de positions
 
 1) Principe du jeu
 
@@ -26,30 +27,48 @@ Sommaire:
                   POS <pos>                       :se positionne
                   COL <couleur>                   :définit sa couleur
                   OK                              :indique que l'on est pret
-              KIK <nick>                        :l'owner peut kicker
+              KIK <nick> [raison]               :l'owner peut kicker
               GO!                               :l'owner lance le jeu
          - En cours de jeu
               RDY                               :le joueur est pret pour passer à la suite (anim ou jeu)
               CRA <nb> <pos> <typ>              :créer une armée
-              CHA <nb> [+<nb>] [%<type>]        :modifier le status d'une armée (+ ajouter hommes
-                  [/<nb>] [><pos>]               % changer le type; / diviser de tant; > changer position
+              CHA <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
+                  [/<nb>] [><pos>] [*[pos]]
+                  [<[pos]]
 
       b) Serveur -> Client
          - Général
               HEL <progs> <version>             :welcome
               AIM <nick>                        :confirmation du IAM
-              LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
-              EOL                               :fin de la liste
+              LSP <nom> <nbjoueurs> <nbmax> [$] :liste une partie
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
               BYE [raison]                      :au revoir
          - Dans une pré-partie
-              :SETS <nom> <sets>                :paramètres d'une partie (notifie un join)
-              :<nick> JOI <sets>                :un user join
+              SETS <sets>                       :paramètres d'une partie (notifie un join)
+              NLS <[@]nick1> [<[@]nick1> ...]   :liste des joueurs
+              :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <param> <value>       :un user met un paramètre
-              :<nick> LEA [raison]              :un user part (ou a été kické)
+              :<nick> LEA [raison] [$]          :un user part (ou a été kické) ($ = quit)
               :<nick> WGO                       :l'owner veut lancer le jeu
               :<nick> GO!                       :l'owner lance le jeu
          - En cours de jeu
-              :SMP <map> [$]                    :envoie la map, le $ notifie la dernière ligne (EOM)
-              :<nick> ARM <nom> [+<nb>]         :montre le changement d'une armée
-                          [%<type>] [><pos>] [<]
+              SMP <map> [$]                     :envoie la map, le $ notifie la dernière ligne (EOM)
+              :<nick>!<arm> ARM <nom> [+<nb>]   :montre le changement d'une armée
+                          [%<type>] [><pos>]
+                          [<[pos]] [-] [.]
+              DATE <jr> <njr> <mois> <année>    :indique la [nouvelle] date
+              :<nick>!<arm> ATQ <nick>!<arm>    :request une attaque (confirmation attendue)
+              :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
+                      OWN <nick>@<arm> <f1>
+                      [<f2> ...]
+
+3) Particularités des commandes de positions
+	Les commandes de positions nécessitent des arguments de la forme suivante :
+		+<nb>       :ajoute des unités (donne le nombre final)
+		%<type>     :définit le type de l'armée
+		/<nb>:<pos> :divise l'armée en une autre armée en indiquant sa position
+		><pos>      :change la position
+		*[pos]      :attaque envisagée (et sans position: accepte un combat)
+		<[pos]      :retour
+		-           :suppression de l'armée  } application encore indéfinie
+		.           :lock                    |
