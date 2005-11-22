@@ -1,3 +1,16 @@
+2005-11-22  Romain Bignon <progs@headfucking.net>
+
+	* API: Mise à jour.
+
+	* server/Server.h, server/Server.cpp, server/Main.h, server/Login.cpp: Utilisation plus
+	structurée de TClient;
+
+	* server/Channels.cpp, server/Channels.h (EChannels): Structure serveur des channels.
+	(ECPlayer): Structure serveur des players.
+
+	* lib/Channels.h, lib/Channels.cpp (ECBChannels): Structure de base (commune) des channels.
+	(ECBPlayer): Structure de base (commune) des channels.
+
 2005-11-21  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp, lib/Channels.h: Création des fichiers.
