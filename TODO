@@ -1,9 +1,10 @@
 À faire:
 
 * En cours
--lib/serveur: JOI
+-client: faire un listbox.
 
 * Urgent
+-client: gestion du listing des parties, de la création et du rejoins.
 -client: Problème de la position de la selection dans le menu à certains moments (options)
 
 * Bof

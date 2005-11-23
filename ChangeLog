@@ -1,5 +1,15 @@
 2005-11-23  Romain Bignon <progs@headfucking.net>
 
+	* src/gui: Création du répertoire. Mise de Menu.cpp dedans ainsi que de ListBox.cpp (vide).
+
+	* server/Server.cpp (TClient::Init): Met la valeur de lastread à maintenant pour éviter un
+	PIG immédiat.
+
+	* server/Login.cpp (BYECommand): Commande pour faire partir un client.
+
+	* server/Channels.cpp (LSPCommande): Commande pour lister les jeux.
+	(~EChannel): Destructeur se retire de la liste ChanList.
+
 	* server/Channels.cpp, server/Channels.h (sendto_players): envoie à tous les joueurs du jeu
 	(JOICommand): commande pour joindre ou créer un jeu
 	(LEACommand): commande pour partir d'un jeu
