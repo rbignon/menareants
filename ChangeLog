@@ -1,3 +1,11 @@
+2005-11-23  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp, server/Channels.h (sendto_players): envoie à tous les joueurs du jeu
+	(JOICommand): commande pour joindre ou créer un jeu
+	(LEACommand): commande pour partir d'un jeu
+
+	* lib/Outils.c (FormatStr): fonction qui formate les chaines en un "mot" (mise de '\')
+
 2005-11-22  Romain Bignon <progs@headfucking.net>
 
 	* API: Mise à jour.

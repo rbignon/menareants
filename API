@@ -43,6 +43,7 @@ Sommaire:
               LSP <nom> <nbjoueurs> <nbmax> [$] :liste une partie
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
               BYE [raison]                      :au revoir
+              USED                              :pseudo déjà utilisé
          - Dans une pré-partie
               SETS <sets>                       :paramètres d'une partie (notifie un join)
               NLS <[@]nick1> [<[@]nick1> ...]   :liste des joueurs
