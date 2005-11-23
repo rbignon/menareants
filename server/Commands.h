@@ -23,12 +23,12 @@
 
 #include <string>
 #include <vector>
-#include "Main.h"
+
 #include "Server.h"
 
 class EC_ACommand
 {
-friend class ECServer;
+friend int TClient::parsemsg();
 public:
 	EC_ACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)
 		: CmdName(_CmdName), flags(_flags), args(_args)
@@ -58,5 +58,7 @@ public: \
 DECLARE_CMD ( IAM );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( POG );
+DECLARE_CMD ( JOI );
+DECLARE_CMD ( LEA );
 
 #endif
