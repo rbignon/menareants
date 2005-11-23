@@ -82,3 +82,11 @@ int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 
 }
+
+/* BYE [message] */
+int BYECommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	const char* raison = parv.size() > 1 ? parv[1].c_str() : "";
+
+	return cl->exit(app.rpl(ECServer::BYE), FormatStr(raison));
+}
