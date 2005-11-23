@@ -28,7 +28,7 @@
 #endif
 
 #include "Main.h"
-#include "Menu.h"
+#include "gui/Menu.h"
 #include "tools/Font.h"
 #include "tools/Images.h"
 
@@ -200,6 +200,15 @@ int EuroConqApp::main(int argc, char **argv)
 			menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
 			menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
 			menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
+
+			std::vector<std::string> sl;
+			sl.push_back("sex");
+			sl.push_back("crime");
+			sl.push_back("encore");
+			sl.push_back("un");
+			menu->add_stringlist("Merde", OPTIONS_TEST, 0, MENU_OPTIONS, sl, 2);
+
+
 			menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
 		menu->add_item(std::string("Quitter"), MENU_EXIT, 0 );
 

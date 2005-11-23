@@ -20,7 +20,6 @@
 
 #include "Sockets.h"
 #include "Main.h"
-#include "Menu.h"
 #include "Commands.h"
 
 #include <arpa/inet.h>
@@ -62,7 +61,7 @@ int EC_Client::sendrpl(const char *pattern, ...)
 
 	send(sock, buf, len, 0);
 #ifdef DEBUG
-	std::cout << "S - " << buf << std::endl;
+	std::cout << "S - " << buf;
 #endif
 
 	return 0;
@@ -97,12 +96,6 @@ void EC_Client::parse_message(std::string buf)
 			parv.push_back(std::string(s));
 		}
 	}
-
-#ifdef DEBUG
-	std::cout << "Com: " << cmdname << std::endl;
-	for(i=0;i<parv.size();i++)
-		std::cout << "parv[" << i << "]=" << parv[i] << std::endl;
-#endif
 
 	EC_ACommand *cmd = NULL;
 	for(i=0;i<Commands.size() && !cmd;i++)

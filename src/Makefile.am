@@ -6,14 +6,16 @@ INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 bin_PROGRAMS = euroconq
 euroconq_SOURCES = \
 		Main.cpp \
-		Menu.cpp \
 		Timer.cpp \
 		Resources.cpp \
 		Sockets.cpp \
 		Config.cpp \
 		Login.cpp \
+		Channels.cpp \
 		tools/Font.cpp \
-		tools/Images.cpp
+		tools/Images.cpp \
+		gui/Menu.cpp \
+		gui/ListBox.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 

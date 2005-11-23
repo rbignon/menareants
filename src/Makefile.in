@@ -50,9 +50,10 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_euroconq_OBJECTS = Main.$(OBJEXT) Menu.$(OBJEXT) Timer.$(OBJEXT) \
+am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Login.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT)
+	Login.$(OBJEXT) Channels.$(OBJEXT) Font.$(OBJEXT) \
+	Images.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -173,14 +174,16 @@ SUBDIRS = data
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 euroconq_SOURCES = \
 		Main.cpp \
-		Menu.cpp \
 		Timer.cpp \
 		Resources.cpp \
 		Sockets.cpp \
 		Config.cpp \
 		Login.cpp \
+		Channels.cpp \
 		tools/Font.cpp \
-		tools/Images.cpp
+		tools/Images.cpp \
+		gui/Menu.cpp \
+		gui/ListBox.cpp
 
 euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
 all: all-recursive
@@ -249,9 +252,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Images.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ListBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Menu.Po@am__quote@
@@ -300,6 +305,34 @@ Images.obj: tools/Images.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Images.cpp' object='Images.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Images.obj `if test -f 'tools/Images.cpp'; then $(CYGPATH_W) 'tools/Images.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Images.cpp'; fi`
+
+Menu.o: gui/Menu.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Menu.o -MD -MP -MF "$(DEPDIR)/Menu.Tpo" -c -o Menu.o `test -f 'gui/Menu.cpp' || echo '$(srcdir)/'`gui/Menu.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Menu.Tpo" "$(DEPDIR)/Menu.Po"; else rm -f "$(DEPDIR)/Menu.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Menu.cpp' object='Menu.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Menu.o `test -f 'gui/Menu.cpp' || echo '$(srcdir)/'`gui/Menu.cpp
+
+Menu.obj: gui/Menu.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Menu.obj -MD -MP -MF "$(DEPDIR)/Menu.Tpo" -c -o Menu.obj `if test -f 'gui/Menu.cpp'; then $(CYGPATH_W) 'gui/Menu.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Menu.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Menu.Tpo" "$(DEPDIR)/Menu.Po"; else rm -f "$(DEPDIR)/Menu.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Menu.cpp' object='Menu.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Menu.obj `if test -f 'gui/Menu.cpp'; then $(CYGPATH_W) 'gui/Menu.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Menu.cpp'; fi`
+
+ListBox.o: gui/ListBox.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ListBox.o -MD -MP -MF "$(DEPDIR)/ListBox.Tpo" -c -o ListBox.o `test -f 'gui/ListBox.cpp' || echo '$(srcdir)/'`gui/ListBox.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/ListBox.Tpo" "$(DEPDIR)/ListBox.Po"; else rm -f "$(DEPDIR)/ListBox.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/ListBox.cpp' object='ListBox.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ListBox.o `test -f 'gui/ListBox.cpp' || echo '$(srcdir)/'`gui/ListBox.cpp
+
+ListBox.obj: gui/ListBox.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ListBox.obj -MD -MP -MF "$(DEPDIR)/ListBox.Tpo" -c -o ListBox.obj `if test -f 'gui/ListBox.cpp'; then $(CYGPATH_W) 'gui/ListBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/ListBox.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/ListBox.Tpo" "$(DEPDIR)/ListBox.Po"; else rm -f "$(DEPDIR)/ListBox.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/ListBox.cpp' object='ListBox.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ListBox.obj `if test -f 'gui/ListBox.cpp'; then $(CYGPATH_W) 'gui/ListBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/ListBox.cpp'; fi`
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
