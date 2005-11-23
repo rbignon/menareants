@@ -45,3 +45,18 @@ std::string stringtok(std::string &in, const char * const delimiters = " \t\n")
 
 		return s;
 }
+
+char* FormatStr(const char* s)
+{
+	static char ptr[512];
+	int i, size = sizeof ptr;
+
+	for(i=0; *s && (i < size); ++i,++s)
+	{
+		if(*s == '\\' && *(s+1) == ' ') ptr[i++] = '\\';
+		else if(*s == ' ') ptr[i++] = '\\';
+		ptr[i] = *s;
+	}
+	ptr[i] = '\0';
+	return ptr;
+}

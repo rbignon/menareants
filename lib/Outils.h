@@ -22,7 +22,11 @@
 #define Outils_hpp
 #include <sstream>
 
+/* Récupère le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
+
+/* Formate la chaine avec des \ devant les espaces */
+char* FormatStr(const char* s);
 
 template<typename T>
 bool StrToTyp( const std::string & Str, T & Dest )
