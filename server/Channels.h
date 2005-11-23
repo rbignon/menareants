@@ -22,6 +22,8 @@
 #ifndef ECD_CHANNELS_H
 #define ECD_CHANNELS_H
 
+#include "../lib/Channels.h"
+
 class TClient;
 
 class ECBPlayer;
@@ -37,7 +39,11 @@ class ECPlayer : public ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
-	ECPlayer(TClient* cl, EChannel* chan);
+
+	/* Création en donnant la structure du client, du salon et
+	 * en spécifiant si il est owner ou non
+	 */
+	ECPlayer(TClient* cl, EChannel* chan, bool owner);
 
 /* Methodes */
 public:
@@ -46,10 +52,13 @@ public:
 public:
 
 	/* Salon auquel appartient le player */
-	EChannel *Channel() { return chan; }
+	EChannel *Channel() { return (EChannel*)chan; }
 
 	/* Obtient le client */
 	TClient *Client() { return client; }
+
+	/* Obtient le pseudo du client */
+	virtual char* GetNick();
 
 	/* Le joueur est pret (utilisation de RDY) */
 	bool Ready;
@@ -57,7 +66,6 @@ public:
 /* Variables privées */
 protected:
 	TClient *client;
-	EChannel *chan;
 };
 
 /********************************************************************************************
@@ -69,17 +77,23 @@ class EChannel : public ECBChannel
 /* Constructeurs/Deconstructeurs */
 public:
 
+	EChannel(std::string _name)
+		: ECBChannel(_name)
+	{}
+
 /* Methodes */
 public:
 
 	/* Nécessite que tous les joueurs soient prets */
 	void NeedReady();
 
+	/* Envoie un message à tous les joueurs
+	 * one: joueur à qui l'on envoie pas
+	 */
+	int sendto_players(ECPlayer* one, const char*, ...);
+
 /* Attributs */
 public:
-
-	/* Récupère la liste des joueurs */
-	std::vector<ECPlayer*> Players() { return players; }
 
 	/* Récupère le Player par le pseudo */
 	ECPlayer* GetPlayer(char* nick);
@@ -89,7 +103,7 @@ public:
 
 /* Variables privées */
 protected:
-	std::vector<ECPlayer*> players;
+
 };
 
 extern std::vector<EChannel*> ChanList;
