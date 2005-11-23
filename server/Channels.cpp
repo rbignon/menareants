@@ -87,6 +87,15 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
+/* LSP */
+int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	for(unsigned i=0; i<ChanList.size();i++)
+		cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(), 0);
+
+	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
+}
+
 /********************************************************************************************
  *                               EPlayer                                                    *
  ********************************************************************************************/
@@ -105,6 +114,20 @@ char* ECPlayer::GetNick()
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
+
+EChannel::~EChannel()
+{
+	for (std::vector<EChannel*>::iterator it = ChanList.begin(); it != ChanList.end(); )
+	{
+		if (*it == this)
+		{
+			it = ChanList.erase(it);
+			return;
+		}
+		else
+			++it;
+	}
+}
 
 void EChannel::NeedReady()
 {
