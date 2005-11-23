@@ -49,6 +49,8 @@ public:
 		SETS,  /* SETS */
 		PLIST, /* PLS */
 		LEAVE, /* LEA */
+		GLIST, /* LSP */
+		EOGLIST,/*EOL */
 
 		NONE
 	};
