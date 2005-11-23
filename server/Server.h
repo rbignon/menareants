@@ -47,10 +47,13 @@ public:
 	/* Parsage du dernier message */
 	int parse_this();
 
-	/* Envoyer un message au client */
+	/* Envoyer un message formaté au client */
 	int sendrpl(const char *pattern, ...);
 
-	/* Fermer le client */
+	/* Envoie un message (sans formatage) */
+	int sendbuf(const char* buf, int len);
+
+	/* Fermer le client (message formaté) */
 	int exit(const char *, ...);
 
 	/* Met le client en etat "Libre" */
@@ -91,6 +94,10 @@ public:
 
 	/* Obtient la sturcture player si il fait partit d'un jeu */
 	ECPlayer *Player() { return pl; }
+
+	void SetPlayer(ECPlayer *P) { if(!pl) pl = P; }
+
+	void ClrPlayer() { pl = NULL; }
 
 /* Variables et fonctions privées */
 protected:

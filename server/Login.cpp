@@ -18,9 +18,10 @@
  * $Id$
  */
 
-#include "Main.h"
+#include "Commands.h"
 #include "Server.h"
 #include "Outils.h"
+#include "Main.h"
 #include <string>
 
 char *correct_nick(const char *nick)
@@ -55,6 +56,10 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	char *nick = correct_nick(parv[1].c_str());
 
 	if(*nick == '\0') return cl->exit(app.rpl(ECServer::ERR));
+
+	for(unsigned int i=0; i < app.GetHighSock(); i++)
+		if(!strcasecmp(app.Clients[i].GetNick(), nick))
+			return cl->exit(app.rpl(ECServer::USED));
 
 	cl->SetNick(nick);
 	SetAuth(cl);

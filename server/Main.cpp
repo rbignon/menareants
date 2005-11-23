@@ -18,8 +18,9 @@
  * $Id$
  */
 
-#include "Main.h"
 #include "Defines.h"
+#include "Commands.h"
+#include "Main.h"
 #include <string>
 #include <iostream>
 #include <signal.h>
@@ -29,10 +30,8 @@ ECServer app;
 
 void ECServer::sig_alarm(int c)
 {
-	int i;
-
 	app.CurrentTS = time(NULL);
-	for(i = 0; i<= app.highsock;i++)
+	for(unsigned int i = 0; i<= app.highsock;i++)
 	{
 		if(app.Clients[i].GetFlags() & ECD_FREE) continue;
 		TClient *cl = &app.Clients[i];
@@ -89,6 +88,7 @@ try {
 	Commands.push_back(new PIGCommand("PIG",	0,			0));
 	Commands.push_back(new POGCommand("POG",	0,			0));
 	Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
+	Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);

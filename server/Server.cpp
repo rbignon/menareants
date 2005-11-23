@@ -20,6 +20,9 @@
 
 #include "Server.h"
 #include "Main.h"
+#include "Commands.h"
+#include "Channels.h"
+#include <config.h>
 #include <string>
 #include <iostream>
 #include <arpa/inet.h>
@@ -39,10 +42,12 @@ const char* msgTab[] = {
      "AIM %s",                              /* AIM - Logué */
      "PIG",                                 /* PIG - Envoie un ping */
      "POG",                                 /* POG - Reçoit un pong */
+     "USED",                                /* USED - Pseudo déjà utilisé */
 
      ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
      "SETS %s",                             /* SETS - Les paramètres du salon */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
+     ":%s LEA %s",                          /* LEA - Un user part du salon */
      0
 };
 
@@ -61,14 +66,24 @@ int TClient::exit(const char *pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	printf("S(%s@%s) - %s", this->nick, this->ip, buf);
+	this->sendbuf(buf, len);
+
+	app.delclient(this);
+	return 0;
+}
+
+int TClient::sendbuf(const char* buf, int len)
+{
+#ifdef DEBUG
+	if(strncasecmp(buf, "PIG", 3) && strncasecmp(buf, "POG", 3))
+		printf("S(%s@%s) - %s", this->nick, this->ip, buf);
+#endif
 
 	if(this->buflen + len >= ECD_SENDSIZE) this->dequeue(); /* would overflow, flush it */
 	strcpy(this->QBuf + this->buflen, buf); /* append reply to buffer */
 	this->buflen += len;
 	this->dequeue();
 
-	app.delclient(this);
 	return 0;
 }
 
@@ -87,13 +102,7 @@ int TClient::sendrpl(const char *pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	//if(strncasecmp(buf, "PING", 4) && strncasecmp(buf, "PONG", 4))
-		printf("S(%s@%s) - %s", this->nick, this->ip, buf);
-
-	if(this->buflen + len >= ECD_SENDSIZE) this->dequeue(); /* would overflow, flush it */
-	strcpy(this->QBuf + this->buflen, buf); /* append reply to buffer */
-	this->buflen += len;
-	this->dequeue();
+	this->sendbuf(buf, len);
 
 	return 0;
 }
@@ -130,10 +139,6 @@ int TClient::parsemsg()
 			parv.push_back(std::string(s));
 		}
 	}
-
-	std::cout << "Com: " << cmdname << std::endl;
-	for(i=0;i<parv.size();i++)
-		std::cout << "parv[" << i << "]=" << parv[i] << std::endl;
 
 	EC_ACommand *cmd = NULL;
 	for(i=0;i<app.GetCommands().size() && !cmd;i++)
@@ -189,8 +194,10 @@ int TClient::parse_this()
 			{
 				RecvBuf[recvlen-1] = 0;
 				lastread = app.CurrentTS;
-				if(strncasecmp(RecvBuf, "PING", 4) && strncasecmp(RecvBuf, "PONG", 4))
+#ifdef DEBUG
+				if(strncasecmp(RecvBuf, "PIG", 3) && strncasecmp(RecvBuf, "POG", 3))
 					printf("R(%s@%s) - %s\n", nick, ip, RecvBuf);
+#endif
 				parsemsg();
 				if(flag & ECD_FREE) break; /* in case of failed pass */
 
@@ -238,7 +245,7 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	else
 	{	/* register the socket in client list */
 		newC = &Clients[fd];
-		if(fd > highsock) highsock = fd;
+		if((unsigned)fd > highsock) highsock = fd;
 		FD_SET(fd, &global_fd_set);
 		newC->Init(fd, ip);
 		newC->sendrpl(rpl(ECServer::HELLO));
@@ -251,6 +258,15 @@ void TClient::Free()
 {
 	if(buflen) dequeue(); /* flush data if any */
 
+	EChannel *c;
+	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
+	{
+		c->RemovePlayer(pl, true);
+		c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "$");
+		if(!c->NbPlayers())
+			delete c;
+	}
+
 	close(fd);
 	memset(this, 0, sizeof *this); /* clean up */
 	flag = ECD_FREE; /* now available for a new con */
@@ -258,8 +274,8 @@ void TClient::Free()
 
 void ECServer::delclient(TClient *del)
 {
-	if(del->GetFd() >= highsock) /* Was the highest..*/
-		for(;highsock >= sock;--highsock) /* loop only till bot.sock */
+	if((unsigned)del->GetFd() >= highsock) /* Was the highest..*/
+		for(;highsock >= (unsigned)sock;--highsock) /* loop only till bot.sock */
 			if(!(Clients[highsock].HasFlag(ECD_FREE))) break;
 
 	FD_CLR(del->GetFd(), &global_fd_set);
@@ -299,7 +315,7 @@ int ECServer::init_socket(void)
 	highsock = 0;
 
 	listen(sock, 5);
-	if(sock > highsock) highsock = sock;
+	if((unsigned)sock > highsock) highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
 	std::cout << "Serveur " << APP_NAME << "(" << APP_VERSION << ") lancé (Port " << conf->port << ")"
@@ -317,7 +333,6 @@ int ECServer::init_socket(void)
 int ECServer::run_server(void)
 {
 	fd_set tmp_fdset;
-	int i;
 
 	while(running)
 	{
@@ -333,10 +348,10 @@ int ECServer::run_server(void)
 		}
 		else
 		{
-			for(i = 0;i <= highsock;++i)
+			for(unsigned int i = 0;i <= highsock;++i)
 			{
 				if(!FD_ISSET(i, &tmp_fdset)) continue;
-				if(i == sock)
+				if(i == (unsigned)sock)
 				{
 					struct sockaddr_in newcon;
 					unsigned int addrlen = sizeof newcon;
@@ -348,7 +363,7 @@ int ECServer::run_server(void)
 				}
 				else
 				{
-					if((unsigned) i >= ASIZE(Clients))
+					if(i >= ASIZE(Clients))
 					{
 						printf("reading data from sock #%d, not registered ?", i);
 						break;

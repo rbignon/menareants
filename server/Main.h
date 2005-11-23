@@ -23,9 +23,10 @@
 
 #include "Config.h"
 #include "Server.h"
-#include "Commands.h"
 #include <fcntl.h>
 #include <vector>
+
+class EC_ACommand;
 
 class ECServer
 {
@@ -42,9 +43,12 @@ public:
 		PING,  /* PIG */
 		PONG,  /* POG */
 
+		USED,  /* USED */
+
 		JOIN,  /* JOI */
 		SETS,  /* SETS */
 		PLIST, /* PLS */
+		LEAVE, /* LEA */
 
 		NONE
 	};
@@ -62,6 +66,8 @@ public:
 
 	std::vector<EC_ACommand*> GetCommands() { return Commands; }
 
+	unsigned int GetHighSock() { return highsock; }
+
 protected:
 	Config *conf;
 	int run_server(void);
@@ -75,7 +81,7 @@ protected:
 
 	time_t uptime;
 	int sock;
-	int highsock;
+	unsigned int highsock;
 	fd_set global_fd_set;
 
 	std::vector<EC_ACommand*> Commands;
