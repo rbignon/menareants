@@ -40,7 +40,8 @@ Sommaire:
          - Général
               HEL <progs> <version>             :welcome
               AIM <nick>                        :confirmation du IAM
-              LSP <nom> <nbjoueurs> <nbmax> [$] :liste une partie
+              LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
+              EOL                               :fin de la liste
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
               BYE [raison]                      :au revoir
               USED                              :pseudo déjà utilisé
