@@ -47,7 +47,9 @@ const char* msgTab[] = {
      ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
      "SETS %s",                             /* SETS - Les paramètres du salon */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
-     ":%s LEA %s",                          /* LEA - Un user part du salon */
+     ":%s LEA %s",                          /* LEA - Un user part du saon */
+     "LSP %s %d %d",                        /* LSP - Liste les parties */
+     "EOL",                                 /* EOL - Fin de la liste */
      0
 };
 
@@ -230,6 +232,7 @@ void TClient::Init(int _fd, const char *_ip)
 	fd = _fd;
 	strcpy(ip, _ip);
 	flag = 0;
+	lastread = app.CurrentTS;
 }
 
 TClient *ECServer::addclient(int fd, const char *ip)
