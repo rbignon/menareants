@@ -28,7 +28,7 @@
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	: chan(_chan), owner(_owner)
 {
-
+	chan->AddPlayer(this);
 }
 
 /********************************************************************************************
@@ -64,4 +64,17 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 			++it;
 	}
 	return false;
+}
+
+const char* ECBChannel::PlayerList()
+{
+	std::string list = "";
+	for(unsigned int i=0; i<players.size();i++)
+	{
+		if(!list.empty()) list += " ";
+		if(players[i]->IsOwner())
+			list += "@";
+		list += players[i]->GetNick();
+	}
+	return list.c_str();
 }

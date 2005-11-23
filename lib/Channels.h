@@ -31,12 +31,13 @@
 
 class ECBChannel;
 
+/* ATTENTION! Classe virtuelle */
 class ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
 	ECBPlayer(ECBChannel *_chan, bool _owner);
-	~ECBPlayer() {}
+	virtual ~ECBPlayer() {}
 
 /* Méthodes */
 public:
@@ -52,6 +53,9 @@ public:
 
 	/* Est le créateur de la partie  ? */
 	bool IsOwner() { return owner; }
+
+	/* Retourne le pseudo du joueur */
+	virtual char* GetNick() = 0;
 
 /* Variables privées */
 protected:
@@ -81,7 +85,7 @@ public:
 public:
 
 	/* Obtient le nom du channel */
-	std::string GetName() { return name; }
+	const char* GetName() { return name.c_str(); }
 
 	/* Récupère la liste des joueurs */
 	std::vector<ECBPlayer*> Players() { return players; }
@@ -93,6 +97,12 @@ public:
 	 * use_delete: si true, supprime lui meme le ECPlayer
 	 */
 	bool RemovePlayer(ECBPlayer*, bool use_delete);
+
+	/* Retourne le nombre de joueurs dans le jeu */
+	unsigned int NbPlayers() { return players.size(); }
+
+	/* Retourne la liste des joueurs */
+	const char* PlayerList();
 
 /* Variables privées */
 protected:
