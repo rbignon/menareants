@@ -23,9 +23,6 @@
 
 #include "tools/Images.h"
 
-class CL_Font;
-class CL_Surface;
-class CL_ResourceManager;
 
 /**
   *@author Andreas Hundt, Denis Oliver Kropp
@@ -40,12 +37,18 @@ public:
 	static ECImage*	Titlescreen();
 	static ECImage*	Loadscreen();
 
+	static ECSpriteBase* UpButton();
+	static ECSpriteBase* DownButton();
+
 	static void Unload();
 
 protected:
 
 	static ECImage *sur_titlescreen;
 	static ECImage *sur_loadscreen;
+
+	static ECSpriteBase *spr_upbutton;
+	static ECSpriteBase *spr_downbutton;
 };
 
 #endif

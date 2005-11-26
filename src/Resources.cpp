@@ -31,6 +31,9 @@
 ECImage*				Resources::sur_titlescreen = NULL;
 ECImage*				Resources::sur_loadscreen = NULL;
 
+ECSpriteBase*			Resources::spr_upbutton = NULL;
+ECSpriteBase*			Resources::spr_downbutton = NULL;
+
 
 Resources::Resources()
 {
@@ -45,6 +48,8 @@ void Resources::Unload()
 {
 	if(sur_titlescreen) delete sur_titlescreen;
 	if(sur_loadscreen) delete sur_loadscreen;
+	if(spr_upbutton) delete spr_upbutton;
+	if(spr_downbutton) delete spr_downbutton;
 }
 
 ECImage* Resources::Titlescreen()
@@ -61,4 +66,18 @@ ECImage* Resources::Loadscreen()
 		sur_loadscreen = new ECImage(PKGDATADIR_PICS "loading.png");
 	return sur_loadscreen;
 
+}
+
+ECSpriteBase* Resources::UpButton()
+{
+	if(!spr_upbutton)
+		spr_upbutton = new ECSpriteBase("upbutton");
+	return spr_upbutton;
+}
+
+ECSpriteBase* Resources::DownButton()
+{
+	if(!spr_downbutton)
+		spr_downbutton = new ECSpriteBase("downbutton");
+	return spr_downbutton;
 }
