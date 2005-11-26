@@ -32,7 +32,7 @@ class ECSprite
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECSprite() {}
+	ECSprite(ECSpriteBase* _base, SDL_Surface* _screen) { init(_base, _screen); }
 	~ECSprite() {};
 
 /* Methodes */
@@ -76,6 +76,10 @@ public:
 	void yset(int nr) { mY=nr; }
 	void set(int xx, int yy) { mX=xx; mY=yy; }
 
+	/* Fonctions pour la largeur */
+	int GetWidth();
+	int GetHeight();
+
 /* Variables privées */
 private:
 	int mFrame;
@@ -99,6 +103,9 @@ public:
 	 * pour l'animation (images, frequence, etc..)
 	 */
 	int init(char *dir);
+
+	ECSpriteBase(char *dir) { init(dir); }
+	~ECSpriteBase() {}
 
 /* Variables publiques */
 public:
@@ -130,6 +137,12 @@ public:
 
 	/* Dessine en 0x0 (background) */
 	void Draw();
+
+	/* Obtenir la largeur */
+	unsigned int GetWidth() { return (Img ? Img->w : 0); }
+
+	/* Obtenir la hauteur */
+	unsigned int GetHeight() { return (Img ? Img->h : 0); }
 
 /* Variables publiques */
 public:

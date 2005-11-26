@@ -85,7 +85,14 @@ void ECSprite::draw()
   SDL_BlitSurface(mSpriteBase->mAnim[mFrame].Img, NULL, mScreen, &dest);
 }
 
-
+int ECSprite::GetWidth()
+{
+	return (mSpriteBase ? mSpriteBase->mW : 0);
+}
+int ECSprite::GetHeight()
+{
+	return (mSpriteBase ? mSpriteBase->mH : 0);
+}
 
 /****************************************************************************************
  *                                      ECSpriteBase                                    *
@@ -99,7 +106,7 @@ int ECSpriteBase::init(char *dir)
   int pause=0, r=0, g=0, b=0;
   FILE *fp;
 
-  sprintf(filename, PKGDATADIR_PICS "%s/info", dir);
+  sprintf(filename, PKGDATADIR_ANIMS "%s/info", dir);
 
   if((fp=fopen(filename, "r")) == NULL)
   {
@@ -120,9 +127,9 @@ int ECSpriteBase::init(char *dir)
     if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n' && strlen(buffer) != 0)
     {
       sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
-      sprintf(filename, PKGDATADIR_PICS "%s/%s", dir, name);
+      sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
       SDL_Surface *temp;
-      if((temp = SDL_LoadBMP(filename)) == NULL) return -1;
+      if((temp = IMG_Load(filename)) == NULL) { printf("die (%s)\n", filename); return -1; }
       if(r >= 0) SDL_SetColorKey(temp, SDL_SRCCOLORKEY, SDL_MapRGB(temp->format, r, g, b));
       mAnim[count].Img = SDL_DisplayFormat(temp);
       SDL_FreeSurface(temp);
