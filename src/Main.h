@@ -21,14 +21,14 @@
 #ifndef EC_Main_h
 #define EC_Main_h
 
-#include "Resources.h"
-
 #include "Defines.h"
 #include "Config.h"
 #include "Sockets.h"
 
 #include <iostream>
 #include <SDL_thread.h>
+
+struct SDL_Surface;
 
 #ifndef WIN32
 	#include <config.h>
@@ -64,6 +64,8 @@ protected:
 	SDL_Thread* Thread;
 
 	void request_game();
+	void ListGames();
+	void GameInfos(bool created);
 
 public:
 	int main(int argc, char** argv);
