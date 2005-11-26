@@ -31,6 +31,8 @@ const char* msgTab[] = {
 	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
 	"POG",                                    /* POG - PONG */
 	"BYE",                                    /* BYE - Quit le serveur */
+
+	"LSP",                                    /* LSP - Liste les jeux */
      0
 };
 
@@ -204,6 +206,8 @@ void EC_Client::Init()
 	Commands.push_back(new HELCommand("HEL", 0,	1));
 	Commands.push_back(new PIGCommand("PIG", 0,	0));
 	Commands.push_back(new AIMCommand("AIM", 0,	1));
+	Commands.push_back(new LSPCommand("LSP", 0,	1));
+	Commands.push_back(new EOLCommand("EOL", 0,	1));
 }
 
 EC_Client::EC_Client()

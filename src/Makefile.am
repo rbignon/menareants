@@ -12,10 +12,13 @@ euroconq_SOURCES = \
 		Config.cpp \
 		Login.cpp \
 		Channels.cpp \
+		JoinGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
+		tools/Maths.cpp \
 		gui/Menu.cpp \
-		gui/ListBox.cpp
+		gui/ListBox.cpp \
+		gui/Boutton.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 

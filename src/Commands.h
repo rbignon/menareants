@@ -58,6 +58,8 @@ public: \
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( AIM );
+DECLARE_CMD ( LSP );
+DECLARE_CMD ( EOL );
 
 #endif
 

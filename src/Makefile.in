@@ -52,8 +52,9 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Login.$(OBJEXT) Channels.$(OBJEXT) Font.$(OBJEXT) \
-	Images.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT)
+	Login.$(OBJEXT) Channels.$(OBJEXT) JoinGame.$(OBJEXT) \
+	Font.$(OBJEXT) Images.$(OBJEXT) Maths.$(OBJEXT) Menu.$(OBJEXT) \
+	ListBox.$(OBJEXT) Boutton.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -180,10 +181,13 @@ euroconq_SOURCES = \
 		Config.cpp \
 		Login.cpp \
 		Channels.cpp \
+		JoinGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
+		tools/Maths.cpp \
 		gui/Menu.cpp \
-		gui/ListBox.cpp
+		gui/ListBox.cpp \
+		gui/Boutton.cpp
 
 euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
 all: all-recursive
@@ -252,13 +256,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Boutton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Images.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JoinGame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ListBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Maths.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Menu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Resources.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sockets.Po@am__quote@
@@ -306,6 +313,20 @@ Images.obj: tools/Images.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Images.obj `if test -f 'tools/Images.cpp'; then $(CYGPATH_W) 'tools/Images.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Images.cpp'; fi`
 
+Maths.o: tools/Maths.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Maths.o -MD -MP -MF "$(DEPDIR)/Maths.Tpo" -c -o Maths.o `test -f 'tools/Maths.cpp' || echo '$(srcdir)/'`tools/Maths.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Maths.Tpo" "$(DEPDIR)/Maths.Po"; else rm -f "$(DEPDIR)/Maths.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Maths.cpp' object='Maths.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Maths.o `test -f 'tools/Maths.cpp' || echo '$(srcdir)/'`tools/Maths.cpp
+
+Maths.obj: tools/Maths.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Maths.obj -MD -MP -MF "$(DEPDIR)/Maths.Tpo" -c -o Maths.obj `if test -f 'tools/Maths.cpp'; then $(CYGPATH_W) 'tools/Maths.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Maths.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Maths.Tpo" "$(DEPDIR)/Maths.Po"; else rm -f "$(DEPDIR)/Maths.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Maths.cpp' object='Maths.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Maths.obj `if test -f 'tools/Maths.cpp'; then $(CYGPATH_W) 'tools/Maths.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Maths.cpp'; fi`
+
 Menu.o: gui/Menu.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Menu.o -MD -MP -MF "$(DEPDIR)/Menu.Tpo" -c -o Menu.o `test -f 'gui/Menu.cpp' || echo '$(srcdir)/'`gui/Menu.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Menu.Tpo" "$(DEPDIR)/Menu.Po"; else rm -f "$(DEPDIR)/Menu.Tpo"; exit 1; fi
@@ -333,6 +354,20 @@ ListBox.obj: gui/ListBox.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/ListBox.cpp' object='ListBox.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ListBox.obj `if test -f 'gui/ListBox.cpp'; then $(CYGPATH_W) 'gui/ListBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/ListBox.cpp'; fi`
+
+Boutton.o: gui/Boutton.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Boutton.o -MD -MP -MF "$(DEPDIR)/Boutton.Tpo" -c -o Boutton.o `test -f 'gui/Boutton.cpp' || echo '$(srcdir)/'`gui/Boutton.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Boutton.Tpo" "$(DEPDIR)/Boutton.Po"; else rm -f "$(DEPDIR)/Boutton.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Boutton.cpp' object='Boutton.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Boutton.o `test -f 'gui/Boutton.cpp' || echo '$(srcdir)/'`gui/Boutton.cpp
+
+Boutton.obj: gui/Boutton.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Boutton.obj -MD -MP -MF "$(DEPDIR)/Boutton.Tpo" -c -o Boutton.obj `if test -f 'gui/Boutton.cpp'; then $(CYGPATH_W) 'gui/Boutton.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Boutton.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Boutton.Tpo" "$(DEPDIR)/Boutton.Po"; else rm -f "$(DEPDIR)/Boutton.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Boutton.cpp' object='Boutton.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Boutton.obj `if test -f 'gui/Boutton.cpp'; then $(CYGPATH_W) 'gui/Boutton.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Boutton.cpp'; fi`
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd

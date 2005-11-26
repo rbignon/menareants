@@ -44,6 +44,7 @@ public:
 		IAM,  /* IAM */
 		PONG, /* POG */
 		QUIT, /* BYE */
+		LISTGAME, /* LSP */
 
 		NONE
 	};
