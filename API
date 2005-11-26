@@ -38,7 +38,7 @@ Sommaire:
 
       b) Serveur -> Client
          - Général
-              HEL <progs> <version>             :welcome
+              HEL <prog> <version>              :welcome
               AIM <nick>                        :confirmation du IAM
               LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
               EOL                               :fin de la liste
@@ -61,7 +61,7 @@ Sommaire:
               DATE <jr> <njr> <mois> <année>    :indique la [nouvelle] date
               :<nick>!<arm> ATQ <nick>!<arm>    :request une attaque (confirmation attendue)
               :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
-                      OWN <nick>@<arm> <f1>
+                      OWN <nick>!<arm> <f1>
                       [<f2> ...]
 
 3) Particularités des commandes de positions

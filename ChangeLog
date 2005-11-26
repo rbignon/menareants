@@ -1,3 +1,20 @@
+2005-11-25  Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp: Rajout du fichier pour la boucle de la liste des jeux, ainsi que de l'écran
+	de création/join de jeu.
+
+	* src/data/anims: Répertoire créé. Avec dedans les anims des boutons "up" et "down".
+
+	* src/tools/Maths.cpp: Création fichier avec deux petites fonctions.
+
+	* src/Resources.cpp: rajout des sprites pour UpButton et DownButton
+
+	* src/gui/ListBox.cpp: Rajout du fichier avec la classe ListBox pour dessiner une listbox (©wormux)
+
+	* src/gui/Boutton.cpp: Rajout du fichier avec la classe Button pour dessiner un bouton (©wormux)
+
+	* src/tools/Images.h: rajout de ECSprite::GetWidth() et ECSprite::GetHeight()
+
 2005-11-23  Romain Bignon <progs@headfucking.net>
 
 	* src/gui: Création du répertoire. Mise de Menu.cpp dedans ainsi que de ListBox.cpp (vide).
