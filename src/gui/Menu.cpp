@@ -22,7 +22,8 @@
 
 #include "Main.h"
 #include "Menu.h"
-#include "../lib/Outils.h"
+#include "Resources.h"
+#include "lib/Outils.h"
 #include "tools/Font.h"
 
 #include "Timer.h"
@@ -427,7 +428,6 @@ int Menu::execute()
 					break;
 			}
 		}
-//		event.key.keysym.sym = 0;
 	}
 	return -1;
 }
