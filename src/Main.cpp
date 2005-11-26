@@ -21,6 +21,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <cerrno>
+#include <signal.h>
 
 #ifndef WIN32
 #include <sys/stat.h>
@@ -31,6 +32,8 @@
 #include "gui/Menu.h"
 #include "tools/Font.h"
 #include "tools/Images.h"
+#include "Resources.h"
+#include "gui/ListBox.h"
 
 EuroConqApp app;
 
@@ -69,8 +72,8 @@ void EuroConqApp::request_game()
 	Menu* menu;
 
 	menu = new Menu( std::string("Jouer"), this);
-	menu->add_item(  std::string("Creer une partie"), JOUER_CREER, M_READ_ONLY);
-	menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, M_READ_ONLY);
+	menu->add_item(  std::string("Creer une partie"), JOUER_CREER, 0);
+	menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, 0);
 	menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, 0);
 
 	try
@@ -89,6 +92,12 @@ void EuroConqApp::request_game()
 						client->SetWantDisconnect();
 						client->sendrpl(client->rpl(EC_Client::QUIT));
 						alive = false;
+						break;
+					case JOUER_LISTER:
+						ListGames();
+						break;
+					case JOUER_CREER:
+						GameInfos(true);
 						break;
 					case -1: break; /**normal**/
 					default:
@@ -127,6 +136,7 @@ int EuroConqApp::main(int argc, char **argv)
 {
 	try
 	{
+		signal(SIGPIPE, SIG_IGN);
 		if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		{
 			std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
