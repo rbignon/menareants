@@ -52,26 +52,29 @@ void EuroConqApp::quit_app(int value)
 
 void EuroConqApp::request_game()
 {
-	try
-	{
-		SDL_mutex *Mutex = SDL_CreateMutex();
+	client = NULL;
+	SDL_mutex *Mutex = SDL_CreateMutex();
+	Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
 
-		Thread = SDL_CreateThread(&EC_Client::read_sock, Mutex);
-	}
-	catch (std::string err)
+	WAIT_EVENT((client && client->IsConnected()), i);
+
+	if(!client || !client->IsConnected())
 	{
-		std::string msg = "Impossible de se connecter :\n";
-		msg += err;
+		std::string msg;
+		if(!client)
+			msg = "Connexion impossible";
+		else
+			msg = "Connexion impossible : " + client->CantConnect();
 		Menu menu_err(msg, this);
 		menu_err.add_item("Retour", 0, 0);
 		menu_err.execute();
-		delete client;
+		if(client) delete client;
 		return;
 	}
 
 	Menu* menu;
 
-	menu = new Menu( std::string("Jouer"), this);
+	menu = new Menu( std::string("Jouer (" + client->GetNick() + ")"), this);
 	menu->add_item(  std::string("Creer une partie"), JOUER_CREER, 0);
 	menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, 0);
 	menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, 0);
@@ -79,7 +82,7 @@ void EuroConqApp::request_game()
 	try
 	{
 		bool alive = true;
-		while (alive)
+		while (alive && client->IsConnected())
 		{
 			int result = menu->execute();
 
@@ -113,7 +116,14 @@ void EuroConqApp::request_game()
 				menu_err.execute();
 				menu_err.scroll_out();
 			}
-			if(client && !client->IsConnected()) alive = false;
+			if(client && !client->IsConnected())
+			{
+				alive = false;
+
+				Menu menu_err("Vous avez ete deconnecte.", this);
+				menu_err.add_item("Retour", 0, 0);
+				menu_err.execute();
+			}
 		}
 		delete client;
 		SDL_WaitThread(Thread, 0); /* Attend la fin du thread
@@ -207,19 +217,11 @@ int EuroConqApp::main(int argc, char **argv)
 		menu = new Menu( std::string("Menu principal"), this);
 		menu->add_item(std::string("Jouer"), MENU_JOUER, 0);
 		menu->add_item(std::string("Options"), MENU_OPTIONS, 0);
-			menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
-			menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
-			menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
+		menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
+		menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
+		menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
 
-			std::vector<std::string> sl;
-			sl.push_back("sex");
-			sl.push_back("crime");
-			sl.push_back("encore");
-			sl.push_back("un");
-			menu->add_stringlist("Merde", OPTIONS_TEST, 0, MENU_OPTIONS, sl, 2);
-
-
-			menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
+		menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
 		menu->add_item(std::string("Quitter"), MENU_EXIT, 0 );
 
 		menu->scroll_in();
