@@ -28,22 +28,22 @@ std::string stringtok(std::string &in, const char * const delimiters = " \t\n")
 	std::string s;
 
 		// eat leading whitespace
-		i = in.find_first_not_of (delimiters, i);
-		if (i == std::string::npos)
-		{
-			s = in;
-			in = "";
-			return s;   // nothing left but white space
-		}
+	i = in.find_first_not_of (delimiters, i);
+	if (i == std::string::npos)
+	{
+		s = in;
+		in = "";
+		return s;   // nothing left but white space
+	}
 
-		// find the end of the token
-		std::string::size_type j = in.find_first_of (delimiters, i);
+	// find the end of the token
+	std::string::size_type j = in.find_first_of (delimiters, i);
 
-		// push token
-			s = in.substr(i, j-i);
-			in = in.substr(j+1);
+	// push token
+	s = in.substr(i, j-i);
+	in = in.substr(j+1);
 
-		return s;
+	return s;
 }
 
 char* FormatStr(const char* s)

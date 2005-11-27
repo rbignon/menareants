@@ -53,9 +53,10 @@ public:
 
 	/* Est le créateur de la partie  ? */
 	bool IsOwner() { return owner; }
+	void SetOwner() { owner = true; }
 
 	/* Retourne le pseudo du joueur */
-	virtual char* GetNick() = 0;
+	virtual const char* GetNick() = 0;
 
 /* Variables privées */
 protected:
