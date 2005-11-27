@@ -24,4 +24,69 @@
 
 #include "../lib/Channels.h"
 
+class EChannel;
+
+/********************************************************************************************
+ *                               ECPlayers                                                  *
+ ********************************************************************************************/
+class ECPlayer : public ECBPlayer
+{
+/* Constructeurs/Deconstructeurs */
+public:
+
+	/* Création en donnant la structure du client, du salon et
+	 * en spécifiant si il est owner ou non, et si c'est moi ou non.
+	 */
+	ECPlayer(const char* nick, EChannel* chan, bool owner, bool IsMe);
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	/* Salon auquel appartient le player */
+	EChannel *Channel() { return (EChannel*)chan; }
+
+	/* Obtient le pseudo du client */
+	virtual const char* GetNick() { return nick.c_str(); }
+
+	/* Est-ce que ce player est moi */
+	bool IsMe() { return isme; }
+
+/* Variables privées */
+protected:
+	std::string nick;
+	bool isme;
+};
+
+/********************************************************************************************
+ *                               EChannel                                                   *
+ ********************************************************************************************/
+
+class EChannel : public ECBChannel
+{
+/* Constructeurs/Deconstructeurs */
+public:
+
+	EChannel(std::string _name)
+		: ECBChannel(_name)
+	{}
+
+	~EChannel() {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	/* Récupère le Player par le pseudo */
+	ECPlayer* GetPlayer(const char* nick);
+
+/* Variables privées */
+protected:
+
+};
+
 #endif /* EC_CHANNELS_H */

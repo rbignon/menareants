@@ -20,3 +20,25 @@
  */
 
 #include "Channels.h"
+
+/********************************************************************************************
+ *                               EPlayer                                                    *
+ ********************************************************************************************/
+
+ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _isme)
+	: ECBPlayer(_chan, _owner), nick(_nick), isme(_isme)
+{
+
+}
+
+/********************************************************************************************
+ *                               EChannel                                                   *
+ ********************************************************************************************/
+
+ECPlayer *EChannel::GetPlayer(const char* nick)
+{
+	for(unsigned int i=0;i<players.size();i++)
+		if(!strcasecmp(((ECPlayer *)players[i])->GetNick(), nick))
+			return ((ECPlayer *)players[i]);
+	return NULL;
+}
