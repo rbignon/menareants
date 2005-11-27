@@ -31,6 +31,8 @@ protected:
 
   ECSprite *image;
 
+  bool enabled;
+
 public:
   Button();
   Button (unsigned int x, unsigned int y, unsigned int w, unsigned int h);
@@ -46,6 +48,9 @@ public:
   unsigned int GetY() const;
   unsigned int GetWidth() const;
   unsigned int GetHeight() const;
+
+  bool Enabled() { return enabled; }
+  void SetEnabled(bool _en) { enabled = _en; }
 
 protected:
   void DrawImage (unsigned int souris_x, unsigned int souris_y);

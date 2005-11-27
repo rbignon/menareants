@@ -35,6 +35,7 @@ Button::Button (unsigned int x, unsigned int y, unsigned int w, unsigned int h)
   : m_x(x), m_width(w), m_y(y), m_height(h)
 {
 	image = NULL;
+	enabled = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +76,8 @@ void Button::Draw (unsigned int souris_x, unsigned int souris_y)
 
 void Button::DrawImage (unsigned int souris_x, unsigned int souris_y)
 {
+  if(!image) return;
+
   unsigned int frame = Test(souris_x,souris_y) ? 1 : 0;
 
   image->setFrame(frame);
