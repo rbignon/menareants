@@ -18,7 +18,8 @@ euroconq_SOURCES = \
 		tools/Maths.cpp \
 		gui/Menu.cpp \
 		gui/ListBox.cpp \
-		gui/Boutton.cpp
+		gui/Boutton.cpp \
+		gui/BouttonText.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 
