@@ -22,22 +22,31 @@
 #include "Sockets.h"
 
 /* HEL <prog> <version> */
-int HELCommand::Exec(EC_Client *me, std::vector<std::string> parv)
+int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->sendrpl(me->rpl(EC_Client::IAM), me->lapp->getconf()->nick.c_str());
 	return 0;
 }
 
 /* AIM <nick> */
-int AIMCommand::Exec(EC_Client *me, std::vector<std::string> parv)
+int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->set_nick(parv[1]);
+	me->SetConnected();
 	return 0;
 }
 
-int PIGCommand::Exec(EC_Client *me, std::vector<std::string> parv)
+/* PIG */
+int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->sendrpl(me->rpl(EC_Client::PONG));
 
+	return 0;
+}
+
+/* USED */
+int USEDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	me->SetCantConnect("Le pseudo " + me->lapp->getconf()->nick + " est pris");
 	return 0;
 }
