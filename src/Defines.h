@@ -72,4 +72,7 @@
 #define PKGDATADIR_ANIMS "anims" PATH_SEPARATOR
 #endif /* PKGDATADIR */
 
+#define WAIT_EVENT(x,y) for(int y=0; !(x) && (y)<10; SDL_Delay(1), (y++))
+#define WAIT_EVENT_T(x,y, t) for(int y=0; !(x) && (y)<(t); SDL_Delay(1), (y++))
+
 #endif /* EC_Defines_h */
