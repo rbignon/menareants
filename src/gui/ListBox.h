@@ -29,10 +29,12 @@
 #include "Boutton.h"
 
 struct SDL_Surface;
+struct SDL_Color;
 
 typedef struct s_list_box_item_t{
     std::string label;
     std::string value;
+    SDL_Color color;
   } list_box_item_t;
 
 
@@ -72,12 +74,14 @@ public:
   bool Clic (uint mouse_x, uint mouse_y);
   void AddItem (bool selected,
 		const std::string &label,
-		const std::string &value);
+		const std::string &value,
+		SDL_Color _color);
+  void ClearItems();
   int MouseIsOnWitchItem (uint mouse_x, uint mouse_y);
   void Select (uint index);
   void Deselect (uint index);
   bool IsSelected (uint index);
-  uint GetSelectedItem ();
+  int GetSelectedItem (); /* retourne -1 si non sélectionné */
   const std::list<uint>& GetSelection() const;
   const std::string& ReadLabel (uint index) const;
   const std::string& ReadValue (uint index) const;

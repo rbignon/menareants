@@ -19,11 +19,11 @@
  * $Id$
  */
 
+#include "tools/Font.h"
 #include "ListBox.h"
 #include "Main.h"
 #include "Resources.h"
 #include "tools/Maths.h"
-#include "tools/Font.h"
 #include <algorithm>
 #include <SDL.h>
 
@@ -151,9 +151,8 @@ void ListBox::Display (uint mouse_x, uint mouse_y)
 	small_font.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
-			 IsSelected(i+first_visible_item) ? white_color : black_color) ;
+			 IsSelected(i+first_visible_item) ? white_color : m_items[i+first_visible_item].color) ;
   }
-
 
   // buttons for listbox with more items than visible
   if (m_items.size() > nb_visible_items_max)
@@ -170,7 +169,7 @@ void ListBox::Display (uint mouse_x, uint mouse_y)
 
 void ListBox::AddItem (bool selected,
 		       const std::string &label,
-		       const std::string &value)
+		       const std::string &value, SDL_Color _color)
 {
   uint pos = m_items.size();
 
@@ -178,6 +177,7 @@ void ListBox::AddItem (bool selected,
   list_box_item_t item;
   item.label = label;
   item.value = value;
+  item.color = _color;
   m_items.push_back (item);
 
   // Select it if selected
@@ -190,6 +190,12 @@ void ListBox::AddItem (bool selected,
   visible_height = nb_visible_items*height_item;
   if (height < visible_height)  visible_height = height;
 
+}
+
+void ListBox::ClearItems()
+{
+	m_items.clear();
+	m_selection.clear();
 }
 
 void ListBox::Select (uint index)
@@ -224,9 +230,10 @@ bool ListBox::IsSelected (uint index)
 
 //-----------------------------------------------------------------------------
 
-uint ListBox::GetSelectedItem ()
+int ListBox::GetSelectedItem ()
 {
-  assert (m_selection.size() == 1);
+  if(m_selection.size() != 1) return -1;
+
   return m_selection.front();
 }
 
