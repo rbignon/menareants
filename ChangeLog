@@ -1,3 +1,23 @@
+2005-11-26  Romain Bignon <progs@headfucking.net>
+
+	* src/Login.cpp: Gestion commande Used
+
+	* src/Main.cpp: Meilleur système de connexion.
+
+	* src/gui/Menu.cpp: Utilisation d'une fonction plus généraliste et statique Menu::EnterString().
+
+	* src/Sockets.cpp: Parsage du premier argument de parv (player(s)).
+
+	* src/Commands.h: Commandes JOI, PLS, EOL, USED.
+
+	* src/JoinGame.cpp: support du join.
+
+	* src/gui/ListBox.cpp: Membre ClearItems().
+
+	* src/Resources.cpp: Anim NormalButton.
+
+	* src/gui/BouttonText.cpp: Rajout du fichier avec ButtonText pour dessiner un bouton (©wormux)
+
 2005-11-25  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Rajout du fichier pour la boucle de la liste des jeux, ainsi que de l'écran

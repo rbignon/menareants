@@ -1,14 +1,14 @@
 À faire:
 
 * En cours
--client: gestion du listing des parties, de la création et du rejoins.
+-client: Avancer dans la création
 
 * Urgent
--client: Problème de la position de la selection dans le menu à certains moments (options)
+-client: PROBLÈME DU THREAD QUI EMPECHE LA CONNEXION AVANT UN CERTAIN DELAIS (VOIR PRINTFS).
 
 * Bof
--gérer le listing de parties, création, et tout ce qui s'en suit niveau graphique avant le jeu
--lib: faire donc dans la lib un fichier où il y a les elements de jeux utilisés par les DEUX programmes.
+-client: Problème de la position de la selection dans le menu à certains moments (options)
+-client: utilisation de la souris dans le menu
 
 * Objectif actuel
 -Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
