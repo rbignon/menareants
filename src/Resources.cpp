@@ -33,6 +33,7 @@ ECImage*				Resources::sur_loadscreen = NULL;
 
 ECSpriteBase*			Resources::spr_upbutton = NULL;
 ECSpriteBase*			Resources::spr_downbutton = NULL;
+ECSpriteBase*			Resources::spr_normalbutton = NULL;
 
 
 Resources::Resources()
@@ -80,4 +81,11 @@ ECSpriteBase* Resources::DownButton()
 	if(!spr_downbutton)
 		spr_downbutton = new ECSpriteBase("downbutton");
 	return spr_downbutton;
+}
+
+ECSpriteBase* Resources::NormalButton()
+{
+	if(!spr_normalbutton)
+		spr_normalbutton = new ECSpriteBase("normalbutton");
+	return spr_normalbutton;
 }

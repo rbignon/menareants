@@ -39,6 +39,7 @@ public:
 
 	static ECSpriteBase* UpButton();
 	static ECSpriteBase* DownButton();
+	static ECSpriteBase* NormalButton();
 
 	static void Unload();
 
@@ -49,6 +50,7 @@ protected:
 
 	static ECSpriteBase *spr_upbutton;
 	static ECSpriteBase *spr_downbutton;
+	static ECSpriteBase *spr_normalbutton;
 };
 
 #endif
