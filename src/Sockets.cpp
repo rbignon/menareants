@@ -21,6 +21,7 @@
 #include "Sockets.h"
 #include "Main.h"
 #include "Commands.h"
+#include "Outils.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -33,6 +34,7 @@ const char* msgTab[] = {
 	"BYE",                                    /* BYE - Quit le serveur */
 
 	"LSP",                                    /* LSP - Liste les jeux */
+	"JOI %s",                                 /* JOI - Joindre une partie */
      0
 };
 
@@ -61,14 +63,15 @@ int EC_Client::sendrpl(const char *pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	send(sock, buf, len, 0);
 #ifdef DEBUG
 	std::cout << "S - " << buf;
 #endif
+	send(sock, buf, len, 0);
 
 	return 0;
 }
 
+/* [:parv[0]] CMD [parv[1] [parv[2] ... [parv[parv.size()-1]]]] */
 void EC_Client::parse_message(std::string buf)
 {
 	char s[MAXBUFFER + 20];
@@ -80,6 +83,7 @@ void EC_Client::parse_message(std::string buf)
 #endif
 
 	std::vector<std::string> parv;
+	std::vector<ECPlayer*> players;
 	for(i=0; i <= len; )
 	{
 		bool slash;
@@ -91,12 +95,30 @@ void EC_Client::parse_message(std::string buf)
 			else
 				s[j++]=buf[i], slash=false;
 		s[j]='\0';
-		if(s[0] != ':' || parv.size())
+		if(cmdname.empty())
 		{
-			if(!parv.size())
+			if(s[0] == ':')
+			{
+				std::string line = ((char*) s + 1);
+				parv.push_back(line);
+				if(pl)
+				{
+					std::string tmp;
+					for(tmp = stringtok(line, ","); !line.empty(); tmp = stringtok(line, ","))
+					{
+						ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
+						if(tmpl) players.push_back(tmpl);
+					}
+				}
+			}
+			else
+			{
+				if(!parv.size()) parv.push_back("");
 				cmdname = s;
-			parv.push_back(std::string(s));
+			}
 		}
+		else
+			parv.push_back(std::string(s));
 	}
 
 	EC_ACommand *cmd = NULL;
@@ -107,7 +129,7 @@ void EC_Client::parse_message(std::string buf)
 			break;
 		}
 
-	if(!cmd || parv.size() < cmd->args)
+	if(!cmd || (parv.size()-1) < cmd->args)
 		/* ATTENTION: la commande est inconnu ou donnée incorrectement, donc on exit
 		 *            mais on ne quit pas (?). À voir, quand il y aurra un système
 		 *            de debugage, si on le fait remarquer à l'user. Au pire je pense
@@ -118,7 +140,7 @@ void EC_Client::parse_message(std::string buf)
 
 	try
 	{
-		cmd->Exec(this, parv);
+		cmd->Exec(players, this, parv);
 	}
 	catch(...)
 	{
@@ -132,9 +154,14 @@ int EC_Client::read_sock(void *data)
 {
 	SDL_LockMutex((SDL_mutex*)data);
 
-	EC_Client* cl = new EC_Client;
-	cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port);
+	EC_Client *cl = new EC_Client;
 	app.setclient(cl);
+	cl->lapp = &app;
+
+	if(!cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port))
+		return 0;
+
+	//EC_Client* cl = app.getclient();
 
 	fd_set tmp_fdset;
 	struct timeval timeout = {0};
@@ -172,8 +199,6 @@ int EC_Client::read_sock(void *data)
 			break;
 		}
 
-		if(!cl->connected) cl->connected = true;
-
 		ptr = buf;
 		buf[r] = 0;
 
@@ -199,15 +224,22 @@ void EC_Client::Init()
 	/* Initialisation des variables */
 	connected = false;
 	readQi = 0;
+	sock = 0;
 	want_disconnect = false;
+	lapp = NULL;
+	pl = NULL;
 	FD_ZERO(&global_fd_set);
 
 	/* Ajout des commandes */
 	Commands.push_back(new HELCommand("HEL", 0,	1));
 	Commands.push_back(new PIGCommand("PIG", 0,	0));
 	Commands.push_back(new AIMCommand("AIM", 0,	1));
-	Commands.push_back(new LSPCommand("LSP", 0,	1));
-	Commands.push_back(new EOLCommand("EOL", 0,	1));
+	Commands.push_back(new LSPCommand("LSP", 0,	3));
+	Commands.push_back(new EOLCommand("EOL", 0,	0));
+	Commands.push_back(new JOICommand("JOI", 0, 1));
+	Commands.push_back(new SETSCommand("SETS", 0, 0)); /* TODO: Commande SETS à compléter */
+	Commands.push_back(new PLSCommand("PLS", 0, 1));
+	Commands.push_back(new USEDCommand("USED", 0, 0));
 }
 
 EC_Client::EC_Client()
@@ -235,7 +267,10 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
-		throw strerror(errno);
+	{
+		cantconnect = strerror(errno);
+		return false;
+	}
 
 	FD_SET(sock, &global_fd_set);
 
@@ -245,4 +280,6 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 EC_Client::~EC_Client()
 {
 	if(connected) close(sock);
+	if(pl)
+		delete pl->Channel();
 }

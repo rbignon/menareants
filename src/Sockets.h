@@ -30,6 +30,8 @@ class EC_ACommand;
 
 class EuroConqApp;
 
+class ECPlayer;
+
 class EC_Client
 {
 public:
@@ -45,6 +47,7 @@ public:
 		PONG, /* POG */
 		QUIT, /* BYE */
 		LISTGAME, /* LSP */
+		JOIN, /* JOI */
 
 		NONE
 	};
@@ -57,12 +60,21 @@ public:
 	char *rpl(msg t);
 
 	bool IsConnected() { return connected; }
+	void SetConnected() { connected = true; }
 	void SetWantDisconnect() { want_disconnect = true; }
 	bool WantDisconnect() { return want_disconnect; }
-	std::string get_nick() { return nick; }
+	std::string GetNick() { return nick; }
 	void set_nick(std::string _nick) { nick = _nick; }
 
 	EuroConqApp *lapp;
+
+	/* Obtient la sturcture player si il fait partit d'un jeu */
+	ECPlayer *Player() { return pl; }
+	void SetPlayer(ECPlayer *P) { if(!pl) pl = P; }
+	void ClrPlayer() { pl = NULL; }
+
+	std::string CantConnect() { return cantconnect; }
+	void SetCantConnect(std::string _msg) { cantconnect = _msg; }
 
 protected:
 	int sock;
@@ -78,6 +90,10 @@ protected:
 	fd_set global_fd_set;
 
 	std::string nick;
+
+	std::string cantconnect;
+
+	ECPlayer *pl;
 
 private:
 	void Init();
