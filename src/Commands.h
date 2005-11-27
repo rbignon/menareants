@@ -24,8 +24,11 @@
 #include <string>
 #include <vector>
 #include "Sockets.h"
+#include "Channels.h"
 
 class EC_Client;
+
+class ECPlayer;
 
 class EC_ACommand
 {
@@ -36,7 +39,10 @@ public:
 	{}
 
 	virtual ~EC_ACommand() {}
-	virtual int Exec(EC_Client *me, std::vector<std::string> string_list) = 0;
+
+	typedef std::vector<ECPlayer*> PlayerList;
+	typedef std::vector<std::string> ParvList;
+	virtual int Exec(PlayerList players, EC_Client *me, ParvList parv) = 0;
 
 private:
 	std::string CmdName;
@@ -52,7 +58,7 @@ public: \
 		: EC_ACommand(_CmdName, _flags, _args) \
 	{} \
 	virtual ~commName##Command() {} \
-	virtual int Exec(EC_Client *me, std::vector<std::string> string_list); \
+	virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); \
 }
 
 DECLARE_CMD ( HEL );
@@ -60,6 +66,10 @@ DECLARE_CMD ( PIG );
 DECLARE_CMD ( AIM );
 DECLARE_CMD ( LSP );
 DECLARE_CMD ( EOL );
+DECLARE_CMD ( JOI );
+DECLARE_CMD ( SETS );
+DECLARE_CMD ( PLS );
+DECLARE_CMD ( USED );
 
 #endif
 
