@@ -158,8 +158,11 @@ public:
 	void redraw(int yoffset=0);
 	MenuItem* get_item_by_id( int id );
 	void go_main_menu(); /* Afficher le menu principal */
+
+	static std::string EnterString(std::string label, std::string last_string, bool first_cap);
+
 protected:
-	EuroConqApp* app;
+	EuroConqApp* lapp;
 	std::vector<MenuItem*> items;
 	int current_run_id;
 	unsigned int current_selection;

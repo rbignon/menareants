@@ -215,7 +215,7 @@ void MenuItem_StringList::test_value()
 // ************************
 Menu::Menu( const std::string& name, EuroConqApp* _app )
 {
-	app = _app;
+	lapp = _app;
 	current_run_id = -1;
 	current_selection = 1;
 
@@ -265,7 +265,7 @@ void Menu::redraw( int yoffset )
 	int vert = yoffset + 300 - height / 2;
 
 	//Resources::Titlescreen()->Draw();
-	SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app->sdlwindow,NULL);
+	SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,lapp->sdlwindow,NULL);
 	//CL_Display::fill_rect( left_border-30,vert-20, right_border+20,vert+20+height, 0,0,0,0.0f);
 
 	big_font.WriteCenter(400,vert, current->get_text(), black_color);
@@ -284,9 +284,9 @@ void Menu::redraw( int yoffset )
 #endif
 			SDL_Rect r_back = {left_border-30,vert-15, right_border-left_border+30,35};
 			if(((*item_counter)->flags & M_READ_ONLY))
-				SDL_FillRect(app->sdlwindow, &r_back, SDL_MapRGBA(app->sdlwindow->format, 15,15,15,55));
+				SDL_FillRect(lapp->sdlwindow, &r_back, SDL_MapRGBA(lapp->sdlwindow->format, 15,15,15,55));
 			else
-				SDL_FillRect(app->sdlwindow, &r_back, SDL_MapRGBA(app->sdlwindow->format, 10,60,10,55));
+				SDL_FillRect(lapp->sdlwindow, &r_back, SDL_MapRGBA(lapp->sdlwindow->format, 10,60,10,55));
 
 		}
 		if ((*item_counter)->get_type() == MenuItem::MT_VALUE)
@@ -325,7 +325,7 @@ void Menu::redraw( int yoffset )
 		vert += 40;
 	}
 	normal_font.WriteRight( right_border+0, vert+20, "v "APP_VERSION, white_color );
-	SDL_Flip(app->sdlwindow);
+	SDL_Flip(lapp->sdlwindow);
 }
 
 int Menu::execute()
@@ -458,19 +458,20 @@ void Menu::scroll_out()
 	}
 }
 
-void Menu::enter_string(MenuItem_String* item)
+std::string Menu::EnterString(std::string label, std::string last_string, bool first_cap)
 {
-	std::string new_string = item->get_string();
+	std::string new_string = last_string;
+
 	SDL_Event event;
 
 	while (1)
 	{
-		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app->sdlwindow,NULL);
+		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app.sdlwindow,NULL);
 
-		big_font.WriteLeft( 230, 330, item->get_text(), black_color );
+		big_font.WriteLeft( 230, 330, label, black_color );
 		big_font.WriteLeft( 380, 330, new_string+"_", black_color );
 
-		SDL_Flip(app->sdlwindow);
+		SDL_Flip(app.sdlwindow);
 
 		while (SDL_PollEvent( &event))
 		{
@@ -480,11 +481,10 @@ void Menu::enter_string(MenuItem_String* item)
 			switch (event.key.keysym.sym)
 			{
 				case SDLK_RETURN:
-					item->set_string( new_string );
-					return;
+					return new_string;
 					break;
 				case SDLK_ESCAPE:
-					return; /* S'enfuie sans faire le changement */
+					return last_string; /* S'enfuie sans faire le changement */
 					break;
 				case SDLK_BACKSPACE:
 					new_string = std::string(new_string, 0, new_string.size()-1 );
@@ -606,10 +606,16 @@ void Menu::enter_string(MenuItem_String* item)
 				default:
 					break;
 			}
-			if (new_string.size() == 1 && !(item->flags & M_NOFMAJ))
+			if (new_string.size() == 1 && first_cap)
 				std::transform( new_string.begin(), new_string.end(), new_string.begin(), static_cast<int (*)(int)>(toupper) );
 		}
 	}
+}
+
+void Menu::enter_string(MenuItem_String* item)
+{
+	item->set_string(Menu::EnterString(item->get_text(), item->get_string(), !(item->flags & M_NOFMAJ)));
+	return;
 }
 
 void Menu::add_item( const std::string& text, int id, unsigned int flags, int parent )
