@@ -58,7 +58,7 @@ public:
 	TClient *Client() { return client; }
 
 	/* Obtient le pseudo du client */
-	virtual char* GetNick();
+	virtual const char* GetNick();
 
 	/* Le joueur est pret (utilisation de RDY) */
 	bool Ready;
@@ -98,10 +98,10 @@ public:
 public:
 
 	/* Récupère le Player par le pseudo */
-	ECPlayer* GetPlayer(char* nick);
+	ECPlayer* GetPlayer(const char* nick);
 
 	/* Récupère le Player par sa classe cliente */
-	ECPlayer *EChannel::GetPlayer(TClient *cl);
+	ECPlayer *GetPlayer(TClient *cl);
 
 /* Variables privées */
 protected:

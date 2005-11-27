@@ -147,7 +147,7 @@ int TClient::parsemsg()
 		if(app.GetCommands()[i]->CmdName == cmdname)
 			cmd = app.GetCommands()[i];
 
-	if(!cmd || parv.size() < cmd->args)
+	if(!cmd || (parv.size()-1) < cmd->args)
 		/* TODO: voir si on vire ou non l'user du serveur */
 		return 0;
 

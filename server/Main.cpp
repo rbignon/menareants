@@ -84,7 +84,7 @@ try {
 
 	/* Déclarations des commandes */
 	/*                                 NOM		flag		args */
-	Commands.push_back(new IAMCommand("IAM",	0,			2));
+	Commands.push_back(new IAMCommand("IAM",	0,			3));
 	Commands.push_back(new PIGCommand("PIG",	0,			0));
 	Commands.push_back(new POGCommand("POG",	0,			0));
 	Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));

@@ -106,7 +106,7 @@ ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner)
 
 }
 
-char* ECPlayer::GetNick()
+const char* ECPlayer::GetNick()
 {
 	return (client ? client->GetNick() : NULL);
 }
@@ -136,11 +136,11 @@ void EChannel::NeedReady()
 	return;
 }
 
-ECPlayer *EChannel::GetPlayer(char* nick)
+ECPlayer *EChannel::GetPlayer(const char* nick)
 {
 	for(unsigned int i=0;i<players.size();i++)
 		if(((ECPlayer *)players[i])->Client() &&
-		   !strcasecmp(((ECPlayer *)players[i])->Client()->GetNick(), nick))
+		   !strcasecmp(((ECPlayer *)players[i])->GetNick(), nick))
 			return ((ECPlayer *)players[i]);
 	return NULL;
 }
