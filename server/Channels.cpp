@@ -32,11 +32,21 @@ std::vector<EChannel*> ChanList;
  *                              Commandes                                                   *
  ********************************************************************************************/
 
+/* MSG <message> */
+int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	if(!cl->Player()) return cl->exit(app.rpl(ECServer::ERR));
+
+	cl->Player()->Channel()->sendto_players(cl->Player(),
+			app.rpl(ECServer::MSG), cl->GetNick(), FormatStr(parv[1].c_str()));
+	return 0;
+}
+
 /* JOI <nom> */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* Ne peut être que sur un seul salon à la fois */
-	if(cl->Player()) return cl->exit(app.rpl(ECServer::ERR));
+	if(cl->Player() || parv[1].empty()) return cl->exit(app.rpl(ECServer::ERR));
 
 	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
@@ -91,7 +101,8 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	for(unsigned i=0; i<ChanList.size();i++)
-		cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(), 0);
+		cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(),
+		                                      ChanList[i]->GetLimite());
 
 	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
 }

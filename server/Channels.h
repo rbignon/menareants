@@ -60,9 +60,6 @@ public:
 	/* Obtient le pseudo du client */
 	virtual const char* GetNick();
 
-	/* Le joueur est pret (utilisation de RDY) */
-	bool Ready;
-
 /* Variables privées */
 protected:
 	TClient *client;
