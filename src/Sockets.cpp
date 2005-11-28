@@ -35,6 +35,8 @@ const char* msgTab[] = {
 
 	"LSP",                                    /* LSP - Liste les jeux */
 	"JOI %s",                                 /* JOI - Joindre une partie */
+	"LEA",                                    /* LEA - Partir d'une partie */
+	"MSG %s",                                 /* MSG - Message dans une partie */
      0
 };
 
@@ -95,6 +97,7 @@ void EC_Client::parse_message(std::string buf)
 			else
 				s[j++]=buf[i], slash=false;
 		s[j]='\0';
+		if(!j) continue;
 		if(cmdname.empty())
 		{
 			if(s[0] == ':')
@@ -103,11 +106,14 @@ void EC_Client::parse_message(std::string buf)
 				parv.push_back(line);
 				if(pl)
 				{
-					std::string tmp;
-					for(tmp = stringtok(line, ","); !line.empty(); tmp = stringtok(line, ","))
+					while(!line.empty())
 					{
+						std::string tmp;
+						tmp = stringtok(line, ",");
 						ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
 						if(tmpl) players.push_back(tmpl);
+						/* Il est tout à fait possible que le player ne soit pas trouvé,
+						   genre si c'est un join... */
 					}
 				}
 			}
@@ -240,6 +246,8 @@ void EC_Client::Init()
 	Commands.push_back(new SETSCommand("SETS", 0, 0)); /* TODO: Commande SETS à compléter */
 	Commands.push_back(new PLSCommand("PLS", 0, 1));
 	Commands.push_back(new USEDCommand("USED", 0, 0));
+	Commands.push_back(new LEACommand("LEA", 0, 0));
+	Commands.push_back(new MSGCommand("MSG", 0, 1));
 }
 
 EC_Client::EC_Client()

@@ -48,6 +48,8 @@ public:
 		QUIT, /* BYE */
 		LISTGAME, /* LSP */
 		JOIN, /* JOI */
+		LEAVE,/* LEA */
+		MSG,  /* MSG */
 
 		NONE
 	};
