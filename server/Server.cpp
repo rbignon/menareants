@@ -50,6 +50,7 @@ const char* msgTab[] = {
      ":%s LEA %s",                          /* LEA - Un user part du saon */
      "LSP %s %d %d",                        /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
+     ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
      0
 };
 
@@ -134,7 +135,7 @@ int TClient::parsemsg()
 			else
 				s[j++]=buf[i], slash=false;
 		s[j]='\0';
-		if(s[0] != ':')
+		if(s[0] != ':' && j)
 		{
 			if(!parv.size())
 				strncpy(cmdname, s, COMLEN);

@@ -51,6 +51,7 @@ public:
 		LEAVE, /* LEA */
 		GLIST, /* LSP */
 		EOGLIST,/*EOL */
+		MSG,   /* MSG */
 
 		NONE
 	};
