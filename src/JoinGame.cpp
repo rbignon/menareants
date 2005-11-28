@@ -31,11 +31,18 @@
 ListBox *GameListBox = NULL;
 bool EOL = false, JOINED = false;
 
-/* LSP <nom> <nbjoueur> <nbmax> */
+/* <nick> MSG <message> */
+int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	return 0;
+}
+
+/* LSP <nom> <nbjoueur> [nbmax] */
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(parv[2] != parv[3])
-		GameListBox->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1], red_color);
+	GameListBox->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1],
+	                     (parv.size() <= 3 || parv[2] != parv[3]) ? black_color : red_color,
+	                     (parv.size() <= 3 || parv[2] != parv[3]) ? true : false);
 	return 0;
 }
 
@@ -66,7 +73,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			owner = true, *nick++;
 
 		if(!strcasecmp(nick, me->GetNick().c_str()))
-		{
+		{ /* On a déjà créé notre player */
 			if(owner) me->Player()->SetOwner();
 		}
 		else
@@ -100,19 +107,94 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/* <nick> LEA */
+int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	/* Note: Dans le protocole il ne devrait y avoir qu'un seul départ
+	 *       à la fois mais bon par respect de ce qui est *possible*
+	 *       (on ne sait jamais, après tout, on pourrait imager dans
+	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
+	 *        départs ?) ou alors pour une eventuelle IA du serveur)
+	 */
+	for(unsigned int i=0; i<players.size(); i++)
+	{
+		if(players[i]->IsMe())
+		{
+			delete me->Player()->Channel();
+			me->ClrPlayer();
+			return 0;
+		}
+		else
+			me->Player()->Channel()->RemovePlayer(players[i], true);
+	}
+	return 0;
+}
+
 void EuroConqApp::GameInfos(bool create)
 {
+	if(!client) return;
 	if(create)
 	{
 		std::string name = Menu::EnterString("Nom", "", false);
+		if(name.empty()) return;
 
 		JOINED = false;
 		client->sendrpl(client->rpl(EC_Client::JOIN), name.c_str());
 		WAIT_EVENT(JOINED, i);
 		if(!JOINED) return;
 	}
-	for(unsigned int i=0; i<client->Player()->Channel()->Players().size();i++)
-		printf("%s\n", ((ECPlayer*)client->Player()->Channel()->Players()[i])->GetNick());
+	SDL_Event event;
+	bool eob = false;
+	EChannel *chan = client->Player()->Channel();
+
+	/* Déclaration membres fixes */
+	ButtonText RetourButton(600,450,100,49, "Retour");
+	RetourButton.SetFont(&normal_font);
+
+	do
+	{
+		int x=0, y=0;
+		while( SDL_PollEvent( &event) )
+		{
+			switch(event.type)
+			{
+				case SDL_KEYUP:
+					switch (event.key.keysym.sym)
+					{
+						case SDLK_ESCAPE:
+							eob = true;
+							break;
+						default: break;
+					}
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if(RetourButton.Test(event.button.x, event.button.y))
+						eob = true;
+					break;
+				default:
+					break;
+			}
+		}
+		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,sdlwindow,NULL);
+		SDL_GetMouseState( &x, &y);
+
+		unsigned int vert = 30;
+		for(unsigned int i=0; i<chan->Players().size();i++, vert += 50)
+		{
+			ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
+
+			big_font.WriteLeft(30, vert, "OK", pl->Ready ? black_color : gray_color);
+			if(pl->IsOwner()) big_font.WriteLeft(70, vert, "*", red_color);
+			big_font.WriteLeft(85, vert, pl->GetNick(), black_color);
+		}
+		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
+
+		RetourButton.Draw(x, y);
+		SDL_Flip(sdlwindow);
+	} while(!eob && client->IsConnected() && client->Player());
+
+	client->sendrpl(client->rpl(EC_Client::LEAVE));
+	return;
 }
 
 void EuroConqApp::ListGames()
@@ -120,6 +202,8 @@ void EuroConqApp::ListGames()
 	if(!client) return;
 
 	SDL_Event event;
+
+	/* Déclaration membres fixes */
 	ButtonText JoinButton(500,200,100,49, "Joindre");
 	JoinButton.SetFont(&normal_font);
 	ButtonText RefreshButton(500,250,100,49, "Actualiser");
@@ -191,7 +275,9 @@ void EuroConqApp::ListGames()
 		SDL_GetMouseState( &x, &y);
 		big_font.WriteCenter(400,180, "Liste des parties", black_color);
 		GameListBox->Display(x,y);
-		if(GameListBox->GetSelectedItem() >= 0) JoinButton.SetEnabled(true);
+		if(GameListBox->GetSelectedItem() >= 0 &&
+		   GameListBox->Enabled(GameListBox->GetSelectedItem()))
+			JoinButton.SetEnabled(true);
 		JoinButton.Draw(x, y);
 		RefreshButton.Draw(x, y);
 		CreerButton.Draw(x, y);
