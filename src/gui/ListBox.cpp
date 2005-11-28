@@ -169,7 +169,7 @@ void ListBox::Display (uint mouse_x, uint mouse_y)
 
 void ListBox::AddItem (bool selected,
 		       const std::string &label,
-		       const std::string &value, SDL_Color _color)
+		       const std::string &value, SDL_Color _color = black_color, bool enabled = true)
 {
   uint pos = m_items.size();
 
@@ -178,6 +178,7 @@ void ListBox::AddItem (bool selected,
   item.label = label;
   item.value = value;
   item.color = _color;
+  item.enabled = enabled;
   m_items.push_back (item);
 
   // Select it if selected
@@ -200,6 +201,7 @@ void ListBox::ClearItems()
 
 void ListBox::Select (uint index)
 {
+  if(!m_items[index].enabled) return;
   // If they are to much selection, kick the oldest one
   if (selection_max != -1)
   {
@@ -249,6 +251,12 @@ const std::string& ListBox::ReadValue (uint index) const
 {
   assert (index < m_items.size());
   return m_items[index].value;
+}
+
+bool ListBox::Enabled (uint index)
+{
+  assert (index < m_items.size());
+  return m_items[index].enabled;
 }
 
 void ListBox::SetXY (uint px, uint py) { x = px; y = py; }

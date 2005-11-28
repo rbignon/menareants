@@ -35,6 +35,7 @@ typedef struct s_list_box_item_t{
     std::string label;
     std::string value;
     SDL_Color color;
+    bool enabled;
   } list_box_item_t;
 
 
@@ -75,7 +76,7 @@ public:
   void AddItem (bool selected,
 		const std::string &label,
 		const std::string &value,
-		SDL_Color _color);
+		SDL_Color _color, bool _enabled);
   void ClearItems();
   int MouseIsOnWitchItem (uint mouse_x, uint mouse_y);
   void Select (uint index);
@@ -85,6 +86,7 @@ public:
   const std::list<uint>& GetSelection() const;
   const std::string& ReadLabel (uint index) const;
   const std::string& ReadValue (uint index) const;
+  bool Enabled(uint index);
   void SetXY (uint x, uint y);
 };
 
