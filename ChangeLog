@@ -1,3 +1,17 @@
+2005-11-27  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ListBox.cpp: Disable...
+
+	* src/Commands.h: Commande MSG et LEA
+
+	* server/Channels.c: Commande MSG.
+
+	* lib/Channels.h: State.
+
+	* lib/Outils.cpp: Correction bug de stringtok.
+
+	* src/JoinGame.cpp: Interface DANS une partie.
+
 2005-11-26  Romain Bignon <progs@headfucking.net>
 
 	* src/Login.cpp: Gestion commande Used
