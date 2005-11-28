@@ -58,6 +58,9 @@ public:
 	/* Retourne le pseudo du joueur */
 	virtual const char* GetNick() = 0;
 
+	/* Le joueur est pret (utilisation de RDY) */
+	bool Ready;
+
 /* Variables privées */
 protected:
 	ECBChannel *chan;
@@ -78,6 +81,13 @@ public:
 
 	/* Deconstructeur par default */
 	~ECBChannel() {}
+
+	enum e_state {
+		WAITING,
+		SENDING,
+		PLAYING,
+		ANIMING
+	};
 
 /* Methodes */
 public:
@@ -105,10 +115,20 @@ public:
 	/* Retourne la liste des joueurs */
 	const char* PlayerList();
 
+	/* A propos des etats */
+	e_state GetState() { return state; }
+	bool IsInGame() { return (state >= PLAYING); }
+
+	/* Limite maximale pour entrer dans le chan */
+	unsigned int GetLimite() { return limite; }
+	void SetLimite(unsigned int l) { limite = l; }
+
 /* Variables privées */
 protected:
 	std::string name;
 	std::vector<ECBPlayer*> players;
+	e_state state;
+	unsigned int limite;
 };
 
 #endif /* ECLIB_CHANNELS_H */

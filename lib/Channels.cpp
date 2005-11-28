@@ -29,6 +29,7 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	: chan(_chan), owner(_owner)
 {
 	chan->AddPlayer(this);
+	Ready = false;
 }
 
 /********************************************************************************************
@@ -38,7 +39,8 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 ECBChannel::ECBChannel(std::string _name)
 	: name(_name)
 {
-
+	state = WAITING;
+	limite = 0;
 }
 
 bool ECBChannel::AddPlayer(ECBPlayer* pl)
