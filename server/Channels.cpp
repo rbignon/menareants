@@ -68,6 +68,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	else
 	{ /* Rejoins un salon existant */
+		if(chan->GetState() != WAITING) return cl->exit(app.rpl(ECServer::ERR));
 		pl = new ECPlayer(cl, chan, false);
 	}
 	cl->SetPlayer(pl);
