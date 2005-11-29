@@ -1,3 +1,15 @@
+2005-11-28  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp: Empeche le join d'un salon en cours de jeu...
+
+	* src/Main.cpp: Utilisation du parsage unicode des chars au clavier.
+
+	* src/JoinGame.cpp: Utilisation du ListBox et du Edit pour faire un petit espace de discussion.
+
+	* src/gui/Memo.cpp: Création du composant Memo en s'inspirant du ListBox.
+
+	* src/gui/Edit.cpp: Création du composant Edit.
+
 2005-11-27  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Disable...

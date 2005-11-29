@@ -4,7 +4,6 @@
 -client: Avancer dans la création
 
 * Urgent
--client: PROBLÈME DU THREAD QUI EMPECHE LA CONNEXION AVANT UN CERTAIN DELAIS (VOIR PRINTFS).
 
 * Bof
 -client: Problème de la position de la selection dans le menu à certains moments (options)
