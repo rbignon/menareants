@@ -153,6 +153,7 @@ int EuroConqApp::main(int argc, char **argv)
 			return 0;
 		}
 		atexit(SDL_Quit);
+		SDL_EnableUNICODE(1);
 		int sdlflags = SDL_SWSURFACE|SDL_HWPALETTE;
 #ifdef WIN32
 		sdlflags |= SDL_FULLSCREEN;
