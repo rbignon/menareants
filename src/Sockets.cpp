@@ -144,14 +144,14 @@ void EC_Client::parse_message(std::string buf)
 		 */
 		{ printf("erreur de pars ! %s\n", cmd ? "arg" : "cmd introuvable"); return; }
 
-	try
-	{
+/*	try
+	{*/
 		cmd->Exec(players, this, parv);
-	}
-	catch(...)
+	/*}
+	/catch(...)
 	{
 		std::cout << "Erreur du parsage !!" << std::endl;
-	}
+	}*/
 
 	return;
 }
