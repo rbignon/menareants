@@ -26,23 +26,32 @@
 #include "gui/ListBox.h"
 #include "gui/BouttonText.h"
 #include "gui/Menu.h"
+#include "gui/Memo.h"
+#include "gui/Edit.h"
 #include "tools/Font.h"
+#include "Outils.h"
 
 ListBox *GameListBox = NULL;
+Memo *MessageList = NULL;
 bool EOL = false, JOINED = false;
 
 /* <nick> MSG <message> */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	if(MessageList) MessageList->AddItem("<" + parv[0] + "> " + parv[1],
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
 	return 0;
 }
 
 /* LSP <nom> <nbjoueur> [nbmax] */
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	GameListBox->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1],
-	                     (parv.size() <= 3 || parv[2] != parv[3]) ? black_color : red_color,
-	                     (parv.size() <= 3 || parv[2] != parv[3]) ? true : false);
+	if(parv[3] == "0")
+		GameListBox->AddItem(false, parv[1] + "   " + parv[2], parv[1], black_color, true);
+	else
+		GameListBox->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1],
+		                 (parv.size() <= 3 || parv[2] != parv[3]) ? black_color : red_color,
+		                 (parv.size() <= 3 || parv[2] != parv[3]) ? true : false);
 	return 0;
 }
 
@@ -148,6 +157,10 @@ void EuroConqApp::GameInfos(bool create)
 	EChannel *chan = client->Player()->Channel();
 
 	/* Déclaration membres fixes */
+	MessageList = new Memo(75,325,300,200,30);
+	MessageList->Init();
+	Edit SendMessage(75,530,300, MAXBUFFER-20);
+	SendMessage.Init();
 	ButtonText RetourButton(600,450,100,49, "Retour");
 	RetourButton.SetFont(&normal_font);
 
@@ -159,15 +172,30 @@ void EuroConqApp::GameInfos(bool create)
 			switch(event.type)
 			{
 				case SDL_KEYUP:
+					SendMessage.PressKey(event.key.keysym);
 					switch (event.key.keysym.sym)
 					{
 						case SDLK_ESCAPE:
 							eob = true;
 							break;
+						case SDLK_RETURN:
+							if(SendMessage.Focused())
+							{
+								client->sendrpl(client->rpl(EC_Client::MSG),
+								                FormatStr(SendMessage.GetString().c_str()));
+								MessageList->AddItem("<" + client->GetNick() + "> " +
+								                     SendMessage.GetString(), black_color);
+								SendMessage.ClearString();
+							}
+							break;
 						default: break;
 					}
 					break;
+				case SDL_MOUSEBUTTONUP:
+					MessageList->Clic( event.button.x, event.button.y);
+					break;
 				case SDL_MOUSEBUTTONDOWN:
+					SendMessage.Clic(event.button.x, event.button.y);
 					if(RetourButton.Test(event.button.x, event.button.y))
 						eob = true;
 					break;
@@ -188,10 +216,15 @@ void EuroConqApp::GameInfos(bool create)
 			big_font.WriteLeft(85, vert, pl->GetNick(), black_color);
 		}
 		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
+		MessageList->Display(x,y);
+		SendMessage.Display();
 
 		RetourButton.Draw(x, y);
 		SDL_Flip(sdlwindow);
 	} while(!eob && client->IsConnected() && client->Player());
+
+	delete MessageList;
+	MessageList = NULL;
 
 	client->sendrpl(client->rpl(EC_Client::LEAVE));
 	return;
