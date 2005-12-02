@@ -96,6 +96,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_GAME = @INSTALL_GAME@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_SERVER = @INSTALL_SERVER@
@@ -166,7 +167,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-SUBDIRS = lib src ${INSTALL_SERVER}
+SUBDIRS = lib ${INSTALL_GAME} ${INSTALL_SERVER}
 AUTOMAKE_OPTIONS = foreign
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

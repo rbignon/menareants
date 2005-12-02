@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="Makefile.am"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS INSTALL_SERVER DATA_FILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB INSTALL_SERVER INSTALL_GAME SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS DATA_FILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -819,9 +819,10 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-server         compilation of Europe Conquest's server
+  --disable-game          compilation of Europe Conquest game
   --disable-sdltest       Do not try to compile and run a test SDL program
   --enable-warnings       enable warnings during compilation
-  --enable-server         compilation of Europe Conquest's server
   --enable-debug          enable debug
 
 Optional Packages:
@@ -2640,21 +2641,40 @@ else
 fi
 
 
-# Checks for libraries.
-#AC_CHECK_LIB(z,main,,echo "Europe Conquest requires zlib to run."; exit 1)
-# AC_CHECK_LIB(Hermes,main,,echo "Europe Conquest requires Hermes to run."; exit 1)
-#AC_CHECK_LIB(clanCore,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-#AC_CHECK_LIB(clanApp,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-#AC_CHECK_LIB(clanDisplay,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-#AC_CHECK_LIB(clanNetwork,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-# AC_CHECK_LIB(clanSound,main,,echo "Europe Conquest requires ClanLib to run."; exit 1)
-#AC_CHECK_LIB(png,main,,echo "Europe Conquest requires PNG library to run."; exit 1)
-#AC_CHECK_LIB(clanPNG,main,,echo "Europe Conquest requires ClanLib PNG support to run."; exit1)
-# AC_CHECK_LIB(clanMikMod,main,
-# [
-# 	AC_DEFINE(MUSIC, 1, [Define to 1 if you want musc support])
-# 	LIBS=$LIBS" -lclanMikMod"
-# ],)
+# COMPILER ET INSTALLER LE SERVEUR
+
+# Check whether --enable-server or --disable-server was given.
+if test "${enable_server+set}" = set; then
+  enableval="$enable_server"
+
+                        if test "x${enableval}" != "xno"; then
+                                INSTALL_SERVER=server
+
+                        fi
+
+fi;
+
+# NE PAS COMPILER ET INSTALLER LE JEU
+
+INSTALL_GAME_Q=1
+
+# Check whether --enable-game or --disable-game was given.
+if test "${enable_game+set}" = set; then
+  enableval="$enable_game"
+
+                        if test "x${enableval}" = "xno"; then
+                                INSTALL_GAME_Q=0
+                        fi
+
+else
+  INSTALL_GAME_Q=1
+
+fi;
+
+if test "x${INSTALL_GAME_Q}" = "x1"; then
+  INSTALL_GAME=src
+
+fi
 
 # SDL
 
@@ -3590,8 +3610,10 @@ echo $ECHO_N "checking for SDL - version >= $min_sdl_version... $ECHO_C" >&6
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
     if test "x$enable_sdltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
+      ac_save_CXXFLAGS="$CXXFLAGS"
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $SDL_CFLAGS"
+      CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
       LIBS="$LIBS $SDL_LIBS"
       rm -f conf.sdltest
       if test "$cross_compiling" = yes; then
@@ -3706,6 +3728,7 @@ echo "${ECHO_T}no" >&6
        else
           echo "*** Could not run SDL test program, checking why..."
           CFLAGS="$CFLAGS $SDL_CFLAGS"
+          CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
           LIBS="$LIBS $SDL_LIBS"
           cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -3772,22 +3795,24 @@ fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
           CFLAGS="$ac_save_CFLAGS"
+          CXXFLAGS="$ac_save_CXXFLAGS"
           LIBS="$ac_save_LIBS"
        fi
      fi
      SDL_CFLAGS=""
+     SDL_CXXFLAGS=""
      SDL_LIBS=""
-     { { echo "$as_me:$LINENO: error: *** SDL version $SDL_VERSION not found!" >&5
+     if test "x{INSTALL_GAME_Q}" = "x1"; then
+				{ { echo "$as_me:$LINENO: error: *** SDL version $SDL_VERSION not found!" >&5
 echo "$as_me: error: *** SDL version $SDL_VERSION not found!" >&2;}
    { (exit 1); exit 1; }; }
+			fi
+
   fi
 
 
   rm -f conf.sdltest
 
-CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
-CFLAGS="$CFLAGS $SDL_CFLAGS"
-LIBS="$LIBS $SDL_LIBS"
 
 # SLD_image
 
@@ -3863,12 +3888,14 @@ _ACEOF
   LIBS="-lSDL_image $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: SDL_image library required" >&5
+  if test "x{INSTALL_GAME_Q}" = "x1"; then
+					{ { echo "$as_me:$LINENO: error: SDL_image library required" >&5
 echo "$as_me: error: SDL_image library required" >&2;}
    { (exit 1); exit 1; }; }
+				fi
+
 fi
 
-LIBS="$LIBS -lSDL_image"
 
 # SDL_ttf
 
@@ -3944,12 +3971,13 @@ _ACEOF
   LIBS="-lSDL_ttf $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: SDL_ttf library is required" >&5
+  if test "x{INSTALL_GAME_Q}" = "x1"; then
+					{ { echo "$as_me:$LINENO: error: SDL_ttf library is required" >&5
 echo "$as_me: error: SDL_ttf library is required" >&2;}
    { (exit 1); exit 1; }; }
+				fi
 fi
 
-LIBS="$LIBS -lSDL_ttf"
 
 # SDL_gfx
 
@@ -4025,12 +4053,19 @@ _ACEOF
   LIBS="-lSDL_gfx $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: SDL_gfx library >= 2.0.13 required" >&5
+  if test "x{INSTALL_GAME_Q}" = "x1"; then
+					{ { echo "$as_me:$LINENO: error: SDL_gfx library >= 2.0.13 required" >&5
 echo "$as_me: error: SDL_gfx library >= 2.0.13 required" >&2;}
    { (exit 1); exit 1; }; }
+				fi
 fi
 
-LIBS="$LIBS -lSDL_gfx"
+
+if test "x{INSTALL_GAME_Q}" = "x1"; then
+	LIBS="$LIBS $SDL_LIBS"
+	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+	CFLAGS="$CFLAGS $SDL_CFLAGS"
+fi
 
 #  WARNINGS
 # Check whether --enable-warnings or --disable-warnings was given.
@@ -4039,19 +4074,6 @@ if test "${enable_warnings+set}" = set; then
 
                         if test "x${enableval}" != "xno"; then
                                 CXXFLAGS="$CXXFLAGS -Wall"
-                        fi
-
-fi;
-
-# COMPILER ET INSTALLER LE SERVEUR
-
-# Check whether --enable-server or --disable-server was given.
-if test "${enable_server+set}" = set; then
-  enableval="$enable_server"
-
-                        if test "x${enableval}" != "xno"; then
-                                INSTALL_SERVER=server
-
                         fi
 
 fi;
@@ -4079,7 +4101,6 @@ fi
 
 DATA_FILES=`cd src/data ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
 DATA_FILES=`echo $DATA_FILES`
-
 
 
 
@@ -4786,6 +4807,8 @@ s,@am__fastdepCXX_TRUE@,$am__fastdepCXX_TRUE,;t t
 s,@am__fastdepCXX_FALSE@,$am__fastdepCXX_FALSE,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@INSTALL_SERVER@,$INSTALL_SERVER,;t t
+s,@INSTALL_GAME@,$INSTALL_GAME,;t t
 s,@SDL_CONFIG@,$SDL_CONFIG,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
@@ -4795,7 +4818,6 @@ s,@am__fastdepCC_TRUE@,$am__fastdepCC_TRUE,;t t
 s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
 s,@SDL_CFLAGS@,$SDL_CFLAGS,;t t
 s,@SDL_LIBS@,$SDL_LIBS,;t t
-s,@INSTALL_SERVER@,$INSTALL_SERVER,;t t
 s,@DATA_FILES@,$DATA_FILES,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
