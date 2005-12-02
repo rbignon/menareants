@@ -13,9 +13,6 @@
 -Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
 
 * En parallèle (on s'en fou un peu de quand on les fait)
--client: système d'exception
--serveur: système d'exception (logage)
--c/s: envoie des erreurs du client au serveur
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -client: Faire la partie de jeu vraiment

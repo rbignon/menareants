@@ -1,3 +1,23 @@
+2005-11-30  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/: Renomage des différents composants en T*.
+
+	* configure.ac: Possibilité de ne pas compiler le jeu.
+
+	* Application des debugages un peu partout...
+
+	* lib/Outils.cpp (Format): Fonction qui formate (à la sprintf) mais qui retourne le résultat dans
+	une std::string.
+	(get_time): Retourne la date formatée.
+
+	* lib/Debug.cpp: Création fichier.
+	(TECExcept): Classe d'exception.
+
+	* src/Debug.cpp (Debug): Fonction pour envoyer un debug au serveur et/ou printf.
+
+	* server/Debug.cpp (Debug): Fonction lors de la reception d'erreurs. Ecriture dans un fichier.
+	(ERRCommand): Commande lorsqu'un client rapporte un bug.
+
 2005-11-28  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp: Empeche le join d'un salon en cours de jeu...
