@@ -23,6 +23,7 @@
 #include "Server.h"
 #include "Commands.h"
 #include "Outils.h"
+#include "Debug.h"
 #include "Main.h"
 #include <cstdarg>
 
@@ -35,7 +36,8 @@ std::vector<EChannel*> ChanList;
 /* MSG <message> */
 int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	if(!cl->Player()) return cl->exit(app.rpl(ECServer::ERR));
+	if(!cl->Player())
+		return vDebug(W_DESYNCH, "MSG en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
 	cl->Player()->Channel()->sendto_players(cl->Player(),
 			app.rpl(ECServer::MSG), cl->GetNick(), FormatStr(parv[1].c_str()));
@@ -46,7 +48,9 @@ int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* Ne peut être que sur un seul salon à la fois */
-	if(cl->Player() || parv[1].empty()) return cl->exit(app.rpl(ECServer::ERR));
+	if(cl->Player() || parv[1].empty())
+		return vDebug(W_WARNING, "Essaye de joindre plusieurs salons", VSName(cl->GetNick())
+		                          VSName(cl->Player()->Channel()->GetName()));
 
 	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
@@ -68,7 +72,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	else
 	{ /* Rejoins un salon existant */
-		if(chan->GetState() != WAITING) return cl->exit(app.rpl(ECServer::ERR));
+		if(chan->GetState() != EChannel::WAITING) return cl->exit(app.rpl(ECServer::ERR));
 		pl = new ECPlayer(cl, chan, false);
 	}
 	cl->SetPlayer(pl);
@@ -82,7 +86,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* N'est pas dans un salon TODO: Desynch */
-	if(!cl->Player()) return cl->exit(app.rpl(ECServer::ERR));
+	if(!cl->Player())
+		return vDebug(W_DESYNCH, "LEA en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
 	const char* raison = parv.size() > 1 ? parv[1].c_str() : "";
 

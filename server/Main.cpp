@@ -92,6 +92,7 @@ try {
 	Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
 	Commands.push_back(new BYECommand("BYE",	0,			0));
 	Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
+	Commands.push_back(new ERRCommand("ERR",	0,			1));
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);

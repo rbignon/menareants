@@ -22,6 +22,7 @@
 #include "Main.h"
 #include "Commands.h"
 #include "Channels.h"
+#include "Debug.h"
 #include <config.h>
 #include <string>
 #include <iostream>
@@ -113,8 +114,7 @@ int TClient::sendrpl(const char *pattern, ...)
 char *ECServer::rpl(ECServer::msg t)
 {
   if(t<0 || t>ECServer::NONE)
-    //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
-    throw std::string("Sort de la table"); /* TODO: utiliser une exception à nous */
+    throw ECExcept(VIName(t) VIName(ECServer::NONE), "Sort de la table");
   return (char *)msgTab[t];
 }
 
@@ -149,20 +149,17 @@ int TClient::parsemsg()
 			cmd = app.GetCommands()[i];
 
 	if(!cmd || (parv.size()-1) < cmd->args)
-		/* TODO: voir si on vire ou non l'user du serveur */
-		return 0;
+		return vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VSName(RecvBuf)
+		                         VPName(cmd) VIName(parv.size()-1) VIName(cmd ? cmd->args : 0));
 
 	try
 	{
 		cmd->Exec(this, parv);
 	}
-	catch(std::string err)
+	catch(TECExcept &e)
 	{
-		std::cout << "Erreur d'une commande : " << err << std::endl;
-	}
-	catch(...)
-	{
-		std::cout << "Erreur du parsage !!" << std::endl;
+		vDebug(W_ERR, e.Message, e.Vars);
+		exit(app.rpl(ECServer::ERR));
 	}
 
 	return 0;
@@ -241,10 +238,10 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	TClient *newC = NULL;
 
 	if((unsigned) fd >= ASIZE(Clients))
-		printf("Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
+		Debug(W_WARNING, "Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
 			fd, ip, ASIZE(Clients));
 	else if(!(Clients[fd].HasFlag(ECD_FREE)))
-		printf("Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
+		Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
 			ip, fd, Clients[fd].GetIp());
 	else
 	{	/* register the socket in client list */

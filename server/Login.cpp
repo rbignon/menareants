@@ -22,6 +22,7 @@
 #include "Server.h"
 #include "Outils.h"
 #include "Main.h"
+#include "Debug.h"
 #include <string>
 
 char *correct_nick(const char *nick)
@@ -43,7 +44,9 @@ char *correct_nick(const char *nick)
 /* IAM <nick> <prog> <version> */
 int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	if(IsAuth(cl)) return cl->exit(app.rpl(ECServer::ERR));
+	if(IsAuth(cl))
+		return vDebug(W_DESYNCH, "User déjà logué", VSName(cl->GetNick()));
+
 	if(parv[2] != CLIENT_SMALLNAME)
 		return cl->exit(app.rpl(ECServer::MAJ), '0');
 

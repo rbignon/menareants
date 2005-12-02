@@ -21,6 +21,10 @@
 #ifndef ECD_Defines_h
 #define ECD_Defines_h
 
+#ifndef WIN32
+	#include <config.h>
+#endif
+
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Europa Conquest Daemon"
 #define APP_SMALLNAME "EuroConqD"
@@ -43,13 +47,16 @@
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
 
+/* Fichier de debugage */
+#define DEBUG_LOG       "errors.log"     /* Fichier de DEBUG */
+
 /* Interval */
 #define PINGINTERVAL 30
 
 /* Tailles */
 #define NICKLEN 20
 
-#define MAXBUFFER 512
+#define MAXBUFFER 1024
 #define ECD_SENDSIZE 1024
 #define ECD_RECVSIZE 256
 #define COMLEN 10
@@ -61,13 +68,19 @@
 /* Macro */
 #define ASIZE(x) 				(sizeof (x) / sizeof *(x))
 
-/*
- * Il n'est pas nécessaire d'éditer la suite
- */
+/*********************************************************************************************
+ *           Il n'est pas nécessaire d'éditer la suite                                       *
+ *********************************************************************************************/
 #ifdef APP_VERSION_PATCH
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
 #else
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
+#endif
+
+#ifdef WIN32
+#define DEBUGLOG DEBUG_LOG
+#else
+#define DEBUGLOG "~/.euroconqserver/" DEBUG_LOG
 #endif
 
 #endif
