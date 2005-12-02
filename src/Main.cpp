@@ -34,6 +34,7 @@
 #include "tools/Images.h"
 #include "Resources.h"
 #include "gui/ListBox.h"
+#include "Debug.h"
 
 EuroConqApp app;
 
@@ -93,7 +94,7 @@ void EuroConqApp::request_game()
 				{
 					case JOUER_RETOUR:
 						client->SetWantDisconnect();
-						client->sendrpl(client->rpl(EC_Client::QUIT));
+						client->sendrpl(client->rpl(EC_Client::BYE));
 						alive = false;
 						break;
 					case JOUER_LISTER:
@@ -126,14 +127,12 @@ void EuroConqApp::request_game()
 			}
 		}
 		delete client;
-		SDL_WaitThread(Thread, 0); /* Attend la fin du thread
-		                            *  TODO: voir pour un moyen de le forcer à finir
-		                            */
+		SDL_WaitThread(Thread, 0);
 		delete menu;
 	}
-	catch(const std::string err)
+	catch(const TECExcept &e)
 	{
-		std::cout << err << std::endl;
+		Debug(W_ERR, e.Message);
 		if(menu) delete menu;
 		SDL_KillThread(Thread); /* En cas d'erreur, clore arbitrairement le thread */
 		if(client) delete client;

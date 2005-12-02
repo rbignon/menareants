@@ -22,6 +22,7 @@
 #include "Main.h"
 #include "Commands.h"
 #include "Outils.h"
+#include "Debug.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -32,6 +33,8 @@ const char* msgTab[] = {
 	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
 	"POG",                                    /* POG - PONG */
 	"BYE",                                    /* BYE - Quit le serveur */
+	"ERR %s",                                 /* ERR - Message d'erreur */
+	"ERR %s %s",                              /* ERR - Message d'erreur avec vars */
 
 	"LSP",                                    /* LSP - Liste les jeux */
 	"JOI %s",                                 /* JOI - Joindre une partie */
@@ -43,8 +46,7 @@ const char* msgTab[] = {
 char *EC_Client::rpl(EC_Client::msg t)
 {
   if(t<0 || t>EC_Client::NONE)
-    //throw WRWExcept(VIName(t) VIName(EC_Client::NONE), "sort de la table", 0);
-    throw std::string("Sort de la table"); /* TODO: utiliser une exception à nous */
+    throw ECExcept(VIName(t) VIName(EC_Client::NONE), "Sort de la table");
   return (char *)msgTab[t];
 }
 
@@ -144,14 +146,14 @@ void EC_Client::parse_message(std::string buf)
 		 */
 		{ printf("erreur de pars ! %s\n", cmd ? "arg" : "cmd introuvable"); return; }
 
-/*	try
-	{*/
-		cmd->Exec(players, this, parv);
-	/*}
-	/catch(...)
+	try
 	{
-		std::cout << "Erreur du parsage !!" << std::endl;
-	}*/
+		cmd->Exec(players, this, parv);
+	}
+	catch(TECExcept &e)
+	{
+		vDebug(W_ERR, e.Message, e.Vars);
+	}
 
 	return;
 }

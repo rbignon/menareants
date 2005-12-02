@@ -30,9 +30,10 @@
 #include "gui/Edit.h"
 #include "tools/Font.h"
 #include "Outils.h"
+#include "Debug.h"
 
-ListBox *GameListBox = NULL;
-Memo *MessageList = NULL;
+TListBox *GameListBox = NULL;
+TMemo *MessageList = NULL;
 bool EOL = false, JOINED = false;
 
 /* <nick> MSG <message> */
@@ -71,7 +72,7 @@ int SETSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 /* PLS [[@]nick] [[[@]nick] ...] */
 int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(!me->Player()) return 0; /* TODO Desynch */
+	if(!me->Player()) return Debug(W_DESYNCH|W_ERR, "Reception d'un PLS sans être dans un chan");
 
 	for(unsigned int i=1;i<parv.size();i++)
 	{
@@ -96,9 +97,9 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(players.size())
-	{ /* Le joueur est reconnu (!?) */
-		/* TODO: Desynch */
-	}
+	/* Le joueur est reconnu (!?) */
+		return vDebug(W_DESYNCH|W_SEND, "Reception d'un JOIN d'un joueur connu !",
+		                                VSName(players[0]->GetNick()));
 	else
 	{ /* Le joueur est inconnu */
 		if(parv[0] == me->GetNick())
@@ -108,7 +109,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
-			if(!me->Player()) return 0; /* TODO: Desynch */
+			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
 
 			new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false);
 		}
@@ -119,6 +120,10 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 /* <nick> LEA */
 int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	if(!players.size())
+		return vDebug(W_DESYNCH|W_SEND, "Reception d'un LEAVE d'un joueur inconnu !",
+		                                VSName(parv[0].c_str()));
+
 	/* Note: Dans le protocole il ne devrait y avoir qu'un seul départ
 	 *       à la fois mais bon par respect de ce qui est *possible*
 	 *       (on ne sait jamais, après tout, on pourrait imager dans
@@ -141,7 +146,9 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 void EuroConqApp::GameInfos(bool create)
 {
-	if(!client) return;
+	if(!client)
+		throw ECExcept(VPName(client), "Non connecté");
+
 	if(create)
 	{
 		std::string name = Menu::EnterString("Nom", "", false);
@@ -154,14 +161,16 @@ void EuroConqApp::GameInfos(bool create)
 	}
 	SDL_Event event;
 	bool eob = false;
+	if(!client->Player() || !client->Player()->Channel())
+		throw ECExcept(VPName(client->Player()), "Dans aucun chan");
 	EChannel *chan = client->Player()->Channel();
 
 	/* Déclaration membres fixes */
-	MessageList = new Memo(75,325,300,200,30);
+	MessageList = new TMemo(75,325,300,200,30);
 	MessageList->Init();
-	Edit SendMessage(75,530,300, MAXBUFFER-20);
+	TEdit SendMessage(75,530,300, MAXBUFFER-20);
 	SendMessage.Init();
-	ButtonText RetourButton(600,450,100,49, "Retour");
+	TButtonText RetourButton(600,450,100,49, "Retour");
 	RetourButton.SetFont(&normal_font);
 
 	do
@@ -232,21 +241,22 @@ void EuroConqApp::GameInfos(bool create)
 
 void EuroConqApp::ListGames()
 {
-	if(!client) return;
+	if(!client)
+		throw ECExcept(VPName(client), "Non connecté");
 
 	SDL_Event event;
 
 	/* Déclaration membres fixes */
-	ButtonText JoinButton(500,200,100,49, "Joindre");
+	TButtonText JoinButton(500,200,100,49, "Joindre");
 	JoinButton.SetFont(&normal_font);
-	ButtonText RefreshButton(500,250,100,49, "Actualiser");
+	TButtonText RefreshButton(500,250,100,49, "Actualiser");
 	RefreshButton.SetFont(&normal_font);
-	ButtonText CreerButton(500,300,100,49, "Creer");
+	TButtonText CreerButton(500,300,100,49, "Creer");
 	CreerButton.SetFont(&normal_font);
-	ButtonText RetourButton(500,350,100,49, "Retour");
+	TButtonText RetourButton(500,350,100,49, "Retour");
 	RetourButton.SetFont(&normal_font);
 
-	GameListBox = new ListBox(300,200,200,300);
+	GameListBox = new TListBox(300,200,200,300);
 	GameListBox->Init();
 
 	bool eob = false, refresh = true;

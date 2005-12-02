@@ -45,7 +45,10 @@ public:
 	enum msg {  /* mettre à jour systematiquement msgTab[] dans Sockets.cpp */
 		IAM,  /* IAM */
 		PONG, /* POG */
-		QUIT, /* BYE */
+		BYE,  /* BYE */
+		ERROR,/* ERR */
+		ERRORV,/*ERR */
+
 		LISTGAME, /* LSP */
 		JOIN, /* JOI */
 		LEAVE,/* LEA */

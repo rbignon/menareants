@@ -30,11 +30,6 @@
 
 struct SDL_Surface;
 
-#ifndef WIN32
-	#include <config.h>
-#endif
-
-
 class Menu;
 
 class EC_Client;

@@ -21,6 +21,10 @@
 #ifndef EC_Defines_h
 #define EC_Defines_h
 
+#ifndef WIN32
+	#include <config.h>
+#endif
+
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Europa Conquest"
 #define APP_SMALLNAME "EuroConq"
@@ -44,12 +48,12 @@
 #endif
 
 /* Tailles */
-#define MAXBUFFER 512
+#define MAXBUFFER 1024
 #define COMLEN 10
 
-/*
- * Il n'est pas nécessaire d'éditer la suite
- */
+/*********************************************************************************************
+ *           Il n'est pas nécessaire d'éditer la suite                                       *
+ *********************************************************************************************/
 #ifdef APP_VERSION_PATCH
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
 #else

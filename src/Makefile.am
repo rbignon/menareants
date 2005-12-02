@@ -10,6 +10,7 @@ euroconq_SOURCES = \
 		Resources.cpp \
 		Sockets.cpp \
 		Config.cpp \
+		Debug.cpp \
 		Login.cpp \
 		Channels.cpp \
 		JoinGame.cpp \

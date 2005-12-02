@@ -52,10 +52,11 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Login.$(OBJEXT) Channels.$(OBJEXT) JoinGame.$(OBJEXT) \
-	Font.$(OBJEXT) Images.$(OBJEXT) Maths.$(OBJEXT) Menu.$(OBJEXT) \
-	ListBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
-	Memo.$(OBJEXT) Edit.$(OBJEXT)
+	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
+	JoinGame.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT) \
+	Maths.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT) \
+	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
+	Edit.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -102,6 +103,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_GAME = @INSTALL_GAME@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_SERVER = @INSTALL_SERVER@
@@ -180,6 +182,7 @@ euroconq_SOURCES = \
 		Resources.cpp \
 		Sockets.cpp \
 		Config.cpp \
+		Debug.cpp \
 		Login.cpp \
 		Channels.cpp \
 		JoinGame.cpp \
@@ -264,6 +267,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BouttonText.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Images.Po@am__quote@
