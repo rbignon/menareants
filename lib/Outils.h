@@ -28,6 +28,13 @@ std::string stringtok(std::string &, const char * const);
 /* Formate la chaine avec des \ devant les espaces */
 char* FormatStr(const char* s);
 
+/* Formate une chaine et retourne dans une std::string */
+std::string StringF(const char* format, ...);
+
+/* Retourne la date formatée */
+#define TIMELEN 20
+char *get_time(time_t mytime);
+
 template<typename T>
 bool StrToTyp( const std::string & Str, T & Dest )
 {

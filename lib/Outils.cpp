@@ -19,6 +19,7 @@
  */
 
 #include <string>
+#include <cstdarg>
 
 #include "Outils.h"
 
@@ -61,3 +62,29 @@ char* FormatStr(const char* s)
 	ptr[i] = '\0';
 	return ptr;
 }
+
+std::string StringF(const char* format, ...)
+{
+  char buf[512];
+  va_list va;
+  std::string s;
+
+  va_start(va, format);
+  vsnprintf(buf, sizeof buf - 2, format, va);
+  va_end(va);
+
+  s = buf;
+  return s;
+}
+
+char *get_time(time_t mytime)
+{
+        static char buftime[TIMELEN + 1];
+        register struct tm *lt = localtime(&mytime);
+
+        snprintf(buftime + 1, sizeof buftime, "%d-%02d-%02d %02d:%02d:%02d",
+                1900 + lt->tm_year,     lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+
+        return buftime;
+}
+
