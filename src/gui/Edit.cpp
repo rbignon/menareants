@@ -1,4 +1,4 @@
-/* src/gui/Edit.cpp - Edit GUI
+/* src/gui/TEdit.cpp - TEdit GUI
  *
  * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
  *
@@ -24,7 +24,7 @@
 #include "Edit.h"
 #include <SDL.h>
 
-Edit::Edit (uint _x, uint _y, uint _width, uint _maxlen)
+TEdit::TEdit (uint _x, uint _y, uint _width, uint _maxlen)
   : x(_x), y(_y), width(_width), height(EDIT_HEIGHT)
 {
   first_char = 0;
@@ -37,13 +37,13 @@ Edit::Edit (uint _x, uint _y, uint _width, uint _maxlen)
   background = NULL;
 }
 
-Edit::~Edit()
+TEdit::~TEdit()
 {
    if ( background)
      SDL_FreeSurface( background);
 }
 
-void Edit::Init()
+void TEdit::Init()
 {
   if ( background)
     SDL_FreeSurface( background);
@@ -56,7 +56,7 @@ void Edit::Init()
 
 }
 
-bool Edit::Clic (uint mouse_x, uint mouse_y)
+bool TEdit::Clic (uint mouse_x, uint mouse_y)
 {
 	if((x <= mouse_x) && (mouse_x <= x+width)
 	  && (y <= mouse_y) && (mouse_y <= y+height))
@@ -67,17 +67,17 @@ bool Edit::Clic (uint mouse_x, uint mouse_y)
   return true;
 }
 
-void Edit::SetFocus()
+void TEdit::SetFocus()
 {
 	focus = true;
 }
 
-void Edit::DelFocus()
+void TEdit::DelFocus()
 {
 	focus = false;
 }
 
-void Edit::Display ()
+void TEdit::Display ()
 {
   SDL_Rect r_back = {x,y,width,height};
   SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
@@ -92,7 +92,7 @@ void Edit::Display ()
 	small_font.WriteLeft(x+5, y, chaine + std::string(focus ? "_" : ""), black_color);
 }
 
-void Edit::PressKey(SDL_keysym key)
+void TEdit::PressKey(SDL_keysym key)
 {
 	if(!focus) return;
 

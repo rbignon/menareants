@@ -31,13 +31,13 @@
 
 struct SDL_Surface;
 
-class Edit
+class TEdit
 {
 /* Constructeur/Deconstructeur */
 public:
 
-	Edit(uint _x, uint _y, uint _width, uint _maxlen = 0);
-	~Edit();
+	TEdit(uint _x, uint _y, uint _width, uint _maxlen = 0);
+	~TEdit();
 
 /* Methodes */
 public:

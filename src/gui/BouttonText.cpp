@@ -21,15 +21,15 @@
 
 #include "BouttonText.h"
 
-ButtonText::ButtonText() : Button()
+TButtonText::TButtonText() : TButton()
 {
   font = NULL;
 }
 
 //-----------------------------------------------------------------------------
 
-ButtonText::ButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string &text)
-  : Button(x, y, w, h)
+TButtonText::TButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string &text)
+  : TButton(x, y, w, h)
 {
   m_text = text;
 }
@@ -37,21 +37,21 @@ ButtonText::ButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned
 
 //-----------------------------------------------------------------------------
 
-void ButtonText::SetFont (Font *font)
+void TButtonText::SetFont (Font *font)
 {
   this->font = font;
 }
 
 //-----------------------------------------------------------------------------
 
-void ButtonText::SetText(const std::string &text)
+void TButtonText::SetText(const std::string &text)
 {
   m_text = text;
 }
 
 //-----------------------------------------------------------------------------
 
-void ButtonText::Draw (unsigned int souris_x, unsigned int souris_y)
+void TButtonText::Draw (unsigned int souris_x, unsigned int souris_y)
 {
   if(image)
     DrawImage (souris_x, souris_y);
@@ -66,7 +66,7 @@ void ButtonText::Draw (unsigned int souris_x, unsigned int souris_y)
 
 //-----------------------------------------------------------------------------
 
-std::string ButtonText::GetText() const
+std::string TButtonText::GetText() const
 {
   return m_text;
 }

@@ -35,7 +35,7 @@ typedef struct s_memo_box_item_t{
     SDL_Color color;
   } memo_box_item_t;
 
-class Memo
+class TMemo
 {
 private:
   // for the placement
@@ -51,13 +51,13 @@ private:
   std::vector<memo_box_item_t> m_items;
 
   // Buttons
-  Button m_up, m_down;
+  TButton m_up, m_down;
 
   SDL_Surface *background;
 
 public:
-  Memo (uint _x, uint _y, uint _width, uint _height, uint max_items);
-  ~Memo();
+  TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items);
+  ~TMemo();
   void Init ();
   void Display (uint mouse_x, uint mouse_y);
   bool Clic (uint mouse_x, uint mouse_y);

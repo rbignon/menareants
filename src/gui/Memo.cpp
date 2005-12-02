@@ -1,4 +1,4 @@
-/* src/gui/Memo.cpp - Memo GUI
+/* src/gui/TMemo.cpp - TMemo GUI
  *
  * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
  *
@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <SDL.h>
 
-Memo::Memo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0)
+TMemo::TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0)
   : x(_x), y(_y), width(_width), height(_height)
 {
   height_item = 15;
@@ -42,13 +42,13 @@ Memo::Memo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0)
   background = NULL;
 }
 
-Memo::~Memo()
+TMemo::~TMemo()
 {
    if ( background)
      SDL_FreeSurface( background);
 }
 
-void Memo::Init()
+void TMemo::Init()
 {
   // Load images
   m_up.SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
@@ -65,7 +65,7 @@ void Memo::Init()
 
 }
 
-bool Memo::Clic (uint mouse_x, uint mouse_y)
+bool TMemo::Clic (uint mouse_x, uint mouse_y)
 {
   if (m_items.size() > nb_visible_items_max)
   {
@@ -88,7 +88,7 @@ bool Memo::Clic (uint mouse_x, uint mouse_y)
   return false;
 }
 
-void Memo::Display (uint mouse_x, uint mouse_y)
+void TMemo::Display (uint mouse_x, uint mouse_y)
 {
   // blit a surface as SDL_FillRect don't alpha blit a rectangle
   SDL_Rect r_back = {x,y,width,height};
@@ -113,7 +113,7 @@ void Memo::Display (uint mouse_x, uint mouse_y)
   }
 }
 
-void Memo::AddItem (const std::string &_label, SDL_Color _color = black_color)
+void TMemo::AddItem (const std::string &_label, SDL_Color _color = black_color)
 {
   std::string label = _label;
   bool theend = false;
@@ -152,9 +152,9 @@ void Memo::AddItem (const std::string &_label, SDL_Color _color = black_color)
 
 }
 
-void Memo::ClearItems()
+void TMemo::ClearItems()
 {
 	m_items.clear();
 }
 
-void Memo::SetXY (uint px, uint py) { x = px; y = py; }
+void TMemo::SetXY (uint px, uint py) { x = px; y = py; }

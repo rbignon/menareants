@@ -1,4 +1,4 @@
-/* src/gui/ListBox.cpp - To draw a listbox
+/* src/gui/TListBox.cpp - To draw a listbox
  *
  * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
  *
@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <SDL.h>
 
-ListBox::ListBox (uint _x, uint _y, uint _width, uint _height)
+TListBox::TListBox (uint _x, uint _y, uint _width, uint _height)
   : x(_x), y(_y), width(_width), height(_height)
 {
   height_item = 15;
@@ -43,7 +43,7 @@ ListBox::ListBox (uint _x, uint _y, uint _width, uint _height)
   background = NULL;
 }
 
-ListBox::~ListBox()
+TListBox::~TListBox()
 {
    if ( cursorover_box)
      SDL_FreeSurface( cursorover_box);
@@ -53,7 +53,7 @@ ListBox::~ListBox()
      SDL_FreeSurface( background);
 }
 
-void ListBox::Init()
+void TListBox::Init()
 {
   // Load images
 
@@ -84,7 +84,7 @@ void ListBox::Init()
 
 }
 
-int ListBox::MouseIsOnWitchItem (uint mouse_x, uint mouse_y)
+int TListBox::MouseIsOnWitchItem (uint mouse_x, uint mouse_y)
 {
   if ((mouse_x < x+1)
       || (mouse_y < y+1)
@@ -96,7 +96,7 @@ int ListBox::MouseIsOnWitchItem (uint mouse_x, uint mouse_y)
   return BorneLong(index+first_visible_item, 0, m_items.size()-1);
 }
 
-bool ListBox::Clic (uint mouse_x, uint mouse_y)
+bool TListBox::Clic (uint mouse_x, uint mouse_y)
 {
 
   // buttons for listbox with more items than visible
@@ -127,7 +127,7 @@ bool ListBox::Clic (uint mouse_x, uint mouse_y)
   return true;
 }
 
-void ListBox::Display (uint mouse_x, uint mouse_y)
+void TListBox::Display (uint mouse_x, uint mouse_y)
 {
   int item = MouseIsOnWitchItem(mouse_x, mouse_y);
 
@@ -167,7 +167,7 @@ void ListBox::Display (uint mouse_x, uint mouse_y)
 
 }
 
-void ListBox::AddItem (bool selected,
+void TListBox::AddItem (bool selected,
 		       const std::string &label,
 		       const std::string &value, SDL_Color _color = black_color, bool enabled = true)
 {
@@ -193,13 +193,13 @@ void ListBox::AddItem (bool selected,
 
 }
 
-void ListBox::ClearItems()
+void TListBox::ClearItems()
 {
 	m_items.clear();
 	m_selection.clear();
 }
 
-void ListBox::Select (uint index)
+void TListBox::Select (uint index)
 {
   if(!m_items[index].enabled) return;
   // If they are to much selection, kick the oldest one
@@ -216,7 +216,7 @@ void ListBox::Select (uint index)
 
 //-----------------------------------------------------------------------------
 
-void ListBox::Deselect (uint index)
+void TListBox::Deselect (uint index)
 {
   if ((int)m_selection.size()-1 < selection_min) return;
   m_selection.remove (index);
@@ -224,7 +224,7 @@ void ListBox::Deselect (uint index)
 
 //-----------------------------------------------------------------------------
 
-bool ListBox::IsSelected (uint index)
+bool TListBox::IsSelected (uint index)
 {
   return std::find (m_selection.begin(), m_selection.end(), index)
     != m_selection.end();
@@ -232,7 +232,7 @@ bool ListBox::IsSelected (uint index)
 
 //-----------------------------------------------------------------------------
 
-int ListBox::GetSelectedItem ()
+int TListBox::GetSelectedItem ()
 {
   if(m_selection.size() != 1) return -1;
 
@@ -241,22 +241,22 @@ int ListBox::GetSelectedItem ()
 
 //-----------------------------------------------------------------------------
 
-const std::list<uint>& ListBox::GetSelection() const { return m_selection; }
-const std::string& ListBox::ReadLabel (uint index) const
+const std::list<uint>& TListBox::GetSelection() const { return m_selection; }
+const std::string& TListBox::ReadLabel (uint index) const
 {
   assert (index < m_items.size());
   return m_items[index].label;
 }
-const std::string& ListBox::ReadValue (uint index) const
+const std::string& TListBox::ReadValue (uint index) const
 {
   assert (index < m_items.size());
   return m_items[index].value;
 }
 
-bool ListBox::Enabled (uint index)
+bool TListBox::Enabled (uint index)
 {
   assert (index < m_items.size());
   return m_items[index].enabled;
 }
 
-void ListBox::SetXY (uint px, uint py) { x = px; y = py; }
+void TListBox::SetXY (uint px, uint py) { x = px; y = py; }

@@ -39,7 +39,7 @@ typedef struct s_list_box_item_t{
   } list_box_item_t;
 
 
-class ListBox
+class TListBox
 {
 public:
   int selection_min; // Minimal number of selected items
@@ -61,15 +61,15 @@ private:
   std::list<uint> m_selection;
 
   // Buttons
-  Button m_up, m_down;
+  TButton m_up, m_down;
 
   SDL_Surface *cursorover_box;
   SDL_Surface *selected_box;
   SDL_Surface *background;
 
 public:
-  ListBox (uint _x, uint _y, uint _width, uint _height);
-  ~ListBox();
+  TListBox (uint _x, uint _y, uint _width, uint _height);
+  ~TListBox();
   void Init ();
   void Display (uint mouse_x, uint mouse_y);
   bool Clic (uint mouse_x, uint mouse_y);

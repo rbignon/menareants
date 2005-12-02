@@ -24,7 +24,7 @@
 
 class ECSprite;
 
-class Button
+class TButton
 {
 protected:
   unsigned int m_x, m_width, m_y, m_height;
@@ -34,9 +34,9 @@ protected:
   bool enabled;
 
 public:
-  Button();
-  Button (unsigned int x, unsigned int y, unsigned int w, unsigned int h);
-  virtual ~Button();
+  TButton();
+  TButton (unsigned int x, unsigned int y, unsigned int w, unsigned int h);
+  virtual ~TButton();
   void SetPos(unsigned int x, unsigned int y);
   void SetSize (unsigned int larg, unsigned int haut);
 

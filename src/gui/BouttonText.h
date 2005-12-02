@@ -26,7 +26,7 @@
 #include "../tools/Font.h"
 #include <string>
 
-class ButtonText : public Button
+class TButtonText : public TButton
 {
 private:
   std::string m_text;
@@ -34,8 +34,8 @@ private:
   Font *font;
 
 public:
-  ButtonText();
-  ButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string &text);
+  TButtonText();
+  TButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string &text);
 
   virtual void Draw (unsigned int souris_x, unsigned int souris_y);
   void SetText (const std::string &text);
