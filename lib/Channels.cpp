@@ -32,6 +32,12 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	Ready = false;
 }
 
+void ECBPlayer::SetPlace(unsigned int p)
+{
+	if(p <= chan->NbPlayers())
+		place = p;
+}
+
 /********************************************************************************************
  *                               ECBChannel                                                   *
  ********************************************************************************************/

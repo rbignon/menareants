@@ -24,8 +24,9 @@ Sommaire:
               BYE                               :au revoir
          - Dans une pré-partie
               SET <param> <value>               :met un paramètre
-                  POS <pos>                       :se positionne
-                  COL <couleur>                   :définit sa couleur
+                  POS <pos>                       :se positionne (1-l)
+                  COL <couleur>                   :définit sa couleur (enum)
+                  MAP <map>                       :définit la map (voir comment la définir)
                   OK                              :indique que l'on est pret
               KIK <nick> [raison]               :l'owner peut kicker
               GO!                               :l'owner lance le jeu
@@ -46,6 +47,7 @@ Sommaire:
               BYE [raison]                      :au revoir
               USED                              :pseudo déjà utilisé
          - Dans une pré-partie
+              ER1                               :ne peut pas joindre
               SETS <sets>                       :paramètres d'une partie (notifie un join)
               NLS <[@]nick1> [<[@]nick1> ...]   :liste des joueurs
               :<nick> JOI <nom> <sets>          :un user join
@@ -65,12 +67,12 @@ Sommaire:
                       [<f2> ...]
 
 3) Particularités des commandes de positions
-	Les commandes de positions nécessitent des arguments de la forme suivante :
-		+<nb>       :ajoute des unités (donne le nombre final)
-		%<type>     :définit le type de l'armée
-		/<nb>:<pos> :divise l'armée en une autre armée en indiquant sa position
-		><pos>      :change la position
-		*[pos]      :attaque envisagée (et sans position: accepte un combat)
-		<[pos]      :retour
-		-           :suppression de l'armée  } application encore indéfinie
-		.           :lock                    |
+      Les commandes de positions nécessitent des arguments de la forme suivante :
+         +<nb>       :ajoute des unités (donne le nombre final)
+         %<type>     :définit le type de l'armée
+         /<nb>:<pos> :divise l'armée en une autre armée en indiquant sa position
+         ><pos>      :change la position
+         *[pos]      :attaque envisagée (et sans position: accepte un combat)
+         <[pos]      :retour
+         -           :suppression de l'armée  } application encore indéfinie
+         .           :lock                    |

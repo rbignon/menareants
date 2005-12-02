@@ -40,6 +40,8 @@ public:
 		BYE,   /* BYE */
 		AIM,   /* AIM */
 
+		CANTJOIN, /* ER1 */
+
 		PING,  /* PIG */
 		PONG,  /* POG */
 

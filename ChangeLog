@@ -1,3 +1,11 @@
+* Suspension provisoire du developpement du jeu.
+
+2005-12-02  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (JOICommand): Envoie de ER1 (CANTJOIN) si le chan est plein
+
+	* API: Modifications de l'API
+
 2005-11-30  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/: Renomage des différents composants en T*.

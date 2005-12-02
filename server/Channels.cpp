@@ -72,7 +72,14 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	else
 	{ /* Rejoins un salon existant */
-		if(chan->GetState() != EChannel::WAITING) return cl->exit(app.rpl(ECServer::ERR));
+		if(!chan->Joinable())
+		{
+			vDebug(W_WARNING, "Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
+			                  VSName(cl->GetNick()) VIName(chan->GetState()));
+			return cl->exit(app.rpl(ECServer::ERR));
+		}
+		if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
+			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 		pl = new ECPlayer(cl, chan, false);
 	}
 	cl->SetPlayer(pl);

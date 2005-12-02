@@ -41,6 +41,9 @@ const char* msgTab[] = {
      "ERR",                                 /* ERR - Erreur en provenance theorique du client */
      "BYE %s",                              /* BYE - Dis adieu à un client */
      "AIM %s",                              /* AIM - Logué */
+
+     "ER1",                                 /* ER1 - Ne peut pas joindre */
+
      "PIG",                                 /* PIG - Envoie un ping */
      "POG",                                 /* POG - Reçoit un pong */
      "USED",                                /* USED - Pseudo déjà utilisé */

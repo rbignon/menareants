@@ -31,6 +31,8 @@
 
 class ECBChannel;
 
+class ECBMap;
+
 /* ATTENTION! Classe virtuelle */
 class ECBPlayer
 {
@@ -55,6 +57,24 @@ public:
 	bool IsOwner() { return owner; }
 	void SetOwner() { owner = true; }
 
+	/* Place */
+	unsigned int Place() { return place; }
+	void SetPlace(unsigned int p);
+
+	/* MAP */
+	ECBMap *Map() { return map; }
+	void SetMap(ECBMap *m) { map = m; }
+
+	/* Couleur
+	 * Les couleurs sont représentées par un énumérateur... Alors
+	 * il faut voir si le serveur en aurra quelque chose à foutre
+	 * ou pas, si oui on met l'énumérateur ici, sinon on le met
+	 * uniquement dans le client.
+	 * TODO: il faut mettre dans le client un tableau de couleurs SDL
+	 */
+	unsigned int Color() { return color; }
+	void SetColor(unsigned int c) { color = c; }
+
 	/* Retourne le pseudo du joueur */
 	virtual const char* GetNick() = 0;
 
@@ -65,6 +85,9 @@ public:
 protected:
 	ECBChannel *chan;
 	bool owner;
+	unsigned int place;
+	unsigned int color;
+	ECBMap *map;
 };
 
 /********************************************************************************************
@@ -115,9 +138,10 @@ public:
 	/* Retourne la liste des joueurs */
 	const char* PlayerList();
 
-	/* A propos des etats */
+	/* A propos des etats de la partie */
 	e_state GetState() { return state; }
 	bool IsInGame() { return (state >= PLAYING); }
+	bool Joinable() { return (state == WAITING); }
 
 	/* Limite maximale pour entrer dans le chan */
 	unsigned int GetLimite() { return limite; }

@@ -215,16 +215,17 @@ void EuroConqApp::GameInfos(bool create)
 		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,sdlwindow,NULL);
 		SDL_GetMouseState( &x, &y);
 
-		unsigned int vert = 30;
-		for(unsigned int i=0; i<chan->Players().size();i++, vert += 50)
+		unsigned int vert = 50;
+		big_font.WriteCenter(400,vert, "Jeu : " + std::string(chan->GetName()), black_color);
+		vert += 30;
+		for(unsigned int i=0; i<chan->Players().size();i++, vert += 30)
 		{
 			ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
 
-			big_font.WriteLeft(30, vert, "OK", pl->Ready ? black_color : gray_color);
-			if(pl->IsOwner()) big_font.WriteLeft(70, vert, "*", red_color);
-			big_font.WriteLeft(85, vert, pl->GetNick(), black_color);
+			big_font.WriteLeft(50, vert, "OK", pl->Ready ? black_color : gray_color);
+			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
+			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
 		}
-		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
 		MessageList->Display(x,y);
 		SendMessage.Display();
 
