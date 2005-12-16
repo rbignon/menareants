@@ -1,4 +1,23 @@
-* Suspension provisoire du developpement du jeu.
+2005-12-16  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/MessageBox.cpp (TMessageBox): Classe d'un composant qui affiche une fenêtre avec un message
+	et des boutons d'un certain type.
+
+	* server/Config.cpp, server/euroconqd.conf: Rajout du champ DEFLIMITE pour la limite par default
+	d'un jeu.
+
+	* API: Modification du protocole: plus de "$" pour indiquer si c'est un quit ou non -> on s'en fou!
+
+	* src/JoinGame.cpp (GameInfos): Taille du TMemo proportionnel au nombre de joueurs (en priant
+	pour qu'il n'y en ait pas des tonnes). Messages dans le TMemo lors de join/part.
+
+	* src/gui/Memo.cpp: Rajout fonctions SetHeight et SetWidth pour modifier la taille.
+
+	* configure.ac: Correction d'un problème qui ne mettait plus les cflags de sdl.
+
+	* Petites modifs par ci par là.
+
+	* src/Sockets.cpp (read_sock): Correction d'un bug qui rajoutait à chaques fois un parv.
 
 2005-12-02  Romain Bignon <progs@headfucking.net>
 

@@ -14,10 +14,17 @@ Sommaire:
 5) Jouer
 
 1) Nécessite
-	EuroConq nécessite les librairies SDL suivantes :
+	Pour compiler il est nécessaire d'avoir :
+	- un compilateur (gcc ou autre)
+	En plus, pour le jeu EuroConq, il est requis d'avoir les librairies SDL suivantes :
 	- SDL_image
 	- SDL_ttf
 	- lSDL_gfx
+	Et le serveur EuroConqServer, si activé, nécessite d'avoir tout de même une
+	bonne connexion à internet.
+
+	Il est d'ailleurs à noter que vous pouvez compiler et installer soit le jeu, soit le
+	serveur, soit les deux. Voir les options du script configure (./configure --help).
 
 2) ./configure
 	Veuillez lancer la commande suivante:

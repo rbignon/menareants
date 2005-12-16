@@ -17,3 +17,22 @@ public:
 	TECExcept(const char* func, const char* file, int line, std::string vars, std::string msg);
 	TECExcept(std::string msg);
 };
+
+/*
+#define CATCHBUGS(x) \
+	} \
+	catch(TECExcept &e) \
+	{ \
+		throw; \
+	} \
+	catch(...) \
+	{ \
+		cout	<< "  RAPPORT DE BUG !!!" << std::endl \
+			<< "  ------------------" << std::endl \
+			<< "Il y a un bug dans le programme. Nous " \
+			<< "vous demandons d'envoyer le rapport de bug " \
+			<< "à " PACKAGE_BUGREPORT "." << std::endl \
+			<< "  ------------------" << std::endl \
+			<< __func__ "(" + std::string(x) + ":"__FILE__":"__LINE__";"; \ 
+	}
+*/

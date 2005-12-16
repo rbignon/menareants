@@ -73,6 +73,8 @@ public:
 
 	unsigned int GetHighSock() { return highsock; }
 
+	Config *GetConf() { return conf; }
+
 protected:
 	Config *conf;
 	int run_server(void);
