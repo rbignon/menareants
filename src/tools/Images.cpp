@@ -119,9 +119,8 @@ int ECSpriteBase::init(char *dir)
   mAnim = new ECImage[mNumframes];
 
   mBuilt = 1;
-  int count = 0;
 
-  while(!feof(fp) && count<mNumframes)
+  for(int count=0;!feof(fp) && count<mNumframes;)
   {
     fgets(buffer, 255, fp);
     if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n' && strlen(buffer) != 0)
@@ -135,7 +134,8 @@ int ECSpriteBase::init(char *dir)
       SDL_FreeSurface(temp);
 
       mAnim[count].pause = pause;
-      if(!mW) mW = mAnim[count].Img->w; if(!mH) mH = mAnim[count].Img->w;
+      if(!mW) mW = mAnim[count].Img->w;
+      if(!mH) mH = mAnim[count].Img->h;
 
       count++;
     }
