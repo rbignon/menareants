@@ -80,7 +80,7 @@ void EC_Client::parse_message(std::string buf)
 {
 	char s[MAXBUFFER + 20];
 	std::string cmdname;
-	unsigned int i, len = buf.size();
+	unsigned int i, len = (buf.size()-1);
 
 #ifdef DEBUG
 	std::cout << "R - " << buf << std::endl;
