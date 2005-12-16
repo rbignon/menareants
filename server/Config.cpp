@@ -34,6 +34,7 @@ bool Config::set_defaults()
 {
 	servername = "Europa.Conquest";
 	port = 5461;
+	deflimite = 10;
 	return true;
 }
 
@@ -55,11 +56,12 @@ bool Config::load()
 
 		if(key == "SERVERNAME") servername = ligne;
 		else if(key == "PORT") port = atoi(ligne.c_str());
+		else if(key == "DEFLIMITE") deflimite = atoi(ligne.c_str());
 		else return false;
 	}
-	if(port < 1 || port > 65535)
+	if(port < 1 || port > 65535 || deflimite < 2)
 	{
-		std::cout << "Lecture de la configuration invalide : " << port << std::endl;
+		std::cout << "Lecture de la configuration invalide" << std::endl;
 		return false;
 	}
 	return true;

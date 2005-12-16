@@ -34,6 +34,7 @@ public:
 public:
 	std::string servername;
 	int port;
+	int deflimite;
 
 private:
 	std::string filename;
