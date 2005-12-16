@@ -48,11 +48,11 @@ Sommaire:
               USED                              :pseudo déjà utilisé
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
-              SETS <sets>                       :paramètres d'une partie (notifie un join)
+              SETS <limit>                      :paramètres d'une partie (notifie un join)
               NLS <[@]nick1> [<[@]nick1> ...]   :liste des joueurs
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <param> <value>       :un user met un paramètre
-              :<nick> LEA [raison] [$]          :un user part (ou a été kické) ($ = quit)
+              :<nick> LEA [raison]              :un user part (ou a été kické)
               :<nick> WGO                       :l'owner veut lancer le jeu
               :<nick> GO!                       :l'owner lance le jeu
          - En cours de jeu

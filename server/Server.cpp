@@ -49,7 +49,7 @@ const char* msgTab[] = {
      "USED",                                /* USED - Pseudo déjà utilisé */
 
      ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
-     "SETS %s",                             /* SETS - Les paramètres du salon */
+     "SETS %d",                             /* SETS - Les paramètres du salon */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
      ":%s LEA %s",                          /* LEA - Un user part du saon */
      "LSP %s %d %d",                        /* LSP - Liste les parties */
@@ -266,7 +266,7 @@ void TClient::Free()
 	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
 		c->RemovePlayer(pl, true);
-		c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "$");
+		c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "");
 		if(!c->NbPlayers())
 			delete c;
 	}
