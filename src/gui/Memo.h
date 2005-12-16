@@ -66,6 +66,8 @@ public:
   void ClearItems();
 
   void SetXY (uint x, uint y);
+  void SetHeight (uint h);
+  void SetWidth (uint w);
 };
 
 #endif /* EC_MEMO_H */

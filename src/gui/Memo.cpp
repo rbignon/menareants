@@ -158,3 +158,18 @@ void TMemo::ClearItems()
 }
 
 void TMemo::SetXY (uint px, uint py) { x = px; y = py; }
+
+void TMemo::SetHeight (uint ph)
+{
+	if(height == ph) return;
+	height = ph;
+	nb_visible_items_max = height/height_item;
+	Init();
+}
+
+void TMemo::SetWidth (uint pw) {
+	if(width == pw) return;
+	width = pw;
+	maxlen = ((width) / small_font.GetWidth("A"));
+	Init();
+}
