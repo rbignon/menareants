@@ -27,6 +27,7 @@
 #include "gui/BouttonText.h"
 #include "gui/Menu.h"
 #include "gui/Memo.h"
+#include "gui/MessageBox.h"
 #include "gui/Edit.h"
 #include "tools/Font.h"
 #include "Outils.h"
@@ -72,7 +73,7 @@ int SETSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 /* PLS [[@]nick] [[[@]nick] ...] */
 int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(!me->Player()) return Debug(W_DESYNCH|W_ERR, "Reception d'un PLS sans être dans un chan");
+	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
 
 	for(unsigned int i=1;i<parv.size();i++)
 	{
@@ -112,6 +113,8 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
 
 			new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false);
+			if(MessageList)
+				MessageList->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
 		}
 	}
 	return 0;
@@ -126,7 +129,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	/* Note: Dans le protocole il ne devrait y avoir qu'un seul départ
 	 *       à la fois mais bon par respect de ce qui est *possible*
-	 *       (on ne sait jamais, après tout, on pourrait imager dans
+	 *       (on ne sait jamais, après tout, on pourrait imaginer dans
 	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
 	 *        départs ?) ou alors pour une eventuelle IA du serveur)
 	 */
@@ -139,7 +142,14 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			return 0;
 		}
 		else
+		{
 			me->Player()->Channel()->RemovePlayer(players[i], true);
+			if(parv.size() > 1)
+				MessageList->AddItem("*** " + parv[0] + " quitte la partie (" + parv[1] + ")",
+					                     green_color);
+			else
+				MessageList->AddItem("*** " + parv[0] + " quitte la partie", green_color);
+		}
 	}
 	return 0;
 }
@@ -168,6 +178,7 @@ void EuroConqApp::GameInfos(bool create)
 	/* Déclaration membres fixes */
 	MessageList = new TMemo(75,325,300,200,30);
 	MessageList->Init();
+	MessageList->AddItem("*** Vous avez bien rejoin le jeu " + std::string(chan->GetName()), green_color);
 	TEdit SendMessage(75,530,300, MAXBUFFER-20);
 	SendMessage.Init();
 	TButtonText RetourButton(600,450,100,49, "Retour");
@@ -226,6 +237,8 @@ void EuroConqApp::GameInfos(bool create)
 			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
 			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
 		}
+		MessageList->SetXY(75, vert);
+		MessageList->SetHeight(525-vert); /* On définit une jolie taille */
 		MessageList->Display(x,y);
 		SendMessage.Display();
 
@@ -307,7 +320,15 @@ void EuroConqApp::ListGames()
 					else if(RefreshButton.Test(event.button.x, event.button.y))
 						refresh = true;
 					else if(CreerButton.Test(event.button.x, event.button.y))
+					{
+						TMessageBox *mb = new TMessageBox(150,300, "GROS PROUT", BT_OK|BT_CANCEL);
+						uint pipi = mb->Show();
+						if(pipi == BT_OK) printf("sodo\n");
+						else if(pipi == BT_CANCEL) printf("mimie\n");
+						else printf("pipi %X\n", pipi);
+						delete mb;
 						GameInfos(true);
+					}
 					else if(RetourButton.Test(event.button.x, event.button.y))
 						eob = true;
 					break;
