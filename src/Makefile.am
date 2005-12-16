@@ -22,7 +22,8 @@ euroconq_SOURCES = \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \
-		gui/Edit.cpp
+		gui/Edit.cpp \
+		gui/MessageBox.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 

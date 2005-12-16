@@ -1,12 +1,13 @@
 AC_PREREQ(2.59)
-AC_INIT(Makefile.am)
+
+AC_INIT([EuroConq], [0.1], [bugs@coderz.info], [euroconq])
 
 AM_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(euroconq,1)
+AM_INIT_AUTOMAKE([foreign 1.5])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -77,7 +78,7 @@ AC_CHECK_LIB(SDL_gfx, rotozoomSurfaceXY,,
 					AC_MSG_ERROR([SDL_gfx library >= 2.0.13 required])
 				fi)
 
-if test "x{INSTALL_GAME_Q}" = "x1"; then
+if test "x${INSTALL_GAME_Q}" = "x1"; then
 	LIBS="$LIBS $SDL_LIBS"
 	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
