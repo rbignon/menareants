@@ -52,6 +52,8 @@ public:
   bool Enabled() { return enabled; }
   void SetEnabled(bool _en) { enabled = _en; }
 
+  unsigned int Tag;
+
 protected:
   void DrawImage (unsigned int souris_x, unsigned int souris_y);
 };

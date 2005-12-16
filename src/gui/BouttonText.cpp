@@ -23,7 +23,7 @@
 
 TButtonText::TButtonText() : TButton()
 {
-  font = NULL;
+  font = &normal_font;
 }
 
 //-----------------------------------------------------------------------------
@@ -32,6 +32,7 @@ TButtonText::TButtonText (unsigned int x, unsigned int y, unsigned int w, unsign
   : TButton(x, y, w, h)
 {
   m_text = text;
+  font = &normal_font;
 }
 
 
