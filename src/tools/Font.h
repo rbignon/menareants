@@ -71,6 +71,7 @@ extern SDL_Color white_color;
 extern SDL_Color black_color;
 extern SDL_Color red_color;
 extern SDL_Color gray_color;
+extern SDL_Color green_color;
 
 extern Font huge_font;
 extern Font large_font;
