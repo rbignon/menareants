@@ -74,10 +74,7 @@ class EChannel : public ECBChannel
 /* Constructeurs/Deconstructeurs */
 public:
 
-	EChannel(std::string _name)
-		: ECBChannel(_name)
-	{}
-
+	EChannel(std::string _name);
 	~EChannel();
 
 /* Methodes */

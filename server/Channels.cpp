@@ -84,7 +84,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	cl->SetPlayer(pl);
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), nom, "");
-	cl->sendrpl(app.rpl(ECServer::SETS), "");
+	cl->sendrpl(app.rpl(ECServer::SETS), chan->GetLimite());
 	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList());
 	return 0;
 }
@@ -92,7 +92,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 /* LEA [raison] */
 int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	/* N'est pas dans un salon TODO: Desynch */
+	/* N'est pas dans un salon */
 	if(!cl->Player())
 		return vDebug(W_DESYNCH, "LEA en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
@@ -138,6 +138,12 @@ const char* ECPlayer::GetNick()
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
+
+EChannel::EChannel(std::string _name)
+	: ECBChannel(_name)
+{
+	limite = app.GetConf()->deflimite; /* Limite par default */
+}
 
 EChannel::~EChannel()
 {
