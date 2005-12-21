@@ -28,12 +28,13 @@ class TComponent
 /* Constructeur/Deconstructeur */
 public:
 
-	TComponent() : visible(true) {}
+	TComponent() : visible(true), enabled(true)
+	{}
 	TComponent(uint _x, uint _y)
-		: x(_x), y(_y), visible(true)
+		: x(_x), y(_y), visible(true), enabled(true)
 	{}
 	TComponent(uint _x, uint _y, uint _w, uint _h)
-		: x(_x), y(_y), h(_h), w(_w), visible(true)
+		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true)
 	{}
 
 	virtual ~TComponent() {}
@@ -66,11 +67,16 @@ public:
 	void Show() { visible = true; }
 	void Hide() { visible = false; }
 
+	/* Actif */
+	bool Enabled() { return enabled; }
+	void SetEnabled(bool _en = true) { enabled = _en; }
+
 /* Variables privées */
 protected:
 	uint x, y;
 	uint h, w;
 	bool visible;
+	bool enabled;
 };
 
 #endif /* EC_COMPONENT_H */

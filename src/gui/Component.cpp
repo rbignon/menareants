@@ -25,7 +25,7 @@ unsigned int TComponent::GetY() const { return y; }
 unsigned int TComponent::GetWidth() const { return w; }
 unsigned int TComponent::GetHeight() const { return h; }
 
-void TComponent::SetXY (uint px, uint py) { x = px; y = py; }
+void TComponent::SetXY (uint px, uint py) { x = px; y = py; Init(); }
 
 void TComponent::SetHeight (uint ph)
 {

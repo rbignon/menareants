@@ -23,15 +23,12 @@
 #define EC_BOUTTON_H
 
 #include "Component.h"
-
-class ECSprite;
+#include "tools/Images.h"
 
 class TButton : public TComponent
 {
 protected:
   ECSprite *image;
-
-  bool enabled;
 
 public:
   TButton();
@@ -44,9 +41,6 @@ public:
 
   bool Test (unsigned int souris_x, unsigned int souris_y);
   virtual void Draw (unsigned int souris_x, unsigned int souris_y);
-
-  bool Enabled() { return enabled; }
-  void SetEnabled(bool _en) { enabled = _en; }
 
   unsigned int Tag;
 
