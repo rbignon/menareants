@@ -48,7 +48,7 @@ public:
 		USED,  /* USED */
 
 		JOIN,  /* JOI */
-		SETS,  /* SETS */
+		SET,   /* SET */
 		PLIST, /* PLS */
 		LEAVE, /* LEA */
 		GLIST, /* LSP */

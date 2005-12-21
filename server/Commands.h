@@ -55,14 +55,17 @@ public: \
 	virtual int Exec(TClient *cl, std::vector<std::string> string_list); \
 }
 
+DECLARE_CMD ( ERR );
+
 DECLARE_CMD ( IAM );
+DECLARE_CMD ( BYE );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( POG );
+
 DECLARE_CMD ( JOI );
 DECLARE_CMD ( LEA );
 DECLARE_CMD ( LSP );
-DECLARE_CMD ( BYE );
 DECLARE_CMD ( MSG );
-DECLARE_CMD ( ERR );
+DECLARE_CMD ( SET );
 
 #endif

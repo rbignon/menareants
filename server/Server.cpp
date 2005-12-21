@@ -49,7 +49,7 @@ const char* msgTab[] = {
      "USED",                                /* USED - Pseudo déjà utilisé */
 
      ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
-     "SETS %d",                             /* SETS - Les paramètres du salon */
+     ":%s SET %s",                          /* SET - Définit ou informe les paramètres d'un jeu */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
      ":%s LEA %s",                          /* LEA - Un user part du saon */
      "LSP %s %d %d",                        /* LSP - Liste les parties */
@@ -153,7 +153,7 @@ int TClient::parsemsg()
 
 	if(!cmd || (parv.size()-1) < cmd->args)
 		return vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VSName(RecvBuf)
-		                         VPName(cmd) VIName(parv.size()-1) VIName(cmd ? cmd->args : 0));
+		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
 
 	try
 	{
