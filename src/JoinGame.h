@@ -28,6 +28,7 @@
 #include "gui/Label.h"
 #include "gui/Edit.h"
 #include "gui/Memo.h"
+#include "gui/SpinEdit.h"
 
 class TGameInfosForm : public TForm
 {

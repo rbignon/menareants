@@ -67,13 +67,80 @@ int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* SETS [?] */
-int SETSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+/* :%s SET <modes> [params]
+ *
+ * La reception des modes se fait de manière IRC: chaques "attributs" sont "stockés" dans
+ * une lettre et il peut y avoir un attribut mis à la suite.
+ */
+int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	if(!me->Player() || !me->Player()->Channel())
+		return Debug(W_DESYNCH|W_SEND, "Reception d'un SET sans être dans un chan");
+
+	ECPlayer *sender = 0;
+	if(players.size()) sender = players[0];
+
+	bool add = true;
+	uint j = 2;
+	for(uint i=0;i < parv[1].size(); i++)
+	{
+		switch(parv[1][i])
+		{
+			case '+': add = true; break;
+			case '-': add = false; break;
+			case 'l':
+				if(add)
+				{
+					if(j<parv.size()) me->Player()->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
+					else Debug(W_DESYNCH|W_SEND, "+l sans limite");
+				}
+				else
+					me->Player()->Channel()->SetLimite(0);
+				break;
+			case 'W': me->Player()->Channel()->SetState(EChannel::WAITING); break;
+			case 'S': me->Player()->Channel()->SetState(EChannel::SENDING); break;
+			case 'P': me->Player()->Channel()->SetState(EChannel::PLAYING); break;
+			case 'A': me->Player()->Channel()->SetState(EChannel::ANIMING); break;
+			case 'o':
+			{
+				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+o sans nick"); break; }
+				ECPlayer *pl = me->Player()->Channel()->GetPlayer(parv[j++].c_str());
+				if(!pl) { Debug(W_DESYNCH|W_SEND, "%s non trouvé", parv[(j-1)].c_str()); break; }
+				pl->SetOwner(add);
+				break;
+			}
+			case 'c':
+				if(!sender) { Debug(W_DESYNCH|W_SEND, "+c sans sender humain"); break; }
+				if(add)
+				{
+					if(j<parv.size()) sender->SetColor(StrToTyp<uint>(parv[j++]));
+					else Debug(W_DESYNCH|W_SEND, "+c sans couleur");
+				}
+				else
+					sender->SetColor(0);
+				break;
+			case 'p':
+				if(!sender) { Debug(W_DESYNCH|W_SEND, "+p sans sender humain"); break; }
+				if(add)
+				{
+					if(j<parv.size()) sender->SetPlace(StrToTyp<uint>(parv[j++]));
+					else Debug(W_DESYNCH|W_SEND, "+p sans position");
+				}
+				else
+					sender->SetPlace(0);
+				break;
+			default:
+				Debug(W_DESYNCH|W_SEND, "Reception d'un mode non supporté (%c)", parv[1][i]);
+				break;
+		}
+	}
 	return 0;
 }
 
-/* PLS [[@]nick] [[[@]nick] ...] */
+/* PLS [[@]<pos>,<col>,<nick>] [[[@]<pos>,<col>,<nick>] ...]
+ *
+ * Affiche le nom des joueurs lors du join d'une partie
+ */
 int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
@@ -86,12 +153,28 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(*nick == '@')
 			owner = true, *nick++;
 
+		std::string nb;
+		int pos = 0, col = 0;
+		while(*nick != ',')
+			nb += *nick++;
+		nick++;
+		pos = StrToTyp<uint>(nb);
+
+		while(*nick != ',')
+			nb += *nick++;
+		nick++;
+		col = StrToTyp<uint>(nb);
+
+		ECPlayer *pl = 0;
 		if(!strcasecmp(nick, me->GetNick().c_str()))
 		{ /* On a déjà créé notre player */
 			if(owner) me->Player()->SetOwner();
+			pl = me->Player();
 		}
 		else
-			new ECPlayer(nick, me->Player()->Channel(), owner, false);
+			pl = new ECPlayer(nick, me->Player()->Channel(), owner, false);
+		pl->SetColor(col);
+		pl->SetPlace(pos);
 	}
 	JOINED = true;
 	return 0;
@@ -183,7 +266,9 @@ void EuroConqApp::GameInfos(bool create)
 	GameInfosForm = new TGameInfosForm;
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoin le jeu " +
 	                                    std::string(chan->GetName()), green_color);
-
+	TSpinEdit *pos = new TSpinEdit(std::string("Position"), 200, 0, 200, 0, chan->NbPlayers(), 1, 0);
+	pos->SetColorFont(black_color, &big_font);
+	pos->Init();
 	do
 	{
 		int x=0, y=0;
@@ -213,6 +298,9 @@ void EuroConqApp::GameInfos(bool create)
 					break;
 				case SDL_MOUSEBUTTONUP:
 					GameInfosForm->Chat->Clic( event.button.x, event.button.y);
+					if(pos->Clic( event.button.x, event.button.y))
+						client->sendrpl(client->rpl(EC_Client::SET),
+						                ("+p " + TypToStr(pos->Value())).c_str());
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
@@ -237,6 +325,8 @@ void EuroConqApp::GameInfos(bool create)
 			big_font.WriteLeft(50, vert, "OK", pl->Ready ? black_color : gray_color);
 			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
 			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
+			pos->SetXY(200, vert);
+			pos->Draw(x, y);
 		}
 		GameInfosForm->Chat->SetXY(75, vert);
 		GameInfosForm->Chat->SetHeight(525-vert); /* On définit une jolie taille */
