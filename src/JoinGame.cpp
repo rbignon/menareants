@@ -33,14 +33,15 @@
 #include "Outils.h"
 #include "Debug.h"
 
-TListBox *GameListBox = NULL;
-TMemo *MessageList = NULL;
+TListGameForm  *ListGameForm = NULL;
+TGameInfosForm *GameInfosForm = NULL;
 bool EOL = false, JOINED = false;
 
 /* <nick> MSG <message> */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(MessageList) MessageList->AddItem("<" + parv[0] + "> " + parv[1],
+	if(GameInfosForm->Chat)
+		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
 	return 0;
 }
@@ -48,10 +49,12 @@ int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 /* LSP <nom> <nbjoueur> [nbmax] */
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	if(!ListGameForm) return 0;
+
 	if(parv[3] == "0")
-		GameListBox->AddItem(false, parv[1] + "   " + parv[2], parv[1], black_color, true);
+		ListGameForm->GList->AddItem(false, parv[1] + "   " + parv[2], parv[1], black_color, true);
 	else
-		GameListBox->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1],
+		ListGameForm->GList->AddItem(false, parv[1] + "   " + parv[2] + "/" + parv[3], parv[1],
 		                 (parv.size() <= 3 || parv[2] != parv[3]) ? black_color : red_color,
 		                 (parv.size() <= 3 || parv[2] != parv[3]) ? true : false);
 	return 0;
@@ -113,8 +116,8 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
 
 			new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false);
-			if(MessageList)
-				MessageList->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
+			if(GameInfosForm)
+				GameInfosForm->Chat->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
 		}
 	}
 	return 0;
@@ -144,11 +147,12 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		else
 		{
 			me->Player()->Channel()->RemovePlayer(players[i], true);
+			if(!GameInfosForm) continue;
 			if(parv.size() > 1)
-				MessageList->AddItem("*** " + parv[0] + " quitte la partie (" + parv[1] + ")",
-					                     green_color);
+				GameInfosForm->Chat->AddItem("*** " + parv[0] + " quitte la partie (" + parv[1] +
+				                             ")", green_color);
 			else
-				MessageList->AddItem("*** " + parv[0] + " quitte la partie", green_color);
+				GameInfosForm->Chat->AddItem("*** " + parv[0] + " quitte la partie", green_color);
 		}
 	}
 	return 0;
@@ -176,13 +180,9 @@ void EuroConqApp::GameInfos(bool create)
 	EChannel *chan = client->Player()->Channel();
 
 	/* Déclaration membres fixes */
-	MessageList = new TMemo(75,325,300,200,30);
-	MessageList->Init();
-	MessageList->AddItem("*** Vous avez bien rejoin le jeu " + std::string(chan->GetName()), green_color);
-	TEdit SendMessage(75,530,300, MAXBUFFER-20);
-	SendMessage.Init();
-	TButtonText RetourButton(600,450,100,49, "Retour");
-	RetourButton.SetFont(&normal_font);
+	GameInfosForm = new TGameInfosForm;
+	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoin le jeu " +
+	                                    std::string(chan->GetName()), green_color);
 
 	do
 	{
@@ -192,39 +192,40 @@ void EuroConqApp::GameInfos(bool create)
 			switch(event.type)
 			{
 				case SDL_KEYUP:
-					SendMessage.PressKey(event.key.keysym);
+					GameInfosForm->SendMessage->PressKey(event.key.keysym);
 					switch (event.key.keysym.sym)
 					{
 						case SDLK_ESCAPE:
 							eob = true;
 							break;
 						case SDLK_RETURN:
-							if(SendMessage.Focused())
+							if(GameInfosForm->SendMessage->Focused())
 							{
 								client->sendrpl(client->rpl(EC_Client::MSG),
-								                FormatStr(SendMessage.GetString().c_str()));
-								MessageList->AddItem("<" + client->GetNick() + "> " +
-								                     SendMessage.GetString(), black_color);
-								SendMessage.ClearString();
+								             FormatStr(GameInfosForm->SendMessage->GetString().c_str()));
+								GameInfosForm->Chat->AddItem("<" + client->GetNick() + "> " +
+								             GameInfosForm->SendMessage->GetString(), black_color);
+								GameInfosForm->SendMessage->ClearString();
 							}
 							break;
 						default: break;
 					}
 					break;
 				case SDL_MOUSEBUTTONUP:
-					MessageList->Clic( event.button.x, event.button.y);
+					GameInfosForm->Chat->Clic( event.button.x, event.button.y);
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					SendMessage.Clic(event.button.x, event.button.y);
-					if(RetourButton.Test(event.button.x, event.button.y))
+					GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
+					if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 						eob = true;
 					break;
 				default:
 					break;
 			}
 		}
-		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,sdlwindow,NULL);
 		SDL_GetMouseState( &x, &y);
+
+		GameInfosForm->Update(x, y, false);
 
 		unsigned int vert = 50;
 		big_font.WriteCenter(400,vert, "Jeu : " + std::string(chan->GetName()), black_color);
@@ -237,17 +238,14 @@ void EuroConqApp::GameInfos(bool create)
 			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
 			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
 		}
-		MessageList->SetXY(75, vert);
-		MessageList->SetHeight(525-vert); /* On définit une jolie taille */
-		MessageList->Display(x,y);
-		SendMessage.Display();
+		GameInfosForm->Chat->SetXY(75, vert);
+		GameInfosForm->Chat->SetHeight(525-vert); /* On définit une jolie taille */
 
-		RetourButton.Draw(x, y);
 		SDL_Flip(sdlwindow);
 	} while(!eob && client->IsConnected() && client->Player());
 
-	delete MessageList;
-	MessageList = NULL;
+	delete GameInfosForm;
+	GameInfosForm = NULL;
 
 	client->sendrpl(client->rpl(EC_Client::LEAVE));
 	return;
@@ -260,18 +258,7 @@ void EuroConqApp::ListGames()
 
 	SDL_Event event;
 
-	/* Déclaration membres fixes */
-	TButtonText JoinButton(500,200,100,49, "Joindre");
-	JoinButton.SetFont(&normal_font);
-	TButtonText RefreshButton(500,250,100,49, "Actualiser");
-	RefreshButton.SetFont(&normal_font);
-	TButtonText CreerButton(500,300,100,49, "Creer");
-	CreerButton.SetFont(&normal_font);
-	TButtonText RetourButton(500,350,100,49, "Retour");
-	RetourButton.SetFont(&normal_font);
-
-	GameListBox = new TListBox(300,200,200,300);
-	GameListBox->Init();
+	ListGameForm = new TListGameForm;
 
 	bool eob = false, refresh = true;
 	int i;
@@ -279,20 +266,20 @@ void EuroConqApp::ListGames()
 	{
 		if(refresh)
 		{
-			GameListBox->ClearItems();
+			ListGameForm->GList->ClearItems();
 			EOL = false;
 			client->sendrpl(client->rpl(EC_Client::LISTGAME));
 			WAIT_EVENT(EOL, j);
 			if(!EOL)
 			{
-				delete GameListBox;
+				delete ListGameForm;
+				ListGameForm = 0;
 				return; /* On a attendu pour rien */
 			}
 			refresh = false;
-			JoinButton.SetEnabled(false);
+			ListGameForm->JoinButton->SetEnabled(false);
 			i=0;
 		}
-		int x=0, y=0;
 		while( SDL_PollEvent( &event) )
 		{
 			switch(event.type)
@@ -307,51 +294,100 @@ void EuroConqApp::ListGames()
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					GameListBox->Clic( event.button.x, event.button.y);
-					if(JoinButton.Enabled() && JoinButton.Test(event.button.x, event.button.y))
+					ListGameForm->GList->Clic( event.button.x, event.button.y);
+					if(ListGameForm->JoinButton->Enabled() &&
+					   ListGameForm->JoinButton->Test(event.button.x, event.button.y))
 					{
 						JOINED = false;
 						client->sendrpl(client->rpl(EC_Client::JOIN),
-							GameListBox->ReadValue(GameListBox->GetSelectedItem()).c_str());
+						      ListGameForm->GList->ReadValue(
+						           ListGameForm->GList->GetSelectedItem()).c_str());
 						WAIT_EVENT(JOINED, j);
 						if(JOINED)
 							GameInfos(false);
+						else
+						{
+							TMessageBox *mb = new TMessageBox(150,300,
+							                  std::string("Impossible de joindre le salon " +
+							                  ListGameForm->GList->ReadValue(
+							                           ListGameForm->GList->GetSelectedItem())
+							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
+							mb->Show();
+							delete mb;
+						}
 					}
-					else if(RefreshButton.Test(event.button.x, event.button.y))
+					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y))
 						refresh = true;
-					else if(CreerButton.Test(event.button.x, event.button.y))
-					{
-						TMessageBox *mb = new TMessageBox(150,300, "GROS PROUT", BT_OK|BT_CANCEL);
-						uint pipi = mb->Show();
-						if(pipi == BT_OK) printf("sodo\n");
-						else if(pipi == BT_CANCEL) printf("mimie\n");
-						else printf("pipi %X\n", pipi);
-						delete mb;
+					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y))
 						GameInfos(true);
-					}
-					else if(RetourButton.Test(event.button.x, event.button.y))
+					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y))
 						eob = true;
 					break;
 				default:
 					break;
 			}
 		}
-		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,sdlwindow,NULL);
-		SDL_GetMouseState( &x, &y);
-		big_font.WriteCenter(400,180, "Liste des parties", black_color);
-		GameListBox->Display(x,y);
-		if(GameListBox->GetSelectedItem() >= 0 &&
-		   GameListBox->Enabled(GameListBox->GetSelectedItem()))
-			JoinButton.SetEnabled(true);
-		JoinButton.Draw(x, y);
-		RefreshButton.Draw(x, y);
-		CreerButton.Draw(x, y);
-		RetourButton.Draw(x, y);
-		SDL_Flip(sdlwindow);
+		if(ListGameForm->GList->GetSelectedItem() >= 0 &&
+		   ListGameForm->GList->Enabled(ListGameForm->GList->GetSelectedItem()))
+			ListGameForm->JoinButton->SetEnabled(true);
+		ListGameForm->Update();
+
+		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
+
 		if(++i >= 100) refresh = true; /* ~= une minute ? */
 	} while(!eob && client->IsConnected());
 
-	delete GameListBox;
-	GameListBox=NULL;
+	delete ListGameForm;
+	ListGameForm = NULL;
 	return;
+}
+
+/********************************************************************************************
+ *                               TListGameForm                                              *
+ ********************************************************************************************/
+
+TGameInfosForm::TGameInfosForm()
+	: TForm()
+{
+	Chat = AddComponent(new TMemo(75,325,300,200,30));
+
+	SendMessage = AddComponent(new TEdit(75,530,300, MAXBUFFER-20));
+	RetourButton = AddComponent(new TButtonText(600,450,100,49, "Retour"));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+TGameInfosForm::~TGameInfosForm()
+{
+	delete Chat;
+	delete SendMessage;
+	delete RetourButton;
+}
+
+/********************************************************************************************
+ *                               TListGameForm                                              *
+ ********************************************************************************************/
+
+TListGameForm::TListGameForm()
+	: TForm()
+{
+	Title = AddComponent(new TLabel(300,150,"Liste des parties", black_color, &big_font));
+
+	JoinButton = AddComponent(new TButtonText(500,200,100,49, "Joindre"));
+	RefreshButton = AddComponent(new TButtonText(500,250,100,49, "Actualiser"));
+	CreerButton = AddComponent(new TButtonText(500,300,100,49, "Creer"));
+	RetourButton = AddComponent(new TButtonText(500,350,100,49, "Retour"));
+
+	GList = AddComponent(new TListBox(300,200,200,300));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+TListGameForm::~TListGameForm()
+{
+	delete JoinButton;
+	delete RefreshButton;
+	delete CreerButton;
+	delete RetourButton;
+	delete GList;
 }

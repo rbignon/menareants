@@ -22,4 +22,54 @@
 #ifndef EC_JOINGAME_H
 #define EC_JOINGAME_H
 
+#include "gui/Form.h"
+#include "gui/BouttonText.h"
+#include "gui/ListBox.h"
+#include "gui/Label.h"
+#include "gui/Edit.h"
+#include "gui/Memo.h"
+
+class TGameInfosForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TGameInfosForm();
+	~TGameInfosForm();
+
+/* Composants */
+public:
+
+	TMemo*       Chat;
+	TEdit*       SendMessage;
+	TButtonText* RetourButton;
+
+/* Evenements */
+public:
+
+};
+
+class TListGameForm : public TForm
+{
+/* Constructeur/Deconstructeur */
+public:
+
+	TListGameForm();
+	~TListGameForm();
+
+/* Composants */
+public:
+
+	TButtonText  *JoinButton;
+	TButtonText  *RefreshButton;
+	TButtonText  *CreerButton;
+	TButtonText  *RetourButton;
+	TListBox     *GList;
+	TLabel       *Title;
+
+/* Evenements */
+public:
+
+};
+
 #endif /* EC_JOINGAME_H */
