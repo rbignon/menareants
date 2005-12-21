@@ -1,3 +1,30 @@
+2005-12-21  Romain Bignon <progs@headfucking.net>
+
+	* src/tools/Font.cpp: Mise d'un cache. (© Wormux)
+
+	* src/gui/SpinEdit.cpp (TSpinEdit): Composant TSpinEdit pour un Edit de nombres.
+
+	* src/gui/Component.h, src/gui/Button.h: Mise de l'attribut Enabled directement dans TComponent.
+
+	* server/Channels.cpp (SETCommand::Exec): Fonction de la commande SET pour parser les modes d'un chan.
+
+	* src/JoinGame.cpp (SETCommand::Exec): Fonction de la commande SET pour parser les modes d'un chan.
+
+	* server/Server.cpp, src/Commands.cpp: Changement de la commande SETS en SET.
+
+	* server/Login.cpp: Utilisation de la nouvelle syntaxe de StrToTyp;
+
+	* server/Channels.cpp: Envoie des modes avec SET.
+
+	* lib/Outils.h (StrToTyp): La fonction renvoie désormais la valeur plutot que de l'assigner
+	dans une variable donnée en argument.
+	(FichierExist): Fonction pour vérifier l'existence d'un fichier.
+
+	* lib/Channels.cpp (ECBChannel::ModesStr): Fonction qui retourne le buffer des modes.
+	(ECBChannel::PlayerList): Rajout de la position et de la couleur.
+
+	* API: Modification de SET: prend en charges des modes à la IRC. Voir section 4. Modes.
+
 2005-12-20  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Utilisation du TForm pour les écrans ListGame et GameInfos.

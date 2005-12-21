@@ -1,6 +1,7 @@
 À faire:
 
 * En cours
+-client: Finir le SpinEdit
 -client: Corriger bug lors de GameInfos qui redimentionne trop tard le TMemo.
 -client: Avancer dans les paramètres de la partie.
 
