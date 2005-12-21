@@ -31,19 +31,26 @@ char* FormatStr(const char* s);
 /* Formate une chaine et retourne dans une std::string */
 std::string StringF(const char* format, ...);
 
+/* Retourne si le fichier existe ou non */
+bool FichierExiste(const std::string &nom);
+
 /* Retourne la date formatée */
 #define TIMELEN 20
 char *get_time(time_t mytime);
 
+/* Convertit d'une chaine en un type */
 template<typename T>
-bool StrToTyp( const std::string & Str, T & Dest )
+T StrToTyp(const std::string & Str)
 {
+	T Dest;
     // créer un flux à partir de la chaîne donnée
     std::istringstream iss( Str );
     // tenter la conversion vers Dest
-    return iss >> Dest != 0;
+    iss >> Dest;
+    return Dest;
 }
 
+/* Convertit d'un type en une chaine */
 template<typename T>
 std::string TypToStr( const T & Value )
 {

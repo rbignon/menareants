@@ -20,6 +20,7 @@
 
 #include <string>
 #include <cstdarg>
+#include <fstream>
 
 #include "Outils.h"
 
@@ -88,3 +89,10 @@ char *get_time(time_t mytime)
         return buftime;
 }
 
+bool FichierExiste(const std::string &nom)
+{
+  std::ifstream f(nom.c_str());
+  bool existe = f;
+  f.close();
+  return existe;
+}
