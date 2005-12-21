@@ -44,6 +44,140 @@ int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
+/* SET <modes> */
+int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	if(!cl->Player() || !cl->Player()->Channel())
+		return Debug(W_DESYNCH, "SET en dehors d'un chan");
+
+	ECPlayer *sender = cl->Player();
+
+	bool add = true;
+	uint j = 2;
+	struct
+	{
+		char c;
+		bool changed;
+		bool add;
+		const char* params;
+	} newmodes[] = {
+		{ 'l', false, false, NULL},
+		{ 'o', false, false, NULL},
+		{ 'c', false, false, NULL},
+		{ 'p', false, false, NULL},
+	};
+#define MODE_MODIFIED \
+		do { \
+			for(uint k=0;k<ASIZE(newmodes);k++) \
+				if(parv[1][i] == newmodes[k].c) \
+				{ \
+					newmodes[k].changed = true; \
+					newmodes[k].add = add; \
+					newmodes[k].params = 0; \
+					break; \
+				} \
+		} while(0)
+#define MODE_MODIFIED_P(x) \
+		do { \
+			for(uint k=0;k<ASIZE(newmodes);k++) \
+				if(parv[1][i] == newmodes[k].c) \
+				{ \
+					newmodes[k].changed = true; \
+					newmodes[k].add = add; \
+					newmodes[k].params = (x).c_str(); \
+					break; \
+				} \
+		} while(0)
+	for(uint i=0;i < parv[1].size(); i++)
+	{
+		switch(parv[1][i])
+		{
+			case '+': add = true; break;
+			case '-': add = false; break;
+			case 'l':
+				if(!sender->IsOwner())
+					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
+				if(add)
+				{
+					if(j<parv.size())
+					{
+						sender->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
+						MODE_MODIFIED_P(parv[(j-1)]);
+					}
+					else Debug(W_DESYNCH, "+l sans limite");
+				}
+				else
+				{
+					sender->Channel()->SetLimite(0);
+					MODE_MODIFIED;
+				}
+				break;
+			case 'o':
+			{
+				if(!sender->IsOwner())
+					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
+				if(j>=parv.size()) { Debug(W_DESYNCH, "+o sans nick"); break; }
+				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
+				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break;}
+				pl->SetOwner(add);
+				MODE_MODIFIED_P(parv[(j-1)]);
+				break;
+			}
+			case 'c':
+				if(!sender) { Debug(W_DESYNCH, "+c sans sender humain"); break; }
+				if(add)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
+					sender->SetColor(StrToTyp<uint>(parv[j++]));
+					MODE_MODIFIED_P(parv[(j-1)]);
+				}
+				else
+				{
+					sender->SetColor(0);
+					MODE_MODIFIED;
+				}
+				break;
+			case 'p':
+				if(!sender) { Debug(W_DESYNCH, "+p sans sender humain"); break; }
+				if(add)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
+					sender->SetPlace(StrToTyp<uint>(parv[j++]));
+					MODE_MODIFIED_P(parv[(j-1)]);
+				}
+				else
+				{
+					sender->SetPlace(0);
+					MODE_MODIFIED;
+				}
+				break;
+			default:
+				Debug(W_DESYNCH, "Reception d'un mode non supporté (%c)", parv[1][i]);
+				break;
+		}
+	}
+#undef MODE_MODIFIED
+#undef MODE_MODIFIED_P
+
+	std::string modes = "", params = "";
+	for(uint k=0;k<ASIZE(newmodes);k++)
+		if(newmodes[k].changed)
+		{
+			if(modes.empty() || newmodes[k].add != add)
+				modes += newmodes[k].add ? '+' : '-',
+				add = newmodes[k].add;
+
+			modes += newmodes[k].c;
+			if(newmodes[k].params) params += " " + std::string(newmodes[k].params);
+		}
+
+	if(!modes.empty())
+		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
+		                                 (modes + params).c_str());
+
+	return 0;
+}
+
 /* JOI <nom> */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
@@ -75,7 +209,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if(!chan->Joinable())
 		{
 			vDebug(W_WARNING, "Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
-			                  VSName(cl->GetNick()) VIName(chan->GetState()));
+			                  VSName(cl->GetNick()) VIName(chan->State()));
 			return cl->exit(app.rpl(ECServer::ERR));
 		}
 		if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
@@ -84,7 +218,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	cl->SetPlayer(pl);
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), nom, "");
-	cl->sendrpl(app.rpl(ECServer::SETS), chan->GetLimite());
+	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->servername.c_str(), chan->ModesStr());
 	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList());
 	return 0;
 }
@@ -114,8 +248,9 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	for(unsigned i=0; i<ChanList.size();i++)
-		cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(),
-		                                      ChanList[i]->GetLimite());
+		if(ChanList[i]->Joinable())
+			cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(),
+			                                      ChanList[i]->GetLimite());
 
 	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
 }
