@@ -49,6 +49,8 @@
 
 /* Tailles */
 #define MAXBUFFER 1024
+#define NICKLEN 20
+#define GAMELEN 15
 #define COMLEN 10
 
 /*********************************************************************************************
