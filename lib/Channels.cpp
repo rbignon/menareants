@@ -20,6 +20,7 @@
  */
 
 #include "Channels.h"
+#include "Outils.h"
 
 /********************************************************************************************
  *                               ECBPlayer                                                   *
@@ -30,12 +31,20 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 {
 	chan->AddPlayer(this);
 	Ready = false;
+	fric = 0;
+	place = 0;
+	color = 0;
+	map = 0;
 }
 
-void ECBPlayer::SetPlace(unsigned int p)
+bool ECBPlayer::SetPlace(unsigned int p)
 {
 	if(p <= chan->NbPlayers())
+	{
 		place = p;
+		return true;
+	}
+	return false;
 }
 
 /********************************************************************************************
@@ -74,6 +83,21 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
+const char* ECBChannel::ModesStr()
+{
+	std::string modes = "+", params = "";
+	if(limite) modes += "l", params += " " + TypToStr(limite);
+	switch(state)
+	{
+		case WAITING: modes += "W"; break;
+		case SENDING: modes += "S"; break;
+		case PLAYING: modes += "P"; break;
+		case ANIMING: modes += "A"; break;
+	}
+	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
+	return (modes + params).c_str();
+}
+
 const char* ECBChannel::PlayerList()
 {
 	std::string list = "";
@@ -82,6 +106,10 @@ const char* ECBChannel::PlayerList()
 		if(!list.empty()) list += " ";
 		if(players[i]->IsOwner())
 			list += "@";
+
+		/* Informe de la place et de la couleur */
+		list += TypToStr(players[i]->Place()) + "," + TypToStr(players[i]->Color()) + ",";
+
 		list += players[i]->GetNick();
 	}
 	return list.c_str();

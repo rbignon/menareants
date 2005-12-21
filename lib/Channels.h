@@ -55,11 +55,11 @@ public:
 
 	/* Est le créateur de la partie  ? */
 	bool IsOwner() { return owner; }
-	void SetOwner() { owner = true; }
+	void SetOwner(bool o = true) { owner = o; }
 
 	/* Place */
 	unsigned int Place() { return place; }
-	void SetPlace(unsigned int p);
+	bool SetPlace(unsigned int p);
 
 	/* MAP */
 	ECBMap *Map() { return map; }
@@ -138,10 +138,14 @@ public:
 	/* Retourne la liste des joueurs */
 	const char* PlayerList();
 
+	/* Retourne les modes formatés */
+	const char* ModesStr();
+
 	/* A propos des etats de la partie */
-	e_state GetState() { return state; }
+	e_state State() { return state; }
 	bool IsInGame() { return (state >= PLAYING); }
 	bool Joinable() { return (state == WAITING); }
+	void SetState(e_state s) { state = s; }
 
 	/* Limite maximale pour entrer dans le chan */
 	unsigned int GetLimite() { return limite; }
