@@ -42,18 +42,27 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <string>
+#include <map>
 
 //-----------------------------------------------------------------------------
 
 class Font
 {
+private:
+  typedef std::map<std::string, SDL_Surface *>::value_type
+    txt_sample;
+  typedef std::map<std::string, SDL_Surface *>::iterator
+    txt_iterator;
+
+  std::map<std::string, SDL_Surface *> surface_text_table;
+  int surface_size;
 public:
   TTF_Font *m_font;
 
 public:
   Font();
   ~Font();
-  void Load (const std::string& resource_id, int size);
+  bool Load (const std::string& resource_id, int size);
   void WriteLeft (int x, int y, const std::string &txt, SDL_Color color);
   void WriteLeftBottom (int x, int y, const std::string &txt, SDL_Color color);
   void WriteRight (int x, int y, const std::string &txt, SDL_Color color);
@@ -62,9 +71,9 @@ public:
   int GetWidth (const std::string &txt);
   int GetHeight ();
   int GetHeight (const std::string &txt);
-  SDL_Surface * Render(const std::string &txt, SDL_Color color);
+  SDL_Surface * Render(const std::string &txt, SDL_Color color, bool cache);
 
-  static void InitAllFonts();
+  static bool InitAllFonts();
  };
 
 extern SDL_Color white_color;

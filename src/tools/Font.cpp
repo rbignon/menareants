@@ -39,9 +39,10 @@
 #include <SDL/SDL_video.h>
 #include <iostream>
 #include <string>
-#include "../Main.h"
+#include "Main.h"
 #include "Font.h"
-#include "../Defines.h"
+#include "Outils.h"
+#include "Defines.h"
 //-----------------------------------------------------------------------------
 SDL_Color white_color = { 0xFF, 0xFF, 0xFF, 0 };
 SDL_Color black_color = { 0x00, 0x00, 0x00, 0 };
@@ -57,14 +58,22 @@ Font normal_font;
 Font small_font;
 Font tiny_font;
 
-void Font::InitAllFonts()
+bool Font::InitAllFonts()
 {
-  huge_font.Load(PKGDATADIR_FONTS"Vera.ttf", 40);
-  large_font.Load(PKGDATADIR_FONTS"Vera.ttf", 32);
-  big_font.Load(PKGDATADIR_FONTS"Vera.ttf", 24);
-  normal_font.Load(PKGDATADIR_FONTS"Vera.ttf", 16);
-  small_font.Load(PKGDATADIR_FONTS"Vera.ttf", 12);
-  tiny_font.Load(PKGDATADIR_FONTS"Vera.ttf", 8);
+  std::string vera_ttf = "Vera.ttf";
+  std::string filename  = PKGDATADIR_FONTS + vera_ttf;
+  if (!FichierExiste(filename))
+  {
+      std::cout << "Error: Font " << vera_ttf << " can't be found (" << filename << ")!" << std::endl;
+      return false;
+  }
+  huge_font.Load(vera_ttf, 40);
+  large_font.Load(vera_ttf, 32);
+  big_font.Load(vera_ttf, 24);
+  normal_font.Load(vera_ttf, 16);
+  small_font.Load(vera_ttf, 12);
+  tiny_font.Load(vera_ttf, 8);
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -83,16 +92,26 @@ Font::~Font()
     TTF_CloseFont(m_font);
     m_font = NULL;
   }
+
+  txt_iterator it;
+  for (it = surface_text_table.begin();
+       it != surface_text_table.end();
+       ++it){
+    SDL_FreeSurface(it->second);
+    surface_text_table.erase(it->first);
+  }
 }
 
 //-----------------------------------------------------------------------------
 
-void Font::Load (const std::string& font_name, int size)
+bool Font::Load (const std::string& font_name, int size)
 {
-  //assert (m_font == NULL);
-  m_font = TTF_OpenFont(font_name.c_str(), size);
-  //assert (m_font != NULL);
+  std::string filename  = PKGDATADIR_FONTS + font_name;
+  assert (FichierExiste(filename));
+
+  m_font = TTF_OpenFont(filename.c_str(), size);
   TTF_SetFontStyle(m_font,TTF_STYLE_NORMAL);
+  return true;
 }
 //-----------------------------------------------------------------------------
 
@@ -100,7 +119,7 @@ void Font::WriteLeft (int x, int y, const std::string &txt,
 		      SDL_Color color)
 {
   //assert (m_font != NULL);
-  SDL_Surface * text_surface = Render(txt.c_str(), color);
+  SDL_Surface * text_surface = Render(txt.c_str(), color, true);
   SDL_Rect dst_rect;
   dst_rect.x = x;
   dst_rect.y = y;
@@ -108,7 +127,6 @@ void Font::WriteLeft (int x, int y, const std::string &txt,
   dst_rect.w = text_surface->w;
 
   SDL_BlitSurface(text_surface,NULL,app.sdlwindow, &dst_rect);
-  SDL_FreeSurface(text_surface);
 }
 
 // //-----------------------------------------------------------------------------
@@ -117,7 +135,7 @@ void Font::WriteLeftBottom (int x, int y, const std::string &txt,
 			    SDL_Color color)
 {
   //assert (m_font != NULL);
-  SDL_Surface * text_surface = Render(txt.c_str(), color);
+  SDL_Surface * text_surface = Render(txt.c_str(), color, true);
   SDL_Rect dst_rect;
   dst_rect.x = x;
   dst_rect.y = y - GetHeight();
@@ -125,7 +143,6 @@ void Font::WriteLeftBottom (int x, int y, const std::string &txt,
   dst_rect.w = text_surface->w;
 
   SDL_BlitSurface(text_surface,NULL,app.sdlwindow, &dst_rect);
-  SDL_FreeSurface(text_surface);
 }
 
 // //-----------------------------------------------------------------------------
@@ -134,7 +151,7 @@ void Font::WriteRight (int x, int y, const std::string &txt,
 		       SDL_Color color)
 {
   //assert (m_font != NULL);
-  SDL_Surface * text_surface = Render(txt.c_str(), color);
+  SDL_Surface * text_surface = Render(txt.c_str(), color, true);
   SDL_Rect dst_rect;
   dst_rect.x = x - GetWidth(txt);
   dst_rect.y = y;
@@ -142,7 +159,6 @@ void Font::WriteRight (int x, int y, const std::string &txt,
   dst_rect.w = text_surface->w;
 
   SDL_BlitSurface(text_surface, NULL, app.sdlwindow, &dst_rect);
-  SDL_FreeSurface(text_surface);
 }
 
 // //-----------------------------------------------------------------------------
@@ -151,7 +167,7 @@ void Font::WriteCenter (int x, int y, const std::string &txt,
 			SDL_Color color)
 {
   //assert (m_font != NULL);
-  SDL_Surface * text_surface = Render(txt.c_str(), color);
+  SDL_Surface * text_surface = Render(txt.c_str(), color, true);
   SDL_Rect dst_rect;
   dst_rect.x = x - GetWidth(txt)/2;
   dst_rect.y = y - GetHeight()/2;
@@ -159,7 +175,6 @@ void Font::WriteCenter (int x, int y, const std::string &txt,
   dst_rect.w = text_surface->w;
 
   SDL_BlitSurface(text_surface, NULL, app.sdlwindow, &dst_rect);
-  SDL_FreeSurface(text_surface);
 }
 
 // //-----------------------------------------------------------------------------
@@ -168,7 +183,7 @@ void Font::WriteCenterTop (int x, int y, const std::string &txt,
 			   SDL_Color color)
 {
   //assert (m_font != NULL);
-  SDL_Surface * text_surface = Render(txt.c_str(), color);
+  SDL_Surface * text_surface = Render(txt.c_str(), color, true);
   SDL_Rect dst_rect;
   dst_rect.x = x - GetWidth(txt)/2;
   dst_rect.y = y;
@@ -176,17 +191,37 @@ void Font::WriteCenterTop (int x, int y, const std::string &txt,
   dst_rect.w = text_surface->w;
 
   SDL_BlitSurface(text_surface, NULL, app.sdlwindow, &dst_rect);
-  SDL_FreeSurface(text_surface);
 }
 
 //-----------------------------------------------------------------------------
 
-SDL_Surface * Font::Render(const std::string &txt, SDL_Color color)
+SDL_Surface * Font::Render(const std::string &txt, SDL_Color color, bool cache)
 {
-  //assert (m_font != NULL);
-  SDL_Surface * surface = TTF_RenderUTF8_Blended(m_font, txt.c_str(),
-						 color); //, black_color);
-  //assert (surface != NULL);
+  SDL_Surface * surface = NULL;
+
+  if (cache) {
+    txt_iterator p = surface_text_table.find(txt);
+    if (p == surface_text_table.end() ) {
+
+      if (surface_size > 5) {
+	SDL_FreeSurface(surface_text_table.begin()->second);
+	surface_text_table.erase(surface_text_table.begin());
+	surface_size--;
+      }
+      surface = TTF_RenderText_Blended(m_font, txt.c_str(),
+				       color); //, black_color);
+
+      surface_text_table.insert(txt_sample(txt, surface));
+      surface_size++;
+    } else {
+      txt_iterator p = surface_text_table.find(txt);
+      surface = p->second;
+    }
+  } else {
+    surface = TTF_RenderText_Blended(m_font, txt.c_str(),
+				     color); //, black_color);
+  }
+  assert (surface != NULL);
   return surface;
 }
 
@@ -196,7 +231,7 @@ int Font::GetWidth (const std::string &txt)
 {
   //assert (m_font != NULL);
   int width=-1;
-  TTF_SizeUTF8(m_font, txt.c_str(), &width, NULL);
+  TTF_SizeText(m_font, txt.c_str(), &width, NULL);
   return width;
 }
 
@@ -213,7 +248,7 @@ int Font::GetHeight ()
 int Font::GetHeight (const std::string &str)
 {
   int height=-1;
-  TTF_SizeUTF8(m_font, str.c_str(), NULL, &height);
+  TTF_SizeText(m_font, str.c_str(), NULL, &height);
   return height;
 }
 

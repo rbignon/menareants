@@ -206,7 +206,7 @@ int EuroConqApp::main(int argc, char **argv)
 			return false;
 		}
 
-		Font::InitAllFonts();
+		if(!Font::InitAllFonts()) return false;
 
 		SDL_UpdateRect(app.sdlwindow, 0, 0, 0, 0);
 		SDL_Flip(app.sdlwindow);
