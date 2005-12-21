@@ -10,6 +10,7 @@ Sommaire:
 1) Principe du jeu
 2) Protocole
 3) Particularités des commandes de positions
+4) Modes
 
 1) Principe du jeu
 
@@ -23,17 +24,12 @@ Sommaire:
               JOI <nom>                         :joindre une partie
               BYE                               :au revoir
          - Dans une pré-partie
-              SET <param> <value>               :met un paramètre
-                  POS <pos>                       :se positionne (1-l)
-                  COL <couleur>                   :définit sa couleur (enum)
-                  MAP <map>                       :définit la map (voir comment la définir)
-                  OK                              :indique que l'on est pret
+              SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
               KIK <nick> [raison]               :l'owner peut kicker
               GO!                               :l'owner lance le jeu
          - En cours de jeu
               RDY                               :le joueur est pret pour passer à la suite (anim ou jeu)
-              CRA <nb> <pos> <typ>              :créer une armée
-              CHA <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
+              ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [><pos>] [*[pos]]
                   [<[pos]]
 
@@ -48,10 +44,9 @@ Sommaire:
               USED                              :pseudo déjà utilisé
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
-              SETS <limit>                      :paramètres d'une partie (notifie un join)
-              NLS <[@]nick1> [<[@]nick1> ...]   :liste des joueurs
+              PLS <[@]pos,col,nick1> [...]      :liste des joueurs
               :<nick> JOI <nom> <sets>          :un user join
-              :<nick> SET <param> <value>       :un user met un paramètre
+              :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA [raison]              :un user part (ou a été kické)
               :<nick> WGO                       :l'owner veut lancer le jeu
               :<nick> GO!                       :l'owner lance le jeu
@@ -76,3 +71,18 @@ Sommaire:
          <[pos]      :retour
          -           :suppression de l'armée  } application encore indéfinie
          .           :lock                    |
+
+4) Modes
+      La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
+      Voici la liste :
+        Mode pour le chan:
+         +l <limite>         :paramètre la limite
+         +o <user>           :met owner un user
+         +m <map>            :définie la map du jeu
+         +W                  :pré-partie (WAITING)
+         +S                  :envoie des infos (SENDING)
+         +P                  :jeu (PLAYING)
+         +A                  :animation (ANIMING)
+        Mode pour un user:
+         +c <couleur>        :l'user se définie sa couleur
+         +p <position>       :l'user définie sa position
