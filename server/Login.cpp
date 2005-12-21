@@ -51,7 +51,7 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return cl->exit(app.rpl(ECServer::MAJ), '0');
 
 	int pversion = 0;
-	StrToTyp(parv[3], pversion);
+	pversion = StrToTyp<int>(parv[3]);
 
 	if(parv[3] != APP_PVERSION)
 		return cl->exit(app.rpl(ECServer::MAJ), pversion < atol(APP_PVERSION) ? '-' : '+');
