@@ -17,13 +17,16 @@ euroconq_SOURCES = \
 		tools/Font.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
+		gui/Component.cpp \
+		gui/Form.cpp \
 		gui/Menu.cpp \
 		gui/ListBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \
 		gui/Edit.cpp \
-		gui/MessageBox.cpp
+		gui/MessageBox.cpp \
+		gui/Label.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 

@@ -55,9 +55,10 @@ am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
 	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
 	JoinGame.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT) \
-	Maths.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT) \
-	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
-	Edit.$(OBJEXT) MessageBox.$(OBJEXT)
+	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
+	Menu.$(OBJEXT) ListBox.$(OBJEXT) Boutton.$(OBJEXT) \
+	BouttonText.$(OBJEXT) Memo.$(OBJEXT) Edit.$(OBJEXT) \
+	MessageBox.$(OBJEXT) Label.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -190,13 +191,16 @@ euroconq_SOURCES = \
 		tools/Font.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
+		gui/Component.cpp \
+		gui/Form.cpp \
 		gui/Menu.cpp \
 		gui/ListBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \
 		gui/Edit.cpp \
-		gui/MessageBox.cpp
+		gui/MessageBox.cpp \
+		gui/Label.cpp
 
 euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
 all: all-recursive
@@ -268,12 +272,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Boutton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BouttonText.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Component.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Form.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Images.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JoinGame.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Label.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ListBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
@@ -340,6 +347,34 @@ Maths.obj: tools/Maths.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Maths.cpp' object='Maths.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Maths.obj `if test -f 'tools/Maths.cpp'; then $(CYGPATH_W) 'tools/Maths.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Maths.cpp'; fi`
+
+Component.o: gui/Component.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Component.o -MD -MP -MF "$(DEPDIR)/Component.Tpo" -c -o Component.o `test -f 'gui/Component.cpp' || echo '$(srcdir)/'`gui/Component.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Component.Tpo" "$(DEPDIR)/Component.Po"; else rm -f "$(DEPDIR)/Component.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Component.cpp' object='Component.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Component.o `test -f 'gui/Component.cpp' || echo '$(srcdir)/'`gui/Component.cpp
+
+Component.obj: gui/Component.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Component.obj -MD -MP -MF "$(DEPDIR)/Component.Tpo" -c -o Component.obj `if test -f 'gui/Component.cpp'; then $(CYGPATH_W) 'gui/Component.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Component.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Component.Tpo" "$(DEPDIR)/Component.Po"; else rm -f "$(DEPDIR)/Component.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Component.cpp' object='Component.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Component.obj `if test -f 'gui/Component.cpp'; then $(CYGPATH_W) 'gui/Component.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Component.cpp'; fi`
+
+Form.o: gui/Form.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Form.o -MD -MP -MF "$(DEPDIR)/Form.Tpo" -c -o Form.o `test -f 'gui/Form.cpp' || echo '$(srcdir)/'`gui/Form.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Form.Tpo" "$(DEPDIR)/Form.Po"; else rm -f "$(DEPDIR)/Form.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Form.cpp' object='Form.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Form.o `test -f 'gui/Form.cpp' || echo '$(srcdir)/'`gui/Form.cpp
+
+Form.obj: gui/Form.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Form.obj -MD -MP -MF "$(DEPDIR)/Form.Tpo" -c -o Form.obj `if test -f 'gui/Form.cpp'; then $(CYGPATH_W) 'gui/Form.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Form.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Form.Tpo" "$(DEPDIR)/Form.Po"; else rm -f "$(DEPDIR)/Form.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Form.cpp' object='Form.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Form.obj `if test -f 'gui/Form.cpp'; then $(CYGPATH_W) 'gui/Form.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Form.cpp'; fi`
 
 Menu.o: gui/Menu.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Menu.o -MD -MP -MF "$(DEPDIR)/Menu.Tpo" -c -o Menu.o `test -f 'gui/Menu.cpp' || echo '$(srcdir)/'`gui/Menu.cpp; \
@@ -438,6 +473,20 @@ MessageBox.obj: gui/MessageBox.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/MessageBox.cpp' object='MessageBox.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o MessageBox.obj `if test -f 'gui/MessageBox.cpp'; then $(CYGPATH_W) 'gui/MessageBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/MessageBox.cpp'; fi`
+
+Label.o: gui/Label.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Label.o -MD -MP -MF "$(DEPDIR)/Label.Tpo" -c -o Label.o `test -f 'gui/Label.cpp' || echo '$(srcdir)/'`gui/Label.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Label.Tpo" "$(DEPDIR)/Label.Po"; else rm -f "$(DEPDIR)/Label.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Label.cpp' object='Label.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Label.o `test -f 'gui/Label.cpp' || echo '$(srcdir)/'`gui/Label.cpp
+
+Label.obj: gui/Label.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Label.obj -MD -MP -MF "$(DEPDIR)/Label.Tpo" -c -o Label.obj `if test -f 'gui/Label.cpp'; then $(CYGPATH_W) 'gui/Label.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Label.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Label.Tpo" "$(DEPDIR)/Label.Po"; else rm -f "$(DEPDIR)/Label.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Label.cpp' object='Label.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Label.obj `if test -f 'gui/Label.cpp'; then $(CYGPATH_W) 'gui/Label.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Label.cpp'; fi`
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
