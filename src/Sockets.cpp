@@ -40,6 +40,7 @@ const char* msgTab[] = {
 	"JOI %s",                                 /* JOI - Joindre une partie */
 	"LEA",                                    /* LEA - Partir d'une partie */
 	"MSG %s",                                 /* MSG - Message dans une partie */
+	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
      0
 };
 
@@ -242,12 +243,14 @@ void EC_Client::Init()
 	Commands.push_back(new HELCommand("HEL", 0,	1));
 	Commands.push_back(new PIGCommand("PIG", 0,	0));
 	Commands.push_back(new AIMCommand("AIM", 0,	1));
+	Commands.push_back(new USEDCommand("USED", 0, 0));
+
 	Commands.push_back(new LSPCommand("LSP", 0,	3));
 	Commands.push_back(new EOLCommand("EOL", 0,	0));
+
 	Commands.push_back(new JOICommand("JOI", 0, 1));
-	Commands.push_back(new SETSCommand("SETS", 0, 0)); /* TODO: Commande SETS à compléter */
+	Commands.push_back(new SETCommand("SET", 0, 1));
 	Commands.push_back(new PLSCommand("PLS", 0, 1));
-	Commands.push_back(new USEDCommand("USED", 0, 0));
 	Commands.push_back(new LEACommand("LEA", 0, 0));
 	Commands.push_back(new MSGCommand("MSG", 0, 1));
 }

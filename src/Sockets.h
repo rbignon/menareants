@@ -53,6 +53,7 @@ public:
 		JOIN, /* JOI */
 		LEAVE,/* LEA */
 		MSG,  /* MSG */
+		SET,  /* SET */
 
 		NONE
 	};
