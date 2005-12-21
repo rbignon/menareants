@@ -27,6 +27,7 @@
 #include <list>
 
 #include "Boutton.h"
+#include "Component.h"
 
 struct SDL_Surface;
 struct SDL_Color;
@@ -39,7 +40,7 @@ typedef struct s_list_box_item_t{
   } list_box_item_t;
 
 
-class TListBox
+class TListBox : public TComponent
 {
 public:
   int selection_min; // Minimal number of selected items
@@ -47,9 +48,8 @@ public:
   typedef std::list<uint>::const_iterator selection_iterator;
 
 private:
-  // for the placement
-  uint x, y;
-  uint width, height, visible_height;
+
+  uint visible_height;
   uint nb_visible_items, nb_visible_items_max;
   uint height_item;
 
@@ -71,8 +71,10 @@ public:
   TListBox (uint _x, uint _y, uint _width, uint _height);
   ~TListBox();
   void Init ();
-  void Display (uint mouse_x, uint mouse_y);
+
+  void Draw (uint mouse_x, uint mouse_y);
   bool Clic (uint mouse_x, uint mouse_y);
+
   void AddItem (bool selected,
 		const std::string &label,
 		const std::string &value,
@@ -87,7 +89,6 @@ public:
   const std::string& ReadLabel (uint index) const;
   const std::string& ReadValue (uint index) const;
   bool Enabled(uint index);
-  void SetXY (uint x, uint y);
 };
 
 #endif /* EC_LISTBOX_H */

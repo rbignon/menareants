@@ -28,11 +28,10 @@
 #include <SDL.h>
 
 TListBox::TListBox (uint _x, uint _y, uint _width, uint _height)
-  : x(_x), y(_y), width(_width), height(_height)
+  : TComponent(_x, _y, _width, _height)
 {
   height_item = 15;
   first_visible_item = 0;
-  nb_visible_items_max = height/height_item;
   nb_visible_items = 0;
   visible_height = 0;
   selection_min = 1;
@@ -60,6 +59,8 @@ void TListBox::Init()
   m_up.SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
   m_down.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
 
+  nb_visible_items_max = h/height_item;
+
   if ( cursorover_box)
     SDL_FreeSurface( cursorover_box);
   if ( selected_box)
@@ -67,18 +68,18 @@ void TListBox::Init()
   if ( background)
     SDL_FreeSurface( background);
 
-  SDL_Rect r_item = {0,0,width,height_item};
-  SDL_Rect r_back = {0,0,width,height};
+  SDL_Rect r_item = {0,0,w,height_item};
+  SDL_Rect r_back = {0,0,w,h};
 
-  cursorover_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, width, height_item,
+  cursorover_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
   SDL_FillRect( cursorover_box, &r_item, SDL_MapRGBA( cursorover_box->format,0,0,255*6/10,255*4/10));
 
-  selected_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, width, height_item,
+  selected_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
   SDL_FillRect( selected_box, &r_item, SDL_MapRGBA( selected_box->format,0,0,255*6/10,255*8/10));
 
-  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, width, height,
+  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
   SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
 
@@ -89,7 +90,7 @@ int TListBox::MouseIsOnWitchItem (uint mouse_x, uint mouse_y)
   if ((mouse_x < x+1)
       || (mouse_y < y+1)
       || ((y+1 + visible_height) < mouse_y)
-      || ((x + width) < mouse_x))
+      || ((x + w) < mouse_x))
     return -1;
 
   int index = (mouse_y - y)/height_item;
@@ -127,12 +128,12 @@ bool TListBox::Clic (uint mouse_x, uint mouse_y)
   return true;
 }
 
-void TListBox::Display (uint mouse_x, uint mouse_y)
+void TListBox::Draw (uint mouse_x, uint mouse_y)
 {
   int item = MouseIsOnWitchItem(mouse_x, mouse_y);
 
   // blit a surface as SDL_FillRect don't alpha blit a rectangle
-  SDL_Rect r_back = {x,y,width,height};
+  SDL_Rect r_back = {x,y,w,h};
   SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
 
   for (uint i=0; i < nb_visible_items; i++)
@@ -140,12 +141,12 @@ void TListBox::Display (uint mouse_x, uint mouse_y)
 	// blit surfaces as SDL_FillRect don't alpha blit a rectangle
 	if ( i+first_visible_item == uint(item) )
 	{
-		SDL_Rect r = {x+1, y+i*height_item+1, width-2, height_item-2};
+		SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
 		SDL_BlitSurface( cursorover_box, NULL, app.sdlwindow, &r);
 	}
 	else if ( IsSelected(i+first_visible_item) )
 	{
-		SDL_Rect r = {x+1, y+i*height_item+1, width-2, height_item-2};
+		SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
 		SDL_BlitSurface( selected_box, NULL, app.sdlwindow, &r);
 	}
 	small_font.WriteLeft(x+5,
@@ -157,8 +158,8 @@ void TListBox::Display (uint mouse_x, uint mouse_y)
   // buttons for listbox with more items than visible
   if (m_items.size() > nb_visible_items_max)
   {
-    m_up.SetPos(x+width-12, y+2);
-    m_down.SetPos(x+width-12, y+height-7);
+    m_up.SetXY(x+w-12, y+2);
+    m_down.SetXY(x+w-12, y+h-7);
 
     m_up.Draw (mouse_x, mouse_y);
     m_down.Draw (mouse_x, mouse_y);
@@ -189,7 +190,7 @@ void TListBox::AddItem (bool selected,
     nb_visible_items = nb_visible_items_max;
 
   visible_height = nb_visible_items*height_item;
-  if (height < visible_height)  visible_height = height;
+  if (h < visible_height)  visible_height = h;
 
 }
 
@@ -258,5 +259,3 @@ bool TListBox::Enabled (uint index)
   assert (index < m_items.size());
   return m_items[index].enabled;
 }
-
-void TListBox::SetXY (uint px, uint py) { x = px; y = py; }

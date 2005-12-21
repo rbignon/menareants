@@ -25,14 +25,15 @@
 TButton::TButton ()
 {
    image = NULL;
-   SetPos(0,0);
-   SetSize(0,0);
+   SetXY(0,0);
+   w = 0;
+   h = 0;
 }
 
 //-----------------------------------------------------------------------------
 
-TButton::TButton (unsigned int x, unsigned int y, unsigned int w, unsigned int h)
-  : m_x(x), m_width(w), m_y(y), m_height(h)
+TButton::TButton (unsigned int _x, unsigned int _y, unsigned int _w, unsigned int _h)
+  : TComponent(_x, _y, _w, _h)
 {
 	image = NULL;
 	enabled = true;
@@ -45,26 +46,12 @@ TButton::~TButton()
 	if(image) delete image;
 }
 
-void TButton::SetPos (unsigned int x, unsigned int y)
-{
-  m_x  = x;
-  m_y  = y;
-}
-
-//-----------------------------------------------------------------------------
-
-void TButton::SetSize (unsigned int w, unsigned int h)
-{
-  m_width = w;
-  m_height = h;
-}
-
 //-----------------------------------------------------------------------------
 
 bool TButton::Test (unsigned int souris_x, unsigned int souris_y)
 {
-  return ((m_x <= souris_x) && (souris_x <= m_x+m_width)
-	  && (m_y <= souris_y) && (souris_y <= m_y+m_height));
+  return ((x <= souris_x) && (souris_x <= x+w)
+	  && (y <= souris_y) && (souris_y <= y+h));
 }
 
 void TButton::Draw (unsigned int souris_x, unsigned int souris_y)
@@ -81,7 +68,7 @@ void TButton::DrawImage (unsigned int souris_x, unsigned int souris_y)
   unsigned int frame = Test(souris_x,souris_y) ? 1 : 0;
 
   image->setFrame(frame);
-  image->set(m_x, m_y);
+  image->set(x, y);
   image->draw();
 
 }
@@ -90,10 +77,6 @@ void TButton::SetImage (ECSprite *_image)
 {
   if(image) delete image;
   image = _image;
-  SetSize (image->GetWidth(), image->GetHeight());
+  SetWidth(image->GetWidth());
+  SetHeight(image->GetHeight());
 }
-
-unsigned int TButton::GetX() const { return m_x; }
-unsigned int TButton::GetY() const { return m_y; }
-unsigned int TButton::GetWidth() const { return m_width; }
-unsigned int TButton::GetHeight() const { return m_height; }

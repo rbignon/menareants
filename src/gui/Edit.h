@@ -26,12 +26,14 @@
 #include <string>
 #include <SDL.h>
 
+#include "Component.h"
+
 #define EDIT_HEIGHT 15
 #define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN123456789 .+-*/,;:!?()[]={}'\"&<>"
 
 struct SDL_Surface;
 
-class TEdit
+class TEdit : public TComponent
 {
 /* Constructeur/Deconstructeur */
 public:
@@ -49,7 +51,7 @@ public:
 	bool Clic (uint mouse_x, uint mouse_y);
 
 	/* Affiche */
-	void Display();
+	void Draw(uint m_x, uint m_y);
 
 	/* Une touche a été pressée */
 	void PressKey(SDL_keysym);
@@ -74,9 +76,6 @@ private:
 	bool focus;
 	uint first_char;
 	std::string chaine;
-
-	uint x, y;
-	uint width, height;
 };
 
 #endif /* EC_EDIT_H */

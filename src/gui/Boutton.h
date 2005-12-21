@@ -22,13 +22,13 @@
 #ifndef EC_BOUTTON_H
 #define EC_BOUTTON_H
 
+#include "Component.h"
+
 class ECSprite;
 
-class TButton
+class TButton : public TComponent
 {
 protected:
-  unsigned int m_x, m_width, m_y, m_height;
-
   ECSprite *image;
 
   bool enabled;
@@ -36,18 +36,14 @@ protected:
 public:
   TButton();
   TButton (unsigned int x, unsigned int y, unsigned int w, unsigned int h);
-  virtual ~TButton();
-  void SetPos(unsigned int x, unsigned int y);
-  void SetSize (unsigned int larg, unsigned int haut);
+  ~TButton();
+
+  void Init() {}
 
   void SetImage (ECSprite *image);
 
   bool Test (unsigned int souris_x, unsigned int souris_y);
   virtual void Draw (unsigned int souris_x, unsigned int souris_y);
-  unsigned int GetX() const;
-  unsigned int GetY() const;
-  unsigned int GetWidth() const;
-  unsigned int GetHeight() const;
 
   bool Enabled() { return enabled; }
   void SetEnabled(bool _en) { enabled = _en; }

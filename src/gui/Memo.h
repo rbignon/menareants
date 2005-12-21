@@ -25,6 +25,7 @@
 #include <vector>
 #include <string>
 
+#include "Component.h"
 #include "Boutton.h"
 
 struct SDL_Surface;
@@ -35,12 +36,11 @@ typedef struct s_memo_box_item_t{
     SDL_Color color;
   } memo_box_item_t;
 
-class TMemo
+class TMemo : public TComponent
 {
 private:
   // for the placement
-  uint x, y;
-  uint width, height, visible_height;
+  uint visible_height;
   uint nb_visible_items, nb_visible_items_max;
   uint height_item;
   uint maxitems;
@@ -59,15 +59,12 @@ public:
   TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items);
   ~TMemo();
   void Init ();
-  void Display (uint mouse_x, uint mouse_y);
+  void Draw (uint mouse_x, uint mouse_y);
   bool Clic (uint mouse_x, uint mouse_y);
   void AddItem (const std::string &label, SDL_Color _color);
   void RemoveItem (uint index);
   void ClearItems();
 
-  void SetXY (uint x, uint y);
-  void SetHeight (uint h);
-  void SetWidth (uint w);
 };
 
 #endif /* EC_MEMO_H */

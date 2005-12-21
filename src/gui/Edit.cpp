@@ -25,14 +25,14 @@
 #include <SDL.h>
 
 TEdit::TEdit (uint _x, uint _y, uint _width, uint _maxlen)
-  : x(_x), y(_y), width(_width), height(EDIT_HEIGHT)
+  : TComponent(_x, _y, _width, EDIT_HEIGHT)
 {
   first_char = 0;
   maxlen = _maxlen;
   focus = false;
   chaine = "";
 
-  visible_len = ((width) / small_font.GetWidth("A"));
+  visible_len = ((w) / small_font.GetWidth("A"));
 
   background = NULL;
 }
@@ -48,9 +48,9 @@ void TEdit::Init()
   if ( background)
     SDL_FreeSurface( background);
 
-  SDL_Rect r_back = {0,0,width,height};
+  SDL_Rect r_back = {0,0,w,h};
 
-  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, width, height,
+  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
   SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
 
@@ -58,8 +58,8 @@ void TEdit::Init()
 
 bool TEdit::Clic (uint mouse_x, uint mouse_y)
 {
-	if((x <= mouse_x) && (mouse_x <= x+width)
-	  && (y <= mouse_y) && (mouse_y <= y+height))
+	if((x <= mouse_x) && (mouse_x <= x+w)
+	  && (y <= mouse_y) && (mouse_y <= y+h))
 		SetFocus();
 	else
 		DelFocus();
@@ -77,11 +77,10 @@ void TEdit::DelFocus()
 	focus = false;
 }
 
-void TEdit::Display ()
+void TEdit::Draw (uint m_x, uint m_y)
 {
-  SDL_Rect r_back = {x,y,width,height};
+  SDL_Rect r_back = {x,y,w,h};
   SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
-
   if(!focus && chaine.empty()) return;
 
   if(chaine.size() > visible_len)

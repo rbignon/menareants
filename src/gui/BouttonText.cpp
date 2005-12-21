@@ -28,8 +28,8 @@ TButtonText::TButtonText() : TButton()
 
 //-----------------------------------------------------------------------------
 
-TButtonText::TButtonText (unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string &text)
-  : TButton(x, y, w, h)
+TButtonText::TButtonText (unsigned int _x, unsigned int _y, unsigned int _w, unsigned int _h, const std::string &text)
+  : TButton(_x, _y, _w, _h)
 {
   m_text = text;
   font = &normal_font;
@@ -59,10 +59,10 @@ void TButtonText::Draw (unsigned int souris_x, unsigned int souris_y)
 
   assert (font != NULL);
 
-  const int x = GetX()+GetWidth()/2;
-  const int y = GetY()+GetHeight()/2;
+  const int _x = GetX()+GetWidth()/2;
+  const int _y = GetY()+GetHeight()/2;
 
-  font->WriteCenter (x, y, m_text, enabled ? white_color : gray_color);
+  font->WriteCenter (_x, _y, m_text, enabled ? white_color : gray_color);
 }
 
 //-----------------------------------------------------------------------------
