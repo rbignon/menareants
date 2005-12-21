@@ -1,13 +1,15 @@
 À faire:
 
 * En cours
--client: Avancer dans la création
+-client: Corriger bug lors de GameInfos qui redimentionne trop tard le TMemo.
+-client: Avancer dans les paramètres de la partie.
 
 * Urgent
 -Gestion de l'ouverture d'une map (fichier) et son interpretation (pas encore graphique)
 -Gestion de l'envoie/reception de la preview de la map
 
 * Bof
+-client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
 -client: Problème de la position de la selection dans le menu à certains moments (options)
 
 * Objectif actuel

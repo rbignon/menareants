@@ -1,3 +1,18 @@
+2005-12-20  Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp: Utilisation du TForm pour les écrans ListGame et GameInfos.
+
+	* Edit.cpp,Memo.cpp,ListBox.cpp,Button.cpp,TextButton.cpp: Dérivation de TComponent
+
+	* src/gui/MessageBox.cpp: Utilisation du TForm pour faire marcher correctement.
+
+	* src/gui/Component.cpp: Création de TComponent qui est la base de tous les composants.
+
+	* src/gui/Form.cpp: Création de TForm qui est la base des forms contenant les composants.
+	Ça va permettre de gérer les "fenêtres" plus simplement.
+
+	* src/gui/Label.cpp: Composant TLabel. Le nom est assez explicite.
+
 2005-12-16  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/MessageBox.cpp (TMessageBox): Classe d'un composant qui affiche une fenêtre avec un message
