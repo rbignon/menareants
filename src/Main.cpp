@@ -33,7 +33,6 @@
 #include "tools/Font.h"
 #include "tools/Images.h"
 #include "Resources.h"
-#include "gui/ListBox.h"
 #include "Debug.h"
 
 EuroConqApp app;
