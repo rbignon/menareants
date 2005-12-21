@@ -32,8 +32,6 @@ TEdit::TEdit (uint _x, uint _y, uint _width, uint _maxlen)
   focus = false;
   chaine = "";
 
-  visible_len = ((w) / small_font.GetWidth("A"));
-
   background = NULL;
 }
 
@@ -47,6 +45,8 @@ void TEdit::Init()
 {
   if ( background)
     SDL_FreeSurface( background);
+
+  visible_len = ((w) / small_font.GetWidth("A"));
 
   SDL_Rect r_back = {0,0,w,h};
 
