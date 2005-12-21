@@ -21,6 +21,7 @@
 #include "MessageBox.h"
 #include "Defines.h"
 #include "Main.h"
+#include "Debug.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -41,29 +42,40 @@ static struct ButtonList_t
 uint TMessageBox::Show()
 {
 	SDL_Event event;
-	bool eob = false;
-	do
+	try
 	{
-		int x=0, y=0;
-		while( SDL_PollEvent( &event) )
+		do
 		{
-			switch(event.type)
+			int x=0, y=0;
+			while( SDL_PollEvent( &event) )
 			{
-				case SDL_MOUSEBUTTONDOWN:
-					for(uint i=0; i<boutons.size();i++)
-						if(boutons[i]->Test(event.button.x, event.button.y))
-							return boutons[i]->Tag;
-				default:
-					break;
+				switch(event.type)
+				{
+					case SDL_MOUSEBUTTONDOWN:
+						for(uint i=0; i<boutons.size();i++)
+							if(boutons[i]->Test(event.button.x, event.button.y))
+								return boutons[i]->Tag;
+						break;
+					default:
+						break;
+				}
 			}
-		}
-		SDL_GetMouseState( &x, &y);
-		Display(x,y);
-		SDL_Flip(app.sdlwindow);
-	} while(!eob);
+			SDL_GetMouseState( &x, &y);
+			if(Form)
+				Form->Update(x,y,false);
+			Draw(x,y);
+			SDL_Flip(app.sdlwindow);
+		} while(1);
+	}
+	catch(...)
+	{
+		Debug(W_SEND|W_ERR, "Erreur dans un TMessageBox");
+		throw;
+	}
+	return 0;
 }
 
-void TMessageBox::Display(uint mouse_x, uint mouse_y)
+void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 {
 	SDL_Rect r_back = {x,y,w,h};
 	SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
@@ -71,9 +83,9 @@ void TMessageBox::Display(uint mouse_x, uint mouse_y)
 	uint vert = y;
 
 	for (uint i=0; i < message.size(); i++, vert += height_string)
-		normal_font.WriteLeft(x+10, vert, message[i], black_color);
+		normal_font.WriteLeft(x+30, vert, message[i], black_color);
 
-	vert += 10;
+	vert += 20;
 
 	for(uint i=0;i<boutons.size();i++)
 		boutons[i]->Draw(mouse_x, mouse_y);
@@ -81,11 +93,8 @@ void TMessageBox::Display(uint mouse_x, uint mouse_y)
 	return;
 }
 
-TMessageBox::TMessageBox(uint _x, uint _y, const char* _s, uint _b)
-	: x(_x), y(_y), b(_b)
+void TMessageBox::SetText(const char* _s)
 {
-	w = 0;
-	h = 0;
 	height_string = normal_font.GetHeight();
 
 	/* On parse le message pour le découper en différentes lignes */
@@ -102,10 +111,11 @@ TMessageBox::TMessageBox(uint _x, uint _y, const char* _s, uint _b)
 			i=0;
 
 			h += height_string;
-			uint yw = normal_font.GetWidth(s) + 20;
+			uint yw = normal_font.GetWidth(s);
 			if(w < yw) w = yw;
 
-			if(*_s == '\n') _s++; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
+			if(*_s == '\n')
+				_s++; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
 			while(*_s == ' ') _s++;
 			if(!*_s) break;
 		}
@@ -113,7 +123,7 @@ TMessageBox::TMessageBox(uint _x, uint _y, const char* _s, uint _b)
 			s[i++] = *_s++;
 	}
 
-	h += 10;
+	h += 20;
 
 	/* Préparation des boutons */
 	uint tmpw = x, tmph = 0;

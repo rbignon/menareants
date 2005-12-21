@@ -25,6 +25,7 @@
 #include <vector>
 #include <SDL.h>
 #include "BouttonText.h"
+#include "Form.h"
 
 #define MSGBOX_MAXWIDTH 300
 
@@ -38,7 +39,17 @@ class TMessageBox
 /* Constructeur/Deconstructeur */
 public:
 
-	TMessageBox(uint x, uint y, const char* msg, uint buttons);
+	template<typename T>
+	TMessageBox(uint _x, uint _y, const char* _s, uint _b, T* form = 0)
+		: x(_x), y(_y), b(_b)
+	{
+		Form = form;
+		w = 0;
+		h = 0;
+		SetText(_s);
+	}
+
+	~TMessageBox() {}
 
 /* Methodes */
 public:
@@ -47,10 +58,14 @@ public:
 	uint Show();
 
 	/* Affiche */
-	void Display (uint mouse_x, uint mouse_y);
+	void Draw (uint mouse_x, uint mouse_y);
 
 /* Attributs */
 public:
+
+	/* Form */
+	template<typename T>
+	void SetForm(T* _form) { Form = _form; }
 
 /* Variables privées */
 private:
@@ -61,6 +76,9 @@ private:
 	std::vector<std::string> message;
 	std::vector<TButtonText*> boutons;
 	SDL_Surface *background;
+	TForm *Form;
+
+	void SetText(const char* s);
 };
 
 #endif /* EC_MSGBOX_H */
