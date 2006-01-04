@@ -2,6 +2,12 @@
 
 	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et éclaircissement du code.
 
+	* DEVELOPPEURS: Fichier pour que les developpeurs puissent laisser des notes aux autres.
+	(oui je sais il n'y a que deux developpeurs et l'IRC ça existe mais bon, on fait genre)
+
+	* patch: Répertoire contenant les patchs qui ont été receptionnés de l'exterieur (oui je *sais*
+	y a personne qui en envoie mais BON).
+
 2005-12-28  Romain Bignon <progs@headfucking.net>
 
 	* *.h: Passage de la majorité des fonctions membres qui le doivent en "const" pour respecter
