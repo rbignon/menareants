@@ -1,6 +1,6 @@
 /* src/main.cpp - Main file
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -152,6 +152,7 @@ int EuroConqApp::main(int argc, char **argv)
 		}
 		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
+		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 		int sdlflags = SDL_SWSURFACE|SDL_HWPALETTE;
 #ifdef WIN32
 		sdlflags |= SDL_FULLSCREEN;
@@ -216,8 +217,8 @@ int EuroConqApp::main(int argc, char **argv)
 		menu = new Menu( std::string("Menu principal"), this);
 		menu->add_item(std::string("Jouer"), MENU_JOUER, 0);
 		menu->add_item(std::string("Options"), MENU_OPTIONS, 0);
-		menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_READ_ONLY|M_NOFMAJ, MENU_OPTIONS, conf->hostname);
-		menu->add_value( std::string("Port"), OPTIONS_PORT, M_READ_ONLY, MENU_OPTIONS, 100, 65535, conf->port);
+		menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_NOFMAJ, MENU_OPTIONS, conf->hostname);
+		menu->add_value( std::string("Port"), OPTIONS_PORT, 0, MENU_OPTIONS, 100, 65535, conf->port);
 		menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
 
 		menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);

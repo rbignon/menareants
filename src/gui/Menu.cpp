@@ -1,6 +1,6 @@
 /* src/Menu.cpp - Make a menu (by ClanBomber)
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -232,15 +232,17 @@ void Menu::redraw( int yoffset )
 {
 	MenuItem* current = get_item_by_id(current_run_id);
 
-	int width = big_font.GetWidth(current->get_text());
+  const int space_between_items = 15;
+	int item_height = big_font.GetHeight("A") + space_between_items;
 
+  int width=0;
 	std::vector<MenuItem*>::iterator item_counter = current->children.begin();
 	for(;item_counter != current->children.end(); ++item_counter)
 	{
 		int w = big_font.GetWidth( (*item_counter)->get_text() );
 		if ((*item_counter)->get_type() == MenuItem::MT_VALUE)
 		{
-			w += 50;
+			w += 250;
 		}
 		if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
@@ -252,37 +254,29 @@ void Menu::redraw( int yoffset )
 		}
 		width = std::max( w, width );
 	}
-	width += 30;
 #ifdef DEBUG_MENU
 	printf("width=%d\n", width);
 #endif
 
-	int height = current->children.size()*40 + 110;
-
 	int left_border = 400 - width/2;
-	int right_border = 400 + width/2 + 30;
-
-	int vert = yoffset + 300 - height / 2;
+	int right_border = 400 + width/2;
 
 	//Resources::Titlescreen()->Draw();
 	SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,lapp->sdlwindow,NULL);
-	//CL_Display::fill_rect( left_border-30,vert-20, right_border+20,vert+20+height, 0,0,0,0.0f);
-
-	big_font.WriteCenter(400,vert, current->get_text(), black_color);
-	vert += 80;
+	//CL_Display::fill_rect( left_border-30,yoffset-20, right_border+20,yoffset+20+height, 0,0,0,0.0f);
+  yoffset += 160;
+	big_font.WriteCenterTop(400,yoffset, current->get_text(), black_color);
+	yoffset += item_height * 2;
 
 	unsigned int act_draw = 0;
 	for(item_counter = current->children.begin();item_counter != current->children.end(); ++item_counter)
 	{
 		act_draw++;
 		if(((*item_counter)->flags & M_RETOUR))
-			vert += 10;
+			yoffset += 10;
 		if (act_draw==current_selection)
 		{
-#ifdef DEBUG_MENU
-			printf("%d-30=%d, %d-5=%d, %d+20=%d, %d+35=%d\n", left_border, left_border-30, vert, vert-10, right_border, right_border+20, vert, vert+35);
-#endif
-			SDL_Rect r_back = {left_border-30,vert-15, right_border-left_border+30,35};
+			SDL_Rect r_back = {left_border-15,yoffset-space_between_items/2, width+30, item_height};
 			if(((*item_counter)->flags & M_READ_ONLY))
 				SDL_FillRect(lapp->sdlwindow, &r_back, SDL_MapRGBA(lapp->sdlwindow->format, 15,15,15,55));
 			else
@@ -294,37 +288,38 @@ void Menu::redraw( int yoffset )
 			if ((((MenuItem_Value*)(*item_counter))->get_min() == 0) &&
 			    (((MenuItem_Value*)(*item_counter))->get_max() == 1))
 			{
-				big_font.WriteRight( right_border, vert,
+				big_font.WriteRight( right_border, yoffset,
 			                std::string(((MenuItem_Value*)(*item_counter))->get_value() ? "Oui" : "Non"),
 			                black_color);
 			}
 			else
 			{
-				big_font.WriteRight(right_border, vert,
+				big_font.WriteRight(right_border, yoffset,
 				                 TypToStr(((MenuItem_Value*)(*item_counter))->get_value()), black_color);
 			}
-			big_font.WriteLeft( left_border, vert, (*item_counter)->get_text(), black_color );
+			big_font.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color );
 		}
 		else if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
 			if(!((MenuItem_String*)(*item_counter))->get_string().empty())
-				big_font.WriteRight(right_border, vert,
+				big_font.WriteRight(right_border, yoffset,
 				                    ((MenuItem_String*)(*item_counter))->get_string(), black_color);
-			big_font.WriteLeft(left_border, vert, (*item_counter)->get_text(), black_color);
+			big_font.WriteLeft(left_border, yoffset, (*item_counter)->get_text(), black_color);
 		}
 		else if ((*item_counter)->get_type()==MenuItem::MT_STRINGLIST)
 		{
-			big_font.WriteRight(right_border, vert,
+			big_font.WriteRight(right_border, yoffset,
 			                    ((MenuItem_StringList*)(*item_counter))->get_string(), black_color);
-			big_font.WriteLeft( left_border, vert, (*item_counter)->get_text(), black_color);
+			big_font.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color);
 		}
 		else
 		{
-			big_font.WriteCenter( 400, vert, (*item_counter)->get_text(), black_color );
+			big_font.WriteCenterTop( 400, yoffset, (*item_counter)->get_text(), black_color );
 		}
-		vert += 40;
+		yoffset += item_height;
 	}
-	normal_font.WriteRight( right_border+0, vert+20, "v "APP_VERSION, white_color );
+  int version_h = normal_font.GetHeight("v "APP_VERSION);
+	normal_font.WriteRight( 800-25, 600-version_h/2-25, "v "APP_VERSION, white_color );
 	SDL_Flip(lapp->sdlwindow);
 }
 
@@ -348,7 +343,7 @@ int Menu::execute()
 		{
 			switch(event.type)
 			{
-				case SDL_KEYUP:
+				case SDL_KEYDOWN:
 					selected = current->children[current_selection-1];
 					switch (event.key.keysym.sym)
 					{
@@ -475,7 +470,7 @@ std::string Menu::EnterString(std::string label, std::string last_string, bool f
 
 		while (SDL_PollEvent( &event))
 		{
-			if (event.type != SDL_KEYUP)
+			if (event.type == SDL_KEYUP)
 				continue;
 
 			switch (event.key.keysym.sym)
@@ -492,118 +487,25 @@ std::string Menu::EnterString(std::string label, std::string last_string, bool f
 				case SDLK_SPACE:
 					new_string += " ";
 					break;
-				case SDLK_a:
-					new_string += "a";
-					break;
-				case SDLK_b:
-					new_string += "b";
-					break;
-				case SDLK_c:
-					new_string += "c";
-					break;
-				case SDLK_d:
-					new_string += "d";
-					break;
-				case SDLK_e:
-					new_string += "e";
-					break;
-				case SDLK_f:
-					new_string += "f";
-					break;
-				case SDLK_g:
-					new_string += "g";
-					break;
-				case SDLK_h:
-					new_string += "h";
-					break;
-				case SDLK_i:
-					new_string += "i";
-					break;
-				case SDLK_j:
-					new_string += "j";
-					break;
-				case SDLK_k:
-					new_string += "k";
-					break;
-				case SDLK_l:
-					new_string += "l";
-					break;
-				case SDLK_m:
-					new_string += "m";
-					break;
-				case SDLK_n:
-					new_string += "n";
-					break;
-				case SDLK_o:
-					new_string += "o";
-					break;
-				case SDLK_p:
-					new_string += "p";
-					break;
-				case SDLK_q:
-					new_string += "q";
-					break;
-				case SDLK_r:
-					new_string += "r";
-					break;
-				case SDLK_s:
-					new_string += "s";
-					break;
-				case SDLK_t:
-					new_string += "t";
-					break;
-				case SDLK_u:
-					new_string += "u";
-					break;
-				case SDLK_v:
-					new_string += "v";
-					break;
-				case SDLK_w:
-					new_string += "w";
-					break;
-				case SDLK_x:
-					new_string += "x";
-					break;
-				case SDLK_y:
-					new_string += "y";
-					break;
-				case SDLK_z:
-					new_string += "z";
-					break;
-				case SDLK_KP0:
-					new_string += "0";
-					break;
-				case SDLK_KP1:
-					new_string += "1";
-					break;
-				case SDLK_KP2:
-					new_string += "2";
-					break;
-				case SDLK_KP3:
-					new_string += "3";
-					break;
-				case SDLK_KP4:
-					new_string += "4";
-					break;
-				case SDLK_KP5:
-					new_string += "5";
-					break;
-				case SDLK_KP6:
-					new_string += "6";
-					break;
-				case SDLK_KP7:
-					new_string += "7";
-					break;
-				case SDLK_KP8:
-					new_string += "8";
-					break;
-				case SDLK_KP9:
-					new_string += "9";
 					break;
 				case SDLK_KP_PERIOD:
 					new_string += ".";
 					break;
 				default:
+          //Alpha keys
+          if(event.key.keysym.sym >= SDLK_a
+          && event.key.keysym.sym <= SDLK_z)
+          {
+            char c = 'a' + event.key.keysym.sym - SDLK_a;
+            new_string += c;
+          }
+          //Numeric keys
+          if(event.key.keysym.sym >= SDLK_0
+          && event.key.keysym.sym <= SDLK_9)
+          {
+            char c = '0' + event.key.keysym.sym - SDLK_0;
+            new_string += c;
+          }
 					break;
 			}
 			if (new_string.size() == 1 && first_cap)
