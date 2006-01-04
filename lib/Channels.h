@@ -1,6 +1,6 @@
 /* lib/Channels.h - Header of Channels.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,15 +54,15 @@ public:
 	int fric;
 
 	/* Est le créateur de la partie  ? */
-	bool IsOwner() { return owner; }
+	bool IsOwner() const { return owner; }
 	void SetOwner(bool o = true) { owner = o; }
 
 	/* Place */
-	unsigned int Place() { return place; }
+	unsigned int Place() const { return place; }
 	bool SetPlace(unsigned int p);
 
 	/* MAP */
-	ECBMap *Map() { return map; }
+	ECBMap *Map() const { return map; }
 	void SetMap(ECBMap *m) { map = m; }
 
 	/* Couleur
@@ -72,11 +72,11 @@ public:
 	 * uniquement dans le client.
 	 * TODO: il faut mettre dans le client un tableau de couleurs SDL
 	 */
-	unsigned int Color() { return color; }
+	unsigned int Color() const { return color; }
 	void SetColor(unsigned int c) { color = c; }
 
 	/* Retourne le pseudo du joueur */
-	virtual const char* GetNick() = 0;
+	virtual const char* GetNick() const = 0;
 
 	/* Le joueur est pret (utilisation de RDY) */
 	bool Ready;
@@ -119,10 +119,10 @@ public:
 public:
 
 	/* Obtient le nom du channel */
-	const char* GetName() { return name.c_str(); }
+	const char* GetName() const { return name.c_str(); }
 
 	/* Récupère la liste des joueurs */
-	std::vector<ECBPlayer*> Players() { return players; }
+	std::vector<ECBPlayer*> Players() const { return players; }
 
 	/* Ajoute un player */
 	bool AddPlayer(ECBPlayer*);
@@ -133,22 +133,22 @@ public:
 	bool RemovePlayer(ECBPlayer*, bool use_delete);
 
 	/* Retourne le nombre de joueurs dans le jeu */
-	unsigned int NbPlayers() { return players.size(); }
+	unsigned int NbPlayers() const { return players.size(); }
 
 	/* Retourne la liste des joueurs */
-	const char* PlayerList();
+	const char* PlayerList() const;
 
 	/* Retourne les modes formatés */
-	const char* ModesStr();
+	const char* ModesStr() const;
 
 	/* A propos des etats de la partie */
-	e_state State() { return state; }
-	bool IsInGame() { return (state >= PLAYING); }
-	bool Joinable() { return (state == WAITING); }
+	e_state State() const { return state; }
+	bool IsInGame() const { return (state >= PLAYING); }
+	bool Joinable() const { return (state == WAITING); }
 	void SetState(e_state s) { state = s; }
 
 	/* Limite maximale pour entrer dans le chan */
-	unsigned int GetLimite() { return limite; }
+	unsigned int GetLimite() const { return limite; }
 	void SetLimite(unsigned int l) { limite = l; }
 
 /* Variables privées */
@@ -160,3 +160,4 @@ protected:
 };
 
 #endif /* ECLIB_CHANNELS_H */
+

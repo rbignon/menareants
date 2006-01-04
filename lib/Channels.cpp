@@ -1,6 +1,6 @@
 /* lib/Channels.cpp - Game's channel of client AND server
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
-const char* ECBChannel::ModesStr()
+const char* ECBChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
 	if(limite) modes += "l", params += " " + TypToStr(limite);
@@ -98,7 +98,7 @@ const char* ECBChannel::ModesStr()
 	return (modes + params).c_str();
 }
 
-const char* ECBChannel::PlayerList()
+const char* ECBChannel::PlayerList() const
 {
 	std::string list = "";
 	for(unsigned int i=0; i<players.size();i++)

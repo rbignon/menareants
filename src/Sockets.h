@@ -1,6 +1,6 @@
 /* src/Sockets.h- Header of Sockets.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,11 +65,11 @@ public:
 	int sendrpl(const char *pattern, ...);
 	char *rpl(msg t);
 
-	bool IsConnected() { return connected; }
+	bool IsConnected() const { return connected; }
 	void SetConnected() { connected = true; }
 	void SetWantDisconnect() { want_disconnect = true; }
-	bool WantDisconnect() { return want_disconnect; }
-	std::string GetNick() { return nick; }
+	bool WantDisconnect() const { return want_disconnect; }
+	std::string GetNick() const { return nick; }
 	void set_nick(std::string _nick) { nick = _nick; }
 
 	EuroConqApp *lapp;
@@ -79,7 +79,7 @@ public:
 	void SetPlayer(ECPlayer *P) { if(!pl) pl = P; }
 	void ClrPlayer() { pl = NULL; }
 
-	std::string CantConnect() { return cantconnect; }
+	std::string CantConnect() const { return cantconnect; }
 	void SetCantConnect(std::string _msg) { cantconnect = _msg; }
 
 protected:

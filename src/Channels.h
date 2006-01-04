@@ -1,6 +1,6 @@
 /* src/Channels.h - Header of Channels.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,13 +46,13 @@ public:
 public:
 
 	/* Salon auquel appartient le player */
-	EChannel *Channel() { return (EChannel*)chan; }
+	EChannel *Channel() const { return (EChannel*)chan; }
 
 	/* Obtient le pseudo du client */
-	virtual const char* GetNick() { return nick.c_str(); }
+	virtual const char* GetNick() const { return nick.c_str(); }
 
 	/* Est-ce que ce player est moi */
-	bool IsMe() { return isme; }
+	bool IsMe() const { return isme; }
 
 /* Variables privées */
 protected:
@@ -82,7 +82,7 @@ public:
 public:
 
 	/* Récupère le Player par le pseudo */
-	ECPlayer* GetPlayer(const char* nick);
+	ECPlayer* GetPlayer(const char* nick) const;
 
 /* Variables privées */
 protected:

@@ -1,6 +1,6 @@
 /* src/gui/Boutton.cpp - Boutton
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ TButton::~TButton()
 
 //-----------------------------------------------------------------------------
 
-bool TButton::Test (unsigned int souris_x, unsigned int souris_y)
+bool TButton::Test (unsigned int souris_x, unsigned int souris_y) const
 {
   return ((x <= souris_x) && (souris_x <= x+w)
 	  && (y <= souris_y) && (souris_y <= y+h));

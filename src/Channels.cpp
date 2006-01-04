@@ -1,6 +1,6 @@
 /* src/Channels.cpp - Channels functions
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _isme)
  *                               EChannel                                                   *
  ********************************************************************************************/
 
-ECPlayer *EChannel::GetPlayer(const char* nick)
+ECPlayer *EChannel::GetPlayer(const char* nick) const
 {
 	for(unsigned int i=0;i<players.size();i++)
 		if(!strcasecmp(((ECPlayer *)players[i])->GetNick(), nick))

@@ -1,6 +1,6 @@
 /* server/Channels.h - Header of Channels.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public:
 	TClient *Client() { return client; }
 
 	/* Obtient le pseudo du client */
-	virtual const char* GetNick();
+	virtual const char* GetNick() const;
 
 /* Variables privées */
 protected:

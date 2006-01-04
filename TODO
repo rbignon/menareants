@@ -6,21 +6,23 @@
 -client: Avancer dans les paramètres de la partie.
 
 * Urgent
--Gestion de l'ouverture d'une map (fichier) et son interpretation (pas encore graphique)
--Gestion de l'envoie/reception de la preview de la map
+-Gestion de l'ouverture d'une map (fichier) et son interpretation (pas encore graphique).
+-Gestion de l'envoie/reception de la preview de la map.
 
 * Bof
+-Motd avec une page "vous etes connecté" et le motd affiché à la connexion.
 -client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
--client: Problème de la position de la selection dans le menu à certains moments (options)
+-server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
 
 * Objectif actuel
 -Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
 
 * En parallèle (on s'en fou un peu de quand on les fait)
--client: utilisation de la souris dans le menu
+-client: Utilisation de la souris dans le menu.
+-À chaques modifs changer le copyright dans le fichier si non déjà fait.
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
--client: Faire la partie de jeu vraiment
+-client: Faire la partie de jeu vraiment.
 
 * Sur le très long terme
--bosser
+-Bosser.

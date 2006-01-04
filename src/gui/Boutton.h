@@ -1,6 +1,6 @@
 /* src/gui/Boutton.h - Header of Boutton.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ public:
 
   void SetImage (ECSprite *image);
 
-  bool Test (unsigned int souris_x, unsigned int souris_y);
+  bool Test (unsigned int souris_x, unsigned int souris_y) const;
   virtual void Draw (unsigned int souris_x, unsigned int souris_y);
 
   unsigned int Tag;

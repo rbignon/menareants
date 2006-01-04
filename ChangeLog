@@ -1,3 +1,12 @@
+2006-01-01  Laurent Defert <lodesi2@yahoo.fr>
+
+	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et éclaircissement du code.
+
+2005-12-28  Romain Bignon <progs@headfucking.net>
+
+	* *.h: Passage de la majorité des fonctions membres qui le doivent en "const" pour respecter
+	la norme C++.
+
 2005-12-21  Romain Bignon <progs@headfucking.net>
 
 	* src/tools/Font.cpp: Mise d'un cache. (© Wormux)

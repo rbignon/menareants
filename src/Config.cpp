@@ -1,6 +1,6 @@
 /* src/Config.cpp - Configuration
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ bool Config::load()
 	return true;
 }
 
-bool Config::save()
+bool Config::save() const
 {
     std::ofstream fp(filename.c_str());
     if (!fp)

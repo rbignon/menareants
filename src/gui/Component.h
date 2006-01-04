@@ -1,6 +1,6 @@
 /* src/gui/Component.h - Header of Component.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public:
 	void Hide() { visible = false; }
 
 	/* Actif */
-	bool Enabled() { return enabled; }
+	bool Enabled() const { return enabled; }
 	void SetEnabled(bool _en = true) { enabled = _en; }
 
 /* Variables privées */
