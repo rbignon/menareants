@@ -33,7 +33,7 @@ Config::Config(std::string _filename)
 bool Config::set_defaults()
 {
 	hostname = "127.0.0.1";
-	port = 6667;
+	port = 5461;
 	nick = "anonyme";
 	return true;
 }
