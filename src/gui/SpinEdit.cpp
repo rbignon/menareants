@@ -1,6 +1,6 @@
 /* src/gui/SpinEdit.cpp - To increment or decrement a comptor
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,8 @@ TSpinEdit::~TSpinEdit()
      SDL_FreeSurface( background);
   if(txt_label) delete txt_label;
   if(txt_value) delete txt_value;
+  if(m_plus) delete m_plus;
+  if(m_minus) delete m_minus;
 }
 
 void TSpinEdit::Init()
@@ -82,7 +84,7 @@ void TSpinEdit::Init()
   uint center = (m_plus->GetX() +5 + m_minus->GetX() )/2;
   txt_label = new TLabel(x, y, label, color, font);
   txt_value = new TLabel(center, y, "", color, font);
-  SetValue(value);
+  SetValue(value, true);
 
   SDL_Rect r_back = {0,0,w,h};
 
@@ -92,15 +94,20 @@ void TSpinEdit::Init()
 
 }
 
-void TSpinEdit::SetValue(int _value)
+bool TSpinEdit::SetValue(int _value, bool first)
 {
-  value = BorneLong(_value, min, max);
+  _value = BorneLong(_value, min, max);
+
+  if(_value == value && !first) return false;
+  value = _value;
 
   std::ostringstream value_s;
   value_s << value ;
 
   std::string s(value_s.str());
   txt_value->SetCaption(s);
+
+  return true;
 }
 
 void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
@@ -117,13 +124,11 @@ void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
 
 bool TSpinEdit::Clic (uint mouse_x, uint mouse_y)
 {
-  if (m_minus->Test(mouse_x, mouse_y)) {
-    SetValue(value - step);
-    return true;
-  } else if (m_plus->Test(mouse_x, mouse_y)) {
-    SetValue(value + step);
-    return true;
-  }
+  if (m_minus->Test(mouse_x, mouse_y))
+    return SetValue(value - step);
+  else if (m_plus->Test(mouse_x, mouse_y))
+    return SetValue(value + step);
+
   return false;
 }
 

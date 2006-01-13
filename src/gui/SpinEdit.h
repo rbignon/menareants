@@ -1,6 +1,6 @@
 /* src/gui/SpinEdit.h - Header of SpinEdit.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,11 @@ public:
 /* Attributs */
 public:
 
-	/* Valeur du champ */
-	void SetValue(int _value);
+	/* Valeur du champ.
+	 * Notes:
+	 * - SetValue(int _value): retourne true si la valeur a changée.
+	 */
+	bool SetValue(int _value, bool first = false);
 	int Value() { return value; }
 
 /* Variables privées */
