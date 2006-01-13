@@ -1,8 +1,15 @@
 À faire:
 
 * En cours
--client: Finir le SpinEdit
+-client: Finir le SpinEdit, et en particulier surtout voir comment faire une liste de tspinedit sans
+         avoir à refaire la liste à chaque mise à jour (ahaha): solution  compliquée: mettre dans le FORM,
+         solution simple: faire un pré-boucle et devoir ajouter/supprimer les machins au fur et à mesure.
+         Ce qui serait mieux, ça serait tout de même un super moyen de faire une liste de TForm. Enfin
+         ce serait faire un nouveau "composant conteneur" spécialisé dans les listes.
 -client: Corriger bug lors de GameInfos qui redimentionne trop tard le TMemo.
+         -> Note: c'est parce qu'il y a un affichage une toute première fois où le TMemo est mal
+         dimensionné (il utilise le TForm::Draw() avant d'afficher les users et donc de redimentionner
+         le TMemo.
 -client: Avancer dans les paramètres de la partie.
 
 * Urgent

@@ -1,3 +1,17 @@
+2006-01-13  Romain Bignon <prgs@headfucking.net>
+
+	* src/tools/Font.cpp: Suspension temporaire du cache, il causait des problèmes.
+
+	* src/gui/Boutton.cpp (Test): Ne renvoie true que si le bouton est Enabled.
+
+	* API, lib/Channels.h, server/Channels.cpp, src/JoinGames.cpp:
+	- Changement du protocole de PLS qui affiche si l'user est ok.
+	- Rajout du mode '!' pour se définir comme étant OK.
+	- Noter en particulier dans server/Channels.cpp::SETCommand::Exec la suppression des deux macros
+	  dont la laideur me faisait frémir pendant mon someil.
+
+	* src/gui/SpinEdit.cpp: La fonction Click() renvoie true que si la valeur a été modifiée.
+
 2006-01-01  Laurent Defert <lodesi2@yahoo.fr>
 
 	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et éclaircissement du code.
