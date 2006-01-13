@@ -11,6 +11,7 @@ Sommaire:
 2) Protocole
 3) Particularités des commandes de positions
 4) Modes
+5) PLS
 
 1) Principe du jeu
 
@@ -28,7 +29,6 @@ Sommaire:
               KIK <nick> [raison]               :l'owner peut kicker
               GO!                               :l'owner lance le jeu
          - En cours de jeu
-              RDY                               :le joueur est pret pour passer à la suite (anim ou jeu)
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [><pos>] [*[pos]]
                   [<[pos]]
@@ -44,7 +44,7 @@ Sommaire:
               USED                              :pseudo déjà utilisé
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
-              PLS <[@]pos,col,nick1> [...]      :liste des joueurs
+              PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA [raison]              :un user part (ou a été kické)
@@ -86,3 +86,15 @@ Sommaire:
         Mode pour un user:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position
+         +!                  :le joueur est READY
+
+5) PLS
+     La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible
+     sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la détailler:
+
+     PLS [@][!]<place>,<couleur>,<pseudo> [...]
+     [@]               :le joueur est owner
+     [!]               :le joueur est pret (Ready)
+     <place>           :la position du joueur sur la carte
+     <couleur>         :la couleur
+     <pseudo>          :le pseudo du joueur
