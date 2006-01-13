@@ -56,7 +56,7 @@ void EuroConqApp::request_game()
 	SDL_mutex *Mutex = SDL_CreateMutex();
 	Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
 
-	WAIT_EVENT((client && client->IsConnected()), i);
+	WAIT_EVENT_T((client && client->IsConnected()), i, 15);
 
 	if(!client || !client->IsConnected())
 	{
