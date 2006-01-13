@@ -1,6 +1,6 @@
 /* server/Defines.h - A lot of defines
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #ifndef ECD_Defines_h
 #define ECD_Defines_h
 
-#ifndef WIN32
+#if !defined(WIN32) && defined(HAVE_CONFIG_H)
 	#include <config.h>
 #endif
 
@@ -81,6 +81,10 @@
 #define DEBUGLOG DEBUG_LOG
 #else
 #define DEBUGLOG "~/.euroconqserver/" DEBUG_LOG
+#endif
+
+#ifdef DEBUG
+#	define NOPINGCHECK
 #endif
 
 #endif

@@ -1,6 +1,6 @@
 /* server/Main.cpp - Main file
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ ECServer app;
 
 void ECServer::sig_alarm(int c)
 {
+#ifndef NOPINGCHECK
 	app.CurrentTS = time(NULL);
 	for(unsigned int i = 0; i<= app.highsock;i++)
 	{
@@ -48,6 +49,7 @@ void ECServer::sig_alarm(int c)
 	}
 
 	alarm(PINGINTERVAL);
+#endif
 }
 
 int ECServer::main(int argc, char **argv)
