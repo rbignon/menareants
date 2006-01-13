@@ -65,31 +65,14 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{ 'o', false, false, NULL},
 		{ 'c', false, false, NULL},
 		{ 'p', false, false, NULL},
+		{ '!', false, false, NULL},
 	};
-#define MODE_MODIFIED \
-		do { \
-			for(uint k=0;k<ASIZE(newmodes);k++) \
-				if(parv[1][i] == newmodes[k].c) \
-				{ \
-					newmodes[k].changed = true; \
-					newmodes[k].add = add; \
-					newmodes[k].params = 0; \
-					break; \
-				} \
-		} while(0)
-#define MODE_MODIFIED_P(x) \
-		do { \
-			for(uint k=0;k<ASIZE(newmodes);k++) \
-				if(parv[1][i] == newmodes[k].c) \
-				{ \
-					newmodes[k].changed = true; \
-					newmodes[k].add = add; \
-					newmodes[k].params = (x).c_str(); \
-					break; \
-				} \
-		} while(0)
-	for(uint i=0;i < parv[1].size(); i++)
+
+	for(uint i=0; i<parv[1].size(); i++)
 	{
+		short changed = 0;
+		const short NOPARAMS = 1;
+		const short PARAM = 2;
 		switch(parv[1][i])
 		{
 			case '+': add = true; break;
@@ -102,25 +85,31 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					if(j<parv.size())
 					{
 						sender->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
-						MODE_MODIFIED_P(parv[(j-1)]);
+						changed = PARAM;
 					}
 					else Debug(W_DESYNCH, "+l sans limite");
 				}
 				else
 				{
 					sender->Channel()->SetLimite(0);
-					MODE_MODIFIED;
+					changed = NOPARAMS;
 				}
+				break;
+			case '!':
+				if(sender->Ready() == add)
+					{ Debug(W_WARNING, "SET %c%c sans modif.", add ? '+' : '-', parv[1][i]); break; }
+				sender->SetReady(add);
+				changed = NOPARAMS;
 				break;
 			case 'o':
 			{
 				if(!sender->IsOwner())
-					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
+					{ Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]); break; }
 				if(j>=parv.size()) { Debug(W_DESYNCH, "+o sans nick"); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
 				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break;}
 				pl->SetOwner(add);
-				MODE_MODIFIED_P(parv[(j-1)]);
+				changed = PARAM;
 				break;
 			}
 			case 'c':
@@ -129,12 +118,12 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
 					sender->SetColor(StrToTyp<uint>(parv[j++]));
-					MODE_MODIFIED_P(parv[(j-1)]);
+					changed = PARAM;
 				}
 				else
 				{
 					sender->SetColor(0);
-					MODE_MODIFIED;
+					changed = NOPARAMS;
 				}
 				break;
 			case 'p':
@@ -143,21 +132,31 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
 					sender->SetPlace(StrToTyp<uint>(parv[j++]));
-					MODE_MODIFIED_P(parv[(j-1)]);
+					changed = PARAM;
 				}
 				else
 				{
 					sender->SetPlace(0);
-					MODE_MODIFIED;
+					changed = NOPARAMS;
 				}
 				break;
 			default:
-				Debug(W_DESYNCH, "Reception d'un mode non supporté (%c)", parv[1][i]);
+				Debug(W_DESYNCH, "Reception d'un mode non supporté (%c%c)", add ? '+' : '-', parv[1][i]);
 				break;
 		}
+		if(changed)
+		{
+			for(uint k=0;k<ASIZE(newmodes);k++)
+				if(parv[1][i] == newmodes[k].c)
+				{
+					newmodes[k].changed = true;
+					newmodes[k].add = add;
+					if(changed == PARAM)
+						newmodes[k].params = parv[(j-1)].c_str();
+					break;
+				}
+		}
 	}
-#undef MODE_MODIFIED
-#undef MODE_MODIFIED_P
 
 	std::string modes = "", params = "";
 	for(uint k=0;k<ASIZE(newmodes);k++)
@@ -297,7 +296,7 @@ EChannel::~EChannel()
 void EChannel::NeedReady()
 {
 	for(unsigned int i=0;i<players.size();i++)
-		((ECPlayer *)players[i])->Ready = false;
+		((ECPlayer *)players[i])->SetReady(false);
 	return;
 }
 

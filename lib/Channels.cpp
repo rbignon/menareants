@@ -30,7 +30,7 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	: chan(_chan), owner(_owner)
 {
 	chan->AddPlayer(this);
-	Ready = false;
+	ready = false;
 	fric = 0;
 	place = 0;
 	color = 0;
@@ -83,6 +83,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
+/* Lors de rajouts de modes, modifier API paragraphe 4. Modes */
 const char* ECBChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
@@ -98,6 +99,10 @@ const char* ECBChannel::ModesStr() const
 	return (modes + params).c_str();
 }
 
+/* En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
+ * Note qu'il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
+ * où il y en a une, d'incrémenter le protocole
+ */
 const char* ECBChannel::PlayerList() const
 {
 	std::string list = "";
@@ -106,6 +111,8 @@ const char* ECBChannel::PlayerList() const
 		if(!list.empty()) list += " ";
 		if(players[i]->IsOwner())
 			list += "@";
+		if(players[i]->Ready())
+			list += "!";
 
 		/* Informe de la place et de la couleur */
 		list += TypToStr(players[i]->Place()) + "," + TypToStr(players[i]->Color()) + ",";

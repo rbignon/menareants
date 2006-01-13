@@ -44,6 +44,7 @@ public:
 	TMemo*       Chat;
 	TEdit*       SendMessage;
 	TButtonText* RetourButton;
+	TButtonText* PretButton;
 
 /* Evenements */
 public:

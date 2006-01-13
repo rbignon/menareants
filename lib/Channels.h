@@ -79,7 +79,8 @@ public:
 	virtual const char* GetNick() const = 0;
 
 	/* Le joueur est pret (utilisation de RDY) */
-	bool Ready;
+	bool Ready() const { return ready; }
+	void SetReady(bool r = true) { ready = r; }
 
 /* Variables privées */
 protected:
@@ -88,6 +89,7 @@ protected:
 	unsigned int place;
 	unsigned int color;
 	ECBMap *map;
+	bool ready;
 };
 
 /********************************************************************************************
@@ -135,10 +137,14 @@ public:
 	/* Retourne le nombre de joueurs dans le jeu */
 	unsigned int NbPlayers() const { return players.size(); }
 
-	/* Retourne la liste des joueurs */
+	/* Retourne la liste des joueurs
+	 * Note: Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
+	 */
 	const char* PlayerList() const;
 
-	/* Retourne les modes formatés */
+	/* Retourne les modes formatés
+	 * Note: Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
+	 */
 	const char* ModesStr() const;
 
 	/* A propos des etats de la partie */

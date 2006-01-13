@@ -1,6 +1,6 @@
 /* src/JoinGame.cpp - Functions to list game and join/create a game.
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	bool add = true;
 	uint j = 2;
-	for(uint i=0;i < parv[1].size(); i++)
+	for(uint i=0; i<parv[1].size(); i++)
 	{
 		switch(parv[1][i])
 		{
@@ -101,6 +101,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'S': me->Player()->Channel()->SetState(EChannel::SENDING); break;
 			case 'P': me->Player()->Channel()->SetState(EChannel::PLAYING); break;
 			case 'A': me->Player()->Channel()->SetState(EChannel::ANIMING); break;
+			case '!':
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+/-! sans sender"); break; }
+				for(uint k=players.size(); k-- > 0;)
+					players[k]->SetReady(add);
+				break;
 			case 'o':
 			{
 				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+o sans nick"); break; }
@@ -148,10 +153,12 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	for(unsigned int i=1;i<parv.size();i++)
 	{
 		const char *nick = parv[i].c_str();
-		bool owner = false;
+		bool owner = false, ready = false;
 
 		if(*nick == '@')
 			owner = true, *nick++;
+		if(*nick == '!')
+			ready = true, *nick++;
 
 		std::string nb;
 		int pos = 0, col = 0;
@@ -175,6 +182,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			pl = new ECPlayer(nick, me->Player()->Channel(), owner, false);
 		pl->SetColor(col);
 		pl->SetPlace(pos);
+		pl->SetReady(ready);
 	}
 	JOINED = true;
 	return 0;
@@ -266,9 +274,9 @@ void EuroConqApp::GameInfos(bool create)
 	GameInfosForm = new TGameInfosForm;
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoin le jeu " +
 	                                    std::string(chan->GetName()), green_color);
-	TSpinEdit *pos = new TSpinEdit(std::string("Position"), 200, 0, 200, 0, chan->NbPlayers(), 1, 0);
-	pos->SetColorFont(black_color, &big_font);
-	pos->Init();
+	TSpinEdit pos(std::string("Position"), 200, 0, 200, 0, chan->NbPlayers(), 1, 0);
+	pos.SetColorFont(black_color, &big_font);
+	pos.Init();
 	do
 	{
 		int x=0, y=0;
@@ -298,14 +306,19 @@ void EuroConqApp::GameInfos(bool create)
 					break;
 				case SDL_MOUSEBUTTONUP:
 					GameInfosForm->Chat->Clic( event.button.x, event.button.y);
-					if(pos->Clic( event.button.x, event.button.y))
+					if(pos.Clic( event.button.x, event.button.y))
 						client->sendrpl(client->rpl(EC_Client::SET),
-						                ("+p " + TypToStr(pos->Value())).c_str());
+						                ("+p " + TypToStr(pos.Value())).c_str());
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
 					if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 						eob = true;
+					if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
+					{
+						client->sendrpl(client->rpl(EC_Client::SET), "+!");
+						GameInfosForm->PretButton->SetEnabled(false);
+					}
 					break;
 				default:
 					break;
@@ -322,11 +335,11 @@ void EuroConqApp::GameInfos(bool create)
 		{
 			ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
 
-			big_font.WriteLeft(50, vert, "OK", pl->Ready ? black_color : gray_color);
+			big_font.WriteLeft(50, vert, "OK", pl->Ready() ? red_color : gray_color);
 			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
 			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
-			pos->SetXY(200, vert);
-			pos->Draw(x, y);
+			pos.SetXY(200, vert);
+			pos.Draw(x, y);
 		}
 		GameInfosForm->Chat->SetXY(75, vert);
 		GameInfosForm->Chat->SetHeight(525-vert); /* On définit une jolie taille */
@@ -442,6 +455,7 @@ TGameInfosForm::TGameInfosForm()
 	Chat = AddComponent(new TMemo(75,325,300,200,30));
 
 	SendMessage = AddComponent(new TEdit(75,530,300, MAXBUFFER-20));
+	PretButton = AddComponent(new TButtonText(600,400, 100,49, "Pret"));
 	RetourButton = AddComponent(new TButtonText(600,450,100,49, "Retour"));
 
 	SetBackground(Resources::Titlescreen());
@@ -452,6 +466,7 @@ TGameInfosForm::~TGameInfosForm()
 	delete Chat;
 	delete SendMessage;
 	delete RetourButton;
+	delete PretButton;
 }
 
 /********************************************************************************************
