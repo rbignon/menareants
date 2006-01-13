@@ -1,6 +1,6 @@
 /* src/tools/Font.cpp - Fonts from Wormux
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -199,6 +199,7 @@ SDL_Surface * Font::Render(const std::string &txt, SDL_Color color, bool cache)
 {
   SDL_Surface * surface = NULL;
 
+#if 0 /* TODO: Voir comment contourner les problèmes posés par le cache */
   if (cache) {
     txt_iterator p = surface_text_table.find(txt);
     if (p == surface_text_table.end() ) {
@@ -217,10 +218,11 @@ SDL_Surface * Font::Render(const std::string &txt, SDL_Color color, bool cache)
       txt_iterator p = surface_text_table.find(txt);
       surface = p->second;
     }
-  } else {
+  } else
+#endif
     surface = TTF_RenderText_Blended(m_font, txt.c_str(),
 				     color); //, black_color);
-  }
+
   assert (surface != NULL);
   return surface;
 }
