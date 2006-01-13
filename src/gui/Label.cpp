@@ -1,6 +1,6 @@
 /* src/gui/Label.cpp - Show a litle text
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ TLabel::TLabel(unsigned int x, unsigned int y, std::string new_txt, SDL_Color ne
 
 TLabel::~TLabel()
 {
-  assert(surf!=NULL);
-  SDL_FreeSurface(surf);
+  if(surf!=NULL)
+    SDL_FreeSurface(surf);
 }
 
 void TLabel::SetCaption (std::string &new_txt)
@@ -62,6 +62,7 @@ void TLabel::SetCaption (std::string &new_txt)
 
 void TLabel::Draw(unsigned int m_x, unsigned int m_y)
 {
+	assert(surf!=NULL);
 	SDL_Rect dst_rect;
 	dst_rect.x = x;
 	dst_rect.y = y;
