@@ -44,7 +44,7 @@ int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* SET <modes> */
+/* SET <modes> [params ...] */
 int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(!cl->Player() || !cl->Player()->Channel())
@@ -71,8 +71,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	for(uint i=0; i<parv[1].size(); i++)
 	{
 		short changed = 0;
-		const short NOPARAMS = 1;
-		const short PARAM = 2;
+		const short YES_NOPARAMS = 1;
+		const short YES_WITHPARAM = 2;
 		switch(parv[1][i])
 		{
 			case '+': add = true; break;
@@ -85,21 +85,29 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					if(j<parv.size())
 					{
 						sender->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
-						changed = PARAM;
+						changed = YES_WITHPARAM;
 					}
 					else Debug(W_DESYNCH, "+l sans limite");
 				}
 				else
 				{
 					sender->Channel()->SetLimite(0);
-					changed = NOPARAMS;
+					changed = YES_NOPARAMS;
 				}
 				break;
 			case '!':
-				if(sender->Ready() == add)
-					{ Debug(W_WARNING, "SET %c%c sans modif.", add ? '+' : '-', parv[1][i]); break; }
+				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
+				 * a dit par la suite.
+				 */
+				if(sender->Ready())
+				{
+					Debug(W_WARNING, "SET %c%c: sender->Ready()=TRUE", add ? '+' : '-', parv[1][i]);
+					break;
+				}
+				if(!add)
+					{ Debug(W_DESYNCH, "SET %c%c interdit.", add ? '+' : '-', parv[1][i]); break; }
 				sender->SetReady(add);
-				changed = NOPARAMS;
+				changed = YES_NOPARAMS;
 				break;
 			case 'o':
 			{
@@ -109,35 +117,35 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
 				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break;}
 				pl->SetOwner(add);
-				changed = PARAM;
+				changed = YES_WITHPARAM;
 				break;
 			}
 			case 'c':
-				if(!sender) { Debug(W_DESYNCH, "+c sans sender humain"); break; }
+				if(!sender) { Debug(W_DESYNCH, "%cc sans sender humain", add ? '+' : '-'); break; }
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
 					sender->SetColor(StrToTyp<uint>(parv[j++]));
-					changed = PARAM;
+					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetColor(0);
-					changed = NOPARAMS;
+					changed = YES_NOPARAMS;
 				}
 				break;
 			case 'p':
-				if(!sender) { Debug(W_DESYNCH, "+p sans sender humain"); break; }
+				if(!sender) { Debug(W_DESYNCH, "%cp sans sender humain", add ? '+' : '-'); break; }
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
 					sender->SetPlace(StrToTyp<uint>(parv[j++]));
-					changed = PARAM;
+					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetPlace(0);
-					changed = NOPARAMS;
+					changed = YES_NOPARAMS;
 				}
 				break;
 			default:
@@ -151,7 +159,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					newmodes[k].changed = true;
 					newmodes[k].add = add;
-					if(changed == PARAM)
+					if(changed == YES_WITHPARAM)
 						newmodes[k].params = parv[(j-1)].c_str();
 					break;
 				}
@@ -217,22 +225,20 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	cl->SetPlayer(pl);
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), nom, "");
-	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->servername.c_str(), chan->ModesStr());
+	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr());
 	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList());
 	return 0;
 }
 
-/* LEA [raison] */
+/* LEA */
 int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* N'est pas dans un salon */
 	if(!cl->Player())
 		return vDebug(W_DESYNCH, "LEA en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
-	const char* raison = parv.size() > 1 ? parv[1].c_str() : "";
-
 	EChannel *chan = cl->Player()->Channel();
-	chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick(), FormatStr(raison));
+	chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
 
 	chan->RemovePlayer(cl->Player(), true);
 	if(!chan->NbPlayers())
@@ -276,7 +282,7 @@ const char* ECPlayer::GetNick() const
 EChannel::EChannel(std::string _name)
 	: ECBChannel(_name)
 {
-	limite = app.GetConf()->deflimite; /* Limite par default */
+	limite = app.GetConf()->DefLimite(); /* Limite par default */
 }
 
 EChannel::~EChannel()
