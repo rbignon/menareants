@@ -1,6 +1,6 @@
 /* src/Sockets.cpp - Gestion des sockets.
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -239,20 +239,23 @@ void EC_Client::Init()
 	pl = NULL;
 	FD_ZERO(&global_fd_set);
 
-	/* Ajout des commandes */
-	Commands.push_back(new HELCommand("HEL", 0,	1));
-	Commands.push_back(new PIGCommand("PIG", 0,	0));
-	Commands.push_back(new AIMCommand("AIM", 0,	1));
-	Commands.push_back(new USEDCommand("USED", 0, 0));
+	/* Ajout des commandes            CMDNAME FLAGS ARGS */
+	Commands.push_back(new HELCommand("HEL",	0,	1));
+	Commands.push_back(new PIGCommand("PIG",	0,	0));
+	Commands.push_back(new AIMCommand("AIM",	0,	1));
+	Commands.push_back(new USEDCommand("USED",	0,	0));
+	Commands.push_back(new MAJCommand("MAJ",	0,	1));
+	Commands.push_back(new MOTDCommand("MOTD",	0,	0));
+	Commands.push_back(new EOMCommand("EOM",	0,	0));
 
-	Commands.push_back(new LSPCommand("LSP", 0,	3));
-	Commands.push_back(new EOLCommand("EOL", 0,	0));
+	Commands.push_back(new LSPCommand("LSP",	0,	3));
+	Commands.push_back(new EOLCommand("EOL",	0,	0));
 
-	Commands.push_back(new JOICommand("JOI", 0, 1));
-	Commands.push_back(new SETCommand("SET", 0, 1));
-	Commands.push_back(new PLSCommand("PLS", 0, 1));
-	Commands.push_back(new LEACommand("LEA", 0, 0));
-	Commands.push_back(new MSGCommand("MSG", 0, 1));
+	Commands.push_back(new JOICommand("JOI",	0,	1));
+	Commands.push_back(new SETCommand("SET",	0,	1));
+	Commands.push_back(new PLSCommand("PLS",	0,	1));
+	Commands.push_back(new LEACommand("LEA",	0,	0));
+	Commands.push_back(new MSGCommand("MSG",	0,	1));
 }
 
 EC_Client::EC_Client()
