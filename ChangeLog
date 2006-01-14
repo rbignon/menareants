@@ -1,4 +1,30 @@
-2006-01-13  Romain Bignon <prgs@headfucking.net>
+2006-01-14  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Menu.cpp: Correction de Menu::EnterString().
+
+	* src/Login.cpp, src/Main.cpp: request_game() a bougé dans Login.cpp et a été entièrement remodelé
+	avec l'utilisation d'un TForm plutot que d'un menu. Affichage du MOTD
+
+	* server/Config.cpp, server/Login.cpp: Envoie d'un motd.
+
+	* src/gui/Memo.cpp: Utilisation du parsage du TMessageBox pour ne pas couper les mots.
+
+	* src/Commands.h, src/Login.cpp: Support de la commande MAJ.
+
+	* server/Channels.cpp: Petite modification de noms de variables.
+
+	* API, server/Server.h: Suppression de la raison pour le LEA ou le BYE. Rajout MOTD.
+
+	* server/Debug.cpp: Correction du logging dans un fichier.
+
+	* server/Main.cpp: Trouve le path de ~/.euroconqserver. Sauvegarde dans une variable de
+	EuroConqServerApp.
+
+	* src/Main.h: Sauvegarde de path dans une variable de EuroConqApp.
+
+	* src/Defines.h, server/Defines.h: Passage à des constantes plutot que des macros pour les tailles.
+
+2006-01-13  Romain Bignon <progs@headfucking.net>
 
 	* src/tools/Font.cpp: Suspension temporaire du cache, il causait des problèmes.
 
@@ -15,6 +41,8 @@
 2006-01-01  Laurent Defert <lodesi2@yahoo.fr>
 
 	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et éclaircissement du code.
+
+2006-01-01  Romain Bignon <progs@headfucking.net>
 
 	* DEVELOPPEURS: Fichier pour que les developpeurs puissent laisser des notes aux autres.
 	(oui je sais il n'y a que deux developpeurs et l'IRC ça existe mais bon, on fait genre)

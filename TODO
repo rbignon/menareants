@@ -17,7 +17,6 @@
 -Gestion de l'envoie/reception de la preview de la map.
 
 * Bof
--Motd avec une page "vous etes connecté" et le motd affiché à la connexion.
 -client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
 -server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
 
