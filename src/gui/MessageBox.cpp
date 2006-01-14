@@ -1,6 +1,6 @@
 /* src/gui/MessageBox.cpp - Show a window with a message.
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,6 +61,8 @@ uint TMessageBox::Show()
 				}
 			}
 			SDL_GetMouseState( &x, &y);
+			if(realbg)
+				SDL_BlitSurface(realbg->Img, NULL, app.sdlwindow, NULL);
 			if(Form)
 				Form->Update(x,y,false);
 			Draw(x,y);

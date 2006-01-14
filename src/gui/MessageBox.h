@@ -1,6 +1,6 @@
 /* src/gui/MessageBox.h - Header of MessageBox.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <SDL.h>
 #include "BouttonText.h"
 #include "Form.h"
+#include "tools/Images.h"
 
 #define MSGBOX_MAXWIDTH 300
 
@@ -39,13 +40,13 @@ class TMessageBox
 /* Constructeur/Deconstructeur */
 public:
 
-	template<typename T>
-	TMessageBox(uint _x, uint _y, const char* _s, uint _b, T* form = 0)
+	TMessageBox(uint _x, uint _y, const char* _s, uint _b, TForm* form = 0)
 		: x(_x), y(_y), b(_b)
 	{
 		Form = form;
 		w = 0;
 		h = 0;
+		realbg = 0;
 		SetText(_s);
 	}
 
@@ -64,8 +65,10 @@ public:
 public:
 
 	/* Form */
-	template<typename T>
-	void SetForm(T* _form) { Form = _form; }
+	void SetForm(TForm* _form) { Form = _form; }
+
+	/* Real Back Ground */
+	void SetBackGround(ECImage* _ebg) { realbg = _ebg; }
 
 /* Variables privées */
 private:
@@ -76,6 +79,7 @@ private:
 	std::vector<std::string> message;
 	std::vector<TButtonText*> boutons;
 	SDL_Surface *background;
+	ECImage *realbg;
 	TForm *Form;
 
 	void SetText(const char* s);
