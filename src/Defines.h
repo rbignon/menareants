@@ -1,6 +1,6 @@
 /* src/Defines.h - A lot of defines
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,10 +48,10 @@
 #endif
 
 /* Tailles */
-#define MAXBUFFER 1024
-#define NICKLEN 20
-#define GAMELEN 15
-#define COMLEN 10
+const int MAXBUFFER=1024;
+const int NICKLEN=20;
+const int GAMELEN=15;
+const int COMLEN=10;
 
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
@@ -67,6 +67,8 @@
 #else
 #define PATH_SEPARATOR "/"
 #endif
+
+typedef unsigned int   uint;
 
 /* Macro */
 #define ASIZE(x) 				(sizeof (x) / sizeof *(x))

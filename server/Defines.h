@@ -24,6 +24,7 @@
 #if !defined(WIN32) && defined(HAVE_CONFIG_H)
 	#include <config.h>
 #endif
+typedef unsigned int   uint;
 
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Europa Conquest Daemon"
@@ -51,22 +52,19 @@
 #define DEBUG_LOG       "errors.log"     /* Fichier de DEBUG */
 
 /* Interval */
-#define PINGINTERVAL 30
+const int PINGINTERVAL=30;
 
 /* Tailles */
-#define NICKLEN 20
+const int NICKLEN=20;
 
-#define MAXBUFFER 1024
-#define ECD_SENDSIZE 1024
-#define ECD_RECVSIZE 256
-#define COMLEN 10
-#define MAXCONNEX 100 /* de préférence un multiple de 4 */
+const int MAXBUFFER=1024;
+const uint ECD_SENDSIZE=1024;
+const uint ECD_RECVSIZE=256;
+const int COMLEN=10;
+const int MAXCONNEX=100; /* de préférence un multiple de 4 */
 
 /* Config */
 #define CONFIG_FILE "/etc/euroconqd.conf"
-
-/* Macro */
-#define ASIZE(x) 				(sizeof (x) / sizeof *(x))
 
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
@@ -77,11 +75,8 @@
 #	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
 #endif
 
-#ifdef WIN32
-#define DEBUGLOG DEBUG_LOG
-#else
-#define DEBUGLOG "~/.euroconqserver/" DEBUG_LOG
-#endif
+/* Macro */
+#define ASIZE(x) 				(sizeof (x) / sizeof *(x))
 
 #ifdef DEBUG
 #	define NOPINGCHECK
