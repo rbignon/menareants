@@ -1,6 +1,6 @@
 /* src/gui/TMemo.cpp - TMemo GUI
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ void TMemo::Draw (uint mouse_x, uint mouse_y)
 
   for (uint i=0; i < nb_visible_items; i++)
   {
-	small_font.WriteLeft(x+5,
+	if(!m_items[i+first_visible_item].label.empty())
+		small_font.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 m_items[i+first_visible_item].color) ;
@@ -114,43 +115,46 @@ void TMemo::Draw (uint mouse_x, uint mouse_y)
   }
 }
 
-void TMemo::AddItem (const std::string &_label, SDL_Color _color = black_color)
+void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
 {
-  std::string label = _label;
-  bool theend = false;
-  while(!theend)
-  {
-	std::string toadd;
-	if(label.size() > maxlen)
+	const char *_s = label.c_str();
+	/* On parse le message pour le découper en différentes lignes */
+	char *s = new char[maxlen + 2];
+	for(uint i=0;;)
 	{
-		toadd = label.substr(0, maxlen);
-		label = label.substr(maxlen);
+		if(*_s == '\n' || ((i > maxlen-5) && *_s == ' ') || (i > (maxlen)) || !(*_s))
+		{ /* Retour à la ligne. Si ça dépasse le MSGBOX_MAXWIDTH lettres, on laisse une chance
+		   * à un caractère ' ' ou '\n' de s'interposer pour couper proprement. A partir de
+		   * MSGBOX_MAXWIDTH + 20 on coupe net.
+		   */
+		    s[i] = '\0';
+
+			/* Suppression du premier element */
+			if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
+			else if (m_items.size() >= nb_visible_items_max) first_visible_item++;
+
+			// Push item
+			memo_box_item_t item;
+			item.label = s;
+			item.color = _color;
+			m_items.push_back (item);
+
+			nb_visible_items = m_items.size();
+			if (nb_visible_items_max < nb_visible_items)
+				nb_visible_items = nb_visible_items_max;
+
+			visible_height = nb_visible_items*height_item;
+			if (h < visible_height)  visible_height = h;
+			i=0;
+
+			if(*_s == '\n')
+				_s++; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
+			while(*_s == ' ') _s++;
+			if(!*_s) break;
+		}
+		else
+			s[i++] = *_s++;
 	}
-	else
-	{
-		toadd = label;
-		theend = true;
-	}
-
-	/* Suppression du premier element */
-	if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
-	else if (m_items.size() >= nb_visible_items_max) first_visible_item++;
-
-	// Push item
-	memo_box_item_t item;
-	item.label = toadd;
-	item.color = _color;
-	m_items.push_back (item);
-
-	nb_visible_items = m_items.size();
-	if (nb_visible_items_max < nb_visible_items)
-		nb_visible_items = nb_visible_items_max;
-
-	visible_height = nb_visible_items*height_item;
-	if (h < visible_height)  visible_height = h;
-
-  }
-
 }
 
 void TMemo::ClearItems()
