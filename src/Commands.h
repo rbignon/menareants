@@ -1,6 +1,6 @@
 /* src/Commands.h - Command list
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,6 +65,9 @@ DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( AIM );
 DECLARE_CMD ( USED );
+DECLARE_CMD ( MAJ );
+DECLARE_CMD ( MOTD );
+DECLARE_CMD ( EOM );
 
 DECLARE_CMD ( LSP );
 DECLARE_CMD ( EOL );
