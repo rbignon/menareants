@@ -37,6 +37,8 @@ Sommaire:
          - Général
               HEL <prog> <version>              :welcome
               AIM <nick>                        :confirmation du IAM
+              MOTD  <ligne>                     :motd
+              EOM                               :fin du motd
               LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
               EOL                               :fin de la liste
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
@@ -47,7 +49,7 @@ Sommaire:
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
-              :<nick> LEA [raison]              :un user part (ou a été kické)
+              :<nick> LEA                       :un user part (ou a été kické)
               :<nick> WGO                       :l'owner veut lancer le jeu
               :<nick> GO!                       :l'owner lance le jeu
          - En cours de jeu

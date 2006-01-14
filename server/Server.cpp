@@ -1,6 +1,6 @@
 /* server/Serveur.cpp - Server
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,8 +39,10 @@ const char* msgTab[] = {
      "HEL " APP_SMALLNAME " " APP_PVERSION, /* HEL - Hello */
      "MAJ %c",                              /* MAJ - Nécessite une mise à jour du client */
      "ERR",                                 /* ERR - Erreur en provenance theorique du client */
-     "BYE %s",                              /* BYE - Dis adieu à un client */
+     "BYE",                                 /* BYE - Dis adieu à un client */
      "AIM %s",                              /* AIM - Logué */
+     "MOTD %s",                             /* MOTD - Message Of The Day */
+     "EOM",                                 /* EOM - Fin du motd */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
 
@@ -51,7 +53,7 @@ const char* msgTab[] = {
      ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
      ":%s SET %s",                          /* SET - Définit ou informe les paramètres d'un jeu */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
-     ":%s LEA %s",                          /* LEA - Un user part du saon */
+     ":%s LEA",                             /* LEA - Un user part du saon */
      "LSP %s %d %d",                        /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
@@ -307,11 +309,11 @@ int ECServer::init_socket(void)
 
 	localhost.sin_family = AF_INET;
 	localhost.sin_addr.s_addr = INADDR_ANY;
-	localhost.sin_port = htons(conf->port);
+	localhost.sin_port = htons(conf->Port());
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		std::cout << "Impossible d'écouter au port " << conf->port << " pour le serveur." << std::endl;
+		std::cout << "Impossible d'écouter au port " << conf->Port() << " pour le serveur." << std::endl;
 		close(sock);
 		return 0;
 	}
@@ -322,7 +324,7 @@ int ECServer::init_socket(void)
 	if((unsigned)sock > highsock) highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
-	std::cout << "Serveur " << APP_NAME << "(" << APP_VERSION << ") lancé (Port " << conf->port << ")"
+	std::cout << "Serveur " << APP_NAME << "(" << APP_VERSION << ") lancé (Port " << conf->Port() << ")"
 		<< std::endl;
 	uptime = CurrentTS;
 

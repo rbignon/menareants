@@ -39,6 +39,8 @@ public:
 		ERR,   /* ERR */
 		BYE,   /* BYE */
 		AIM,   /* AIM */
+		MOTD,  /* MOTD */
+		ENDOFMOTD,   /* EOM */
 
 		CANTJOIN, /* ER1 */
 
@@ -64,16 +66,18 @@ public:
 	time_t CurrentTS;
 	bool running;
 
-	time_t get_uptime() { return uptime; }
+	time_t get_uptime() const { return uptime; }
 	char *rpl(ECServer::msg t);
 
 	TClient Clients[MAXCONNEX+1];
 
-	std::vector<EC_ACommand*> GetCommands() { return Commands; }
+	std::vector<EC_ACommand*> GetCommands() const { return Commands; }
 
-	unsigned int GetHighSock() { return highsock; }
+	unsigned int GetHighSock() const { return highsock; }
 
-	Config *GetConf() { return conf; }
+	Config *GetConf() const { return conf; }
+
+	std::string GetPath() const { return path; }
 
 protected:
 	Config *conf;
@@ -90,6 +94,7 @@ protected:
 	int sock;
 	unsigned int highsock;
 	fd_set global_fd_set;
+	std::string path;
 
 	std::vector<EC_ACommand*> Commands;
 };
