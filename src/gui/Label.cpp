@@ -38,7 +38,7 @@ TLabel::~TLabel()
     SDL_FreeSurface(surf);
 }
 
-void TLabel::SetCaption (std::string &new_txt)
+void TLabel::SetCaption (std::string new_txt)
 {
   if(caption == new_txt)
     return;

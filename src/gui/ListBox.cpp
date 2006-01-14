@@ -149,7 +149,8 @@ void TListBox::Draw (uint mouse_x, uint mouse_y)
 		SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
 		SDL_BlitSurface( selected_box, NULL, app.sdlwindow, &r);
 	}
-	small_font.WriteLeft(x+5,
+	if(!m_items[i+first_visible_item].label.empty())
+		small_font.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 IsSelected(i+first_visible_item) ? white_color : m_items[i+first_visible_item].color) ;

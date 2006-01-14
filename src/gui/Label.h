@@ -47,7 +47,7 @@ public:
 /* Attributs */
 public:
 
-	void SetCaption(std::string &text);
+	void SetCaption(std::string text);
 	std::string Caption() const { return caption; }
 
 /* Variables privées */
