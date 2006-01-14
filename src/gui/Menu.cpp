@@ -471,16 +471,16 @@ std::string Menu::EnterString(std::string label, std::string last_string, bool f
 		while (SDL_PollEvent( &event))
 		{
 			if (event.type == SDL_KEYUP)
+			{
+				if(event.key.keysym.sym == SDLK_ESCAPE)
+					return last_string;
+				else if(event.key.keysym.sym == SDLK_RETURN)
+					return new_string;
 				continue;
+			}
 
 			switch (event.key.keysym.sym)
 			{
-				case SDLK_RETURN:
-					return new_string;
-					break;
-				case SDLK_ESCAPE:
-					return last_string; /* S'enfuie sans faire le changement */
-					break;
 				case SDLK_BACKSPACE:
 					new_string = std::string(new_string, 0, new_string.size()-1 );
 					break;
