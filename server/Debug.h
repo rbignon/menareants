@@ -29,6 +29,7 @@
 #define W_WARNING       0x0008          /* Warning */
 #define W_DEBUG         0x0010          /* Debug */
 #define W_CLIENT        0x0020          /* Erreur en provenance du client */
+#define W_ECHO          0x0040          /* Affiche en echo */
 
 int Debug(unsigned int flags, const char* format, ...);
 int vDebug(unsigned int flags, std::string msg, std::string vars);

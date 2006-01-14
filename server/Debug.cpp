@@ -1,6 +1,6 @@
 /* server/Debug.cpp - Debug functions
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,19 +65,29 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 
 	if(!(flags & W_NOLOG))
 	{
-		std::ofstream file(DEBUGLOG);
+		std::ofstream file((app.GetPath() + DEBUG_LOG).c_str(), std::ios_base::app);
 		if(file)
 		{
-			file << get_time(app.CurrentTS) << s << std::endl;
+			file << std::string(get_time(app.CurrentTS)) << s << std::endl;
 			if(!vars.empty())
 				file << vars << std::endl;
 		}
+#ifdef DEBUG
+		else
+			std::cout << "[WARNING] Impossible d'ouvrir " << std::string(app.GetPath() + DEBUG_LOG)
+			          << std::endl;
+#endif
 	}
 
-#ifdef DEBUG
-	std::cout << s << std::endl;
-	if(!vars.empty())
-	std::cout << "          " << vars << std::endl;
+#ifndef DEBUG
+	if(flags & W_ECHO)
+	{
+#endif
+		std::cout << s << std::endl;
+		if(!vars.empty())
+		std::cout << "          " << vars << std::endl;
+#ifndef DEBUG
+	}
 #endif
 
 	return 0;
