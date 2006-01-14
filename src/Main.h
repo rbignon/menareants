@@ -1,6 +1,6 @@
 /* src/main.h - Main file
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ protected:
 	EC_Client* client;
 	Config *conf;
 	SDL_Thread* Thread;
+	std::string path;
 
 	void request_game();
 	void ListGames();
@@ -71,10 +72,18 @@ public:
 	void quit_app(int value);
 #endif
 
-	Config* getconf() { return conf; }
-	EC_Client* getclient() { return client; }
+	Config* getconf() const { return conf; }
+	EC_Client* getclient() const { return client; }
 	void setclient(EC_Client* c);
-	Menu* getmenu() { return menu; }
+	Menu* getmenu() const { return menu; }
+	std::string GetPath() const { return path; }
+
+	EuroConqApp() {
+		menu = 0;
+		client = 0;
+		conf = 0;
+		Thread = 0;
+	}
 
 	SDL_Surface* sdlwindow;
 };
