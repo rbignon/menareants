@@ -272,7 +272,7 @@ void EuroConqApp::GameInfos(bool create)
 
 	/* Déclaration membres fixes */
 	GameInfosForm = new TGameInfosForm;
-	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoin le jeu " +
+	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(chan->GetName()), green_color);
 	TSpinEdit pos(std::string("Position"), 200, 0, 200, 0, chan->NbPlayers(), 1, 0);
 	pos.SetColorFont(black_color, &big_font);
@@ -410,13 +410,12 @@ void EuroConqApp::ListGames()
 							GameInfos(false);
 						else
 						{
-							TMessageBox *mb = new TMessageBox(150,300,
+							TMessageBox mb(150,300,
 							                  std::string("Impossible de joindre le salon " +
 							                  ListGameForm->GList->ReadValue(
 							                           ListGameForm->GList->GetSelectedItem())
 							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
-							mb->Show();
-							delete mb;
+							mb.Show();
 						}
 					}
 					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y))
