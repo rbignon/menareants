@@ -1,6 +1,6 @@
 /* src/Login.cpp - Login commands
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,24 @@
 #include "Main.h"
 #include "Debug.h"
 #include <string>
+#include <fstream>
 
-char *correct_nick(const char *nick)
+static void send_motd(TClient *cl)
+{
+	std::ifstream fp(app.GetConf()->MotdFile().c_str());
+
+	if(fp)
+	{
+		std::string ligne;
+
+		while(std::getline(fp, ligne))
+			cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(ligne.c_str()));
+	}
+	cl->sendrpl(app.rpl(ECServer::ENDOFMOTD));
+	return;
+}
+
+static char *correct_nick(const char *nick)
 {
 	static char newnick[NICKLEN + 1];
 	int i = 0;
@@ -47,7 +63,10 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(IsAuth(cl))
 		return vDebug(W_DESYNCH, "User déjà logué", VSName(cl->GetNick()));
 
-	if(parv[2] != CLIENT_SMALLNAME)
+	/* Note: il est normal de vérifier ici seulement le nombre d'arguments: ça permet un
+	 *       meilleur controle par rapport à la version
+	 */
+	if(parv.size() < 4 || parv[2] != CLIENT_SMALLNAME)
 		return cl->exit(app.rpl(ECServer::MAJ), '0');
 
 	int pversion = 0;
@@ -68,6 +87,9 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	SetAuth(cl);
 
 	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
+
+	send_motd(cl);
+
 	return 0;
 }
 
@@ -86,10 +108,8 @@ int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 }
 
-/* BYE [message] */
+/* BYE */
 int BYECommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	const char* raison = parv.size() > 1 ? parv[1].c_str() : "";
-
-	return cl->exit(app.rpl(ECServer::BYE), FormatStr(raison));
+	return cl->exit(app.rpl(ECServer::BYE));
 }

@@ -31,10 +31,16 @@ public:
 public:
 	bool load();
 
-public:
+	std::string ServerName() const { return servername; }
+	int Port() const { return port; }
+	int DefLimite() const { return deflimite; }
+	std::string MotdFile() const { return motdfile; }
+
+private:
 	std::string servername;
 	int port;
 	int deflimite;
+	std::string motdfile;
 
 private:
 	std::string filename;
