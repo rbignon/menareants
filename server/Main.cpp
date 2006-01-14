@@ -25,6 +25,9 @@
 #include <iostream>
 #include <signal.h>
 #include <sys/resource.h>
+#ifndef WIN32
+#include <dirent.h>
+#endif
 
 ECServer app;
 
@@ -39,7 +42,7 @@ void ECServer::sig_alarm(int c)
 		if(IsPing(cl))
 		{
 			DelPing(cl);
-			cl->exit(app.rpl(ECServer::BYE), "Ping Timeout");
+			cl->exit(app.rpl(ECServer::BYE));
 		}
 		else if((cl->GetLastRead() + PINGINTERVAL) <= app.CurrentTS)
 		{
@@ -86,7 +89,7 @@ try {
 
 	/* Déclarations des commandes */
 	/*                                 NOM		flag		args */
-	Commands.push_back(new IAMCommand("IAM",	0,			3));
+	Commands.push_back(new IAMCommand("IAM",	0,			0)); /* Args vérifié dans IAMCommand::Exec */
 	Commands.push_back(new PIGCommand("PIG",	0,			0));
 	Commands.push_back(new POGCommand("POG",	0,			0));
 	Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
@@ -99,6 +102,19 @@ try {
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);
+
+#ifndef WIN32
+		if (getenv("HOME"))
+		{
+			path = getenv("HOME");
+			path += "/.euroconqserver/";
+			if (!opendir(path.c_str()))
+			{
+				mkdir( path.c_str(), 0755 );
+			}
+			std::cout << "Logs dans: " << path << std::endl;
+		}
+#endif
 
 	if(background)
 	{
