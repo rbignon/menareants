@@ -50,96 +50,6 @@ void EuroConqApp::quit_app(int value)
         exit(value);
 }
 
-void EuroConqApp::request_game()
-{
-	client = NULL;
-	SDL_mutex *Mutex = SDL_CreateMutex();
-	Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
-
-	WAIT_EVENT_T((client && client->IsConnected()), i, 15);
-
-	if(!client || !client->IsConnected())
-	{
-		std::string msg;
-		if(!client)
-			msg = "Connexion impossible";
-		else
-			msg = "Connexion impossible : " + client->CantConnect();
-		Menu menu_err(msg, this);
-		menu_err.add_item("Retour", 0, 0);
-		menu_err.execute();
-		if(client) delete client;
-		return;
-	}
-
-	Menu* menu;
-
-	menu = new Menu( std::string("Jouer (" + client->GetNick() + ")"), this);
-	menu->add_item(  std::string("Creer une partie"), JOUER_CREER, 0);
-	menu->add_item(  std::string("Lister les parties"), JOUER_LISTER, 0);
-	menu->add_item(  std::string("Se deconnecter"), JOUER_RETOUR, 0);
-
-	try
-	{
-		bool alive = true;
-		while (alive && client->IsConnected())
-		{
-			int result = menu->execute();
-
-			try
-			{
-				/* MenuItem* item = menu->get_item_by_id( result ); TODO: utilisation de item */
-				switch (result)
-				{
-					case JOUER_RETOUR:
-						client->SetWantDisconnect();
-						client->sendrpl(client->rpl(EC_Client::BYE));
-						alive = false;
-						break;
-					case JOUER_LISTER:
-						ListGames();
-						break;
-					case JOUER_CREER:
-						GameInfos(true);
-						break;
-					case -1: break; /**normal**/
-					default:
-						std::cout << result << std::endl;
-						break;
-				}
-			}
-			catch (const std::string err)
-			{
-				Menu menu_err( err, this);
-				menu_err.add_item("Retour", 0, 0);
-				menu_err.scroll_in();
-				menu_err.execute();
-				menu_err.scroll_out();
-			}
-			if(client && !client->IsConnected())
-			{
-				alive = false;
-
-				Menu menu_err("Vous avez ete deconnecte.", this);
-				menu_err.add_item("Retour", 0, 0);
-				menu_err.execute();
-			}
-		}
-		delete client;
-		SDL_WaitThread(Thread, 0);
-		delete menu;
-	}
-	catch(const TECExcept &e)
-	{
-		Debug(W_ERR, e.Message);
-		if(menu) delete menu;
-		SDL_KillThread(Thread); /* En cas d'erreur, clore arbitrairement le thread */
-		if(client) delete client;
-	}
-
-	return;
-}
-
 int EuroConqApp::main(int argc, char **argv)
 {
 	try
@@ -188,15 +98,19 @@ int EuroConqApp::main(int argc, char **argv)
 #ifndef WIN32
 		if (getenv("HOME"))
 		{
-			std::string path;
 			path = getenv("HOME");
-			path += "/.euroconq";
+			path += "/.euroconq/";
 			if (!opendir(path.c_str()))
 			{
 				mkdir( path.c_str(), 0755 );
 			}
 
-			conf = new Config( path + "/euroconq.cfg" );
+			conf = new Config( path + "euroconq.cfg" );
+		}
+		else
+		{
+			std::cout << "Unable to read HOME environment variable !" << std::endl;
+			quit_app(0);
 		}
 #else
 		conf = new Config("euroconq.cfg");
@@ -261,10 +175,11 @@ int EuroConqApp::main(int argc, char **argv)
 	     				break;
 				}
 			}
-			catch (const std::string err)
+			catch(TECExcept &e)
 			{
+				vDebug(W_ERR, e.Message, e.Vars);
 				Menu menu_err( "Shit", this);
-				menu_err.add_item(err, 0, 0);
+				menu_err.add_item(e.Message, 0, 0);
 				menu_err.scroll_in();
 				menu_err.execute();
 				menu_err.scroll_out();
