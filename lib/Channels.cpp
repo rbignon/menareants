@@ -48,7 +48,7 @@ bool ECBPlayer::SetPlace(unsigned int p)
 }
 
 /********************************************************************************************
- *                               ECBChannel                                                   *
+ *                               ECBChannel                                                 *
  ********************************************************************************************/
 
 ECBChannel::ECBChannel(std::string _name)
@@ -68,7 +68,7 @@ bool ECBChannel::AddPlayer(ECBPlayer* pl)
 
 bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
-	for (std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); )
+	for (PlayerIterator it = players.begin(); it != players.end(); )
 	{
 		if (*it == pl)
 		{
@@ -103,10 +103,25 @@ const char* ECBChannel::ModesStr() const
  * Note qu'il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
  * où il y en a une, d'incrémenter le protocole
  */
-const char* ECBChannel::PlayerList() const
+const char* ECBChannel::PlayerList()
 {
 	std::string list = "";
-	for(unsigned int i=0; i<players.size();i++)
+#if 1
+	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	{
+		if(!list.empty()) list += " ";
+		if((*it)->IsOwner())
+			list += "@";
+		if((*it)->Ready())
+			list += "!";
+
+		/* Informe de la place et de la couleur */
+		list += TypToStr((*it)->Place()) + "," + TypToStr((*it)->Color()) + ",";
+
+		list += (*it)->GetNick();
+	}
+#else
+	for(uint i=0; i<players.size();i++)
 	{
 		if(!list.empty()) list += " ";
 		if(players[i]->IsOwner())
@@ -119,5 +134,6 @@ const char* ECBChannel::PlayerList() const
 
 		list += players[i]->GetNick();
 	}
+#endif
 	return list.c_str();
 }

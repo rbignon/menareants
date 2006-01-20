@@ -20,6 +20,78 @@
 
 #include "Component.h"
 
+/********************************************************************************************
+ *                                 TList                                                    *
+ ********************************************************************************************/
+
+TList::TList(uint _x, uint _y)
+	: TComponent(_x, _y)
+{
+	list.clear(); /* On ne sait jamais */
+}
+
+TList::~TList()
+{
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+		delete (*it);
+	list.clear();
+}
+
+void TList::AddLine(TComponent *c)
+{
+	list.push_back(c);
+	c->SetXY(x, y+h);
+	h += c->GetHeight();
+	if(c->GetWidth() > w) w = c->GetWidth();
+	c->Init();
+}
+
+bool TList::RemoveLine(TComponent *c)
+{
+	for (std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); )
+	{
+		if (*it == c)
+		{
+			h -= c->GetHeight();
+			it = list.erase(it);
+			delete (*it);
+			Rebuild(); /* Reconstruction */
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
+}
+
+void TList::Rebuild()
+{
+	h = 0;
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+	{
+		(*it)->SetXY(x, y+h);
+		h += (*it)->GetHeight();
+		if((*it)->GetWidth() > w)
+			w = (*it)->GetWidth();
+	}
+}
+
+void TList::Draw(uint souris_x, uint souris_y)
+{
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+		(*it)->Draw(souris_x, souris_y);
+}
+
+void TList::SetXY (uint px, uint py)
+{
+	TComponent::SetXY(px, py);
+	Rebuild();
+}
+
+/********************************************************************************************
+ *                                 TComponent                                               *
+ ********************************************************************************************/
+
 unsigned int TComponent::GetX() const { return x; }
 unsigned int TComponent::GetY() const { return y; }
 unsigned int TComponent::GetWidth() const { return w; }

@@ -25,7 +25,8 @@
 TButton::TButton ()
 {
    image = NULL;
-   SetXY(0,0);
+   x = 0;
+   y = 0;
    w = 0;
    h = 0;
 }

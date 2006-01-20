@@ -62,7 +62,8 @@ void TLabel::SetCaption (std::string new_txt)
 
 void TLabel::Draw(unsigned int m_x, unsigned int m_y)
 {
-	assert(surf!=NULL);
+	if(!surf) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
+
 	SDL_Rect dst_rect;
 	dst_rect.x = x;
 	dst_rect.y = y;

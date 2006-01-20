@@ -125,7 +125,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
-					sender->SetColor(StrToTyp<uint>(parv[j++]));
+					uint color = StrToTyp<uint>(parv[j++]);
+					if(color > 0)
+					{
+						PlayerIterator it;
+						for(it = sender->Channel()->Players().begin();
+						    it != sender->Channel()->Players().end() && (*it)->Color() != color;
+						    it++);
+						if(it != sender->Channel()->Players().end())
+							{ Debug(W_DESYNCH, "+c d'une couleur déjà utilisée"); break; }
+					}
+					sender->SetColor(color);
 					changed = YES_WITHPARAM;
 				}
 				else
@@ -139,7 +149,23 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
-					sender->SetPlace(StrToTyp<uint>(parv[j++]));
+					uint place = StrToTyp<uint>(parv[j++]);
+					if(place > 0)
+					{
+						if(place > sender->Channel()->GetLimite())
+						{
+							Debug(W_DESYNCH, "+p %d > %d(limite)", place,
+							                 sender->Channel()->GetLimite());
+							break;
+						}
+						PlayerIterator it;
+						for(it = sender->Channel()->Players().begin();
+						    it != sender->Channel()->Players().end() && (*it)->Place() != place;
+						    it++);
+						if(it != sender->Channel()->Players().end())
+							{ Debug(W_DESYNCH, "+p d'une position déjà utilisée"); break; }
+					}
+					sender->SetPlace(place);
 					changed = YES_WITHPARAM;
 				}
 				else
@@ -196,12 +222,11 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
 	ECPlayer* pl;
-	unsigned int i;
 
-	for(i=0; i<ChanList.size();i++)
-		if(!strcasecmp(ChanList[i]->GetName(), nom))
+	for(ChannelIterator it=ChanList.begin(); it != ChanList.end(); it++)
+		if(!strcasecmp((*it)->GetName(), nom))
 		{
-			chan = ChanList[i];
+			chan = *it;
 			break;
 		}
 
@@ -252,10 +277,10 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 /* LSP */
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	for(unsigned i=0; i<ChanList.size();i++)
-		if(ChanList[i]->Joinable())
-			cl->sendrpl(app.rpl(ECServer::GLIST), ChanList[i]->GetName(), ChanList[i]->NbPlayers(),
-			                                      ChanList[i]->GetLimite());
+	for(ChannelIterator it=ChanList.begin(); it != ChanList.end(); it++)
+		if((*it)->Joinable())
+			cl->sendrpl(app.rpl(ECServer::GLIST), (*it)->GetName(), (*it)->NbPlayers(),
+			                                      (*it)->GetLimite());
 
 	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
 }
@@ -287,7 +312,7 @@ EChannel::EChannel(std::string _name)
 
 EChannel::~EChannel()
 {
-	for (std::vector<EChannel*>::iterator it = ChanList.begin(); it != ChanList.end(); )
+	for (ChannelIterator it = ChanList.begin(); it != ChanList.end(); )
 	{
 		if (*it == this)
 		{
@@ -301,25 +326,24 @@ EChannel::~EChannel()
 
 void EChannel::NeedReady()
 {
-	for(unsigned int i=0;i<players.size();i++)
-		((ECPlayer *)players[i])->SetReady(false);
+	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+		(*it)->SetReady(false);
 	return;
 }
 
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
-	for(unsigned int i=0;i<players.size();i++)
-		if(((ECPlayer *)players[i])->Client() &&
-		   !strcasecmp(((ECPlayer *)players[i])->GetNick(), nick))
-			return ((ECPlayer *)players[i]);
+	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+		if(((ECPlayer*) (*it))->Client() && !strcasecmp((*it)->GetNick(), nick))
+			return ((ECPlayer*) (*it));
 	return NULL;
 }
 
 ECPlayer *EChannel::GetPlayer(TClient *cl)
 {
-	for(unsigned int i=0;i<players.size();i++)
-		if(((ECPlayer *)players[i])->Client() == cl)
-			return ((ECPlayer *)players[i]);
+	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+		if(((ECPlayer*) (*it))->Client() == cl)
+			return ((ECPlayer*) (*it));
 	return NULL;
 }
 
@@ -338,11 +362,11 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	for(unsigned int i=0; i<players.size(); i++)
+	for(PlayerIterator it=players.begin(); it != players.end(); it++)
 	{
-		if(!((ECPlayer *)players[i])->Client() || ((ECPlayer *)players[i]) == one) continue;
+		if(!((ECPlayer*) (*it))->Client() || *it == one) continue;
 
-		((ECPlayer *)players[i])->Client()->sendbuf(buf, len);
+		((ECPlayer*) (*it))->Client()->sendbuf(buf, len);
 	}
 	return 0;
 }

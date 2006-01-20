@@ -35,6 +35,7 @@ class EChannel;
 /********************************************************************************************
  *                               ECPlayers                                                  *
  ********************************************************************************************/
+
 class ECPlayer : public ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
@@ -101,6 +102,8 @@ public:
 protected:
 
 };
+
+typedef std::vector<EChannel*>::iterator ChannelIterator;
 
 extern std::vector<EChannel*> ChanList;
 

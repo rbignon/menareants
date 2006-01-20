@@ -91,6 +91,8 @@ bool TMemo::Clic (uint mouse_x, uint mouse_y)
 
 void TMemo::Draw (uint mouse_x, uint mouse_y)
 {
+  if(!background) return; /* Peut (malheureusement, vive les threads) arriver */
+
   // blit a surface as SDL_FillRect don't alpha blit a rectangle
   SDL_Rect r_back = {x,y,w,h};
   SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);

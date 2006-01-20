@@ -1,15 +1,9 @@
+Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
+
 À faire:
 
 * En cours
--client: Finir le SpinEdit, et en particulier surtout voir comment faire une liste de tspinedit sans
-         avoir à refaire la liste à chaque mise à jour (ahaha): solution  compliquée: mettre dans le FORM,
-         solution simple: faire un pré-boucle et devoir ajouter/supprimer les machins au fur et à mesure.
-         Ce qui serait mieux, ça serait tout de même un super moyen de faire une liste de TForm. Enfin
-         ce serait faire un nouveau "composant conteneur" spécialisé dans les listes.
--client: Corriger bug lors de GameInfos qui redimentionne trop tard le TMemo.
-         -> Note: c'est parce qu'il y a un affichage une toute première fois où le TMemo est mal
-         dimensionné (il utilise le TForm::Draw() avant d'afficher les users et donc de redimentionner
-         le TMemo.
+-client: Utiliser une fonction pour redimentionner le Memo dans GameInfosForm quand on ajoute/del un player (voir papier).
 -client: Avancer dans les paramètres de la partie.
 
 * Urgent
@@ -24,8 +18,7 @@
 -Connexion au serveur avec listing des parties ou création, sans y jouer véritablement.
 
 * En parallèle (on s'en fou un peu de quand on les fait)
--client: Utilisation de la souris dans le menu.
--À chaques modifs changer le copyright dans le fichier si non déjà fait.
+-client: Suppression progressive du menu pour passer uniquement à des TForm.
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -client: Faire la partie de jeu vraiment.

@@ -1,6 +1,7 @@
 /* src/Menu.cpp - Make a menu (by ClanBomber)
  *
  * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ *                         Laurent Defert <lodesi2@yahoo.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

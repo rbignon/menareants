@@ -21,17 +21,23 @@
 #ifndef EC_COMPONENT_H
 #define EC_COMPONENT_H
 
+#include <vector>
+
 typedef unsigned int   uint;
+
+/********************************************************************************************
+ *                               TComponent                                                 *
+ ********************************************************************************************/
 
 class TComponent
 {
 /* Constructeur/Deconstructeur */
 public:
 
-	TComponent() : visible(true), enabled(true)
+	TComponent() : x(0), y(0), h(0), w(0), visible(true), enabled(true)
 	{}
 	TComponent(uint _x, uint _y)
-		: x(_x), y(_y), visible(true), enabled(true)
+		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true)
 	{}
 	TComponent(uint _x, uint _y, uint _w, uint _h)
 		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true)
@@ -77,6 +83,50 @@ protected:
 	uint h, w;
 	bool visible;
 	bool enabled;
+};
+
+/********************************************************************************************
+ *                                 TList                                                    *
+ ********************************************************************************************/
+
+class TList : public TComponent
+{
+/* Constructeur/Deconstructeur */
+public:
+
+	TList(uint _x, uint _y);
+
+	~TList();
+
+/* Méthodes */
+public:
+
+	/* Rajoute une ligne à la liste des composants */
+	void AddLine(TComponent *);
+
+	/* Supprime une ligne à la liste des composants */
+	bool RemoveLine(TComponent *);
+
+	/* Dessine tous les composants de la liste */
+	void Draw(uint souris_x, uint souris_y);
+
+	/* Initialisation non requise... (surcharge de fonction virtuelle) */
+	void Init() {}
+
+/* Attributs */
+public:
+
+	void SetXY (uint _x, uint _y);
+
+	std::vector<TComponent*> GetList() const { return list; }
+
+/* Variables privées */
+private:
+
+	/* Redéfinit x pour les composants de la liste et la hauteur du TList */
+	void Rebuild();
+
+	std::vector<TComponent*> list;
 };
 
 #endif /* EC_COMPONENT_H */

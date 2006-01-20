@@ -1,3 +1,14 @@
+2006-01-15  Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp (TPlayerLine): Composant utilisé dans un TList pour la liste des players dans
+	TGameInfos.
+
+	* src/gui/Component.h (TList): Création du composant TList, conteneur de composants.
+
+	* Utilisation d'iterateurs un peu partout plutot que de boucles à index.
+
+	* server/Channels.cpp: Interdiction d'utiliser une place ou une couleur déjà prise.
+
 2006-01-14  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Menu.cpp: Correction de Menu::EnterString().

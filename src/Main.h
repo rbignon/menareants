@@ -61,7 +61,7 @@ protected:
 
 	void request_game();
 	void ListGames();
-	void GameInfos(bool created);
+	bool GameInfos(const char* c);
 
 public:
 	int main(int argc, char** argv);

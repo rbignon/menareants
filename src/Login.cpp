@@ -178,7 +178,7 @@ void EuroConqApp::request_game()
 						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y))
 							ListGames();
 						if(ConnectedForm->CreateButton->Test(event.button.x, event.button.y))
-							GameInfos(true);
+							GameInfos(NULL);
 						break;
 					default:
 						break;

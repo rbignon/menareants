@@ -92,6 +92,9 @@ protected:
 	bool ready;
 };
 
+typedef std::vector<ECBPlayer*> PlayerVector;
+typedef PlayerVector::iterator PlayerIterator;
+
 /********************************************************************************************
  *                               ECBChannel                                                   *
  ********************************************************************************************/
@@ -124,7 +127,7 @@ public:
 	const char* GetName() const { return name.c_str(); }
 
 	/* Récupère la liste des joueurs */
-	std::vector<ECBPlayer*> Players() const { return players; }
+	PlayerVector Players() const { return players; }
 
 	/* Ajoute un player */
 	bool AddPlayer(ECBPlayer*);
@@ -140,7 +143,7 @@ public:
 	/* Retourne la liste des joueurs
 	 * Note: Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
 	 */
-	const char* PlayerList() const;
+	const char* PlayerList();
 
 	/* Retourne les modes formatés
 	 * Note: Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
@@ -160,7 +163,7 @@ public:
 /* Variables privées */
 protected:
 	std::string name;
-	std::vector<ECBPlayer*> players;
+	PlayerVector players;
 	e_state state;
 	unsigned int limite;
 };

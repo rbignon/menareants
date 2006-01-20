@@ -22,6 +22,7 @@
 #ifndef EC_JOINGAME_H
 #define EC_JOINGAME_H
 
+#include "Channels.h"
 #include "gui/Form.h"
 #include "gui/BouttonText.h"
 #include "gui/ListBox.h"
@@ -29,6 +30,52 @@
 #include "gui/Edit.h"
 #include "gui/Memo.h"
 #include "gui/SpinEdit.h"
+
+/********************************************************************************************
+ *                               TPlayerLine                                                *
+ ********************************************************************************************/
+
+class TPlayerLine : public TComponent
+{
+/* Constructeur/Destructeur */
+public:
+
+	TPlayerLine(ECPlayer *pl);
+
+	~TPlayerLine();
+
+/* Methodes */
+public:
+
+	/* Initialisation */
+	void Init();
+
+	/* Dessine */
+	void Draw(uint souris_x, uint souris_y);
+
+/* Composants */
+public:
+
+	TSpinEdit *position;
+
+/* Attributs */
+public:
+	ECPlayer* Player() { return pl; }
+
+/* Variables privées */
+private:
+
+	/* Privatisation de constructeurs à rendre inaccessibles */
+	TPlayerLine();
+	TPlayerLine(uint _x, uint _y);
+	TPlayerLine(uint _x, uint _y, uint _w, uint _h);
+
+	ECPlayer *pl;
+};
+
+/********************************************************************************************
+ *                               TGameInfosForm                                              *
+ ********************************************************************************************/
 
 class TGameInfosForm : public TForm
 {
@@ -45,11 +92,24 @@ public:
 	TEdit*       SendMessage;
 	TButtonText* RetourButton;
 	TButtonText* PretButton;
+	TList*       Players;
+
+	TSpinEdit*   MyPosition;
 
 /* Evenements */
 public:
 
+/* Fonctions */
+public:
+
+	/* Calcul la taille du TMemo */
+	void RecalcMemo();
+
 };
+
+/********************************************************************************************
+ *                               TListGameForm                                              *
+ ********************************************************************************************/
 
 class TListGameForm : public TForm
 {
