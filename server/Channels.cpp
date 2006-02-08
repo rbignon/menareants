@@ -33,7 +33,10 @@ std::vector<EChannel*> ChanList;
  *                              Commandes                                                   *
  ********************************************************************************************/
 
-/* MSG <message> */
+/** A player wants to send a message to channel.
+ *
+ * Syntax: MSG message
+ */
 int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(!cl->Player())
@@ -44,7 +47,10 @@ int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* SET <modes> [params ...] */
+/** A player wants to set an attribute in channel.
+ *
+ * Syntax: SET modes [params ...]
+ */
 int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(!cl->Player() || !cl->Player()->Channel())
@@ -211,13 +217,16 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* JOI <nom> */
+/** A client wants to join a channel.
+ *
+ * Syntax: JOI nom
+ */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* Ne peut être que sur un seul salon à la fois */
 	if(cl->Player() || parv[1].empty())
 		return vDebug(W_WARNING, "Essaye de joindre plusieurs salons", VSName(cl->GetNick())
-		                          VSName(cl->Player()->Channel()->GetName()));
+		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
 
 	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
@@ -255,7 +264,10 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* LEA */
+/** A player wants to leave a channel.
+ *
+ * Syntax: LEA
+ */
 int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* N'est pas dans un salon */
@@ -274,7 +286,10 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* LSP */
+/** A player wants to list all channels.
+ *
+ * Syntax: LSP
+ */
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	for(ChannelIterator it=ChanList.begin(); it != ChanList.end(); it++)
@@ -334,7 +349,7 @@ void EChannel::NeedReady()
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
 	for(PlayerIterator it=players.begin(); it != players.end(); it++)
-		if(((ECPlayer*) (*it))->Client() && !strcasecmp((*it)->GetNick(), nick))
+		if((dynamic_cast<ECPlayer*> (*it))->Client() && !strcasecmp((*it)->GetNick(), nick))
 			return ((ECPlayer*) (*it));
 	return NULL;
 }
@@ -342,7 +357,7 @@ ECPlayer *EChannel::GetPlayer(const char* nick)
 ECPlayer *EChannel::GetPlayer(TClient *cl)
 {
 	for(PlayerIterator it=players.begin(); it != players.end(); it++)
-		if(((ECPlayer*) (*it))->Client() == cl)
+		if((dynamic_cast<ECPlayer*> (*it))->Client() == cl)
 			return ((ECPlayer*) (*it));
 	return NULL;
 }
@@ -364,9 +379,9 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 
 	for(PlayerIterator it=players.begin(); it != players.end(); it++)
 	{
-		if(!((ECPlayer*) (*it))->Client() || *it == one) continue;
+		if(!(dynamic_cast<ECPlayer*> (*it))->Client() || *it == one) continue;
 
-		((ECPlayer*) (*it))->Client()->sendbuf(buf, len);
+		(dynamic_cast<ECPlayer*> (*it))->Client()->sendbuf(buf, len);
 	}
 	return 0;
 }

@@ -30,6 +30,7 @@
 
 ECImage*				Resources::sur_titlescreen = NULL;
 ECImage*				Resources::sur_loadscreen = NULL;
+ECImage*				Resources::sur_menuscreen = NULL;
 
 ECSpriteBase*			Resources::spr_upbutton = NULL;
 ECSpriteBase*			Resources::spr_downbutton = NULL;
@@ -58,6 +59,14 @@ ECImage* Resources::Titlescreen()
 	if (!sur_titlescreen)
 		sur_titlescreen = new ECImage(PKGDATADIR_PICS "menu.png");
 	return sur_titlescreen;
+
+}
+
+ECImage* Resources::Menuscreen()
+{
+	if (!sur_menuscreen)
+		sur_menuscreen = new ECImage(PKGDATADIR_PICS "menu_vide.png");
+	return sur_menuscreen;
 
 }
 

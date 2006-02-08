@@ -33,8 +33,8 @@ TSpinEdit::TSpinEdit(std::string _label, uint _x, uint _y, uint _width, int _min
 {
 	/* Sécurités */
 	if(max < min) max = min;
-	if(value < _min) value = _min;
-	else if(value > _max) value = _max;
+	if(value < min) value = min;
+	else if(value > max) value = max;
 
 	value = _defvalue;
 
@@ -66,18 +66,21 @@ void TSpinEdit::Init()
   std::ostringstream max_value_s;
   max_value_s << max;
   uint max_value_w = font->GetWidth(max_value_s.str());
-
   uint margin = 5;
 
+  /* Boutons */
   if(m_plus) delete m_plus;
   if(m_minus) delete m_minus;
 
   m_plus = new TButton (x+w-5,y,5,10);
   m_minus = new TButton (x+w-max_value_w-5-2*margin,y,5,10);
 
+  /* Images */
+  /* Pas besoin de delete, ECImage le fait */
   m_plus->SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
   m_minus->SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
 
+  /* Label */
   if(txt_label) delete txt_label;
   if(txt_value) delete txt_value;
 
@@ -112,18 +115,24 @@ bool TSpinEdit::SetValue(int _value, bool first)
 
 void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
 {
-  txt_label->Draw(mouse_x, mouse_y);
+  if(txt_label)
+    txt_label->Draw(mouse_x, mouse_y);
 
-  m_minus->Draw (mouse_x, mouse_y);
-  m_plus->Draw (mouse_x, mouse_y);
+  if(m_minus)
+    m_minus->Draw (mouse_x, mouse_y);
+  if(m_plus)
+    m_plus->Draw (mouse_x, mouse_y);
 
-  txt_value->Draw(mouse_x, mouse_y);
+  if(txt_value)
+    txt_value->Draw(mouse_x, mouse_y);
 }
 
 //-----------------------------------------------------------------------------
 
 bool TSpinEdit::Clic (uint mouse_x, uint mouse_y)
 {
+  if(!m_minus || !m_plus) return false;
+
   if (m_minus->Test(mouse_x, mouse_y))
     return SetValue(value - step);
   else if (m_plus->Test(mouse_x, mouse_y))

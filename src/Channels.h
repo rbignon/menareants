@@ -29,13 +29,20 @@ class EChannel;
 /********************************************************************************************
  *                               ECPlayers                                                  *
  ********************************************************************************************/
+/** Derivation of class ECBPlayer for client game.
+ *
+ * \note See definition of ECBPlayer to see all members of ECPlayers (in doc/lib/)
+ */
 class ECPlayer : public ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
 
-	/* Création en donnant la structure du client, du salon et
-	 * en spécifiant si il est owner ou non, et si c'est moi ou non.
+	/** Create a Player class in a channel.
+	 * @param nick nickname of user who joined channel.
+	 * @param chan channel struct.
+	 * @param owner if player is an owner or not.
+	 * @param IsMe specifie if this player is me.
 	 */
 	ECPlayer(const char* nick, EChannel* chan, bool owner, bool IsMe);
 
@@ -45,13 +52,13 @@ public:
 /* Attributs */
 public:
 
-	/* Salon auquel appartient le player */
+	/** Player's channel. */
 	EChannel *Channel() const { return (EChannel*)chan; }
 
-	/* Obtient le pseudo du client */
+	/** Get nick of client. */
 	virtual const char* GetNick() const { return nick.c_str(); }
 
-	/* Est-ce que ce player est moi */
+	/** Is this player is me ? */
 	bool IsMe() const { return isme; }
 
 /* Variables privées */
@@ -63,7 +70,10 @@ protected:
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
-
+/** Channel structure based on ECBChannel
+ *
+ * \note See definition of ECBChannel to see all members of EChannel (in doc/lib/)
+ */
 class EChannel : public ECBChannel
 {
 /* Constructeurs/Deconstructeurs */
@@ -81,7 +91,7 @@ public:
 /* Attributs */
 public:
 
-	/* Récupère le Player par le pseudo */
+	/** Get a player in channel by his nickname. */
 	ECPlayer* GetPlayer(const char* nick) const;
 
 /* Variables privées */

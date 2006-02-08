@@ -28,17 +28,30 @@ typedef unsigned int   uint;
 /********************************************************************************************
  *                               TComponent                                                 *
  ********************************************************************************************/
-
+/** Base of components. */
 class TComponent
 {
 /* Constructeur/Deconstructeur */
 public:
 
+	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
 	TComponent() : x(0), y(0), h(0), w(0), visible(true), enabled(true)
 	{}
+
+	/** Constructor with position
+	 * @param _x x position
+	 * @param _y y position
+	 */
 	TComponent(uint _x, uint _y)
 		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true)
 	{}
+
+	/** Constructor with position and size
+	 * @param _x x position
+	 * @param _y y position
+	 * @param _w width of component
+	 * @param _h heigh of component
+	 */
 	TComponent(uint _x, uint _y, uint _w, uint _h)
 		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true)
 	{}
@@ -48,34 +61,33 @@ public:
 /* Méthodes */
 public:
 
-	/* Dessine l'objet */
+	/** Draw the object. */
 	virtual void Draw(unsigned int souris_x, unsigned int souris_y) = 0;
 
-	/* Fonction d'initialisation */
+	/** Initialization. */
 	virtual void Init() = 0;
 
 /* Attributs */
 public:
 
 	/* Obtient la position, la hauteur ou la largeur */
-	unsigned int GetX() const;
-	unsigned int GetY() const;
-	unsigned int GetWidth() const;
-	unsigned int GetHeight() const;
+	unsigned int GetX() const;                            /**< Get \a x position. */
+	unsigned int GetY() const;                            /**< Get \a y position. */
+	unsigned int GetWidth() const;                        /**< Get \a width position. */
+	unsigned int GetHeight() const;                       /**< Get \a height position. */
 
 	/* Définie la position, la hauteur ou la largeur */
-	void SetXY (uint _x, uint _y);
-	void SetHeight (uint _h);
-	void SetWidth (uint _w);
+	void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
+	void SetHeight (uint _h);                             /**< Set \a height */
+	void SetWidth (uint _w);                              /**< Set \a width */
 
 	/* Visibilité */
-	bool Visible() const { return visible; }
-	void Show() { visible = true; }
-	void Hide() { visible = false; }
+	bool Visible() const { return visible; }              /**< Is this object visible ? */
+	void Show() { visible = true; }                       /**< Set visible to true */
+	void Hide() { visible = false; }                      /**< Set visible to false */
 
-	/* Actif */
-	bool Enabled() const { return enabled; }
-	void SetEnabled(bool _en = true) { enabled = _en; }
+	bool Enabled() const { return enabled; }              /**< Is this object enabled ? */
+	void SetEnabled(bool _en = true) { enabled = _en; }   /**< Set or unset this objet as enabled */
 
 /* Variables privées */
 protected:
@@ -88,12 +100,54 @@ protected:
 /********************************************************************************************
  *                                 TList                                                    *
  ********************************************************************************************/
-
+/** @page TList_usage Usage of TList
+ *
+ * This component is usefull when we have to show a list of components in a TForm.
+ * To do this action automaticaly (with TForm::Update() and without redefine this function),
+ * we have to use TList.
+ *
+ * TList is a contener of TComponents*. You can set a single real component or create
+ * a special component who contain some components too.
+ *
+ * Usage :
+ *
+ * Add a TList in the form. You can add or remove dynamically a "list" of components.
+ * This components are a derived of TComponent called for example TElement. You have
+ * to define Draw() function to show yourself TElement components. TElement is
+ * considered as a kind of form.
+ *
+ * Schema is :
+ * <pre>
+ *     TForm
+ *     |- TButton
+ *     |- TList
+ *     |  |- TElement
+ *     |  |  |- TSpinEdit
+ *     |  |  `- TLabel
+ *     |  `- TElement
+ *     |     |- TSpinEdit
+ *     |     `- TLabel
+ *     |- TMemo
+ *     `- TEdit
+ * </pre>
+ *
+ * Note that all components in list have their position setted automaticaly.
+ * Heigh is automaticaly setted when you add or remove a component and use heigh
+ * of each components.
+ * Width is width of biggest component.
+ *
+ * --Progs
+ */
+/** This is a particular component who show a list of components in a TForm */
 class TList : public TComponent
 {
 /* Constructeur/Deconstructeur */
 public:
 
+	/** Constructor of TList.
+	 * @param _x this is x position of first component in list
+	 * @param _y this is y position of first component in list
+	 */
 	TList(uint _x, uint _y);
 
 	~TList();
@@ -101,29 +155,32 @@ public:
 /* Méthodes */
 public:
 
-	/* Rajoute une ligne à la liste des composants */
+	/** Add a component in the list */
 	void AddLine(TComponent *);
 
-	/* Supprime une ligne à la liste des composants */
+	/** Remove a component from list
+	 * \warning This will use \a delete on TComponent !!
+	 */
 	bool RemoveLine(TComponent *);
 
-	/* Dessine tous les composants de la liste */
+	/** Draw all components in list */
 	void Draw(uint souris_x, uint souris_y);
 
-	/* Initialisation non requise... (surcharge de fonction virtuelle) */
+	/** Initialization not requiered... But it is a virtual function so i have to implemente this  */
 	void Init() {}
 
 /* Attributs */
 public:
 
-	void SetXY (uint _x, uint _y);
+	void SetXY (uint _x, uint _y); /** Reimplementation to affect all components in the list */
 
+	/** Get list of components as a vector */
 	std::vector<TComponent*> GetList() const { return list; }
 
 /* Variables privées */
 private:
 
-	/* Redéfinit x pour les composants de la liste et la hauteur du TList */
+	/** Set \a x for all components in list, and reset height of TList */
 	void Rebuild();
 
 	std::vector<TComponent*> list;

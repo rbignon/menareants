@@ -35,14 +35,19 @@ class EChannel;
 /********************************************************************************************
  *                               ECPlayers                                                  *
  ********************************************************************************************/
-
+/** Derivation of class ECBPlayer for server.
+ *
+ * \note See definition of ECBPlayer to see all members of ECPlayers (in doc/lib/)
+ */
 class ECPlayer : public ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
 
-	/* Création en donnant la structure du client, du salon et
-	 * en spécifiant si il est owner ou non
+	/** Create a Player class in a channel.
+	 * @param cl client struct of user who joined channel.
+	 * @param chan channel struct.
+	 * @param owner if player is an owner or not.
 	 */
 	ECPlayer(TClient* cl, EChannel* chan, bool owner);
 
@@ -52,13 +57,13 @@ public:
 /* Attributs */
 public:
 
-	/* Salon auquel appartient le player */
+	/** Return player's channel */
 	EChannel *Channel() { return (EChannel*)chan; }
 
-	/* Obtient le client */
+	/** Get client's structure of player */
 	TClient *Client() { return client; }
 
-	/* Obtient le pseudo du client */
+	/** Get client's nickname */
 	virtual const char* GetNick() const;
 
 /* Variables privées */
@@ -69,7 +74,10 @@ protected:
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
-
+/** Channel structure based on ECBChannel
+ *
+ * \note See definition of ECBChannel to see all members of EChannel (in doc/lib/)
+ */
 class EChannel : public ECBChannel
 {
 /* Constructeurs/Deconstructeurs */
@@ -81,21 +89,25 @@ public:
 /* Methodes */
 public:
 
-	/* Nécessite que tous les joueurs soient prets */
+	/** All players have to be ready
+	 * This will \b not send a message, it will only set all players as Ready = false.
+	 */
 	void NeedReady();
 
-	/* Envoie un message à tous les joueurs
-	 * one: joueur à qui l'on envoie pas
+	/** Send a message to all players.
+	 * 
+	 * @param one if not null, we will not send message to \b this player.
+	 * @return always 0.
 	 */
 	int sendto_players(ECPlayer* one, const char*, ...);
 
 /* Attributs */
 public:
 
-	/* Récupère le Player par le pseudo */
+	/** Get a player structure with his nickname. */
 	ECPlayer* GetPlayer(const char* nick);
 
-	/* Récupère le Player par sa classe cliente */
+	/** Get a player structure with his client structure. */
 	ECPlayer *GetPlayer(TClient *cl);
 
 /* Variables privées */

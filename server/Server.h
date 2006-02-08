@@ -36,6 +36,9 @@
 
 class ECPlayer;
 
+/** TClient class.
+ * This is class of a client.
+ */
 class TClient
 {
 /* Constructeurs/Deconstructeurs */
@@ -44,59 +47,63 @@ public:
 /* Methodes */
 public:
 
-	/* Parsage du dernier message */
+	/** Parse a messages. */
 	int parse_this();
 
-	/* Envoyer un message formaté au client */
+	/** Send a reply to client.
+	 * @return systematicaly 0.
+	 */
 	int sendrpl(const char *pattern, ...);
 
-	/* Envoie un message (sans formatage) */
+	/** Send an unformated message. */
 	int sendbuf(const char* buf, int len);
 
-	/* Fermer le client (message formaté) */
+	/** Close connexion with client and send a formated message. */
 	int exit(const char *, ...);
 
-	/* Met le client en etat "Libre" */
+	/** Free client class. */
 	void Free();
 
-	/* Initialisation d'un client */
+	/** Initialization of client. */
 	void Init(int fd, const char *ip);
 
 /* Attributs */
 public:
 
-	/* Obtient le pseudo */
+	/** Get nickname of client. */
 	char* GetNick() { return nick; }
 
-	/* Paramètre le nick */
+	/** Set client's nickname. */
 	void SetNick(char* _nick) { strncpy(nick, _nick, NICKLEN); }
 
-	/* Obtient l'ip */
+	/** Get IP. */
 	char* GetIp() { return ip; }
 
-	/* Obtient les flags */
+	/** Get flags. */
 	unsigned int GetFlags() { return flag; }
 
-	/* Paramètre un flag */
+	/** Set a flag. */
 	void SetFlag(unsigned int f) { flag |= f; }
 
-	/* Retire un flag */
+	/** Remove a flag. */
 	void DelFlag(unsigned int f) { flag &= ~f; }
 
-	/* A le flag ? */
+	/** Check if client has \a f flag. */
 	bool HasFlag(unsigned int f) { return (flag & f); }
 
-	/* Dernière lecture */
+	/** Get last read time. */
 	time_t GetLastRead() { return lastread; }
 
-	/* Obtient le sock */
+	/** Get client's sock. */
 	int GetFd() { return fd; }
 
-	/* Obtient la sturcture player si il fait partit d'un jeu */
+	/** Get player's struct if client is in a game. */
 	ECPlayer *Player() { return pl; }
 
+	/** Set player struct */
 	void SetPlayer(ECPlayer *P) { if(!pl) pl = P; }
 
+	/** Remove player struct */
 	void ClrPlayer() { pl = NULL; }
 
 /* Variables et fonctions privées */
@@ -119,6 +126,8 @@ protected:
 	inline int dequeue();
 
 public:
+
+	/** Parse a message to call a function's command. */
 	int parsemsg();
 };
 

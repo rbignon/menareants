@@ -62,6 +62,35 @@ public: \
 	virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); \
 }
 
+class HELCommand : public EC_ACommand { public: HELCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class PIGCommand : public EC_ACommand { public:PIGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class AIMCommand : public EC_ACommand { public: AIMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~AIMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class USEDCommand : public EC_ACommand { public: USEDCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~USEDCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class MAJCommand : public EC_ACommand { public: MAJCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MAJCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class MOTDCommand : public EC_ACommand { public: MOTDCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MOTDCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class EOMCommand : public EC_ACommand { public: EOMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class EOLCommand : public EC_ACommand { public: EOLCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOLCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class PLSCommand : public EC_ACommand { public: PLSCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PLSCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+/*
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( AIM );
@@ -78,6 +107,6 @@ DECLARE_CMD ( PLS );
 DECLARE_CMD ( LEA );
 DECLARE_CMD ( MSG );
 DECLARE_CMD ( SET );
-
+*/
 #endif
 

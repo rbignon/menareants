@@ -32,7 +32,7 @@
 #define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN123456789 .+-*/,;:!?()[]={}'\"&<>"
 
 struct SDL_Surface;
-
+/** This is a component whose show a box where user can type text */
 class TEdit : public TComponent
 {
 /* Constructeur/Deconstructeur */

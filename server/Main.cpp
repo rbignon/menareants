@@ -31,6 +31,7 @@
 
 ECServer app;
 
+/** Check ping timeouts */
 void ECServer::sig_alarm(int c)
 {
 #ifndef NOPINGCHECK

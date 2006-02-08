@@ -30,16 +30,29 @@
 
 #define MSGBOX_MAXWIDTH 300
 
+/** This is a complex box to show a message and some buttons */
 class TMessageBox
 {
+/**< Yes button */
 #define BT_YES		0x001
+/**< No button */
 #define BT_NO		0x002
+/**< OK button */
 #define BT_OK		0x004
+/**< Cancel button */
 #define BT_CANCEL	0x008
 
 /* Constructeur/Deconstructeur */
 public:
 
+	/** Constructor of TMessageBox.
+	 *
+	 * @param _x this is \a horizontal position of box.
+	 * @param _y this is \a vertial position of box.
+	 * @param _s this is string to show.
+	 * @param _b this is flags of buttons to show.
+	 * @param form if there is a TForm, to continue to show it, put it in.
+	 */
 	TMessageBox(uint _x, uint _y, const char* _s, uint _b, TForm* form = 0)
 		: x(_x), y(_y), b(_b)
 	{
@@ -55,19 +68,22 @@ public:
 /* Methodes */
 public:
 
-	/* Montre le message, pratique une boucle et attend le resultat */
+	/** Show message, use loop and wait a result.
+	 *
+	 * @return It return flag of button whose is clicked.
+	 */
 	uint Show();
 
-	/* Affiche */
+	/** Draw box */
 	void Draw (uint mouse_x, uint mouse_y);
 
 /* Attributs */
 public:
 
-	/* Form */
+	/** Set form */
 	void SetForm(TForm* _form) { Form = _form; }
 
-	/* Real Back Ground */
+	/** Set real back ground. */
 	void SetBackGround(ECImage* _ebg) { realbg = _ebg; }
 
 /* Variables privées */

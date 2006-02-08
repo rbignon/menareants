@@ -23,11 +23,6 @@
 
 #include "tools/Images.h"
 
-
-/**
-  *@author Andreas Hundt, Denis Oliver Kropp
-  */
-
 class Resources
 {
 public:
@@ -36,6 +31,7 @@ public:
 
 	static ECImage*	Titlescreen();
 	static ECImage*	Loadscreen();
+	static ECImage* Menuscreen();
 
 	static ECSpriteBase* UpButton();
 	static ECSpriteBase* DownButton();
@@ -47,6 +43,7 @@ protected:
 
 	static ECImage *sur_titlescreen;
 	static ECImage *sur_loadscreen;
+	static ECImage *sur_menuscreen;
 
 	static ECSpriteBase *spr_upbutton;
 	static ECSpriteBase *spr_downbutton;

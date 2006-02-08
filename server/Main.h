@@ -28,34 +28,43 @@
 
 class EC_ACommand;
 
+/** ECServer class.
+ * This is class of application.
+ *
+ * \todo Documente this class.
+ */
 class ECServer
 {
 friend int TClient::exit(const char *, ...);
 friend int TClient::parse_this();
 public:
-	enum msg {  /* mettre à jour systematiquement msgTab[] dans Server.cpp */
-		HELLO, /* HEL */
-		MAJ,   /* MAJ */
-		ERR,   /* ERR */
-		BYE,   /* BYE */
-		AIM,   /* AIM */
-		MOTD,  /* MOTD */
-		ENDOFMOTD,   /* EOM */
+	/** Message to send to clients.
+	 *
+	 * \attention mettre à jour systematiquement msgTab[] dans Server.cpp
+	 */
+	enum msg {
+		HELLO,        /**< HEL */
+		MAJ,          /**< MAJ */
+		ERR,          /**< ERR */
+		BYE,          /**< BYE */
+		AIM,          /**< AIM */
+		MOTD,         /**< MOTD */
+		ENDOFMOTD,    /**< EOM */
 
-		CANTJOIN, /* ER1 */
+		CANTJOIN,     /**< ER1 */
 
-		PING,  /* PIG */
-		PONG,  /* POG */
+		PING,         /**< PIG */
+		PONG,         /**< POG */
 
-		USED,  /* USED */
+		USED,         /**< USED */
 
-		JOIN,  /* JOI */
-		SET,   /* SET */
-		PLIST, /* PLS */
-		LEAVE, /* LEA */
-		GLIST, /* LSP */
-		EOGLIST,/*EOL */
-		MSG,   /* MSG */
+		JOIN,         /**< JOI */
+		SET,          /**< SET */
+		PLIST,        /**< PLS */
+		LEAVE,        /**< LEA */
+		GLIST,        /**< LSP */
+		EOGLIST,      /**< EOL */
+		MSG,          /**< MSG */
 
 		NONE
 	};

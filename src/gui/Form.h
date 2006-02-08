@@ -25,36 +25,34 @@
 #include "tools/Images.h"
 #include <vector>
 
-/*****************
- * DOCUMENTATION *
- *****************
- * Il faut déclarer une classe dérivée de TForm. Dedans, mettre les composants commes
- * POINTEURS PUBLIQUES. En outre, il est nécessaire, dans le constructeur, d'initialiser
- * les variables de la façon suivante :
- *   VarComp = AddComponent(new TComponent());
- * La fonction AddComponent ajoute le composant dans la liste et utilise sa fonction Init().
- * Et il faut également détruire les composants dans le destructeur avec delete.
+/** @page TForm_usage Usage of TForm
  *
- * Par la suite, lors de l'utilisation de la Form créée, il faut créer l'objet.
- * Il est nécessaire d'utiliser une boucle sans fin dans laquelle on utilise à chaques fois Update().
- * Il est possible pour chaques composants de définir les fonctions à executer en cas d'actions.
+ * You have to define a derived class from TForm. Put in components as PUBLICS POINTERS.
+ * It is necessary to initialize all variables in the constructor as this :
+ * <pre>VarComp = AddComponent(new TComponent());</pre>
+ * AddComponent function add the component in list and call his Init() function.
+ * You have to destroy components too in the destructor with \a delete.c delete.
  *
- * Voici un exemple de structure d'une classe dérivée de TForm :
+ * After, when you use this Form, you have to create the object.
+ * You must use a no-end-loop where you call TForm::Update() function.
+ * It is possible to each components to define some functions to execute when there is an action.
  *
+ * This is an example of a derived class from TForm :
+ *
+ * <pre>
  * class TForm1 : public TForm
  * {
- * // Constructeur/Deconstructeur
+ * // Constructor/Deconstructor
  * public:
  *
- *    // A noter qu'il est toutefois préférable d'implémenter les deux fonctions
- *    // suivantes hors de la classe.
+ *    // Note: you have to implemente this two functions outside of class definition.
  *    TForm1()
  *    {
- *      // Ajout des composants
+ *      // Add components
  *      Button1 =   AddComponent(new TButton(500,350,100,49));
  *      MyListBox = AddComponent(new TListBox(300,200,200,300));
  *      Blah =      AddComponent(new TMemo(75,325,300,200,30));
- *      // Définition des evenements.
+ *      // Défine the events
  *      Button1->OnClick =    Button1OnClick;
  *      MyListBox->OnSelect = MyListBoxOnSelect;
  *    }
@@ -65,21 +63,24 @@
  *      delete Blah;
  *    }
  *
- * // Composants
+ * // Components
  * public:
  *
  *    TButton      *Button1;
  *    TListBox     *MyListBox;
  *    TMemo        *Blah;
  *
- * // Evenements
+ * // Events
  * public:
  *    void Button1OnClick();
  *    void MyListBoxOnSelect(uint selected);
  * };
+ * </pre>
  *
- *****************/
+ * --Progs
+ */
 
+/** This is a class who show a form on the screen and contain some components */
 class TForm
 {
 /* Constructeur/Destructeur */
@@ -92,15 +93,20 @@ public:
 public:
 
 	/* Dessine chaques composants */
-	void Update();
-	void Update(bool flip);
-	void Update(int x, int y);
+	void Update(); /**< Draw all components */
+	void Update(bool flip); /**< Draw all components @param flip If true, function calls SDL_Flip() */
+	void Update(int x, int y); /**< Draw all components @param x x position of mouse @param y y position of mouse */
+	/** Draw all components
+	 * @param x x position of mouse
+	 * @param y y position of mouse
+	 * @param flip If true, function calls SDL_Flip() and draw directly with SDL
+	 */
 	void Update(int x, int y, bool flip);
 
 /* Attributs */
 public:
 
-	/* Définit l'arrière plan */
+	/** Set background picture */
 	void SetBackground(ECImage *image);
 
 /* Variables protégées */
@@ -108,7 +114,7 @@ protected:
 
 	ECImage *background;
 
-	/* Ajoute un composant */
+	/** Add a component */
 	template<typename T>
 	T* AddComponent(T* comp)
 	{

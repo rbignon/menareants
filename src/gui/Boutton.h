@@ -25,6 +25,10 @@
 #include "Component.h"
 #include "tools/Images.h"
 
+/** This is a component based on TComponent and whose show a button with a picture
+ *
+ * \note There isn't any text, you have to see \a TButtonText
+ */
 class TButton : public TComponent
 {
 protected:

@@ -26,6 +26,7 @@
 #include "Component.h"
 #include "tools/Font.h"
 
+/** This is a component who shows a text */
 class TLabel : public TComponent
 {
 /* Constructeur/Destructeur */
@@ -37,11 +38,10 @@ public:
 /* Methodes */
 public:
 
-	/* Dessine */
+	/** Draw */
 	void Draw(unsigned int m_x, unsigned int m_y);
 
-	/* Initialisation. Fonction nécessaire par TComponent mais non
-	 * utile pour ce composant */
+	/** Initialization. It is requiered to be defined by TComponent but it isn't necessary for TLabel */
 	void Init() {}
 
 /* Attributs */

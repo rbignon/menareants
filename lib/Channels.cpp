@@ -34,7 +34,6 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	fric = 0;
 	place = 0;
 	color = 0;
-	map = 0;
 }
 
 bool ECBPlayer::SetPlace(unsigned int p)
@@ -56,6 +55,7 @@ ECBChannel::ECBChannel(std::string _name)
 {
 	state = WAITING;
 	limite = 0;
+	map = 0;
 }
 
 bool ECBChannel::AddPlayer(ECBPlayer* pl)
@@ -83,7 +83,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
-/* Lors de rajouts de modes, modifier API paragraphe 4. Modes */
+/** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
 const char* ECBChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
@@ -99,8 +99,8 @@ const char* ECBChannel::ModesStr() const
 	return (modes + params).c_str();
 }
 
-/* En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
- * Note qu'il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
+/** \attention En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
+ * \note il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
  * où il y en a une, d'incrémenter le protocole
  */
 const char* ECBChannel::PlayerList()

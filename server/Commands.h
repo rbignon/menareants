@@ -55,6 +55,27 @@ public: \
 	virtual int Exec(TClient *cl, std::vector<std::string> string_list); \
 }
 
+class ERRCommand : public EC_ACommand { public: ERRCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ERRCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class IAMCommand : public EC_ACommand { public: IAMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~IAMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class BYECommand : public EC_ACommand { public: BYECommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BYECommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class PIGCommand : public EC_ACommand { public: PIGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class POGCommand : public EC_ACommand { public: POGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~POGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+/*
 DECLARE_CMD ( ERR );
 
 DECLARE_CMD ( IAM );
@@ -67,5 +88,6 @@ DECLARE_CMD ( LEA );
 DECLARE_CMD ( LSP );
 DECLARE_CMD ( MSG );
 DECLARE_CMD ( SET );
+*/
 
 #endif

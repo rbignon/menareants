@@ -23,6 +23,9 @@
 
 #include <string>
 
+/** Config class.
+ * \todo documente.
+ */
 class Config
 {
 public:

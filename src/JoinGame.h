@@ -34,7 +34,7 @@
 /********************************************************************************************
  *                               TPlayerLine                                                *
  ********************************************************************************************/
-
+/** This is a line to show a player status in TGameInfos form */
 class TPlayerLine : public TComponent
 {
 /* Constructeur/Destructeur */
@@ -76,7 +76,7 @@ private:
 /********************************************************************************************
  *                               TGameInfosForm                                              *
  ********************************************************************************************/
-
+/** This is a form based on TForm showed when an user joined or created a channel before start game. */
 class TGameInfosForm : public TForm
 {
 /* Constructeur/Destructeur */
@@ -110,7 +110,7 @@ public:
 /********************************************************************************************
  *                               TListGameForm                                              *
  ********************************************************************************************/
-
+/** This is a form based on TForm showed when client want to list channels. */
 class TListGameForm : public TForm
 {
 /* Constructeur/Deconstructeur */

@@ -32,6 +32,7 @@
 struct SDL_Surface;
 struct SDL_Color;
 
+/** An item of TListBox */
 typedef struct s_list_box_item_t{
     std::string label;
     std::string value;
@@ -39,12 +40,12 @@ typedef struct s_list_box_item_t{
     bool enabled;
   } list_box_item_t;
 
-
+/** This is a component based on TComponent and whose show a list of items */
 class TListBox : public TComponent
 {
 public:
-  int selection_min; // Minimal number of selected items
-  int selection_max; // Maximal number of selected items (-1 means no limit)
+  int selection_min; ///< Minimal number of selected items
+  int selection_max; ///<Maximal number of selected items (-1 means no limit)
   typedef std::list<uint>::const_iterator selection_iterator;
 
 private:
@@ -84,7 +85,7 @@ public:
   void Select (uint index);
   void Deselect (uint index);
   bool IsSelected (uint index);
-  int GetSelectedItem (); /* retourne -1 si non sélectionné */
+  int GetSelectedItem (); /**< retourne -1 si non sélectionné */
   const std::list<uint>& GetSelection() const;
   const std::string& ReadLabel (uint index) const;
   const std::string& ReadValue (uint index) const;

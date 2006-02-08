@@ -32,12 +32,17 @@
 #include "tools/Font.h"
 #include "Outils.h"
 #include "Debug.h"
+#include "Timer.h"
 
-TListGameForm  *ListGameForm = NULL;
-TGameInfosForm *GameInfosForm = NULL;
-bool EOL = false, JOINED = false;
+TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
+TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
+bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
+bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
 
-/* <nick> MSG <message> */
+/** We received a message in channel.
+ *
+ * Syntax: nick MSG message
+ */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(GameInfosForm->Chat)
@@ -46,10 +51,14 @@ int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* LSP <nom> <nbjoueur> [nbmax] */
+/** List games.
+ *
+ * Syntax: LSP nom nbjoueur [nbmax]
+ */
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(!ListGameForm) return 0;
+	if(!ListGameForm)
+		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la liste des chans", VPName(ListGameForm));
 
 	if(parv[3] == "0")
 		ListGameForm->GList->AddItem(false, parv[1] + "   " + parv[2], parv[1], black_color, true);
@@ -60,17 +69,22 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* EOL */
+/** End of channel list
+ *
+ * Syntax: EOL
+ */
 int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	EOL = true;
 	return 0;
 }
 
-/* :%s SET <modes> [params]
+/** An user have setted some modes in the channel.
  *
- * La reception des modes se fait de manière IRC: chaques "attributs" sont "stockés" dans
- * une lettre et il peut y avoir un attribut mis à la suite.
+ * Syntax: nicks SET modes [params]
+ *
+ * Reception of modes looks like IRC: each "attributes" are stocked in a letter and you can put several attributs in
+ * the same command.
  */
 int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -142,9 +156,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* PLS [[@]<pos>,<col>,<nick>] [[[@]<pos>,<col>,<nick>] ...]
+/** Show players when you join a game.
  *
- * Affiche le nom des joueurs lors du join d'une partie
+ * Syntax : PLS [[@]pos,col,nick] [[[@]pos,col,nick] ...]
  */
 int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -197,7 +211,10 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* <nick> JOI <chan> */
+/** Someone (or me) has joined the channel.
+ *
+ * Syntax: nick JOI chan
+ */
 int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(players.size())
@@ -227,14 +244,17 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* <nick> LEA */
+/** Someone (or me) has leave the channel.
+ *
+ * Syntax: nick LEA 
+ */
 int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!players.size())
 		return vDebug(W_DESYNCH|W_SEND, "Reception d'un LEAVE d'un joueur inconnu !",
 		                                VSName(parv[0].c_str()));
 
-	/* Note: Dans le protocole il ne devrait y avoir qu'un seul départ
+	/** \note Dans le protocole il ne devrait y avoir qu'un seul départ
 	 *       à la fois mais bon par respect de ce qui est *possible*
 	 *       (on ne sait jamais, après tout, on pourrait imaginer dans
 	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
@@ -258,19 +278,20 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				  it!=GameInfosForm->Players->GetList().end();
 				  it++)
 				{
-					TPlayerLine *pline = ((TPlayerLine*) (*it));
+					TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 					if(!pline)
 					{ /* Il ne devrait PAS être possible que la liste contienne un element nul */
 						vDebug(W_ERR|W_SEND, "La liste contient un element vide", VPName(*it));
 						continue;
 					}
-					/* TODO: En revanche, il devrait (et il y aurra) des elements qui ne seront
+					/** \todo En revanche, il devrait (et il y aurra) des elements qui ne seront
 					 *       *pas* des TPlayerLine. Il faut donc arriver à trouver le type de *it.
 					 */
 					printf("p - %s\n", pline->Player()->GetNick());
 					if(pline->Player() == (*playersi))
 					{
-						GameInfosForm->Players->RemoveLine(*it);
+						if(!GameInfosForm->Players->RemoveLine(*it))
+							Debug(W_ERR|W_SEND, "LEA: Impossible de supprimer la ligne de l'user");
 						GameInfosForm->RecalcMemo();
 						break;
 					}
@@ -286,10 +307,12 @@ bool EuroConqApp::GameInfos(const char *cname)
 {
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
+		
+	std::string name;
 
 	if(!cname)
 	{
-		std::string name = Menu::EnterString("Nom", "", false);
+		name = Menu::EnterString("Nom", "", false);
 		if(name.empty()) return true;
 
 		cname = name.c_str();
@@ -313,89 +336,89 @@ bool EuroConqApp::GameInfos(const char *cname)
 	SDL_Event event;
 	bool eob = false;
 
-try
-{
-	if(!client->Player() || !client->Player()->Channel())
-		throw ECExcept(VPName(client->Player()), "Dans aucun chan");
-	EChannel *chan = client->Player()->Channel();
-
-	do
+	try
 	{
-		int x=0, y=0;
-		while( SDL_PollEvent( &event) )
+		if(!client->Player() || !client->Player()->Channel())
+			throw ECExcept(VPName(client->Player()), "Dans aucun chan");
+		EChannel *chan = client->Player()->Channel();
+	
+		do
 		{
-			switch(event.type)
+			int x=0, y=0;
+			while( SDL_PollEvent( &event) )
 			{
-				case SDL_KEYUP:
-					GameInfosForm->SendMessage->PressKey(event.key.keysym);
-					switch (event.key.keysym.sym)
-					{
-						case SDLK_ESCAPE:
+				switch(event.type)
+				{
+					case SDL_KEYUP:
+						GameInfosForm->SendMessage->PressKey(event.key.keysym);
+						switch (event.key.keysym.sym)
+						{
+							case SDLK_ESCAPE:
+								eob = true;
+								break;
+							case SDLK_RETURN:
+								if(GameInfosForm->SendMessage->Focused())
+								{
+									client->sendrpl(client->rpl(EC_Client::MSG),
+												FormatStr(GameInfosForm->SendMessage->GetString().c_str()));
+									GameInfosForm->Chat->AddItem("<" + client->GetNick() + "> " +
+												GameInfosForm->SendMessage->GetString(), black_color);
+									GameInfosForm->SendMessage->ClearString();
+								}
+								break;
+							default: break;
+						}
+						break;
+					case SDL_MOUSEBUTTONUP:
+						GameInfosForm->Chat->Clic( event.button.x, event.button.y);
+						if(GameInfosForm->MyPosition &&
+						GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
+								client->sendrpl(client->rpl(EC_Client::SET),
+									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
+						break;
+					case SDL_MOUSEBUTTONDOWN:
+						GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
+						if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 							eob = true;
-							break;
-						case SDLK_RETURN:
-							if(GameInfosForm->SendMessage->Focused())
-							{
-								client->sendrpl(client->rpl(EC_Client::MSG),
-								             FormatStr(GameInfosForm->SendMessage->GetString().c_str()));
-								GameInfosForm->Chat->AddItem("<" + client->GetNick() + "> " +
-								             GameInfosForm->SendMessage->GetString(), black_color);
-								GameInfosForm->SendMessage->ClearString();
-							}
-							break;
-						default: break;
-					}
-					break;
-				case SDL_MOUSEBUTTONUP:
-					GameInfosForm->Chat->Clic( event.button.x, event.button.y);
-					if(GameInfosForm->MyPosition &&
-					   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
-							client->sendrpl(client->rpl(EC_Client::SET),
-							       ("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
-					if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
-						eob = true;
-					if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
-					{
-						client->sendrpl(client->rpl(EC_Client::SET), "+!");
-						GameInfosForm->PretButton->SetEnabled(false);
-					}
-					break;
-				default:
-					break;
+						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
+						{
+							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+							GameInfosForm->PretButton->SetEnabled(false);
+						}
+						break;
+					default:
+						break;
+				}
 			}
-		}
-		SDL_GetMouseState( &x, &y);
-
-		GameInfosForm->Update(x, y, false);
-
-		big_font.WriteCenter(400,50, "Jeu : " + std::string(chan->GetName()), black_color);
-/*		vert += 30;
-		for(unsigned int i=0; i<chan->Players().size();i++, vert += 30)
-		{
-			ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
-
-			big_font.WriteLeft(50, vert, "OK", pl->Ready() ? red_color : gray_color);
-			if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
-			big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
-			pos.SetXY(200, vert);
-			pos.Draw(x, y);
-		}
-		GameInfosForm->Chat->SetXY(75, vert);
-		GameInfosForm->Chat->SetHeight(525-vert); * On définit une jolie taille */
-
-		SDL_Flip(sdlwindow);
-	} while(!eob && client->IsConnected() && client->Player());
-
-}
-catch(TECExcept &e)
-{
-	delete GameInfosForm;
-	GameInfosForm = NULL;
-	throw;
-}
+			SDL_GetMouseState( &x, &y);
+	
+			GameInfosForm->Update(x, y, false);
+	
+			big_font.WriteCenter(400,50, "Jeu : " + std::string(chan->GetName()), black_color);
+	/*		vert += 30;
+			for(unsigned int i=0; i<chan->Players().size();i++, vert += 30)
+			{
+				ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
+	
+				big_font.WriteLeft(50, vert, "OK", pl->Ready() ? red_color : gray_color);
+				if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
+				big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
+				pos.SetXY(200, vert);
+				pos.Draw(x, y);
+			}
+			GameInfosForm->Chat->SetXY(75, vert);
+			GameInfosForm->Chat->SetHeight(525-vert); * On définit une jolie taille */
+	
+			SDL_Flip(sdlwindow);
+		} while(!eob && client->IsConnected() && client->Player());
+	
+	}
+	catch(TECExcept &e)
+	{
+		delete GameInfosForm;
+		GameInfosForm = NULL;
+		throw;
+	}
 	delete GameInfosForm;
 	GameInfosForm = NULL;
 
@@ -413,7 +436,7 @@ void EuroConqApp::ListGames()
 	ListGameForm = new TListGameForm;
 
 	bool eob = false, refresh = true;
-	int i;
+	Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
 	do
 	{
 		if(refresh)
@@ -430,7 +453,7 @@ void EuroConqApp::ListGames()
 			}
 			refresh = false;
 			ListGameForm->JoinButton->SetEnabled(false);
-			i=0;
+			timer.reset();
 		}
 		while( SDL_PollEvent( &event) )
 		{
@@ -479,7 +502,7 @@ void EuroConqApp::ListGames()
 
 		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
 
-		if(++i >= 100) refresh = true; /* ~= une minute ? */
+		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
 	} while(!eob && client->IsConnected());
 
 	delete ListGameForm;
@@ -502,7 +525,7 @@ TGameInfosForm::TGameInfosForm()
 
 	Players = AddComponent(new TList(50, 30));
 
-	SetBackground(Resources::Titlescreen());
+	SetBackground(Resources::Menuscreen());
 
 	MyPosition = 0;
 }
@@ -538,7 +561,7 @@ TListGameForm::TListGameForm()
 
 	GList = AddComponent(new TListBox(300,200,200,300));
 
-	SetBackground(Resources::Titlescreen());
+	SetBackground(Resources::Menuscreen());
 }
 
 TListGameForm::~TListGameForm()

@@ -26,6 +26,7 @@
 #include "gui/Memo.h"
 #include "gui/Label.h"
 
+/** This is class based on TForm showed when I am connected */
 class TConnectedForm : public TForm
 {
 /* Constructeur/Destructeur */

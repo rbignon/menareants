@@ -33,7 +33,11 @@ class ECBChannel;
 
 class ECBMap;
 
-/* ATTENTION! Classe virtuelle */
+/** Base class of Player/
+ * There if informations about a player whose are used by server and client.
+ *
+ * \attention This is a \a virtual class !
+ */
 class ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
@@ -47,39 +51,44 @@ public:
 /* Attributs */
 public:
 
-	/* Salon auquel appartient le player */
+	/** Player's Channel. */
 	ECBChannel *Channel() { return chan; }
 
-	/* Argent détenu par le joueur */
+	/** This is player's money. \todo Use a private variable ? */
 	int fric;
 
-	/* Est le créateur de la partie  ? */
+	/** Is he the owner of game ? */
 	bool IsOwner() const { return owner; }
+	
+	/** Set a player as the owner of game of not. */
 	void SetOwner(bool o = true) { owner = o; }
 
-	/* Place */
+	/** Place of player in the map. */
 	unsigned int Place() const { return place; }
+	
+	/** Set place of player. */
 	bool SetPlace(unsigned int p);
 
-	/* MAP */
-	ECBMap *Map() const { return map; }
-	void SetMap(ECBMap *m) { map = m; }
-
-	/* Couleur
-	 * Les couleurs sont représentées par un énumérateur... Alors
+	/** Return color of player.
+	 * \note Les couleurs sont représentées par un énumérateur. Alors
 	 * il faut voir si le serveur en aurra quelque chose à foutre
 	 * ou pas, si oui on met l'énumérateur ici, sinon on le met
 	 * uniquement dans le client.
-	 * TODO: il faut mettre dans le client un tableau de couleurs SDL
+	 *
+	 * \todo il faut mettre dans le client un tableau de couleurs SDL
 	 */
 	unsigned int Color() const { return color; }
+	
+	/** Set color of player. */
 	void SetColor(unsigned int c) { color = c; }
 
-	/* Retourne le pseudo du joueur */
+	/** Return nick of player. */
 	virtual const char* GetNick() const = 0;
 
-	/* Le joueur est pret (utilisation de RDY) */
+	/** Is player ready ? */
 	bool Ready() const { return ready; }
+	
+	/** Set player. */
 	void SetReady(bool r = true) { ready = r; }
 
 /* Variables privées */
@@ -88,7 +97,6 @@ protected:
 	bool owner;
 	unsigned int place;
 	unsigned int color;
-	ECBMap *map;
 	bool ready;
 };
 
@@ -99,22 +107,25 @@ typedef PlayerVector::iterator PlayerIterator;
  *                               ECBChannel                                                   *
  ********************************************************************************************/
 
+/** Base class of a Channel.
+ * There are channel's informations used by server and client.
+ */
 class ECBChannel
 {
 /* Constructeurs/Deconstructeurs */
 public:
 
-	/* Constructeur en donnant le nom du salon */
+	/** @param _name name of channel */
 	ECBChannel(std::string _name);
 
-	/* Deconstructeur par default */
 	~ECBChannel() {}
 
+	/** Define state of game */
 	enum e_state {
-		WAITING,
-		SENDING,
-		PLAYING,
-		ANIMING
+		WAITING,           /**< Game has been created and is able to be joined. */
+		SENDING,           /**< Informations about game are sending. */
+		PLAYING,           /**< Players are playing. */
+		ANIMING            /**< Game is in animation. */
 	};
 
 /* Methodes */
@@ -123,42 +134,57 @@ public:
 /* Attributs */
 public:
 
-	/* Obtient le nom du channel */
+	/** Return channel name. */
 	const char* GetName() const { return name.c_str(); }
 
-	/* Récupère la liste des joueurs */
+	/** Return player list in the channel. */
 	PlayerVector Players() const { return players; }
 
-	/* Ajoute un player */
+	/** Add a player. */
 	bool AddPlayer(ECBPlayer*);
 
-	/* Supprime un player
-	 * use_delete: si true, supprime lui meme le ECPlayer
+	/** Delete a player.
+	 * @param pl class of player to remove.
+	 * @param use_delete if true, use \a delete on \a pl .
 	 */
-	bool RemovePlayer(ECBPlayer*, bool use_delete);
+	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 
-	/* Retourne le nombre de joueurs dans le jeu */
+	/** Return number of players in channel. */
 	unsigned int NbPlayers() const { return players.size(); }
 
-	/* Retourne la liste des joueurs
-	 * Note: Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
+	/** Return aformated list of players.
+	 * It is used to send to client a player list when it joined.
+	 *
+	 * \return formated list of players.
+	 *
+	 * \note Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
 	 */
 	const char* PlayerList();
 
-	/* Retourne les modes formatés
-	 * Note: Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
+	/** Return a formated modes list.
+	 * It is used to send to client a mode list when it joined.
+	 *
+	 * \return formated list of modes.
+	 *
+	 * \note Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
 	 */
 	const char* ModesStr() const;
 
 	/* A propos des etats de la partie */
-	e_state State() const { return state; }
-	bool IsInGame() const { return (state >= PLAYING); }
-	bool Joinable() const { return (state == WAITING); }
-	void SetState(e_state s) { state = s; }
+	e_state State() const { return state; }              /**< Return state of game. */
+	bool IsInGame() const { return (state >= PLAYING); } /**< Check if channel is in game. */
+	bool Joinable() const { return (state == WAITING); } /**< Check if channel is joinable. */
+	void SetState(e_state s) { state = s; }              /**< Define state. */
 
 	/* Limite maximale pour entrer dans le chan */
-	unsigned int GetLimite() const { return limite; }
-	void SetLimite(unsigned int l) { limite = l; }
+	unsigned int GetLimite() const { return limite; }    /**< Return user limit of channel. */
+	void SetLimite(unsigned int l) { limite = l; }       /**< Define user limit of channel. */
+	
+	/** Return MAP \attention ECBMap n'existe pas encore ! */
+	ECBMap *Map() const { return map; }
+	
+	/** Define the map \attention ECBMap n'existe pas encore ! */
+	void SetMap(ECBMap *m) { map = m; }
 
 /* Variables privées */
 protected:
@@ -166,6 +192,7 @@ protected:
 	PlayerVector players;
 	e_state state;
 	unsigned int limite;
+	ECBMap *map;
 };
 
 #endif /* ECLIB_CHANNELS_H */

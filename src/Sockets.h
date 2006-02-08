@@ -42,18 +42,22 @@ public:
 
 public:
 
-	enum msg {  /* mettre à jour systematiquement msgTab[] dans Sockets.cpp */
-		IAM,  /* IAM */
-		PONG, /* POG */
-		BYE,  /* BYE */
-		ERROR,/* ERR */
-		ERRORV,/*ERR */
+	/** Messages à utiliser dans les reply
+	 *
+	 * \attention mettre à jour systematiquement msgTab[] dans Sockets.cpp
+	 */
+	enum msg {
+		IAM,         /** IAM */
+		PONG,        /** POG */
+		BYE,         /** BYE */
+		ERROR,       /** ERR */
+		ERRORV,      /**ERR */
 
-		LISTGAME, /* LSP */
-		JOIN, /* JOI */
-		LEAVE,/* LEA */
-		MSG,  /* MSG */
-		SET,  /* SET */
+		LISTGAME,    /** LSP */
+		JOIN,        /** JOI */
+		LEAVE,       /** LEA */
+		MSG,         /** MSG */
+		SET,         /** SET */
 
 		NONE
 	};

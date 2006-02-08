@@ -29,11 +29,22 @@
 #include <string>
 #include <SDL.h>
 
+/** This component show an edit who you can choose an integer in an interval */
 class TSpinEdit : public TComponent
 {
 /* Constructeur/Destructeur */
 public:
 
+	/** Constructor
+	 * @param label label of component.
+	 * @param _x x position of component.
+	 * @param _y y position of component.
+	 * @param _width width of component.
+	 * @param _min min value that component can take.
+	 * @param _max max value that component can take.
+	 * @param _step value added or removed when user clicks on one of buttons.
+	 * @param _defvalue this is default value that component has when it is created.
+	 */
 	TSpinEdit(std::string label, uint _x, uint _y, uint _width, int _min, int _max, uint _step = 1, int _defvalue = 0);
 	~TSpinEdit();
 
@@ -51,9 +62,8 @@ public:
 /* Attributs */
 public:
 
-	/* Valeur du champ.
-	 * Notes:
-	 * - SetValue(int _value): retourne true si la valeur a changée.
+	/** Value of spinedit.
+	 * @return true if value is changed
 	 */
 	bool SetValue(int _value, bool first = false);
 	int Value() { return value; }

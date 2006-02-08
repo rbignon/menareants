@@ -26,6 +26,10 @@
 #include <string>
 #include <fstream>
 
+/** Send motd to client.
+ *
+ * @param cl client struct
+ */
 static void send_motd(TClient *cl)
 {
 	std::ifstream fp(app.GetConf()->MotdFile().c_str());
@@ -41,6 +45,11 @@ static void send_motd(TClient *cl)
 	return;
 }
 
+/** Check if nickname is correct.
+ *
+ * @param nick original nickname.
+ * @return new nickname (or NULL if nickname is absolutly incorrect)
+ */
 static char *correct_nick(const char *nick)
 {
 	static char newnick[NICKLEN + 1];
@@ -57,13 +66,16 @@ static char *correct_nick(const char *nick)
 	return newnick;
 }
 
-/* IAM <nick> <prog> <version> */
+/** Client send me several informations about him.
+ *
+ * Syntax: IAM nick prog version
+ */
 int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(IsAuth(cl))
 		return vDebug(W_DESYNCH, "User déjà logué", VSName(cl->GetNick()));
 
-	/* Note: il est normal de vérifier ici seulement le nombre d'arguments: ça permet un
+	/** \note il est normal de vérifier ici seulement le nombre d'arguments: ça permet un
 	 *       meilleur controle par rapport à la version
 	 */
 	if(parv.size() < 4 || parv[2] != CLIENT_SMALLNAME)
@@ -93,13 +105,19 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 }
 
-/* PIG */
+/** Received a PING message from client.
+ *
+ * Syntax: PIG
+ */
 int PIGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	return cl->sendrpl(app.rpl(ECServer::PONG));
 }
 
-/* POG */
+/** Received a PONG message from client.
+ *
+ * Syntax: POG
+ */
 int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(IsPing(cl)) DelPing(cl);
@@ -108,7 +126,10 @@ int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 }
 
-/* BYE */
+/** Client wants to disconnect.
+ *
+ * Syntax: BYE
+ */
 int BYECommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	return cl->exit(app.rpl(ECServer::BYE));

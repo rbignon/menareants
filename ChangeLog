@@ -1,3 +1,7 @@
+2006-02-08  Romain Bignon <progs@headfucking.net>
+
+	* Utilisation de Doxygen.
+
 2006-01-15  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp (TPlayerLine): Composant utilisé dans un TList pour la liste des players dans

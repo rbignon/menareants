@@ -22,23 +22,23 @@
 #define Outils_hpp
 #include <sstream>
 
-/* Récupère le premier mot de la chaine */
+/** Récupère le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
 
-/* Formate la chaine avec des \ devant les espaces */
+/** Formate la chaine avec des \ devant les espaces */
 char* FormatStr(const char* s);
 
-/* Formate une chaine et retourne dans une std::string */
+/** Formate une chaine et retourne dans une std::string */
 std::string StringF(const char* format, ...);
 
-/* Retourne si le fichier existe ou non */
+/** Retourne si le fichier existe ou non */
 bool FichierExiste(const std::string &nom);
 
-/* Retourne la date formatée */
-#define TIMELEN 20
+/** Retourne la date formatée */
 char *get_time(time_t mytime);
+#define TIMELEN 20
 
-/* Convertit d'une chaine en un type */
+/** Convertit d'une chaine en un type */
 template<typename T>
 T StrToTyp(const std::string & Str)
 {
@@ -50,7 +50,7 @@ T StrToTyp(const std::string & Str)
     return Dest;
 }
 
-/* Convertit d'un type en une chaine */
+/** Convertit d'un type en une chaine */
 template<typename T>
 std::string TypToStr( const T & Value )
 {

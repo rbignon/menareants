@@ -66,6 +66,7 @@ bool TList::RemoveLine(TComponent *c)
 
 void TList::Rebuild()
 {
+	visible = false;
 	h = 0;
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
 	{
@@ -74,6 +75,7 @@ void TList::Rebuild()
 		if((*it)->GetWidth() > w)
 			w = (*it)->GetWidth();
 	}
+	visible = true;
 }
 
 void TList::Draw(uint souris_x, uint souris_y)

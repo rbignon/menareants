@@ -30,14 +30,20 @@
 TConnectedForm  *ConnectedForm = NULL;
 static bool RC_MOTD = false;
 
-/* HEL <prog> <version> */
+/** We are connected to server.
+ *
+ * Syntax: HEL prog version
+ */
 int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->sendrpl(me->rpl(EC_Client::IAM), me->lapp->getconf()->nick.c_str());
 	return 0;
 }
 
-/* AIM <nick> */
+/** Server acknowledges my nickname.
+ *
+ * Syntax: AIM nick
+ */
 int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->set_nick(parv[1]);
@@ -45,7 +51,10 @@ int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* PIG */
+/** Received a PING from server.
+ *
+ * Syntax: PIG
+ */
 int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->sendrpl(me->rpl(EC_Client::PONG));
@@ -53,14 +62,20 @@ int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* USED */
+/** My nickname is already used by another user.
+ *
+ * Syntax: USED
+ */
 int USEDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->SetCantConnect("Le pseudo " + me->lapp->getconf()->nick + " est pris");
 	return 0;
 }
 
-/* MAJ <0/+/-> */
+/** My game isn't compatible with this server.
+ *
+ * Syntax: MAJ <0/+/->
+ */
 int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	switch(parv[1][0])
@@ -85,7 +100,10 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* MOTD [ligne] */
+/** I receive message of the day of server.
+ *
+ * Syntax: MOTD [ligne]
+ */
 int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!ConnectedForm) return 0;
@@ -100,7 +118,10 @@ int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/* EOM */
+/** I received all message of the day from server.
+ *
+ * Syntax: EOM
+ */
 int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	RC_MOTD = false;
@@ -190,7 +211,7 @@ void EuroConqApp::request_game()
 
 			SDL_Flip(sdlwindow);
 
-			if(client && !client->IsConnected())
+			if(!client || !client->IsConnected())
 			{
 				eob = true;
 
@@ -233,7 +254,7 @@ TConnectedForm::TConnectedForm()
 	ListButton = AddComponent(new TButtonText(600,150,100,49, "Lister les parties"));
 	DisconnectButton = AddComponent(new TButtonText(600,200,100,49, "Se déconnecter"));
 
-	SetBackground(Resources::Titlescreen());
+	SetBackground(Resources::Menuscreen());
 }
 
 TConnectedForm::~TConnectedForm()

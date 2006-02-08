@@ -31,11 +31,13 @@
 struct SDL_Surface;
 struct SDL_Color;
 
+/** An item of TMemo */
 typedef struct s_memo_box_item_t{
     std::string label;
     SDL_Color color;
   } memo_box_item_t;
 
+/** This is a component derived of TComponent whose show a box with text lines */
 class TMemo : public TComponent
 {
 private:

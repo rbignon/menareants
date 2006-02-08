@@ -49,6 +49,13 @@ int Debug(unsigned int flags, const char* format, ...)
 	return vDebug(flags, buf, "");
 }
 
+/** Debug function where we can specifie variables
+ *
+ * @param flags flags specified in Debug.h
+ * @param msg   message
+ * @param vars  list of variables as a string
+ * @return always 0.
+ */
 int vDebug(unsigned int flags, std::string msg, std::string vars)
 {
 #ifndef DEBUG
