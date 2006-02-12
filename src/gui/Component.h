@@ -77,7 +77,7 @@ public:
 	unsigned int GetHeight() const;                       /**< Get \a height position. */
 
 	/* Définie la position, la hauteur ou la largeur */
-	void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
+	virtual void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
 	void SetHeight (uint _h);                             /**< Set \a height */
 	void SetWidth (uint _w);                              /**< Set \a width */
 
@@ -96,6 +96,7 @@ protected:
 	bool visible;
 	bool enabled;
 };
+typedef std::vector<TComponent*> ComponentVector;
 
 /********************************************************************************************
  *                                 TList                                                    *
@@ -161,7 +162,7 @@ public:
 	/** Remove a component from list
 	 * \warning This will use \a delete on TComponent !!
 	 */
-	bool RemoveLine(TComponent *);
+	bool RemoveLine(TComponent *c);
 
 	/** Draw all components in list */
 	void Draw(uint souris_x, uint souris_y);
@@ -175,7 +176,7 @@ public:
 	void SetXY (uint _x, uint _y); /** Reimplementation to affect all components in the list */
 
 	/** Get list of components as a vector */
-	std::vector<TComponent*> GetList() const { return list; }
+	ComponentVector GetList() const { return list; }
 
 /* Variables privées */
 private:
@@ -183,7 +184,7 @@ private:
 	/** Set \a x for all components in list, and reset height of TList */
 	void Rebuild();
 
-	std::vector<TComponent*> list;
+	ComponentVector list;
 };
 
 #endif /* EC_COMPONENT_H */

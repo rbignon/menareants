@@ -267,10 +267,13 @@ void TClient::Free()
 	EChannel *c;
 	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
-		c->RemovePlayer(pl, true);
-		c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "");
 		if(!c->NbPlayers())
 			delete c;
+		else
+		{
+			c->RemovePlayer(pl, true);
+			c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "");
+		}
 	}
 
 	close(fd);

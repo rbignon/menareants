@@ -27,7 +27,7 @@
 #include "Main.h"
 #include <cstdarg>
 
-std::vector<EChannel*> ChanList;
+ChannelVector ChanList;
 
 /********************************************************************************************
  *                              Commandes                                                   *
@@ -134,7 +134,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					uint color = StrToTyp<uint>(parv[j++]);
 					if(color > 0)
 					{
-						PlayerIterator it;
+						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
 						    it != sender->Channel()->Players().end() && (*it)->Color() != color;
 						    it++);
@@ -164,7 +164,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							                 sender->Channel()->GetLimite());
 							break;
 						}
-						PlayerIterator it;
+						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
 						    it != sender->Channel()->Players().end() && (*it)->Place() != place;
 						    it++);
@@ -232,7 +232,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	EChannel* chan = NULL;
 	ECPlayer* pl;
 
-	for(ChannelIterator it=ChanList.begin(); it != ChanList.end(); it++)
+	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); it++)
 		if(!strcasecmp((*it)->GetName(), nom))
 		{
 			chan = *it;
@@ -251,7 +251,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			vDebug(W_WARNING, "Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
 			                  VSName(cl->GetNick()) VIName(chan->State()));
-			return cl->exit(app.rpl(ECServer::ERR));
+			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 		}
 		if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
 			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
@@ -292,7 +292,7 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
  */
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	for(ChannelIterator it=ChanList.begin(); it != ChanList.end(); it++)
+	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); it++)
 		if((*it)->Joinable())
 			cl->sendrpl(app.rpl(ECServer::GLIST), (*it)->GetName(), (*it)->NbPlayers(),
 			                                      (*it)->GetLimite());
@@ -327,7 +327,7 @@ EChannel::EChannel(std::string _name)
 
 EChannel::~EChannel()
 {
-	for (ChannelIterator it = ChanList.begin(); it != ChanList.end(); )
+	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
 		if (*it == this)
 		{
@@ -341,14 +341,15 @@ EChannel::~EChannel()
 
 void EChannel::NeedReady()
 {
-	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 		(*it)->SetReady(false);
+
 	return;
 }
 
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
-	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 		if((dynamic_cast<ECPlayer*> (*it))->Client() && !strcasecmp((*it)->GetNick(), nick))
 			return ((ECPlayer*) (*it));
 	return NULL;
@@ -356,9 +357,10 @@ ECPlayer *EChannel::GetPlayer(const char* nick)
 
 ECPlayer *EChannel::GetPlayer(TClient *cl)
 {
-	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 		if((dynamic_cast<ECPlayer*> (*it))->Client() == cl)
 			return ((ECPlayer*) (*it));
+
 	return NULL;
 }
 
@@ -377,7 +379,7 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 	{
 		if(!(dynamic_cast<ECPlayer*> (*it))->Client() || *it == one) continue;
 

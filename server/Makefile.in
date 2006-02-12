@@ -362,8 +362,6 @@ install-strip:
 	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
 mostlyclean-generic:
 
-clean-generic:
-
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
@@ -434,6 +432,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 
 install-data-local:
 	$(INSTALL_DATA) euroconqd.conf /etc/euroconqd.conf
+
+clean-generic:
+	-rm -f .#* *~
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

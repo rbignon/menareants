@@ -117,7 +117,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'A': me->Player()->Channel()->SetState(EChannel::ANIMING); break;
 			case '!':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+/-! sans sender"); break; }
-				for(PlayerIterator it=players.begin(); it != players.end(); it++)
+				for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
 					(*it)->SetReady(add);
 				break;
 			case 'o':
@@ -164,7 +164,6 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
 
-	JOINED = true;
 	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); parvi++)
 	{
 		const char *nick = (*parvi).c_str();
@@ -208,6 +207,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 	if(GameInfosForm)
 		GameInfosForm->RecalcMemo();
+	JOINED = true;
 	return 0;
 }
 
@@ -227,6 +227,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{ /* C'est moi qui join */
 			EChannel *c = new EChannel(parv[1]);
 			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, true));
+			printf("me add - %p\n", me->Player());
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
@@ -260,18 +261,20 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
 	 *        départs ?) ou alors pour une eventuelle IA du serveur)
 	 */
-	for(PlayerIterator playersi=players.begin(); playersi != players.end(); playersi++)
+	for(PlayerList::iterator playersi=players.begin(); playersi != players.end();)
 	{
 		if((*playersi)->IsMe())
 		{
 			delete me->Player()->Channel();
 			me->ClrPlayer(); /* <=> me->pl = 0 */
+			JOINED = false;
 			return 0;
 		}
 		else
 		{
 			if(GameInfosForm)
 			{
+				GameInfosForm->Players->Hide();
 				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
 				                             " quitte la partie", green_color);
 				for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
@@ -279,25 +282,26 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				  it++)
 				{
 					TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
-					if(!pline)
-					{ /* Il ne devrait PAS être possible que la liste contienne un element nul */
-						vDebug(W_ERR|W_SEND, "La liste contient un element vide", VPName(*it));
+					if(!pline) /* Ce n'est pas un TPlayerLine */
 						continue;
-					}
-					/** \todo En revanche, il devrait (et il y aurra) des elements qui ne seront
-					 *       *pas* des TPlayerLine. Il faut donc arriver à trouver le type de *it.
-					 */
-					printf("p - %s\n", pline->Player()->GetNick());
+
 					if(pline->Player() == (*playersi))
 					{
 						if(!GameInfosForm->Players->RemoveLine(*it))
-							Debug(W_ERR|W_SEND, "LEA: Impossible de supprimer la ligne de l'user");
+							throw ECExcept(VPName(*it) VPName(*playersi), "Player-line introuvable");
 						GameInfosForm->RecalcMemo();
 						break;
 					}
 				}
+				GameInfosForm->Players->Show();
 			}
-			me->Player()->Channel()->RemovePlayer((*playersi), true);
+			if(me->Player()->Channel()->RemovePlayer((*playersi), true))
+				playersi = players.erase(playersi);
+			else
+			{
+				vDebug(W_DESYNCH|W_SEND, "LEA - Impossible de supprimer un player", VPName(*playersi));
+				playersi++;
+			}
 		}
 	}
 	return 0;
@@ -328,8 +332,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 	WAIT_EVENT(JOINED, i);
 	if(!JOINED)
 	{
-		delete GameInfosForm;
-		GameInfosForm = 0;
+		MyFree(GameInfosForm);
 		return false;
 	}
 
@@ -369,14 +372,14 @@ bool EuroConqApp::GameInfos(const char *cname)
 							default: break;
 						}
 						break;
-					case SDL_MOUSEBUTTONUP:
+					case SDL_MOUSEBUTTONDOWN:
 						GameInfosForm->Chat->Clic( event.button.x, event.button.y);
 						if(GameInfosForm->MyPosition &&
 						GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
-						break;
-					case SDL_MOUSEBUTTONDOWN:
+/*						break;
+					case SDL_MOUSEBUTTONDOWN:*/
 						GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
 						if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 							eob = true;
@@ -415,14 +418,16 @@ bool EuroConqApp::GameInfos(const char *cname)
 	}
 	catch(TECExcept &e)
 	{
-		delete GameInfosForm;
-		GameInfosForm = NULL;
+		MyFree(GameInfosForm);
+		client->sendrpl(client->rpl(EC_Client::LEAVE));
 		throw;
 	}
-	delete GameInfosForm;
-	GameInfosForm = NULL;
+	MyFree(GameInfosForm);
 
 	client->sendrpl(client->rpl(EC_Client::LEAVE));
+	
+	WAIT_EVENT(!JOINED, i);
+	
 	return true;
 }
 
@@ -505,8 +510,7 @@ void EuroConqApp::ListGames()
 		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
 	} while(!eob && client->IsConnected());
 
-	delete ListGameForm;
-	ListGameForm = NULL;
+	MyFree(ListGameForm);
 	return;
 }
 
@@ -517,13 +521,14 @@ void EuroConqApp::ListGames()
 TGameInfosForm::TGameInfosForm()
 	: TForm()
 {
-	Chat = AddComponent(new TMemo(75,325,300,200,30));
+	Chat = AddComponent(new TMemo(60,325,315,200,30));
 
-	SendMessage = AddComponent(new TEdit(75,530,300, MAXBUFFER-20));
+	SendMessage = AddComponent(new TEdit(60,530,315, MAXBUFFER-20));
 	PretButton = AddComponent(new TButtonText(600,400, 100,49, "Pret"));
 	RetourButton = AddComponent(new TButtonText(600,450,100,49, "Retour"));
 
-	Players = AddComponent(new TList(50, 30));
+	Players = AddComponent(new TList(60, 60));
+	Players->AddLine(new TPlayerLineHeader);
 
 	SetBackground(Resources::Menuscreen());
 
@@ -541,8 +546,8 @@ TGameInfosForm::~TGameInfosForm()
 
 void TGameInfosForm::RecalcMemo()
 {
-	Chat->SetXY(75, Players->GetHeight()+20);
-	Chat->SetHeight(525-Players->GetHeight()-20); /* On définit une jolie taille */
+	Chat->SetXY(60, Players->GetY() + Players->GetHeight());
+	Chat->SetHeight(528-Players->GetHeight()-Players->GetX()); /* On définit une jolie taille */
 }
 
 /********************************************************************************************
@@ -589,10 +594,18 @@ TPlayerLine::~TPlayerLine()
 	if(position) delete position;
 }
 
+void TPlayerLine::SetXY (uint px, uint py)
+{
+	TComponent::SetXY(px, py);
+	if(position)
+		position->SetXY(px+210, py);
+}
+
 void TPlayerLine::Init()
 {
+	assert(pl);
 	if(position) delete position;
-	position = new TSpinEdit("", x+155, y, 50, 0, pl->Channel()->NbPlayers(), 1, 0);
+	position = new TSpinEdit("", x+210, y, 50, 0, pl->Channel()->NbPlayers(), 1, 0);
 	position->Init();
 }
 
@@ -604,7 +617,44 @@ void TPlayerLine::Draw(uint souris_x, uint souris_y)
 
 	big_font.WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
 	if(pl->IsOwner())
-		big_font.WriteLeft(x+40, y, "*", red_color);
-	big_font.WriteLeft(x+55, y, pl->GetNick(), black_color);
+		big_font.WriteLeft(x+50, y, "*", red_color);
+	big_font.WriteLeft(x+65, y, pl->GetNick(), black_color);
 	position->Draw(souris_x, souris_y);
+}
+
+/********************************************************************************************
+ *                               TPlayerLineHeader                                          *
+ ********************************************************************************************/
+
+TPlayerLineHeader::TPlayerLineHeader()
+{
+	h = 30;
+	label = 0;
+}
+
+void TPlayerLineHeader::Init()
+{
+	if(label)
+		delete label;
+
+	std::string s = "Pret  Pseudo           Position";
+	label = new TLabel(x, y, s, black_color, &big_font);
+}
+
+void TPlayerLineHeader::SetXY (uint px, uint py)
+{
+	TComponent::SetXY(px, py);
+	if(label)
+		label->SetXY(px, py);
+}
+
+TPlayerLineHeader::~TPlayerLineHeader()
+{
+	if(label)
+		delete label;
+}
+
+void TPlayerLineHeader::Draw(uint souris_x, uint souris_y)
+{
+	label->Draw(souris_x, souris_y);
 }

@@ -41,7 +41,6 @@ public:
 	virtual ~EC_ACommand() {}
 
 	typedef std::vector<ECPlayer*> PlayerList;
-	typedef std::vector<ECPlayer*>::iterator PlayerIterator;
 	typedef std::vector<std::string> ParvList;
 	virtual int Exec(PlayerList players, EC_Client *me, ParvList parv) = 0;
 

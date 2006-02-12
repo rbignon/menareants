@@ -36,7 +36,6 @@ TMemo::TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0)
   visible_height = 0;
   maxitems = max_items;
 
-
   background = NULL;
 }
 

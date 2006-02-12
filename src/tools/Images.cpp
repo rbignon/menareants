@@ -32,6 +32,9 @@
 
 int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
 {
+  assert(base);
+  assert(screen);
+
   mSpriteBase = base;
   if(mSpriteBase->mBuilt)
   {
@@ -97,6 +100,17 @@ int ECSprite::GetHeight()
 /****************************************************************************************
  *                                      ECSpriteBase                                    *
  ****************************************************************************************/
+
+ECSpriteBase::ECSpriteBase(char *dir)
+{
+	mAnim = 0;
+	mBuilt = 0;
+	mNumframes = 0;
+	mW = 0;
+	mH = 0;
+
+	init(dir);
+}
 
 int ECSpriteBase::init(char *dir)
 {

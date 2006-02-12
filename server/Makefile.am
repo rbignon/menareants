@@ -15,3 +15,6 @@ euroconqserver_LDADD =$(top_srcdir)/lib/libeuroconq.a
 
 install-data-local:
 	$(INSTALL_DATA) euroconqd.conf /etc/euroconqd.conf
+
+clean-generic:
+	-rm -f .#* *~

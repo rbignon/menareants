@@ -1,6 +1,6 @@
 /* src/Outils.h- Header of Outils.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,5 +61,15 @@ std::string TypToStr( const T & Value )
     // renvoyer une string
     return oss.str();
 }
+
+/** Free and set pointer to 0 */
+#define MyFree(p)	do { delete (p); (p) = 0; } while(0)
+/*
+inline void MyFree(void *p)
+{
+	delete &p;
+	p = 0;
+}
+*/
 
 #endif

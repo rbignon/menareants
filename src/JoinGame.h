@@ -1,6 +1,6 @@
 /* src/JoinGame.h - Header of JoinGame.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,48 +30,6 @@
 #include "gui/Edit.h"
 #include "gui/Memo.h"
 #include "gui/SpinEdit.h"
-
-/********************************************************************************************
- *                               TPlayerLine                                                *
- ********************************************************************************************/
-/** This is a line to show a player status in TGameInfos form */
-class TPlayerLine : public TComponent
-{
-/* Constructeur/Destructeur */
-public:
-
-	TPlayerLine(ECPlayer *pl);
-
-	~TPlayerLine();
-
-/* Methodes */
-public:
-
-	/* Initialisation */
-	void Init();
-
-	/* Dessine */
-	void Draw(uint souris_x, uint souris_y);
-
-/* Composants */
-public:
-
-	TSpinEdit *position;
-
-/* Attributs */
-public:
-	ECPlayer* Player() { return pl; }
-
-/* Variables privées */
-private:
-
-	/* Privatisation de constructeurs à rendre inaccessibles */
-	TPlayerLine();
-	TPlayerLine(uint _x, uint _y);
-	TPlayerLine(uint _x, uint _y, uint _w, uint _h);
-
-	ECPlayer *pl;
-};
 
 /********************************************************************************************
  *                               TGameInfosForm                                              *
@@ -132,6 +90,70 @@ public:
 /* Evenements */
 public:
 
+};
+
+/********************************************************************************************
+ *                               TPlayerLine                                                *
+ ********************************************************************************************/
+/** This is a line to show a player status in TGameInfos form */
+class TPlayerLine : public TComponent
+{
+/* Constructeur/Destructeur */
+public:
+
+	TPlayerLine(ECPlayer *pl);
+
+	~TPlayerLine();
+
+/* Methodes */
+public:
+
+	void Init();                                          /**< Initialisation */
+	void Draw(uint souris_x, uint souris_y);              /**< Draw */
+	virtual void SetXY (uint _x, uint _y);                /**< Set \a x and \a y positions */
+
+/* Composants */
+public:
+
+	TSpinEdit *position;
+
+/* Attributs */
+public:
+	ECPlayer* Player() { return pl; }
+
+/* Variables privées */
+private:
+
+	/* Privatisation de constructeurs à rendre inaccessibles */
+	TPlayerLine();
+	TPlayerLine(uint _x, uint _y);
+	TPlayerLine(uint _x, uint _y, uint _w, uint _h);
+
+	ECPlayer *pl;
+};
+
+/********************************************************************************************
+ *                               TPlayerLineHeader                                          *
+ ********************************************************************************************/
+/** This is a line to show a the header of playerlist in TGameInfos form */
+class TPlayerLineHeader : public TComponent
+{
+/* Constructeur/Destructeur */
+public:
+
+	TPlayerLineHeader();
+	~TPlayerLineHeader();
+
+/* Methodes */
+public:
+
+	void Init();                                          /**< No initialisation */
+	void Draw(uint souris_x, uint souris_y);              /**< Draw */
+	virtual void SetXY (uint _x, uint _y);                /**< Set \a x and \a y positions */
+
+/* Composants */
+public:
+	TLabel *label;
 };
 
 #endif /* EC_JOINGAME_H */

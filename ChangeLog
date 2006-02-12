@@ -1,4 +1,10 @@
+2006-02-12  Romain Bignon <progs@headfucking.net>
+
+	* Corrections un peu partout. Normalement y a plus de plantages.
+
 2006-02-08  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.h (MyFree): Macro qui utilise delete sur un pointeur et qui l'assigne à 0.
 
 	* Utilisation de Doxygen.
 

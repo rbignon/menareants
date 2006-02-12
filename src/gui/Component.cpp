@@ -54,7 +54,6 @@ bool TList::RemoveLine(TComponent *c)
 		{
 			h -= c->GetHeight();
 			it = list.erase(it);
-			delete (*it);
 			Rebuild(); /* Reconstruction */
 			return true;
 		}
@@ -99,7 +98,7 @@ unsigned int TComponent::GetY() const { return y; }
 unsigned int TComponent::GetWidth() const { return w; }
 unsigned int TComponent::GetHeight() const { return h; }
 
-void TComponent::SetXY (uint px, uint py) { x = px; y = py; Init(); }
+void TComponent::SetXY (uint px, uint py) { x = px; y = py; }
 
 void TComponent::SetHeight (uint ph)
 {

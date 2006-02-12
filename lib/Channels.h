@@ -26,7 +26,7 @@
 #include <vector>
 
 /********************************************************************************************
- *                               ECBPlayer                                                   *
+ *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
 class ECBChannel;
@@ -34,7 +34,7 @@ class ECBChannel;
 class ECBMap;
 
 /** Base class of Player/
- * There if informations about a player whose are used by server and client.
+ * There are informations about a player whose are used by server and client.
  *
  * \attention This is a \a virtual class !
  */
@@ -87,7 +87,7 @@ public:
 
 	/** Is player ready ? */
 	bool Ready() const { return ready; }
-	
+
 	/** Set player. */
 	void SetReady(bool r = true) { ready = r; }
 
@@ -99,12 +99,10 @@ protected:
 	unsigned int color;
 	bool ready;
 };
-
-typedef std::vector<ECBPlayer*> PlayerVector;
-typedef PlayerVector::iterator PlayerIterator;
+typedef std::vector<ECBPlayer*> BPlayerVector;
 
 /********************************************************************************************
- *                               ECBChannel                                                   *
+ *                               ECBChannel                                                 *
  ********************************************************************************************/
 
 /** Base class of a Channel.
@@ -118,7 +116,7 @@ public:
 	/** @param _name name of channel */
 	ECBChannel(std::string _name);
 
-	~ECBChannel() {}
+	virtual ~ECBChannel() {}
 
 	/** Define state of game */
 	enum e_state {
@@ -137,8 +135,24 @@ public:
 	/** Return channel name. */
 	const char* GetName() const { return name.c_str(); }
 
+	/* A propos des etats de la partie */
+	e_state State() const { return state; }              /**< Return state of game. */
+	bool IsInGame() const { return (state >= PLAYING); } /**< Check if channel is in game. */
+	bool Joinable() const { return (state == WAITING); } /**< Check if channel is joinable. */
+	void SetState(e_state s) { state = s; }              /**< Define state. */
+
+	/* Limite maximale pour entrer dans le chan */
+	unsigned int GetLimite() const { return limite; }    /**< Return user limit of channel. */
+	void SetLimite(unsigned int l) { limite = l; }       /**< Define user limit of channel. */
+
+	/** Return MAP \attention ECBMap n'existe pas encore ! */
+	ECBMap *Map() const { return map; }
+
+	/** Define the map \attention ECBMap n'existe pas encore ! */
+	void SetMap(ECBMap *m) { map = m; }
+
 	/** Return player list in the channel. */
-	PlayerVector Players() const { return players; }
+	BPlayerVector Players() const { return players; }
 
 	/** Add a player. */
 	bool AddPlayer(ECBPlayer*);
@@ -170,30 +184,13 @@ public:
 	 */
 	const char* ModesStr() const;
 
-	/* A propos des etats de la partie */
-	e_state State() const { return state; }              /**< Return state of game. */
-	bool IsInGame() const { return (state >= PLAYING); } /**< Check if channel is in game. */
-	bool Joinable() const { return (state == WAITING); } /**< Check if channel is joinable. */
-	void SetState(e_state s) { state = s; }              /**< Define state. */
-
-	/* Limite maximale pour entrer dans le chan */
-	unsigned int GetLimite() const { return limite; }    /**< Return user limit of channel. */
-	void SetLimite(unsigned int l) { limite = l; }       /**< Define user limit of channel. */
-	
-	/** Return MAP \attention ECBMap n'existe pas encore ! */
-	ECBMap *Map() const { return map; }
-	
-	/** Define the map \attention ECBMap n'existe pas encore ! */
-	void SetMap(ECBMap *m) { map = m; }
-
 /* Variables privées */
 protected:
+	BPlayerVector players;
 	std::string name;
-	PlayerVector players;
 	e_state state;
 	unsigned int limite;
 	ECBMap *map;
 };
 
 #endif /* ECLIB_CHANNELS_H */
-

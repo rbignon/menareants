@@ -21,9 +21,10 @@
 
 #include "Channels.h"
 #include "Outils.h"
+#include "Debug.h"
 
 /********************************************************************************************
- *                               ECBPlayer                                                   *
+ *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
@@ -68,12 +69,14 @@ bool ECBChannel::AddPlayer(ECBPlayer* pl)
 
 bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
-	for (PlayerIterator it = players.begin(); it != players.end(); )
+	for (BPlayerVector::iterator it = players.begin(); it != players.end(); )
 	{
+		//printf("ss - %p (%s) vs %p\n", *it, (*it)->GetNick(), pl);
+		printf("ss - %p s %p\n", *it, pl);
 		if (*it == pl)
 		{
 			if(use_delete)
-				delete pl;
+			delete pl;
 			it = players.erase(it);
 			return true;
 		}
@@ -82,6 +85,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	}
 	return false;
 }
+
 
 /** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
 const char* ECBChannel::ModesStr() const
@@ -106,8 +110,7 @@ const char* ECBChannel::ModesStr() const
 const char* ECBChannel::PlayerList()
 {
 	std::string list = "";
-#if 1
-	for(PlayerIterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 	{
 		if(!list.empty()) list += " ";
 		if((*it)->IsOwner())
@@ -120,20 +123,5 @@ const char* ECBChannel::PlayerList()
 
 		list += (*it)->GetNick();
 	}
-#else
-	for(uint i=0; i<players.size();i++)
-	{
-		if(!list.empty()) list += " ";
-		if(players[i]->IsOwner())
-			list += "@";
-		if(players[i]->Ready())
-			list += "!";
-
-		/* Informe de la place et de la couleur */
-		list += TypToStr(players[i]->Place()) + "," + TypToStr(players[i]->Color()) + ",";
-
-		list += players[i]->GetNick();
-	}
-#endif
 	return list.c_str();
 }

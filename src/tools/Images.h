@@ -38,35 +38,35 @@ public:
 /* Methodes */
 public:
 
-	/* Initialisation */
+	/** Initialisation */
 	int init(ECSpriteBase *base, SDL_Surface *screen);
 
-	/* Dessine l'animation */
+	/** Dessine l'animation */
 	void draw();
 
-	/* Vide le background */
+	/** Vide le background */
 	void clearBG();
 
-	/* Met à jour le background */
+	/** Met à jour le background */
 	void updateBG();
 
 /* Attributs */
 public:
 
-	/* Paramètre ou retourne le nombre de frames */
+	/** Paramètre ou retourne le nombre de frames */
 	void setFrame(int nr) { mFrame = nr; }
 	int getFrame() { return mFrame; }
 
-	/* Paramètre ou retourne la vitesse */
+	/** Paramètre ou retourne la vitesse */
 	void setSpeed(float nr) { mSpeed = nr; }
 	float getSpeed() { return mSpeed; }
 
-	/* Active/Desactive l'animation */
+	/** Active/Desactive l'animation */
 	void toggleAnim() { mAnimating = !mAnimating; }
 	void startAnim() { mAnimating = 1; }
 	void stopAnim() { mAnimating = 0; }
 
-	/* Repasse à la première frame */
+	/** Repasse à la première frame */
 	void rewind() { mFrame = 0; }
 
 	/* Fonctions pour changer les coordonnées */
@@ -76,9 +76,8 @@ public:
 	void yset(int nr) { mY=nr; }
 	void set(int xx, int yy) { mX=xx; mY=yy; }
 
-	/* Fonctions pour la largeur */
-	int GetWidth();
-	int GetHeight();
+	int GetWidth();                             /**< Fonction pour la largeur */
+	int GetHeight();                            /**< Fonction pour la hauteur */
 
 /* Variables privées */
 private:
@@ -98,13 +97,13 @@ class ECSpriteBase
 /* Methodes */
 public:
 
-	/* Initialisation.
+	/** Initialisation.
 	 * Ouvre dans un répertoire le fichier info dans lequel est inscrit les informations
 	 * pour l'animation (images, frequence, etc..)
 	 */
 	int init(char *dir);
 
-	ECSpriteBase(char *dir) { init(dir); }
+	ECSpriteBase(char *dir);
 	~ECSpriteBase() {}
 
 /* Variables publiques */
@@ -126,22 +125,22 @@ public:
 /* Methodes */
 public:
 
-	/* Charge l'image à partir d'un fichier */
+	/** Charge l'image à partir d'un fichier */
 	void Load(char *fichier);
 
-	/* Dessin à la taille originale à la position (x,y) */
+	/** Dessin à la taille originale à la position (x,y) */
 	void Draw(int x, int y);
 
-	/* Dessin avec une taille différente à la position (x,y) */
+	/** Dessin avec une taille différente à la position (x,y) */
 	void Draw(int x, int y, int w, int h, int x2, int y2);
 
-	/* Dessine en 0x0 (background) */
+	/** Dessine en 0x0 (background) */
 	void Draw();
 
-	/* Obtenir la largeur */
+	/** Obtenir la largeur */
 	unsigned int GetWidth() { return (Img ? Img->w : 0); }
 
-	/* Obtenir la hauteur */
+	/** Obtenir la hauteur */
 	unsigned int GetHeight() { return (Img ? Img->h : 0); }
 
 /* Variables publiques */

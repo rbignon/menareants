@@ -3,10 +3,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: TROUVER LA PAIRE DE BUG :
-         > Lorsqu'on join une partie déjà créée, et que le joueur en face part et rejoin, si on touche au spinedit ça crash.
-         > Lorsqu'on créé une partie, dès qu'un mec join puis part ça crash.
--client: Utiliser une fonction pour redimentionner le Memo dans GameInfosForm quand on ajoute/del un player (voir papier).
+-client: Valeurs interdites dans le TSpinEdit (places prises).
 -client: Avancer dans les paramètres de la partie.
 
 * Urgent

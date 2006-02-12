@@ -20,6 +20,7 @@
  */
 
 #include "Channels.h"
+#include "Debug.h"
 
 /********************************************************************************************
  *                               EPlayer                                                    *
@@ -35,10 +36,10 @@ ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _isme)
  *                               EChannel                                                   *
  ********************************************************************************************/
 
-ECPlayer *EChannel::GetPlayer(const char* nick) const
+ECPlayer *EChannel::GetPlayer(const char* nick)
 {
-	for(unsigned int i=0;i<players.size();i++)
-		if(!strcasecmp(((ECPlayer *)players[i])->GetNick(), nick))
-			return ((ECPlayer *)players[i]);
-	return NULL;
+	BPlayerVector::iterator it;
+	for(it=players.begin(); it != players.end() && strcasecmp((*it)->GetNick(),nick); it++);
+	
+	return (it == players.end() ? 0 : (dynamic_cast<ECPlayer*>(*it)));
 }

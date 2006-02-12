@@ -70,6 +70,7 @@ public:
 protected:
 	TClient *client;
 };
+typedef std::vector<ECPlayer> PlayerVector;
 
 /********************************************************************************************
  *                               EChannel                                                   *
@@ -109,14 +110,14 @@ public:
 
 	/** Get a player structure with his client structure. */
 	ECPlayer *GetPlayer(TClient *cl);
-
+	
 /* Variables privées */
 protected:
 
 };
 
-typedef std::vector<EChannel*>::iterator ChannelIterator;
+typedef std::vector<EChannel*> ChannelVector;
 
-extern std::vector<EChannel*> ChanList;
+extern ChannelVector ChanList;
 
-#endif /* ECLIB_CHANNELS_H */
+#endif /* ECD_CHANNELS_H */

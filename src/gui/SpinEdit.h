@@ -67,6 +67,8 @@ public:
 	 */
 	bool SetValue(int _value, bool first = false);
 	int Value() { return value; }
+	
+	virtual void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
 
 /* Variables privées */
 protected:

@@ -42,7 +42,7 @@ public:
 	 * @param nick nickname of user who joined channel.
 	 * @param chan channel struct.
 	 * @param owner if player is an owner or not.
-	 * @param IsMe specifie if this player is me.
+	 * @param IsMe say if this player is me.
 	 */
 	ECPlayer(const char* nick, EChannel* chan, bool owner, bool IsMe);
 
@@ -58,7 +58,7 @@ public:
 	/** Get nick of client. */
 	virtual const char* GetNick() const { return nick.c_str(); }
 
-	/** Is this player is me ? */
+	/** Is this player me ? */
 	bool IsMe() const { return isme; }
 
 /* Variables privées */
@@ -66,6 +66,7 @@ protected:
 	std::string nick;
 	bool isme;
 };
+typedef std::vector<ECPlayer*> PlayerVector;
 
 /********************************************************************************************
  *                               EChannel                                                   *
@@ -92,7 +93,7 @@ public:
 public:
 
 	/** Get a player in channel by his nickname. */
-	ECPlayer* GetPlayer(const char* nick) const;
+	ECPlayer* GetPlayer(const char* nick);
 
 /* Variables privées */
 protected:

@@ -34,6 +34,10 @@ euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 distclean-local:
 	rm -f euroconq.cfg
 
+clean-generic:
+	-rm -f .#* *~
+	-rm -f gui/.#* gui/*~
+	-rm -f tools/.#* tools/*~
 
 .PHONY: files
 
