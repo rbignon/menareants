@@ -113,6 +113,34 @@ bool TSpinEdit::SetValue(int _value, bool first)
   return true;
 }
 
+bool TSpinEdit::ChangeValueByClick(bool up)
+{
+	int new_value = up ? value + step : value - step;
+	printf("first - %d\n", new_value);
+	while(1)
+	{
+		if(new_value > max) new_value = max;
+		else if(new_value < min) new_value = min;
+		
+		printf("tested new value - %d < %d < %d\n", min, new_value, max);
+
+		std::vector<int>::iterator it;
+		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; it++)
+			printf("[bad value][%d]\n", *it);
+		if(it != bad_values.end())
+		{
+			printf("  checked !!\n");
+			if(new_value == max || new_value == min) return false;
+			printf("  continue...\n");
+			new_value = up ? new_value + step : new_value - step;
+			continue;
+		}
+		else
+			return SetValue(new_value);
+	}
+	return false;
+}
+
 void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
 {
   if(txt_label)
@@ -134,9 +162,9 @@ bool TSpinEdit::Clic (uint mouse_x, uint mouse_y)
   if(!m_minus || !m_plus) return false;
 
   if (m_minus->Test(mouse_x, mouse_y))
-    return SetValue(value - step);
+    return ChangeValueByClick(false);
   else if (m_plus->Test(mouse_x, mouse_y))
-    return SetValue(value + step);
+    return ChangeValueByClick(true);
 
   return false;
 }
@@ -148,3 +176,40 @@ void TSpinEdit::SetColorFont(SDL_Color new_color, Font* new_font)
 }
 
 void TSpinEdit::SetXY (uint px, uint py) { x = px; y = py; Init(); }
+
+void TSpinEdit::SetMax(int _max)
+{
+	max = _max;
+	if(max < min) max = min;
+	if(value > max) value = max;
+}
+
+void TSpinEdit::SetMin(int _min)
+{
+	min = _min;
+	if(max < min) max = min;
+	if(value < min) value = min;
+}
+
+void TSpinEdit::AddBadValue(int i)
+{
+	for(std::vector<int>::iterator it = bad_values.begin(); it != bad_values.end(); it++)
+		if(*it == i)
+			return;
+	bad_values.push_back(i);
+	return;
+}
+
+void TSpinEdit::DelBadValue(int i)
+{
+	for (std::vector<int>::iterator it = bad_values.begin(); it != bad_values.end(); )
+	{
+		if (*it == i)
+		{
+			it = bad_values.erase(it);
+			return;
+		}
+		else
+			++it;
+	}
+}

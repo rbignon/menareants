@@ -68,7 +68,14 @@ public:
 	bool SetValue(int _value, bool first = false);
 	int Value() { return value; }
 	
+	void SetMax(int _max);                                        /**< Set maximal value */
+	void SetMin(int _min);                                        /**< Set minimal value */
+	
 	virtual void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
+	
+	/* Valeurs interdites */
+	void AddBadValue(int i);                                      /**< Add a bad value */
+	void DelBadValue(int i);                                      /**< Remove a bad value */
 
 /* Variables privées */
 protected:
@@ -79,6 +86,11 @@ protected:
 	uint step;
 	uint visible_len;
 	std::string label;
+	
+	std::vector<int> bad_values;
+	
+	/** This function is used by Clic() to check in bad_values */
+	bool ChangeValueByClick(bool up);
 
 	SDL_Color color;
 	Font *font;
