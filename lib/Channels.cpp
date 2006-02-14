@@ -33,15 +33,15 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
 	chan->AddPlayer(this);
 	ready = false;
 	fric = 0;
-	place = 0;
+	position = 0;
 	color = 0;
 }
 
-bool ECBPlayer::SetPlace(unsigned int p)
+bool ECBPlayer::SetPosition(unsigned int p)
 {
-	if(p <= chan->NbPlayers())
+	if(p <= chan->GetLimite())
 	{
-		place = p;
+		position = p;
 		return true;
 	}
 	return false;
@@ -71,8 +71,6 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
 	for (BPlayerVector::iterator it = players.begin(); it != players.end(); )
 	{
-		//printf("ss - %p (%s) vs %p\n", *it, (*it)->GetNick(), pl);
-		printf("ss - %p s %p\n", *it, pl);
 		if (*it == pl)
 		{
 			if(use_delete)
@@ -119,7 +117,7 @@ const char* ECBChannel::PlayerList()
 			list += "!";
 
 		/* Informe de la place et de la couleur */
-		list += TypToStr((*it)->Place()) + "," + TypToStr((*it)->Color()) + ",";
+		list += TypToStr((*it)->Position()) + "," + TypToStr((*it)->Color()) + ",";
 
 		list += (*it)->GetNick();
 	}

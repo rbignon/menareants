@@ -63,11 +63,11 @@ public:
 	/** Set a player as the owner of game of not. */
 	void SetOwner(bool o = true) { owner = o; }
 
-	/** Place of player in the map. */
-	unsigned int Place() const { return place; }
+	/** Position of player in the map. */
+	unsigned int Position() const { return position; }
 	
-	/** Set place of player. */
-	bool SetPlace(unsigned int p);
+	/** Set position of player. */
+	bool SetPosition(unsigned int p);
 
 	/** Return color of player.
 	 * \note Les couleurs sont représentées par un énumérateur. Alors
@@ -95,7 +95,7 @@ public:
 protected:
 	ECBChannel *chan;
 	bool owner;
-	unsigned int place;
+	unsigned int position;
 	unsigned int color;
 	bool ready;
 };
@@ -136,14 +136,14 @@ public:
 	const char* GetName() const { return name.c_str(); }
 
 	/* A propos des etats de la partie */
-	e_state State() const { return state; }              /**< Return state of game. */
-	bool IsInGame() const { return (state >= PLAYING); } /**< Check if channel is in game. */
-	bool Joinable() const { return (state == WAITING); } /**< Check if channel is joinable. */
-	void SetState(e_state s) { state = s; }              /**< Define state. */
+	e_state State() const { return state; }                 /**< Return state of game. */
+	bool IsInGame() const { return (state >= PLAYING); }    /**< Check if channel is in game. */
+	bool Joinable() const { return (state == WAITING); }    /**< Check if channel is joinable. */
+	void SetState(e_state s) { state = s; }                 /**< Define state. */
 
 	/* Limite maximale pour entrer dans le chan */
-	unsigned int GetLimite() const { return limite; }    /**< Return user limit of channel. */
-	void SetLimite(unsigned int l) { limite = l; }       /**< Define user limit of channel. */
+	unsigned int GetLimite() const { return limite; }       /**< Return user limit of channel. */
+	virtual void SetLimite(unsigned int l) { limite = l; }  /**< Define user limit of channel. */
 
 	/** Return MAP \attention ECBMap n'existe pas encore ! */
 	ECBMap *Map() const { return map; }
