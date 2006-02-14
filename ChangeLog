@@ -1,3 +1,19 @@
+2006-02-13  Romain Bignon <progs@headfucking.net>
+
+	* src/Map.cpp, lib/Map.cpp, server/Map.cpp: Création des fichiers.
+
+	* src/JoinGame.cpp: Utilisation des valeurs interdites pour les "position" (TSpinEdit) des players.
+
+	* src/gui/SpinEdit.cpp: Utilisation de valeurs interdites.
+
+	* lib/Channels.h: Renomage des ECBChannel::*Place() en ECBChannel::*Position().
+
+	* server/Channels.cpp (EChannel-send_modes()): Fonction qui envoie les modes aux players à partir d'un ou de
+	plusieurs senders.
+
+	* src/JoinGame.cpp: Utilise comme position maximale la limite et non plus le nombre de joueurs. En outre, actualise
+	la position maximale lors d'un +l. En outre pour les modes "!pc" prend en compte *tous* les senders.
+
 2006-02-12  Romain Bignon <progs@headfucking.net>
 
 	* Corrections un peu partout. Normalement y a plus de plantages.

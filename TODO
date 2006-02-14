@@ -3,8 +3,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: Valeurs interdites dans le TSpinEdit (places prises).
--client: Avancer dans les paramètres de la partie.
+-map
 
 * Urgent
 -Gestion de l'ouverture d'une map (fichier) et son interpretation (pas encore graphique).

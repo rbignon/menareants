@@ -94,9 +94,9 @@ Sommaire:
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible
      sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la détailler:
 
-     PLS [@][!]<place>,<couleur>,<pseudo> [...]
+     PLS [@][!]<position>,<couleur>,<pseudo> [...]
      [@]               :le joueur est owner
      [!]               :le joueur est pret (Ready)
-     <place>           :la position du joueur sur la carte
+     <position>        :la position du joueur sur la carte
      <couleur>         :la couleur
      <pseudo>          :le pseudo du joueur
