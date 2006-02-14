@@ -51,6 +51,7 @@ public:
 	TButtonText* RetourButton;
 	TButtonText* PretButton;
 	TList*       Players;
+	TLabel*      Title;
 
 	TSpinEdit*   MyPosition;
 

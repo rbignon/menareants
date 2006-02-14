@@ -79,6 +79,24 @@ int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+#if 0 /** \todo peut toujours servir! */
+static TPlayerLine* GetPlayerLineFromPlayer(ECPlayer* pl)
+{
+	if(GameInfosForm)
+		for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
+		it!=GameInfosForm->Players->GetList().end();
+		it++)
+		{
+			TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
+			if(!pline) /* Ce n'est pas un TPlayerLine */
+				continue;
+			if(pl == pline->Player())
+				return pline;
+		}
+	return NULL;
+}
+#endif
+
 /** An user have setted some modes in the channel.
  *
  * Syntax: nicks SET modes [params]
@@ -105,11 +123,27 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'l':
 				if(add)
 				{
-					if(j<parv.size()) me->Player()->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
+					if(j<parv.size())
+					{
+						me->Player()->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
+
+						if(GameInfosForm)
+						{ /* Redéfini la limite des SpinEdit de chaques joueurs */
+							for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
+							it!=GameInfosForm->Players->GetList().end();
+							it++)
+							{
+								TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
+								if(!pline) /* Ce n'est pas un TPlayerLine */
+									continue;
+								pline->position->SetMax(me->Player()->Channel()->GetLimite());
+							}
+						}
+					}
 					else Debug(W_DESYNCH|W_SEND, "+l sans limite");
 				}
 				else
-					me->Player()->Channel()->SetLimite(0);
+					vDebug(W_DESYNCH|W_SEND, "-l interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
 				break;
 			case 'W': me->Player()->Channel()->SetState(EChannel::WAITING); break;
 			case 'S': me->Player()->Channel()->SetState(EChannel::SENDING); break;
@@ -129,24 +163,40 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			}
 			case 'c':
-				if(!sender) { Debug(W_DESYNCH|W_SEND, "+c sans sender humain"); break; }
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+c sans sender humain"); break; }
 				if(add)
 				{
-					if(j<parv.size()) sender->SetColor(StrToTyp<uint>(parv[j++]));
+					if(j<parv.size())
+						for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+							(*it)->SetColor(StrToTyp<uint>(parv[j++]));
 					else Debug(W_DESYNCH|W_SEND, "+c sans couleur");
 				}
 				else
-					sender->SetColor(0);
+					for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+						(*it)->SetColor(0);
 				break;
 			case 'p':
-				if(!sender) { Debug(W_DESYNCH|W_SEND, "+p sans sender humain"); break; }
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+p sans sender humain"); break; }
 				if(add)
 				{
-					if(j<parv.size()) sender->SetPlace(StrToTyp<uint>(parv[j++]));
+					if(j<parv.size())
+						for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+						{
+							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+								GameInfosForm->MyPosition->DelBadValue((*it)->Position());
+							(*it)->SetPosition(StrToTyp<uint>(parv[j++]));
+							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+								GameInfosForm->MyPosition->AddBadValue((*it)->Position());
+						}
 					else Debug(W_DESYNCH|W_SEND, "+p sans position");
 				}
 				else
-					sender->SetPlace(0);
+					for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+					{
+						if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+							GameInfosForm->MyPosition->DelBadValue((*it)->Position());
+						(*it)->SetPosition(0);
+					}
 				break;
 			default:
 				Debug(W_DESYNCH|W_SEND, "Reception d'un mode non supporté (%c)", parv[1][i]);
@@ -164,6 +214,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
 
+	std::vector<int> pos_badval;
 	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); parvi++)
 	{
 		const char *nick = (*parvi).c_str();
@@ -195,7 +246,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		else
 			pl = new ECPlayer(nick, me->Player()->Channel(), owner, false);
 		pl->SetColor(col);
-		pl->SetPlace(pos);
+		pl->SetPosition(pos);
 		pl->SetReady(ready);
 		if(GameInfosForm)
 		{
@@ -203,10 +254,17 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			GameInfosForm->Players->AddLine(pline);
 			if(pl == me->Player())
 				GameInfosForm->MyPosition = pline->position;
+			else if(pos > 0) /* GameInfosForm->MyPosition n'est probablement pas encore défini ! */
+				pos_badval.push_back(pos);
 		}
 	}
 	if(GameInfosForm)
+	{
+		 if(GameInfosForm->MyPosition)
+		 	for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); it++)
+				GameInfosForm->MyPosition->AddBadValue(*it);
 		GameInfosForm->RecalcMemo();
+	}
 	JOINED = true;
 	return 0;
 }
@@ -344,10 +402,11 @@ bool EuroConqApp::GameInfos(const char *cname)
 		if(!client->Player() || !client->Player()->Channel())
 			throw ECExcept(VPName(client->Player()), "Dans aucun chan");
 		EChannel *chan = client->Player()->Channel();
+
+		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
 	
 		do
 		{
-			int x=0, y=0;
 			while( SDL_PollEvent( &event) )
 			{
 				switch(event.type)
@@ -393,26 +452,9 @@ bool EuroConqApp::GameInfos(const char *cname)
 						break;
 				}
 			}
-			SDL_GetMouseState( &x, &y);
-	
-			GameInfosForm->Update(x, y, false);
+			GameInfosForm->Update();
 	
 			big_font.WriteCenter(400,50, "Jeu : " + std::string(chan->GetName()), black_color);
-	/*		vert += 30;
-			for(unsigned int i=0; i<chan->Players().size();i++, vert += 30)
-			{
-				ECPlayer *pl = ((ECPlayer*)chan->Players()[i]);
-	
-				big_font.WriteLeft(50, vert, "OK", pl->Ready() ? red_color : gray_color);
-				if(pl->IsOwner()) big_font.WriteLeft(90, vert, "*", red_color);
-				big_font.WriteLeft(105, vert, pl->GetNick(), black_color);
-				pos.SetXY(200, vert);
-				pos.Draw(x, y);
-			}
-			GameInfosForm->Chat->SetXY(75, vert);
-			GameInfosForm->Chat->SetHeight(525-vert); * On définit une jolie taille */
-	
-			SDL_Flip(sdlwindow);
 		} while(!eob && client->IsConnected() && client->Player());
 	
 	}
@@ -521,6 +563,8 @@ void EuroConqApp::ListGames()
 TGameInfosForm::TGameInfosForm()
 	: TForm()
 {
+	Title = AddComponent(new TLabel(400,50,"Jeu", black_color, &big_font));
+
 	Chat = AddComponent(new TMemo(60,325,315,200,30));
 
 	SendMessage = AddComponent(new TEdit(60,530,315, MAXBUFFER-20));
@@ -605,7 +649,8 @@ void TPlayerLine::Init()
 {
 	assert(pl);
 	if(position) delete position;
-	position = new TSpinEdit("", x+210, y, 50, 0, pl->Channel()->NbPlayers(), 1, 0);
+	                    /*  label   x    y  w  min      max                  step  defvalue */
+	position = new TSpinEdit("",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
 	position->Init();
 }
 
@@ -613,7 +658,7 @@ void TPlayerLine::Draw(uint souris_x, uint souris_y)
 {
 	assert(pl);
 
-	if(pl->Place() != (unsigned int)position->Value()) position->SetValue(pl->Place());
+	if(pl->Position() != (unsigned int)position->Value()) position->SetValue(pl->Position());
 
 	big_font.WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
 	if(pl->IsOwner())
