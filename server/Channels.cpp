@@ -84,6 +84,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case '+': add = true; break;
 			case '-': add = false; break;
 			case 'l':
+				/** \todo Un user ne devrait *pas* être autorisé à changer le mode +l. En effet, la limite devrait
+				 *        être imposée par la map choisie et mise à conf->DEFLIMITE sinon
+				 */
 				if(!sender->IsOwner())
 					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
 				if(add)
@@ -96,10 +99,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					else Debug(W_DESYNCH, "+l sans limite");
 				}
 				else
-				{
-					sender->Channel()->SetLimite(0);
-					changed = YES_NOPARAMS;
-				}
+					Debug(W_DESYNCH, "SET -l interdit.");
 				break;
 			case '!':
 				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
@@ -166,17 +166,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						}
 						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
-						    it != sender->Channel()->Players().end() && (*it)->Place() != place;
+						    it != sender->Channel()->Players().end() && (*it)->Position() != place;
 						    it++);
 						if(it != sender->Channel()->Players().end())
 							{ Debug(W_DESYNCH, "+p d'une position déjà utilisée"); break; }
 					}
-					sender->SetPlace(place);
+					sender->SetPosition(place);
 					changed = YES_WITHPARAM;
 				}
 				else
 				{
-					sender->SetPlace(0);
+					sender->SetPosition(0);
 					changed = YES_NOPARAMS;
 				}
 				break;
@@ -339,10 +339,30 @@ EChannel::~EChannel()
 	}
 }
 
+void EChannel::SetLimite(unsigned int l)
+{
+	limite = l;
+	
+	PlayerVector plv;
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+		if((*it)->Position() > limite)
+		{
+			(*it)->SetPosition(0);
+			plv.push_back(dynamic_cast<ECPlayer*> (*it));
+		}
+	send_modes(plv, "-p");
+	return;
+}
+
 void EChannel::NeedReady()
 {
+	PlayerVector plv;
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	{
 		(*it)->SetReady(false);
+		plv.push_back(dynamic_cast<ECPlayer*> (*it));
+	}
+	send_modes(plv, "-!");
 
 	return;
 }
@@ -362,6 +382,29 @@ ECPlayer *EChannel::GetPlayer(TClient *cl)
 			return ((ECPlayer*) (*it));
 
 	return NULL;
+}
+
+void EChannel::send_modes(ECPlayer *sender, const char* msg)
+{
+	PlayerVector plv;
+	plv.push_back(sender);
+
+	send_modes(plv, msg);
+	return;
+}
+
+void EChannel::send_modes(PlayerVector senders, const char* msg)
+{
+	std::string snds;
+	
+	for(PlayerVector::iterator it = senders.begin(); it != senders.end(); it++)
+	{
+		if(!snds.empty())
+			snds += ",";
+		snds += (*it)->GetNick();
+	}
+	sendto_players(NULL, app.rpl(ECServer::SET), snds.c_str(), msg);
+	return;
 }
 
 int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)

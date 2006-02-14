@@ -70,7 +70,7 @@ public:
 protected:
 	TClient *client;
 };
-typedef std::vector<ECPlayer> PlayerVector;
+typedef std::vector<ECPlayer*> PlayerVector;
 
 /********************************************************************************************
  *                               EChannel                                                   *
@@ -101,7 +101,19 @@ public:
 	 * @return always 0.
 	 */
 	int sendto_players(ECPlayer* one, const char*, ...);
+	
+	/** Send modes to all players from \a sender
+	 * \warning this will only send modes, no set them in channel or on player.
+	 */
+	void send_modes(ECPlayer *sender, const char* msg);
 
+	/** Send modes to all players from \a senders
+	 * @param sender this will a player vector of senders.
+	 *
+	 * \warning this will only send modes, no set them in channel of on players.
+	 */
+	void send_modes(PlayerVector senders, const char* msg);
+	
 /* Attributs */
 public:
 
@@ -110,6 +122,12 @@ public:
 
 	/** Get a player structure with his client structure. */
 	ECPlayer *GetPlayer(TClient *cl);
+	
+	/** Define user limit of channel.
+	 * \warning This function will send to all players, if they have a position bigger than new limite, a
+	 * SET message to set their position to 0 !
+	 */
+	virtual void SetLimite(unsigned int l);
 	
 /* Variables privées */
 protected:
