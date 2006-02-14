@@ -22,7 +22,7 @@
 #ifndef ECLIB_MAP_H
 #define ECLIB_MAP_H
 
-#include "Channel.h"
+#include "Channels.h"
 #include <vector>
 
 /********************************************************************************************
