@@ -55,7 +55,7 @@ ARFLAGS = cru
 libeuroconq_a_AR = $(AR) $(ARFLAGS)
 libeuroconq_a_LIBADD =
 am_libeuroconq_a_OBJECTS = Outils.$(OBJEXT) Channels.$(OBJEXT) \
-	Debug.$(OBJEXT)
+	Debug.$(OBJEXT) Map.$(OBJEXT)
 libeuroconq_a_OBJECTS = $(am_libeuroconq_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -166,7 +166,7 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 noinst_LIBRARIES = libeuroconq.a
-libeuroconq_a_SOURCES = Outils.cpp Channels.cpp Debug.cpp
+libeuroconq_a_SOURCES = Outils.cpp Channels.cpp Debug.cpp Map.cpp
 all: all-am
 
 .SUFFIXES:
@@ -216,6 +216,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Outils.Po@am__quote@
 
 .cpp.o:

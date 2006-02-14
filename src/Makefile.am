@@ -13,6 +13,7 @@ euroconq_SOURCES = \
 		Debug.cpp \
 		Login.cpp \
 		Channels.cpp \
+		Map.cpp \
 		JoinGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \

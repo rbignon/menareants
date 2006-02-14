@@ -55,7 +55,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_euroconqserver_OBJECTS = Main.$(OBJEXT) Server.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT)
+	Channels.$(OBJEXT) Map.$(OBJEXT)
 euroconqserver_OBJECTS = $(am_euroconqserver_OBJECTS)
 euroconqserver_DEPENDENCIES = $(top_srcdir)/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -173,7 +173,8 @@ euroconqserver_SOURCES = \
 	Config.cpp \
 	Debug.cpp \
 	Login.cpp \
-	Channels.cpp
+	Channels.cpp \
+	Map.cpp
 
 euroconqserver_LDADD = $(top_srcdir)/lib/libeuroconq.a
 all: all-am
@@ -247,6 +248,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Server.Po@am__quote@
 
 .cpp.o:

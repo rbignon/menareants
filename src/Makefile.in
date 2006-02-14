@@ -56,11 +56,12 @@ PROGRAMS = $(bin_PROGRAMS)
 am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
 	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
-	JoinGame.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT) \
-	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
-	Menu.$(OBJEXT) ListBox.$(OBJEXT) Boutton.$(OBJEXT) \
-	BouttonText.$(OBJEXT) Memo.$(OBJEXT) Edit.$(OBJEXT) \
-	MessageBox.$(OBJEXT) Label.$(OBJEXT) SpinEdit.$(OBJEXT)
+	Map.$(OBJEXT) JoinGame.$(OBJEXT) Font.$(OBJEXT) \
+	Images.$(OBJEXT) Maths.$(OBJEXT) Component.$(OBJEXT) \
+	Form.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT) \
+	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
+	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
+	SpinEdit.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -189,6 +190,7 @@ euroconq_SOURCES = \
 		Debug.cpp \
 		Login.cpp \
 		Channels.cpp \
+		Map.cpp \
 		JoinGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
@@ -287,6 +289,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ListBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Maths.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Memo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Menu.Po@am__quote@
@@ -782,6 +785,8 @@ distclean-local:
 
 clean-generic:
 	-rm -f .#* *~
+	-rm -f gui/.#* gui/*~
+	-rm -f tools/.#* tools/*~
 
 .PHONY: files
 
