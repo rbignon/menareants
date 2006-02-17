@@ -9,7 +9,13 @@ $Id$
 But: Ce fichier devrait contenir des notes écrites des développeurs, des reflexions,
 des petits trucs, classés par date.
 
-2005-01-01   Romain Bignon
+2006-01-01   Romain Bignon
+
+	Utiliser le répertoire test/ pour tester la librairie autrement qu'en faisant une implémentation sur le
+	serveur ou le jeu. Lire README pour plus d'infos. Voir l'exemple de map.cpp qui fait un petit
+	programme pour tester la validité d'une map et donne des infos sur celle-ci.
+
+2006-01-01   Romain Bignon
 
 	Lors de la modification d'un fichier, pour des modifs plus ou moins importantes qui nécessiteront
 	un commit, passer, si ce n'est pas encore fait, le copyright en "2005-2006".

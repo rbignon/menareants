@@ -1,3 +1,13 @@
+2005-02-17  Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp: Reception de la liste des maps et de la map paramétrée.
+
+	* lib/Map.cpp: Utilisation d'une fonction virtuelle pour le Z d'une case, ainsi que quelques petites modifs.
+
+	* server/Channels.cpp: Envoie la liste des maps au JOI et une map lors d'un +m
+
+	* server/Map.cpp: Fonction d'ouverture de toutes les maps.
+
 2005-02-16  Romain Bignon <progs@headfucking.net>
 
 	* test/map.cpp: Outil permettant d'ouvrir une map (genre gna.map) et d'avoir des infos sur elle une fois qu'on a
