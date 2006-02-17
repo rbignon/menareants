@@ -3,11 +3,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--map
+-finir de commenter les classes
+-faire les dérivées d'ECBCase.
 
 * Urgent
--Gestion de l'ouverture d'une map (fichier) et son interpretation (pas encore graphique).
--Gestion de l'envoie/reception de la preview de la map.
+-Gestion de l'envoie/reception de la map dans la pré-partie.
 
 * Bof
 -client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
