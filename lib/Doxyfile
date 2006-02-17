@@ -48,7 +48,7 @@ EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
-EXTRACT_LOCAL_METHODS  = NO
+EXTRACT_LOCAL_METHODS  = YES
 HIDE_UNDOC_MEMBERS     = NO
 HIDE_UNDOC_CLASSES     = NO
 HIDE_FRIEND_COMPOUNDS  = NO
@@ -58,7 +58,7 @@ CASE_SENSE_NAMES       = YES
 HIDE_SCOPE_NAMES       = NO
 SHOW_INCLUDE_FILES     = YES
 INLINE_INFO            = YES
-SORT_MEMBER_DOCS       = YES
+SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
 GENERATE_TODOLIST      = YES
@@ -69,7 +69,7 @@ ENABLED_SECTIONS       =
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = YES
 SHOW_DIRECTORIES       = YES
-FILE_VERSION_FILTER    = 
+#FILE_VERSION_FILTER    = "../versionfilter.sh"
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
