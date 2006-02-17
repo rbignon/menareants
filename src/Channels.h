@@ -84,7 +84,7 @@ public:
 		: ECBChannel(_name)
 	{}
 
-	~EChannel() {}
+	virtual ~EChannel() {}
 
 /* Methodes */
 public:
