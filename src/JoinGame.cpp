@@ -33,11 +33,92 @@
 #include "Outils.h"
 #include "Debug.h"
 #include "Timer.h"
+#include "Map.h"
 
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
+
+/** We receive a map !
+ *
+ * Syntax: SMAP ligne
+ */
+int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(GameInfosForm)
+	{
+		EChannel* chan = me->Player()->Channel();
+		if(GameInfosForm->RecvMap.empty())
+		{
+			ECMap *map;
+			if((map = chan->Map()))
+				MyFree(map);
+			chan->SetMap(NULL);
+		}
+		GameInfosForm->RecvMap.push_back(parv[1]);
+	}
+	return 0;
+}
+
+/** This is end of map.
+ *
+ * Syntax: EOSMAP
+ */
+int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(GameInfosForm)
+	{
+		if(GameInfosForm->RecvMap.empty())
+			Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
+		else
+		{
+			EChannel *chan = me->Player()->Channel();
+			try
+			{
+				chan->SetMap(new ECMap(GameInfosForm->RecvMap));
+			}
+			catch(TECExcept &e)
+			{
+				Debug(W_ERR, "Unable to load a map :");
+				vDebug(W_ERR, e.Message, e.Vars);
+			}
+			GameInfosForm->MapTitle->SetCaption(chan->Map()->Name() + " (" + TypToStr(chan->Map()->MinPlayers()) +
+			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
+			GameInfosForm->RecvMap.clear();
+		}
+	}
+	return 0;
+}
+
+/** This is map list.
+ *
+ * Syntax: LSM nom min max
+ */
+int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(GameInfosForm)
+	{
+		if(!GameInfosForm->RecvMapList)
+		{
+			GameInfosForm->RecvMapList = true;
+			GameInfosForm->MapList->ClearItems();
+		}
+		GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color, true);
+	}
+	return 0;
+}
+
+/** This is end of map list.
+ *
+ * Syntax: EOMAP
+ */
+int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(GameInfosForm)
+		GameInfosForm->RecvMapList = false;
+	return 0;
+}
 
 /** We can't rejoin channel.
  * @note this function isn't very usefull...
@@ -121,6 +202,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		return Debug(W_DESYNCH|W_SEND, "Reception d'un SET sans être dans un chan");
 
 	ECPlayer *sender = 0;
+	EChannel *chan = me->Player()->Channel();
 	if(players.size()) sender = players[0];
 
 	bool add = true;
@@ -136,7 +218,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				{
 					if(j<parv.size())
 					{
-						me->Player()->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
+						chan->SetLimite(StrToTyp<uint>(parv[j++]));
 
 						if(GameInfosForm)
 						{ /* Redéfini la limite des SpinEdit de chaques joueurs */
@@ -147,7 +229,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 								if(!pline) /* Ce n'est pas un TPlayerLine */
 									continue;
-								pline->position->SetMax(me->Player()->Channel()->GetLimite());
+								pline->position->SetMax(chan->GetLimite());
 							}
 						}
 					}
@@ -156,10 +238,22 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				else
 					vDebug(W_DESYNCH|W_SEND, "-l interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
 				break;
-			case 'W': me->Player()->Channel()->SetState(EChannel::WAITING); break;
-			case 'S': me->Player()->Channel()->SetState(EChannel::SENDING); break;
-			case 'P': me->Player()->Channel()->SetState(EChannel::PLAYING); break;
-			case 'A': me->Player()->Channel()->SetState(EChannel::ANIMING); break;
+			case 'W': if(add) chan->SetState(EChannel::WAITING); break;
+			case 'S': if(add) chan->SetState(EChannel::SENDING); break;
+			case 'P': if(add) chan->SetState(EChannel::PLAYING); break;
+			case 'A': if(add) chan->SetState(EChannel::ANIMING); break;
+			case 'm':
+				if(add)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+m sans numero"); break; }
+					if(GameInfosForm)
+						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
+					else
+						Debug(W_DESYNCH|W_SEND, "SET +m hors de GameInfosForm !");
+				}
+				else
+					Debug(W_DESYNCH|W_SEND, "SET -m theoriquement impossible");
+				break;
 			case '!':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+/-! sans sender"); break; }
 				for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
@@ -168,7 +262,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'o':
 			{
 				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+o sans nick"); break; }
-				ECPlayer *pl = me->Player()->Channel()->GetPlayer(parv[j++].c_str());
+				ECPlayer *pl = chan->GetPlayer(parv[j++].c_str());
 				if(!pl) { Debug(W_DESYNCH|W_SEND, "%s non trouvé", parv[(j-1)].c_str()); break; }
 				pl->SetOwner(add);
 				break;
@@ -296,7 +390,6 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{ /* C'est moi qui join */
 			EChannel *c = new EChannel(parv[1]);
 			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, true));
-			printf("me add - %p\n", me->Player());
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
@@ -402,6 +495,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 	if(!JOINED)
 	{
 		MyFree(GameInfosForm);
+		client->sendrpl(client->rpl(EC_Client::LEAVE));
 		return false;
 	}
 
@@ -415,6 +509,8 @@ bool EuroConqApp::GameInfos(const char *cname)
 		EChannel *chan = client->Player()->Channel();
 
 		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
+
+		GameInfosForm->MapList->SetEnabled(client->Player()->IsOwner());
 	
 		do
 		{
@@ -444,6 +540,16 @@ bool EuroConqApp::GameInfos(const char *cname)
 						break;
 					case SDL_MOUSEBUTTONDOWN:
 						GameInfosForm->Chat->Clic( event.button.x, event.button.y);
+						if(client->Player()->IsOwner())
+						{
+							GameInfosForm->MapList->SetEnabled();
+							if(GameInfosForm->MapList->Clic( event.button.x, event.button.y))
+								client->sendrpl(client->rpl(EC_Client::SET),
+								                ("+m " + TypToStr(GameInfosForm->MapList->GetSelectedItem())).c_str());
+							
+						}
+						else
+							GameInfosForm->MapList->SetEnabled(false);
 						if(GameInfosForm->MyPosition &&
 						GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
@@ -582,27 +688,34 @@ TGameInfosForm::TGameInfosForm()
 	PretButton = AddComponent(new TButtonText(600,400, 100,49, "Pret"));
 	RetourButton = AddComponent(new TButtonText(600,450,100,49, "Retour"));
 
-	Players = AddComponent(new TList(60, 60));
+	Players = AddComponent(new TList(60, 80));
 	Players->AddLine(new TPlayerLineHeader);
+
+	MapList = AddComponent(new TListBox(600, 100, 150, 200));
+	MapTitle = AddComponent(new TLabel(550, 300, "", black_color, &big_font));
 
 	SetBackground(Resources::Menuscreen());
 
 	MyPosition = 0;
+	RecvMapList = false;
 }
 
 TGameInfosForm::~TGameInfosForm()
 {
-	delete Chat;
-	delete SendMessage;
+	delete MapTitle;
+	delete MapList;
+	delete Players;
 	delete RetourButton;
 	delete PretButton;
-	delete Players;
+	delete SendMessage;
+	delete Chat;
+	delete Title;
 }
 
 void TGameInfosForm::RecalcMemo()
 {
 	Chat->SetXY(60, Players->GetY() + Players->GetHeight());
-	Chat->SetHeight(528-Players->GetHeight()-Players->GetX()); /* On définit une jolie taille */
+	Chat->SetHeight(505-Players->GetHeight()-Players->GetX()); /* On définit une jolie taille */
 }
 
 /********************************************************************************************
@@ -626,11 +739,12 @@ TListGameForm::TListGameForm()
 
 TListGameForm::~TListGameForm()
 {
-	delete JoinButton;
-	delete RefreshButton;
-	delete CreerButton;
-	delete RetourButton;
 	delete GList;
+	delete RetourButton;
+	delete CreerButton;
+	delete RefreshButton;
+	delete JoinButton;
+	delete Title;
 }
 
 /********************************************************************************************

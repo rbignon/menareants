@@ -139,13 +139,11 @@ void EC_Client::parse_message(std::string buf)
 		}
 
 	if(!cmd || (parv.size()-1) < cmd->args)
-		/* ATTENTION: la commande est inconnu ou donnée incorrectement, donc on exit
-		 *            mais on ne quit pas (?). À voir, quand il y aurra un système
-		 *            de debugage, si on le fait remarquer à l'user. Au pire je pense
-		 *            qu'il faudrait au moins en informer le serveur. Ceci permettrait
-		 *            de noter les bugs qu'il voit et les écrire dans un fichier.
-		 */
-		{ printf("erreur de pars ! %s\n", cmd ? "arg" : "cmd introuvable"); return; }
+	{
+		vDebug(W_ERR|W_DESYNCH|W_SEND, "Commande incorrecte du serveur.", VSName(buf.c_str())
+		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
+		return;
+	}
 
 	try
 	{
@@ -153,7 +151,7 @@ void EC_Client::parse_message(std::string buf)
 	}
 	catch(TECExcept &e)
 	{
-		vDebug(W_ERR, e.Message, e.Vars);
+		vDebug(W_ERR|W_SEND, e.Message, e.Vars);
 	}
 
 	return;
@@ -256,6 +254,12 @@ void EC_Client::Init()
 	Commands.push_back(new PLSCommand("PLS",	0,	1));
 	Commands.push_back(new LEACommand("LEA",	0,	0));
 	Commands.push_back(new MSGCommand("MSG",	0,	1));
+
+	Commands.push_back(new LSMCommand("LSM",	0,	3));
+	Commands.push_back(new EOMAPCommand("EOMAP",0,	0));
+	Commands.push_back(new SMAPCommand("SMAP",	0,	1));
+	Commands.push_back(new EOSMAPCommand("EOSMAP",0,0));
+	
 }
 
 EC_Client::EC_Client()

@@ -52,8 +52,15 @@ public:
 	TButtonText* PretButton;
 	TList*       Players;
 	TLabel*      Title;
+	TListBox*    MapList;
+	TLabel*      MapTitle;
 
 	TSpinEdit*   MyPosition;
+
+/* Variables publiques */
+public:
+	bool RecvMapList;
+	std::vector<std::string> RecvMap;
 
 /* Evenements */
 public:

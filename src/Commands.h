@@ -98,6 +98,16 @@ class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _Cm
 
 class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+/* RECEPTION MAPS */
+
+class LSMCommand : public EC_ACommand { public: LSMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class EOMAPCommand : public EC_ACommand { public: EOMAPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOMAPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class SMAPCommand : public EC_ACommand { public: SMAPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SMAPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class EOSMAPCommand : public EC_ACommand { public: EOSMAPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOSMAPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 #else
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
