@@ -273,7 +273,7 @@ PACKAGE_VERSION='0.1'
 PACKAGE_STRING='EuroConq 0.1'
 PACKAGE_BUGREPORT='bugs@coderz.info'
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB INSTALL_SERVER INSTALL_GAME SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS DATA_FILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB INSTALL_SERVER INSTALL_GAME SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS DATA_FILES MAP_FILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4113,7 +4113,12 @@ DATA_FILES=`echo $DATA_FILES`
 
 
 
-                                                  ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile"
+MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+MAP_FILES=`echo $MAP_FILES`
+
+
+
+                                                            ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/maps/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4677,6 +4682,7 @@ do
   "src/data/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/data/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "server/Makefile" ) CONFIG_FILES="$CONFIG_FILES server/Makefile" ;;
+  "server/maps/Makefile" ) CONFIG_FILES="$CONFIG_FILES server/maps/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -4828,6 +4834,7 @@ s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
 s,@SDL_CFLAGS@,$SDL_CFLAGS,;t t
 s,@SDL_LIBS@,$SDL_LIBS,;t t
 s,@DATA_FILES@,$DATA_FILES,;t t
+s,@MAP_FILES@,$MAP_FILES,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
@@ -5545,4 +5552,5 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
+
 

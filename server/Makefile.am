@@ -1,3 +1,5 @@
+SUBDIRS = maps
+
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
 LIBS =

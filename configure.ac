@@ -113,6 +113,12 @@ DATA_FILES=`echo $DATA_FILES`
 
 AC_SUBST([DATA_FILES])
 
-AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile)
+MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+MAP_FILES=`echo $MAP_FILES`
+
+AC_SUBST([MAP_FILES])
+
+AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/maps/Makefile)
 
 AC_OUTPUT
+
