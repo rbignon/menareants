@@ -165,7 +165,7 @@ void EuroConqApp::request_game()
 			return;
 		}
 
-		ConnectedForm->Welcome->SetCaption("Vous etes bien connecte en temps que " +
+		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en temps que " +
 		                                               client->GetNick());
 
 		bool eob = false;
@@ -246,7 +246,7 @@ void EuroConqApp::request_game()
 TConnectedForm::TConnectedForm()
 	: TForm()
 {
-	Welcome = AddComponent(new TLabel(200,50,"Vous etes bien connecte", black_color, &big_font));
+	Welcome = AddComponent(new TLabel(200,50,"Vous êtes bien connecté", black_color, &big_font));
 
 	Motd = AddComponent(new TMemo(75,100,500,400, 0));
 
