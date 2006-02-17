@@ -59,6 +59,13 @@ ECBChannel::ECBChannel(std::string _name)
 	map = 0;
 }
 
+ECBChannel::~ECBChannel()
+{
+	/* Libération des players */
+	for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+		delete *it;
+}
+
 bool ECBChannel::AddPlayer(ECBPlayer* pl)
 {
 	if(!pl) return false;
@@ -90,6 +97,9 @@ const char* ECBChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
 	if(limite) modes += "l", params += " " + TypToStr(limite);
+#if 0 /* Il n'y a *PAS* d'envoie du +m là !!!!!! */
+	 if(map)    modes += "m";
+#endif
 	switch(state)
 	{
 		case WAITING: modes += "W"; break;

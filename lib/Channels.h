@@ -116,7 +116,7 @@ public:
 	/** @param _name name of channel */
 	ECBChannel(std::string _name);
 
-	virtual ~ECBChannel() {}
+	virtual ~ECBChannel();
 
 	/** Define state of game */
 	enum e_state {
@@ -145,11 +145,11 @@ public:
 	unsigned int GetLimite() const { return limite; }       /**< Return user limit of channel. */
 	virtual void SetLimite(unsigned int l) { limite = l; }  /**< Define user limit of channel. */
 
-	/** Return MAP \attention ECBMap n'existe pas encore ! */
+	/** Return MAP */
 	ECBMap *Map() const { return map; }
 
-	/** Define the map \attention ECBMap n'existe pas encore ! */
-	void SetMap(ECBMap *m) { map = m; }
+	/** Define the map */
+	virtual void SetMap(ECBMap *m) { map = m; }
 
 	/** Return player list in the channel. */
 	BPlayerVector Players() const { return players; }
