@@ -61,6 +61,9 @@ public: \
 	virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); \
 }
 
+#if 1
+/* GENERAL */
+
 class HELCommand : public EC_ACommand { public: HELCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
 class PIGCommand : public EC_ACommand { public:PIGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
@@ -75,9 +78,15 @@ class MOTDCommand : public EC_ACommand { public: MOTDCommand(const std::string _
 
 class EOMCommand : public EC_ACommand { public: EOMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+/* JOINDRE PARTIES */
+
 class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
 class EOLCommand : public EC_ACommand { public: EOLCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOLCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class ER1Command : public EC_ACommand { public: ER1Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ER1Command() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+/* DANS PRE-PARTIES */
 
 class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
@@ -89,7 +98,7 @@ class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _Cm
 
 class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
-/*
+#else
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( AIM );
@@ -106,6 +115,7 @@ DECLARE_CMD ( PLS );
 DECLARE_CMD ( LEA );
 DECLARE_CMD ( MSG );
 DECLARE_CMD ( SET );
-*/
+#endif
+
 #endif
 

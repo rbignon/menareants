@@ -39,6 +39,17 @@ TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
 
+/** We can't rejoin channel.
+ * @note this function isn't very usefull...
+ *
+ * Syntax: ER1
+ */
+int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	JOINED = false;
+	return 0;
+}
+
 /** We received a message in channel.
  *
  * Syntax: nick MSG message
