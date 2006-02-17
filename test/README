@@ -1,0 +1,26 @@
+                   ********************
+                   *  Europa Conquest *
+                   ********************
+                     [ test/README ]
+
+Dernière modification:
+$Id$
+
+--
+
+Ce dossier est destiné à faire des tests de code.
+Ca permet d'utiliser la lib/ sans inclure du test au serveur ou au jeu.
+
+Il suffit de créer un fichier <nom>.cpp et de le compiler avec :
+$ ./make <nom>
+ou
+$ make FILE=<nom>
+Ca va créer un executable nomé <nom>.
+
+Par exemple pour le fichier "test.cpp" on utilisera :
+$ ./make test
+ou
+$ make FILE=test
+puis :
+$ ./test
+
