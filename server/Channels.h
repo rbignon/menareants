@@ -85,7 +85,7 @@ class EChannel : public ECBChannel
 public:
 
 	EChannel(std::string _name);
-	~EChannel();
+	virtual ~EChannel();
 
 /* Methodes */
 public:
@@ -123,6 +123,9 @@ public:
 
 	/** Get a player structure with his client structure. */
 	ECPlayer *GetPlayer(TClient *cl);
+
+	/** Define the map */
+	virtual void SetMap(ECBMap *m);
 	
 	/** Define user limit of channel.
 	 * \warning This function will send to all players, if they have a position bigger than new limite, a

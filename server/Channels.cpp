@@ -25,6 +25,7 @@
 #include "Outils.h"
 #include "Debug.h"
 #include "Main.h"
+#include "Map.h"
 #include <cstdarg>
 
 ChannelVector ChanList;
@@ -67,7 +68,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		bool add;
 		const char* params;
 	} newmodes[] = {
-		{ 'l', false, false, NULL},
+		{ 'm', false, false, NULL},
 		{ 'o', false, false, NULL},
 		{ 'c', false, false, NULL},
 		{ 'p', false, false, NULL},
@@ -83,23 +84,29 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
-			case 'l':
-				/** \todo Un user ne devrait *pas* être autorisé à changer le mode +l. En effet, la limite devrait
-				 *        être imposée par la map choisie et mise à conf->DEFLIMITE sinon
-				 */
+			case 'm':
 				if(!sender->IsOwner())
 					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
+
 				if(add)
 				{
 					if(j<parv.size())
 					{
-						sender->Channel()->SetLimite(StrToTyp<uint>(parv[j++]));
-						changed = YES_WITHPARAM;
+						uint mapi = StrToTyp<uint>(parv[j++]);
+						if(mapi >= MapList.size())
+							Debug(W_DESYNCH, "SET +m de la map %d hors de la liste (%d)", mapi, MapList.size());
+						else
+						{
+							ECMap* map = MapList[mapi];
+							if(map == sender->Channel()->Map())
+								continue; /* anti-flood */
+							sender->Channel()->SetMap(map);
+							changed = YES_WITHPARAM;
+						}
 					}
-					else Debug(W_DESYNCH, "+l sans limite");
 				}
 				else
-					Debug(W_DESYNCH, "SET -l interdit.");
+					Debug(W_DESYNCH, "SET -m interdit.");
 				break;
 			case '!':
 				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
@@ -258,9 +265,43 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		pl = new ECPlayer(cl, chan, false);
 	}
 	cl->SetPlayer(pl);
+
+	/** @page JOIN_MSGS Join's messages
+	 *
+	 * Messages sent on a join are :
+	 * <pre>
+	 * :me JOI chan
+	 * LSM map1 1 5
+	 * LSM map2 1 5
+	 * EOM
+	 * :server SET +lWm
+	 * SMAP ligne1
+	 * SMAP ligne2
+	 * EOSMAP
+	 * PLIST 0,0,me \@1,5prout
+	 * </pre>
+	 * @date 17/02/2006
+	 */
+
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), nom, "");
+
+	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
+		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name().c_str()),
+		                                        (*it)->MinPlayers(), (*it)->MaxPlayers());
+	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
+
 	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr());
+
+	if(chan->Map())
+	{ /* Si la map existe on l'envoie */
+		std::vector<std::string> map_file = chan->Map()->MapFile();
+		for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
+			cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr((*it).c_str()));
+		cl->sendrpl(app.rpl(ECServer::ENDOFSMAP));
+	}
+	
 	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList());
+
 	return 0;
 }
 
@@ -339,6 +380,34 @@ EChannel::~EChannel()
 	}
 }
 
+void EChannel::SetMap(ECBMap *m)
+{
+	/** \note Send infos like this :
+	 * <pre>
+	 * :server SET +l 5
+	 * :p1,p2 SET -p
+	 * SMAP line1
+	 * SMAP line2
+	 * [...]
+	 * SMAP linex
+	 * EOSMAP
+	 * :p SET +m 0
+	 * </pre>
+	 */
+	map = m;
+
+	/* Envoie un peu brut mais pour redéfinir la limite */
+	sendto_players(NULL, ":%s SET +l %d", app.GetConf()->ServerName().c_str(), m->MaxPlayers());
+	SetLimite(m->MaxPlayers());
+
+	/* Envoie d'une map */
+	std::vector<std::string> map_file = m->MapFile();
+	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
+		sendto_players(NULL, app.rpl(ECServer::SENDMAP), FormatStr((*it).c_str()));
+	sendto_players(NULL, app.rpl(ECServer::ENDOFSMAP));
+	return;
+}
+
 void EChannel::SetLimite(unsigned int l)
 {
 	limite = l;
@@ -350,7 +419,8 @@ void EChannel::SetLimite(unsigned int l)
 			(*it)->SetPosition(0);
 			plv.push_back(dynamic_cast<ECPlayer*> (*it));
 		}
-	send_modes(plv, "-p");
+	if(!plv.empty())
+		send_modes(plv, "-p");
 	return;
 }
 
@@ -395,6 +465,8 @@ void EChannel::send_modes(ECPlayer *sender, const char* msg)
 
 void EChannel::send_modes(PlayerVector senders, const char* msg)
 {
+	if(senders.empty()) return;
+
 	std::string snds;
 	
 	for(PlayerVector::iterator it = senders.begin(); it != senders.end(); it++)
