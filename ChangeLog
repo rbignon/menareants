@@ -1,3 +1,20 @@
+2005-02-16  Romain Bignon <progs@headfucking.net>
+
+	* test/map.cpp: Outil permettant d'ouvrir une map (genre gna.map) et d'avoir des infos sur elle une fois qu'on a
+	vérifié qu'elle ne comportait pas d'erreurs.
+
+	* src/Map.cpp: Création des différentes classes ainsi que de diverses fonctions. Le chargement de la map MARCHE !
+	
+	* src/Commands.h (ER1): Prise en charge (enfin) de l'ER1 (CANTJOIN) même si elle est inutile !!
+	
+	* lib/Debug.h (VCName): macro pour les char.
+	
+	* src/Debug.cpp: Correction du bug qui envoyait deux fois la meme chaine au serveur avec W_SEND.
+	
+	* src/Login.cpp: Utilisation des accents.
+	
+	* src/gui/Label.cpp: Correction: on peut maintenant utiliser des accents dans les Label.
+
 2006-02-13  Romain Bignon <progs@headfucking.net>
 
 	* src/Map.cpp, lib/Map.cpp, server/Map.cpp: Création des fichiers.

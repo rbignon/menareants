@@ -47,6 +47,8 @@ Sommaire:
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
+              LSM <nom> <nbmin> <nbmax>         :envoie la liste des cartes
+              EOM                               :fin de la liste des maps
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA                       :un user part (ou a été kické)
