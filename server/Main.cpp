@@ -20,6 +20,7 @@
 
 #include "Defines.h"
 #include "Commands.h"
+#include "Map.h"
 #include "Main.h"
 #include <string>
 #include <iostream>
@@ -79,12 +80,28 @@ int ECServer::main(int argc, char **argv)
 		}
 
 try {
+#ifndef WIN32
+		if (getenv("HOME"))
+		{
+			path = getenv("HOME");
+			path += "/.euroconqserver/";
+			if (!opendir(path.c_str()))
+			{
+				mkdir( path.c_str(), 0755 );
+			}
+			std::cout << "Logs dans: " << path << std::endl;
+		}
+#endif
+
 	conf = new Config(conf_file);
 	if(!conf->load())
 	{
 			std::cout << "Erreur lors de la lecture de la configuration" << std::endl;
 			exit(EXIT_FAILURE);
 	}
+
+	if(!LoadMaps()) /* L'output est géré par LoadMaps() */
+		exit(EXIT_FAILURE);
 
 	CurrentTS = time(NULL);
 
@@ -103,19 +120,6 @@ try {
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);
-
-#ifndef WIN32
-		if (getenv("HOME"))
-		{
-			path = getenv("HOME");
-			path += "/.euroconqserver/";
-			if (!opendir(path.c_str()))
-			{
-				mkdir( path.c_str(), 0755 );
-			}
-			std::cout << "Logs dans: " << path << std::endl;
-		}
-#endif
 
 	if(background)
 	{

@@ -66,6 +66,9 @@ const int MAXCONNEX=100; /* de préférence un multiple de 4 */
 /* Config */
 #define CONFIG_FILE "/etc/euroconqd.conf"
 
+/* File of maplist */
+#define MAP_FILE PKGDATADIR "maps.list"
+
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/

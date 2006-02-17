@@ -57,6 +57,11 @@ const char* msgTab[] = {
      "LSP %s %d %d",                        /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
+
+     "LSM %s %d %d",                        /* LSM - Liste les maps disponibles (nom, min, max) */
+     "EOMAP",                               /* EOMAP - Fin de la liste des maps */
+     "SMAP %s",                             /* SMAP - Envoie une ligne d'une map */
+     "EOSMAP",                              /* EOSMAP - Fin de l'envoie d'une map */
      0
 };
 
@@ -267,7 +272,7 @@ void TClient::Free()
 	EChannel *c;
 	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
-		if(!c->NbPlayers())
+		if(c->NbPlayers() == 1) /* Dernier sur le chan */
 			delete c;
 		else
 		{

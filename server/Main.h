@@ -66,6 +66,12 @@ public:
 		EOGLIST,      /**< EOL */
 		MSG,          /**< MSG */
 
+
+		LISTMAP,      /**< LSM */
+		ENDOFMAP,     /**< EOMAP */
+		SENDMAP,      /**< SMAP */
+		ENDOFSMAP,    /**< EOSMAP */
+
 		NONE
 	};
 
