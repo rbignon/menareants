@@ -116,22 +116,16 @@ bool TSpinEdit::SetValue(int _value, bool first)
 bool TSpinEdit::ChangeValueByClick(bool up)
 {
 	int new_value = up ? value + step : value - step;
-	printf("first - %d\n", new_value);
 	while(1)
 	{
 		if(new_value > max) new_value = max;
 		else if(new_value < min) new_value = min;
 		
-		printf("tested new value - %d < %d < %d\n", min, new_value, max);
-
 		std::vector<int>::iterator it;
-		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; it++)
-			printf("[bad value][%d]\n", *it);
+		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; it++);
 		if(it != bad_values.end())
 		{
-			printf("  checked !!\n");
 			if(new_value == max || new_value == min) return false;
-			printf("  continue...\n");
 			new_value = up ? new_value + step : new_value - step;
 			continue;
 		}

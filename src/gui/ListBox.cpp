@@ -139,21 +139,24 @@ void TListBox::Draw (uint mouse_x, uint mouse_y)
   for (uint i=0; i < nb_visible_items; i++)
   {
 	// blit surfaces as SDL_FillRect don't alpha blit a rectangle
-	if ( i+first_visible_item == uint(item) )
+	if(enabled)
 	{
-		SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-		SDL_BlitSurface( cursorover_box, NULL, app.sdlwindow, &r);
-	}
-	else if ( IsSelected(i+first_visible_item) )
-	{
-		SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-		SDL_BlitSurface( selected_box, NULL, app.sdlwindow, &r);
+		if ( i+first_visible_item == uint(item))
+		{
+			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
+			SDL_BlitSurface( cursorover_box, NULL, app.sdlwindow, &r);
+		}
+		else if ( IsSelected(i+first_visible_item))
+		{
+			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
+			SDL_BlitSurface( selected_box, NULL, app.sdlwindow, &r);
+		}
 	}
 	if(!m_items[i+first_visible_item].label.empty())
 		small_font.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
-			 IsSelected(i+first_visible_item) ? white_color : m_items[i+first_visible_item].color) ;
+			 IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
   }
 
   // buttons for listbox with more items than visible
