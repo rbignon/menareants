@@ -28,6 +28,7 @@
 #define VName(vr) #vr "=" + vr + "; "
 #define VSName(vr) #vr "=" + StringF("\"%s\"", vr) + "; "
 #define VIName(vr) #vr "=" + StringF("%d", vr) + "; "
+#define VCName(vr) #vr "=" + StringF("%c", vr) + "; "
 #define VBName(vr) #vr "=" + StringF("%s", (vr) ? "true" : "false") + "; "
 #define VPName(vr) #vr "=" + StringF("%p", vr) + "; "
 
