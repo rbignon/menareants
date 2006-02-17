@@ -57,7 +57,7 @@ void TLabel::SetCaption (std::string new_txt)
   SDL_Rect dst_rect = {0,0,tmp->w,tmp->h};
   SDL_BlitSurface(tmp, NULL, surf, &dst_rect);*/
 
-  surf = TTF_RenderUTF8_Blended(font->m_font, caption.c_str(),color);
+  surf = TTF_RenderText_Blended(font->m_font, caption.c_str(),color);
 }
 
 void TLabel::Draw(unsigned int m_x, unsigned int m_y)
