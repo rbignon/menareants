@@ -108,7 +108,8 @@ public:
 	void send_modes(ECPlayer *sender, const char* msg);
 
 	/** Send modes to all players from \a senders
-	 * @param sender this will a player vector of senders.
+	 * @param senders this will a player vector of senders.
+	 * @param msg message to send
 	 *
 	 * \warning this will only send modes, no set them in channel of on players.
 	 */
