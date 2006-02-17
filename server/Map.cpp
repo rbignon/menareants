@@ -18,5 +18,41 @@
  *
  * $Id$
  */
- 
+
+#include "Defines.h"
 #include "Map.h"
+#include "Debug.h"
+#include <fstream>
+
+MapVector MapList;
+
+bool LoadMaps()
+{
+	std::ifstream fp(MAP_FILE);
+
+	if(!fp)
+	{
+		Debug(W_ERR|W_ECHO, "Unable to load map list files: %s\n", MAP_FILE);
+		return false;
+	}
+
+	std::string ligne;
+
+	while(std::getline(fp, ligne))
+	{
+		if(ligne[0] == '#' || ligne[0] == '\0') continue;
+		ECMap *map = 0;
+		try
+		{
+			map = new ECMap(std::string(PKGDATADIR + ligne));
+		}
+		catch(TECExcept &e)
+		{
+			Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
+			vDebug(W_ERR|W_ECHO, e.Message, e.Vars);
+			continue;
+		}
+		MapList.push_back(map);
+	}
+	return true;
+}

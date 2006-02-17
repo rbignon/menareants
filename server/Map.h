@@ -22,4 +22,27 @@
 #ifndef ECD_MAP_H
 #define ECD_MAP_H
 
+#include "lib/Map.h"
+#include <vector>
+
+/* Note: il n'y a theoriquement aucune redefinition des ECB* pour les maps/cases/etc car toutes
+ * les informations y sont déjà incluses.
+ * C'est pourquoi pour les types qui n'ont pas été à redéfinir il y a des typedef pour les noms courants.
+ */
+
+typedef ECBMap         ECMap;
+typedef ECBCase        ECase;
+typedef ECBVille       ECVille;
+typedef ECBMer         ECMer;
+typedef ECBTerre       ECTerre;
+typedef ECBPont        ECPont;
+typedef ECBMapPlayer   ECMapPlayer;
+typedef ECBCountry     ECountry;
+
+extern bool LoadMaps();
+
+typedef std::vector<ECMap*> MapVector;
+
+extern MapVector MapList;
+
 #endif /* ECD_MAP_H */
