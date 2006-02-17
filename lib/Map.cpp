@@ -104,7 +104,8 @@ ECBMap::ECBMap(std::string filename)
 	std::string ligne;
 
 	while(std::getline(fp, ligne))
-		map_file.push_back(ligne);
+		if(ligne[0] != '#' && ligne[0] != '\0')
+			map_file.push_back(ligne);
 
 	Init();
 }
@@ -320,11 +321,14 @@ void ECBMap::Init()
 						(*it)->AddCountry(country);
 						break;
 					}
-					/* Type d'architecture
-					 * TODO: renvoie sur une fonction virtuelle
-					 */
+					/* Type d'architecture */
 					case 4:
 					{
+						/* C'est une fonction virtuelle qui dans la lib ne fait rien.
+						 * Elle sera surpassée dans le client pour définir les attributs propres
+						 * aux images.
+						 */
+						SetCaseAttr(acase, ligne[i]);
 						break;
 					}
 					default:

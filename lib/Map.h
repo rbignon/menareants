@@ -255,7 +255,7 @@ public:
 	 */
 	ECBMap(std::vector<std::string> _map_file);
 
-	~ECBMap();
+	virtual ~ECBMap();
 
 /* Methodes */
 public:
@@ -283,6 +283,8 @@ public:
 	std::vector<ECBCase*> Cases() { return map; }                   /**< Return case vector */
 	std::vector<ECBMapPlayer*> MapPlayers() { return map_players; } /**< Return map players vector */
 	std::vector<ECBCountry*> Countries() { return map_countries; }  /**< Return countries vector */
+
+	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 	
 	/** Access to a case of map 
 	 * Example: map(x,y)
@@ -310,6 +312,9 @@ protected:
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
 
 	void Init();      /**< Initialisation, called by constructors */
+
+	/** This function have to be redefined by client to set attributs of images in case */
+	virtual void SetCaseAttr(ECBCase*, char) {}
 
 	ECBMap();         /**< Disallowed */
 };
