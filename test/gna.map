@@ -12,7 +12,7 @@ MAP
 
 # WXXYZ
 # W ¤ {'v', 'V', 't', 'm', 'p' }
-# XX ¤ ['AA';'ZZ]
+# XX ¤ ['AA';'ZZ']
 # Y ¤ {'A', 'B', 'D' }
 # Z ¤ R
 #    #    #

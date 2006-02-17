@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 	{
 		map = new ECBMap(filename);
 
+		/* Utilisation de printf parce que c'est plus beau */
 		printf("Map \"%s\" is loaded !!\n", map->Name().c_str());
 		printf("--------------------\n");
 		printf("NbPlayers:    %6d\n", map->NbMapPlayers());
@@ -78,7 +79,7 @@ int main(int argc, char **argv)
 	}
 	catch(TECExcept &e)
 	{
-		std::cout << "Erreur : " << e.Message << std::endl;
+		std::cout << "Erreur    : " << e.Message << std::endl;
 		std::cout << "Variables : " << e.Vars << std::endl;
 	}
 
