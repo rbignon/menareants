@@ -65,8 +65,14 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 		if(vars.empty())
 			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERROR), FormatStr(s.c_str()));
 		else
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s.c_str()),
-			                                                                  FormatStr(vars.c_str()));
+		{
+			char varsc[512];
+			/* C'est utile car si deux FormatStr sont utilisés, comme c'est une variable statique
+			 * les deux pointeurs seront sur la même variable qui aurra la valeur du second appel
+			 */
+			strcpy(varsc, FormatStr(vars.c_str()));
+			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s.c_str()), varsc);
+		}
 	}
 
 	std::cout << s << std::endl;
