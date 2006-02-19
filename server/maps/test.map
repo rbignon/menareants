@@ -1,0 +1,33 @@
+NAME My Map
+
+PLAYER A
+PLAYER B
+
+X 13
+Y 9
+
+MAP
+
+# WXXYZ
+# W ¤ {'v', 'V', 't', 'm', 'p' }
+# XX ¤ ['AA';'ZZ']
+# Y ¤ {'A', 'B', 'D' }
+# Z ¤ R
+#    #    #
+mAAA+mAAA+mAAA+mAAA+mAAA+mAAA+mAAA+mBAB+mBAB+mBAB+mBAB+mBAB+mBAB+
+mAAA+mAAA+mAAA+tAAA+tAAA+tAAA+mAAA+tBAB+tBAB+tBAB+tBAB+mBAB+mBAB+
+mAAA+mAAA+tAAA+tAAA+VAAA+tAAA+mAAA+tBAB+tBAB+tBAB+VBAB+tBAB+mBAB+
+mABA+mABA+tABA+tAAA+tAAA+tAAA+pAAA+tBBB+tBBB+tBBB+tBBB+tBBB+mBBB+
+mABA+mABA+vABA+tABA+tABA+tABA+mABA+tBBB+vBBB+tBBB+tBBB+tBC*+mBC*+
+mABA+mABA+tABA+tABA+tAC*+tAC*+mAC*+mBBB+tBBB+tBC*+vBC*+tBC*+mBC*+
+mABA+mABA+mAC*+tAC*+tAC*+vAC*+tAC*+mBC*+tBC*+tBC*+tBC*+mBC*+mBC*+
+mABA+mAC*+mAC*+mAC*+tAC*+tAC*+mAC*+mBC*+mBC*+tBC*+tBC*+mBC*+mBC*+
+mAC*+mAC*+mAC*+mAC*+mAC*+mAC*+mAC*+mBC*+mBC*+mBC*+mBC*+mBC*+mBC*+
+
+EOM
+
+BEGIN 15000
+CITY 1000
+MIN 2
+MAX 2
+DATE 13 08 1988
