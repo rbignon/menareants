@@ -60,7 +60,7 @@ am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Form.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT) \
 	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
 	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
-	SpinEdit.$(OBJEXT)
+	SpinEdit.$(OBJEXT) Image.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -205,7 +205,8 @@ euroconq_SOURCES = \
 		gui/Edit.cpp \
 		gui/MessageBox.cpp \
 		gui/Label.cpp \
-		gui/SpinEdit.cpp
+		gui/SpinEdit.cpp \
+		gui/Image.cpp
 
 euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
 all: all-recursive
@@ -283,6 +284,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Form.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Image.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Images.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JoinGame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Label.Po@am__quote@
@@ -508,6 +510,20 @@ SpinEdit.obj: gui/SpinEdit.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/SpinEdit.cpp' object='SpinEdit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SpinEdit.obj `if test -f 'gui/SpinEdit.cpp'; then $(CYGPATH_W) 'gui/SpinEdit.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/SpinEdit.cpp'; fi`
+
+Image.o: gui/Image.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Image.o -MD -MP -MF "$(DEPDIR)/Image.Tpo" -c -o Image.o `test -f 'gui/Image.cpp' || echo '$(srcdir)/'`gui/Image.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Image.Tpo" "$(DEPDIR)/Image.Po"; else rm -f "$(DEPDIR)/Image.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Image.cpp' object='Image.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Image.o `test -f 'gui/Image.cpp' || echo '$(srcdir)/'`gui/Image.cpp
+
+Image.obj: gui/Image.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Image.obj -MD -MP -MF "$(DEPDIR)/Image.Tpo" -c -o Image.obj `if test -f 'gui/Image.cpp'; then $(CYGPATH_W) 'gui/Image.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Image.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Image.Tpo" "$(DEPDIR)/Image.Po"; else rm -f "$(DEPDIR)/Image.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Image.cpp' object='Image.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Image.obj `if test -f 'gui/Image.cpp'; then $(CYGPATH_W) 'gui/Image.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Image.cpp'; fi`
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
