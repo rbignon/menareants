@@ -85,8 +85,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case '+': add = true; break;
 			case '-': add = false; break;
 			case 'm':
-				if(!sender->IsOwner())
-					return Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]);
+				if(sender->Channel()->IsInGame())
+				{
+					Debug(W_DESYNCH, "%cm interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->IsPriv())
+					return Debug(W_DESYNCH, "SET %c%c d'un non privilégié", add ? '+' : '-', parv[1][i]);
 
 				if(add)
 				{
@@ -101,6 +106,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							if(map == sender->Channel()->Map())
 								continue; /* anti-flood */
 							sender->Channel()->SetMap(map);
+							sender->Channel()->NeedReady();
 							changed = YES_WITHPARAM;
 						}
 					}
@@ -112,29 +118,53 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
 				 * a dit par la suite.
 				 */
+				if(!add)
+					{ Debug(W_DESYNCH, "SET %c%c interdit.", add ? '+' : '-', parv[1][i]); break; }
+
 				if(sender->Ready())
 				{
 					Debug(W_WARNING, "SET %c%c: sender->Ready()=TRUE", add ? '+' : '-', parv[1][i]);
 					break;
 				}
-				if(!add)
-					{ Debug(W_DESYNCH, "SET %c%c interdit.", add ? '+' : '-', parv[1][i]); break; }
+				if(!sender->Position() || !sender->Color())
+				{ /* Pas besoin de vérifier si il y a une map ou si c'est en cours de partie, car dans
+				   * ces deux cas le joueur a une position et une couleur !
+				   */
+					vDebug(W_DESYNCH, "SET +! alors qu'il n'est pas pret",
+					                  VIName(sender->Position()) VIName(sender->Color()));
+					break;
+				}
 				sender->SetReady(add);
 				changed = YES_NOPARAMS;
 				break;
 			case 'o':
 			{
+				if(sender->Channel()->IsInGame())
+				{
+					Debug(W_DESYNCH, "%co interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
 				if(!sender->IsOwner())
 					{ Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]); break; }
 				if(j>=parv.size()) { Debug(W_DESYNCH, "+o sans nick"); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break;}
-				pl->SetOwner(add);
+				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break; }
+				if(pl->IsOwner()) { Debug(W_DESYNCH, "%s est owner et ne peut pas être op.", parv[(j-1)].c_str()); break; }
+				pl->SetOp(add);
 				changed = YES_WITHPARAM;
 				break;
 			}
 			case 'c':
-				if(!sender) { Debug(W_DESYNCH, "%cc sans sender humain", add ? '+' : '-'); break; }
+				if(sender->Channel()->IsInGame())
+				{
+					Debug(W_DESYNCH, "%cc interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->Channel()->Map())
+				{
+					Debug(W_DESYNCH, "%cc alors qu'il n'y a pas de map", add ? '+' : '-');
+					break;
+				}
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
@@ -158,7 +188,16 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			case 'p':
-				if(!sender) { Debug(W_DESYNCH, "%cp sans sender humain", add ? '+' : '-'); break; }
+				if(sender->Channel()->IsInGame())
+				{
+					Debug(W_DESYNCH, "%cp interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->Channel()->Map())
+				{
+					Debug(W_DESYNCH, "%cp alors qu'il n'y a pas de map", add ? '+' : '-');
+					break;
+				}
 				if(add)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
@@ -249,7 +288,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(!chan)
 	{ /* Création du salon */
 		chan = new EChannel(nom);
-		pl = new ECPlayer(cl, chan, true);
+		pl = new ECPlayer(cl, chan, true, false);
 		ChanList.push_back(chan);
 	}
 	else
@@ -262,7 +301,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
 			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
-		pl = new ECPlayer(cl, chan, false);
+		pl = new ECPlayer(cl, chan, false, false);
 	}
 	cl->SetPlayer(pl);
 
@@ -283,7 +322,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	 * @date 17/02/2006
 	 */
 
-	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), nom, "");
+	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), chan->GetName(), "");
 
 	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
 		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name().c_str()),
@@ -345,8 +384,8 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
  *                               EPlayer                                                    *
  ********************************************************************************************/
 
-ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner)
-	: ECBPlayer(_chan, _owner), client(_client)
+ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner, bool _op)
+	: ECBPlayer(_chan, _owner, _op), client(_client)
 {
 
 }
@@ -429,8 +468,11 @@ void EChannel::NeedReady()
 	PlayerVector plv;
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
 	{
-		(*it)->SetReady(false);
-		plv.push_back(dynamic_cast<ECPlayer*> (*it));
+		if((*it)->Ready())
+		{
+			(*it)->SetReady(false);
+			plv.push_back(dynamic_cast<ECPlayer*> (*it));
+		}
 	}
 	send_modes(plv, "-!");
 
