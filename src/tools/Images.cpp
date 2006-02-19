@@ -1,6 +1,6 @@
 /* src/tools/Images.h - Header of Images.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,87 @@
  */
 
 #include "Images.h"
-#include "../Main.h"
-#include "../Defines.h"
+#include "Main.h"
+#include "Defines.h"
+#include "Debug.h"
 
 #ifdef WIN32
 #	define PKGDATADIR
 #endif
+
+SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags){
+
+  SDL_Surface* surface = SDL_CreateRGBSurface(flags, width, height, 32,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+          0xff000000,  // red mask
+          0x00ff0000,  // green mask
+          0x0000ff00,  // blue mask
+#else
+          0x000000ff,  // red mask
+          0x0000ff00,  // green mask
+          0x00ff0000,  // blue mask
+#endif
+          0 // don't use alpha
+   );
+  if ( surface == NULL )
+      throw ECExcept(0, std::string("Can't create SDL RGBA surface: ") + SDL_GetError());
+  return surface;
+}
+
+SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
+
+  SDL_Surface* surface = SDL_CreateRGBSurface(flags, width, height, 32,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+          0xff000000,  // red mask
+          0x00ff0000,  // green mask
+          0x0000ff00,  // blue mask
+          0x000000ff // alpha mask
+#else
+          0x000000ff,  // red mask
+          0x0000ff00,  // green mask
+          0x00ff0000,  // blue mask
+          0xff000000 // alpha mask
+#endif
+   );
+  if ( surface == NULL )
+      throw ECExcept(0, std::string("Can't create SDL RGBA surface: ") + SDL_GetError());
+  return surface;
+}
+
+
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+    int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to set */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
+    }
+}
+
 
 /****************************************************************************************
  *                                      ECSprite                                        *
@@ -169,9 +244,28 @@ ECImage::ECImage(char* fichier)
 	Load(fichier);
 }
 
+void ECImage::Free()
+{
+	if(Img)
+	{
+		SDL_FreeSurface(Img);
+		Img = 0;
+	}
+}
+
+
 ECImage::~ECImage()
 {
-	SDL_FreeSurface(Img);
+	Free();
+}
+
+ECImage &ECImage::operator=(const ECImage & src){
+        Free();
+        Img = src.Img;
+        if( Img != NULL )
+                Img->refcount++;
+
+        return *this;
 }
 
 void ECImage::Load(char *fichier)

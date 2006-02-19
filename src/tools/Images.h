@@ -1,6 +1,6 @@
 /* src/tools/Images.h - Header of Images.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,12 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+#define EstTransparent(a)       ( (a) != 255 )
+SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags);
+SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags);
+
 
 class ECSpriteBase;
 
@@ -142,6 +148,10 @@ public:
 
 	/** Obtenir la hauteur */
 	unsigned int GetHeight() { return (Img ? Img->h : 0); }
+
+	ECImage &operator=(const ECImage &src);
+
+	void Free();
 
 /* Variables publiques */
 public:
