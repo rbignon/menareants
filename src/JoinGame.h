@@ -30,6 +30,7 @@
 #include "gui/Edit.h"
 #include "gui/Memo.h"
 #include "gui/SpinEdit.h"
+#include "gui/Image.h"
 
 /********************************************************************************************
  *                               TGameInfosForm                                              *
@@ -54,6 +55,7 @@ public:
 	TLabel*      Title;
 	TListBox*    MapList;
 	TLabel*      MapTitle;
+	TImage*      Preview;
 
 	TSpinEdit*   MyPosition;
 
@@ -119,6 +121,8 @@ public:
 	void Init();                                          /**< Initialisation */
 	void Draw(uint souris_x, uint souris_y);              /**< Draw */
 	virtual void SetXY (uint _x, uint _y);                /**< Set \a x and \a y positions */
+
+	bool OwnZone(uint _x, uint _y);
 
 /* Composants */
 public:
