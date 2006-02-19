@@ -43,6 +43,7 @@ public:
 	 * @param nick nickname of user who joined channel.
 	 * @param chan channel struct.
 	 * @param owner if player is an owner or not.
+	 * @param op is player is an oper or not.
 	 * @param IsMe say if this player is me.
 	 */
 	ECPlayer(const char* nick, EChannel* chan, bool owner, bool op, bool IsMe);
