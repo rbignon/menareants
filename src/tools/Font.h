@@ -1,6 +1,6 @@
 /* src/tools/Font.h - Header of Font.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,51 +43,59 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <map>
-
-//-----------------------------------------------------------------------------
-
-class Font
-{
-private:
-  typedef std::map<std::string, SDL_Surface *>::value_type
-    txt_sample;
-  typedef std::map<std::string, SDL_Surface *>::iterator
-    txt_iterator;
-
-  std::map<std::string, SDL_Surface *> surface_text_table;
-  int surface_size;
-public:
-  TTF_Font *m_font;
-
-public:
-  Font();
-  ~Font();
-  bool Load (const std::string& resource_id, int size);
-  void WriteLeft (int x, int y, const std::string &txt, SDL_Color color);
-  void WriteLeftBottom (int x, int y, const std::string &txt, SDL_Color color);
-  void WriteRight (int x, int y, const std::string &txt, SDL_Color color);
-  void WriteCenterTop (int x, int y, const std::string &txt, SDL_Color color);
-  void WriteCenter (int x, int y, const std::string &txt, SDL_Color color);
-  int GetWidth (const std::string &txt);
-  int GetHeight ();
-  int GetHeight (const std::string &txt);
-  SDL_Surface * Render(const std::string &txt, SDL_Color color, bool cache);
-
-  static bool InitAllFonts();
- };
+#include "Images.h"
 
 extern SDL_Color white_color;
 extern SDL_Color black_color;
 extern SDL_Color red_color;
 extern SDL_Color gray_color;
 extern SDL_Color green_color;
+extern SDL_Color marron_color;
+extern SDL_Color blue_color;
 
-extern Font huge_font;
-extern Font large_font;
-extern Font big_font;
-extern Font normal_font;
-extern Font small_font;
-extern Font tiny_font;
+class Font
+{
+  typedef std::map<std::string, ECImage>::value_type
+    txt_sample;
+  typedef std::map<std::string, ECImage>::iterator
+    txt_iterator;
+
+  std::map<std::string, ECImage> surface_text_table;
+  TTF_Font *m_font;
+  void Write(int x, int y, ECImage &surface);
+
+public:
+  Font(int size);
+  ~Font();
+  
+  bool Load (const std::string& filename, int size);
+  TTF_Font& GetTTF() { return *m_font; }
+
+  void WriteLeft (int x, int y, const std::string &txt, const SDL_Color &color);
+  void WriteLeftBottom (int x, int y, const std::string &txt, const SDL_Color &color);
+  void WriteRight (int x, int y, const std::string &txt, const SDL_Color &color);
+  void WriteCenterTop (int x, int y, const std::string &txt, const SDL_Color &color);
+  void WriteCenter (int x, int y, const std::string &txt, const SDL_Color &color);
+  
+  int GetWidth (const std::string &txt);
+  int GetHeight ();
+  int GetHeight (const std::string &txt);
+
+  ECImage Render(const std::string &txt, const SDL_Color &color, bool cache=false);
+  ECImage CreateSurface(const std::string &txt, const SDL_Color &color);
+};
+
+class Fonts
+{
+public:
+  Fonts();
+  Font huge;
+  Font large;
+  Font big;
+  Font normal;
+  Font small;
+  Font tiny;
+};
 
 //-----------------------------------------------------------------------------
 #endif
