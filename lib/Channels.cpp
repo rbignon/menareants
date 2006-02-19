@@ -27,8 +27,8 @@
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
-ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner)
-	: chan(_chan), owner(_owner)
+ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
+	: chan(_chan), owner(_owner), op(_op)
 {
 	chan->AddPlayer(this);
 	ready = false;
@@ -122,6 +122,8 @@ const char* ECBChannel::PlayerList()
 	{
 		if(!list.empty()) list += " ";
 		if((*it)->IsOwner())
+			list += "*";
+		if((*it)->IsOp())
 			list += "@";
 		if((*it)->Ready())
 			list += "!";

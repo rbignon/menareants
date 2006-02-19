@@ -42,7 +42,7 @@ class ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
-	ECBPlayer(ECBChannel *_chan, bool _owner);
+	ECBPlayer(ECBChannel *_chan, bool _owner, bool _op);
 	virtual ~ECBPlayer() {}
 
 /* Méthodes */
@@ -57,11 +57,13 @@ public:
 	/** This is player's money. \todo Use a private variable ? */
 	int fric;
 
-	/** Is he the owner of game ? */
-	bool IsOwner() const { return owner; }
+	bool IsOwner() const { return owner; }      /**< Is he the owner of game ? */
+	void SetOwner(bool o = true) { owner = o; } /**< Set a player as the owner */
 	
-	/** Set a player as the owner of game of not. */
-	void SetOwner(bool o = true) { owner = o; }
+	bool IsOp() const { return op; }            /**< Is he an operator of channel ? */
+	void SetOp(bool o = true) { op = o; }       /**< Set a player as an oper */
+
+	bool IsPriv() const { return op || owner; } /**< Return true if player is op or owner */
 
 	/** Position of player in the map. */
 	unsigned int Position() const { return position; }
@@ -95,6 +97,7 @@ public:
 protected:
 	ECBChannel *chan;
 	bool owner;
+	bool op;
 	unsigned int position;
 	unsigned int color;
 	bool ready;

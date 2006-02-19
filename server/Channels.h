@@ -48,8 +48,9 @@ public:
 	 * @param cl client struct of user who joined channel.
 	 * @param chan channel struct.
 	 * @param owner if player is an owner or not.
+	 * @param op if player is an operator or not.
 	 */
-	ECPlayer(TClient* cl, EChannel* chan, bool owner);
+	ECPlayer(TClient* cl, EChannel* chan, bool owner, bool op);
 
 /* Methodes */
 public:

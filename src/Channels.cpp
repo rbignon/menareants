@@ -26,8 +26,8 @@
  *                               EPlayer                                                    *
  ********************************************************************************************/
 
-ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _isme)
-	: ECBPlayer(_chan, _owner), nick(_nick), isme(_isme)
+ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _op, bool _isme)
+	: ECBPlayer(_chan, _owner, _op), nick(_nick), isme(_isme)
 {
 
 }

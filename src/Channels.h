@@ -23,6 +23,7 @@
 #define EC_CHANNELS_H
 
 #include "../lib/Channels.h"
+#include "Map.h"
 
 class EChannel;
 
@@ -44,7 +45,7 @@ public:
 	 * @param owner if player is an owner or not.
 	 * @param IsMe say if this player is me.
 	 */
-	ECPlayer(const char* nick, EChannel* chan, bool owner, bool IsMe);
+	ECPlayer(const char* nick, EChannel* chan, bool owner, bool op, bool IsMe);
 
 /* Methodes */
 public:
@@ -94,6 +95,8 @@ public:
 
 	/** Get a player in channel by his nickname. */
 	ECPlayer* GetPlayer(const char* nick);
+
+	ECMap* Map() const { return dynamic_cast<ECMap*>(map); }
 
 /* Variables privées */
 protected:
