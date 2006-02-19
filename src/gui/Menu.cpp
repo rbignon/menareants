@@ -234,24 +234,24 @@ void Menu::redraw( int yoffset )
 	MenuItem* current = get_item_by_id(current_run_id);
 
   const int space_between_items = 15;
-	int item_height = big_font.GetHeight("A") + space_between_items;
+	int item_height = app.Font()->big.GetHeight("A") + space_between_items;
 
   int width=0;
 	std::vector<MenuItem*>::iterator item_counter = current->children.begin();
 	for(;item_counter != current->children.end(); ++item_counter)
 	{
-		int w = big_font.GetWidth( (*item_counter)->get_text() );
+		int w = app.Font()->big.GetWidth( (*item_counter)->get_text() );
 		if ((*item_counter)->get_type() == MenuItem::MT_VALUE)
 		{
 			w += 250;
 		}
 		if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
-			w += big_font.GetWidth( ((MenuItem_String*)(*item_counter))->get_string() );
+			w += app.Font()->big.GetWidth( ((MenuItem_String*)(*item_counter))->get_string() );
 		}
 		if ((*item_counter)->get_type()==MenuItem::MT_STRINGLIST)
 		{
-			w += big_font.GetWidth( ((MenuItem_StringList*)(*item_counter))->get_string() );
+			w += app.Font()->big.GetWidth( ((MenuItem_StringList*)(*item_counter))->get_string() );
 		}
 		width = std::max( w, width );
 	}
@@ -266,7 +266,7 @@ void Menu::redraw( int yoffset )
 	SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,lapp->sdlwindow,NULL);
 	//CL_Display::fill_rect( left_border-30,yoffset-20, right_border+20,yoffset+20+height, 0,0,0,0.0f);
   yoffset += 160;
-	big_font.WriteCenterTop(400,yoffset, current->get_text(), black_color);
+	app.Font()->big.WriteCenterTop(400,yoffset, current->get_text(), black_color);
 	yoffset += item_height * 2;
 
 	unsigned int act_draw = 0;
@@ -289,38 +289,38 @@ void Menu::redraw( int yoffset )
 			if ((((MenuItem_Value*)(*item_counter))->get_min() == 0) &&
 			    (((MenuItem_Value*)(*item_counter))->get_max() == 1))
 			{
-				big_font.WriteRight( right_border, yoffset,
+				app.Font()->big.WriteRight( right_border, yoffset,
 			                std::string(((MenuItem_Value*)(*item_counter))->get_value() ? "Oui" : "Non"),
 			                black_color);
 			}
 			else
 			{
-				big_font.WriteRight(right_border, yoffset,
+				app.Font()->big.WriteRight(right_border, yoffset,
 				                 TypToStr(((MenuItem_Value*)(*item_counter))->get_value()), black_color);
 			}
-			big_font.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color );
+			app.Font()->big.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color );
 		}
 		else if ((*item_counter)->get_type()==MenuItem::MT_STRING)
 		{
 			if(!((MenuItem_String*)(*item_counter))->get_string().empty())
-				big_font.WriteRight(right_border, yoffset,
+				app.Font()->big.WriteRight(right_border, yoffset,
 				                    ((MenuItem_String*)(*item_counter))->get_string(), black_color);
-			big_font.WriteLeft(left_border, yoffset, (*item_counter)->get_text(), black_color);
+			app.Font()->big.WriteLeft(left_border, yoffset, (*item_counter)->get_text(), black_color);
 		}
 		else if ((*item_counter)->get_type()==MenuItem::MT_STRINGLIST)
 		{
-			big_font.WriteRight(right_border, yoffset,
+			app.Font()->big.WriteRight(right_border, yoffset,
 			                    ((MenuItem_StringList*)(*item_counter))->get_string(), black_color);
-			big_font.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color);
+			app.Font()->big.WriteLeft( left_border, yoffset, (*item_counter)->get_text(), black_color);
 		}
 		else
 		{
-			big_font.WriteCenterTop( 400, yoffset, (*item_counter)->get_text(), black_color );
+			app.Font()->big.WriteCenterTop( 400, yoffset, (*item_counter)->get_text(), black_color );
 		}
 		yoffset += item_height;
 	}
-  int version_h = normal_font.GetHeight("v "APP_VERSION);
-	normal_font.WriteRight( 800-25, 600-version_h/2-25, "v "APP_VERSION, white_color );
+  int version_h = app.Font()->normal.GetHeight("v "APP_VERSION);
+	app.Font()->normal.WriteRight( 800-25, 600-version_h/2-25, "v "APP_VERSION, white_color );
 	SDL_Flip(lapp->sdlwindow);
 }
 
@@ -464,8 +464,8 @@ std::string Menu::EnterString(std::string label, std::string last_string, bool f
 	{
 		SDL_BlitSurface(Resources::Menuscreen()->Img,NULL,app.sdlwindow,NULL);
 
-		big_font.WriteLeft( 230, 330, label, black_color );
-		big_font.WriteLeft( 380, 330, new_string+"_", black_color );
+		app.Font()->big.WriteLeft( 230, 330, label, black_color );
+		app.Font()->big.WriteLeft( 380, 330, new_string+"_", black_color );
 
 		SDL_Flip(app.sdlwindow);
 

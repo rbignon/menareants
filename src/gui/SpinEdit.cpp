@@ -43,7 +43,7 @@ TSpinEdit::TSpinEdit(std::string _label, uint _x, uint _y, uint _width, int _min
 	txt_value = NULL;
 	m_plus = NULL;
 	m_minus = NULL;
-	font = &small_font;
+	font = &app.Font()->small;
 	color = white_color;
 }
 
@@ -153,7 +153,7 @@ void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
 
 bool TSpinEdit::Clic (uint mouse_x, uint mouse_y)
 {
-  if(!m_minus || !m_plus) return false;
+  if(!m_minus || !m_plus || !enabled) return false;
 
   if (m_minus->Test(mouse_x, mouse_y))
     return ChangeValueByClick(false);

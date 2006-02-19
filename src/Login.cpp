@@ -1,6 +1,6 @@
 /* src/Login.cpp - Login commands
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,7 +172,6 @@ void EuroConqApp::request_game()
 		SDL_Event event;
 		do
 		{
-			int x=0, y=0;
 			while( SDL_PollEvent( &event) )
 			{
 				switch(event.type)
@@ -205,11 +204,7 @@ void EuroConqApp::request_game()
 						break;
 				}
 			}
-			SDL_GetMouseState( &x, &y);
-
-			ConnectedForm->Update(x, y, false);
-
-			SDL_Flip(sdlwindow);
+			ConnectedForm->Update();
 
 			if(!client || !client->IsConnected())
 			{
@@ -246,7 +241,7 @@ void EuroConqApp::request_game()
 TConnectedForm::TConnectedForm()
 	: TForm()
 {
-	Welcome = AddComponent(new TLabel(200,50,"Vous êtes bien connecté", black_color, &big_font));
+	Welcome = AddComponent(new TLabel(200,50,"Vous êtes bien connecté", black_color, &app.Font()->big));
 
 	Motd = AddComponent(new TMemo(75,100,500,400, 0));
 

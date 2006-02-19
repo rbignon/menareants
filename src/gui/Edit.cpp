@@ -1,6 +1,6 @@
 /* src/gui/TEdit.cpp - TEdit GUI
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ void TEdit::Init()
   if ( background)
     SDL_FreeSurface( background);
 
-  visible_len = ((w) / small_font.GetWidth("A"));
+  visible_len = ((w) / app.Font()->small.GetWidth("A"));
 
   SDL_Rect r_back = {0,0,w,h};
 
@@ -84,11 +84,11 @@ void TEdit::Draw (uint m_x, uint m_y)
   if(!focus && chaine.empty()) return;
 
   if(chaine.size() > visible_len)
-	small_font.WriteLeft(x+5, y,
+	app.Font()->small.WriteLeft(x+5, y,
 			 chaine.substr(first_char, first_char+visible_len) + std::string(focus ? "_" : ""),
 			 black_color);
   else
-	small_font.WriteLeft(x+5, y, chaine + std::string(focus ? "_" : ""), black_color);
+	app.Font()->small.WriteLeft(x+5, y, chaine + std::string(focus ? "_" : ""), black_color);
 }
 
 void TEdit::PressKey(SDL_keysym key)

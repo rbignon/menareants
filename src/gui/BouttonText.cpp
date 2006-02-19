@@ -1,6 +1,6 @@
 /* src/gui/BouttonText.cpp - Boutton Text
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 TButtonText::TButtonText() : TButton()
 {
-  font = &normal_font;
+  font = &app.Font()->normal;
 }
 
 //-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ TButtonText::TButtonText (unsigned int _x, unsigned int _y, unsigned int _w, uns
   : TButton(_x, _y, _w, _h)
 {
   m_text = text;
-  font = &normal_font;
+  font = &app.Font()->normal;
 }
 
 

@@ -85,7 +85,7 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 	uint vert = y;
 
 	for (uint i=0; i < message.size(); i++, vert += height_string)
-		normal_font.WriteLeft(x+30, vert, message[i], black_color);
+		app.Font()->normal.WriteLeft(x+30, vert, message[i], black_color);
 
 	vert += 20;
 
@@ -97,7 +97,7 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 
 void TMessageBox::SetText(const char* _s)
 {
-	height_string = normal_font.GetHeight();
+	height_string = app.Font()->normal.GetHeight();
 
 	/* On parse le message pour le découper en différentes lignes */
 	char s[MSGBOX_MAXWIDTH + 20 + 2];
@@ -113,7 +113,7 @@ void TMessageBox::SetText(const char* _s)
 			i=0;
 
 			h += height_string;
-			uint yw = normal_font.GetWidth(s);
+			uint yw = app.Font()->normal.GetWidth(s);
 			if(w < yw) w = yw;
 
 			if(*_s == '\n')

@@ -46,6 +46,7 @@ void EuroConqApp::setclient(EC_Client* c)
 void EuroConqApp::quit_app(int value)
 {
 		if(conf) delete conf;
+		if(fonts) delete fonts;
 		Resources::Unload();
         exit(value);
 }
@@ -121,7 +122,7 @@ int EuroConqApp::main(int argc, char **argv)
 			return false;
 		}
 
-		if(!Font::InitAllFonts()) return false;
+		fonts = new Fonts;
 
 		SDL_UpdateRect(app.sdlwindow, 0, 0, 0, 0);
 		SDL_Flip(app.sdlwindow);

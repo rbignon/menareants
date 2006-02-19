@@ -24,6 +24,7 @@
 #include "Defines.h"
 #include "Config.h"
 #include "Sockets.h"
+#include "tools/Font.h"
 
 #include <iostream>
 #include <SDL_thread.h>
@@ -57,6 +58,7 @@ protected:
 	EC_Client* client;
 	Config *conf;
 	SDL_Thread* Thread;
+	Fonts *fonts;
 	std::string path;
 
 	void request_game();
@@ -74,6 +76,7 @@ public:
 
 	Config* getconf() const { return conf; }
 	EC_Client* getclient() const { return client; }
+	Fonts* Font() const { return fonts; }
 	void setclient(EC_Client* c);
 	Menu* getmenu() const { return menu; }
 	std::string GetPath() const { return path; }
@@ -83,6 +86,7 @@ public:
 		client = 0;
 		conf = 0;
 		Thread = 0;
+		fonts = 0;
 	}
 
 	SDL_Surface* sdlwindow;

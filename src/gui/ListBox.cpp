@@ -1,6 +1,6 @@
 /* src/gui/TListBox.cpp - To draw a listbox
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ void TListBox::Draw (uint mouse_x, uint mouse_y)
 		}
 	}
 	if(!m_items[i+first_visible_item].label.empty())
-		small_font.WriteLeft(x+5,
+		app.Font()->small.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
@@ -202,6 +202,12 @@ void TListBox::ClearItems()
 {
 	m_items.clear();
 	m_selection.clear();
+  height_item = 15;
+  first_visible_item = 0;
+  visible_height = 0;
+  selection_min = 1;
+  nb_visible_items = 0;
+  selection_max = 1;
 }
 
 void TListBox::Select (uint index)
