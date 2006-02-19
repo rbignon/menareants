@@ -23,14 +23,35 @@
 #define EC_MAP_H
 
 #include "lib/Map.h"
+#include "tools/Images.h"
 #include <vector>
 
-/* Note: il n'y a theoriquement aucune redefinition des ECB* pour les maps/cases/etc car toutes
- * les informations y sont déjà incluses.
- * C'est pourquoi pour les types qui n'ont pas été à redéfinir il y a des typedef pour les noms courants.
- */
+class ECMap : public ECBMap
+{
+/* Constructeur/Destructeur */
+public:
+	/** Path of map (used only by Server) */
+	ECMap(std::string _filename);
 
-typedef ECBMap         ECMap;
+	/** Constructor from a string's vector
+	 * @param _map_file this is a string's vector where there is informations about map
+	 */
+	ECMap(std::vector<std::string> _map_file);
+
+	virtual ~ECMap();
+
+/* Attributs */
+public:
+
+	ECImage* Preview() { return preview; }            /**< Creation of map preview */
+
+/* Variables privées */
+protected:
+	ECImage *preview;
+
+	void CreatePreview();
+};
+
 typedef ECBCase        ECase;
 typedef ECBVille       ECVille;
 typedef ECBMer         ECMer;
@@ -38,6 +59,7 @@ typedef ECBTerre       ECTerre;
 typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
+typedef ECBDate        ECDate;
 
 
 #endif /* EC_MAP_H */
