@@ -36,19 +36,22 @@ int main(int argc, char **argv)
 	ECBMap *map = 0;
 	try
 	{
-		map = new ECBMap(filename);
+		map = new ECBMap("../server/maps/" + std::string(filename));
 
 		/* Utilisation de printf parce que c'est plus beau */
 		printf("Map \"%s\" is loaded !!\n", map->Name().c_str());
-		printf("--------------------\n");
-		printf("NbPlayers:    %6d\n", map->NbMapPlayers());
-		printf("NbCases:      %6d\n", map->NbCases());
-		printf("NbCountries:  %6d\n", map->NbCountries());
-		printf("MinPlayers:   %6d\n", map->MinPlayers());
-		printf("MaxPlayers:   %6d\n", map->MaxPlayers());
-		printf("BeginFric:    %6d\n", map->BeginMoney());
-		printf("CityFric:     %6d\n", map->CityMoney());
-		printf("--------------------\n");
+		printf("-----------------------\n");
+		printf("IniDate:     %10s\n", map->Date()->String().c_str());
+		++(*map->Date());
+		printf("NextDate:    %10s\n", map->Date()->String().c_str());
+		printf("NbPlayers:   %10d\n", map->NbMapPlayers());
+		printf("NbCases:     %10d\n", map->NbCases());
+		printf("NbCountries: %10d\n", map->NbCountries());
+		printf("MinPlayers:  %10d\n", map->MinPlayers());
+		printf("MaxPlayers:  %10d\n", map->MaxPlayers());
+		printf("BeginFric:   %10d\n", map->BeginMoney());
+		printf("CityFric:    %10d\n", map->CityMoney());
+		printf("-----------------------\n");
 		printf("TERRAIN :\n\n");
 		for(unsigned y = 0; y < map->Height(); y++)
 		{
@@ -56,7 +59,7 @@ int main(int argc, char **argv)
 				printf("[%c]", (*map)(x, y)->TypeID());
 			printf("\n");
 		}
-		printf("--------------------\n");
+		printf("-----------------------\n");
 		printf("COUNTRIES :\n\n");
 		for(unsigned y = 0; y < map->Height(); y++)
 		{
@@ -64,15 +67,15 @@ int main(int argc, char **argv)
 				printf("|%s", (*map)(x, y)->Country()->ID());
 			printf("|\n");
 		}
-		printf("--------------------\n");
+		printf("-----------------------\n");
 		printf("PLAYERS :\n\n");
 		for(unsigned y = 0; y < map->Height(); y++)
 		{
 			for(unsigned x = 0; x < map->Width(); x++)
-				printf("[%c]", (*map)(x, y)->Country()->Owner()->ID());
+				printf("[%c]", (*map)(x, y)->Country()->Owner() ? (*map)(x, y)->Country()->Owner()->ID() : '*');
 			printf("\n");
 		}
-		printf("--------------------\n");
+		printf("-----------------------\n");
 		std::vector<ECBMapPlayer*> m_p = map->MapPlayers();
 		for(std::vector<ECBMapPlayer*>::iterator it=m_p.begin(); it != m_p.end(); ++it)
 			printf("Player %c : %d countries\n", (*it)->ID(), (*it)->Countries().size());
