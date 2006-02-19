@@ -7,7 +7,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -faire les dérivées d'ECBCase.
 
 * Urgent
--client: preview de la map
+
 
 * Bof
 -client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
@@ -19,6 +19,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 * En parallèle (on s'en fou un peu de quand on les fait)
 -client: Suppression progressive du menu pour passer uniquement à des TForm.
 -passer les conversions explicites en dynamic_cast<>
+-faire un éditeur de map (avec c++ builder pour que ça soit plus facile)
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -client: Faire la partie de jeu vraiment.

@@ -1,3 +1,28 @@
+2005-02-18  Romain Bignon <progs@headfucking.net>
+
+	* test/map.cpp: Petite mise à jour avec prise en compte de la date et test du ++ dessus.
+
+	* lib/Map.cpp: Ajout de ECBDate.
+
+	* API: Section "6. Êtat de la partie"
+
+	* src/JoinGame.cpp, server/Channels.c: Ne peut se mettre Ready que si il a une position et une couleur.
+
+	* src/JoinGame.cpp: Affichage de la preview.
+
+	* src/Map.cpp: Fonction pour créer la preview.
+
+	* src/gui/Image.cpp: Création d'un composant TImage.
+
+	* lib/Channels.cpp, src/Channels.cpp, server/Channels.c: Rajout du status de "Op" pour le +o. Il ne peut y avoir qu'un
+	seul owner.
+
+	* src/tools/Font.cpp: Correction (enfin!) du bug du cpu et memoire full, en reprenant le code de wormux pour ce fichier.
+
+	* src/tools/Images.cpp: Petite amélioration.
+
+	* src/Main.cpp, ...: Mise du membre EuroConqApp::fonts et application partout.
+
 2005-02-17  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Reception de la liste des maps et de la map paramétrée.
