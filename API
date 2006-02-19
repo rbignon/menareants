@@ -12,6 +12,7 @@ Sommaire:
 3) Particularités des commandes de positions
 4) Modes
 5) PLS
+6) Etat d'une partie
 
 1) Principe du jeu
 
@@ -52,11 +53,10 @@ Sommaire:
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA                       :un user part (ou a été kické)
-              :<nick> WGO                       :l'owner veut lancer le jeu
-              :<nick> GO!                       :l'owner lance le jeu
-         - En cours de jeu
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
+         - En cours de jeu
+              GO!                               :lance la partie (mise en SENDING, voir 6. Etats d'une partie)
               :<nick>!<arm> ARM <nom> [+<nb>]   :montre le changement d'une armée
                           [%<type>] [><pos>]
                           [<[pos]] [-] [.]
@@ -82,7 +82,7 @@ Sommaire:
       Voici la liste :
         Mode pour le chan:
          +l <limite>         :paramètre la limite
-         +o <user>           :met owner un user
+         +o <user>           :met op un user
          +m <map>            :définie la map du jeu
          +W                  :pré-partie (WAITING)
          +S                  :envoie des infos (SENDING)
@@ -98,8 +98,15 @@ Sommaire:
      sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la détailler:
 
      PLS [@][!]<position>,<couleur>,<pseudo> [...]
-     [@]               :le joueur est owner
+     [*]               :le joueur est owner
+     [@]               :le joueur est op
      [!]               :le joueur est pret (Ready)
      <position>        :la position du joueur sur la carte
      <couleur>         :la couleur
      <pseudo>          :le pseudo du joueur
+
+6) Êtat d'une partie
+     WAITING           :c'est la pré-partie
+     SENDING           :le client créé la map physiquement et prépare toutes les données
+     PLAYING           :les joueurs doivent jouer jusqu'à ce que tout le monde soit READY
+     ANIMING           :animations commandées par le serveur
