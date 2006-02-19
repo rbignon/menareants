@@ -38,6 +38,7 @@ typedef ECBTerre       ECTerre;
 typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
+typedef ECBDate        ECDate;
 
 extern bool LoadMaps();
 

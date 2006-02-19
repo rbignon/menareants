@@ -37,6 +37,7 @@ bool LoadMaps()
 	}
 
 	std::string ligne;
+	uint nbmaps = 0;
 
 	while(std::getline(fp, ligne))
 	{
@@ -52,7 +53,9 @@ bool LoadMaps()
 			vDebug(W_ERR|W_ECHO, e.Message, e.Vars);
 			continue;
 		}
+		nbmaps++;
 		MapList.push_back(map);
 	}
+	Debug(W_ECHO, "%d maps loaded !", nbmaps);
 	return true;
 }
