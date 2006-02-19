@@ -46,6 +46,47 @@ class ECBMapPlayer;
 class ECBCountry;
 
 /********************************************************************************************
+ *                               ECBDate                                                    *
+ ********************************************************************************************/
+
+class ECBDate
+{
+/* Constructeur/Destructeur */
+public:
+	ECBDate(uint d, uint m, int y);
+	ECBDate(std::string date);
+
+/* Methodes */
+public:
+
+	std::string String();
+
+	void CheckDate();
+
+/* Attributs */
+public:
+
+	uint Day() { return d; }
+	uint Month() { return m; }
+	uint Year() { return y; }
+
+	void SetDay(uint _d) { d = _d; }
+	void SetMonth(uint _m) { m = _m; }
+	void SetYear(int _y) { y = _y; }
+
+	void SetDate(std::string date);
+
+	ECBDate& operator++ ();    // prefix ++
+	ECBDate  operator++ (int); // postfix ++
+
+/* Variables privées */
+protected:
+	uint d;
+	uint m;
+	int y;
+};
+
+/********************************************************************************************
  *                               ECBCase                                                    *
  ********************************************************************************************/
 
@@ -73,12 +114,17 @@ public:
 	/** This case is a member of this map */
 	ECBMap* Map() { return map; }
 
+	/** Return type of terrain (a char) */
 	char TypeID() { return type_id; }
 
+	/** Return flags of case */
 	uint Flags() { return flags; }
 
 	ECBCountry* Country() { return map_country; }
 	void SetCountry(ECBCountry *mc) { map_country = mc; }
+
+	uint X() { return x; }
+	uint Y() { return y; }
 
 /* Variables privées */
 protected:
@@ -183,10 +229,13 @@ public:
 /* Attributs */
 public:
 
+	/** Add case to country */
 	void AddCase(ECBCase* _case) { cases.push_back(_case); }
-	
+
+	/** Return country ID (two chars) */
 	const char* ID() { return ident; }
 
+	/** Return Owner of country */
 	ECBMapPlayer* Owner() { return owner; }
 	void SetOwner(ECBMapPlayer* mp) { owner = mp; }
 
@@ -211,14 +260,16 @@ class ECBMapPlayer
 /* Constructeur/Destructeur*/
 public:
 
-	ECBMapPlayer(char _id)
-		: id(_id)
+	ECBMapPlayer(char _id, uint _num)
+		: id(_id), num(_num)
 	{}
 
 /* Attributs */
 public:
 
 	char ID() { return id; }
+
+	uint Num() { return num; }
 
 	void AddCountry(ECBCountry* _country) { countries.push_back(_country); }
 
@@ -229,6 +280,7 @@ public:
 /* Variables privées */
 public:
 	char id;
+	uint num;
 	std::vector<ECBCountry*> countries;
 
 };
@@ -285,6 +337,8 @@ public:
 	std::vector<ECBCountry*> Countries() { return map_countries; }  /**< Return countries vector */
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
+
+	ECBDate* Date() { return date; }
 	
 	/** Access to a case of map 
 	 * Example: map(x,y)
@@ -300,6 +354,8 @@ protected:
 	std::vector<ECBMapPlayer*> map_players;
 	
 	std::vector<ECBCountry*> map_countries;
+
+	ECBDate* date;
 
 	ECBChannel *chan;
 	std::string name;

@@ -25,6 +25,98 @@
 #include <fstream>
 
 /********************************************************************************************
+ *                               ECBDate                                                    *
+ ********************************************************************************************/
+
+ECBDate::ECBDate(uint _d, uint _m, int _y)
+	: d(_d), m(_m), y(_y)
+{
+	CheckDate();
+}
+
+ECBDate::ECBDate(std::string date)
+{
+	d = 0;
+	m = 0;
+	y = 0;
+	SetDate(date);
+}
+
+ECBDate& ECBDate::operator++ ()
+{
+	bool incm = false;
+	switch(m)
+	{
+		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+			if(d == 31) incm = true;
+			break;
+		case 2:
+			if(d == 28) incm = true;
+			break;
+		default:
+			if(d == 30) incm = true;
+	}
+	if(incm)
+	{
+		d = 1;
+		if(m == 12)
+		{
+			m = 1;
+			y++;
+		}
+		else m++;
+	}
+	else
+		d++;
+	return *this;
+}
+
+ECBDate ECBDate::operator++ (int)
+{
+	ECBDate ans = *this;
+	++(*this);  // ou appeler simplement operator++()
+	return ans;
+}
+
+std::string ECBDate::String()
+{
+	return (TypToStr(d) + "/" + TypToStr(m) + "/" + TypToStr(y));
+}
+
+void ECBDate::CheckDate()
+{
+	if(!d || !m || d > 31 || d > 28 && m == 2 || m > 12)
+		throw ECExcept(VIName(d) VIName(m), "Date incorrecte");
+
+	switch(m)
+	{
+		case 4: case 5: case 9: case 11:
+			if(d > 30)
+				throw ECExcept(VIName(d) VIName(m), "Date incorrecte");
+			break;
+	}
+}
+
+void ECBDate::SetDate(std::string date)
+{
+	unsigned short n = 0;
+	while(n<3)
+	{
+		std::string s = stringtok(date, " ");
+		if(s.empty())
+			throw ECExcept(VName(s), "Date incorrecte");
+		switch(n)
+		{
+			case 0: d = StrToTyp<uint>(s); break;
+			case 1: m = StrToTyp<uint>(s); break;
+			case 2: y = StrToTyp<int>(s); break;
+		}
+		n++;
+	}
+	CheckDate();
+}
+
+/********************************************************************************************
  *                               ECBCase                                                    *
  ********************************************************************************************/
 
@@ -88,7 +180,7 @@ ECBMap::ECBMap(std::vector<std::string> _map_file)
 	initialised = false;
 
 	map_file = _map_file;
-	
+
 	Init();
 }
 
@@ -138,6 +230,7 @@ ECBMap::ECBMap(std::string filename)
  *   CITY [money by city]
  *   MIN [min]
  *   MAX [max]
+ *   DATE [jour] [mois] [année]
  * </pre>
  *
  *  1) NAME [name]
@@ -170,7 +263,7 @@ ECBMap::ECBMap(std::string filename)
  *      't' = terre.
  *      'p' = pont.
  *   XX = Identificator of country (like AA, AB, etc)
- *   Y = Player Owner (like A, B, C, etc, or neutral)
+ *   Y = Player Owner (like A, B, C, etc, or * for 'neutral')
  *   Z = Type of architecture (only for image, so not used by server)
  *   </pre>
  *
@@ -194,6 +287,11 @@ ECBMap::ECBMap(std::string filename)
  *   Max players. It's channel limit.
  *   </pre>
  *
+ *  7) DATE [jour] [mois] [année]
+ *   <pre>
+ *   Initial date of game.
+ *   </pre>
+ *
  * @author Progs
  * @date 15/02/2006
  */
@@ -204,11 +302,12 @@ void ECBMap::Init()
 	y = 0;
 	min = 0;
 	max = 0;
+	date = 0;
 	
 	std::string ligne;
 
 	bool recv_map = false;
-	uint _x = 0, _y = 0;
+	uint _x = 0, _y = 0, num_player = 0;
 
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 	{
@@ -229,12 +328,17 @@ void ECBMap::Init()
 			else if(key == "X") x = atoi(ligne.c_str());
 			else if(key == "Y") y = atoi(ligne.c_str());
 			else if(key == "PLAYER")
-				map_players.push_back(new ECBMapPlayer(ligne[0]));
+			{
+				if(!isalpha(ligne[0]))
+					throw ECExcept(VCName(ligne[0]), "L'identifiant de ce player n'est pas correct (doit être une lettre)");
+				map_players.push_back(new ECBMapPlayer(ligne[0], ++num_player));
+			}
 			else if(key == "MAP") recv_map = true;
 			else if(key == "BEGIN") begin_money = atoi(ligne.c_str());
 			else if(key == "CITY") city_money = atoi(ligne.c_str());
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());
+			else if(key == "DATE") date = new ECBDate(ligne);
 			else
 				throw ECExcept(VName(key) VName(name), "Fichier map incorrect");
 		}
@@ -304,6 +408,15 @@ void ECBMap::Init()
 					/* Player owner (utilisation de map_players) */
 					case 3:
 					{
+						if(ligne[i] == '*')
+						{ /* C'est une country *neutre* */
+							if(country->Owner())
+								throw ECExcept(VCName(ligne[i]) VIName(_x) VIName(_y) VSName(country->ID()),
+								               "Cette country est un coup neutre un coup appartient à quelqu'un ?");
+							else
+								break;
+						}
+
 						std::vector<ECBMapPlayer*>::iterator it;
 						for(it=map_players.begin();
 						    it != map_players.end() && (*it)->ID() != ligne[i]; it++);
@@ -316,9 +429,8 @@ void ECBMap::Init()
 							throw ECExcept(VCName(country->Owner()->ID()) VCName((*it)->ID())
 							               VIName(_x) VIName(_y), "Une country a deux owners !");
 
-						if((*it)->FindCountry(c_id)) /* Ce MapPlayer a déjà cette country en mémoire */
-							break;
-						(*it)->AddCountry(country);
+						if(!(*it)->FindCountry(c_id)) /* Ce MapPlayer n'a pas encore cette country en mémoire */
+							(*it)->AddCountry(country);
 						break;
 					}
 					/* Type d'architecture */
@@ -350,9 +462,9 @@ void ECBMap::Init()
 	}
 	/* Vérification finale des données */
 	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
-	   !min || !max || map_players.size() != max || min > max)
+	   !min || !max || map_players.size() != max || min > max || !date)
 		throw ECExcept(VIName(begin_money) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min) VIName(max)
-		               VIName(map_players.size()) VIName(map_countries.size()), "Fichier incorrect !");
+		               VIName(map_players.size()) VIName(map_countries.size()) VPName(date), "Fichier incorrect !");
 
 	/* On vérifie si il y a bien une ville par country */
 	for(std::vector<ECBCountry*>::iterator it= map_countries.begin(); it != map_countries.end(); ++it)
@@ -385,6 +497,8 @@ ECBMap::~ECBMap()
 	/* Libération des Countries */
 	for(std::vector<ECBCountry*>::iterator it=map_countries.begin(); it != map_countries.end(); ++it)
 		delete *it;
+
+	delete date;
 }
 
 ECBCase* ECBMap::operator() (uint _x, uint _y) const
