@@ -43,6 +43,8 @@ public:
 	TButtonText* ListButton;
 	TButtonText* DisconnectButton;
 	TLabel*      Welcome;
+	TLabel*      UserStats;
+	TLabel*      ChanStats;
 
 /* Evenements */
 public:

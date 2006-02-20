@@ -128,6 +128,22 @@ int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** Statistics of server.
+ *
+ * Syntax: STAT nbactco nbco nbch chinwait chingame chtot
+ */
+int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(ConnectedForm)
+	{
+		ConnectedForm->UserStats->SetCaption("Il y a " + parv[1] + " personnes connectées, avec " + parv[2] +
+		                                     " connexions totales et " + parv[6] + " parties jouées.");
+		ConnectedForm->ChanStats->SetCaption("Il y a actuellement " + parv[3] + " partie(s), dont " + parv[5] +
+		                                     " en cours de jeu et " + parv[4] + " en préparation");
+	}
+	return 0;
+}
+
 void EuroConqApp::request_game()
 {
 	if(client)
@@ -196,9 +212,15 @@ void EuroConqApp::request_game()
 							eob = true;
 						}
 						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y))
+						{
 							ListGames();
+							client->sendrpl(client->rpl(EC_Client::STAT));
+						}
 						if(ConnectedForm->CreateButton->Test(event.button.x, event.button.y))
+						{
 							GameInfos(NULL);
+							client->sendrpl(client->rpl(EC_Client::STAT));
+						}
 						break;
 					default:
 						break;
@@ -249,14 +271,20 @@ TConnectedForm::TConnectedForm()
 	ListButton = AddComponent(new TButtonText(600,150,100,49, "Lister les parties"));
 	DisconnectButton = AddComponent(new TButtonText(600,200,100,49, "Se déconnecter"));
 
+	UserStats = AddComponent(new TLabel(75,505,"", black_color, &app.Font()->normal));
+	ChanStats = AddComponent(new TLabel(75,525,"", black_color, &app.Font()->normal));
+
 	SetBackground(Resources::Menuscreen());
 }
 
 TConnectedForm::~TConnectedForm()
 {
-	delete Welcome;
-	delete Motd;
-	delete CreateButton;
-	delete ListButton;
+	delete ChanStats;
+	delete UserStats;
 	delete DisconnectButton;
+	delete ListButton;
+	delete CreateButton;
+	delete Motd;
+	delete Welcome;
+	
 }
