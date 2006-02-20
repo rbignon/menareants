@@ -43,6 +43,7 @@ const char* msgTab[] = {
      "AIM %s",                              /* AIM - Logué */
      "MOTD %s",                             /* MOTD - Message Of The Day */
      "EOM",                                 /* EOM - Fin du motd */
+     "STAT %d %d %d %d %d %d",              /* STAT - Stats du serveur */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
 
@@ -261,6 +262,8 @@ TClient *ECServer::addclient(int fd, const char *ip)
 		newC->Init(fd, ip);
 		newC->sendrpl(rpl(ECServer::HELLO));
 	}
+	NBco++;
+	NBtot++;
 
 	return newC;
 }
@@ -294,6 +297,7 @@ void ECServer::delclient(TClient *del)
 
 	FD_CLR(del->GetFd(), &global_fd_set);
 	del->Free();
+	NBco--;
 	return;
 }
 

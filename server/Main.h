@@ -50,6 +50,7 @@ public:
 		AIM,          /**< AIM */
 		MOTD,         /**< MOTD */
 		ENDOFMOTD,    /**< EOM */
+		STAT,         /**< STAT */
 
 		CANTJOIN,     /**< ER1 */
 
@@ -86,6 +87,15 @@ public:
 
 	TClient Clients[MAXCONNEX+1];
 
+	uint NBco;
+	uint NBtot;
+	uint NBchan;
+	uint NBachan;
+	uint NBwchan;
+	uint NBtotchan;
+
+	const char* ServerName() { return conf ? conf->ServerName().c_str() : 0; }
+
 	std::vector<EC_ACommand*> GetCommands() const { return Commands; }
 
 	unsigned int GetHighSock() const { return highsock; }
@@ -93,6 +103,8 @@ public:
 	Config *GetConf() const { return conf; }
 
 	std::string GetPath() const { return path; }
+
+	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0) {}
 
 protected:
 	Config *conf;

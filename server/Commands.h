@@ -61,6 +61,8 @@ class IAMCommand : public EC_ACommand { public: IAMCommand(const std::string _Cm
 
 class BYECommand : public EC_ACommand { public: BYECommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BYECommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
+class STATCommand : public EC_ACommand { public: STATCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
 class PIGCommand : public EC_ACommand { public: PIGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class POGCommand : public EC_ACommand { public: POGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~POGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
@@ -82,6 +84,7 @@ DECLARE_CMD ( IAM );
 DECLARE_CMD ( BYE );
 DECLARE_CMD ( PIG );
 DECLARE_CMD ( POG );
+DECLARE_CMD ( STAT );
 
 DECLARE_CMD ( JOI );
 DECLARE_CMD ( LEA );
