@@ -261,7 +261,7 @@ class ECBMapPlayer
 public:
 
 	ECBMapPlayer(char _id, uint _num)
-		: id(_id), num(_num)
+		: id(_id), num(_num), pl(0)
 	{}
 
 /* Attributs */
@@ -273,7 +273,11 @@ public:
 
 	void AddCountry(ECBCountry* _country) { countries.push_back(_country); }
 
-	ECBCountry* FindCountry(const char*);
+	/** Find a country by ID */
+	ECBCountry* FindCountry(const char*id);
+
+	ECBPlayer* Player() { return pl; }
+	void SetPlaye(ECBPlayer* _pl) { pl = _pl; }
 
 	std::vector<ECBCountry*> Countries() { return countries; }
 
@@ -281,6 +285,7 @@ public:
 public:
 	char id;
 	uint num;
+	ECBPlayer* pl;
 	std::vector<ECBCountry*> countries;
 
 };
@@ -291,7 +296,7 @@ public:
 
 /** This is a base of Map class.
  *
- * \warning there is a lot of exceptions in constructor ! Si you *must* use a try/except block when you
+ * \warning there are a lot of exceptions in constructor ! You *must* use a try/except block when you
  *          create an ECBMap !
  */
 class ECBMap
@@ -339,6 +344,7 @@ public:
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
 	ECBDate* Date() { return date; }
+	ECBDate* NextDay() { return &(++(*date)); }                     /**< Increment date to next day */
 	
 	/** Access to a case of map 
 	 * Example: map(x,y)

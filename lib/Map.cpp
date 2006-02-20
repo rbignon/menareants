@@ -486,6 +486,7 @@ void ECBMap::Init()
 
 ECBMap::~ECBMap()
 {
+	printf("d\n");
 	/* Libération des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;
