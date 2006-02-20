@@ -122,7 +122,7 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 		else if(new_value < min) new_value = min;
 		
 		std::vector<int>::iterator it;
-		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; it++);
+		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; ++it);
 		if(it != bad_values.end())
 		{
 			if(new_value == max || new_value == min) return false;
@@ -187,7 +187,7 @@ void TSpinEdit::SetMin(int _min)
 
 void TSpinEdit::AddBadValue(int i)
 {
-	for(std::vector<int>::iterator it = bad_values.begin(); it != bad_values.end(); it++)
+	for(std::vector<int>::iterator it = bad_values.begin(); it != bad_values.end(); ++it)
 		if(*it == i)
 			return;
 	bad_values.push_back(i);

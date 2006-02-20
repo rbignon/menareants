@@ -32,7 +32,7 @@ TList::TList(uint _x, uint _y)
 
 TList::~TList()
 {
-	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 		delete (*it);
 	list.clear();
 }
@@ -67,7 +67,7 @@ void TList::Rebuild()
 {
 	visible = false;
 	h = 0;
-	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		(*it)->SetXY(x, y+h);
 		h += (*it)->GetHeight();
@@ -79,7 +79,7 @@ void TList::Rebuild()
 
 void TList::Draw(uint souris_x, uint souris_y)
 {
-	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); it++)
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 		(*it)->Draw(souris_x, souris_y);
 }
 
