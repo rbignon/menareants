@@ -83,7 +83,7 @@ char *get_time(time_t mytime)
         static char buftime[TIMELEN + 1];
         register struct tm *lt = localtime(&mytime);
 
-        snprintf(buftime + 1, sizeof buftime, "%d-%02d-%02d %02d:%02d:%02d",
+        snprintf(buftime, sizeof buftime, "%d-%02d-%02d %02d:%02d:%02d",
                 1900 + lt->tm_year,     lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 
         return buftime;
