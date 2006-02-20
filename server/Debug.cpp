@@ -75,9 +75,9 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 		std::ofstream file((app.GetPath() + DEBUG_LOG).c_str(), std::ios_base::app);
 		if(file)
 		{
-			file << std::string(get_time(app.CurrentTS)) << s << std::endl;
+			file << std::string(get_time(app.CurrentTS)) << " " << s << std::endl;
 			if(!vars.empty())
-				file << vars << std::endl;
+				file << "                              " << vars << std::endl;
 		}
 #ifdef DEBUG
 		else
