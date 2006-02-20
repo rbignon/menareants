@@ -21,6 +21,7 @@
 
 #include "Channels.h"
 #include "Outils.h"
+#include "Map.h"
 #include "Debug.h"
 
 /********************************************************************************************
@@ -32,7 +33,7 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 {
 	chan->AddPlayer(this);
 	ready = false;
-	fric = 0;
+	money = 0;
 	position = 0;
 	color = 0;
 }

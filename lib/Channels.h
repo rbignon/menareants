@@ -33,6 +33,8 @@ class ECBChannel;
 
 class ECBMap;
 
+class ECBMapPlayer;
+
 /** Base class of Player/
  * There are informations about a player whose are used by server and client.
  *
@@ -54,22 +56,20 @@ public:
 	/** Player's Channel. */
 	ECBChannel *Channel() { return chan; }
 
-	/** This is player's money. \todo Use a private variable ? */
-	int fric;
+	uint Money() { return money; }                     /**< This is player's money. */
+	void UpMoney(uint m) { money += m; }               /**< Add some money. */
+	void DownMoney(uint m) { money -= m; }             /**< Remove some money */
 
-	bool IsOwner() const { return owner; }      /**< Is he the owner of game ? */
-	void SetOwner(bool o = true) { owner = o; } /**< Set a player as the owner */
-	
-	bool IsOp() const { return op; }            /**< Is he an operator of channel ? */
-	void SetOp(bool o = true) { op = o; }       /**< Set a player as an oper */
+	bool IsOwner() const { return owner; }             /**< Is he the owner of game ? */
+	void SetOwner(bool o = true) { owner = o; }        /**< Set a player as the owner */
 
-	bool IsPriv() const { return op || owner; } /**< Return true if player is op or owner */
+	bool IsOp() const { return op; }                   /**< Is he an operator of channel ? */
+	void SetOp(bool o = true) { op = o; }              /**< Set a player as an oper */
 
-	/** Position of player in the map. */
-	unsigned int Position() const { return position; }
-	
-	/** Set position of player. */
-	bool SetPosition(unsigned int p);
+	bool IsPriv() const { return op || owner; }        /**< Return true if player is op or owner */
+
+	unsigned int Position() const { return position; } /**< Position of player in the map. */
+	bool SetPosition(unsigned int p);                  /**< Set position of player. */
 
 	/** Return color of player.
 	 * \note Les couleurs sont représentées par un énumérateur. Alors
@@ -80,18 +80,16 @@ public:
 	 * \todo il faut mettre dans le client un tableau de couleurs SDL
 	 */
 	unsigned int Color() const { return color; }
-	
-	/** Set color of player. */
-	void SetColor(unsigned int c) { color = c; }
+	void SetColor(unsigned int c) { color = c; }        /**< Set color of player. */
 
 	/** Return nick of player. */
 	virtual const char* GetNick() const = 0;
 
-	/** Is player ready ? */
-	bool Ready() const { return ready; }
+	bool Ready() const { return ready; }                /**< Is player ready ? */
+	void SetReady(bool r = true) { ready = r; }         /**< Set player. */
 
-	/** Set player. */
-	void SetReady(bool r = true) { ready = r; }
+	ECBMapPlayer* MapPlayer() { return mp; }
+	void SetMapPlayer(ECBMapPlayer* _mp) { mp = _mp; }
 
 /* Variables privées */
 protected:
@@ -100,6 +98,8 @@ protected:
 	bool op;
 	unsigned int position;
 	unsigned int color;
+	uint money;
+	ECBMapPlayer* mp;
 	bool ready;
 };
 typedef std::vector<ECBPlayer*> BPlayerVector;
