@@ -1,3 +1,27 @@
+2005-02-19  Romain Bignon <progs@headfucking.net>
+
+	* src/Channels.cpp: Supprime la map lors de la suppression du channel (uniquement dans le client car le serveur elle
+	GARDE la map dans sa liste).
+
+	* Changement des it++ en ++it (plus rapide).
+
+	* src/gui/Images.cpp: Pour corriger un bug avec ECMap::preview, il y a un paramètre dans le TImage pour dire ou non
+	si on veut que l'image soit supprimée à la suppression du composant.
+
+	* Outils.cpp (get_time): Correction, il n'affichait pas l'heure.
+
+	* API: Commande STAT pour voir les stats du serveur.
+
+	* server/Server.cpp, server/Commands.h, server/Main.h, server/Channels.cpp: Statistiques du serveur.
+
+	* src/Login.cpp: Affichage des stats
+
+	* src/JoinGame.cpp: Support des noms de salon en plusieurs mots.
+
+	* server/Channels.cpp: Le salon se met en mode SENDING quand tous les joueurs sont READY.
+
+	* server/Debug.cpp: Le fichier errors.log devient plus clair car mieux structuré.
+
 2005-02-18  Romain Bignon <progs@headfucking.net>
 
 	* test/map.cpp: Petite mise à jour avec prise en compte de la date et test du ++ dessus.
