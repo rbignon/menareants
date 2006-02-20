@@ -39,6 +39,7 @@ TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
+bool SENDING = false;                 /**< SENDING is setted to \a true by thread when we receiv a +S mode */
 
 /** We receive a map !
  *
@@ -84,12 +85,13 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			catch(TECExcept &e)
 			{
 				Debug(W_ERR, "Unable to load a map :");
-				vDebug(W_ERR, e.Message, e.Vars);
+				vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+				return 0;
 			}
 			GameInfosForm->MapTitle->SetCaption(chan->Map()->Name() + " (" + TypToStr(chan->Map()->MinPlayers()) +
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
-			GameInfosForm->Preview->SetImage(chan->Map()->Preview());
+			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
 		}
 	}
 	return 0;
@@ -181,7 +183,7 @@ static TPlayerLine* GetPlayerLineFromPlayer(ECPlayer* pl)
 	if(GameInfosForm)
 		for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
 		it!=GameInfosForm->Players->GetList().end();
-		it++)
+		++it)
 		{
 			TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 			if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -228,7 +230,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						{ /* Redéfini la limite des SpinEdit de chaques joueurs */
 							for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
 							it!=GameInfosForm->Players->GetList().end();
-							it++)
+							++it)
 							{
 								TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 								if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -243,7 +245,13 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					vDebug(W_DESYNCH|W_SEND, "-l interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
 				break;
 			case 'W': if(add) chan->SetState(EChannel::WAITING); break;
-			case 'S': if(add) chan->SetState(EChannel::SENDING); break;
+			case 'S':
+				if(add)
+				{
+					chan->SetState(EChannel::SENDING);
+					SENDING = true;
+				}
+				break;
 			case 'P': if(add) chan->SetState(EChannel::PLAYING); break;
 			case 'A': if(add) chan->SetState(EChannel::ANIMING); break;
 			case 'm':
@@ -263,7 +271,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			case '!':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+/-! sans sender"); break; }
-				for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+				for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 				{
 					(*it)->SetReady(add);
 					if((*it)->IsMe() && GameInfosForm)
@@ -283,7 +291,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(add)
 				{
 					if(j<parv.size())
-						for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
 							(*it)->SetColor(StrToTyp<uint>(parv[j++]));
 							if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
@@ -292,7 +300,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					else Debug(W_DESYNCH|W_SEND, "+c sans couleur");
 				}
 				else
-					for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 					{
 						(*it)->SetColor(0);
 						if((*it)->IsMe() && GameInfosForm)
@@ -304,7 +312,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(add)
 				{
 					if(j<parv.size())
-						for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
 							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
 								GameInfosForm->MyPosition->DelBadValue((*it)->Position());
@@ -317,7 +325,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					else Debug(W_DESYNCH|W_SEND, "+p sans position");
 				}
 				else
-					for(PlayerList::iterator it=players.begin(); it != players.end(); it++)
+					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 					{
 						if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
 							GameInfosForm->MyPosition->DelBadValue((*it)->Position());
@@ -395,7 +403,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(GameInfosForm)
 	{
 		 if(GameInfosForm->MyPosition)
-		 	for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); it++)
+		 	for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); ++it)
 				GameInfosForm->MyPosition->AddBadValue(*it);
 		GameInfosForm->RecalcMemo();
 	}
@@ -456,8 +464,11 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	{
 		if((*playersi)->IsMe())
 		{
-			delete me->Player()->Channel();
+			EChannel *c = me->Player()->Channel();
 			me->ClrPlayer(); /* <=> me->pl = 0 */
+			if(GameInfosForm)
+				GameInfosForm->Players->Hide();
+			delete c;
 			JOINED = false;
 			return 0;
 		}
@@ -470,7 +481,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				                             " quitte la partie", green_color);
 				for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
 				  it!=GameInfosForm->Players->GetList().end();
-				  it++)
+				  ++it)
 				{
 					TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 					if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -519,7 +530,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 	                                    std::string(cname), green_color);
 
 	JOINED = false;
-	client->sendrpl(client->rpl(EC_Client::JOIN), cname);
+	client->sendrpl(client->rpl(EC_Client::JOIN), FormatStr(cname));
 	WAIT_EVENT(JOINED, i);
 	if(!JOINED)
 	{
@@ -579,7 +590,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 							if(client->Player()->IsOwner())
 								for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
 								it!=GameInfosForm->Players->GetList().end();
-								it++)
+								++it)
 								{
 									TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
 									if(pll && pll->OwnZone(event.button.x, event.button.y) && !pll->Player()->IsMe() &&
@@ -613,7 +624,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 				}
 			}
 			GameInfosForm->Update();
-		} while(!eob && client->IsConnected() && client->Player());
+		} while(!eob && client->IsConnected() && client->Player() && !SENDING);
 	
 	}
 	catch(TECExcept &e)
@@ -624,7 +635,13 @@ bool EuroConqApp::GameInfos(const char *cname)
 	}
 	MyFree(GameInfosForm);
 
-	client->sendrpl(client->rpl(EC_Client::LEAVE));
+	if(SENDING)
+	{ /* LA PARTIE SE LANCE */
+
+	}
+
+	if(client->Player())
+		client->sendrpl(client->rpl(EC_Client::LEAVE));
 	
 	WAIT_EVENT(!JOINED, i);
 	
@@ -688,11 +705,15 @@ void EuroConqApp::ListGames()
 							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
 							mb.Show();
 						}
+						refresh = true;
 					}
 					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y))
 						refresh = true;
 					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y))
+					{
 						GameInfos(NULL);
+						refresh = true;
+					}
 					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y))
 						eob = true;
 					break;
