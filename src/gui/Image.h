@@ -33,7 +33,7 @@ class TImage : public TComponent
 public:
 
 	TImage();
-	TImage(uint x, uint y, ECImage* _img = 0);
+	TImage(uint x, uint y, ECImage* _img = 0, bool wana_delete = true);
 	~TImage();
 
 /* Methodes */
@@ -46,7 +46,7 @@ public:
 /* Attributs */
 public:
 
-	void SetImage(ECImage* _img);                        /**< Set maximal value */
+	void SetImage(ECImage* _img, bool wana_delete = true);/**< Set maximal value */
 
 /* Variables privées */
 protected:
@@ -55,6 +55,7 @@ protected:
 	/* Interdits*/
 	void SetHeight (uint _h);                             /**< Set \a height */
 	void SetWidth (uint _w);                              /**< Set \a width */
+	bool wana_delete;
 };
 
 #endif /* EC_GUI_IMAGE_H */

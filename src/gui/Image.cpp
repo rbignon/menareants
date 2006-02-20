@@ -27,17 +27,18 @@ TImage::TImage()
 	: TComponent()
 {
 	image = 0;
+	wana_delete = true;
 }
 
-TImage::TImage(uint _x, uint _y, ECImage* _img)
-	: TComponent(_x, _y), image(_img)
+TImage::TImage(uint _x, uint _y, ECImage* _img, bool _wana_delete)
+	: TComponent(_x, _y), image(_img), wana_delete(_wana_delete)
 {
 
 }
 
 TImage::~TImage()
 {
-	if(image) delete image;
+	if(wana_delete && image) delete image;
 }
 
 void TImage::Init()
@@ -49,9 +50,10 @@ void TImage::Init()
 	h = image->Img->h;
 }
 
-void TImage::SetImage(ECImage* _img)
+void TImage::SetImage(ECImage* _img, bool _wd)
 {
 	image = _img;
+	wana_delete = _wd;
 	Init();
 }
 
