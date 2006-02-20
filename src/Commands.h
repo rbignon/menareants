@@ -78,6 +78,8 @@ class MOTDCommand : public EC_ACommand { public: MOTDCommand(const std::string _
 
 class EOMCommand : public EC_ACommand { public: EOMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class STATCommand : public EC_ACommand { public: STATCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* JOINDRE PARTIES */
 
 class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
@@ -116,6 +118,7 @@ DECLARE_CMD ( USED );
 DECLARE_CMD ( MAJ );
 DECLARE_CMD ( MOTD );
 DECLARE_CMD ( EOM );
+DECLARE_CMD ( STAT );
 
 DECLARE_CMD ( LSP );
 DECLARE_CMD ( EOL );

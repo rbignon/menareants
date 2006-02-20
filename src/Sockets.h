@@ -21,7 +21,6 @@
 #ifndef EC_Sockets_h
 #define EC_Sockets_h
 
-#include "link.h"
 #include "Main.h"
 #include "Defines.h"
 #include "Commands.h"
@@ -47,17 +46,18 @@ public:
 	 * \attention mettre à jour systematiquement msgTab[] dans Sockets.cpp
 	 */
 	enum msg {
-		IAM,         /** IAM */
-		PONG,        /** POG */
-		BYE,         /** BYE */
-		ERROR,       /** ERR */
-		ERRORV,      /**ERR */
+		IAM,         /**< IAM */
+		PONG,        /**< POG */
+		BYE,         /**< BYE */
+		ERROR,       /**< ERR */
+		ERRORV,      /**< ERR */
+		STAT,        /**< STAT */
 
-		LISTGAME,    /** LSP */
-		JOIN,        /** JOI */
-		LEAVE,       /** LEA */
-		MSG,         /** MSG */
-		SET,         /** SET */
+		LISTGAME,    /**< LSP */
+		JOIN,        /**< JOI */
+		LEAVE,       /**< LEA */
+		MSG,         /**< MSG */
+		SET,         /**< SET */
 
 		NONE
 	};

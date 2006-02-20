@@ -35,6 +35,7 @@ const char* msgTab[] = {
 	"BYE",                                    /* BYE - Quit le serveur */
 	"ERR %s",                                 /* ERR - Message d'erreur */
 	"ERR %s %s",                              /* ERR - Message d'erreur avec vars */
+	"STAT",                                   /* STAT - Infos sur l'etat du serveur */
 
 	"LSP",                                    /* LSP - Liste les jeux */
 	"JOI %s",                                 /* JOI - Joindre une partie */
@@ -245,6 +246,7 @@ void EC_Client::Init()
 	Commands.push_back(new MAJCommand("MAJ",	0,	1));
 	Commands.push_back(new MOTDCommand("MOTD",	0,	0));
 	Commands.push_back(new EOMCommand("EOM",	0,	0));
+	Commands.push_back(new STATCommand("STAT",	0,	6));
 
 	Commands.push_back(new LSPCommand("LSP",	0,	3));
 	Commands.push_back(new EOLCommand("EOL",	0,	0));
