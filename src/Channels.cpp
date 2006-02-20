@@ -36,10 +36,15 @@ ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _op, bo
  *                               EChannel                                                   *
  ********************************************************************************************/
 
+EChannel::~EChannel()
+{
+	if(map) MyFree(map);
+}
+
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
 	BPlayerVector::iterator it;
-	for(it=players.begin(); it != players.end() && strcasecmp((*it)->GetNick(),nick); it++);
+	for(it=players.begin(); it != players.end() && strcasecmp((*it)->GetNick(),nick); ++it);
 	
 	return (it == players.end() ? 0 : (dynamic_cast<ECPlayer*>(*it)));
 }
