@@ -56,6 +56,6 @@ bool LoadMaps()
 		nbmaps++;
 		MapList.push_back(map);
 	}
-	Debug(W_ECHO, "%d maps loaded !", nbmaps);
+	Debug(W_ECHO|W_NOLOG, "%d maps loaded !", nbmaps);
 	return true;
 }
