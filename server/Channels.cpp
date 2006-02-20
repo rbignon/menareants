@@ -60,6 +60,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	ECPlayer *sender = cl->Player();
 
 	bool add = true;
+	bool ready = false;
 	uint j = 2;
 	struct
 	{
@@ -85,7 +86,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case '+': add = true; break;
 			case '-': add = false; break;
 			case 'm':
-				if(sender->Channel()->IsInGame())
+				if(!sender->Channel()->Joinable())
 				{
 					Debug(W_DESYNCH, "%cm interdit en cours de partie", add ? '+' : '-');
 					break;
@@ -134,35 +135,36 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					                  VIName(sender->Position()) VIName(sender->Color()));
 					break;
 				}
+				ready = true;
 				sender->SetReady(add);
 				changed = YES_NOPARAMS;
 				break;
 			case 'o':
 			{
-				if(sender->Channel()->IsInGame())
+				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "%co interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %co interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->IsOwner())
 					{ Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]); break; }
-				if(j>=parv.size()) { Debug(W_DESYNCH, "+o sans nick"); break; }
+				if(j>=parv.size()) { Debug(W_DESYNCH, "SET +o: pas de nick"); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "%s non trouvé", parv[(j-1)].c_str()); break; }
+				if(!pl) { Debug(W_DESYNCH, "SET +o: %s non trouvé", parv[(j-1)].c_str()); break; }
 				if(pl->IsOwner()) { Debug(W_DESYNCH, "%s est owner et ne peut pas être op.", parv[(j-1)].c_str()); break; }
 				pl->SetOp(add);
 				changed = YES_WITHPARAM;
 				break;
 			}
 			case 'c':
-				if(sender->Channel()->IsInGame())
+				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "%cc interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cc interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->Channel()->Map())
 				{
-					Debug(W_DESYNCH, "%cc alors qu'il n'y a pas de map", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cc alors qu'il n'y a pas de map", add ? '+' : '-');
 					break;
 				}
 				if(add)
@@ -174,7 +176,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
 						    it != sender->Channel()->Players().end() && (*it)->Color() != color;
-						    it++);
+						    ++it);
 						if(it != sender->Channel()->Players().end())
 							{ Debug(W_DESYNCH, "+c d'une couleur déjà utilisée"); break; }
 					}
@@ -188,34 +190,34 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			case 'p':
-				if(sender->Channel()->IsInGame())
+				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "%cp interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cp interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->Channel()->Map())
 				{
-					Debug(W_DESYNCH, "%cp alors qu'il n'y a pas de map", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cp alors qu'il n'y a pas de map", add ? '+' : '-');
 					break;
 				}
 				if(add)
 				{
-					if(j>=parv.size()) { Debug(W_DESYNCH, "+p sans couleur"); break; }
+					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +p sans couleur"); break; }
 					uint place = StrToTyp<uint>(parv[j++]);
 					if(place > 0)
 					{
 						if(place > sender->Channel()->GetLimite())
 						{
-							Debug(W_DESYNCH, "+p %d > %d(limite)", place,
+							Debug(W_DESYNCH, "SET +p %d > %d(limite)", place,
 							                 sender->Channel()->GetLimite());
 							break;
 						}
 						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
 						    it != sender->Channel()->Players().end() && (*it)->Position() != place;
-						    it++);
+						    ++it);
 						if(it != sender->Channel()->Players().end())
-							{ Debug(W_DESYNCH, "+p d'une position déjà utilisée"); break; }
+							{ Debug(W_DESYNCH, "SET +p d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
 					changed = YES_WITHPARAM;
@@ -227,7 +229,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			default:
-				Debug(W_DESYNCH, "Reception d'un mode non supporté (%c%c)", add ? '+' : '-', parv[1][i]);
+				Debug(W_DESYNCH, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', parv[1][i]);
 				break;
 		}
 		if(changed)
@@ -260,6 +262,42 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
 		                                 (modes + params).c_str());
 
+	/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
+	 * si tout le monde est READY pour, dans ce cas là, lancer la partie
+	 * et jarter ceux qui sont en trop.
+	 */
+	if(ready && sender->Channel()->State() == EChannel::WAITING)
+	{
+		uint c = 0;
+		BPlayerVector pv = sender->Channel()->Players();
+		for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
+			if((*it)->Ready())
+				c++;
+		if(c == sender->Channel()->GetLimite())
+		{
+			/* Mesure de précaution */
+			for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
+				if(!(*it)->Ready())
+				{
+					TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
+					sender->Channel()->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+
+					sender->Channel()->RemovePlayer(*it, true);
+					if(!sender->Channel()->NbPlayers())
+					{
+						delete sender->Channel();
+						Debug(W_ERR, "SET:%d: heuuuu, pourquoi on passe par là ?", __LINE__);
+					}
+					cl->ClrPlayer();
+				}
+			sender->Channel()->SetState(EChannel::SENDING);
+			sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
+			sender->Channel()->NeedReady();
+			app.NBwchan--;
+			app.NBachan++;
+		}
+	}
+
 	return 0;
 }
 
@@ -278,7 +316,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	EChannel* chan = NULL;
 	ECPlayer* pl;
 
-	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); it++)
+	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
 		if(!strcasecmp((*it)->GetName(), nom))
 		{
 			chan = *it;
@@ -322,7 +360,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	 * @date 17/02/2006
 	 */
 
-	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), chan->GetName(), "");
+	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), FormatStr(chan->GetName()), "");
 
 	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
 		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name().c_str()),
@@ -372,9 +410,9 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
  */
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); it++)
+	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
 		if((*it)->Joinable())
-			cl->sendrpl(app.rpl(ECServer::GLIST), (*it)->GetName(), (*it)->NbPlayers(),
+			cl->sendrpl(app.rpl(ECServer::GLIST), FormatStr((*it)->GetName()), (*it)->NbPlayers(),
 			                                      (*it)->GetLimite());
 
 	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
@@ -403,10 +441,16 @@ EChannel::EChannel(std::string _name)
 	: ECBChannel(_name)
 {
 	limite = app.GetConf()->DefLimite(); /* Limite par default */
+	app.NBchan++;
+	app.NBwchan++;
+	app.NBtotchan++;
 }
 
 EChannel::~EChannel()
 {
+	app.NBchan--;
+	if(state == EChannel::WAITING) app.NBwchan--;
+	else app.NBachan--;
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
 		if (*it == this)
@@ -452,7 +496,7 @@ void EChannel::SetLimite(unsigned int l)
 	limite = l;
 	
 	PlayerVector plv;
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 		if((*it)->Position() > limite)
 		{
 			(*it)->SetPosition(0);
@@ -466,7 +510,7 @@ void EChannel::SetLimite(unsigned int l)
 void EChannel::NeedReady()
 {
 	PlayerVector plv;
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 	{
 		if((*it)->Ready())
 		{
@@ -481,7 +525,7 @@ void EChannel::NeedReady()
 
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 		if((dynamic_cast<ECPlayer*> (*it))->Client() && !strcasecmp((*it)->GetNick(), nick))
 			return ((ECPlayer*) (*it));
 	return NULL;
@@ -489,7 +533,7 @@ ECPlayer *EChannel::GetPlayer(const char* nick)
 
 ECPlayer *EChannel::GetPlayer(TClient *cl)
 {
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 		if((dynamic_cast<ECPlayer*> (*it))->Client() == cl)
 			return ((ECPlayer*) (*it));
 
@@ -511,7 +555,7 @@ void EChannel::send_modes(PlayerVector senders, const char* msg)
 
 	std::string snds;
 	
-	for(PlayerVector::iterator it = senders.begin(); it != senders.end(); it++)
+	for(PlayerVector::iterator it = senders.begin(); it != senders.end(); ++it)
 	{
 		if(!snds.empty())
 			snds += ",";
@@ -536,7 +580,7 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 	{
 		if(!(dynamic_cast<ECPlayer*> (*it))->Client() || *it == one) continue;
 
