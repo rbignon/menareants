@@ -66,6 +66,11 @@ static char *correct_nick(const char *nick)
 	return newnick;
 }
 
+static void send_stats(TClient *cl)
+{
+	cl->sendrpl(app.rpl(ECServer::STAT), app.NBco, app.NBtot, app.NBchan, app.NBwchan, app.NBachan, app.NBtotchan);
+}
+
 /** Client send me several informations about him.
  *
  * Syntax: IAM nick prog version
@@ -101,7 +106,18 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
 
 	send_motd(cl);
+	send_stats(cl);
 
+	return 0;
+}
+
+/** Request stats of server.
+ *
+ * Syntax: STAT
+ */
+int STATCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	send_stats(cl);
 	return 0;
 }
 
