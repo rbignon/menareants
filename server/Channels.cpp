@@ -88,11 +88,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case 'm':
 				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "%cm interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cm: interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->IsPriv())
-					return Debug(W_DESYNCH, "SET %c%c d'un non privilégié", add ? '+' : '-', parv[1][i]);
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
 
 				if(add)
 				{
@@ -100,7 +100,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					{
 						uint mapi = StrToTyp<uint>(parv[j++]);
 						if(mapi >= MapList.size())
-							Debug(W_DESYNCH, "SET +m de la map %d hors de la liste (%d)", mapi, MapList.size());
+							Debug(W_DESYNCH, "SET +m: de la map %d hors de la liste (%d)", mapi, MapList.size());
 						else
 						{
 							ECMap* map = MapList[mapi];
@@ -113,25 +113,25 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 				}
 				else
-					Debug(W_DESYNCH, "SET -m interdit.");
+					Debug(W_DESYNCH, "SET -m: interdit.");
 				break;
 			case '!':
 				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
 				 * a dit par la suite.
 				 */
 				if(!add)
-					{ Debug(W_DESYNCH, "SET %c%c interdit.", add ? '+' : '-', parv[1][i]); break; }
+					{ Debug(W_DESYNCH, "SET %c%c: interdit.", add ? '+' : '-', parv[1][i]); break; }
 
 				if(sender->Ready())
 				{
-					Debug(W_WARNING, "SET %c%c: sender->Ready()=TRUE", add ? '+' : '-', parv[1][i]);
+					Debug(W_WARNING, "SET +%c: sender->Ready()=TRUE", parv[1][i]);
 					break;
 				}
 				if(!sender->Position() || !sender->Color())
 				{ /* Pas besoin de vérifier si il y a une map ou si c'est en cours de partie, car dans
 				   * ces deux cas le joueur a une position et une couleur !
 				   */
-					vDebug(W_DESYNCH, "SET +! alors qu'il n'est pas pret",
+					vDebug(W_DESYNCH, "SET +!: alors qu'il n'est pas pret",
 					                  VIName(sender->Position()) VIName(sender->Color()));
 					break;
 				}
@@ -143,15 +143,19 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "SET %co interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %co: interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->IsOwner())
-					{ Debug(W_DESYNCH, "SET %c%c d'un non owner", add ? '+' : '-', parv[1][i]); break; }
-				if(j>=parv.size()) { Debug(W_DESYNCH, "SET +o: pas de nick"); break; }
+					{ Debug(W_DESYNCH, "SET %c%c: d'un non owner", add ? '+' : '-', parv[1][i]); break; }
+				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %co: pas de nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "SET +o: %s non trouvé", parv[(j-1)].c_str()); break; }
-				if(pl->IsOwner()) { Debug(W_DESYNCH, "%s est owner et ne peut pas être op.", parv[(j-1)].c_str()); break; }
+				if(!pl) { Debug(W_DESYNCH, "SET %co: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
+				if(pl->IsOwner())
+				{
+					Debug(W_DESYNCH, "SET %co: %s est owner et ne peut pas être op.", parv[(j-1)].c_str());
+					break;
+				}
 				pl->SetOp(add);
 				changed = YES_WITHPARAM;
 				break;
@@ -159,17 +163,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case 'c':
 				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "SET %cc interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cc: interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->Channel()->Map())
 				{
-					Debug(W_DESYNCH, "SET %cc alors qu'il n'y a pas de map", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cc: alors qu'il n'y a pas de map", add ? '+' : '-');
 					break;
 				}
 				if(add)
 				{
-					if(j>=parv.size()) { Debug(W_DESYNCH, "+c sans couleur"); break; }
+					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +c: sans couleur"); break; }
 					uint color = StrToTyp<uint>(parv[j++]);
 					if(color > 0)
 					{
@@ -178,7 +182,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						    it != sender->Channel()->Players().end() && (*it)->Color() != color;
 						    ++it);
 						if(it != sender->Channel()->Players().end())
-							{ Debug(W_DESYNCH, "+c d'une couleur déjà utilisée"); break; }
+							{ Debug(W_DESYNCH, "SET +c: d'une couleur déjà utilisée"); break; }
 					}
 					sender->SetColor(color);
 					changed = YES_WITHPARAM;
@@ -192,17 +196,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case 'p':
 				if(!sender->Channel()->Joinable())
 				{
-					Debug(W_DESYNCH, "SET %cp interdit en cours de partie", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cp: interdit en cours de partie", add ? '+' : '-');
 					break;
 				}
 				if(!sender->Channel()->Map())
 				{
-					Debug(W_DESYNCH, "SET %cp alors qu'il n'y a pas de map", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cp: alors qu'il n'y a pas de map", add ? '+' : '-');
 					break;
 				}
 				if(add)
 				{
-					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +p sans couleur"); break; }
+					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +p: sans couleur"); break; }
 					uint place = StrToTyp<uint>(parv[j++]);
 					if(place > 0)
 					{
@@ -217,7 +221,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						    it != sender->Channel()->Players().end() && (*it)->Position() != place;
 						    ++it);
 						if(it != sender->Channel()->Players().end())
-							{ Debug(W_DESYNCH, "SET +p d'une position déjà utilisée"); break; }
+							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
 					changed = YES_WITHPARAM;
@@ -262,39 +266,60 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
 		                                 (modes + params).c_str());
 
-	/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
-	 * si tout le monde est READY pour, dans ce cas là, lancer la partie
-	 * et jarter ceux qui sont en trop.
-	 */
-	if(ready && sender->Channel()->State() == EChannel::WAITING)
+	/* Si tout le monde est READY, on passe d'un etat de la partie à un autre. */
+	if(ready)
 	{
 		uint c = 0;
 		BPlayerVector pv = sender->Channel()->Players();
 		for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
 			if((*it)->Ready())
 				c++;
-		if(c == sender->Channel()->GetLimite())
+		if(c == sender->Channel()->NbPlayers() || c == sender->Channel()->GetLimite())
 		{
-			/* Mesure de précaution */
-			for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
-				if(!(*it)->Ready())
+			switch(sender->Channel()->State())
+			{
+				case EChannel::WAITING:
 				{
-					TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
-					sender->Channel()->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+					if(c < sender->Channel()->Map()->MinPlayers())
+						break; /* Si c == nbplayers, c'est ok que si nbplayers >= minplayers */
 
-					sender->Channel()->RemovePlayer(*it, true);
-					if(!sender->Channel()->NbPlayers())
-					{
-						delete sender->Channel();
-						Debug(W_ERR, "SET:%d: heuuuu, pourquoi on passe par là ?", __LINE__);
-					}
-					cl->ClrPlayer();
+					/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
+					* si tout le monde est READY pour, dans ce cas là, lancer la partie
+					* et jarter ceux qui sont en trop.
+					*/
+					for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
+						if(!(*it)->Ready())
+						{
+							TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
+							sender->Channel()->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+		
+							sender->Channel()->RemovePlayer(*it, true);
+							if(!sender->Channel()->NbPlayers())
+							{
+								delete sender->Channel();
+								Debug(W_ERR, "SET:%d: heuuuu, pourquoi on passe par là ?", __LINE__);
+							}
+							cl->ClrPlayer();
+						}
+					sender->Channel()->SetState(EChannel::SENDING);
+					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
+					sender->Channel()->NeedReady();
+					app.NBwchan--;
+					app.NBachan++;
+					break;
 				}
-			sender->Channel()->SetState(EChannel::SENDING);
-			sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
-			sender->Channel()->NeedReady();
-			app.NBwchan--;
-			app.NBachan++;
+				case EChannel::SENDING:
+				{
+					/* Le client est pret (a tout affiché, mémorisé, ...), la partie se lance donc et on
+					 * commence en PLAYING.
+					 */
+					sender->Channel()->SetState(EChannel::PLAYING);
+					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-S+P");
+					sender->Channel()->NeedReady();
+				}
+				default: /** @todo Non supportés encore: +AP */
+					break;
+			}
 		}
 	}
 
@@ -309,7 +334,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	/* Ne peut être que sur un seul salon à la fois */
 	if(cl->Player() || parv[1].empty())
-		return vDebug(W_WARNING, "Essaye de joindre plusieurs salons", VSName(cl->GetNick())
+		return vDebug(W_WARNING, "JOI: Essaye de joindre plusieurs salons", VSName(cl->GetNick())
 		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
 
 	const char* nom = parv[1].c_str();
@@ -333,7 +358,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{ /* Rejoins un salon existant */
 		if(!chan->Joinable())
 		{
-			vDebug(W_WARNING, "Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
+			vDebug(W_WARNING, "JOI: Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
 			                  VSName(cl->GetNick()) VIName(chan->State()));
 			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 		}
