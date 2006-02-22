@@ -1,3 +1,10 @@
+2005-02-20  Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp server/Server.cpp, server/Login.cpp, server/Map.coo: Petit formatage des messages des Debug
+	pour plus de compréhension.
+
+	* server/Channels.cpp: Support du passage de SENDING à PLAYING.
+
 2005-02-19  Romain Bignon <progs@headfucking.net>
 
 	* src/Channels.cpp: Supprime la map lors de la suppression du channel (uniquement dans le client car le serveur elle
