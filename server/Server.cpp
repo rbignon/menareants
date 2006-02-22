@@ -249,10 +249,10 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	TClient *newC = NULL;
 
 	if((unsigned) fd >= ASIZE(Clients))
-		Debug(W_WARNING, "Trop de clients connectés! (Dernier %d sur %s, Max: %d)\n",
+		Debug(W_WARNING, "Trop de clients connectés! (Dernier %d sur %s, Max: %d)",
 			fd, ip, ASIZE(Clients));
 	else if(!(Clients[fd].HasFlag(ECD_FREE)))
-		Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
+		Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])",
 			ip, fd, Clients[fd].GetIp());
 	else
 	{	/* register the socket in client list */

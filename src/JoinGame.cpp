@@ -156,7 +156,7 @@ int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!ListGameForm)
-		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la liste des chans", VPName(ListGameForm));
+		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ListGameForm));
 
 	if(parv[3] == "0")
 		ListGameForm->GList->AddItem(false, parv[1] + "   " + parv[2], parv[1], black_color, true);
@@ -239,10 +239,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							}
 						}
 					}
-					else Debug(W_DESYNCH|W_SEND, "+l sans limite");
+					else Debug(W_DESYNCH|W_SEND, "SET +l: sans limite");
 				}
 				else
-					vDebug(W_DESYNCH|W_SEND, "-l interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
+					vDebug(W_DESYNCH|W_SEND, "SET -l: interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
 				break;
 			case 'W': if(add) chan->SetState(EChannel::WAITING); break;
 			case 'S':
@@ -252,25 +252,33 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					SENDING = true;
 				}
 				break;
-			case 'P': if(add) chan->SetState(EChannel::PLAYING); break;
+			case 'P':
+				if(add)
+				{
+					/* On incrémente la date si ce n'est pas justement le premier jour */
+					if(!chan->State() == EChannel::SENDING)
+						chan->Map()->NextDay();
+					chan->SetState(EChannel::PLAYING);
+				}
+				break;
 			case 'A': if(add) chan->SetState(EChannel::ANIMING); break;
 			case 'm':
 				if(add)
 				{
-					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+m sans numero"); break; }
+					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET +m: sans numero"); break; }
 					if(GameInfosForm)
 					{
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
 						GameInfosForm->MyPosition->SetEnabled();
 					}
 					else
-						Debug(W_DESYNCH|W_SEND, "SET +m hors de GameInfosForm !");
+						Debug(W_DESYNCH|W_SEND, "SET +m: hors de GameInfosForm !");
 				}
 				else
-					Debug(W_DESYNCH|W_SEND, "SET -m theoriquement impossible");
+					Debug(W_DESYNCH|W_SEND, "SET -m: theoriquement impossible");
 				break;
 			case '!':
-				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+/-! sans sender"); break; }
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %c!: sans sender", add ? '+' : '-'); break; }
 				for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 				{
 					(*it)->SetReady(add);
@@ -280,14 +288,18 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			case 'o':
 			{
-				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "+o sans nick"); break; }
+				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET %co: sans nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = chan->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH|W_SEND, "%s non trouvé", parv[(j-1)].c_str()); break; }
+				if(!pl)
+				{
+					Debug(W_DESYNCH|W_SEND, "SET %co: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str());
+					break;
+				}
 				pl->SetOp(add);
 				break;
 			}
 			case 'c':
-				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+c sans sender humain"); break; }
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %cc: sans sender humain", add ? '+' : '-'); break; }
 				if(add)
 				{
 					if(j<parv.size())
@@ -297,7 +309,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
 								GameInfosForm->PretButton->SetEnabled();
 						}
-					else Debug(W_DESYNCH|W_SEND, "+c sans couleur");
+					else Debug(W_DESYNCH|W_SEND, "SET +c: sans couleur");
 				}
 				else
 					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
@@ -308,7 +320,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				break;
 			case 'p':
-				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "+p sans sender humain"); break; }
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %cp: sans sender humain", add ? '+' : '-'); break; }
 				if(add)
 				{
 					if(j<parv.size())
@@ -322,7 +334,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
 								GameInfosForm->PretButton->SetEnabled();
 						}
-					else Debug(W_DESYNCH|W_SEND, "+p sans position");
+					else Debug(W_DESYNCH|W_SEND, "SET +p: sans position");
 				}
 				else
 					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
@@ -335,7 +347,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				break;
 			default:
-				Debug(W_DESYNCH|W_SEND, "Reception d'un mode non supporté (%c)", parv[1][i]);
+				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', parv[1][i]);
 				break;
 		}
 	}
@@ -351,7 +363,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
 
 	std::vector<int> pos_badval;
-	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); parvi++)
+	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); ++parvi)
 	{
 		const char *nick = (*parvi).c_str();
 		bool owner = false, ready = false, op = false;

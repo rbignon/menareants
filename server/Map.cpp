@@ -32,7 +32,7 @@ bool LoadMaps()
 
 	if(!fp)
 	{
-		Debug(W_ERR|W_ECHO, "Unable to load map list files: %s\n", MAP_FILE);
+		Debug(W_ERR|W_ECHO, "Unable to load map list files: %s", MAP_FILE);
 		return false;
 	}
 

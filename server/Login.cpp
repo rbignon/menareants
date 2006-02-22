@@ -78,7 +78,7 @@ static void send_stats(TClient *cl)
 int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(IsAuth(cl))
-		return vDebug(W_DESYNCH, "User déjà logué", VSName(cl->GetNick()));
+		return vDebug(W_DESYNCH, "IAM: User déjà logué", VSName(cl->GetNick()));
 
 	/** \note il est normal de vérifier ici seulement le nombre d'arguments: ça permet un
 	 *       meilleur controle par rapport à la version
