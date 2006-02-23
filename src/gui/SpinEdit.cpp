@@ -38,7 +38,6 @@ TSpinEdit::TSpinEdit(std::string _label, uint _x, uint _y, uint _width, int _min
 
 	value = _defvalue;
 
-	background = NULL;
 	txt_label = NULL;
 	txt_value = NULL;
 	m_plus = NULL;
@@ -49,8 +48,6 @@ TSpinEdit::TSpinEdit(std::string _label, uint _x, uint _y, uint _width, int _min
 
 TSpinEdit::~TSpinEdit()
 {
-  if ( background)
-     SDL_FreeSurface( background);
   if(txt_label) delete txt_label;
   if(txt_value) delete txt_value;
   if(m_plus) delete m_plus;
@@ -59,9 +56,6 @@ TSpinEdit::~TSpinEdit()
 
 void TSpinEdit::Init()
 {
-  if ( background)
-    SDL_FreeSurface( background);
-
   // Load images
   std::ostringstream max_value_s;
   max_value_s << max;
@@ -88,13 +82,6 @@ void TSpinEdit::Init()
   txt_label = new TLabel(x, y, label, color, font);
   txt_value = new TLabel(center, y, "", color, font);
   SetValue(value, true);
-
-  SDL_Rect r_back = {0,0,w,h};
-
-  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
-
 }
 
 bool TSpinEdit::SetValue(int _value, bool first)

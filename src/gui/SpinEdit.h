@@ -46,12 +46,12 @@ public:
 	 * @param _defvalue this is default value that component has when it is created.
 	 */
 	TSpinEdit(std::string label, uint _x, uint _y, uint _width, int _min, int _max, uint _step = 1, int _defvalue = 0);
-	~TSpinEdit();
+	virtual ~TSpinEdit();
 
 /* Methodes */
 public:
 
-	void Init();
+	virtual void Init();
 
 	void Draw (uint mouse_x, uint mouse_y);
 
@@ -65,7 +65,7 @@ public:
 	/** Value of spinedit.
 	 * @return true if value is changed
 	 */
-	bool SetValue(int _value, bool first = false);
+	virtual bool SetValue(int _value, bool first = false);
 	int Value() { return value; }
 	
 	void SetMax(int _max);                                        /**< Set maximal value */
@@ -79,7 +79,6 @@ public:
 
 /* Variables privées */
 protected:
-	SDL_Surface *background;
 	TButton *m_plus, *m_minus;
 	TLabel *txt_label, *txt_value;
 	int value, min, max;
