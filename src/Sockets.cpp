@@ -247,6 +247,7 @@ void EC_Client::Init()
 	Commands.push_back(new MOTDCommand("MOTD",	0,	0));
 	Commands.push_back(new EOMCommand("EOM",	0,	0));
 	Commands.push_back(new STATCommand("STAT",	0,	6));
+	Commands.push_back(new ER1Command("ER1",	0,	0));
 
 	Commands.push_back(new LSPCommand("LSP",	0,	3));
 	Commands.push_back(new EOLCommand("EOL",	0,	0));
