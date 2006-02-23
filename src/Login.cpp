@@ -218,7 +218,14 @@ void EuroConqApp::request_game()
 						}
 						if(ConnectedForm->CreateButton->Test(event.button.x, event.button.y))
 						{
-							GameInfos(NULL);
+							if(!GameInfos(NULL))
+							{
+								TMessageBox mb(150,300,
+												std::string("Impossible de créer le salon.\n"
+												"Son nom est peut être déjà utilisé.").c_str(),
+												BT_OK, ConnectedForm);
+								mb.Show();
+							}
 							client->sendrpl(client->rpl(EC_Client::STAT));
 						}
 						break;
