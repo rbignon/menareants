@@ -3,11 +3,10 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: faire un composer TColorEdit
-
-* Urgent
 -client: support du SENDING
 -server: envoyer les infos (si y en a) du serveur au client concernant l'etat SENDING du client.
+
+* Urgent
 -faire les dérivées d'ECBCase.
 
 * Bof
