@@ -50,8 +50,9 @@ SDL_Color black_color = { 0x00, 0x00, 0x00, 0 };
 SDL_Color red_color =   { 0xFF, 0x00, 0x04, 0 };
 SDL_Color gray_color =  { 0x56, 0x56, 0x56, 0 };
 SDL_Color green_color = { 0x00, 0x5A, 0x00, 0 };
-SDL_Color marron_color= { 0x6A, 0x4C, 0x3C, 0 };
+SDL_Color brown_color = { 0x6A, 0x4C, 0x3C, 0 };
 SDL_Color blue_color =  { 0x00, 0x00, 0xFF, 0 };
+SDL_Color orange_color= { 0xff, 0x8c, 0x45, 0 };
 
 //-----------------------------------------------------------------------------
 

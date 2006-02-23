@@ -50,8 +50,9 @@ extern SDL_Color black_color;
 extern SDL_Color red_color;
 extern SDL_Color gray_color;
 extern SDL_Color green_color;
-extern SDL_Color marron_color;
+extern SDL_Color brown_color;
 extern SDL_Color blue_color;
+extern SDL_Color orange_color;
 
 class Font
 {
