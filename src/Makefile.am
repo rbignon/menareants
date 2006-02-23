@@ -29,6 +29,7 @@ euroconq_SOURCES = \
 		gui/MessageBox.cpp \
 		gui/Label.cpp \
 		gui/SpinEdit.cpp \
+		gui/ColorEdit.cpp \
 		gui/Image.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
