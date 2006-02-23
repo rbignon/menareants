@@ -30,6 +30,7 @@
 #include "gui/Edit.h"
 #include "gui/Memo.h"
 #include "gui/SpinEdit.h"
+#include "gui/ColorEdit.h"
 #include "gui/Image.h"
 
 /********************************************************************************************
@@ -58,6 +59,7 @@ public:
 	TImage*      Preview;
 
 	TSpinEdit*   MyPosition;
+	TColorEdit*  MyColor;
 
 /* Variables publiques */
 public:
@@ -127,7 +129,8 @@ public:
 /* Composants */
 public:
 
-	TSpinEdit *position;
+	TSpinEdit   *position;
+	TColorEdit  *couleur;
 
 /* Attributs */
 public:

@@ -270,6 +270,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
 						GameInfosForm->MyPosition->SetEnabled();
+						GameInfosForm->MyColor->SetEnabled();
 					}
 					else
 						Debug(W_DESYNCH|W_SEND, "SET +m: hors de GameInfosForm !");
@@ -283,7 +284,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				{
 					(*it)->SetReady(add);
 					if((*it)->IsMe() && GameInfosForm)
-						GameInfosForm->PretButton->SetEnabled(add);
+						GameInfosForm->PretButton->SetEnabled(!add);
 				}
 				break;
 			case 'o':
@@ -305,9 +306,17 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(j<parv.size())
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
-							(*it)->SetColor(StrToTyp<uint>(parv[j++]));
-							if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
-								GameInfosForm->PretButton->SetEnabled();
+							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+								GameInfosForm->MyColor->DelBadValue((*it)->Color());
+							if(!(*it)->SetColor(StrToTyp<uint>(parv[j++])))
+								Debug(W_DESYNCH|W_SEND, "SET +c: couleur trop grande !?");
+							else
+							{
+								if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
+									GameInfosForm->MyColor->AddBadValue((*it)->Color());
+								if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
+									GameInfosForm->PretButton->SetEnabled();
+							}
 						}
 					else Debug(W_DESYNCH|W_SEND, "SET +c: sans couleur");
 				}
@@ -328,11 +337,15 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						{
 							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
 								GameInfosForm->MyPosition->DelBadValue((*it)->Position());
-							(*it)->SetPosition(StrToTyp<uint>(parv[j++]));
-							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
-								GameInfosForm->MyPosition->AddBadValue((*it)->Position());
-							if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
-								GameInfosForm->PretButton->SetEnabled();
+							if(!(*it)->SetPosition(StrToTyp<uint>(parv[j++])))
+								Debug(W_DESYNCH|W_SEND, "SET +p: position hors limite");
+							else
+							{
+								if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+									GameInfosForm->MyPosition->AddBadValue((*it)->Position());
+								if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
+									GameInfosForm->PretButton->SetEnabled();
+							}
 						}
 					else Debug(W_DESYNCH|W_SEND, "SET +p: sans position");
 				}
@@ -363,6 +376,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
 
 	std::vector<int> pos_badval;
+	std::vector<int> col_badval;
 	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); ++parvi)
 	{
 		const char *nick = (*parvi).c_str();
@@ -407,9 +421,16 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				GameInfosForm->MyPosition = pline->position;
 				GameInfosForm->MyPosition->SetEnabled(false);
+				GameInfosForm->MyColor = pline->couleur;
+				GameInfosForm->MyColor->SetEnabled(false);
 			}
-			else if(pos > 0) /* GameInfosForm->MyPosition n'est probablement pas encore défini ! */
-				pos_badval.push_back(pos);
+			else
+			{ /* GameInfosForm->MyPosition et GameInfosForm->MyColor ne sont probablement pas encore défini ! */
+				if(pos > 0) 
+					pos_badval.push_back(pos);
+				if(col > 0)
+					col_badval.push_back(col);
+			}
 		}
 	}
 	if(GameInfosForm)
@@ -417,6 +438,9 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		 if(GameInfosForm->MyPosition)
 		 	for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); ++it)
 				GameInfosForm->MyPosition->AddBadValue(*it);
+		 if(GameInfosForm->MyColor)
+		 	for(std::vector<int>::iterator it = col_badval.begin(); it != col_badval.end(); ++it)
+				GameInfosForm->MyColor->AddBadValue(*it);
 		GameInfosForm->RecalcMemo();
 	}
 	JOINED = true;
@@ -547,7 +571,8 @@ bool EuroConqApp::GameInfos(const char *cname)
 	if(!JOINED)
 	{
 		MyFree(GameInfosForm);
-		client->sendrpl(client->rpl(EC_Client::LEAVE));
+		if(client->Player())
+			client->sendrpl(client->rpl(EC_Client::LEAVE));
 		return false;
 	}
 
@@ -623,6 +648,10 @@ bool EuroConqApp::GameInfos(const char *cname)
 						GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
+						if(GameInfosForm->MyColor &&
+						GameInfosForm->MyColor->Clic(event.button.x, event.button.y))
+								client->sendrpl(client->rpl(EC_Client::SET),
+									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
 /*						break;
 					case SDL_MOUSEBUTTONDOWN:*/
 						GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
@@ -723,7 +752,14 @@ void EuroConqApp::ListGames()
 						refresh = true;
 					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y))
 					{
-						GameInfos(NULL);
+						if(!GameInfos(NULL))
+						{
+							TMessageBox mb(150,300,
+												std::string("Impossible de créer le salon.\n"
+												"Son nom est peut être déjà utilisé.").c_str(),
+												BT_OK, ListGameForm);
+							mb.Show();
+						}
 						refresh = true;
 					}
 					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y))
@@ -835,6 +871,7 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 	pl = _pl;
 	h = 30;
 	position = 0;
+	couleur = 0;
 }
 
 TPlayerLine::~TPlayerLine()
@@ -847,6 +884,8 @@ void TPlayerLine::SetXY (uint px, uint py)
 	TComponent::SetXY(px, py);
 	if(position)
 		position->SetXY(px+210, py);
+	if(couleur)
+		couleur->SetXY(px+310, py);
 }
 
 bool TPlayerLine::OwnZone(uint _x, uint _y)
@@ -864,6 +903,8 @@ void TPlayerLine::Init()
 	                    /*  label   x    y  w  min      max                  step  defvalue */
 	position = new TSpinEdit("",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
 	position->Init();
+	couleur = new TColorEdit("",  x+340, y, 50);
+	couleur->Init();
 }
 
 void TPlayerLine::Draw(uint souris_x, uint souris_y)
@@ -871,6 +912,7 @@ void TPlayerLine::Draw(uint souris_x, uint souris_y)
 	assert(pl);
 
 	if(pl->Position() != (unsigned int)position->Value()) position->SetValue(pl->Position());
+	if(pl->Color() != (unsigned int)couleur->Value()) couleur->SetValue(pl->Color());
 
 	app.Font()->big.WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
 	if(pl->IsOwner())
@@ -879,6 +921,7 @@ void TPlayerLine::Draw(uint souris_x, uint souris_y)
 		app.Font()->big.WriteLeft(x+45, y, "@", red_color);
 	app.Font()->big.WriteLeft(x+70, y, pl->GetNick(), black_color);
 	position->Draw(souris_x, souris_y);
+	couleur->Draw(souris_x, souris_y);
 }
 
 /********************************************************************************************
@@ -896,7 +939,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = "Pret   Pseudo          Position";
+	std::string s = "Pret   Pseudo        Position     Couleur";
 	label = new TLabel(x, y, s, black_color, &app.Font()->big);
 }
 
