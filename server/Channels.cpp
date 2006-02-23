@@ -26,6 +26,7 @@
 #include "Debug.h"
 #include "Main.h"
 #include "Map.h"
+#include "Colors.h"
 #include <cstdarg>
 
 ChannelVector ChanList;
@@ -177,6 +178,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					uint color = StrToTyp<uint>(parv[j++]);
 					if(color > 0)
 					{
+						if(color >= COLOR_MAX)
+						{
+							Debug(W_DESYNCH, "SET +c %d >= %d(maxcouleur)", color, COLOR_MAX);
+							break;
+						}
 						BPlayerVector::iterator it;
 						for(it = sender->Channel()->Players().begin();
 						    it != sender->Channel()->Players().end() && (*it)->Color() != color;

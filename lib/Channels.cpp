@@ -23,6 +23,7 @@
 #include "Outils.h"
 #include "Map.h"
 #include "Debug.h"
+#include "Colors.h"
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *
@@ -43,6 +44,16 @@ bool ECBPlayer::SetPosition(unsigned int p)
 	if(p <= chan->GetLimite())
 	{
 		position = p;
+		return true;
+	}
+	return false;
+}
+
+bool ECBPlayer::SetColor(unsigned int c)
+{
+	if(c < COLOR_MAX)
+	{
+		color = c;
 		return true;
 	}
 	return false;
@@ -119,7 +130,7 @@ const char* ECBChannel::ModesStr() const
 const char* ECBChannel::PlayerList()
 {
 	std::string list = "";
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); it++)
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 	{
 		if(!list.empty()) list += " ";
 		if((*it)->IsOwner())

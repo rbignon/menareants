@@ -80,7 +80,7 @@ public:
 	 * \todo il faut mettre dans le client un tableau de couleurs SDL
 	 */
 	unsigned int Color() const { return color; }
-	void SetColor(unsigned int c) { color = c; }        /**< Set color of player. */
+	bool SetColor(unsigned int c);                      /**< Set color of player. */
 
 	/** Return nick of player. */
 	virtual const char* GetNick() const = 0;
