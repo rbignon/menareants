@@ -67,7 +67,7 @@ void ECMap::CreatePreview()
 					color = &red_color;
 					break;
 				case 't':
-					color = &marron_color;
+					color = &brown_color;
 					break;
 				case 'p':
 					color = &gray_color;
