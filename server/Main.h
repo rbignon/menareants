@@ -104,6 +104,8 @@ public:
 
 	std::string GetPath() const { return path; }
 
+	time_t Uptime() { return uptime; }
+
 	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0) {}
 
 protected:
