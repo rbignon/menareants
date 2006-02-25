@@ -55,15 +55,18 @@ private:
   // Buttons
   TButton m_up, m_down;
 
+  bool show_background;
+
   SDL_Surface *background;
 
 public:
-  TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items);
+  TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
   ~TMemo();
   void Init ();
   void Draw (uint mouse_x, uint mouse_y);
   bool Clic (uint mouse_x, uint mouse_y);
   void AddItem (const std::string &label, SDL_Color _color);
+  void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);
   void ClearItems();
 

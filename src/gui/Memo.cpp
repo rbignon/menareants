@@ -27,8 +27,8 @@
 #include <algorithm>
 #include <SDL.h>
 
-TMemo::TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0)
-  : TComponent(_x, _y, _width, _height)
+TMemo::TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items, bool _show_background)
+  : TComponent(_x, _y, _width, _height), show_background(_show_background)
 {
   height_item = 15;
   first_visible_item = 0;
@@ -58,6 +58,8 @@ void TMemo::Init()
     SDL_FreeSurface( background);
 
   SDL_Rect r_back = {0,0,w,h};
+
+  if(!show_background) return;
 
   background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
@@ -90,11 +92,11 @@ bool TMemo::Clic (uint mouse_x, uint mouse_y)
 
 void TMemo::Draw (uint mouse_x, uint mouse_y)
 {
-  if(!background) return; /* Peut (malheureusement, vive les threads) arriver */
-
-  // blit a surface as SDL_FillRect don't alpha blit a rectangle
-  SDL_Rect r_back = {x,y,w,h};
-  SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+  if(background)
+  {
+	SDL_Rect r_back = {x,y,w,h};
+	SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+  }
 
   for (uint i=0; i < nb_visible_items; i++)
   {
