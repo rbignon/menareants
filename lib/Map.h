@@ -45,6 +45,40 @@ class ECBMapPlayer;
 
 class ECBCountry;
 
+class ECBCase;
+
+/********************************************************************************************
+ *                               ECBEntity                                                  *
+ ********************************************************************************************/
+class ECBEntity
+{
+/* Constructor/Destructor */
+public:
+
+	ECBEntity(ECBPlayer* _owner, ECBCase* _case)
+		: owner(_owner), acase(_case)
+	{}
+
+	virtual ~ECBEntity() {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	void SetCase(ECBCase* _c) { acase = _c; }
+	ECBCase* Case() { return acase; }
+
+	ECBPlayer* Owner() { return owner; }
+
+/* Variables protégées */
+protected:
+	ECBPlayer* owner;
+
+	ECBCase *acase;
+};
+
 /********************************************************************************************
  *                               ECBDate                                                    *
  ********************************************************************************************/
@@ -277,7 +311,7 @@ public:
 	ECBCountry* FindCountry(const char*id);
 
 	ECBPlayer* Player() { return pl; }
-	void SetPlaye(ECBPlayer* _pl) { pl = _pl; }
+	void SetPlayer(ECBPlayer* _pl) { pl = _pl; }
 
 	std::vector<ECBCountry*> Countries() { return countries; }
 
@@ -289,6 +323,10 @@ public:
 	std::vector<ECBCountry*> countries;
 
 };
+
+typedef std::vector<ECBCase*> BCaseVector;
+typedef std::vector<ECBMapPlayer*> BMapPlayersVector;
+typedef std::vector<ECBCountry*> BCountriesVector;
 
 /********************************************************************************************
  *                               ECBMap                                                     *
@@ -337,14 +375,16 @@ public:
 	uint Width() { return x; }
 	uint Height() { return y; }
 
-	std::vector<ECBCase*> Cases() { return map; }                   /**< Return case vector */
-	std::vector<ECBMapPlayer*> MapPlayers() { return map_players; } /**< Return map players vector */
-	std::vector<ECBCountry*> Countries() { return map_countries; }  /**< Return countries vector */
+	BCaseVector Cases() { return map; }                             /**< Return case vector */
+	BMapPlayersVector MapPlayers() { return map_players; }          /**< Return map players vector */
+	BCountriesVector Countries() { return map_countries; }          /**< Return countries vector */
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
 	ECBDate* Date() { return date; }
 	ECBDate* NextDay() { return &(++(*date)); }                     /**< Increment date to next day */
+
+	std::vector<std::string> MapInfos() { return map_infos; }       /**< Map informations */
 	
 	/** Access to a case of map 
 	 * Example: map(x,y)
@@ -360,6 +400,8 @@ protected:
 	std::vector<ECBMapPlayer*> map_players;
 	
 	std::vector<ECBCountry*> map_countries;
+
+	std::vector<std::string> map_infos;
 
 	ECBDate* date;
 

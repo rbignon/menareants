@@ -339,6 +339,7 @@ void ECBMap::Init()
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());
 			else if(key == "DATE") date = new ECBDate(ligne);
+			else if(key == "INFO") map_infos.push_back(ligne);
 			else
 				throw ECExcept(VName(key) VName(name), "Fichier map incorrect");
 		}
@@ -486,7 +487,6 @@ void ECBMap::Init()
 
 ECBMap::~ECBMap()
 {
-	printf("d\n");
 	/* Libération des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;
