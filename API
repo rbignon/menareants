@@ -23,7 +23,7 @@ Sommaire:
               IAM <nick> <prog> <version>       :je me présente
               LSP                               :lister les parties
               CRE <nom>                         :créé une partie
-              JOI <nom>                         :joindre une partie
+              JOI <nom> [$]                     :joindre une partie ('$' signifie "créer le chan")
               STAT                              :request stats
               BYE                               :au revoir
          - Dans une pré-partie
@@ -42,7 +42,7 @@ Sommaire:
               MOTD  <ligne>                     :motd
               EOM                               :fin du motd
               STAT <nbactco> <nbco> <nbch>      :stats sur le serveur
-                   <chinwait> <chingame> <chtot>
+                   <chinwait> <chingame> <chtot> <uptime>
               LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
               EOL                               :fin de la liste
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
@@ -63,7 +63,6 @@ Sommaire:
               :<nick>!<arm> ARM <nom> [+<nb>]   :montre le changement d'une armée
                           [%<type>] [><pos>]
                           [<[pos]] [-] [.]
-              DATE <jr> <njr> <mois> <année>    :indique la [nouvelle] date
               :<nick>!<arm> ATQ <nick>!<arm>    :request une attaque (confirmation attendue)
               :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
                       OWN <nick>!<arm> <f1>
