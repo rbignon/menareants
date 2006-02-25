@@ -40,6 +40,11 @@ public:
 
 	virtual ~ECMap();
 
+/* Methodes */
+public:
+
+	void CreatePreview(uint width = 200, uint height = 200);
+
 /* Attributs */
 public:
 
@@ -48,8 +53,6 @@ public:
 /* Variables privées */
 protected:
 	ECImage *preview;
-
-	void CreatePreview();
 };
 
 typedef ECBCase        ECase;
