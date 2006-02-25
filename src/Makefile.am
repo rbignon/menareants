@@ -15,6 +15,7 @@ euroconq_SOURCES = \
 		Channels.cpp \
 		Map.cpp \
 		JoinGame.cpp \
+		InGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
