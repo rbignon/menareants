@@ -1,3 +1,31 @@
+2005-02-24  Romain Bignon <progs@headfucking.net>
+
+	* src/Outils.cpp (duration): Fonction pour avoir le temps d'une heure unix.
+
+	* src/Login.cpp, server/Login.cpp, server/Server.cpp, API: Affiche l'uptime à la connexion.
+
+	* src/Map.cpp: Affichage de la preview qui couvre toute une surface définie (ou paramétrable), avec donc la taille
+	des cases variables suivant la taille de la carte. Affichage également des frontières, et coloriage des
+	propriétés des joueurs quand ils en ont.
+
+	* src/gui/Memo.h: Variable pour afficher ou non le background transparent.
+
+	* lib/Batiments.h, lib/Units.h: Création des fichiers et classes de base.
+
+	* lib/Colors.h, src/tools/Font.h, src/gui/ColorEdit.cpp: Suppression du noir dans les couleurs des joueurs, et rajout
+	pour ces memes joueurs de couleurs "foncées" du bleu, du rouge, du marron et du blanc.
+
+	* lib/Map.h: Rajout du map_infos qui contient quelques lignes d'informations un peu superflues.
+
+	* src/InGame.cpp: Rajout du fichier qui contiendra les informations de dans le jeu.
+	(LoadingForm): Form qui affiche un etat de chargement du jeu...
+
+	* src/JoinGame.cpp: Quand l'etat est SENDING, afficher LoadingForm.
+
+	* src/Sockets.cpp, server/Channels.cpp, src/JoinGame.cpp: Utilisation d'un indicateur '$' dans JOI pour dire qu'on
+	veut *créer* un chan. Evite, quand on veut créer un chan, d'en rejoindre un existant ou d'essayer de joindre
+	une partie déjà lancée (et que le serveur s'étonne).
+
 2005-02-22  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ColorEdit.cpp: Création du composant ColorEdit.
