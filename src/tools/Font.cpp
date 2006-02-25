@@ -54,6 +54,11 @@ SDL_Color brown_color = { 0x6A, 0x4C, 0x3C, 0 };
 SDL_Color blue_color =  { 0x00, 0x00, 0xFF, 0 };
 SDL_Color orange_color= { 0xff, 0x8c, 0x45, 0 };
 
+SDL_Color fred_color =  { 0x80, 0x00, 0x02, 0 };
+SDL_Color fwhite_color= { 0xcb, 0xcb, 0xcb, 0 };
+SDL_Color fbrown_color= { 0x3b, 0x2b, 0x1e, 0 };
+SDL_Color fblue_color = { 0x0e, 0x0e, 0x55, 0 };
+
 //-----------------------------------------------------------------------------
 
 Font::Font(int size){ 

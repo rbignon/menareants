@@ -54,6 +54,11 @@ extern SDL_Color brown_color;
 extern SDL_Color blue_color;
 extern SDL_Color orange_color;
 
+extern SDL_Color fred_color;
+extern SDL_Color fbrown_color;
+extern SDL_Color fwhite_color;
+extern SDL_Color fblue_color;
+
 class Font
 {
   typedef std::map<std::string, ECImage>::value_type

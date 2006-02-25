@@ -25,18 +25,7 @@
 #include "SpinEdit.h"
 #include "Colors.h"
 
-static SDL_Color *color_eq[] = {
-	/* {COLOR_NONE  */          NULL,
-	/* COLOR_BLACK  */          &black_color,
-	/* COLOR_GRAY   */          &gray_color,
-	/* COLOR_BLUE   */          &blue_color,
-	/* COLOR_RED    */          &red_color,
-	/* COLOR_GREEN  */          &green_color,
-	/* COLOR_WHITE  */          &white_color,
-	/* COLOR_BROWN  */          &brown_color,
-	/* COLOR_ORANGE */          &orange_color,
-	/* COLOR_MAX    */          NULL
-};
+extern SDL_Color *color_eq[];
 
 class TColorEdit : public TSpinEdit
 {

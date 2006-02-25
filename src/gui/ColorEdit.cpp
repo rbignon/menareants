@@ -1,4 +1,4 @@
-/* src/gui/ColorEdit.h - Header of ColorEdit.cpp
+/* src/gui/ColorEdit.cpp - To select a color in a list.
  *
  * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
@@ -22,6 +22,18 @@
 #include "tools/Maths.h"
 #include "Resources.h"
 #include "Main.h"
+
+SDL_Color *color_eq[] = {
+	/* {COLOR_NONE  */          NULL,
+	/* COLOR_GRAY   */          &gray_color,
+	/* COLOR_BLUE   */          &fblue_color,
+	/* COLOR_RED    */          &fred_color,
+	/* COLOR_GREEN  */          &green_color,
+	/* COLOR_WHITE  */          &fwhite_color,
+	/* COLOR_BROWN  */          &fbrown_color,
+	/* COLOR_ORANGE */          &orange_color,
+	/* COLOR_MAX    */          NULL
+};
 
 TColorEdit::TColorEdit(std::string _label, uint _x, uint _y, uint _width, int _defvalue)
 	: TSpinEdit(_label, _x, _y, _width, COLOR_NONE, COLOR_MAX-1, 1, _defvalue)

@@ -26,7 +26,6 @@
 enum e_color
 {
 	COLOR_NONE,             /**< There isn't color there */
-	COLOR_BLACK,            /**< Black color */
 	COLOR_GRAY,             /**< Gray color */
 	COLOR_BLUE,             /**< Blue color */
 	COLOR_RED,              /**< Red color */
