@@ -43,7 +43,7 @@ const char* msgTab[] = {
      "AIM %s",                              /* AIM - Logué */
      "MOTD %s",                             /* MOTD - Message Of The Day */
      "EOM",                                 /* EOM - Fin du motd */
-     "STAT %d %d %d %d %d %d",              /* STAT - Stats du serveur */
+     "STAT %d %d %d %d %d %d %d",           /* STAT - Stats du serveur */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
 

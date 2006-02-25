@@ -26,6 +26,7 @@
 #include "Main.h"
 #include "Login.h"
 #include "Resources.h"
+#include "Outils.h"
 
 TConnectedForm  *ConnectedForm = NULL;
 static bool RC_MOTD = false;
@@ -130,12 +131,14 @@ int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 /** Statistics of server.
  *
- * Syntax: STAT nbactco nbco nbch chinwait chingame chtot
+ * Syntax: STAT nbactco nbco nbch chinwait chingame chtot uptime
  */
 int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(ConnectedForm)
 	{
+		ConnectedForm->Uptime->SetCaption("Le serveur a été lancé il y a " +
+		                                  std::string(duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
 		ConnectedForm->UserStats->SetCaption("Il y a " + parv[1] + " personnes connectées, avec " + parv[2] +
 		                                     " connexions totales et " + parv[6] + " parties jouées.");
 		ConnectedForm->ChanStats->SetCaption("Il y a actuellement " + parv[3] + " partie(s), dont " + parv[5] +
@@ -272,12 +275,13 @@ TConnectedForm::TConnectedForm()
 {
 	Welcome = AddComponent(new TLabel(200,50,"Vous êtes bien connecté", black_color, &app.Font()->big));
 
-	Motd = AddComponent(new TMemo(75,100,500,400, 0));
+	Motd = AddComponent(new TMemo(75,100,500,380, 0));
 
 	CreateButton = AddComponent(new TButtonText(600,100, 100,49, "Créer une partie"));
 	ListButton = AddComponent(new TButtonText(600,150,100,49, "Lister les parties"));
 	DisconnectButton = AddComponent(new TButtonText(600,200,100,49, "Se déconnecter"));
 
+	Uptime =    AddComponent(new TLabel(75,485,"", black_color, &app.Font()->normal));
 	UserStats = AddComponent(new TLabel(75,505,"", black_color, &app.Font()->normal));
 	ChanStats = AddComponent(new TLabel(75,525,"", black_color, &app.Font()->normal));
 

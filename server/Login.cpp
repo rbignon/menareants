@@ -68,7 +68,8 @@ static char *correct_nick(const char *nick)
 
 static void send_stats(TClient *cl)
 {
-	cl->sendrpl(app.rpl(ECServer::STAT), app.NBco, app.NBtot, app.NBchan, app.NBwchan, app.NBachan, app.NBtotchan);
+	cl->sendrpl(app.rpl(ECServer::STAT), app.NBco, app.NBtot, app.NBchan, app.NBwchan, app.NBachan, app.NBtotchan,
+	                                     app.Uptime());
 }
 
 /** Client send me several informations about him.

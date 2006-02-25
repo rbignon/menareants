@@ -45,6 +45,7 @@ public:
 	TLabel*      Welcome;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
+	TLabel*      Uptime;
 
 /* Evenements */
 public:
