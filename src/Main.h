@@ -33,6 +33,8 @@ struct SDL_Surface;
 
 class Menu;
 
+class EChannel;
+
 class EC_Client;
 
 enum {
@@ -64,6 +66,7 @@ protected:
 	void request_game();
 	void ListGames();
 	bool GameInfos(const char* c);
+	void LoadGame(EChannel* ch);
 
 public:
 	int main(int argc, char** argv);
