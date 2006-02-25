@@ -19,6 +19,7 @@
  * $Id$
  */
 
+#include "InGame.h"
 #include "JoinGame.h"
 #include "Main.h"
 #include "Resources.h"
@@ -35,11 +36,13 @@
 #include "Timer.h"
 #include "Map.h"
 
+extern TLoadingForm   *LoadingForm;
+void LoadingGame(EC_Client* cl);
+
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
-bool SENDING = false;                 /**< SENDING is setted to \a true by thread when we receiv a +S mode */
 
 /** We receive a map !
  *
@@ -249,7 +252,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(add)
 				{
 					chan->SetState(EChannel::SENDING);
-					SENDING = true;
+					LoadingGame(me);
 				}
 				break;
 			case 'P':
@@ -314,8 +317,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							{
 								if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
 									GameInfosForm->MyColor->AddBadValue((*it)->Color());
-								if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
-									GameInfosForm->PretButton->SetEnabled();
+								if((*it)->IsMe() && GameInfosForm)
+									GameInfosForm->PretButton->SetEnabled((*it)->Position() && (*it)->Color());
 							}
 						}
 					else Debug(W_DESYNCH|W_SEND, "SET +c: sans couleur");
@@ -343,8 +346,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							{
 								if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
 									GameInfosForm->MyPosition->AddBadValue((*it)->Position());
-								if((*it)->IsMe() && GameInfosForm && (*it)->Position() && (*it)->Color())
-									GameInfosForm->PretButton->SetEnabled();
+								if((*it)->IsMe() && GameInfosForm)
+									GameInfosForm->PretButton->SetEnabled((*it)->Position() && (*it)->Color());
 							}
 						}
 					else Debug(W_DESYNCH|W_SEND, "SET +p: sans position");
@@ -396,6 +399,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		nick++;
 		pos = StrToTyp<uint>(nb);
 
+		nb.clear();
 		while(*nick != ',')
 			nb += *nick++;
 		nick++;
@@ -435,12 +439,20 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 	if(GameInfosForm)
 	{
-		 if(GameInfosForm->MyPosition)
-		 	for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); ++it)
+		if(GameInfosForm->MyPosition)
+		{
+			for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); ++it)
 				GameInfosForm->MyPosition->AddBadValue(*it);
-		 if(GameInfosForm->MyColor)
-		 	for(std::vector<int>::iterator it = col_badval.begin(); it != col_badval.end(); ++it)
+			if(me->Player()->Channel()->Map())
+				GameInfosForm->MyPosition->SetEnabled();
+		}
+		if(GameInfosForm->MyColor)
+		{
+			for(std::vector<int>::iterator it = col_badval.begin(); it != col_badval.end(); ++it)
 				GameInfosForm->MyColor->AddBadValue(*it);
+			if(me->Player()->Channel()->Map())
+				GameInfosForm->MyColor->SetEnabled();
+		}
 		GameInfosForm->RecalcMemo();
 	}
 	JOINED = true;
@@ -453,7 +465,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(players.size())
+	if(!players.empty())
 	/* Le joueur est reconnu (!?) */
 		return vDebug(W_DESYNCH|W_SEND, "Reception d'un JOIN d'un joueur connu !",
 		                                VSName(players[0]->GetNick()));
@@ -486,7 +498,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(!players.size())
+	if(players.empty())
 		return vDebug(W_DESYNCH|W_SEND, "Reception d'un LEAVE d'un joueur inconnu !",
 		                                VSName(parv[0].c_str()));
 
@@ -551,9 +563,11 @@ bool EuroConqApp::GameInfos(const char *cname)
 		throw ECExcept(VPName(client), "Non connecté");
 		
 	std::string name;
+	bool create = false;
 
 	if(!cname)
 	{
+		create = true;
 		name = Menu::EnterString("Nom", "", false);
 		if(name.empty()) return true;
 
@@ -566,8 +580,9 @@ bool EuroConqApp::GameInfos(const char *cname)
 	                                    std::string(cname), green_color);
 
 	JOINED = false;
-	client->sendrpl(client->rpl(EC_Client::JOIN), FormatStr(cname));
-	WAIT_EVENT(JOINED, i);
+	client->sendrpl(create ? client->rpl(EC_Client::CREATE) : client->rpl(EC_Client::JOIN), FormatStr(cname));
+
+	WAIT_EVENT_T(JOINED, i, 0.3);
 	if(!JOINED)
 	{
 		MyFree(GameInfosForm);
@@ -578,12 +593,13 @@ bool EuroConqApp::GameInfos(const char *cname)
 
 	SDL_Event event;
 	bool eob = false;
+	EChannel *chan = NULL;
 
 	try
 	{
 		if(!client->Player() || !client->Player()->Channel())
 			throw ECExcept(VPName(client->Player()), "Dans aucun chan");
-		EChannel *chan = client->Player()->Channel();
+		chan = client->Player()->Channel();
 
 		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
 
@@ -665,20 +681,22 @@ bool EuroConqApp::GameInfos(const char *cname)
 				}
 			}
 			GameInfosForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() && !SENDING);
+		} while(!eob && client->IsConnected() && client->Player() &&
+		        client->Player()->Channel()->State() != EChannel::SENDING);
 	
 	}
 	catch(TECExcept &e)
 	{
 		MyFree(GameInfosForm);
-		client->sendrpl(client->rpl(EC_Client::LEAVE));
+		if(client && client->Player())
+			client->sendrpl(client->rpl(EC_Client::LEAVE));
 		throw;
 	}
 	MyFree(GameInfosForm);
 
-	if(SENDING)
+	if(client->Player()->Channel()->State() == EChannel::SENDING)
 	{ /* LA PARTIE SE LANCE */
-
+		LoadGame(chan);
 	}
 
 	if(client->Player())
@@ -712,6 +730,7 @@ void EuroConqApp::ListGames()
 			{
 				delete ListGameForm;
 				ListGameForm = 0;
+				printf("dddd\n");
 				return; /* On a attendu pour rien */
 			}
 			refresh = false;
@@ -747,6 +766,7 @@ void EuroConqApp::ListGames()
 							mb.Show();
 						}
 						refresh = true;
+						timer.reset();
 					}
 					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y))
 						refresh = true;
@@ -761,6 +781,7 @@ void EuroConqApp::ListGames()
 							mb.Show();
 						}
 						refresh = true;
+						timer.reset();
 					}
 					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y))
 						eob = true;
@@ -877,6 +898,7 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 TPlayerLine::~TPlayerLine()
 {
 	if(position) delete position;
+	if(couleur) delete couleur;
 }
 
 void TPlayerLine::SetXY (uint px, uint py)
