@@ -344,7 +344,7 @@ int Menu::execute()
 		{
 			switch(event.type)
 			{
-				case SDL_KEYDOWN:
+				case SDL_KEYUP:
 					selected = current->children[current_selection-1];
 					switch (event.key.keysym.sym)
 					{
