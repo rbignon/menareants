@@ -38,6 +38,9 @@ bool FichierExiste(const std::string &nom);
 char *get_time(time_t mytime);
 #define TIMELEN 20
 
+/** Retourne le temps que forme cette date */
+char *duration(int s);
+
 /** Convertit d'une chaine en un type */
 template<typename T>
 T StrToTyp(const std::string & Str)

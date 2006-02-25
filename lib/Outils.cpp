@@ -78,6 +78,26 @@ std::string StringF(const char* format, ...)
   return s;
 }
 
+char *duration(int s)
+{
+        static char dur[44 /* 3 + 7 + 2 + 8 + 2 + 9 + 2 + 9 + 1 */];
+        int i = 0;
+
+        if(s >= 86400)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/86400),
+                                s %= 86400, strcpy(dur + i, " jours "), i += 7;
+        if(s >= 3600)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/3600),
+                                s %= 3600, strcpy(dur + i, " heures "), i += 8;
+        if(s >= 60)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/60),
+                                s %= 60, strcpy(dur + i, " minutes "), i += 9;
+        if(s) i += snprintf(dur + i, sizeof dur - i, "%d secondes",s);
+        else dur[i-2]= 0;
+
+        return dur;
+}
+
 char *get_time(time_t mytime)
 {
         static char buftime[TIMELEN + 1];
