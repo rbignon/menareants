@@ -55,6 +55,7 @@ public:
 
 		LISTGAME,    /**< LSP */
 		JOIN,        /**< JOI */
+		CREATE,      /**< JOI $ */
 		LEAVE,       /**< LEA */
 		MSG,         /**< MSG */
 		SET,         /**< SET */

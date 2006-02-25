@@ -39,6 +39,7 @@ const char* msgTab[] = {
 
 	"LSP",                                    /* LSP - Liste les jeux */
 	"JOI %s",                                 /* JOI - Joindre une partie */
+	"JOI %s $",                               /* JOI $ - Crée une partie */
 	"LEA",                                    /* LEA - Partir d'une partie */
 	"MSG %s",                                 /* MSG - Message dans une partie */
 	"SET %s",                                 /* SET - Définit un paramètre dans le chan */

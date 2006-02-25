@@ -191,11 +191,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							{ Debug(W_DESYNCH, "SET +c: d'une couleur déjà utilisée"); break; }
 					}
 					sender->SetColor(color);
+					sender->NeedReady();
 					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetColor(0);
+					sender->NeedReady();
 					changed = YES_NOPARAMS;
 				}
 				break;
@@ -230,11 +232,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
+					sender->NeedReady();
 					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetPosition(0);
+					sender->NeedReady();
 					changed = YES_NOPARAMS;
 				}
 				break;
@@ -334,7 +338,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 /** A client wants to join a channel.
  *
- * Syntax: JOI nom
+ * Syntax: JOI nom [$]
  */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
@@ -343,6 +347,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return vDebug(W_WARNING, "JOI: Essaye de joindre plusieurs salons", VSName(cl->GetNick())
 		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
 
+	bool create = (parv.size() == 3 && parv[2] == "$");
 	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
 	ECPlayer* pl;
@@ -354,7 +359,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			break;
 		}
 
-	if(!chan)
+	if(!chan && create)
 	{ /* Création du salon */
 		chan = new EChannel(nom);
 		pl = new ECPlayer(cl, chan, true, false);
@@ -362,6 +367,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	else
 	{ /* Rejoins un salon existant */
+		if(create || !chan)
+			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 		if(!chan->Joinable())
 		{
 			vDebug(W_WARNING, "JOI: Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
@@ -464,6 +471,16 @@ const char* ECPlayer::GetNick() const
 	return (client ? client->GetNick() : NULL);
 }
 
+void ECPlayer::NeedReady()
+{
+	if(!ready) return;
+
+	SetReady(false);
+	Channel()->send_modes(this, "-!");
+
+	return;
+}
+
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
@@ -503,16 +520,19 @@ void EChannel::SetMap(ECBMap *m)
 	 * SMAP line1
 	 * SMAP line2
 	 * [...]
-	 * SMAP linex
+	 * SMAP liney
 	 * EOSMAP
 	 * :p SET +m 0
 	 * </pre>
 	 */
 	map = m;
 
-	/* Envoie un peu brut mais pour redéfinir la limite */
-	sendto_players(NULL, ":%s SET +l %d", app.GetConf()->ServerName().c_str(), m->MaxPlayers());
-	SetLimite(m->MaxPlayers());
+	/* Envoie, un peu brut, pour redéfinir la limite */
+	if(limite != m->MaxPlayers())
+	{
+		sendto_players(NULL, ":%s SET +l %d", app.GetConf()->ServerName().c_str(), m->MaxPlayers());
+		SetLimite(m->MaxPlayers());
+	}
 
 	/* Envoie d'une map */
 	std::vector<std::string> map_file = m->MapFile();

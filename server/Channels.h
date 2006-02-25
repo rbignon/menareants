@@ -55,6 +55,9 @@ public:
 /* Methodes */
 public:
 
+	/** This player need to be ready. */
+	void NeedReady();
+
 /* Attributs */
 public:
 
@@ -91,9 +94,7 @@ public:
 /* Methodes */
 public:
 
-	/** All players have to be ready
-	 * This will \b not send a message, it will only set all players as Ready = false.
-	 */
+	/** All players have to be ready */
 	void NeedReady();
 
 	/** Send a message to all players.
