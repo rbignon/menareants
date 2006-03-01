@@ -27,6 +27,7 @@
 #include "Main.h"
 #include "Map.h"
 #include "Colors.h"
+#include "Units.h"
 #include <cstdarg>
 
 ChannelVector ChanList;
@@ -62,20 +63,15 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	bool add = true;
 	bool ready = false;
+	const short NEEDREADY_ALL = 1;
+	const short NEEDREADY_ME = 2;
+	short need_ready = 0;
 	uint j = 2;
-	struct
-	{
-		char c;
-		bool changed;
-		bool add;
-		const char* params;
-	} newmodes[] = {
-		{ 'm', false, false, NULL},
-		{ 'o', false, false, NULL},
-		{ 'c', false, false, NULL},
-		{ 'p', false, false, NULL},
-		{ '!', false, false, NULL},
-	};
+	ECMap* map = 0;
+	uint mapi = 0;
+
+	std::string modes, params;
+	bool last_add = true;
 
 	for(uint i=0; i<parv[1].size(); i++)
 	{
@@ -99,18 +95,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j<parv.size())
 					{
-						uint mapi = StrToTyp<uint>(parv[j++]);
+						mapi = StrToTyp<uint>(parv[j++]);
 						if(mapi >= MapList.size())
 							Debug(W_DESYNCH, "SET +m: de la map %d hors de la liste (%d)", mapi, MapList.size());
+						/* Pour éviter la mise de plusieurs maps successivement, on ne traite que la dernière
+						 * donnée. Donc une fois qu'on a traité la validité du numero de la map, on le met dans
+						 * une variable qui sera vérifié à la fin de la boucle.
+						 * On ne rajoutera qu'à ce moment là le "+m" et le paramètre, donc pas de valeur attribuée
+						 * à changed ici.
+						 */
 						else
-						{
-							ECMap* map = MapList[mapi];
-							if(map == sender->Channel()->Map())
-								continue; /* anti-flood */
-							sender->Channel()->SetMap(map);
-							sender->Channel()->NeedReady();
-							changed = YES_WITHPARAM;
-						}
+							map = MapList[mapi];
 					}
 				}
 				else
@@ -138,6 +133,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				ready = true;
 				sender->SetReady(add);
+				if(need_ready == NEEDREADY_ME) need_ready = 0;
 				changed = YES_NOPARAMS;
 				break;
 			case 'o':
@@ -191,13 +187,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							{ Debug(W_DESYNCH, "SET +c: d'une couleur déjà utilisée"); break; }
 					}
 					sender->SetColor(color);
-					sender->NeedReady();
+					if(!need_ready) need_ready = NEEDREADY_ME;
 					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetColor(0);
-					sender->NeedReady();
+					if(!need_ready) need_ready = NEEDREADY_ME;
 					changed = YES_NOPARAMS;
 				}
 				break;
@@ -232,13 +228,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
-					sender->NeedReady();
+					if(!need_ready) need_ready = NEEDREADY_ME;
 					changed = YES_WITHPARAM;
 				}
 				else
 				{
 					sender->SetPosition(0);
-					sender->NeedReady();
+					if(!need_ready) need_ready = NEEDREADY_ME;
 					changed = YES_NOPARAMS;
 				}
 				break;
@@ -248,33 +244,49 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		if(changed)
 		{
-			for(uint k=0;k<ASIZE(newmodes);k++)
-				if(parv[1][i] == newmodes[k].c)
-				{
-					newmodes[k].changed = true;
-					newmodes[k].add = add;
-					if(changed == YES_WITHPARAM)
-						newmodes[k].params = parv[(j-1)].c_str();
-					break;
-				}
+			if(modes.empty() || last_add != add)
+				modes += add ? '+' : '-';
+			last_add = add;
+			modes += parv[1][i];
+			if(changed == YES_WITHPARAM)
+				params += " " + parv[(j-1)];
 		}
 	}
 
-	std::string modes = "", params = "";
-	for(uint k=0;k<ASIZE(newmodes);k++)
-		if(newmodes[k].changed)
+	if(map && map != sender->Channel()->Map())
+	{
+		sender->Channel()->SetMap(map);
+		need_ready = NEEDREADY_ALL;
+		if(modes.empty() || !last_add)
 		{
-			if(modes.empty() || newmodes[k].add != add)
-				modes += newmodes[k].add ? '+' : '-',
-				add = newmodes[k].add;
-
-			modes += newmodes[k].c;
-			if(newmodes[k].params) params += " " + std::string(newmodes[k].params);
+			modes += '+';
+			last_add = true;
 		}
+		modes += 'm';
+		params += " " + TypToStr(mapi);
+		if(sender->Channel()->GetLimite() != map->MaxPlayers())
+		{
+			modes += 'l';
+			params += " " + TypToStr(map->MaxPlayers());
+		}
+	}
 
 	if(!modes.empty())
 		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
 		                                 (modes + params).c_str());
+
+	if(map && sender->Channel()->GetLimite() != map->MaxPlayers())
+		sender->Channel()->SetLimite(map->MaxPlayers());
+
+	if(need_ready)
+	{
+		switch(need_ready)
+		{
+			case NEEDREADY_ALL: sender->Channel()->NeedReady(); break;
+			case NEEDREADY_ME:  sender->NeedReady(); break;
+		}
+		ready = false;
+	}
 
 	/* Si tout le monde est READY, on passe d'un etat de la partie à un autre. */
 	if(ready)
@@ -297,6 +309,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					* si tout le monde est READY pour, dans ce cas là, lancer la partie
 					* et jarter ceux qui sont en trop.
 					*/
+					BMapPlayersVector mpv = sender->Channel()->Map()->MapPlayers();
 					for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
 						if(!(*it)->Ready())
 						{
@@ -311,11 +324,43 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							}
 							cl->ClrPlayer();
 						}
+						else
+						{
+							BMapPlayersVector::iterator mpi;
+							for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
+							if(mpi == mpv.end())
+								throw ECExcept(VIName((*it)->Position()), "Position introuvable !?");
+							(*mpi)->SetPlayer(*it);
+							(*it)->SetMapPlayer(*mpi);
+						}
+					sender->Channel()->Map()->ClearMapPlayers();
+
 					sender->Channel()->SetState(EChannel::SENDING);
 					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
 					sender->Channel()->NeedReady();
 					app.NBwchan--;
 					app.NBachan++;
+
+					BCaseVector cav = sender->Channel()->Map()->Cases();
+					for(BCaseVector::iterator cai = cav.begin(); cai != cav.end(); ++cai)
+						if((*cai)->Flags() & C_VILLE)
+						{
+							const char *e_name = sender->Channel()->FindEntityName((*cai)->Country()->Owner() ?
+							                     dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player()) : 0);
+
+							/* TODO: supprimer quelque part !!!!!!! */
+							ECArmee *armee = new ECArmee(e_name,
+							                               (*cai)->Country()->Owner() ?
+							                               (*cai)->Country()->Owner()->Player() : 0,
+							                               *cai, sender->Channel()->Map()->NbSoldats());
+							(*cai)->Entities()->Add(armee);
+							if((*cai)->Country()->Owner())
+								(*cai)->Country()->Owner()->Player()->Entities()->Add(armee);
+							sender->Channel()->Map()->Entities()->Add(armee);
+							sender->Channel()->SendArm(armee, ARM_MOVE|ARM_TYPE|ARM_NUMBER, (*cai)->X(), (*cai)->Y(),
+							                           armee->Nb(), armee->Type());
+						}
+
 					break;
 				}
 				case EChannel::SENDING:
@@ -511,28 +556,80 @@ EChannel::~EChannel()
 	}
 }
 
+/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
+void EChannel::SendArm(ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
+{
+	std::string to_send;
+
+	if(flag & ARM_ATTAQ)
+		to_send += " *" + TypToStr(x) + "," + TypToStr(y);
+	if(flag & ARM_MOVE)
+		to_send += " >" + TypToStr(x) + "," + TypToStr(y);
+	if(flag & ARM_RETURN)
+		to_send += " <" + TypToStr(x) + "," + TypToStr(y);
+	if(flag & ARM_TYPE)
+		to_send += " %" + TypToStr(type);
+	if(flag & ARM_NUMBER)
+		to_send += " +" + TypToStr(nb);
+	if(flag & ARM_LOCK)
+		to_send += " .";
+	if(flag & ARM_REMOVE)
+		to_send += " -";
+
+	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
+	sendto_players(NULL, app.rpl(ECServer::ARM), et->Owner() ? et->Owner()->GetNick() : "*",
+	                                             et->ID(),
+                                                 to_send.c_str());
+}
+
+const char* EChannel::FindEntityName(ECPlayer* pl)
+{
+	static char num[3];
+	num[0] = 'A';
+	num[1] = 'A';
+	num[2] = '\0';
+	bool unchecked = false;
+	BEntityVector ev = pl ? pl->Entities()->List() : map->Entities()->List();
+	do
+	{
+		BEntityVector::iterator it;
+		for(it = ev.begin(); it != ev.end() && !((pl || !(*it)->Owner()) && !strcmp((*it)->ID(), num)); it++);
+
+		if(it == ev.end())
+			unchecked = true;
+		else
+		{
+			ev.erase(it);
+			if(num[1] < 'Z') num[1]++;
+			else if(num[0] >= 'Z') break;
+			else
+			{
+				num[0]++;
+				num[1] = 'A';
+			}
+		}
+	} while(!unchecked);
+
+	if(!unchecked)
+		throw ECExcept(VBName(unchecked), "Il y a trop d'unités !!");
+
+	return num;
+}
+
 void EChannel::SetMap(ECBMap *m)
 {
 	/** \note Send infos like this :
 	 * <pre>
-	 * :server SET +l 5
-	 * :p1,p2 SET -p
+	 * :p1,p2 SET -p!
 	 * SMAP line1
 	 * SMAP line2
 	 * [...]
 	 * SMAP liney
 	 * EOSMAP
-	 * :p SET +m 0
+	 * :p SET +ml 0 5
 	 * </pre>
 	 */
 	map = m;
-
-	/* Envoie, un peu brut, pour redéfinir la limite */
-	if(limite != m->MaxPlayers())
-	{
-		sendto_players(NULL, ":%s SET +l %d", app.GetConf()->ServerName().c_str(), m->MaxPlayers());
-		SetLimite(m->MaxPlayers());
-	}
 
 	/* Envoie d'une map */
 	std::vector<std::string> map_file = m->MapFile();

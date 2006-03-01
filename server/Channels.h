@@ -23,13 +23,11 @@
 #define ECD_CHANNELS_H
 
 #include "../lib/Channels.h"
+#include "Map.h"
 
 class TClient;
-
 class ECBPlayer;
-
 class ECBChannel;
-
 class EChannel;
 
 /********************************************************************************************
@@ -116,6 +114,18 @@ public:
 	 * \warning this will only send modes, no set them in channel of on players.
 	 */
 	void send_modes(PlayerVector senders, const char* msg);
+
+	/** This function will return a name doesn't used before */
+	const char* FindEntityName(ECPlayer*);
+
+	#define ARM_MOVE      0x01
+	#define ARM_RETURN    0x02
+	#define ARM_ATTAQ     0x04
+	#define ARM_REMOVE    0x08
+	#define ARM_LOCK      0x10
+	#define ARM_TYPE      0x20
+	#define ARM_NUMBER    0x40
+	void SendArm(ECEntity*, uint flag, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
 	
 /* Attributs */
 public:
