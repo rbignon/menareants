@@ -21,6 +21,7 @@
 #ifndef Outils_hpp
 #define Outils_hpp
 #include <sstream>
+#include <vector>
 
 /** Récupère le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
@@ -74,5 +75,57 @@ inline void MyFree(void *p)
 	p = 0;
 }
 */
+
+const bool USE_DELETE = true;
+
+template <class T>
+class ECList
+{
+/* Variables privées */
+protected:
+	std::vector<T> list;
+
+/* Constructeur/Destructeur */
+public:
+
+/* Methodes */
+public:
+
+	void Add(T _e) { list.push_back(_e); }
+
+	bool Remove(T p, bool use_delete = false)
+	{
+		/*for(std::vector<T*>::iterator it = list.begin(); it != list.end(); )*/
+		for(typename std::vector<T>::iterator it = list.begin(); it != list.end();)
+		{
+			if (*it == p)
+			{
+				if(use_delete)
+					delete p;
+				it = list.erase(it);
+				return true;
+			}
+			else
+				++it;
+		}
+		return false;
+	}
+
+	void Clear(bool use_delete = false)
+	{
+		for(typename std::vector<T>::iterator it = list.begin(); it != list.end();)
+		{
+			if(use_delete)
+				delete (*it);
+			it = list.erase(it);
+		}
+	}
+
+	std::vector<T> List() { return list; }
+
+/* Attributs */
+public:
+
+};
 
 #endif
