@@ -131,10 +131,22 @@ ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
 }
 
 /********************************************************************************************
+ *                               ECBEntity                                                  *
+ ********************************************************************************************/
+
+ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type)
+	: owner(_owner), acase(_case), type(_type)
+{
+	if(strlen(_name) != (sizeof name)-1)
+		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
+	strcpy(name, _name);
+}
+
+/********************************************************************************************
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 
-ECBCountry::ECBCountry(char _ident[3])
+ECBCountry::ECBCountry(const Country_ID _ident)
 {
 	strcpy(ident, _ident);
 	owner = 0;
@@ -231,6 +243,12 @@ ECBMap::ECBMap(std::string filename)
  *   MIN [min]
  *   MAX [max]
  *   DATE [jour] [mois] [année]
+ *   INFO [ligne]
+ *   INFO [ligne]
+ *   ..
+ *   INFO [ligne]
+ *   INFO [ligne]
+ *   SOLDATS [nb]
  * </pre>
  *
  *  1) NAME [name]
@@ -292,6 +310,16 @@ ECBMap::ECBMap(std::string filename)
  *   Initial date of game.
  *   </pre>
  *
+ *  8) INFO [ligne]
+ *   <pre>
+ *   This is one of lines who is a short text of map.
+ *   </pre>
+ *
+ *  9) SOLDATS [nb]
+ *   <pre>
+ *   This is the number of soldats who are in initiales armies (neutral and players).
+ *   </pre>
+ *
  * @author Progs
  * @date 15/02/2006
  */
@@ -331,6 +359,10 @@ void ECBMap::Init()
 			{
 				if(!isalpha(ligne[0]))
 					throw ECExcept(VCName(ligne[0]), "L'identifiant de ce player n'est pas correct (doit être une lettre)");
+				BMapPlayersVector::iterator it = map_players.begin();
+				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
+				if(it != map_players.end())
+					throw ECExcept(VCName(ligne[0]), "L'identifiant est déjà utilisé");
 				map_players.push_back(new ECBMapPlayer(ligne[0], ++num_player));
 			}
 			else if(key == "MAP") recv_map = true;
@@ -340,6 +372,7 @@ void ECBMap::Init()
 			else if(key == "MAX") max = atoi(ligne.c_str());
 			else if(key == "DATE") date = new ECBDate(ligne);
 			else if(key == "INFO") map_infos.push_back(ligne);
+			else if(key == "SOLDATS") nb_soldats = atoi(ligne.c_str());
 			else
 				throw ECExcept(VName(key) VName(name), "Fichier map incorrect");
 		}
@@ -356,7 +389,7 @@ void ECBMap::Init()
 			uint counter = 0;
 			ECBCase *acase = 0;
 			ECBCountry *country = 0;
-			char c_id[3];
+			Country_ID c_id; // [3]
 			for(uint i=0; i<size; ++i)
 			{
 				if(_x >= x)
@@ -464,8 +497,9 @@ void ECBMap::Init()
 	/* Vérification finale des données */
 	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
 	   !min || !max || map_players.size() != max || min > max || !date)
-		throw ECExcept(VIName(begin_money) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min) VIName(max)
-		               VIName(map_players.size()) VIName(map_countries.size()) VPName(date), "Fichier incorrect !");
+		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
+		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date) VIName(nb_soldats),
+		               "Fichier incorrect !");
 
 	/* On vérifie si il y a bien une ville par country */
 	for(std::vector<ECBCountry*>::iterator it= map_countries.begin(); it != map_countries.end(); ++it)
@@ -485,8 +519,25 @@ void ECBMap::Init()
 	initialised = true;
 }
 
+void ECBMap::ClearMapPlayers()
+{
+	for(BMapPlayersVector::iterator it=map_players.begin(); it != map_players.end();)
+		if(!(*it)->Player())
+		{
+			BCountriesVector countries = (*it)->Countries();
+			for(BCountriesVector::iterator cvi = countries.begin(); cvi != countries.end(); ++cvi)
+				(*cvi)->SetOwner(NULL);
+			delete *it;
+			it = map_players.erase(it);
+		}
+		else ++it;
+}
+
 ECBMap::~ECBMap()
 {
+	/* Libération des entitées */
+	entities.Clear(USE_DELETE);
+
 	/* Libération des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;

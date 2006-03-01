@@ -22,9 +22,9 @@
 #ifndef ECLIB_MAP_H
 #define ECLIB_MAP_H
 
-#include "Channels.h"
 #include <string>
 #include <vector>
+#include "Outils.h"
 
 /** @page Map_structure Map structure
  *
@@ -39,45 +39,21 @@
  * </pre>
  */
 
+class ECBPlayer;
+class ECBChannel;
 class ECBMap;
-
 class ECBMapPlayer;
-
 class ECBCountry;
-
 class ECBCase;
+class ECBEntity;
 
-/********************************************************************************************
- *                               ECBEntity                                                  *
- ********************************************************************************************/
-class ECBEntity
-{
-/* Constructor/Destructor */
-public:
-
-	ECBEntity(ECBPlayer* _owner, ECBCase* _case)
-		: owner(_owner), acase(_case)
-	{}
-
-	virtual ~ECBEntity() {}
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-	void SetCase(ECBCase* _c) { acase = _c; }
-	ECBCase* Case() { return acase; }
-
-	ECBPlayer* Owner() { return owner; }
-
-/* Variables protégées */
-protected:
-	ECBPlayer* owner;
-
-	ECBCase *acase;
-};
+typedef std::vector<ECBCase*> BCaseVector;
+typedef std::vector<ECBMapPlayer*> BMapPlayersVector;
+typedef std::vector<ECBCountry*> BCountriesVector;
+typedef std::vector<ECBEntity*> BEntityVector;
+typedef char Entity_ID[3];
+typedef char Country_ID[3];
+typedef char MapPlayer_ID;
 
 /********************************************************************************************
  *                               ECBDate                                                    *
@@ -157,6 +133,8 @@ public:
 	ECBCountry* Country() { return map_country; }
 	void SetCountry(ECBCountry *mc) { map_country = mc; }
 
+	ECList<ECBEntity*> *Entities() { return &entities; }
+
 	uint X() { return x; }
 	uint Y() { return y; }
 
@@ -172,6 +150,8 @@ protected:
 	char type_id;
 
 	ECBCountry *map_country;
+
+	ECList<ECBEntity*> entities;
 };
 
 /** This class is a derived class from ECBCase whose is a city */
@@ -247,6 +227,47 @@ protected:
 };
 
 /********************************************************************************************
+ *                               ECBEntity                                                  *
+ ********************************************************************************************/
+class ECBEntity
+{
+/* Constructor/Destructor */
+public:
+
+	enum e_type {
+		E_ARMEE,
+		E_END
+	};
+
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type);
+
+	virtual ~ECBEntity() {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	void SetCase(ECBCase* _c) { acase = _c; }
+	ECBCase* Case() { return acase; }
+
+	void SetOwner(ECBPlayer* _p) { owner = _p; }
+	ECBPlayer* Owner() { return owner; }
+
+	const char* ID() { return name; }
+
+	e_type Type() { return type; }
+
+/* Variables protégées */
+protected:
+	ECBPlayer* owner;
+	Entity_ID name;
+	ECBCase *acase;
+	e_type type;
+};
+
+/********************************************************************************************
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 /** This class is a country in the map
@@ -258,7 +279,7 @@ class ECBCountry
 /* Constructeur/Destructeur */
 public:
 
-	ECBCountry(char _ident[3]);
+	ECBCountry(const Country_ID ident);
 
 /* Attributs */
 public:
@@ -279,7 +300,7 @@ public:
 protected:
 	std::vector<ECBCase*> cases;
 	ECBMapPlayer *owner;
-	char ident[3];
+	Country_ID ident;
 };
 
 /********************************************************************************************
@@ -301,7 +322,7 @@ public:
 /* Attributs */
 public:
 
-	char ID() { return id; }
+	MapPlayer_ID ID() { return id; }
 
 	uint Num() { return num; }
 
@@ -317,16 +338,12 @@ public:
 
 /* Variables privées */
 public:
-	char id;
+	MapPlayer_ID id;
 	uint num;
 	ECBPlayer* pl;
 	std::vector<ECBCountry*> countries;
 
 };
-
-typedef std::vector<ECBCase*> BCaseVector;
-typedef std::vector<ECBMapPlayer*> BMapPlayersVector;
-typedef std::vector<ECBCountry*> BCountriesVector;
 
 /********************************************************************************************
  *                               ECBMap                                                     *
@@ -355,6 +372,9 @@ public:
 /* Methodes */
 public:
 
+	/** Delete all MapPlayers who are not used by a real player */
+	void ClearMapPlayers();
+
 /* Attributs */
 public:
 
@@ -363,7 +383,7 @@ public:
 
 	/** Channel linked to map */
 	ECBChannel* Channel() { return chan; }
-	
+
 	uint BeginMoney() { return begin_money; }          /**< All players have this money when they begin the game */
 	uint CityMoney() { return city_money; }            /**< This is money that is given to players at each turn by cities */
 	uint MinPlayers() { return min; }                  /**< Min players to play */
@@ -372,12 +392,16 @@ public:
 	uint NbMapPlayers() { return map_players.size(); } /**< Number of map players */
 	uint NbCountries() { return map_countries.size(); }/**< Number of map countries */
 
+	uint NbSoldats() { return nb_soldats; }            /**< This is the number of initiales soldats in armies */
+
 	uint Width() { return x; }
 	uint Height() { return y; }
 
 	BCaseVector Cases() { return map; }                             /**< Return case vector */
 	BMapPlayersVector MapPlayers() { return map_players; }          /**< Return map players vector */
 	BCountriesVector Countries() { return map_countries; }          /**< Return countries vector */
+
+	ECList<ECBEntity*> *Entities() { return &entities; }
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
@@ -403,6 +427,8 @@ protected:
 
 	std::vector<std::string> map_infos;
 
+	ECList<ECBEntity*> entities;
+
 	ECBDate* date;
 
 	ECBChannel *chan;
@@ -410,6 +436,7 @@ protected:
 
 	uint x, y;
 	uint min, max;
+	uint nb_soldats;
 
 	uint begin_money, city_money;
 
