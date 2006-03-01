@@ -57,6 +57,7 @@ void EuroConqApp::LoadGame(EChannel* chan)
 		(*mpi)->SetPlayer(*pli);
 		(*pli)->SetMapPlayer(*mpi);
 	}
+	chan->Map()->ClearMapPlayers();
 	chan->Map()->CreatePreview(300,300);
 
 	try
@@ -118,6 +119,8 @@ TLoadingForm::TLoadingForm(EChannel* ch)
 	Preview = AddComponent(new TImage(450, 150));
 	Preview->SetImage(ch->Map()->Preview(), false);
 
+	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), black_color, &app.Font()->normal));
+
 	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", black_color, &app.Font()->large));
 
 	SetBackground(Resources::Menuscreen());
@@ -126,6 +129,7 @@ TLoadingForm::TLoadingForm(EChannel* ch)
 TLoadingForm::~TLoadingForm()
 {
 	delete Loading;
+	delete Date;
 	delete Preview;
 	delete MapTitle;
 	delete Players;

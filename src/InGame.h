@@ -50,6 +50,7 @@ public:
 
 	TLabel*      MapTitle;
 	TImage*      Preview;
+	TLabel*      Date;
 	TMemo*       MapInformations;
 
 /* Evenements */
