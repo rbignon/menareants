@@ -24,17 +24,18 @@
 
 #include <string>
 #include <vector>
+#include "Outils.h"
+
+class ECBChannel;
+class ECBMap;
+class ECBMapPlayer;
+class ECBEntity;
+
+typedef std::vector<ECBEntity*> BEntityVector;
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
-
-class ECBChannel;
-
-class ECBMap;
-
-class ECBMapPlayer;
-
 /** Base class of Player/
  * There are informations about a player whose are used by server and client.
  *
@@ -91,6 +92,8 @@ public:
 	ECBMapPlayer* MapPlayer() { return mp; }
 	void SetMapPlayer(ECBMapPlayer* _mp) { mp = _mp; }
 
+	ECList<ECBEntity*> *Entities() { return &entities; }
+
 /* Variables privées */
 protected:
 	ECBChannel *chan;
@@ -101,6 +104,7 @@ protected:
 	uint money;
 	ECBMapPlayer* mp;
 	bool ready;
+	ECList<ECBEntity*> entities;
 };
 typedef std::vector<ECBPlayer*> BPlayerVector;
 

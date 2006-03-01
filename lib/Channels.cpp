@@ -93,7 +93,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 		if (*it == pl)
 		{
 			if(use_delete)
-			delete pl;
+				delete pl;
 			it = players.erase(it);
 			return true;
 		}
