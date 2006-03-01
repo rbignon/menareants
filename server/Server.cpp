@@ -63,6 +63,11 @@ const char* msgTab[] = {
      "EOMAP",                               /* EOMAP - Fin de la liste des maps */
      "SMAP %s",                             /* SMAP - Envoie une ligne d'une map */
      "EOSMAP",                              /* EOSMAP - Fin de l'envoie d'une map */
+
+     ":%s!%s ARM%s",                        /* ARM - Envoie des infos sur une armée.
+                                             *       C'est normal qu'il n'y ait pas d'espace après ARM.
+                                             *       Utiliser la fonction EChannel::SendArm().
+                                             */
      0
 };
 

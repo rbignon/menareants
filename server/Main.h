@@ -73,6 +73,8 @@ public:
 		SENDMAP,      /**< SMAP */
 		ENDOFSMAP,    /**< EOSMAP */
 
+		ARM,          /**< ARM */
+
 		NONE
 	};
 
