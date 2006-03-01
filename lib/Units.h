@@ -32,6 +32,9 @@ class ECBArmee : virtual public ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
+	ECBArmee(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
+		: ECBEntity(_name, _owner, _case, E_ARMEE), nb(_nb)
+	{}
 
 /* Methodes */
 public:
@@ -39,9 +42,12 @@ public:
 /* Attributs */
 public:
 
+	/** Return the number of soldats in the army */
+	uint Nb() { return nb; }
+
 /* Variables privées */
 protected:
-
+	uint nb;
 };
 
 #endif /* ECLIB_UNITS_H */
