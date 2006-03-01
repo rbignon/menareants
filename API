@@ -59,11 +59,11 @@ Sommaire:
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
-              GO!                               :lance la partie (mise en SENDING, voir 6. Etats d'une partie)
-              :<nick>!<arm> ARM <nom> [+<nb>]   :montre le changement d'une armée
+              GO!                               :fin de l'envoie des infos, demande un READY des joueurs pour commencer
+                                                 la partie.
+              :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [><pos>]
                           [<[pos]] [-] [.]
-              :<nick>!<arm> ATQ <nick>!<arm>    :request une attaque (confirmation attendue)
               :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
                       OWN <nick>!<arm> <f1>
                       [<f2> ...]
@@ -83,7 +83,7 @@ Sommaire:
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
       Voici la liste :
         Mode pour le chan:
-         +l <limite>         :paramètre la limite
+         +l <limite>         :paramètre la limite (serveur -> user uniquement)
          +o <user>           :met op un user
          +m <map>            :définie la map du jeu
          +W                  :pré-partie (WAITING)
