@@ -3,12 +3,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--organisation des classes "Entity" pour une gestion correct de la hierarchie dans la map
--client: faire les dérivées des classes "Entity" pour arriver au graphique
--client: faire faire les images des cases et unités !!
--server: création des unités/tout ça et les envoyer au client.
+-server: finir le mode SENDING
 
 * Urgent
+-client: faire les dérivées des classes "Entity" pour arriver au graphique
+-client: faire faire les images des cases et unités !!
 -faire les dérivées d'ECBCase.
 
 * Bof

@@ -1,3 +1,28 @@
+2005-03-01  Romain Bignon <progs@headfucking.net>
+
+	* API: Commande ARM
+
+	* lib/Outils.h (ECList): Liste.
+
+	* lib/Map.h: Rajout des entités, et de leur liste dans la map.
+	Rajout du nombre de soldats dans les premières armées.
+	Rajout de typedef pour les IDs (char ou char[3]).
+
+	* lib/Channels.h: Rajout de la liste des entitées d'un player.
+
+	* lib/Units.h (ECBArmee): Armée de base dérivée de ECBEntity.
+
+	* server/Channels.cpp: - Envoie lors du mode SENDING des armées de chaques villes
+	- Réorganisation de la propagation des modes plus simple et plus performante.
+	- Fonction EChannel::SendArm() pour envoyer un message ARM par rapport aux différents arguments de la fonction.
+	- Fonction EChannel::FindEntityName() pour trouver un nom d'entité non pris dans une liste.
+
+	* server/Main.h, server/Server.cpp: Commande ARM.
+
+	* server/maps: Mise à jour des maps.
+
+	* src/InGame.cpp: Affichage de la date dans le Loading.
+
 2005-02-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Outils.cpp (duration): Fonction pour avoir le temps d'une heure unix.
