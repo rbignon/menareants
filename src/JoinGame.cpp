@@ -730,7 +730,6 @@ void EuroConqApp::ListGames()
 			{
 				delete ListGameForm;
 				ListGameForm = 0;
-				printf("dddd\n");
 				return; /* On a attendu pour rien */
 			}
 			refresh = false;
@@ -758,7 +757,7 @@ void EuroConqApp::ListGames()
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
 						{
-							TMessageBox mb(150,300,
+							TMessageBox mb(250,300,
 							                  std::string("Impossible de joindre le salon " +
 							                  ListGameForm->GList->ReadValue(
 							                           ListGameForm->GList->GetSelectedItem())
@@ -774,7 +773,7 @@ void EuroConqApp::ListGames()
 					{
 						if(!GameInfos(NULL))
 						{
-							TMessageBox mb(150,300,
+							TMessageBox mb(250,300,
 												std::string("Impossible de créer le salon.\n"
 												"Son nom est peut être déjà utilisé.").c_str(),
 												BT_OK, ListGameForm);

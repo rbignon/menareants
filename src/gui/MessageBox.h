@@ -33,14 +33,10 @@
 /** This is a complex box to show a message and some buttons */
 class TMessageBox
 {
-/**< Yes button */
-#define BT_YES		0x001
-/**< No button */
-#define BT_NO		0x002
-/**< OK button */
-#define BT_OK		0x004
-/**< Cancel button */
-#define BT_CANCEL	0x008
+#define BT_YES		0x001               /**< Yes button */
+#define BT_NO		0x002               /**< No button */
+#define BT_OK		0x004               /**< OK button */
+#define BT_CANCEL	0x008               /**< Cancel button */
 
 /* Constructeur/Deconstructeur */
 public:

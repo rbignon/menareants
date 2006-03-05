@@ -162,7 +162,7 @@ void EuroConqApp::request_game()
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
 
-		WAIT_EVENT_T((client && client->IsConnected()), i, 15);
+		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 5);
 
 		if(!client || !client->IsConnected())
 		{
@@ -171,7 +171,7 @@ void EuroConqApp::request_game()
 				msg = "Connexion impossible";
 			else
 				msg = "Connexion impossible :\n" + client->CantConnect();
-			TMessageBox mb(100,200, msg.c_str(), BT_OK, NULL);
+			TMessageBox mb(300,200, msg.c_str(), BT_OK, NULL);
 			mb.SetBackGround(Resources::Titlescreen());
 			mb.Show();
 			if(client)
@@ -223,7 +223,7 @@ void EuroConqApp::request_game()
 						{
 							if(!GameInfos(NULL))
 							{
-								TMessageBox mb(150,300,
+								TMessageBox mb(250,300,
 												std::string("Impossible de créer le salon.\n"
 												"Son nom est peut être déjà utilisé.").c_str(),
 												BT_OK, ConnectedForm);
@@ -242,7 +242,7 @@ void EuroConqApp::request_game()
 			{
 				eob = true;
 
-				TMessageBox mb(100,200, "Vous avez ete deconnecte.", BT_OK, NULL);
+				TMessageBox mb(300,200, "Vous avez été déconnecté.", BT_OK, NULL);
 				mb.SetBackGround(Resources::Titlescreen());
 				mb.Show();
 			}

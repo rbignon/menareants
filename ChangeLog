@@ -1,3 +1,7 @@
+2005-03-04  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/MessageBox: Correction du bug de dimentionnement horizontale.
+
 2005-03-01  Romain Bignon <progs@headfucking.net>
 
 	* API: Commande ARM

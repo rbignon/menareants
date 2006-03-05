@@ -11,7 +11,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -faire les dérivées d'ECBCase.
 
 * Bof
--client: Vérifier la taille des TMessageBox qui ne se met pas forcément bien (trop petite ou trop grande).
 -server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
 
 * Objectif actuel

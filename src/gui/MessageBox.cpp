@@ -85,7 +85,7 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 	uint vert = y;
 
 	for (uint i=0; i < message.size(); i++, vert += height_string)
-		app.Font()->normal.WriteLeft(x+30, vert, message[i], black_color);
+		app.Font()->normal.WriteLeft(x+25, vert, message[i], black_color);
 
 	vert += 20;
 
@@ -113,7 +113,7 @@ void TMessageBox::SetText(const char* _s)
 			i=0;
 
 			h += height_string;
-			uint yw = app.Font()->normal.GetWidth(s);
+			uint yw = app.Font()->normal.GetWidth(s) + 50;
 			if(w < yw) w = yw;
 
 			if(*_s == '\n')
@@ -140,7 +140,7 @@ void TMessageBox::SetText(const char* _s)
 			if(tmph < ButtonList[i].h) tmph = ButtonList[i].h;
 		}
 
-	if(w < (tmpw + 20)) w = tmpw + 20;
+	if(w < (tmpw-x + 20)) w = tmpw - x + 20;
 	h += tmph + 5;
 
 	SDL_Rect r_back = {0,0,w,h};
