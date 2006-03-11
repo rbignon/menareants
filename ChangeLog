@@ -1,5 +1,17 @@
 2005-03-11  Romain Bignon <progs@headfucking.net>
 
+	* lib/Map.h: RemoveLast().
+
+	* lib/Units.cpp: Union.
+
+	* server/Channels.cpp, server/InGame.cpp: Premier support de l'animation.
+
+	* server/Map.cpp: Fonctions pour ajouter ou supprimer une entity de tous les endroits où il faut.
+
+	* server/Server.cpp: Ne s'arrete plus sur les messages vides.
+
+2005-03-11  Romain Bignon <progs@headfucking.net>
+
 	* server/Channels.cpp (SendArm): Fonction pour envoyer un message ARM.
 	- Envoie de l'argent, des unités crées au début de la partie.
 
