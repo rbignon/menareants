@@ -25,6 +25,8 @@
 #include "tools/Font.h"
 #include "Debug.h"
 #include "gui/ColorEdit.h"
+#include "Map.h"
+#include "Channels.h"
 
 ECMap::ECMap(std::vector<std::string> _map_file)
 	: ECBMap(_map_file)

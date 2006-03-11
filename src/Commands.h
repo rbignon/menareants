@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 #include "Sockets.h"
-#include "Channels.h"
 
 class EC_Client;
 
