@@ -136,6 +136,8 @@ char *ECServer::rpl(ECServer::msg t)
 
 int TClient::parsemsg()
 {
+	if(RecvBuf[0] == '\0') return 0;
+
 	char s[MAXBUFFER + 20], cmdname[COMLEN+1];
 	std::string buf(RecvBuf);
 	unsigned int i, j, len = buf.length();
