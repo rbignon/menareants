@@ -28,13 +28,15 @@
  *                               ECBCaserne                                                 *
  ********************************************************************************************/
 /** This is a caserne */
-class ECBCaserne : virtual public ECBEntity
+class ECBCaserne : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
 /* Methodes */
 public:
+
+	virtual ECBCase* Move(uint x, uint y) { return 0; }
 
 /* Attributs */
 public:
@@ -48,13 +50,15 @@ protected:
  *                               ECBPort                                                    *
  ********************************************************************************************/
 /** This is a port for boats */
-class ECBPort : virtual public ECBEntity
+class ECBPort : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
 /* Methodes */
 public:
+
+	virtual ECBCase* Move(uint x, uint y) { return 0; }
 
 /* Attributs */
 public:
