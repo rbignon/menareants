@@ -263,13 +263,16 @@ public:
 
 	virtual void CreateLast() = 0;
 
-	/** This function remove entity from case where it is and add it
-	 *  it the new case.
+	virtual void Union(ECBEntity*) = 0;
+
+	/** This function remove entity from case where it is and add it in the new case.
+	* It changes pointer \a acase to \a new_case too.
 	 * @param new_case this is the new case where we send our entity
-	 * @param last_case this is the last case where our entity is from. If there
-	 *                  is nothing here, it will take "acase"
 	 */
-	void ChangeCase(ECBCase* new_case, ECBCase* last_case = 0);
+	void ChangeCase(ECBCase* new_case);
+
+	/** Use this function when an entity have played. */
+	virtual void Played();
 
 /* Attributs */
 public:
@@ -294,7 +297,7 @@ public:
 
 	/** Return last entity */
 	ECBEntity* Last() { return last; }
-	void RemoveLast() { MyFree(last); }
+	virtual void RemoveLast();
 
 	uint MyStep() { return myStep; }
 	void SetMyStep(uint s) { myStep = s; }
@@ -425,6 +428,9 @@ public:
 	/** Delete all MapPlayers who are not used by a real player */
 	void ClearMapPlayers();
 
+	/** Reload */
+	void Reload();
+
 /* Attributs */
 public:
 
@@ -493,6 +499,8 @@ protected:
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
 
 	void Init();      /**< Initialisation, called by constructors */
+
+	void Destruct();  /**< Free of memory */
 
 	/** This function have to be redefined by client to set attributs of images in case */
 	virtual void SetCaseAttr(ECBCase*, char) {}

@@ -149,13 +149,28 @@ ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e
 	restStep = Step;
 }
 
-void ECBEntity::ChangeCase(ECBCase* new_case, ECBCase* last_case)
+void ECBEntity::Played()
 {
-	assert(new_case && (acase || last_case));
+	restStep = myStep;
+	RemoveLast();
+}
 
-	if(!last_case) last_case = acase;
-	last_case->Entities()->Remove(this);
+void ECBEntity::RemoveLast()
+{
+	if(!last) return;
+
+	last->RemoveLast();
+	last->Case()->Entities()->Remove(last);
+	MyFree(last);
+}
+
+void ECBEntity::ChangeCase(ECBCase* new_case)
+{
+	assert(new_case && acase);
+
+	acase->Entities()->Remove(this);
 	new_case->Entities()->Add(this);
+	acase = new_case;
 }
 
 /********************************************************************************************
@@ -549,7 +564,14 @@ void ECBMap::ClearMapPlayers()
 		else ++it;
 }
 
-ECBMap::~ECBMap()
+void ECBMap::Reload()
+{
+	/* On libère tout ce qui est ouvert pour tout recharger à partir des lignes */
+	Destruct();
+	Init();
+}
+
+void ECBMap::Destruct()
 {
 	/* Libération des entitées */
 	entities.Clear(USE_DELETE);
@@ -567,6 +589,11 @@ ECBMap::~ECBMap()
 		delete *it;
 
 	delete date;
+}
+
+ECBMap::~ECBMap()
+{
+	Destruct();
 }
 
 ECBCase* ECBMap::operator() (uint _x, uint _y) const
