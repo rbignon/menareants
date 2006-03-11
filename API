@@ -33,7 +33,6 @@ Sommaire:
          - En cours de jeu
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [><pos>] [*[pos]]
-                  [<[pos]]
 
       b) Serveur -> Client
          - Général
@@ -59,11 +58,9 @@ Sommaire:
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
-              GO!                               :fin de l'envoie des infos, demande un READY des joueurs pour commencer
-                                                 la partie.
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [><pos>]
-                          [<[pos]] [-] [.]
+                          [<] [-] [.]
               :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
                       OWN <nick>!<arm> <f1>
                       [<f2> ...]
@@ -72,12 +69,12 @@ Sommaire:
       Les commandes de positions nécessitent des arguments de la forme suivante :
          +<nb>       :ajoute des unités (donne le nombre final)
          %<type>     :définit le type de l'armée
-         /<nb>:<pos> :divise l'armée en une autre armée en indiquant sa position
+         /<nb>       :divise l'armée en une autre armée en indiquant sa position
          ><pos>      :change la position
          *[pos]      :attaque envisagée (et sans position: accepte un combat)
-         <[pos]      :retour
-         -           :suppression de l'armée  } application encore indéfinie
-         .           :lock                    |
+         <           :retour
+         -           :suppression de l'armée
+         .           :lock                    } application encore indéfinie
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
@@ -94,6 +91,7 @@ Sommaire:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position
          +!                  :le joueur est READY
+         +$                  :l'argent du joueur (serveur -> user uniquement)
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible

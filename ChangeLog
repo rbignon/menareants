@@ -1,3 +1,26 @@
+2005-03-11  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (SendArm): Fonction pour envoyer un message ARM.
+	- Envoie de l'argent, des unités crées au début de la partie.
+
+	* server/Main.h, server/Commands.h, server/InGame.cpp (ARMCommand): Commande ARM
+
+	* server/Map.h (ECEvent): Support des evenements.
+
+	* server/Server.cpp: Commande ARM, et vérifie bien les flags des commandes.
+
+	* server/Units.h: Conforme aux définitions de ses ancetres.
+
+	* src/Sockets.cpp: Variable "error" pour éviter d'attendre quand il y a eu une erreur à la connexion.
+
+	* src/JoinGame.cpp: Support du mode +$
+
+	* lib/Outils.h (ECList): Mise à jour.
+
+	* lib/Map.h: Modifs importantes dans plusieurs classes.
+
+	* lib/Units.cpp (ECArmy): Implémentation de fonctions élémentaires (mouvement, attaque, retour, etc).
+
 2005-03-04  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/MessageBox: Correction du bug de dimentionnement horizontale.

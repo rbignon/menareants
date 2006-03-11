@@ -3,6 +3,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-server/InGame.cpp: Ligne en bleu, voir pour un meilleur arrangement
 -server: finir le mode SENDING
 
 * Urgent
