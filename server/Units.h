@@ -22,8 +22,25 @@
 #ifndef ECD_UNITS_H
 #define ECD_UNITS_H
 
+#include "server/Map.h"
 #include "lib/Units.h"
 
-typedef ECBArmee   ECArmee;
+class ECArmy : public ECEntity, public ECBArmy
+{
+/* Constructeur/Destructeur */
+public:
+	ECArmy(const Entity_ID _name, ECBPlayer* _owner, ECase* _case, uint _nb)
+		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, _nb)
+	{}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables protégées */
+protected:
+};
 
 #endif /* ECD_UNITS_H */
