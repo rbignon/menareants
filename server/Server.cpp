@@ -64,7 +64,7 @@ const char* msgTab[] = {
      "SMAP %s",                             /* SMAP - Envoie une ligne d'une map */
      "EOSMAP",                              /* EOSMAP - Fin de l'envoie d'une map */
 
-     ":%s!%s ARM%s",                        /* ARM - Envoie des infos sur une armée.
+     ":%s ARM%s",                           /* ARM - Envoie des infos sur une armée.
                                              *       C'est normal qu'il n'y ait pas d'espace après ARM.
                                              *       Utiliser la fonction EChannel::SendArm().
                                              */
@@ -167,6 +167,10 @@ int TClient::parsemsg()
 	if(!cmd || (parv.size()-1) < cmd->args)
 		return vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VSName(RecvBuf)
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
+
+	if(cmd->flags && !(flag & cmd->flags))
+		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriés.", VSName(GetNick())
+		                         VSName(RecvBuf) VPName(cmd));
 
 	try
 	{
