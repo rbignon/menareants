@@ -290,6 +290,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						GameInfosForm->PretButton->SetEnabled(!add);
 				}
 				break;
+			case '$':
+				if(j>=parv.size()) Debug(W_DESYNCH|W_SEND, "SET %c$: sans argent", add ? '+' : '-');
+				else me->Player()->SetMoney(StrToTyp<int>(parv[j++]));
+				break;
 			case 'o':
 			{
 				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET %co: sans nick", add ? '+' : '-'); break; }
