@@ -134,11 +134,16 @@ public:
 	EventVector Events() const { return map_events; }
 	void AddEvent(ECEvent* _e) { _e->Priority() ? map_events.push_front(_e) : map_events.push_back(_e); }
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete);
-	EventVector::iterator RemoveEvent(EventVector::iterator _e, bool use_delete);
+
+/* Méthodes */
+public:
+
+	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
+	void AddAnEntity(ECBEntity*);
 
 /* Variables privées */
 protected:
-	EventVector map_events;
+ EventVector map_events;
 };
 
 extern bool LoadMaps();

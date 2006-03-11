@@ -22,6 +22,7 @@
 #include "Defines.h"
 #include "Map.h"
 #include "Debug.h"
+#include "Channels.h"
 #include <fstream>
 
 MapVector MapList;
@@ -60,12 +61,26 @@ bool LoadMaps()
 	return true;
 }
 
-EventVector::iterator ECMap::RemoveEvent(EventVector::iterator _e, bool use_delete)
+void ECMap::AddAnEntity(ECBEntity* e)
 {
+	if(!e) return;
+
+	e->Case()->Entities()->Add(e);
+	if(e->Case()->Country()->Owner())
+		e->Case()->Country()->Owner()->Player()->Entities()->Add(e);
+	entities.Add(e);
+}
+
+void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
+{
+	if(!e) return;
+
+	e->Case()->Entities()->Remove(e);
+	entities.Remove(e);
+	if(e->Owner())
+		e->Owner()->Entities()->Remove(e);
 	if(use_delete)
-		delete *_e;
-	_e = map_events.erase(_e);
-	return _e;
+		delete e;
 }
 
 EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
