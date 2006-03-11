@@ -20,13 +20,17 @@
  */
 
 #include "Units.h"
+#include "Debug.h"
 
 bool ECBArmy::Return()
 {
 	if(!last) return false;
 
-	last->Case()->Entities()->Remove(last);
+	acase->Entities()->Remove(this);
 	acase = last->Case();
+	acase->Entities()->Add(this);
+
+	last->Case()->Entities()->Remove(last);
 	MyFree(last);
 
 	return true;
@@ -39,7 +43,7 @@ void ECBArmy::CreateLast()
 		ECBEntity* e = new ECBArmy(*this);
 		e->SetLock();
 		SetLast(e);
-		acase->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */
+		e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */
 	}
 }
 
@@ -63,7 +67,6 @@ ECBCase* ECBArmy::Attaq(uint mx, uint my)
 		ECBCase* last_c = acase;
 		CreateLast();
 		ChangeCase(c); /* On se positionne sur la nouvelle case */
-		acase = c;
 		return last_c;
 	}
 	return 0;
@@ -107,7 +110,20 @@ ECBCase* ECBArmy::Move(uint mx, uint my)
 	ECBCase* last_c = acase;
 	CreateLast();
 	ChangeCase(c);
-	acase = c;
 
 	return last_c;
+}
+
+void ECBArmy::Union(ECBEntity* entity)
+{
+	if(entity->Type() != Type()) throw ECExcept(VIName(entity->Type()) VIName(Type()), "Union avec un autre type !?");
+
+	/* On lock car il fait maintenant partie intégrale de (*enti) */
+	entity->SetLock();
+	/* On créé un clone de l'ancienne entité. */
+	CreateLast();
+	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
+	SetNb(Nb() + entity->Nb());
+	/* Enfin on défini le nombre de pas restants */
+	SetRestStep(entity->RestStep());
 }

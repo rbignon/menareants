@@ -68,6 +68,8 @@ public:
 
 	virtual void CreateLast();
 
+	virtual void Union(ECBEntity*);
+
 /* Attributs */
 public:
 
