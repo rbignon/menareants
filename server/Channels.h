@@ -59,6 +59,10 @@ public:
 /* Attributs */
 public:
 
+	virtual void UpMoney(int m) { SetMoney(money + m); }
+	virtual void DownMoney(int m) { SetMoney(money - m); }
+	void SetMoney(int m);
+
 	/** Return player's channel */
 	EChannel *Channel() { return (EChannel*)chan; }
 
@@ -68,9 +72,13 @@ public:
 	/** Get client's nickname */
 	virtual const char* GetNick() const;
 
+	uint UpMoney() { return up_money; }
+	void SetUpMoney(uint u) { up_money = u; }
+
 /* Variables privées */
 protected:
 	TClient *client;
+	uint up_money;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 
@@ -118,14 +126,38 @@ public:
 	/** This function will return a name doesn't used before */
 	const char* FindEntityName(ECPlayer*);
 
-	#define ARM_MOVE      0x01
-	#define ARM_RETURN    0x02
-	#define ARM_ATTAQ     0x04
-	#define ARM_REMOVE    0x08
-	#define ARM_LOCK      0x10
-	#define ARM_TYPE      0x20
-	#define ARM_NUMBER    0x40
-	void SendArm(ECEntity*, uint flag, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
+	/** This function send to players a ARM reply.
+	 * @param cl put a TClient here if you want to send message only to *one* client.
+	 * @param et this is a vector of entities who do an event.
+	 * @param flags there is a lot of flags. You can show them at the end of comment.
+	 * @param x an horizontal position. (optional)
+	 * @param y a vertical position. (optional)
+	 * @param nb number of units in entity. (optional)
+	 * @param type type of entity. (optional)
+	 *
+	 * Note that params \a x \a y \a nb and \a type aren't necessary and you have to put
+	 * a good flag to call them in function.
+	 *
+	 * <pre>
+	 * Flags: (Definition in Map.h before ECEvent)
+	 * ARM_MOVE      0x001
+	 * ARM_SPLIT     0x002
+	 * ARM_ATTAQ     0x004
+	 * ARM_REMOVE    0x008
+	 * ARM_LOCK      0x010
+	 * ARM_TYPE      0x020
+	 * ARM_NUMBER    0x040
+	 * ARM_RETURN    0x080
+	 * ARM_HIDE      0x100  (if you want to hide informations to players who haven't any entity in \a et list)
+	 * ARM_RECURSE   0x200  (NEVER CALL IT)
+	 * ARM_UNION     (ARM_MOVE|ARM_NUMBER)
+	 * ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+	 * </pre>
+	 */
+	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
+
+	/** \see SendArm() */
+	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
 	
 /* Attributs */
 public:

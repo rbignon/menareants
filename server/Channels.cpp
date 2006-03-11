@@ -63,9 +63,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	bool add = true;
 	bool ready = false;
-	const short NEEDREADY_ALL = 1;
-	const short NEEDREADY_ME = 2;
-	short need_ready = 0;
+	const char NEEDREADY_ALL = 1;
+	const char NEEDREADY_ME = 2;
+	char need_ready = 0;
 	uint j = 2;
 	ECMap* map = 0;
 	uint mapi = 0;
@@ -75,9 +75,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	for(uint i=0; i<parv[1].size(); i++)
 	{
-		short changed = 0;
-		const short YES_NOPARAMS = 1;
-		const short YES_WITHPARAM = 2;
+		char changed = 0;
+		const char YES_NOPARAMS = 1;
+		const char YES_WITHPARAM = 2;
 		switch(parv[1][i])
 		{
 			case '+': add = true; break;
@@ -337,7 +337,6 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 					sender->Channel()->SetState(EChannel::SENDING);
 					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
-					sender->Channel()->NeedReady();
 					app.NBwchan--;
 					app.NBachan++;
 
@@ -348,18 +347,29 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							const char *e_name = sender->Channel()->FindEntityName((*cai)->Country()->Owner() ?
 							                     dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player()) : 0);
 
-							/* TODO: supprimer quelque part !!!!!!! */
-							ECArmee *armee = new ECArmee(e_name,
+							ECArmy *armee = new ECArmy(e_name,
 							                               (*cai)->Country()->Owner() ?
 							                               (*cai)->Country()->Owner()->Player() : 0,
 							                               *cai, sender->Channel()->Map()->NbSoldats());
+
 							(*cai)->Entities()->Add(armee);
 							if((*cai)->Country()->Owner())
 								(*cai)->Country()->Owner()->Player()->Entities()->Add(armee);
 							sender->Channel()->Map()->Entities()->Add(armee);
-							sender->Channel()->SendArm(armee, ARM_MOVE|ARM_TYPE|ARM_NUMBER, (*cai)->X(), (*cai)->Y(),
-							                           armee->Nb(), armee->Type());
+							sender->Channel()->SendArm(NULL, armee, ARM_CREATE|ARM_HIDE, (*cai)->X(), (*cai)->Y(),
+							                                        armee->Nb(), armee->Type());
+
+							/* On défini le nombre d'argent par tour */
+							if(!(*cai)->Country()->Owner()) continue;
+							dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->SetUpMoney(
+							          dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->UpMoney() +
+							          (sender->Channel()->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
 						}
+					for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
+						dynamic_cast<ECPlayer*>(*it)->SetMoney(sender->Channel()->Map()->BeginMoney()),
+						Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->UpMoney());
+
+					sender->Channel()->NeedReady();
 
 					break;
 				}
@@ -506,7 +516,7 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
  ********************************************************************************************/
 
 ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner, bool _op)
-	: ECBPlayer(_chan, _owner, _op), client(_client)
+	: ECBPlayer(_chan, _owner, _op), client(_client), up_money(0)
 {
 
 }
@@ -524,6 +534,12 @@ void ECPlayer::NeedReady()
 	Channel()->send_modes(this, "-!");
 
 	return;
+}
+
+void ECPlayer::SetMoney(int m)
+{
+	money = m;
+	client->sendrpl(app.rpl(ECServer::SET), GetNick(), std::string("+$ " + TypToStr(m)).c_str());
 }
 
 /********************************************************************************************
@@ -556,40 +572,101 @@ EChannel::~EChannel()
 	}
 }
 
-/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
-void EChannel::SendArm(ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
+void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
 {
+	std::vector<ECEntity*> plv;
+	plv.push_back(et);
+
+	SendArm(cl, plv, flag, x, y, nb, type);
+}
+
+/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
+void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type)
+{
+	if(!flag || flag == ARM_RECURSE || flag == ARM_HIDE) return;
+
 	std::string to_send;
+	std::string senders;
 
 	if(flag & ARM_ATTAQ)
 		to_send += " *" + TypToStr(x) + "," + TypToStr(y);
-	if(flag & ARM_MOVE)
+	else if(flag & ARM_MOVE)
 		to_send += " >" + TypToStr(x) + "," + TypToStr(y);
-	if(flag & ARM_RETURN)
-		to_send += " <" + TypToStr(x) + "," + TypToStr(y);
+	else if(flag & ARM_RETURN)
+		to_send += " <";
+
 	if(flag & ARM_TYPE)
 		to_send += " %" + TypToStr(type);
 	if(flag & ARM_NUMBER)
-		to_send += " +" + TypToStr(nb);
+	{
+		if(flag & ARM_HIDE)
+			to_send += " +";
+		else
+			to_send += " +" + TypToStr(nb);
+	}
 	if(flag & ARM_LOCK)
 		to_send += " .";
 	if(flag & ARM_REMOVE)
 		to_send += " -";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
-	sendto_players(NULL, app.rpl(ECServer::ARM), et->Owner() ? et->Owner()->GetNick() : "*",
-	                                             et->ID(),
-                                                 to_send.c_str());
+	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)
+	{
+		if(!senders.empty()) senders += ",";
+		senders += (*it)->Owner() ? (*it)->Owner()->GetNick() : "*";
+		senders += "!";
+		senders += (*it)->ID();
+	}
+
+	if(cl)
+		cl->sendrpl(app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+	else
+	{
+		if(flag & ARM_RECURSE)
+		{
+			/* On envoie à chaques joueurs qui a envoyé un element sa version non cachée */
+			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
+			{
+				std::vector<ECEntity*>::iterator it;
+				for(it = et.begin(); it != et.end() && (*it)->Owner() != *pl; ++it);
+				if(it != et.end())
+					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
+					                                                                        to_send.c_str());
+			}
+		}
+		else if(flag & ARM_HIDE)
+		{
+			/* On envoie la version cachée uniquement aux joueurs qui n'ont pas d'entity incluses dans cette action. */
+			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
+			{
+				std::vector<ECEntity*>::iterator it;
+				for(it = et.begin(); it != et.end() && (*it)->Owner() != *pl; ++it);
+				if(it == et.end())
+					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
+					                                                                        to_send.c_str());
+			}
+			flag &= ~ARM_HIDE;
+			SendArm(cl, et, flag|ARM_RECURSE, x, y, nb, type);
+		}
+		else
+			sendto_players(NULL, app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+	}
 }
 
 const char* EChannel::FindEntityName(ECPlayer* pl)
 {
-	static char num[3];
+	static Entity_ID num;
+
+	if(sizeof num != 3)
+		throw ECExcept(VIName(sizeof num), "La taille de Entity_ID n'est pas celle supportée par cette fonction");
+
 	num[0] = 'A';
 	num[1] = 'A';
 	num[2] = '\0';
+
 	bool unchecked = false;
 	BEntityVector ev = pl ? pl->Entities()->List() : map->Entities()->List();
+
 	do
 	{
 		BEntityVector::iterator it;
