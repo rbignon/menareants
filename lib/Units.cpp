@@ -20,3 +20,94 @@
  */
 
 #include "Units.h"
+
+bool ECBArmy::Return()
+{
+	if(!last) return false;
+
+	last->Case()->Entities()->Remove(last);
+	acase = last->Case();
+	MyFree(last);
+
+	return true;
+}
+
+void ECBArmy::CreateLast()
+{
+	if(!last)
+	{
+		ECBEntity* e = new ECBArmy(*this);
+		e->SetLock();
+		SetLast(e);
+		acase->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */
+	}
+}
+
+ECBCase* ECBArmy::Attaq(uint mx, uint my)
+{
+	ECBCase* c;
+	if((c = CheckMove(mx, my)))
+	{
+		if(c->Entities()->empty())
+			return 0;
+
+		std::vector<ECBEntity*> ents = c->Entities()->List();
+		std::vector<ECBEntity*>::iterator enti;
+		for(enti = ents.begin(); enti != ents.end() &&
+		          (!CanAttaq(*enti) || (*enti)->Owner() == owner);
+		    ++enti);
+
+		if(enti == ents.end())
+			return 0;
+
+		ECBCase* last_c = acase;
+		CreateLast();
+		ChangeCase(c); /* On se positionne sur la nouvelle case */
+		acase = c;
+		return last_c;
+	}
+	return 0;
+}
+
+ECBCase* ECBArmy::CheckMove(uint mx, uint my)
+{
+	if(mx == acase->X() && my == acase->Y() ||
+	   mx >= acase->Map()->Width() || my >= acase->Map()->Height() ||
+	   int(acase->X() - mx) > (int)restStep || int(mx - acase->X()) > (int)restStep ||
+	   int(acase->Y() - my) > (int)restStep || int(my - acase->Y()) > (int)restStep)
+		return 0;
+
+	uint nb_mov = 0;
+	ECBCase *c = acase;
+
+	for(;c->X() != mx && (c->Flags() & (C_VILLE|C_TERRE|C_PONT)) && nb_mov < restStep;nb_mov++)
+		if(c->X() < mx) c = c->MoveRight();
+		else c = c->MoveLeft();
+	if(c->X() != mx) return 0;
+
+	for(;c->Y() != my && (c->Flags() & (C_VILLE|C_TERRE|C_PONT)) && nb_mov < restStep;nb_mov++)
+		if(c->Y() < my) c = c->MoveDown();
+		else c = c->MoveUp();
+	if(c->Y() != my) return 0;
+
+	if(last && c == last->Case()) return 0;
+	if(!(c->Flags() & (C_VILLE|C_TERRE|C_PONT))) return 0;
+
+	restStep -= nb_mov;
+
+	return c;
+}
+
+ECBCase* ECBArmy::Move(uint mx, uint my)
+{
+	ECBCase *c;
+
+	if(!(c = CheckMove(mx, my))) return 0;
+
+	ECBCase* last_c = acase;
+	CreateLast();
+	ChangeCase(c);
+	acase = c;
+
+	return last_c;
+}

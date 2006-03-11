@@ -25,29 +25,55 @@
 #include "Map.h"
 
 /********************************************************************************************
- *                               ECBArmee                                                   *
+ *                               ECBArmy                                                   *
  ********************************************************************************************/
 /** This is a simple army */
-class ECBArmee : virtual public ECBEntity
+#define ARMY_STEP         2
+class ECBArmy : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
-	ECBArmee(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
-		: ECBEntity(_name, _owner, _case, E_ARMEE), nb(_nb)
+
+	ECBArmy(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
+		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, _nb)
 	{}
+
+	ECBArmy() {}
+
+	virtual ~ECBArmy() {}
+
+/* Constantes */
+public:
+
+	bool CanAttaq(ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_ARMY:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 /* Methodes */
 public:
 
+	/** @return last case */
+	virtual ECBCase* Move(uint x, uint y);
+
+	virtual bool Return();
+
+	virtual ECBCase* Attaq(uint x, uint y);
+
+	virtual void CreateLast();
+
 /* Attributs */
 public:
 
-	/** Return the number of soldats in the army */
-	uint Nb() { return nb; }
-
 /* Variables privées */
 protected:
-	uint nb;
+	ECBCase* CheckMove(uint mx, uint my);
 };
 
 #endif /* ECLIB_UNITS_H */
