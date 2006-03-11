@@ -88,6 +88,9 @@ protected:
 /* Constructeur/Destructeur */
 public:
 
+	typedef typename std::vector<T>::size_type   size_type;
+	typedef typename std::vector<T>::iterator    iterator;
+
 /* Methodes */
 public:
 
@@ -95,8 +98,7 @@ public:
 
 	bool Remove(T p, bool use_delete = false)
 	{
-		/*for(std::vector<T*>::iterator it = list.begin(); it != list.end(); )*/
-		for(typename std::vector<T>::iterator it = list.begin(); it != list.end();)
+		for(iterator it = list.begin(); it != list.end();)
 		{
 			if (*it == p)
 			{
@@ -113,7 +115,7 @@ public:
 
 	void Clear(bool use_delete = false)
 	{
-		for(typename std::vector<T>::iterator it = list.begin(); it != list.end();)
+		for(iterator it = list.begin(); it != list.end();)
 		{
 			if(use_delete)
 				delete (*it);
@@ -121,11 +123,29 @@ public:
 		}
 	}
 
+	T Find(const char* id)
+	{
+		for(iterator it = list.begin(); it != list.end();++it)
+			if(!strcmp((*it)->ID(), id))
+				return *it;
+		return 0;
+	}
+
+	uint Available()
+	{
+		uint i = 0;
+		for(iterator it = list.begin(); it != list.end(); ++it)
+			if(!(*it)->Locked()) ++i;
+		return i;
+	}
+
 	std::vector<T> List() { return list; }
 
 /* Attributs */
 public:
-
+	size_type size() { return list.size(); }
+	bool empty() { return list.empty(); }
+	
 };
 
 #endif
