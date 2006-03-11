@@ -59,3 +59,28 @@ bool LoadMaps()
 	Debug(W_ECHO|W_NOLOG, "%d maps loaded !", nbmaps);
 	return true;
 }
+
+EventVector::iterator ECMap::RemoveEvent(EventVector::iterator _e, bool use_delete)
+{
+	if(use_delete)
+		delete *_e;
+	_e = map_events.erase(_e);
+	return _e;
+}
+
+EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
+{
+		for(EventVector::iterator it = map_events.begin(); it != map_events.end();)
+		{
+			if (*it == p)
+			{
+				if(use_delete)
+					delete p;
+				it = map_events.erase(it);
+				return it;
+			}
+			else
+				++it;
+		}
+		return 0;
+}
