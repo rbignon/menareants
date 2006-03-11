@@ -58,8 +58,9 @@ public:
 	ECBChannel *Channel() { return chan; }
 
 	uint Money() { return money; }                     /**< This is player's money. */
-	void UpMoney(uint m) { money += m; }               /**< Add some money. */
-	void DownMoney(uint m) { money -= m; }             /**< Remove some money */
+	virtual void UpMoney(int m) { money += m; }        /**< Add some money. */
+	virtual void DownMoney(int m) { money -= m; }      /**< Remove some money. */
+	virtual void SetMoney(int m) { money = m; }        /**< Set money. */
 
 	bool IsOwner() const { return owner; }             /**< Is he the owner of game ? */
 	void SetOwner(bool o = true) { owner = o; }        /**< Set a player as the owner */
@@ -101,7 +102,7 @@ protected:
 	bool op;
 	unsigned int position;
 	unsigned int color;
-	uint money;
+	int money;
 	ECBMapPlayer* mp;
 	bool ready;
 	ECList<ECBEntity*> entities;

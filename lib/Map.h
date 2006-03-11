@@ -138,6 +138,11 @@ public:
 	uint X() { return x; }
 	uint Y() { return y; }
 
+	ECBCase* MoveUp(uint c = 1);
+	ECBCase* MoveDown(uint c = 1);
+	ECBCase* MoveLeft(uint c = 1);
+	ECBCase* MoveRight(uint c = 1);
+
 /* Variables privées */
 protected:
 
@@ -235,16 +240,36 @@ class ECBEntity
 public:
 
 	enum e_type {
-		E_ARMEE,
+		E_ARMY,
 		E_END
 	};
 
-	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type);
+	ECBEntity() {}
+
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint nb = 0);
 
 	virtual ~ECBEntity() {}
 
 /* Methodes */
 public:
+
+	virtual ECBCase* Attaq(uint x, uint y) = 0;
+
+	virtual ECBCase* Move(uint x, uint y) = 0;
+
+	virtual bool Return() = 0;
+
+	virtual bool CanAttaq(ECBEntity* e) = 0;
+
+	virtual void CreateLast() = 0;
+
+	/** This function remove entity from case where it is and add it
+	 *  it the new case.
+	 * @param new_case this is the new case where we send our entity
+	 * @param last_case this is the last case where our entity is from. If there
+	 *                  is nothing here, it will take "acase"
+	 */
+	void ChangeCase(ECBCase* new_case, ECBCase* last_case = 0);
 
 /* Attributs */
 public:
@@ -259,12 +284,37 @@ public:
 
 	e_type Type() { return type; }
 
+	/** Return the number of soldats in the army */
+	uint Nb() { return nb; }
+	void SetNb(uint n) { nb = n; }
+
+	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
+	bool Locked() { return lock; }
+	void SetLock(bool l = true) { lock = l; }
+
+	/** Return last entity */
+	ECBEntity* Last() { return last; }
+	void RemoveLast() { MyFree(last); }
+
+	uint MyStep() { return myStep; }
+	void SetMyStep(uint s) { myStep = s; }
+	uint RestStep() { return restStep; }
+	void SetRestStep(uint s) { restStep = s; }
+	
+
 /* Variables protégées */
 protected:
 	ECBPlayer* owner;
 	Entity_ID name;
 	ECBCase *acase;
 	e_type type;
+	ECBEntity* last;
+	uint nb;
+	bool lock;
+	uint myStep;
+	uint restStep;
+
+	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
 };
 
 /********************************************************************************************
@@ -384,8 +434,8 @@ public:
 	/** Channel linked to map */
 	ECBChannel* Channel() { return chan; }
 
-	uint BeginMoney() { return begin_money; }          /**< All players have this money when they begin the game */
-	uint CityMoney() { return city_money; }            /**< This is money that is given to players at each turn by cities */
+	int BeginMoney() { return begin_money; }           /**< All players have this money when they begin the game */
+	int CityMoney() { return city_money; }             ///< This is money that is given to players at each turn by cities
 	uint MinPlayers() { return min; }                  /**< Min players to play */
 	uint MaxPlayers() { return max; }                  /**< Max players to play */
 	uint NbCases() { return map.size(); }              /**< Number of cases */

@@ -130,16 +130,32 @@ ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
 	map_country = 0;
 }
 
+ECBCase* ECBCase::MoveUp(uint c)    { return y >= c ? (*map)(x, y-c) : this; }
+ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y+c) : this; }
+ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : this; }
+ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : this; }
+
 /********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
 
-ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type)
-	: owner(_owner), acase(_case), type(_type)
+ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _nb)
+	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
 	strcpy(name, _name);
+	myStep = Step;
+	restStep = Step;
+}
+
+void ECBEntity::ChangeCase(ECBCase* new_case, ECBCase* last_case)
+{
+	assert(new_case && (acase || last_case));
+
+	if(!last_case) last_case = acase;
+	last_case->Entities()->Remove(this);
+	new_case->Entities()->Add(this);
 }
 
 /********************************************************************************************
@@ -496,7 +512,7 @@ void ECBMap::Init()
 	}
 	/* Vérification finale des données */
 	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
-	   !min || !max || map_players.size() != max || min > max || !date)
+	   !min || !max || map_players.size() != max || min > max || !date || begin_money < 0 || city_money < 0)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
 		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date) VIName(nb_soldats),
 		               "Fichier incorrect !");
