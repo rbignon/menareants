@@ -22,6 +22,7 @@
 #include "Main.h"
 #include "Commands.h"
 #include "Outils.h"
+#include "Channels.h"
 #include "Debug.h"
 
 #include <arpa/inet.h>
@@ -237,6 +238,7 @@ void EC_Client::Init()
 	want_disconnect = false;
 	lapp = NULL;
 	pl = NULL;
+	error = false;
 	FD_ZERO(&global_fd_set);
 
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
@@ -292,7 +294,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{
-		cantconnect = strerror(errno);
+		SetCantConnect(strerror(errno));
 		return false;
 	}
 

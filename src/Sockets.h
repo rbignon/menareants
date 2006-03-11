@@ -26,9 +26,7 @@
 #include "Commands.h"
 
 class EC_ACommand;
-
 class EuroConqApp;
-
 class ECPlayer;
 
 class EC_Client
@@ -85,7 +83,9 @@ public:
 	void ClrPlayer() { pl = NULL; }
 
 	std::string CantConnect() const { return cantconnect; }
-	void SetCantConnect(std::string _msg) { cantconnect = _msg; }
+	void SetCantConnect(std::string _msg) { cantconnect = _msg; error = true; }
+
+	bool Error() { return error; }
 
 protected:
 	int sock;
@@ -103,6 +103,7 @@ protected:
 	std::string nick;
 
 	std::string cantconnect;
+	bool error;
 
 	ECPlayer *pl;
 
