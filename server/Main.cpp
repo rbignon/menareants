@@ -116,8 +116,9 @@ try {
 	Commands.push_back(new BYECommand("BYE",	0,			0));
 	Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
 	Commands.push_back(new ERRCommand("ERR",	0,			1));
-	Commands.push_back(new SETCommand("SET",	0,			1));
-	Commands.push_back(new STATCommand("STAT",	0,			0));
+	Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
+	Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
+	Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	0));
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);
