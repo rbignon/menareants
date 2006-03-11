@@ -72,13 +72,13 @@ public:
 	/** Get client's nickname */
 	virtual const char* GetNick() const;
 
-	uint UpMoney() { return up_money; }
-	void SetUpMoney(uint u) { up_money = u; }
+	uint TurnMoney() { return turn_money; }
+	void SetTurnMoney(uint u) { turn_money = u; }
 
 /* Variables privées */
 protected:
 	TClient *client;
-	uint up_money;
+	uint turn_money;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 
@@ -127,7 +127,7 @@ public:
 	const char* FindEntityName(ECPlayer*);
 
 	/** This function send to players a ARM reply.
-	 * @param cl put a TClient here if you want to send message only to *one* client.
+	 * @param cl put a TClient here if you want to send message only to  a list of clients.
 	 * @param et this is a vector of entities who do an event.
 	 * @param flags there is a lot of flags. You can show them at the end of comment.
 	 * @param x an horizontal position. (optional)
@@ -154,10 +154,17 @@ public:
 	 * ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 	 * </pre>
 	 */
-	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
+	void SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
+	             uint x=0, uint y=0, uint nb=0, uint type=0);
 
 	/** \see SendArm() */
+	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0);
 	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
+	void SendArm(std::vector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0);
+
+	void InitAnims();
+
+	void NextAnim();
 	
 /* Attributs */
 public:
@@ -176,6 +183,8 @@ public:
 	 * SET message to set their position to 0 !
 	 */
 	virtual void SetLimite(unsigned int l);
+
+	ECMap *Map() const { return (ECMap*)map; }
 	
 /* Variables privées */
 protected:

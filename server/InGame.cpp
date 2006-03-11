@@ -25,6 +25,52 @@
 #include "Outils.h"
 #include "Commands.h"
 
+void EChannel::InitAnims()
+{
+
+}
+
+#define SHOW_EVENT(x) ((x) & ARM_NUMBER ? "number" : (x) & ARM_MOVE ? "move" : (x) & ARM_ATTAQ ? "attaq" : "no")
+void EChannel::NextAnim()
+{
+	if(!map) throw ECExcept(VPName(map), "Pas de map");
+	if(state != EChannel::ANIMING)
+		throw ECExcept(VIName(state), "Appel hors du mode +A(niming)");
+
+	if(dynamic_cast<ECMap*>(map)->Events().empty()) return;
+
+	ECEvent* event = (*dynamic_cast<ECMap*>(map)->Events().begin());
+
+	if(!event)
+		throw ECExcept(VPName(event) VIName(dynamic_cast<ECMap*>(map)->Events().size()), "Evenement vide");
+
+	switch(event->Flags())
+	{
+		case ARM_ATTAQ:
+			Debug(W_DEBUG, "C'est une attaque");
+			SendArm(NULL, event->Entities()->List(), ARM_ATTAQ, event->Case()->X(), event->Case()->Y());
+			break;
+		case ARM_UNION:
+			SendArm(NULL, event->Entities()->List(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+			break;
+		case ARM_MOVE:
+			SendArm(NULL, event->Entities()->List(), ARM_MOVE, event->Case()->X(), event->Case()->Y());
+			break;
+		default: break;
+	}
+	Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT(event->Flags()), event->Case()->X(),
+									event->Case()->Y());
+	std::vector<ECEntity*> ents = event->Entities()->List();
+	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	{
+		if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
+		else
+			Debug(W_DEBUG, "      - Member %s!%s (%s)", (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*",
+							(*enti)->ID(), SHOW_EVENT((*enti)->EventType()));
+	}
+	dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
+}
+
 /** Modification of an army.
  *
  * Syntax: ARM nom [+nb] [%type] [/nb] [>pos] [*pos]
@@ -32,8 +78,11 @@
 int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(!cl->Player() || cl->Player()->Channel()->State() != EChannel::PLAYING)
-		return vDebug(W_DESYNCH, "Le joueur n'est pas dans une partie, ou alors la partie n'est pas +P(laying)",
+		return vDebug(W_DESYNCH, "ARM: Le joueur n'est pas dans une partie, ou alors la partie n'est pas +P(laying)",
 		              VPName(cl->Player()));
+
+	if(cl->Player()->Ready())
+		return Debug(W_DESYNCH, "ARM: Le joueur essaye de ARM alors qu'il est pret !");
 
 	EChannel* chan = cl->Player()->Channel();
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
@@ -90,6 +139,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	if(flags)
 	{
+		std::vector<TClient*> recvers;
 		if(flags & ARM_ATTAQ || flags & ARM_MOVE)
 		{
 			entity->SetEvent(flags);
@@ -110,35 +160,30 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						std::vector<ECEntity*> ents = (*evti)->Entities()->List();
 						for(ECList<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 						{
+							if((*enti)->Locked()) continue;
+
 							if((*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
-							{ /* On va scinder les deux armées */
-								if((*evti)->Flags() & ARM_ATTAQ)
-								{ /* L'evenement actuel est une attaque, donc on se propose de créer un
+							{ /* On va unir les deux armées */
+								if((*evti)->Flags() == ARM_UNION)
+								{ /* Cet evenement est une union donc on se propose de rajouter
+								   * notre unité ici.
+								   */
+									(*enti)->SetEvent(ARM_UNION);
+									(*evti)->Entities()->Add(entity);
+									Debug(W_DEBUG, "On Union dans cet event");
+								}
+								else
+								{ /* L'evenement actuel n'est pas une union, donc on se propose de créer un
 								   * nouvel evenement rien que pour ça
 								   */
 									ECEvent* event = new ECEvent(ARM_UNION, entity->Case());
 									event->Entities()->Add(entity);
-									event->Entities()->Add(*enti);
 									map->AddEvent(event);
 									event_found = true;
-									Debug(W_DEBUG, "On Split dans un nouvel event");
+									Debug(W_DEBUG, "On Union dans un nouvel event");
 								}
-								else
-								{ /* Cet evenement n'est pas une attaque donc on se propose de rajouter
-								   * notre unité ici et de modifier le type de l'evenement
-								   */
-									(*enti)->SetEvent((*enti)->EventType() | ARM_UNION);
-									(*evti)->Entities()->Add(entity);
-									Debug(W_DEBUG, "On Split dans cet event");
-								}
-								/* On lock car il fait maintenant partie intégrale de (*enti) */
-								entity->SetLock();
-								/* On créé un clone de l'ancienne entité. */
-								(*enti)->CreateLast();
-								/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
-								(*enti)->SetNb((*enti)->Nb() + entity->Nb());
-								/* Enfin on défini le nombre de pas restants */
-								(*enti)->SetRestStep(entity->RestStep());
+
+								(*enti)->Union(entity); /* entity union dans *enti */
 								event_found = true;
 							}
 							/* Si jamais une des deux entités peut attaquer l'autre, on dit que c'est bien
@@ -148,8 +193,12 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								attaq = true;
 						}
 					}
-					if(attaq)
+					if(attaq && !event_found && ((*evti)->Flags() == ARM_MOVE || (*evti)->Flags() & ARM_ATTAQ))
 					{ /* Ce mouvement se transforme en attaque */
+						std::vector<ECEntity*> etlist = (*evti)->Entities()->List();
+						for(ECList<ECEntity*>::iterator it = etlist.begin(); it != etlist.end(); ++it)
+							if((*it) && !(*it)->Locked() && (*it)->Owner())
+								recvers.push_back(dynamic_cast<ECPlayer*>((*it)->Owner())->Client());
 						(*evti)->Entities()->Add(entity);
 						(*evti)->SetFlags(ARM_ATTAQ);
 						event_found = true;
@@ -163,7 +212,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					 * point d'origine...
 					 */
 					std::vector<ECEntity*> ents = (*evti)->Entities()->List();
-					bool no_body = true;
+					bool no_body = true, someone_want_attaq = false;
 					for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end();)
 						if((*enti)->EventType() & ARM_ATTAQ)
 						{
@@ -188,8 +237,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						else
 						{
 							if((*enti)->EventType()) no_body = false;
+							if((*enti)->EventType() & ARM_ATTAQ) someone_want_attaq = true;
 							++enti;
 						}
+					if(!someone_want_attaq)
+						(*evti)->SetFlags(ARM_MOVE);
 					if((*evti)->Entities()->empty() || no_body)
 					{
 						EventVector::iterator it = evti;
@@ -220,21 +272,20 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					{
 						if((*enti)->Locked() || *enti == entity) continue;
 						if((*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
+							// On va faire une union, pas besoin de le mettre dans l'evenement
 							my_friend = dynamic_cast<ECEntity*>(*enti);
-						event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
+						else
+						{
+							if((*enti)->Owner())
+								recvers.push_back(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client());
+							event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
+						}
 					}
 					if(my_friend)
 					{ /* Sur la case il y a des unités amies */
 						event->SetFlags(ARM_UNION);
-						Debug(W_DEBUG, "On Split dans cet event (%d)", map->Events().size());
-						/* On lock car il fait maintenant partie intégrale de (*enti) */
-						entity->SetLock();
-						/* On créé un clone de l'ancienne entité. */
-						my_friend->CreateLast();
-						/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
-						my_friend->SetNb(my_friend->Nb() + entity->Nb());
-						/* Enfin on défini le nombre de pas restants */
-						my_friend->SetRestStep(entity->RestStep());
+						Debug(W_DEBUG, "On Union dans cet event (%d)", map->Events().size());
+						my_friend->Union(entity); /* entity s'unie dans my_friend */
 					}
 				}
 				event->Entities()->Add(entity);
@@ -242,23 +293,35 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 		}
 
-		chan->SendArm(cl, entity, flags, x, y, nb, type);
+		recvers.push_back(cl);
+		chan->SendArm(recvers, entity, flags, x, y, nb, type);
 	}
-	Debug(W_DEBUG, "sended");
 	EventVector evts = map->Events();
-#define SHOW_EVENT(x) ((x) & ARM_NUMBER ? "number" : (x) & ARM_MOVE ? "move" : (x) & ARM_ATTAQ ? "attaq" : "no")
+
 	for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
 	{
-		Debug(W_DEBUG, "event - %s %d,%d\n", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
+		Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
 		                             (*evti)->Case()->Y());
 		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
 		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p\n", *enti);
+			if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
 			else
-			  Debug(W_DEBUG, "      - Member %s!%s (%s)\n", (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*",
+			  Debug(W_DEBUG, "      - Member %s!%s (%s)", (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*",
 			                  (*enti)->ID(), SHOW_EVENT((*enti)->EventType()));
 		}
+	}
+
+	BCaseVector casv = map->Cases();
+	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
+	{
+		if((*casi)->Entities()->empty()) continue;
+		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
+		Debug(W_DEBUG, "%d,%d:", (*casi)->X(), (*casi)->Y());
+		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+			Debug(W_DEBUG, "    [%c] %s!%s (%d)", (*enti)->Locked() ? '*' : ' ',
+			                            (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*", (*enti)->ID(),
+			                            (*enti)->Nb());
 	}
 	return 0;
 }

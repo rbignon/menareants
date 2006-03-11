@@ -352,22 +352,19 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							                               (*cai)->Country()->Owner()->Player() : 0,
 							                               *cai, sender->Channel()->Map()->NbSoldats());
 
-							(*cai)->Entities()->Add(armee);
-							if((*cai)->Country()->Owner())
-								(*cai)->Country()->Owner()->Player()->Entities()->Add(armee);
-							sender->Channel()->Map()->Entities()->Add(armee);
+							sender->Channel()->Map()->AddAnEntity(armee);
 							sender->Channel()->SendArm(NULL, armee, ARM_CREATE|ARM_HIDE, (*cai)->X(), (*cai)->Y(),
 							                                        armee->Nb(), armee->Type());
 
 							/* On défini le nombre d'argent par tour */
 							if(!(*cai)->Country()->Owner()) continue;
-							dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->SetUpMoney(
-							          dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->UpMoney() +
+							dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->SetTurnMoney(
+							          dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->TurnMoney() +
 							          (sender->Channel()->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
 						}
 					for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
 						dynamic_cast<ECPlayer*>(*it)->SetMoney(sender->Channel()->Map()->BeginMoney()),
-						Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->UpMoney());
+						Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->TurnMoney());
 
 					sender->Channel()->NeedReady();
 
@@ -381,9 +378,58 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					sender->Channel()->SetState(EChannel::PLAYING);
 					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-S+P");
 					sender->Channel()->NeedReady();
-				}
-				default: /** @todo Non supportés encore: +AP */
 					break;
+				}
+				case EChannel::PLAYING:
+				{
+					/* Tous les clients ont fini de jouer. On va maintenant passer aux animations */
+					sender->Channel()->SetState(EChannel::ANIMING);
+					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-P+A");
+
+					/* Initialisation des animations */
+					sender->Channel()->InitAnims();
+
+					/* Envoie la prochaine animation programmée */
+					sender->Channel()->NextAnim();
+
+					sender->Channel()->NeedReady();
+					break;
+				}
+				case EChannel::ANIMING:
+				{
+					/* Suite des animations, ou alors si il n'y en a plus on repasse en playing */
+					if(dynamic_cast<ECMap*>(sender->Channel()->Map())->Events().empty())
+					{ /* Plus d'animations */
+						sender->Channel()->SetState(EChannel::PLAYING);
+						sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
+
+						/* On attribut à tout le monde son argent */
+						for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
+							dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
+						std::vector<ECBEntity*> entv = sender->Channel()->Map()->Entities()->List();
+						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
+						{
+							Debug(W_DEBUG, "-   [%c] %s!%s (%d)", (*enti)->Locked() ? '*' : ' ',
+			                            (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*", (*enti)->ID(),
+			                            (*enti)->Nb());
+							(*enti)->Played(); /* On marque bien qu'il a été joué */
+							if((*enti)->Locked())
+							{
+								ECList<ECBEntity*>::iterator it = enti;
+								++it;
+								sender->Channel()->Map()->RemoveAnEntity(*enti, USE_DELETE);
+								enti = it;
+							}
+							else
+								++enti;
+						}
+						sender->Channel()->Map()->NextDay();
+					}
+					else
+						sender->Channel()->NextAnim();
+					sender->Channel()->NeedReady();
+					break;
+				}
 			}
 		}
 	}
@@ -516,7 +562,7 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
  ********************************************************************************************/
 
 ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner, bool _op)
-	: ECBPlayer(_chan, _owner, _op), client(_client), up_money(0)
+	: ECBPlayer(_chan, _owner, _op), client(_client), turn_money(0)
 {
 
 }
@@ -572,18 +618,42 @@ EChannel::~EChannel()
 	}
 }
 
-void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
+void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type)
+{
+	std::vector<TClient*> clv;
+	if(cl)
+		clv.push_back(cl);
+
+	SendArm(clv, et, flag, x, y, nb, type);
+}
+
+void EChannel::SendArm(std::vector<TClient*> cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
 {
 	std::vector<ECEntity*> plv;
-	plv.push_back(et);
+	if(et)
+		plv.push_back(et);
 
 	SendArm(cl, plv, flag, x, y, nb, type);
 }
 
-/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
-void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type)
+void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type)
 {
-	if(!flag || flag == ARM_RECURSE || flag == ARM_HIDE) return;
+	std::vector<ECEntity*> plv;
+	if(et)
+		plv.push_back(et);
+
+	std::vector<TClient*> clv;
+	if(cl)
+		clv.push_back(cl);
+
+	SendArm(clv, plv, flag, x, y, nb, type);
+}
+
+/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
+void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type)
+{
+	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE)))
+		return;
 
 	std::string to_send;
 	std::string senders;
@@ -618,8 +688,11 @@ void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x
 		senders += (*it)->ID();
 	}
 
-	if(cl)
-		cl->sendrpl(app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+	if(!cl.empty())
+	{
+		for(std::vector<TClient*>::iterator it = cl.begin(); it != cl.end(); ++it)
+			(*it)->sendrpl(app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+	}
 	else
 	{
 		if(flag & ARM_RECURSE)
@@ -706,10 +779,17 @@ void EChannel::SetMap(ECBMap *m)
 	 * :p SET +ml 0 5
 	 * </pre>
 	 */
-	map = m;
+
+	if(map) MyFree(map);
+
+	if(!m) return;
+
+	ECMap* _new_map = new ECMap(m->MapFile());
+
+	map = _new_map;
 
 	/* Envoie d'une map */
-	std::vector<std::string> map_file = m->MapFile();
+	std::vector<std::string> map_file = map->MapFile();
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 		sendto_players(NULL, app.rpl(ECServer::SENDMAP), FormatStr((*it).c_str()));
 	sendto_players(NULL, app.rpl(ECServer::ENDOFSMAP));
