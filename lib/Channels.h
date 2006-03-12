@@ -74,12 +74,7 @@ public:
 	bool SetPosition(unsigned int p);                  /**< Set position of player. */
 
 	/** Return color of player.
-	 * \note Les couleurs sont représentées par un énumérateur. Alors
-	 * il faut voir si le serveur en aurra quelque chose à foutre
-	 * ou pas, si oui on met l'énumérateur ici, sinon on le met
-	 * uniquement dans le client.
-	 *
-	 * \todo il faut mettre dans le client un tableau de couleurs SDL
+	 * \note Colors are an enumerator defined in Colors.h.
 	 */
 	unsigned int Color() const { return color; }
 	bool SetColor(unsigned int c);                      /**< Set color of player. */
