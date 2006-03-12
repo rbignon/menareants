@@ -84,7 +84,7 @@ class ECEvent
 public:
 
 	ECEvent(uint _f, ECase* _c = 0)
-		: acase(_c), flags(_f)
+		: acase(_c), flags(_f), nb(0), type(0)
 	{}
 
 /* Methodes */
@@ -104,10 +104,18 @@ public:
 
 	ECase* Case() const { return acase; }
 
+	void SetNb(uint n) { nb = n; }
+	uint Nb() { return nb; }
+
+	void SetType(uint t) { type = t; }
+	uint Type() { return type; }
+
 /* Variables privées */
 protected:
 	ECase* acase;
 	uint flags;
+	uint nb;
+	uint type;
 	ECList<ECEntity*> entities;
 };
 
