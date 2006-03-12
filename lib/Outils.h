@@ -131,6 +131,24 @@ public:
 		return 0;
 	}
 
+	uint Sames(T t)
+	{
+		uint i = 0;
+		for(iterator it = list.begin(); it != list.end(); ++it)
+			if(t != *it && !(*it)->Locked() && (*it)->Owner() == t->Owner() && (*it)->Type() == t->Type())
+				++i;
+		return i;
+	}
+
+	uint Enemies(T t)
+	{
+		uint i = 0;
+		for(iterator it = list.begin(); it != list.end(); ++it)
+			if(t != *it && !(*it)->Locked() && ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
+				++i;
+		return i;
+	}
+
 	uint Available()
 	{
 		uint i = 0;
