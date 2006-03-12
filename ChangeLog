@@ -1,3 +1,13 @@
+2005-03-12  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Gestion des créations et amélioration des animations.
+
+	* server/Map.h (ECEvent): Type et nombre.
+
+	* lib/Map.cpp (ECBEntity): Fonctions CanBeCreated(), CanCreate() et AddUnits()
+
+	* lib/Outils.h (ECList): Rajout des fonctions membres ECList::Enemies() et ECList::Sames()
+
 2005-03-11  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h: RemoveLast().
