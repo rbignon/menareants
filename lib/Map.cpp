@@ -164,6 +164,30 @@ void ECBEntity::RemoveLast()
 	MyFree(last);
 }
 
+void ECBEntity::AddUnits(uint u)
+{
+	CreateLast();
+	nb += u;
+}
+
+bool ECBEntity::CanBeCreated()
+{
+	assert(acase);
+
+	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
+	 * une case qui permet de créer une unité de ce type (donc ville etc)
+	 */
+	if(acase->Country()->Owner()->Player() == owner && acase->CanCreate(this))
+		return true;
+
+	std::vector<ECBEntity*> entv = acase->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+		if((*enti)->CanCreate(this))
+			return true;
+
+	return false;
+}
+
 void ECBEntity::ChangeCase(ECBCase* new_case)
 {
 	assert(new_case && acase);

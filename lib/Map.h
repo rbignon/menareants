@@ -56,6 +56,110 @@ typedef char Country_ID[3];
 typedef char MapPlayer_ID;
 
 /********************************************************************************************
+ *                               ECBEntity                                                  *
+ ********************************************************************************************/
+class ECBEntity
+{
+/* Constructor/Destructor */
+public:
+
+	enum e_type {
+		E_ARMY,
+		E_END
+	};
+
+	ECBEntity() {}
+
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint nb = 0);
+
+	virtual ~ECBEntity() {}
+
+/* Methodes */
+public:
+
+	/** Use this function when this entity wants to attaq someone */
+	virtual ECBCase* Attaq(uint x, uint y) = 0;
+
+	/** Use this function when this entity wants to move somewhere */
+	virtual ECBCase* Move(uint x, uint y) = 0;
+
+	/** Use this function to cancel an action of this entity */
+	virtual bool Return() = 0;
+
+	/** Use this function to know if this entity is able to attaq an other entity */
+	virtual bool CanAttaq(ECBEntity* e) = 0;
+
+	/** Use this function to create a last state of this entity (stocked in a variable) */
+	virtual void CreateLast() = 0;
+
+	/** Use this function to make an union with an other entity */
+	virtual void Union(ECBEntity*) = 0;
+
+	/** Use this function to know if this entity can create an other entity */
+	virtual bool CanCreate(ECBEntity*) = 0;
+
+	/** Use this function to know if this entity can be created */
+	virtual bool CanBeCreated();
+
+	/** Use this function to add some units in the entity */
+	virtual void AddUnits(uint units);
+
+	/** This function remove entity from case where it is and add it in the new case.
+	* It changes pointer \a acase to \a new_case too.
+	 * @param new_case this is the new case where we send our entity
+	 */
+	void ChangeCase(ECBCase* new_case);
+
+	/** Use this function when an entity have played. */
+	virtual void Played();
+
+/* Attributs */
+public:
+
+	void SetCase(ECBCase* _c) { acase = _c; }
+	ECBCase* Case() { return acase; }
+
+	void SetOwner(ECBPlayer* _p) { owner = _p; }
+	ECBPlayer* Owner() { return owner; }
+
+	const char* ID() { return name; }
+
+	e_type Type() { return type; }
+
+	/** Return the number of soldats in the army */
+	uint Nb() { return nb; }
+	void SetNb(uint n) { nb = n; }
+
+	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
+	bool Locked() { return lock; }
+	void SetLock(bool l = true) { lock = l; }
+
+	/** Return last entity */
+	ECBEntity* Last() { return last; }
+	virtual void RemoveLast();
+
+	uint MyStep() { return myStep; }
+	void SetMyStep(uint s) { myStep = s; }
+	uint RestStep() { return restStep; }
+	void SetRestStep(uint s) { restStep = s; }
+	
+
+/* Variables protégées */
+protected:
+	ECBPlayer* owner;
+	Entity_ID name;
+	ECBCase *acase;
+	e_type type;
+	ECBEntity* last;
+	uint nb;
+	bool lock;
+	uint myStep;
+	uint restStep;
+
+	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
+};
+
+/********************************************************************************************
  *                               ECBDate                                                    *
  ********************************************************************************************/
 
@@ -115,8 +219,12 @@ public:
 
 	ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
+	virtual ~ECBCase() {}
+
 /* Methodes */
 public:
+
+	virtual bool CanCreate(ECBEntity*) { return false; }
 
 /* Attributs */
 public:
@@ -168,6 +276,17 @@ public:
 
 /* Methodes */
 public:
+
+	virtual bool CanCreate(ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_ARMY:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 /* Attributs */
 public:
@@ -229,95 +348,6 @@ public:
 /* Variables privées */
 protected:
 
-};
-
-/********************************************************************************************
- *                               ECBEntity                                                  *
- ********************************************************************************************/
-class ECBEntity
-{
-/* Constructor/Destructor */
-public:
-
-	enum e_type {
-		E_ARMY,
-		E_END
-	};
-
-	ECBEntity() {}
-
-	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint nb = 0);
-
-	virtual ~ECBEntity() {}
-
-/* Methodes */
-public:
-
-	virtual ECBCase* Attaq(uint x, uint y) = 0;
-
-	virtual ECBCase* Move(uint x, uint y) = 0;
-
-	virtual bool Return() = 0;
-
-	virtual bool CanAttaq(ECBEntity* e) = 0;
-
-	virtual void CreateLast() = 0;
-
-	virtual void Union(ECBEntity*) = 0;
-
-	/** This function remove entity from case where it is and add it in the new case.
-	* It changes pointer \a acase to \a new_case too.
-	 * @param new_case this is the new case where we send our entity
-	 */
-	void ChangeCase(ECBCase* new_case);
-
-	/** Use this function when an entity have played. */
-	virtual void Played();
-
-/* Attributs */
-public:
-
-	void SetCase(ECBCase* _c) { acase = _c; }
-	ECBCase* Case() { return acase; }
-
-	void SetOwner(ECBPlayer* _p) { owner = _p; }
-	ECBPlayer* Owner() { return owner; }
-
-	const char* ID() { return name; }
-
-	e_type Type() { return type; }
-
-	/** Return the number of soldats in the army */
-	uint Nb() { return nb; }
-	void SetNb(uint n) { nb = n; }
-
-	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
-	bool Locked() { return lock; }
-	void SetLock(bool l = true) { lock = l; }
-
-	/** Return last entity */
-	ECBEntity* Last() { return last; }
-	virtual void RemoveLast();
-
-	uint MyStep() { return myStep; }
-	void SetMyStep(uint s) { myStep = s; }
-	uint RestStep() { return restStep; }
-	void SetRestStep(uint s) { restStep = s; }
-	
-
-/* Variables protégées */
-protected:
-	ECBPlayer* owner;
-	Entity_ID name;
-	ECBCase *acase;
-	e_type type;
-	ECBEntity* last;
-	uint nb;
-	bool lock;
-	uint myStep;
-	uint restStep;
-
-	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
 };
 
 /********************************************************************************************
