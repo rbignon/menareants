@@ -70,6 +70,8 @@ public:
 
 	virtual void Union(ECBEntity*);
 
+	virtual bool CanCreate(ECBEntity*) { return false; }
+
 /* Attributs */
 public:
 
