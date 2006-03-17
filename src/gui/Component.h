@@ -162,7 +162,7 @@ public:
 	/** Remove a component from list
 	 * \warning This will use \a delete on TComponent !!
 	 */
-	bool RemoveLine(TComponent *c);
+	bool RemoveLine(TComponent *c, bool use_delete = false);
 
 	/** Draw all components in list */
 	void Draw(uint souris_x, uint souris_y);

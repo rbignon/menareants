@@ -46,13 +46,15 @@ void TList::AddLine(TComponent *c)
 	c->Init();
 }
 
-bool TList::RemoveLine(TComponent *c)
+bool TList::RemoveLine(TComponent *c, bool use_delete)
 {
 	for (std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); )
 	{
 		if (*it == c)
 		{
 			h -= c->GetHeight();
+			if(use_delete)
+				delete c;
 			it = list.erase(it);
 			Rebuild(); /* Reconstruction */
 			return true;
