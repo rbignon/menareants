@@ -81,16 +81,22 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		else
 		{
 			EChannel *chan = me->Player()->Channel();
+			ECMap *map = 0;
 			try
 			{
-				chan->SetMap(new ECMap(GameInfosForm->RecvMap));
+				map = new ECMap(GameInfosForm->RecvMap);
+				map->Init();
+				map->CreatePreview();
 			}
 			catch(TECExcept &e)
 			{
+				delete map;
 				Debug(W_ERR, "Unable to load a map :");
 				vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+				GameInfosForm->RecvMap.clear();
 				return 0;
 			}
+			chan->SetMap(map);
 			GameInfosForm->MapTitle->SetCaption(chan->Map()->Name() + " (" + TypToStr(chan->Map()->MinPlayers()) +
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
@@ -531,9 +537,8 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->Players->Hide();
 				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
 				                             " quitte la partie", green_color);
-				for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
-				  it!=GameInfosForm->Players->GetList().end();
-				  ++it)
+				std::vector<TComponent*> plrs = GameInfosForm->Players->GetList();
+				for(std::vector<TComponent*>::iterator it=plrs.begin(); it!=plrs.end(); ++it)
 				{
 					TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 					if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -541,13 +546,32 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 					if(pline->Player() == (*playersi))
 					{
-						if(!GameInfosForm->Players->RemoveLine(*it))
+						if(!GameInfosForm->Players->RemoveLine(*it, USE_DELETE))
 							throw ECExcept(VPName(*it) VPName(*playersi), "Player-line introuvable");
 						GameInfosForm->RecalcMemo();
 						break;
 					}
 				}
 				GameInfosForm->Players->Show();
+			}
+			if(LoadingForm)
+			{
+				LoadingForm->Players->Hide();
+				std::vector<TComponent*> plrs = LoadingForm->Players->GetList();
+				for(std::vector<TComponent*>::iterator it=plrs.begin(); it!=plrs.end(); ++it)
+				{
+					TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
+					if(!pline) /* Ce n'est pas un TPlayerLine */
+						continue;
+
+					if(pline->Player() == (*playersi))
+					{
+						if(!LoadingForm->Players->RemoveLine(*it, USE_DELETE))
+							throw ECExcept(VPName(*it) VPName(*playersi), "Player-line introuvable");
+						break;
+					}
+				}
+				LoadingForm->Players->Show();
 			}
 			if(me->Player()->Channel()->RemovePlayer((*playersi), true))
 				playersi = players.erase(playersi);
@@ -561,7 +585,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-bool EuroConqApp::GameInfos(const char *cname)
+bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 {
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
@@ -572,7 +596,11 @@ bool EuroConqApp::GameInfos(const char *cname)
 	if(!cname)
 	{
 		create = true;
-		name = Menu::EnterString("Nom", "", false);
+		TMessageBox mb(250,300,
+						"Entrez le nom du salon à créer",
+						HAVE_EDIT|BT_OK, form);
+		if(mb.Show() == BT_OK)
+			name = mb.EditText();
 		if(name.empty()) return true;
 
 		cname = name.c_str();
@@ -586,7 +614,7 @@ bool EuroConqApp::GameInfos(const char *cname)
 	JOINED = false;
 	client->sendrpl(create ? client->rpl(EC_Client::CREATE) : client->rpl(EC_Client::JOIN), FormatStr(cname));
 
-	WAIT_EVENT_T(JOINED, i, 0.3);
+	WAIT_EVENT_T(JOINED, i, 0.1);
 	if(!JOINED)
 	{
 		MyFree(GameInfosForm);
@@ -775,7 +803,7 @@ void EuroConqApp::ListGames()
 						refresh = true;
 					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y))
 					{
-						if(!GameInfos(NULL))
+						if(!GameInfos(NULL, ListGameForm))
 						{
 							TMessageBox mb(250,300,
 												std::string("Impossible de créer le salon.\n"
@@ -814,15 +842,15 @@ void EuroConqApp::ListGames()
 TGameInfosForm::TGameInfosForm()
 	: TForm()
 {
-	Title = AddComponent(new TLabel(400,50,"Jeu", black_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(300,50,"Jeu", black_color, &app.Font()->big));
 
 	Chat = AddComponent(new TMemo(60,325,315,200,30));
 
 	SendMessage = AddComponent(new TEdit(60,530,315, MAXBUFFER-20));
-	PretButton = AddComponent(new TButtonText(600,400, 100,49, "Pret"));
+	PretButton = AddComponent(new TButtonText(600,400, 150,50, "Pret"));
 	PretButton->SetEnabled(false);
 
-	RetourButton = AddComponent(new TButtonText(600,450,100,49, "Retour"));
+	RetourButton = AddComponent(new TButtonText(600,450,150,50, "Retour"));
 
 	Players = AddComponent(new TList(60, 80));
 	Players->AddLine(new TPlayerLineHeader);
@@ -866,10 +894,10 @@ TListGameForm::TListGameForm()
 {
 	Title = AddComponent(new TLabel(300,150,"Liste des parties", black_color, &app.Font()->big));
 
-	JoinButton = AddComponent(new TButtonText(500,200,100,49, "Joindre"));
-	RefreshButton = AddComponent(new TButtonText(500,250,100,49, "Actualiser"));
-	CreerButton = AddComponent(new TButtonText(500,300,100,49, "Creer"));
-	RetourButton = AddComponent(new TButtonText(500,350,100,49, "Retour"));
+	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Joindre"));
+	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser"));
+	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Creer"));
+	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour"));
 
 	GList = AddComponent(new TListBox(300,200,200,300));
 
