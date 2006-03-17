@@ -109,11 +109,13 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
 {
   assert(base);
   assert(screen);
+  mAnimating = 0;
+  mDrawn = 0;
 
   mSpriteBase = base;
   if(mSpriteBase->mBuilt)
   {
-    if(mSpriteBase->mNumframes>1) mAnimating=1;
+    if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=1;
     mBackreplacement = SDL_DisplayFormat(mSpriteBase->mAnim[0].Img);
   }
   mScreen = screen;
@@ -183,6 +185,7 @@ ECSpriteBase::ECSpriteBase(char *dir)
 	mNumframes = 0;
 	mW = 0;
 	mH = 0;
+	animation = false;
 
 	init(dir);
 }
@@ -212,7 +215,7 @@ int ECSpriteBase::init(char *dir)
   for(int count=0;!feof(fp) && count<mNumframes;)
   {
     fgets(buffer, 255, fp);
-    if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n' && strlen(buffer) != 0)
+    if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n')
     {
       sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
       sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
@@ -223,6 +226,7 @@ int ECSpriteBase::init(char *dir)
       SDL_FreeSurface(temp);
 
       mAnim[count].pause = pause;
+      if(pause) animation = true;
       if(!mW) mW = mAnim[count].Img->w;
       if(!mH) mH = mAnim[count].Img->h;
 

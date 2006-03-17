@@ -116,6 +116,7 @@ public:
 public:
 	ECImage *mAnim;
 	int mBuilt, mNumframes, mW, mH;
+	bool animation;
 };
 
 class ECImage
