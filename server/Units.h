@@ -36,6 +36,8 @@ public:
 /* Methodes */
 public:
 
+	virtual bool Attaq(std::vector<ECEntity*> entities);
+
 /* Attributs */
 public:
 
