@@ -128,6 +128,7 @@ protected:
 	std::string path;
 
 	std::vector<EC_ACommand*> Commands;
+	void CleanUp();
 };
 
 extern ECServer app;

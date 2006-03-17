@@ -21,6 +21,7 @@
 #include "Defines.h"
 #include "Commands.h"
 #include "Map.h"
+#include "Channels.h"
 #include "Main.h"
 #include <string>
 #include <iostream>
@@ -30,7 +31,20 @@
 #include <dirent.h>
 #endif
 
+
 ECServer app;
+
+void ECServer::CleanUp()
+{
+	for(ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); it = ChanList.begin())
+                delete *it;
+
+	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
+		delete *it;
+
+	for(std::vector<EC_ACommand*>::iterator it = Commands.begin(); it != Commands.end(); ++it)
+		delete *it;
+}
 
 /** Check ping timeouts */
 void ECServer::sig_alarm(int c)
@@ -85,10 +99,11 @@ try {
 		{
 			path = getenv("HOME");
 			path += "/.euroconqserver/";
-			if (!opendir(path.c_str()))
-			{
+			DIR *d;
+			if(!(d = opendir(path.c_str())))
 				mkdir( path.c_str(), 0755 );
-			}
+			else closedir(d);
+
 			std::cout << "Logs dans: " << path << std::endl;
 		}
 #endif
@@ -149,8 +164,11 @@ try {
 }
 catch(...)
 {
+	CleanUp();
 	delete conf;
 }
+	CleanUp();
+	delete conf;
 	return 0;
 }
 
