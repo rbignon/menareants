@@ -21,6 +21,8 @@
 
 #include "Boutton.h"
 #include "tools/Images.h"
+#include "Resources.h"
+#include "Main.h"
 
 TButton::TButton ()
 {
@@ -37,6 +39,7 @@ TButton::TButton (unsigned int _x, unsigned int _y, unsigned int _w, unsigned in
   : TComponent(_x, _y, _w, _h)
 {
 	image = NULL;
+	SetImage(new ECSprite(Resources::NormalButton(), app.sdlwindow));
 	enabled = true;
 }
 
