@@ -13,6 +13,7 @@ euroconqserver_SOURCES = \
 	Login.cpp \
 	Channels.cpp \
 	Map.cpp \
+	Units.cpp \
 	InGame.cpp
 
 euroconqserver_LDADD =$(top_srcdir)/lib/libeuroconq.a
