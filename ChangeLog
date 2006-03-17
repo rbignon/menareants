@@ -1,3 +1,46 @@
+2005-03-17  Romain Bignon <progs@headfucking.net>
+
+	* lib/Channels.h: Petites améliorations.
+
+	* lib/Map.cpp: Support pour le type des cases du client, fonction ECBCountry::ChangeOwner() et autres...
+
+	* lib/Outils.h (ECList): Fonctions Fixed() et Moved(), et quelques modifs.
+
+	* lib/Units.cpp: Modification des Attaq() et Move() en WantAttaq() et WantMove().
+
+	* server/Units.cpp (ECArmy): Gestion des attaques.
+
+	* server/Map.cpp: Gestion du tri des evenements, fonction static ECEntity::AreFriends() et autres..
+
+	* server/InGame.cpp: Gestion des attaques.
+
+	* src/JoinGame.cpp: Suppression des TPlayerLine pour le LoadingForm.
+
+	* src/gui/Components.h (TLine): Rajout de l'argument use_delete dans RemoveComponent.
+
+2005-03-15  Romain Bignon <progs@headfucking.net>
+
+	* src/Map.cpp: Dérivation des cases avec chargement des sprites des cases.
+
+	* src/gui/MessageBox.h: Rajout de la possibilité de mettre un Edit dans le MessageBox.
+
+	* server/Main.cpp: Fonction CleanUp() pour libérer la mémoire.
+
+	* server/: Un certain nombre de corrections de fuites de mémoire.
+
+	* src/data/anims/cases: Images des cases
+
+	* src/data/anims/normalbutton: Images d'un boutton "normal"
+
+	* src/gui/Boutton.cpp: Utilisation du normalbutton comme image par default
+
+	* src/JoinGame.cpp,src/Login.cpp: Redimension des boutons
+
+	* src/tools/Image.cpp: Correction d'un bug quand il y a plusieurs images non animées
+
+	* src/Resources.h: Rajout de normalbutton et de toutes les images des cases, mise en place d'un nouveau système
+	avec les macros qui déchire.
+
 2005-03-12  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Gestion des créations et amélioration des animations.

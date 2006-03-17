@@ -3,12 +3,15 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--server/InGame.cpp: Fonction InitAnims() pour classer les events !
--server/InGame.cpp: Fonction NextAnim() pour montrer une animation
+-client: vérifier la position des textes vertical dans un bouton
+-client: composant TComboBox pour choisir une nation
+-mettre un mode pour l'argent du début
+-support des nations
 
 * Urgent
+-support des nations
+-client: composant TComboBox pour choisir une nation
 -client: faire les dérivées des classes "Entity" pour arriver au graphique
--client: faire faire les images des cases et unités !!
 -faire les dérivées d'ECBCase.
 
 * Bof
