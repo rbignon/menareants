@@ -60,11 +60,11 @@ public:
 public:
 
 	/** @return last case */
-	virtual ECBCase* Move(uint x, uint y);
+	virtual ECBCase* WantMove(uint x, uint y);
 
 	virtual bool Return();
 
-	virtual ECBCase* Attaq(uint x, uint y);
+	virtual ECBCase* WantAttaq(uint x, uint y);
 
 	virtual void CreateLast();
 

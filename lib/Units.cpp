@@ -24,6 +24,7 @@
 
 bool ECBArmy::Return()
 {
+	restStep = myStep;
 	if(!last) return false;
 
 	acase->Entities()->Remove(this);
@@ -47,7 +48,7 @@ void ECBArmy::CreateLast()
 	}
 }
 
-ECBCase* ECBArmy::Attaq(uint mx, uint my)
+ECBCase* ECBArmy::WantAttaq(uint mx, uint my)
 {
 	ECBCase* c;
 	if((c = CheckMove(mx, my)))
@@ -101,7 +102,7 @@ ECBCase* ECBArmy::CheckMove(uint mx, uint my)
 	return c;
 }
 
-ECBCase* ECBArmy::Move(uint mx, uint my)
+ECBCase* ECBArmy::WantMove(uint mx, uint my)
 {
 	ECBCase *c;
 
