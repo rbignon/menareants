@@ -26,6 +26,7 @@
 #include <SDL.h>
 #include "BouttonText.h"
 #include "Form.h"
+#include "Edit.h"
 #include "tools/Images.h"
 
 #define MSGBOX_MAXWIDTH 300
@@ -37,6 +38,7 @@ class TMessageBox
 #define BT_NO		0x002               /**< No button */
 #define BT_OK		0x004               /**< OK button */
 #define BT_CANCEL	0x008               /**< Cancel button */
+#define HAVE_EDIT	0x010               /**< Use a TEdit */
 
 /* Constructeur/Deconstructeur */
 public:
@@ -52,11 +54,10 @@ public:
 	TMessageBox(uint _x, uint _y, const char* _s, uint _b, TForm* form = 0)
 		: x(_x), y(_y), b(_b)
 	{
+		Edit = 0;
 		Form = form;
-		w = 0;
-		h = 0;
 		realbg = 0;
-		SetText(_s);
+		Init(_s);
 	}
 
 	~TMessageBox() {}
@@ -79,11 +80,13 @@ public:
 	/** Set form */
 	void SetForm(TForm* _form) { Form = _form; }
 
+	std::string EditText() { return (Edit ? Edit->GetString() : ""); }
+
 	/** Set real back ground. */
 	void SetBackGround(ECImage* _ebg) { realbg = _ebg; }
 
 /* Variables privées */
-private:
+protected:
 	uint x, y;
 	uint w, h;
 	uint b;
@@ -93,7 +96,11 @@ private:
 	SDL_Surface *background;
 	ECImage *realbg;
 	TForm *Form;
+	TEdit *Edit;
 
+	void SetButtons();
+	void SetEdit();
+	void Init(const char* s);
 	void SetText(const char* s);
 };
 
