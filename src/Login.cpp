@@ -221,7 +221,7 @@ void EuroConqApp::request_game()
 						}
 						if(ConnectedForm->CreateButton->Test(event.button.x, event.button.y))
 						{
-							if(!GameInfos(NULL))
+							if(!GameInfos(NULL, ConnectedForm))
 							{
 								TMessageBox mb(250,300,
 												std::string("Impossible de créer le salon.\n"
@@ -277,9 +277,9 @@ TConnectedForm::TConnectedForm()
 
 	Motd = AddComponent(new TMemo(75,100,500,380, 0));
 
-	CreateButton = AddComponent(new TButtonText(600,100, 100,49, "Créer une partie"));
-	ListButton = AddComponent(new TButtonText(600,150,100,49, "Lister les parties"));
-	DisconnectButton = AddComponent(new TButtonText(600,200,100,49, "Se déconnecter"));
+	CreateButton = AddComponent(new TButtonText(600,100, 150,50, "Créer une partie"));
+	ListButton = AddComponent(new TButtonText(600,150,150,50, "Lister les parties"));
+	DisconnectButton = AddComponent(new TButtonText(600,200,150,50, "Se déconnecter"));
 
 	Uptime =    AddComponent(new TLabel(75,485,"", black_color, &app.Font()->normal));
 	UserStats = AddComponent(new TLabel(75,505,"", black_color, &app.Font()->normal));
