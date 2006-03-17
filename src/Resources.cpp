@@ -22,20 +22,42 @@
 #include <SDL_image.h>
 
 #include "Resources.h"
-#include "Defines.h"
 
 #ifdef WIN32
 #	define PKGDATADIR
 #endif
 
-ECImage*				Resources::sur_titlescreen = NULL;
-ECImage*				Resources::sur_loadscreen = NULL;
-ECImage*				Resources::sur_menuscreen = NULL;
-
-ECSpriteBase*			Resources::spr_upbutton = NULL;
-ECSpriteBase*			Resources::spr_downbutton = NULL;
-ECSpriteBase*			Resources::spr_normalbutton = NULL;
-
+#define R_CLEARTYPE(type) for(std::vector<type*>::iterator it = type##_objects.begin(); it != type##_objects.end(); ++it) \
+                          	delete *it; \
+                          type##_objects.clear()
+#define R_RESOURCE(type, name) type* Resources::spr_##name = NULL
+	R_RESOURCE(ECImage,      Titlescreen);
+	R_RESOURCE(ECImage,      Menuscreen);
+	R_RESOURCE(ECImage,      Loadscreen);
+	R_RESOURCE(ECSpriteBase, UpButton);
+	R_RESOURCE(ECSpriteBase, DownButton);
+	R_RESOURCE(ECSpriteBase, NormalButton);
+	R_RESOURCE(ECSpriteBase, CaseMer);
+	R_RESOURCE(ECSpriteBase, CaseTerre);
+	R_RESOURCE(ECSpriteBase, CaseVille);
+	R_RESOURCE(ECSpriteBase, CaseCapitale);
+	R_RESOURCE(ECSpriteBase, CaseBordNord);
+	R_RESOURCE(ECSpriteBase, CaseBordSud);
+	R_RESOURCE(ECSpriteBase, CaseBordEst);
+	R_RESOURCE(ECSpriteBase, CaseBordOuest);
+	R_RESOURCE(ECSpriteBase, CaseBordNordOuest);
+	R_RESOURCE(ECSpriteBase, CaseBordNordEst);
+	R_RESOURCE(ECSpriteBase, CaseBordSudOuest);
+	R_RESOURCE(ECSpriteBase, CaseBordSudEst);
+	R_RESOURCE(ECSpriteBase, CaseCoinSudEst);
+	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest);
+	R_RESOURCE(ECSpriteBase, CaseCoinNordEst);
+	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest);
+#undef R_RESOURCE
+#define R_TYPE(type) std::vector<type*> Resources::type##_objects
+	R_TYPE(ECImage);
+	R_TYPE(ECSpriteBase);
+#undef R_TYPE
 
 Resources::Resources()
 {
@@ -48,53 +70,8 @@ Resources::~Resources()
 
 void Resources::Unload()
 {
-	if(sur_titlescreen) delete sur_titlescreen;
-	if(sur_loadscreen) delete sur_loadscreen;
-	if(spr_upbutton) delete spr_upbutton;
-	if(spr_downbutton) delete spr_downbutton;
+	R_CLEARTYPE(ECImage);
+	R_CLEARTYPE(ECSpriteBase);
 }
 
-ECImage* Resources::Titlescreen()
-{
-	if (!sur_titlescreen)
-		sur_titlescreen = new ECImage(PKGDATADIR_PICS "menu.png");
-	return sur_titlescreen;
-
-}
-
-ECImage* Resources::Menuscreen()
-{
-	if (!sur_menuscreen)
-		sur_menuscreen = new ECImage(PKGDATADIR_PICS "menu_vide.png");
-	return sur_menuscreen;
-
-}
-
-ECImage* Resources::Loadscreen()
-{
-	if (!sur_loadscreen)
-		sur_loadscreen = new ECImage(PKGDATADIR_PICS "loading.png");
-	return sur_loadscreen;
-
-}
-
-ECSpriteBase* Resources::UpButton()
-{
-	if(!spr_upbutton)
-		spr_upbutton = new ECSpriteBase("upbutton");
-	return spr_upbutton;
-}
-
-ECSpriteBase* Resources::DownButton()
-{
-	if(!spr_downbutton)
-		spr_downbutton = new ECSpriteBase("downbutton");
-	return spr_downbutton;
-}
-
-ECSpriteBase* Resources::NormalButton()
-{
-	if(!spr_normalbutton)
-		spr_normalbutton = new ECSpriteBase("normalbutton");
-	return spr_normalbutton;
-}
+#undef R_CLEARTYPE
