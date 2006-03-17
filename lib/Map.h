@@ -68,20 +68,20 @@ public:
 		E_END
 	};
 
-	ECBEntity() {}
+	ECBEntity() : owner(0), acase(0), last(0), shooted(0) {}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint nb = 0);
 
-	virtual ~ECBEntity() {}
+	virtual ~ECBEntity();
 
 /* Methodes */
 public:
 
 	/** Use this function when this entity wants to attaq someone */
-	virtual ECBCase* Attaq(uint x, uint y) = 0;
+	virtual ECBCase* WantAttaq(uint x, uint y) = 0;
 
 	/** Use this function when this entity wants to move somewhere */
-	virtual ECBCase* Move(uint x, uint y) = 0;
+	virtual ECBCase* WantMove(uint x, uint y) = 0;
 
 	/** Use this function to cancel an action of this entity */
 	virtual bool Return() = 0;
@@ -113,6 +113,8 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
+	bool Like(ECBEntity* e) { return (owner == e->Owner()); }
+
 /* Attributs */
 public:
 
@@ -129,6 +131,8 @@ public:
 	/** Return the number of soldats in the army */
 	uint Nb() { return nb; }
 	void SetNb(uint n) { nb = n; }
+	void Shooted(uint n) { shooted += n; }
+	void ReleaseShoot() { nb -= (shooted > nb ? nb : shooted); shooted = 0; }
 
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
 	bool Locked() { return lock; }
@@ -155,6 +159,7 @@ protected:
 	bool lock;
 	uint myStep;
 	uint restStep;
+	uint shooted;
 
 	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
 };
@@ -217,6 +222,7 @@ class ECBCase
 /* Constructeur/Destructeur */
 public:
 
+	ECBCase() : map(0), map_country(0) {}
 	ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
 	virtual ~ECBCase() {}
@@ -268,11 +274,12 @@ protected:
 };
 
 /** This class is a derived class from ECBCase whose is a city */
-class ECBVille : public ECBCase
+class ECBVille : public virtual ECBCase
 {
 /* Constructeur/Destructeur */
 public:
 	ECBVille(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECBVille() {}
 
 /* Methodes */
 public:
@@ -297,11 +304,12 @@ protected:
 };
 
 /** This class is a derived class from ECBCase whose is a land */
-class ECBTerre : public ECBCase
+class ECBTerre : public virtual ECBCase
 {
 /* Constructeur/Destructeur */
 public:
 	ECBTerre(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECBTerre() {}
 
 /* Methodes */
 public:
@@ -315,11 +323,12 @@ protected:
 };
 
 /** This class is a derived class from ECBCase whose is sea */
-class ECBMer : public ECBCase
+class ECBMer : public virtual ECBCase
 {
 /* Constructeur/Destructeur */
 public:
 	ECBMer(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECBMer() {}
 
 /* Methodes */
 public:
@@ -333,11 +342,12 @@ protected:
 };
 
 /** This class is a derived class from ECBCase whose is a bridge */
-class ECBPont : public ECBCase
+class ECBPont : public virtual ECBCase
 {
 /* Constructeur/Destructeur */
 public:
 	ECBPont(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECBPont() {}
 
 /* Methodes */
 public:
@@ -362,7 +372,7 @@ class ECBCountry
 /* Constructeur/Destructeur */
 public:
 
-	ECBCountry(const Country_ID ident);
+	ECBCountry(ECBMap* map, const Country_ID ident);
 
 /* Attributs */
 public:
@@ -371,19 +381,30 @@ public:
 	void AddCase(ECBCase* _case) { cases.push_back(_case); }
 
 	/** Return country ID (two chars) */
-	const char* ID() { return ident; }
+	const char* ID() const { return ident; }
 
 	/** Return Owner of country */
-	ECBMapPlayer* Owner() { return owner; }
+	ECBMapPlayer* Owner() const { return owner; }
 	void SetOwner(ECBMapPlayer* mp) { owner = mp; }
 
-	std::vector<ECBCase*> Cases() { return cases; }
+	/** Change owner of country.
+	 * This function will remove this country from my actual owner list, and will add me
+	 * in the list of my new owner. And it will change turnmoney of the two players.
+	 * @param mp this is the new map player
+	 * @param flags this is flags of my city (to know if this is a capitale or not)
+	 */
+	void ChangeOwner(ECBMapPlayer* mp, uint flags);
+
+	std::vector<ECBCase*> Cases() const { return cases; }
+
+	ECBMap* Map() { return map; }
 
 /* Variables privées */
 protected:
 	std::vector<ECBCase*> cases;
 	ECBMapPlayer *owner;
 	Country_ID ident;
+	ECBMap *map;
 };
 
 /********************************************************************************************
@@ -410,6 +431,7 @@ public:
 	uint Num() { return num; }
 
 	void AddCountry(ECBCountry* _country) { countries.push_back(_country); }
+	bool RemoveCountry(ECBCountry* _country, bool use_delete = false);
 
 	/** Find a country by ID */
 	ECBCountry* FindCountry(const char*id);
@@ -450,6 +472,8 @@ public:
 	 */
 	ECBMap(std::vector<std::string> _map_file);
 
+	void Init();      /**< Initialisation, you *HAVE* to call this !! */
+
 	virtual ~ECBMap();
 
 /* Methodes */
@@ -460,6 +484,9 @@ public:
 
 	/** Reload */
 	void Reload();
+
+	/** Create a case */
+	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
 
 /* Attributs */
 public:
@@ -527,8 +554,6 @@ protected:
 	uint begin_money, city_money;
 
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
-
-	void Init();      /**< Initialisation, called by constructors */
 
 	void Destruct();  /**< Free of memory */
 

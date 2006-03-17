@@ -22,6 +22,7 @@
 #include "Map.h"
 #include "Debug.h"
 #include "Outils.h"
+#include "Channels.h"
 #include <fstream>
 
 /********************************************************************************************
@@ -140,7 +141,7 @@ ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, 
  ********************************************************************************************/
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _nb)
-	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false)
+	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false), shooted(0)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -152,6 +153,11 @@ ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e
 void ECBEntity::Played()
 {
 	restStep = myStep;
+	RemoveLast();
+}
+
+ECBEntity::~ECBEntity()
+{
 	RemoveLast();
 }
 
@@ -201,10 +207,32 @@ void ECBEntity::ChangeCase(ECBCase* new_case)
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 
-ECBCountry::ECBCountry(const Country_ID _ident)
+ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident)
+	: map(_map)
 {
 	strcpy(ident, _ident);
 	owner = 0;
+}
+
+void ECBCountry::ChangeOwner(ECBMapPlayer* mp, uint flags)
+{
+	if(Owner())
+	{
+		Owner()->RemoveCountry(this);
+		if(Owner()->Player())
+			Owner()->Player()->SetTurnMoney(
+							          Owner()->Player()->TurnMoney() -
+							          (map->CityMoney() * (flags & C_CAPITALE ? 2 : 1)));
+	}
+	SetOwner(mp);
+	if(Owner())
+	{
+		mp->AddCountry(this);
+		if(Owner()->Player())
+			Owner()->Player()->SetTurnMoney(
+							          Owner()->Player()->TurnMoney() +
+							          (map->CityMoney() * (flags & C_CAPITALE ? 2 : 1)));
+	}
 }
 
 /********************************************************************************************
@@ -217,6 +245,23 @@ ECBCountry* ECBMapPlayer::FindCountry(const char* c)
 		if(!strcmp(c, (*it)->ID()))
 			return *it;
 	return NULL;
+}
+
+bool ECBMapPlayer::RemoveCountry(ECBCountry* _country, bool use_delete)
+{
+	for (std::vector<ECBCountry*>::iterator it = countries.begin(); it != countries.end(); )
+	{
+		if (*it == _country)
+		{
+			if(use_delete)
+				delete _country;
+			it = countries.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
 }
 
 /********************************************************************************************
@@ -242,13 +287,20 @@ static struct
 	{ 'p', CreateCase<ECBPont>,  C_PONT             }
 };
 
+ECBCase* ECBMap::CreateCase(uint _x, uint _y, char type_id)
+{
+	for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
+		if(case_type[j].c == type_id)
+			return case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
+
+	return 0;
+}
+
 ECBMap::ECBMap(std::vector<std::string> _map_file)
 {
 	initialised = false;
 
 	map_file = _map_file;
-
-	Init();
 }
 
 ECBMap::ECBMap(std::string filename)
@@ -265,8 +317,6 @@ ECBMap::ECBMap(std::string filename)
 	while(std::getline(fp, ligne))
 		if(ligne[0] != '#' && ligne[0] != '\0')
 			map_file.push_back(ligne);
-
-	Init();
 }
 
 /** \page Map_Format Map's file format
@@ -380,6 +430,9 @@ ECBMap::ECBMap(std::string filename)
  */
 void ECBMap::Init()
 {
+	if(initialised)
+		throw ECExcept(VBName(initialised), "Appel de la fonction alors que la carte est déjà initialisée");
+
 	chan = 0;
 	x = 0;
 	y = 0;
@@ -413,7 +466,8 @@ void ECBMap::Init()
 			else if(key == "PLAYER")
 			{
 				if(!isalpha(ligne[0]))
-					throw ECExcept(VCName(ligne[0]), "L'identifiant de ce player n'est pas correct (doit être une lettre)");
+					throw ECExcept(VCName(ligne[0]), "L'identifiant de ce player n'est pas correct "
+					                                 "(doit être une lettre)");
 				BMapPlayersVector::iterator it = map_players.begin();
 				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
 				if(it != map_players.end())
@@ -458,13 +512,7 @@ void ECBMap::Init()
 					/* Type du terrain (utilisation de case_type */
 					case 0:
 					{
-						for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
-							if(case_type[j].c == ligne[i])
-							{
-								acase = case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
-								break;
-							}
-						if(!acase)
+						if(!(acase = CreateCase(_x, _y, ligne[i])))
 							throw ECExcept(VPName(acase) VCName(ligne[i]), "Terrain introuvable");
 						map.push_back(acase);
 						break;
@@ -485,7 +533,7 @@ void ECBMap::Init()
 						    it != map_countries.end() && strcmp(c_id, (*it)->ID()); ++it);
 						if(it == map_countries.end())
 						{ /* La country n'existe pas encore */
-							country = new ECBCountry(c_id);
+							country = new ECBCountry(this, c_id);
 							map_countries.push_back(country);
 						}
 						else /* La country existe déjà */
@@ -613,6 +661,7 @@ void ECBMap::Destruct()
 		delete *it;
 
 	delete date;
+	initialised = false;
 }
 
 ECBMap::~ECBMap()
