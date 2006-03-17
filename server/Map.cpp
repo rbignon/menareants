@@ -24,6 +24,7 @@
 #include "Debug.h"
 #include "Channels.h"
 #include <fstream>
+#include <algorithm>
 
 MapVector MapList;
 
@@ -46,10 +47,12 @@ bool LoadMaps()
 		ECMap *map = 0;
 		try
 		{
-			map = new ECMap(std::string(PKGDATADIR + ligne));
+			map = new ECMap(std::string(PKGDATADIR + ligne), nbmaps);
+			map->Init();
 		}
 		catch(TECExcept &e)
 		{
+			delete map;
 			Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
 			vDebug(W_ERR|W_ECHO, e.Message, e.Vars);
 			continue;
@@ -59,6 +62,12 @@ bool LoadMaps()
 	}
 	Debug(W_ECHO|W_NOLOG, "%d maps loaded !", nbmaps);
 	return true;
+}
+
+ECMap::~ECMap()
+{
+	for(EventVector::iterator it = map_events.begin(); it != map_events.end(); ++it)
+		delete *it;
 }
 
 void ECMap::AddAnEntity(ECBEntity* e)
@@ -97,5 +106,55 @@ EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 			else
 				++it;
 		}
-		return 0;
+		return EventVector::iterator(0);
+}
+
+bool ECEntity::AreFriends(std::vector<ECEntity*> list)
+{
+	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
+		for(std::vector<ECEntity*>::iterator ti = list.begin(); ti != list.end(); ++ti)
+			if(!(*ti)->Like(*it) || !(*it)->Like(*ti))
+				return false;
+	return true;
+}
+
+struct SortEventsFunction
+{
+	bool operator ()(ECEvent* const& a1, ECEvent* const& a2) const
+	{
+		return (*a2) < (*a1);
+	}
+};
+void ECMap::SortEvents()
+{
+	std::sort(map_events.begin(), map_events.end(), SortEventsFunction());
+}
+
+bool ECEvent::operator<(const ECEvent& e) const
+{
+	const char NUMBER = 10;
+	const char CREATE = 9;
+	const char UNION = 7;
+	const char ATTAQ = 5;
+	const char MOVE = 2;
+	char me = 0, him = 0;
+	switch(flags)
+	{
+		case ARM_NUMBER: me = NUMBER; break;
+		case ARM_CREATE: me = CREATE; break;
+		case ARM_UNION: me = UNION; break;
+		case ARM_ATTAQ: me = ATTAQ; break;
+		case ARM_MOVE: me = MOVE; break;
+		default: me = 0; break;
+	}
+	switch(e.Flags())
+	{
+		case ARM_NUMBER: him = NUMBER; break;
+		case ARM_CREATE: him = CREATE; break;
+		case ARM_UNION: him = UNION; break;
+		case ARM_ATTAQ: him = ATTAQ; break;
+		case ARM_MOVE: him = MOVE; break;
+		default: him = 0; break;
+	}
+	return (me < him);
 }

@@ -23,7 +23,7 @@
 #define ECD_MAP_H
 
 #include "lib/Map.h"
-#include <list>
+#include <set>
 
 /* Note: il n'y a theoriquement aucune redefinition des ECB* pour les classes suivantes car toutes
  * les informations y sont déjà incluses.
@@ -47,16 +47,28 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	virtual ~ECEntity() {}
+	ECEntity() : Tag(0), event_type(0) {}
+
+	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), event_type(0)
+	{}
+
+	virtual ~ECEntity() { }
 
 /* Methodes */
 public:
+
+	virtual bool Attaq(std::vector<ECEntity*> entities) = 0;
+
+	static bool AreFriends(std::vector<ECEntity*> list);
 
 /* Attributs */
 public:
 
 	uint EventType() { return event_type; }
 	void SetEvent(uint _e) { event_type = _e; }
+
+	int Tag;
 
 /* Variables privées */
 protected:
@@ -96,11 +108,9 @@ public:
 	uint Flags() const { return flags; }
 	void SetFlags(uint _f) { flags = _f; }
 
-	bool Priority() const { return (flags & ARM_ATTAQ); }
-
 	ECList<ECEntity*> *Entities() { return &entities; }
 
-	bool operator<(const ECEvent& e) const { return (e.Priority() && !Priority()); }
+	bool operator<(const ECEvent& e) const;
 
 	ECase* Case() const { return acase; }
 
@@ -119,7 +129,8 @@ protected:
 	ECList<ECEntity*> entities;
 };
 
-typedef std::list<ECEvent*> EventVector;
+typedef std::vector<ECEvent*> EventVector;
+//typedef std::set<ECEvent*, SortEventsFunction> EventVector;
 
 /********************************************************************************************
  *                                 ECMap                                                    *
@@ -128,19 +139,23 @@ class ECMap : public ECBMap
 {
 /* Constructeur/Destructeur */
 public:
-	ECMap(std::string _filename)
-		: ECBMap(_filename)
+	ECMap(std::string _filename, uint _i)
+		: ECBMap(_filename), i(_i)
 	{}
 
-	ECMap(std::vector<std::string> _map_file)
-		: ECBMap(_map_file)
+	ECMap(std::vector<std::string> _map_file, uint _i)
+		: ECBMap(_map_file), i(_i)
 	{}
+
+	virtual ~ECMap();
 
 /* Attributs */
 public:
 
+	uint Num() { return i; }
+
 	EventVector Events() const { return map_events; }
-	void AddEvent(ECEvent* _e) { _e->Priority() ? map_events.push_front(_e) : map_events.push_back(_e); }
+	void AddEvent(ECEvent* _e) { map_events.push_back(_e); }
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete);
 
 /* Méthodes */
@@ -149,9 +164,12 @@ public:
 	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
 	void AddAnEntity(ECBEntity*);
 
+	void SortEvents();
+
 /* Variables privées */
 protected:
- EventVector map_events;
+	EventVector map_events;
+	uint i;
 };
 
 extern bool LoadMaps();
