@@ -26,25 +26,114 @@
 #include "Debug.h"
 #include "gui/ColorEdit.h"
 #include "Map.h"
+#include "Resources.h"
 #include "Channels.h"
+
+/********************************************************************************************
+ *                                ECase                                                     *
+ ********************************************************************************************/
+
+ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
+	: ECBCase(_map, _x, _y, _flags, _type_id)
+{
+	image = 0;
+}
+
+ECase::~ECase()
+{
+	delete image;
+}
+
+void ECase::SetImage(ECSpriteBase* spr)
+{
+	if(image) delete image;
+	image = new ECSprite(spr, app.sdlwindow);
+}
+
+/********************************************************************************************
+ *                                ECMap                                                     *
+ ********************************************************************************************/
 
 ECMap::ECMap(std::vector<std::string> _map_file)
 	: ECBMap(_map_file)
 {
 	preview = 0;
-	CreatePreview();
 }
 
 ECMap::ECMap(std::string filename)
 	: ECBMap(filename)
 {
 	preview = 0;
-	CreatePreview();
 }
 
 ECMap::~ECMap()
 {
 	if(preview) delete preview;
+}
+
+static struct
+{
+	char c;
+	ECSpriteBase* (*spr) ();
+} case_img[] = {
+	{ 't', Resources::CaseTerre },
+	{ 'm', Resources::CaseMer },
+	{ 'v', Resources::CaseVille },
+	{ 'V', Resources::CaseCapitale },
+	{ 'a', Resources::CaseBordSud },
+	{ 'b', Resources::CaseBordNord },
+	{ 'c', Resources::CaseBordEst },
+	{ 'd', Resources::CaseBordOuest },
+	{ 'e', Resources::CaseBordSudEst },
+	{ 'f', Resources::CaseBordSudOuest },
+	{ 'g', Resources::CaseBordNordOuest },
+	{ 'h', Resources::CaseBordNordEst },
+	{ 'i', Resources::CaseCoinNordOuest },
+	{ 'j', Resources::CaseCoinNordEst },
+	{ 'k', Resources::CaseCoinSudEst },
+	{ 'l', Resources::CaseCoinSudOuest }
+};
+
+void ECMap::SetCaseAttr(ECBCase* c, char id)
+{
+	if(!c) return;
+
+	for(uint j=0; j < (sizeof case_img / sizeof *case_img); j++)
+		if(case_img[j].c == id)
+		{
+			dynamic_cast<ECase*>(c)->SetImage(case_img[j].spr());
+			return;
+		}
+
+	throw ECExcept(VIName(c->X()) VIName(c->Y()) VCName(id), "Le terrain graphique est introuvable");
+}
+
+template<typename T>
+static ECBCase* CreateCase(ECBMap *map, uint x, uint y, uint flags, char type_id)
+{
+	return new T(map, x, y, flags, type_id);
+}
+
+static struct
+{
+	char c;
+	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
+	uint flags;
+} case_type[] = {
+	{ 'v', CreateCase<ECVille>, C_VILLE            },
+	{ 'V', CreateCase<ECVille>, C_VILLE|C_CAPITALE },
+	{ 'm', CreateCase<ECMer>,   C_MER              },
+	{ 't', CreateCase<ECTerre>, C_TERRE            },
+	{ 'p', CreateCase<ECPont>,  C_PONT             }
+};
+
+ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
+{
+	for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
+		if(case_type[j].c == type_id)
+			return case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
+
+	return 0;
 }
 
 /** \note Preview use two screen pixels for one pixel in map */
@@ -63,7 +152,7 @@ void ECMap::CreatePreview(uint width, uint height)
 	for(uint _y = 0; _y < y; ++_y, yy+=size_y, xx=0)
 		for(uint _x = 0; _x < x; ++_x, xx+=size_x)
 		{
-			ECase *c = map[ _y * x + _x ];
+			ECase *c = dynamic_cast<ECase*>(map[ _y * x + _x ]);
 			SDL_Color *color = 0;
 			switch(c->TypeID())
 			{
@@ -126,8 +215,8 @@ void ECMap::CreatePreview(uint width, uint height)
 		std::vector<ECountry*> coun = (*it)->Countries();
 		for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end() && !found; ++ci)
 		{
-			std::vector<ECase*> cas = (*ci)->Cases();
-			for(std::vector<ECase*>::iterator casi = cas.begin(); casi != cas.end() && !found; ++casi)
+			std::vector<ECBCase*> cas = (*ci)->Cases();
+			for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end() && !found; ++casi)
 			{
 				if((*casi)->Flags() & (C_VILLE|C_CAPITALE)/* && ((casi+1) == cas.end() || (casi+2) == cas.end() ||
 				   ((*(casi+2))->X() == (*casi)->X()+2 && (*(casi+2))->Flags() & (C_TERRE|C_VILLE|C_CAPITALE)))*/)

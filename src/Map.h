@@ -26,6 +26,110 @@
 #include "tools/Images.h"
 #include <vector>
 
+/********************************************************************************************
+ *                                ECase                                                     *
+ ********************************************************************************************/
+
+class ECase : public virtual ECBCase
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECase() { image = 0; }
+
+	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
+
+	virtual ~ECase();
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	void SetImage(ECSpriteBase* spr);
+
+/* Variables privées */
+protected:
+	ECSprite* image;
+};
+
+/** This class is a derived class from ECBCase whose is a city */
+class ECVille : public ECBVille, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECVille(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
+/** This class is a derived class from ECBCase whose is a land */
+class ECTerre : public ECBTerre, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECTerre(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
+/** This class is a derived class from ECBCase whose is sea */
+class ECMer : public ECBMer, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECMer(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
+/** This class is a derived class from ECBCase whose is a bridge */
+class ECPont : public ECBPont, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECPont(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
+/********************************************************************************************
+ *                               ECMap                                                      *
+ ********************************************************************************************/
+
 class ECMap : public ECBMap
 {
 /* Constructeur/Destructeur */
@@ -45,6 +149,8 @@ public:
 
 	void CreatePreview(uint width = 200, uint height = 200);
 
+	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
+
 /* Attributs */
 public:
 
@@ -53,13 +159,10 @@ public:
 /* Variables privées */
 protected:
 	ECImage *preview;
+
+	virtual void SetCaseAttr(ECBCase*, char);
 };
 
-typedef ECBCase        ECase;
-typedef ECBVille       ECVille;
-typedef ECBMer         ECMer;
-typedef ECBTerre       ECTerre;
-typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
