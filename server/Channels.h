@@ -72,13 +72,9 @@ public:
 	/** Get client's nickname */
 	virtual const char* GetNick() const;
 
-	uint TurnMoney() { return turn_money; }
-	void SetTurnMoney(uint u) { turn_money = u; }
-
 /* Variables privées */
 protected:
 	TClient *client;
-	uint turn_money;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

@@ -95,7 +95,7 @@ int TClient::exit(const char *pattern, ...)
 int TClient::sendbuf(const char* buf, int len)
 {
 #ifdef DEBUG
-	if(strncasecmp(buf, "PIG", 3) && strncasecmp(buf, "POG", 3))
+	if(strncmp(buf, "PIG", 3) && strncmp(buf, "POG", 3))
 		printf("S(%s@%s) - %s", this->nick, this->ip, buf);
 #endif
 
@@ -160,6 +160,8 @@ int TClient::parsemsg()
 			parv.push_back(std::string(s));
 		}
 	}
+
+	if(cmdname == std::string("DIE")) { app.running = false; printf("stop\n"); }
 
 	EC_ACommand *cmd = NULL;
 	for(i=0;i<app.GetCommands().size() && !cmd;i++)

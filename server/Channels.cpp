@@ -180,10 +180,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							break;
 						}
 						BPlayerVector::iterator it;
-						for(it = sender->Channel()->Players().begin();
-						    it != sender->Channel()->Players().end() && (*it)->Color() != color;
-						    ++it);
-						if(it != sender->Channel()->Players().end())
+						BPlayerVector plv = sender->Channel()->Players();
+						for(it = plv.begin(); it != plv.end() && (*it)->Color() != color; ++it);
+						if(it != plv.end())
 							{ Debug(W_DESYNCH, "SET +c: d'une couleur déjà utilisée"); break; }
 					}
 					sender->SetColor(color);
@@ -221,10 +220,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							break;
 						}
 						BPlayerVector::iterator it;
-						for(it = sender->Channel()->Players().begin();
-						    it != sender->Channel()->Players().end() && (*it)->Position() != place;
-						    ++it);
-						if(it != sender->Channel()->Players().end())
+                                                BPlayerVector plv = sender->Channel()->Players();
+                                                for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
+                                                if(it != plv.end())
 							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
@@ -253,7 +251,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 	}
 
-	if(map && map != sender->Channel()->Map())
+	if(map && (!sender->Channel()->Map() || mapi != sender->Channel()->Map()->Num()))
 	{
 		sender->Channel()->SetMap(map);
 		need_ready = NEEDREADY_ALL;
@@ -358,8 +356,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 							/* On défini le nombre d'argent par tour */
 							if(!(*cai)->Country()->Owner()) continue;
-							dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->SetTurnMoney(
-							          dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player())->TurnMoney() +
+
+							(*cai)->Country()->Owner()->Player()->SetTurnMoney(
+							          (*cai)->Country()->Owner()->Player()->TurnMoney() +
 							          (sender->Channel()->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
 						}
 					for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
@@ -506,7 +505,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		                                        (*it)->MinPlayers(), (*it)->MaxPlayers());
 	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
 
-	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr());
+	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
 
 	if(chan->Map())
 	{ /* Si la map existe on l'envoie */
@@ -516,7 +515,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		cl->sendrpl(app.rpl(ECServer::ENDOFSMAP));
 	}
 	
-	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList());
+	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList().c_str());
 
 	return 0;
 }
@@ -562,7 +561,7 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
  ********************************************************************************************/
 
 ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner, bool _op)
-	: ECBPlayer(_chan, _owner, _op), client(_client), turn_money(0)
+	: ECBPlayer(_chan, _owner, _op), client(_client)
 {
 
 }
@@ -604,6 +603,7 @@ EChannel::EChannel(std::string _name)
 EChannel::~EChannel()
 {
 	app.NBchan--;
+	if(map) delete map;
 	if(state == EChannel::WAITING) app.NBwchan--;
 	else app.NBachan--;
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
@@ -784,7 +784,18 @@ void EChannel::SetMap(ECBMap *m)
 
 	if(!m) return;
 
-	ECMap* _new_map = new ECMap(m->MapFile());
+	ECMap* _new_map = 0;
+	try
+	{
+		_new_map = new ECMap(m->MapFile(), dynamic_cast<ECMap*>(m)->Num());
+		_new_map->Init();
+	}
+	catch(TECExcept &e)
+	{
+		delete _new_map;
+		vDebug(W_ERR, e.Message, e.Vars);
+		return;
+	}
 
 	map = _new_map;
 
