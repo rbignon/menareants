@@ -135,7 +135,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Locked() && (*it)->Owner() == t->Owner() && (*it)->Type() == t->Type())
+			if(t != *it && !(*it)->Locked() && ((*it)->Like(t) || t->Like(*it)) && (*it)->Type() == t->Type())
 				++i;
 		return i;
 	}
@@ -144,7 +144,26 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Locked() && ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
+			if(t != *it && !(*it)->Locked() && (!(*it)->Like(t) || !t->Like(*it)) &&
+			                                   ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
+				++i;
+		return i;
+	}
+
+	uint Fixed()
+	{
+		uint i = 0;
+		for(iterator it = list.begin(); it != list.end(); ++it)
+			if(!(*it)->Locked() && (!(*it)->Last() || (*it)->Last()->Case() == (*it)->Case()))
+				++i;
+		return i;
+	}
+
+	uint Moved()
+	{
+		uint i = 0;
+		for(iterator it = list.begin(); it != list.end(); ++it)
+			if(!(*it)->Locked() && (*it)->Last() && (*it)->Last()->Case() != (*it)->Case())
 				++i;
 		return i;
 	}
