@@ -30,11 +30,9 @@
 #include <SDL_thread.h>
 
 struct SDL_Surface;
-
 class Menu;
-
+class TForm;
 class EChannel;
-
 class EC_Client;
 
 enum {
@@ -65,7 +63,7 @@ protected:
 
 	void request_game();
 	void ListGames();
-	bool GameInfos(const char* c);
+	bool GameInfos(const char* c, TForm* f = 0);
 	void LoadGame(EChannel* ch);
 
 public:

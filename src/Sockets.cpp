@@ -72,7 +72,8 @@ int EC_Client::sendrpl(const char *pattern, ...)
 	va_end(vl);
 
 #ifdef DEBUG
-	std::cout << "S - " << buf;
+	if(strncmp(buf, "ERR", 3))
+		std::cout << "S - " << buf;
 #endif
 	send(sock, buf, len, 0);
 

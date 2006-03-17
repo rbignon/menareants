@@ -77,6 +77,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 
 	std::cout << s << std::endl;
 #ifdef DEBUG
+	if(!vars.empty())
 	std::cout << vars << std::endl;
 #endif
 
