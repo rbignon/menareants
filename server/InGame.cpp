@@ -28,7 +28,7 @@
 
 void EChannel::InitAnims()
 {
-
+	dynamic_cast<ECMap*>(map)->SortEvents();
 }
 
 #define SHOW_EVENT(x) ((x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : "no")
@@ -42,15 +42,80 @@ void EChannel::NextAnim()
 
 	ECEvent* event = (*dynamic_cast<ECMap*>(map)->Events().begin());
 
+	Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT(event->Flags()), event->Case()->X(),
+									event->Case()->Y());
+	std::vector<ECEntity*> ents = event->Entities()->List();
+	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	{
+		if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
+		else
+			Debug(W_DEBUG, "      - Member %s!%s (%s)", (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*",
+							(*enti)->ID(), SHOW_EVENT((*enti)->EventType()));
+	}
+
 	if(!event)
 		throw ECExcept(VPName(event) VIName(dynamic_cast<ECMap*>(map)->Events().size()), "Evenement vide");
 
 	switch(event->Flags())
 	{
 		case ARM_ATTAQ:
-			Debug(W_DEBUG, "C'est une attaque");
+		{
 			SendArm(NULL, event->Entities()->List(), ARM_ATTAQ, event->Case()->X(), event->Case()->Y());
+
+			std::vector<ECEntity*> entv = event->Entities()->List();
+			const char S_ATTAQ = 1;
+			const char S_REMOVE = 2;
+			const char S_WINERS = 3;
+			const char S_END = 4;
+			const char T_CONTINUE = 1;
+			const char T_STOP = 0;
+			char state = S_ATTAQ;
+			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END;)
+			{
+				if(state == S_ATTAQ)
+				{
+					(*it)->Tag = (*it)->Attaq(entv) ? T_CONTINUE : T_STOP;
+					++it;
+				}
+				else if(state == S_REMOVE || state == S_WINERS)
+				{
+					if(state == S_REMOVE)
+						(*it)->ReleaseShoot(),
+						Debug(W_DEBUG, "- %s!%s reste %d", (*it)->Owner() ? (*it)->Owner()->GetNick() : "*",
+						                                   (*it)->ID(), (*it)->Nb());
+
+					if(!(*it)->Nb())
+					{
+						SendArm(NULL, *it, ARM_REMOVE);
+						event->Entities()->Remove(*it);
+						dynamic_cast<ECMap*>(map)->RemoveAnEntity(*it, USE_DELETE);
+						it = entv.erase(it);
+					}
+					else if(state == S_WINERS || (*it)->Tag == T_STOP)
+					{
+						if(event->Case()->Entities()->Fixed() && (*it)->Last() &&
+						   (*it)->Last()->Case() != event->Case())
+						{
+							
+						}
+						SendArm(NULL, *it, ARM_NUMBER|ARM_HIDE, (*it)->Case()->X(), (*it)->Case()->Y(), (*it)->Nb());
+						if((*it)->Case()->Country()->Owner()->Player() != (*it)->Owner())
+							(*it)->Case()->Country()->ChangeOwner((*it)->Owner()->MapPlayer(), (*it)->Case()->Flags());
+						it = entv.erase(it);
+					}
+					else ++it;
+				}
+				else ++it;
+
+				if(it == entv.end())
+				{
+					it = entv.begin();
+					if(state == S_REMOVE && !ECEntity::AreFriends(entv)) state = S_ATTAQ;
+					else state++;
+				}
+			}
 			break;
+		}
 		case ARM_UNION:
 			SendArm(NULL, event->Entities()->List(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
 			break;
@@ -62,19 +127,16 @@ void EChannel::NextAnim()
 			                                                                       event->Nb(), event->Type());
 			break;
 		case ARM_MOVE:
+		{
 			SendArm(NULL, event->Entities()->List(), ARM_MOVE, event->Case()->X(), event->Case()->Y());
+
+			std::vector<ECEntity*> entv = event->Entities()->List();
+			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+				if((*it)->Case()->Country()->Owner()->Player() != (*it)->Owner())
+					(*it)->Case()->Country()->ChangeOwner((*it)->Owner()->MapPlayer(), (*it)->Case()->Flags());
 			break;
+		}
 		default: break;
-	}
-	Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT(event->Flags()), event->Case()->X(),
-									event->Case()->Y());
-	std::vector<ECEntity*> ents = event->Entities()->List();
-	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-	{
-		if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
-		else
-			Debug(W_DEBUG, "      - Member %s!%s (%s)", (*enti)->Owner() ? (*enti)->Owner()->GetNick() : "*",
-							(*enti)->ID(), SHOW_EVENT((*enti)->EventType()));
 	}
 	dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
 }
@@ -135,7 +197,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				x = StrToTyp<uint>(stringtok(s, ","));
 				y = StrToTyp<uint>(s);
 
-				if(!entity || (last_case = entity->Move(x, y)))
+				if(!entity || (last_case = entity->WantMove(x, y)))
 					flags |= ARM_MOVE;
 				break;
 			}
@@ -148,7 +210,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				x = StrToTyp<uint>(stringtok(s, ","));
 				y = StrToTyp<uint>(s);
 
-				if(entity && (last_case = entity->Attaq(x, y)))
+				if(entity && (last_case = entity->WantAttaq(x, y)))
 					flags |= ARM_ATTAQ;
 				break;
 			}
@@ -161,13 +223,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			}
-			case '/':
 			case '%':
 			{
 				type = StrToTyp<uint>(parv[i].substr(1));
 				flags |= ARM_TYPE;
 				break;
 			}
+			case '/':
 			default: Debug(W_DESYNCH, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
 	}
@@ -289,7 +351,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								{ /* Cet evenement est une union donc on se propose de rajouter
 								   * notre unité ici.
 								   */
-									(*enti)->SetEvent(flags == ARM_CREATE ? ARM_CREATE : ARM_UNION);
+									(*enti)->SetEvent(flags == ARM_UNION);
 									(*evti)->Entities()->Add(entity);
 									Debug(W_DEBUG, "On Union dans cet event");
 								}
@@ -300,7 +362,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 									ECEvent* event = new ECEvent(ARM_UNION, entity->Case());
 									event->Entities()->Add(entity);
 									map->AddEvent(event);
-									event_found = true;
 									Debug(W_DEBUG, "On Union dans un nouvel event");
 								}
 
@@ -314,12 +375,15 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								attaq = true;
 						}
 					}
-					if(attaq && !event_found && (*evti)->Flags() & (ARM_MOVE|ARM_ATTAQ))
+					if(attaq && !event_found && ((*evti)->Flags() == ARM_MOVE || (*evti)->Flags() == ARM_ATTAQ))
 					{ /* Ce mouvement se transforme en attaque */
-						std::vector<ECEntity*> etlist = (*evti)->Entities()->List();
-						for(ECList<ECEntity*>::iterator it = etlist.begin(); it != etlist.end(); ++it)
-							if((*it) && !(*it)->Locked() && (*it)->Owner())
-								recvers.push_back(dynamic_cast<ECPlayer*>((*it)->Owner())->Client());
+						if(flags & ARM_ATTAQ)
+						{ /* On ne prévient les autres QUE si c'est une attaque *EXPLICITE* */
+							std::vector<ECEntity*> etlist = (*evti)->Entities()->List();
+							for(ECList<ECEntity*>::iterator it = etlist.begin(); it != etlist.end(); ++it)
+								if((*it) && !(*it)->Locked() && (*it)->Owner())
+									recvers.push_back(dynamic_cast<ECPlayer*>((*it)->Owner())->Client());
+						}
 						(*evti)->Entities()->Add(entity);
 						(*evti)->SetFlags(ARM_ATTAQ);
 						event_found = true;
@@ -335,7 +399,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					std::vector<ECEntity*> ents = (*evti)->Entities()->List();
 					bool no_body = true, someone_want_attaq = false;
 					for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end();)
-						if((*enti)->EventType() & ARM_ATTAQ)
+						if(*enti != entity && (*enti)->EventType() & ARM_ATTAQ)
 						{
 							Debug(W_DEBUG, "il y a un attaquant qui se trouve fort sodomisé.");
 							if((*enti)->Return())
@@ -404,7 +468,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 					if(my_friend)
 					{ /* Sur la case il y a des unités amies */
-						event->SetFlags(flags == ARM_CREATE ? ARM_CREATE : ARM_UNION);
+						event->SetFlags(ARM_UNION);
 						Debug(W_DEBUG, "On Union dans cet event (%d)", map->Events().size());
 						my_friend->Union(entity); /* entity s'unie dans my_friend */
 					}
