@@ -90,6 +90,9 @@ public:
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
+	uint TurnMoney() { return turn_money; }
+	void SetTurnMoney(uint u) { turn_money = u; }
+
 /* Variables privées */
 protected:
 	ECBChannel *chan;
@@ -101,6 +104,7 @@ protected:
 	ECBMapPlayer* mp;
 	bool ready;
 	ECList<ECBEntity*> entities;
+	uint turn_money;
 };
 typedef std::vector<ECBPlayer*> BPlayerVector;
 
@@ -176,7 +180,7 @@ public:
 	 *
 	 * \note Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
 	 */
-	const char* PlayerList();
+	std::string PlayerList();
 
 	/** Return a formated modes list.
 	 * It is used to send to client a mode list when it joined.
@@ -185,7 +189,7 @@ public:
 	 *
 	 * \note Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
 	 */
-	const char* ModesStr() const;
+	std::string ModesStr() const;
 
 /* Variables privées */
 protected:

@@ -30,7 +30,7 @@
  ********************************************************************************************/
 
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
-	: chan(_chan), owner(_owner), op(_op)
+	: chan(_chan), owner(_owner), op(_op), turn_money(0)
 {
 	chan->AddPlayer(this);
 	ready = false;
@@ -105,7 +105,7 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 
 
 /** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
-const char* ECBChannel::ModesStr() const
+std::string ECBChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
 	if(limite) modes += "l", params += " " + TypToStr(limite);
@@ -120,14 +120,14 @@ const char* ECBChannel::ModesStr() const
 		case ANIMING: modes += "A"; break;
 	}
 	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
-	return (modes + params).c_str();
+	return (modes + params);
 }
 
 /** \attention En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
  * \note il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
  * où il y en a une, d'incrémenter le protocole
  */
-const char* ECBChannel::PlayerList()
+std::string ECBChannel::PlayerList()
 {
 	std::string list = "";
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
@@ -145,5 +145,5 @@ const char* ECBChannel::PlayerList()
 
 		list += (*it)->GetNick();
 	}
-	return list.c_str();
+	return list;
 }
