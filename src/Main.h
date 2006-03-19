@@ -65,6 +65,7 @@ protected:
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0);
 	void LoadGame(EChannel* ch);
+	void InGame();
 
 public:
 	int main(int argc, char** argv);

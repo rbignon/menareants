@@ -26,7 +26,55 @@
 #include "gui/Label.h"
 #include "gui/Image.h"
 #include "gui/Memo.h"
-#include "Channels.h"
+#include "gui/ShowMap.h"
+#include "gui/ChildForm.h"
+#include "gui/BouttonText.h"
+
+class EChannel;
+class ECPlayer;
+
+/********************************************************************************************
+ *                               TInGameForm                                                *
+ ********************************************************************************************/
+class TBarreLat : public TChildForm
+{
+public:
+	TBarreLat(EChannel*);
+	~TBarreLat();
+
+/* Composants */
+public:
+	TImage*      Radar;
+	TButtonText* PretButton;
+
+protected:
+	EChannel* chan;
+};
+
+/** This is a form who show realy the map ! */
+class TInGameForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TInGameForm(EChannel*);
+	~TInGameForm();
+
+/* Composants */
+public:
+
+	TMap*      Map;
+	TBarreLat* BarreLat;
+
+/* Methodes */
+public:
+
+	void ShowBarreLat(bool show = true);
+
+/* Evenements */
+public:
+
+};
 
 /********************************************************************************************
  *                               TLoadingForm                                               *
@@ -73,7 +121,7 @@ public:
 public:
 
 	void Init() {}
-	void Draw(uint souris_x, uint souris_y);              /**< Draw */
+	void Draw(int souris_x, int souris_y);              /**< Draw */
 
 /* Composants */
 public:
@@ -87,8 +135,8 @@ private:
 
 	/* Privatisation de constructeurs à rendre inaccessibles */
 	TLoadPlayerLine();
-	TLoadPlayerLine(uint _x, uint _y);
-	TLoadPlayerLine(uint _x, uint _y, uint _w, uint _h);
+	TLoadPlayerLine(int _x, int _y);
+	TLoadPlayerLine(int _x, int _y, uint _w, uint _h);
 
 	ECPlayer *pl;
 };
