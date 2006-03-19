@@ -37,6 +37,7 @@
 #include "Map.h"
 
 extern TLoadingForm   *LoadingForm;
+extern TInGameForm    *InGameForm;
 void LoadingGame(EC_Client* cl);
 
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
@@ -97,6 +98,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				return 0;
 			}
 			chan->SetMap(map);
+			map->SetChannel(chan);
 			GameInfosForm->MapTitle->SetCaption(chan->Map()->Name() + " (" + TypToStr(chan->Map()->MinPlayers()) +
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
@@ -268,9 +270,28 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(!chan->State() == EChannel::SENDING)
 						chan->Map()->NextDay();
 					chan->SetState(EChannel::PLAYING);
+					if(InGameForm && InGameForm->BarreLat)
+					{
+						InGameForm->ShowBarreLat(true);
+				 		for(;InGameForm->BarreLat->X() > SCREEN_HEIGHT + int(InGameForm->BarreLat->Width());
+				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-1, InGameForm->BarreLat->Y()),
+				 		     SDL_Delay(100));
+				 	}
 				}
 				break;
-			case 'A': if(add) chan->SetState(EChannel::ANIMING); break;
+			case 'A':
+				 if(add)
+				 {
+				 	chan->SetState(EChannel::ANIMING);
+				 	if(InGameForm && InGameForm->BarreLat)
+				 	{
+				 		for(;InGameForm->BarreLat->X() < SCREEN_HEIGHT;
+				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+1, InGameForm->BarreLat->Y()),
+				 		     SDL_Delay(100));
+				 		InGameForm->ShowBarreLat(false);
+				 	}
+				 }
+				 break;
 			case 'm':
 				if(add)
 				{
@@ -292,8 +313,15 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 				{
 					(*it)->SetReady(add);
-					if((*it)->IsMe() && GameInfosForm)
-						GameInfosForm->PretButton->SetEnabled(!add);
+					if((*it)->IsMe())
+					{
+						if(GameInfosForm)
+							GameInfosForm->PretButton->SetEnabled(!add);
+						if(!add && chan->State() == EChannel::SENDING)
+							me->sendrpl(me->rpl(EC_Client::SET), "+!");
+						if(InGameForm)
+							InGameForm->BarreLat->PretButton->SetEnabled(!add);
+					}
 				}
 				break;
 			case '$':
@@ -881,8 +909,8 @@ TGameInfosForm::~TGameInfosForm()
 
 void TGameInfosForm::RecalcMemo()
 {
-	Chat->SetXY(60, Players->GetY() + Players->GetHeight());
-	Chat->SetHeight(505-Players->GetHeight()-Players->GetX()); /* On définit une jolie taille */
+	Chat->SetXY(60, Players->Y() + Players->Height());
+	Chat->SetHeight(505-Players->Height()-Players->X()); /* On définit une jolie taille */
 }
 
 /********************************************************************************************
@@ -932,7 +960,7 @@ TPlayerLine::~TPlayerLine()
 	if(couleur) delete couleur;
 }
 
-void TPlayerLine::SetXY (uint px, uint py)
+void TPlayerLine::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
 	if(position)
@@ -941,9 +969,9 @@ void TPlayerLine::SetXY (uint px, uint py)
 		couleur->SetXY(px+310, py);
 }
 
-bool TPlayerLine::OwnZone(uint _x, uint _y)
+bool TPlayerLine::OwnZone(int _x, int _y)
 {
-	if(_x > x+45 && _x < x+70 && _y > y && _y < y+h)
+	if(_x > x+45 && _x < x+70 && _y > y && _y < int(y+h))
 		return true;
 	else
 		return false;
@@ -960,7 +988,7 @@ void TPlayerLine::Init()
 	couleur->Init();
 }
 
-void TPlayerLine::Draw(uint souris_x, uint souris_y)
+void TPlayerLine::Draw(int souris_x, int souris_y)
 {
 	assert(pl);
 
@@ -996,7 +1024,7 @@ void TPlayerLineHeader::Init()
 	label = new TLabel(x, y, s, black_color, &app.Font()->big);
 }
 
-void TPlayerLineHeader::SetXY (uint px, uint py)
+void TPlayerLineHeader::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
 	if(label)
@@ -1009,7 +1037,7 @@ TPlayerLineHeader::~TPlayerLineHeader()
 		delete label;
 }
 
-void TPlayerLineHeader::Draw(uint souris_x, uint souris_y)
+void TPlayerLineHeader::Draw(int souris_x, int souris_y)
 {
 	label->Draw(souris_x, souris_y);
 }

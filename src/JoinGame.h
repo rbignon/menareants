@@ -121,10 +121,10 @@ public:
 public:
 
 	void Init();                                          /**< Initialisation */
-	void Draw(uint souris_x, uint souris_y);              /**< Draw */
-	virtual void SetXY (uint _x, uint _y);                /**< Set \a x and \a y positions */
+	void Draw(int souris_x, int souris_y);                /**< Draw */
+	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 
-	bool OwnZone(uint _x, uint _y);
+	bool OwnZone(int _x, int _y);
 
 /* Composants */
 public:
@@ -141,8 +141,8 @@ private:
 
 	/* Privatisation de constructeurs à rendre inaccessibles */
 	TPlayerLine();
-	TPlayerLine(uint _x, uint _y);
-	TPlayerLine(uint _x, uint _y, uint _w, uint _h);
+	TPlayerLine(int _x, int _y);
+	TPlayerLine(int _x, int _y, uint _w, uint _h);
 
 	ECPlayer *pl;
 };
@@ -163,8 +163,8 @@ public:
 public:
 
 	void Init();                                          /**< No initialisation */
-	void Draw(uint souris_x, uint souris_y);              /**< Draw */
-	virtual void SetXY (uint _x, uint _y);                /**< Set \a x and \a y positions */
+	void Draw(int souris_x, int souris_y);                /**< Draw */
+	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 
 /* Composants */
 public:
