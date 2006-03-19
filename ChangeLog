@@ -1,3 +1,37 @@
+2005-03-18  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.h (is_num): Fonction pour vérifier si une chaine est un entier.
+
+	* lib/Map.cpp, lib/Units.h: Prise en compte du prix d'une entité.
+
+	* server/Map.cpp, lib/Map.cpp: Passage de server à lib des fonctions ECMap::AddAnEntity() et ECMap::RemoveAnEntity().
+
+	* src/gui/ShowMap.h (TShowMap): Composant qui affiche la carte.
+
+	* src/gui/ChildForm.h (TChildForm): Composant qui est une Form enfant.
+
+	* src/data/: Rajout des fleches, de la barre laterale, du curseur de selection et d'animation (de merde) pour la mer.
+
+	* src/gui/Component.h, src/gui/*: Passage des variables x et y de uint à int ainsi que quelques autres changements.
+
+	* src/InGame.cpp: Gestion de la carte, ébauche de la gestion des déplacements et des animations.
+
+	* src/JoinGame.cpp: Support du LEA, et des changements de modes pour le mode PLAYING.
+
+	* src/Sockets.cpp: Commande ARM.
+
+	* src/Map.cpp, src/Units.h: Dérivation des cases et entitées avec leur image, fonctions pour afficher, gérer, etc.
+
+	* src/Defines.h: Constantes pour la résolution de l'écran plutot que des valeurs magiques.
+
+	* src/tools/Images.cpp: Correction de bugs.
+
+	* src/tools/Font.cpp: Correction du bug qui n'affichait pas le texte bien au centre verticalement avec WriteCenter().
+
+2005-03-17  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/: Réorganisation en utilisant int plutot que uint pour X et Y.
+
 2005-03-17  Romain Bignon <progs@headfucking.net>
 
 	* lib/Channels.h: Petites améliorations.

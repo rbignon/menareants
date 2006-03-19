@@ -3,22 +3,18 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: vérifier la position des textes vertical dans un bouton
--client: composant TComboBox pour choisir une nation
 -mettre un mode pour l'argent du début
--support des nations
 
 * Urgent
 -support des nations
 -client: composant TComboBox pour choisir une nation
 -client: faire les dérivées des classes "Entity" pour arriver au graphique
--faire les dérivées d'ECBCase.
 
 * Bof
 -server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
 
 * Objectif actuel
--Préparation de la partie (classes tout ça)
+-jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
 
 * En parallèle (on s'en fou un peu de quand on les fait)
 -client: Suppression progressive du menu pour passer uniquement à des TForm.
@@ -26,7 +22,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -faire un éditeur de map (avec c++ builder pour que ça soit plus facile)
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
--Le jeu réel.
+-enrichissement du jeu.
 
 * Sur le très long terme
 -Bosser.
