@@ -71,6 +71,7 @@ public:
 	void toggleAnim() { mAnimating = !mAnimating; }
 	void startAnim() { mAnimating = 1; }
 	void stopAnim() { mAnimating = 0; }
+	void SetAnim(bool a) { mAnimating = a ? 1 : 0; }
 
 	/** Repasse à la première frame */
 	void rewind() { mFrame = 0; }
@@ -82,6 +83,8 @@ public:
 	void yset(int nr) { mY=nr; }
 	void set(int xx, int yy) { mX=xx; mY=yy; }
 
+	int X() { return mX; }
+	int Y() { return mY; }
 	int GetWidth();                             /**< Fonction pour la largeur */
 	int GetHeight();                            /**< Fonction pour la hauteur */
 
@@ -150,6 +153,8 @@ public:
 	/** Obtenir la hauteur */
 	unsigned int GetHeight() { return (Img ? Img->h : 0); }
 
+	void SetColorKey(unsigned int, unsigned int, unsigned int);
+
 	ECImage &operator=(const ECImage &src);
 
 	void Free();
@@ -157,7 +162,7 @@ public:
 /* Variables publiques */
 public:
 	SDL_Surface* Img;
-	bool pause;
+	int pause;
 };
 
 #endif /* EC_IMAGES_H */

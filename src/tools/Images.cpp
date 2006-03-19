@@ -110,7 +110,11 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   assert(base);
   assert(screen);
   mAnimating = 0;
+  mFrame = 0;
   mDrawn = 0;
+  mSpeed = 1;
+  mLastupdate = 0;
+  mX = 0; mY = 0; mOldX = 0; mOldY = 0;
 
   mSpriteBase = base;
   if(mSpriteBase->mBuilt)
@@ -150,7 +154,7 @@ void ECSprite::draw()
 {
   if(mAnimating == 1)
   {
-    if(mLastupdate+mSpriteBase->mAnim[mFrame].pause*mSpeed<SDL_GetTicks())
+    if(mLastupdate + mSpriteBase->mAnim[mFrame].pause * mSpeed<SDL_GetTicks())
     {
       mFrame++;
       if(mFrame>mSpriteBase->mNumframes-1) mFrame=0;
@@ -161,7 +165,10 @@ void ECSprite::draw()
   if(mDrawn==0) mDrawn=1;
 
   SDL_Rect dest;
-  dest.x = mX; dest.y = mY;
+  dest.x = mX;
+  dest.y = mY;
+  dest.w = GetWidth();
+  dest.h = GetHeight();
   SDL_BlitSurface(mSpriteBase->mAnim[mFrame].Img, NULL, mScreen, &dest);
 }
 
@@ -276,6 +283,7 @@ void ECImage::Load(char *fichier)
 {
 	//SDL_Surface *tmp;
 	Img = IMG_Load(fichier);
+	SetColorKey(255,0,255);
 	//Img = SDL_DisplayFormat(tmp);
 	//SDL_FreeSurface(Img);
 }
@@ -304,5 +312,10 @@ void ECImage::Draw(int x, int y, int w, int h, int x2, int y2)
 void ECImage::Draw()
 {
   Draw(0, 0);
+}
+
+void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)
+{
+	SDL_SetColorKey(Img, SDL_SRCCOLORKEY, SDL_MapRGB(Img->format, r, g, b));
 }
 
