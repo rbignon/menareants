@@ -89,7 +89,7 @@ int EuroConqApp::main(int argc, char **argv)
 
 		srand( (long)time(NULL) );
 
-  		app.sdlwindow = SDL_SetVideoMode(800,600,32, sdlflags);
+  		app.sdlwindow = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,32, sdlflags);
   		SDL_WM_SetCaption(get_title(), NULL);
 
 		ECImage *loading_image = Resources::Loadscreen();

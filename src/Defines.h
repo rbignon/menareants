@@ -53,6 +53,9 @@ const int NICKLEN=20;
 const int GAMELEN=15;
 const int COMLEN=10;
 
+const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH  = 800;
+
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
