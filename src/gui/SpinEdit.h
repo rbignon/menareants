@@ -45,7 +45,7 @@ public:
 	 * @param _step value added or removed when user clicks on one of buttons.
 	 * @param _defvalue this is default value that component has when it is created.
 	 */
-	TSpinEdit(std::string label, uint _x, uint _y, uint _width, int _min, int _max, uint _step = 1, int _defvalue = 0);
+	TSpinEdit(std::string label, int _x, int _y, uint _width, int _min, int _max, uint _step = 1, int _defvalue = 0);
 	virtual ~TSpinEdit();
 
 /* Methodes */
@@ -53,9 +53,9 @@ public:
 
 	virtual void Init();
 
-	void Draw (uint mouse_x, uint mouse_y);
+	void Draw (int mouse_x, int mouse_y);
 
-	bool Clic (uint mouse_x, uint mouse_y);
+	bool Clic (int mouse_x, int mouse_y);
 
 	void SetColorFont(SDL_Color new_color, Font* new_font);
 
@@ -71,7 +71,7 @@ public:
 	void SetMax(int _max);                                        /**< Set maximal value */
 	void SetMin(int _min);                                        /**< Set minimal value */
 	
-	virtual void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
+	virtual void SetXY (int _x, int _y);                          /**< Set \a x and \a y positions */
 	
 	/* Valeurs interdites */
 	void AddBadValue(int i);                                      /**< Add a bad value */

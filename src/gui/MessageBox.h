@@ -51,7 +51,7 @@ public:
 	 * @param _b this is flags of buttons to show.
 	 * @param form if there is a TForm, to continue to show it, put it in.
 	 */
-	TMessageBox(uint _x, uint _y, const char* _s, uint _b, TForm* form = 0)
+	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0)
 		: x(_x), y(_y), b(_b)
 	{
 		Edit = 0;
@@ -87,7 +87,7 @@ public:
 
 /* Variables privées */
 protected:
-	uint x, y;
+	int x, y;
 	uint w, h;
 	uint b;
 	uint height_string;

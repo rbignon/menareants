@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 
-TSpinEdit::TSpinEdit(std::string _label, uint _x, uint _y, uint _width, int _min, int _max, uint _step,
+TSpinEdit::TSpinEdit(std::string _label, int _x, int _y, uint _width, int _min, int _max, uint _step,
                      int _defvalue)
 	: TComponent(_x, _y, _width, SPINEDIT_HEIGHT), min(_min), max(_max), step(_step),
 	  label(_label)
@@ -78,7 +78,7 @@ void TSpinEdit::Init()
   if(txt_label) delete txt_label;
   if(txt_value) delete txt_value;
 
-  uint center = (m_plus->GetX() +5 + m_minus->GetX() )/2;
+  uint center = (m_plus->X() +5 + m_minus->X() )/2;
   txt_label = new TLabel(x, y, label, color, font);
   txt_value = new TLabel(center, y, "", color, font);
   SetValue(value, true);
@@ -122,7 +122,7 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 	return false;
 }
 
-void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
+void TSpinEdit::Draw (int mouse_x, int mouse_y)
 {
   if(txt_label)
     txt_label->Draw(mouse_x, mouse_y);
@@ -138,7 +138,7 @@ void TSpinEdit::Draw (uint mouse_x, uint mouse_y)
 
 //-----------------------------------------------------------------------------
 
-bool TSpinEdit::Clic (uint mouse_x, uint mouse_y)
+bool TSpinEdit::Clic (int mouse_x, int mouse_y)
 {
   if(!m_minus || !m_plus || !enabled) return false;
 
@@ -156,7 +156,7 @@ void TSpinEdit::SetColorFont(SDL_Color new_color, Font* new_font)
 	font = new_font;
 }
 
-void TSpinEdit::SetXY (uint px, uint py) { x = px; y = py; Init(); }
+void TSpinEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
 
 void TSpinEdit::SetMax(int _max)
 {

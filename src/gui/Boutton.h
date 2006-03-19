@@ -36,20 +36,20 @@ protected:
 
 public:
   TButton();
-  TButton (unsigned int x, unsigned int y, unsigned int w, unsigned int h);
+  TButton (int x, int y, unsigned int w, unsigned int h);
   ~TButton();
 
   void Init() {}
 
   void SetImage (ECSprite *image);
 
-  bool Test (unsigned int souris_x, unsigned int souris_y) const;
-  virtual void Draw (unsigned int souris_x, unsigned int souris_y);
+  bool Test (int souris_x, int souris_y) const;
+  virtual void Draw (int souris_x, int souris_y);
 
   unsigned int Tag;
 
 protected:
-  void DrawImage (unsigned int souris_x, unsigned int souris_y);
+  void DrawImage (int souris_x, int souris_y);
 };
 
 

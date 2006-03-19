@@ -31,7 +31,7 @@ class TColorEdit : public TSpinEdit
 {
 /* Constructor/Destructor */
 public:
-	TColorEdit(std::string label, uint _x, uint _y, uint _width, int _defvalue = 0);
+	TColorEdit(std::string label, int _x, int _y, uint _width, int _defvalue = 0);
 
 	~TColorEdit();
 
@@ -40,7 +40,7 @@ public:
 
 	void Init();
 
-	void Draw (uint mouse_x, uint mouse_y);
+	void Draw (int mouse_x, int mouse_y);
 
 /* Attributs */
 public:

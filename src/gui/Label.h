@@ -32,14 +32,14 @@ class TLabel : public TComponent
 /* Constructeur/Destructeur */
 public:
 
-	TLabel(unsigned int x, unsigned int y, std::string s, SDL_Color new_color, Font* new_font);
+	TLabel(int x, int y, std::string s, SDL_Color new_color, Font* new_font);
 	~TLabel();
 
 /* Methodes */
 public:
 
 	/** Draw */
-	void Draw(unsigned int m_x, unsigned int m_y);
+	void Draw(int m_x, int m_y);
 
 	/** Initialization. It is requiered to be defined by TComponent but it isn't necessary for TLabel */
 	void Init() {}

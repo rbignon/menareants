@@ -33,7 +33,7 @@ class TImage : public TComponent
 public:
 
 	TImage();
-	TImage(uint x, uint y, ECImage* _img = 0, bool wana_delete = true);
+	TImage(int x, int y, ECImage* _img = 0, bool wana_delete = true);
 	~TImage();
 
 /* Methodes */
@@ -41,7 +41,7 @@ public:
 
 	void Init();
 
-	void Draw (uint mouse_x, uint mouse_y);
+	void Draw (int mouse_x, int mouse_y);
 
 /* Attributs */
 public:

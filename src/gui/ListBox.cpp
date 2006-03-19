@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <SDL.h>
 
-TListBox::TListBox (uint _x, uint _y, uint _width, uint _height)
+TListBox::TListBox (int _x, int _y, uint _width, uint _height)
   : TComponent(_x, _y, _width, _height)
 {
   height_item = 15;
@@ -85,19 +85,19 @@ void TListBox::Init()
 
 }
 
-int TListBox::MouseIsOnWitchItem (uint mouse_x, uint mouse_y)
+int TListBox::MouseIsOnWitchItem (int mouse_x, int mouse_y)
 {
   if ((mouse_x < x+1)
       || (mouse_y < y+1)
-      || ((y+1 + visible_height) < mouse_y)
-      || ((x + w) < mouse_x))
+      || (int(y+1 + visible_height) < mouse_y)
+      || (int(x + w) < mouse_x))
     return -1;
 
   int index = (mouse_y - y)/height_item;
   return BorneLong(index+first_visible_item, 0, m_items.size()-1);
 }
 
-bool TListBox::Clic (uint mouse_x, uint mouse_y)
+bool TListBox::Clic (int mouse_x, int mouse_y)
 {
 
   // buttons for listbox with more items than visible
@@ -128,7 +128,7 @@ bool TListBox::Clic (uint mouse_x, uint mouse_y)
   return true;
 }
 
-void TListBox::Draw (uint mouse_x, uint mouse_y)
+void TListBox::Draw (int mouse_x, int mouse_y)
 {
   int item = MouseIsOnWitchItem(mouse_x, mouse_y);
 

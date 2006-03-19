@@ -24,7 +24,7 @@
  *                                 TList                                                    *
  ********************************************************************************************/
 
-TList::TList(uint _x, uint _y)
+TList::TList(int _x, int _y)
 	: TComponent(_x, _y)
 {
 	list.clear(); /* On ne sait jamais */
@@ -41,8 +41,8 @@ void TList::AddLine(TComponent *c)
 {
 	list.push_back(c);
 	c->SetXY(x, y+h);
-	h += c->GetHeight();
-	if(c->GetWidth() > w) w = c->GetWidth();
+	h += c->Height();
+	if(c->Width() > w) w = c->Width();
 	c->Init();
 }
 
@@ -52,7 +52,7 @@ bool TList::RemoveLine(TComponent *c, bool use_delete)
 	{
 		if (*it == c)
 		{
-			h -= c->GetHeight();
+			h -= c->Height();
 			if(use_delete)
 				delete c;
 			it = list.erase(it);
@@ -72,20 +72,20 @@ void TList::Rebuild()
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		(*it)->SetXY(x, y+h);
-		h += (*it)->GetHeight();
-		if((*it)->GetWidth() > w)
-			w = (*it)->GetWidth();
+		h += (*it)->Height();
+		if((*it)->Width() > w)
+			w = (*it)->Width();
 	}
 	visible = true;
 }
 
-void TList::Draw(uint souris_x, uint souris_y)
+void TList::Draw(int souris_x, int souris_y)
 {
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 		(*it)->Draw(souris_x, souris_y);
 }
 
-void TList::SetXY (uint px, uint py)
+void TList::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
 	Rebuild();
@@ -95,12 +95,12 @@ void TList::SetXY (uint px, uint py)
  *                                 TComponent                                               *
  ********************************************************************************************/
 
-unsigned int TComponent::GetX() const { return x; }
-unsigned int TComponent::GetY() const { return y; }
-unsigned int TComponent::GetWidth() const { return w; }
-unsigned int TComponent::GetHeight() const { return h; }
+int TComponent::X() const { return x; }
+int TComponent::Y() const { return y; }
+unsigned int TComponent::Width() const { return w; }
+unsigned int TComponent::Height() const { return h; }
 
-void TComponent::SetXY (uint px, uint py) { x = px; y = py; }
+void TComponent::SetXY (int px, int py) { x = px; y = py; }
 
 void TComponent::SetHeight (uint ph)
 {

@@ -42,7 +42,7 @@ public:
 	 * @param _x x position
 	 * @param _y y position
 	 */
-	TComponent(uint _x, uint _y)
+	TComponent(int _x, int _y)
 		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true)
 	{}
 
@@ -52,7 +52,7 @@ public:
 	 * @param _w width of component
 	 * @param _h heigh of component
 	 */
-	TComponent(uint _x, uint _y, uint _w, uint _h)
+	TComponent(int _x, int _y, uint _w, uint _h)
 		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true)
 	{}
 
@@ -62,7 +62,7 @@ public:
 public:
 
 	/** Draw the object. */
-	virtual void Draw(unsigned int souris_x, unsigned int souris_y) = 0;
+	virtual void Draw(int souris_x, int souris_y) = 0;
 
 	/** Initialization. */
 	virtual void Init() = 0;
@@ -71,13 +71,13 @@ public:
 public:
 
 	/* Obtient la position, la hauteur ou la largeur */
-	unsigned int GetX() const;                            /**< Get \a x position. */
-	unsigned int GetY() const;                            /**< Get \a y position. */
-	unsigned int GetWidth() const;                        /**< Get \a width position. */
-	unsigned int GetHeight() const;                       /**< Get \a height position. */
+	int X() const;                                        /**< Get \a x position. */
+	int Y() const;                                        /**< Get \a y position. */
+	unsigned int Width() const;                           /**< Get \a width position. */
+	unsigned int Height() const;                          /**< Get \a height position. */
 
 	/* Définie la position, la hauteur ou la largeur */
-	virtual void SetXY (uint _x, uint _y);                        /**< Set \a x and \a y positions */
+	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 	void SetHeight (uint _h);                             /**< Set \a height */
 	void SetWidth (uint _w);                              /**< Set \a width */
 
@@ -91,7 +91,7 @@ public:
 
 /* Variables privées */
 protected:
-	uint x, y;
+	int x, y;
 	uint h, w;
 	bool visible;
 	bool enabled;
@@ -149,7 +149,7 @@ public:
 	 * @param _x this is x position of first component in list
 	 * @param _y this is y position of first component in list
 	 */
-	TList(uint _x, uint _y);
+	TList(int _x, int _y);
 
 	~TList();
 
@@ -165,7 +165,7 @@ public:
 	bool RemoveLine(TComponent *c, bool use_delete = false);
 
 	/** Draw all components in list */
-	void Draw(uint souris_x, uint souris_y);
+	void Draw(int souris_x, int souris_y);
 
 	/** Initialization not requiered... But it is a virtual function so i have to implemente this  */
 	void Init() {}
@@ -173,7 +173,7 @@ public:
 /* Attributs */
 public:
 
-	void SetXY (uint _x, uint _y); /** Reimplementation to affect all components in the list */
+	void SetXY (int _x, int _y); /** Reimplementation to affect all components in the list */
 
 	/** Get list of components as a vector */
 	ComponentVector GetList() const { return list; }

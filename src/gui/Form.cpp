@@ -55,10 +55,9 @@ void TForm::Update(int x, int y, bool flip)
 	if(x < 0 || y < 0)
 		SDL_GetMouseState( &x, &y);
 
-	size_t s = composants.size();
-	for(uint i=0; i<s; i++)
-		if(composants[i]->Visible())
-			composants[i]->Draw(x, y);
+	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
+		if((*it)->Visible())
+			(*it)->Draw(x, y);
 
 	if(flip)
 		SDL_Flip(app.sdlwindow);

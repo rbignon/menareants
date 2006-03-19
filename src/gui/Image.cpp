@@ -30,7 +30,7 @@ TImage::TImage()
 	wana_delete = true;
 }
 
-TImage::TImage(uint _x, uint _y, ECImage* _img, bool _wana_delete)
+TImage::TImage(int _x, int _y, ECImage* _img, bool _wana_delete)
 	: TComponent(_x, _y), image(_img), wana_delete(_wana_delete)
 {
 
@@ -57,7 +57,7 @@ void TImage::SetImage(ECImage* _img, bool _wd)
 	Init();
 }
 
-void TImage::Draw(uint _x, uint _y)
+void TImage::Draw(int _x, int _y)
 {
 	if(!image) return;
 	SDL_Rect r_back = {x,y,w,h};

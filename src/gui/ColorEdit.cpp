@@ -35,7 +35,7 @@ SDL_Color *color_eq[] = {
 	/* COLOR_MAX    */          NULL
 };
 
-TColorEdit::TColorEdit(std::string _label, uint _x, uint _y, uint _width, int _defvalue)
+TColorEdit::TColorEdit(std::string _label, int _x, int _y, uint _width, int _defvalue)
 	: TSpinEdit(_label, _x, _y, _width, COLOR_NONE, COLOR_MAX-1, 1, _defvalue)
 {
 	imgx = 0;
@@ -67,7 +67,7 @@ void TColorEdit::Init()
   /* Label */
   if(txt_label) delete txt_label;
 
-  imgx = m_minus->GetX() + m_minus->GetWidth() + 5;
+  imgx = m_minus->X() + m_minus->Width() + 5;
 
   txt_label = new TLabel(x, y, label, color, font);
 
@@ -96,7 +96,7 @@ bool TColorEdit::SetValue(int _value, bool first)
   return true;
 }
 
-void TColorEdit::Draw (uint mouse_x, uint mouse_y)
+void TColorEdit::Draw (int mouse_x, int mouse_y)
 {
   if(img)
   {

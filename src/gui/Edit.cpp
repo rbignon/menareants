@@ -24,7 +24,7 @@
 #include "Edit.h"
 #include <SDL.h>
 
-TEdit::TEdit (uint _x, uint _y, uint _width, uint _maxlen)
+TEdit::TEdit (int _x, int _y, uint _width, uint _maxlen)
   : TComponent(_x, _y, _width, EDIT_HEIGHT)
 {
   first_char = 0;
@@ -56,10 +56,10 @@ void TEdit::Init()
 
 }
 
-bool TEdit::Clic (uint mouse_x, uint mouse_y)
+bool TEdit::Clic (int mouse_x, int mouse_y)
 {
-	if((x <= mouse_x) && (mouse_x <= x+w)
-	  && (y <= mouse_y) && (mouse_y <= y+h))
+	if((x <= mouse_x) && (mouse_x <= int(x+w))
+	  && (y <= mouse_y) && (mouse_y <= int(y+h)))
 		SetFocus();
 	else
 		DelFocus();
@@ -77,7 +77,7 @@ void TEdit::DelFocus()
 	focus = false;
 }
 
-void TEdit::Draw (uint m_x, uint m_y)
+void TEdit::Draw (int m_x, int m_y)
 {
   SDL_Rect r_back = {x,y,w,h};
   SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);

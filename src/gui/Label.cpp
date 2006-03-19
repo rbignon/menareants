@@ -21,7 +21,7 @@
 #include "Label.h"
 #include "Main.h"
 
-TLabel::TLabel(unsigned int x, unsigned int y, std::string new_txt, SDL_Color new_color, Font* new_font)
+TLabel::TLabel(int x, int y, std::string new_txt, SDL_Color new_color, Font* new_font)
 	: TComponent(x, y)
 {
   assert(new_font!=NULL);
@@ -60,7 +60,7 @@ void TLabel::SetCaption (std::string new_txt)
   surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
 }
 
-void TLabel::Draw(unsigned int m_x, unsigned int m_y)
+void TLabel::Draw(int m_x, int m_y)
 {
 	if(!surf) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
 

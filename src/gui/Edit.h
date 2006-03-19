@@ -38,7 +38,7 @@ class TEdit : public TComponent
 /* Constructeur/Deconstructeur */
 public:
 
-	TEdit(uint _x, uint _y, uint _width, uint _maxlen = 0);
+	TEdit(int _x, int _y, uint _width, uint _maxlen = 0);
 	~TEdit();
 
 /* Methodes */
@@ -48,10 +48,10 @@ public:
 	void Init ();
 
 	/* Click */
-	bool Clic (uint mouse_x, uint mouse_y);
+	bool Clic (int mouse_x, int mouse_y);
 
 	/* Affiche */
-	void Draw(uint m_x, uint m_y);
+	void Draw(int m_x, int m_y);
 
 	/* Une touche a été pressée */
 	void PressKey(SDL_keysym);

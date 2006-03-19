@@ -60,11 +60,11 @@ private:
   SDL_Surface *background;
 
 public:
-  TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
+  TMemo (int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
   ~TMemo();
   void Init ();
-  void Draw (uint mouse_x, uint mouse_y);
-  bool Clic (uint mouse_x, uint mouse_y);
+  void Draw (int mouse_x, int mouse_y);
+  bool Clic (int mouse_x, int mouse_y);
   void AddItem (const std::string &label, SDL_Color _color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);

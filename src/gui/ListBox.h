@@ -69,19 +69,19 @@ private:
   SDL_Surface *background;
 
 public:
-  TListBox (uint _x, uint _y, uint _width, uint _height);
+  TListBox (int _x, int _y, uint _width, uint _height);
   ~TListBox();
   void Init ();
 
-  void Draw (uint mouse_x, uint mouse_y);
-  bool Clic (uint mouse_x, uint mouse_y);
+  void Draw (int mouse_x, int mouse_y);
+  bool Clic (int mouse_x, int mouse_y);
 
   void AddItem (bool selected,
 		const std::string &label,
 		const std::string &value,
 		SDL_Color _color, bool _enabled);
   void ClearItems();
-  int MouseIsOnWitchItem (uint mouse_x, uint mouse_y);
+  int MouseIsOnWitchItem (int mouse_x, int mouse_y);
   void Select (uint index);
   void Deselect (uint index);
   bool IsSelected (uint index);

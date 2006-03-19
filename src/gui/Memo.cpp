@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <SDL.h>
 
-TMemo::TMemo (uint _x, uint _y, uint _width, uint _height, uint max_items, bool _show_background)
+TMemo::TMemo (int _x, int _y, uint _width, uint _height, uint max_items, bool _show_background)
   : TComponent(_x, _y, _width, _height), show_background(_show_background)
 {
   height_item = 15;
@@ -67,7 +67,7 @@ void TMemo::Init()
 
 }
 
-bool TMemo::Clic (uint mouse_x, uint mouse_y)
+bool TMemo::Clic (int mouse_x, int mouse_y)
 {
   if (m_items.size() > nb_visible_items_max)
   {
@@ -90,7 +90,7 @@ bool TMemo::Clic (uint mouse_x, uint mouse_y)
   return false;
 }
 
-void TMemo::Draw (uint mouse_x, uint mouse_y)
+void TMemo::Draw (int mouse_x, int mouse_y)
 {
   if(background)
   {
