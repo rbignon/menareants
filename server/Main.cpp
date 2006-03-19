@@ -133,7 +133,7 @@ try {
 	Commands.push_back(new ERRCommand("ERR",	0,			1));
 	Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
 	Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
-	Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	0));
+	Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGALRM, &sig_alarm);

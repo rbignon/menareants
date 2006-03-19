@@ -142,14 +142,14 @@ void EChannel::NextAnim()
 }
 
 template<typename T>
-static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _case, uint _nb)
+static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
 {
-	return new T(_name, _owner, _case, _nb);
+	return new T(_name, _owner, _case);
 }
 
 static struct
 {
-	ECEntity* (*func) (const Entity_ID _name, ECBPlayer* _owner, ECase* _case, uint _nb);
+	ECEntity* (*func) (const Entity_ID _name, ECBPlayer* _owner, ECase* _case);
 } entities_type[] = {
 	/* E_ARMY */{ CreateEntity<ECArmy> },
 	/* E_END  */{ NULL }
@@ -218,15 +218,19 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				if(!entity)
 				{
-					nb = StrToTyp<uint>(parv[i].substr(1));
+					if(is_num(parv[i].substr(1).c_str()))
+						nb = StrToTyp<uint>(parv[i].substr(1));
 					flags |= ARM_NUMBER;
 				}
 				break;
 			}
 			case '%':
 			{
-				type = StrToTyp<uint>(parv[i].substr(1));
-				flags |= ARM_TYPE;
+				if(is_num(parv[i].substr(1).c_str()))
+				{
+					type = StrToTyp<uint>(parv[i].substr(1));
+					flags |= ARM_TYPE;
+				}
 				break;
 			}
 			case '/':
@@ -242,15 +246,16 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			return Debug(W_DESYNCH, "ARM: Création d'une entité incorrecte");
 
 		const char *e_name = chan->FindEntityName(cl->Player());
-		entity = entities_type[type].func(e_name, cl->Player(), (*(chan->Map()))(x,y), nb);
-		if(!entity->CanBeCreated())
+		entity = entities_type[type].func(e_name, cl->Player(), (*(chan->Map()))(x,y));
+		if(!entity->CanBeCreated() || int(entity->Cost()) > cl->Player()->Money())
 		{
 			MyFree(entity);
 			flags = 0;
 		}
 		else
 		{
-			/** \todo: mettre ici concernant l'argent */
+			cl->Player()->DownMoney(entity->Cost());
+
 			ECEvent* event = 0;
 
 			if(entity->Case()->Entities()->Sames(entity))

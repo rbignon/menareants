@@ -798,6 +798,7 @@ void EChannel::SetMap(ECBMap *m)
 	}
 
 	map = _new_map;
+	map->SetChannel(this);
 
 	/* Envoie d'une map */
 	std::vector<std::string> map_file = map->MapFile();
@@ -903,4 +904,10 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 		(dynamic_cast<ECPlayer*> (*it))->Client()->sendbuf(buf, len);
 	}
 	return 0;
+}
+
+bool EChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
+{
+	/// \todo supporter la suppression des unités, et la mise à neutre des territoires
+	return ECBChannel::RemovePlayer(pl, use_delete);
 }

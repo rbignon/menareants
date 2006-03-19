@@ -135,7 +135,7 @@ public:
 	 * a good flag to call them in function.
 	 *
 	 * <pre>
-	 * Flags: (Definition in Map.h before ECEvent)
+	 * Flags: (Definition in lib/Map.h before ECBEntity)
 	 * ARM_MOVE      0x001
 	 * ARM_SPLIT     0x002
 	 * ARM_ATTAQ     0x004
@@ -181,6 +181,8 @@ public:
 	virtual void SetLimite(unsigned int l);
 
 	ECMap *Map() const { return (ECMap*)map; }
+
+	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 	
 /* Variables privées */
 protected:
