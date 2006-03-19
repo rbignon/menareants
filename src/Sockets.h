@@ -58,6 +58,8 @@ public:
 		MSG,         /**< MSG */
 		SET,         /**< SET */
 
+		ARM,         /**< ARM */
+
 		NONE
 	};
 

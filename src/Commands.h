@@ -109,6 +109,8 @@ class SMAPCommand : public EC_ACommand { public: SMAPCommand(const std::string _
 
 class EOSMAPCommand : public EC_ACommand { public: EOSMAPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOSMAPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 #else
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );

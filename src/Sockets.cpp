@@ -44,6 +44,8 @@ const char* msgTab[] = {
 	"LEA",                                    /* LEA - Partir d'une partie */
 	"MSG %s",                                 /* MSG - Message dans une partie */
 	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
+
+	"ARM %s",                                 /* ARM - Envoie des infos sur une armée */
      0
 };
 
@@ -117,6 +119,7 @@ void EC_Client::parse_message(std::string buf)
 					{
 						std::string tmp;
 						tmp = stringtok(line, ",");
+						if(tmp.find('!')) tmp = stringtok(tmp, "!");
 						ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
 						if(tmpl) players.push_back(tmpl);
 						/* Il est tout à fait possible que le player ne soit pas trouvé,
@@ -266,6 +269,8 @@ void EC_Client::Init()
 	Commands.push_back(new EOMAPCommand("EOMAP",0,	0));
 	Commands.push_back(new SMAPCommand("SMAP",	0,	1));
 	Commands.push_back(new EOSMAPCommand("EOSMAP",0,0));
+
+	Commands.push_back(new ARMCommand("ARM",	0,	0));
 	
 }
 
