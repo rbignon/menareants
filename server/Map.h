@@ -78,18 +78,6 @@ protected:
 /********************************************************************************************
  *                                 ECEvent                                                  *
  ********************************************************************************************/
-#define ARM_MOVE      0x001
-#define ARM_SPLIT     0x002
-#define ARM_ATTAQ     0x004
-#define ARM_REMOVE    0x008
-#define ARM_LOCK      0x010
-#define ARM_TYPE      0x020
-#define ARM_NUMBER    0x040
-#define ARM_RETURN    0x080
-#define ARM_HIDE      0x100
-#define ARM_RECURSE   0x200 /* ne JAMAIS appeler */
-#define ARM_UNION     (ARM_MOVE|ARM_NUMBER)
-#define ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 class ECEvent
 {
 /* Constructeur/Destructeur */
@@ -160,9 +148,6 @@ public:
 
 /* Méthodes */
 public:
-
-	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
-	void AddAnEntity(ECBEntity*);
 
 	void SortEvents();
 

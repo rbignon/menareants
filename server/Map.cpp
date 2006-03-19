@@ -70,28 +70,6 @@ ECMap::~ECMap()
 		delete *it;
 }
 
-void ECMap::AddAnEntity(ECBEntity* e)
-{
-	if(!e) return;
-
-	e->Case()->Entities()->Add(e);
-	if(e->Case()->Country()->Owner())
-		e->Case()->Country()->Owner()->Player()->Entities()->Add(e);
-	entities.Add(e);
-}
-
-void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
-{
-	if(!e) return;
-
-	e->Case()->Entities()->Remove(e);
-	entities.Remove(e);
-	if(e->Owner())
-		e->Owner()->Entities()->Remove(e);
-	if(use_delete)
-		delete e;
-}
-
 EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 {
 		for(EventVector::iterator it = map_events.begin(); it != map_events.end();)
