@@ -135,7 +135,7 @@ void Font::WriteRight (int x, int y, const std::string &txt,
 void Font::WriteCenter (int x, int y, const std::string &txt,
  const SDL_Color &color){
   ECImage surface( Render(txt, color, true) );
-  Write( x - surface.GetWidth()/2, y - surface.GetHeight(), surface);
+  Write( x - surface.GetWidth()/2, y - surface.GetHeight()/2, surface);
 }
 
 void Font::WriteCenterTop (int x, int y, const std::string &txt,
