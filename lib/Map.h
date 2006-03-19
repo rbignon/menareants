@@ -58,6 +58,18 @@ typedef char MapPlayer_ID;
 /********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
+#define ARM_MOVE      0x001
+#define ARM_SPLIT     0x002
+#define ARM_ATTAQ     0x004
+#define ARM_REMOVE    0x008
+#define ARM_LOCK      0x010
+#define ARM_TYPE      0x020
+#define ARM_NUMBER    0x040
+#define ARM_RETURN    0x080
+#define ARM_HIDE      0x100
+#define ARM_RECURSE   0x200 /* ne JAMAIS appeler */
+#define ARM_UNION     (ARM_MOVE|ARM_NUMBER)
+#define ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 class ECBEntity
 {
 /* Constructor/Destructor */
@@ -68,9 +80,9 @@ public:
 		E_END
 	};
 
-	ECBEntity() : owner(0), acase(0), last(0), shooted(0) {}
+	ECBEntity() : owner(0), acase(0), last(0), lock(false), shooted(0), cost(0) {}
 
-	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint nb = 0);
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0);
 
 	virtual ~ECBEntity();
 
@@ -146,6 +158,8 @@ public:
 	void SetMyStep(uint s) { myStep = s; }
 	uint RestStep() { return restStep; }
 	void SetRestStep(uint s) { restStep = s; }
+
+	uint Cost() { return cost; }
 	
 
 /* Variables protégées */
@@ -160,6 +174,7 @@ protected:
 	uint myStep;
 	uint restStep;
 	uint shooted;
+	uint cost;
 
 	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
 };
@@ -496,6 +511,7 @@ public:
 
 	/** Channel linked to map */
 	ECBChannel* Channel() { return chan; }
+	void SetChannel(ECBChannel* c) { chan = c; }
 
 	int BeginMoney() { return begin_money; }           /**< All players have this money when they begin the game */
 	int CityMoney() { return city_money; }             ///< This is money that is given to players at each turn by cities
@@ -527,6 +543,9 @@ public:
 	 * Example: map(x,y)
 	 */
 	ECBCase* operator() (uint x, uint y) const;
+
+	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
+	void AddAnEntity(ECBEntity*);
 
 /* Variables privées */
 protected:

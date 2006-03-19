@@ -140,8 +140,8 @@ ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, 
  *                               ECBEntity                                                  *
  ********************************************************************************************/
 
-ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _nb)
-	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false), shooted(0)
+ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb)
+	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false), shooted(0), cost(_c)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -179,6 +179,10 @@ void ECBEntity::AddUnits(uint u)
 bool ECBEntity::CanBeCreated()
 {
 	assert(acase);
+
+	/** \todo avec les nations, vérifier ici si ma nation peut créer cette unité, car si
+	 * ce n'est pas le cas autant se barrer de suite.
+	 */
 
 	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
@@ -680,3 +684,26 @@ ECBCase* ECBMap::operator() (uint _x, uint _y) const
 	/** \warning ALIGNEMENT FAIT LIGNE PAR LIGNE !!! */
 	return map[ _y * x + _x ];
 }
+
+void ECBMap::AddAnEntity(ECBEntity* e)
+{
+	if(!e) return;
+
+	e->Case()->Entities()->Add(e);
+	if(e->Case()->Country()->Owner())
+		e->Case()->Country()->Owner()->Player()->Entities()->Add(e);
+	entities.Add(e);
+}
+
+void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
+{
+	if(!e) return;
+
+	e->Case()->Entities()->Remove(e);
+	entities.Remove(e);
+	if(e->Owner())
+		e->Owner()->Entities()->Remove(e);
+	if(use_delete)
+		delete e;
+}
+

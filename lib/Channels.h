@@ -57,7 +57,7 @@ public:
 	/** Player's Channel. */
 	ECBChannel *Channel() { return chan; }
 
-	uint Money() { return money; }                     /**< This is player's money. */
+	int Money() { return money; }                      /**< This is player's money. */
 	virtual void UpMoney(int m) { money += m; }        /**< Add some money. */
 	virtual void DownMoney(int m) { money -= m; }      /**< Remove some money. */
 	virtual void SetMoney(int m) { money = m; }        /**< Set money. */
@@ -168,7 +168,7 @@ public:
 	 * @param pl class of player to remove.
 	 * @param use_delete if true, use \a delete on \a pl .
 	 */
-	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
+	virtual bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 
 	/** Return number of players in channel. */
 	unsigned int NbPlayers() const { return players.size(); }
