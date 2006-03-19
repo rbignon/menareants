@@ -21,6 +21,7 @@ euroconq_SOURCES = \
 		tools/Maths.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
+		gui/ChildForm.cpp \
 		gui/Menu.cpp \
 		gui/ListBox.cpp \
 		gui/Boutton.cpp \
@@ -31,7 +32,8 @@ euroconq_SOURCES = \
 		gui/Label.cpp \
 		gui/SpinEdit.cpp \
 		gui/ColorEdit.cpp \
-		gui/Image.cpp
+		gui/Image.cpp \
+		gui/ShowMap.cpp
 
 euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
 
