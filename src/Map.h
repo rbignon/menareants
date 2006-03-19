@@ -26,6 +26,48 @@
 #include "tools/Images.h"
 #include <vector>
 
+class ECase;
+
+/********************************************************************************************
+ *                                 ECEntity                                                 *
+ ********************************************************************************************/
+class ECEntity : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECEntity() : image(0), selected(false), new_case(0) {}
+
+	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
+
+	virtual ~ECEntity();
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	bool Test(int x, int y);
+
+	void Draw();
+	ECSprite* Image() { return image; }
+	void SetImage(ECSpriteBase* spr);
+	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
+
+	void SetNewCase(ECase* nc) { new_case = nc; }
+	ECase* NewCase() { return new_case; }
+
+	void Select(bool s = true) { selected = s; }
+	bool Selected() { return selected; }
+
+/* Variables privées */
+protected:
+	ECSprite* image;
+	bool selected;
+	ECase* new_case;
+};
+
 /********************************************************************************************
  *                                ECase                                                     *
  ********************************************************************************************/
@@ -47,6 +89,10 @@ public:
 /* Attributs */
 public:
 
+	bool Test(int x, int y);
+
+	void Draw();
+	ECSprite* Image() { return image; }
 	void SetImage(ECSpriteBase* spr);
 
 /* Variables privées */
@@ -166,6 +212,5 @@ protected:
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
-
 
 #endif /* EC_MAP_H */

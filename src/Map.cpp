@@ -30,6 +30,43 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                                 ECEntity                                                 *
+ ********************************************************************************************/
+
+ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), image(0), selected(false), new_case(0)
+{}
+
+ECEntity::~ECEntity()
+{
+	delete image;
+}
+
+bool ECEntity::Test(int souris_x, int souris_y)
+{
+	return (image && ((image->X() <= souris_x) && (souris_x <= (int)(image->X()+image->GetWidth()))
+	         && (image->Y() <= souris_y) && (souris_y <= int(image->Y()+image->GetHeight()))));
+}
+
+void ECEntity::Draw()
+{
+	if(image)
+	{
+		image->draw();
+		if(selected)
+			Resources::Cadre()->Draw(image->X(),image->Y());
+	}
+}
+
+void ECEntity::SetImage(ECSpriteBase* spr)
+{
+	if(image) MyFree(image);
+	if(!spr) return;
+	image = new ECSprite(spr, app.sdlwindow);
+	image->SetAnim(false);
+}
+
+/********************************************************************************************
  *                                ECase                                                     *
  ********************************************************************************************/
 
@@ -44,9 +81,22 @@ ECase::~ECase()
 	delete image;
 }
 
+bool ECase::Test(int souris_x, int souris_y)
+{
+	return (image && ((image->X() <= souris_x) && (souris_x <= (int)(image->X()+image->GetWidth()))
+	         && (image->Y() <= souris_y) && (souris_y <= int(image->Y()+image->GetHeight()))));
+}
+
+void ECase::Draw()
+{
+	if(image)
+		image->draw();
+}
+
 void ECase::SetImage(ECSpriteBase* spr)
 {
 	if(image) delete image;
+	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
 }
 
@@ -141,8 +191,6 @@ void ECMap::CreatePreview(uint width, uint height)
 {
 	if(!initialised) return;
 
-	if(preview) delete preview;
-
 	uint size_x = width/x, size_y = height/y;
 
 	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_SWSURFACE|SDL_SRCALPHA);
@@ -235,5 +283,6 @@ void ECMap::CreatePreview(uint width, uint height)
 			}
 		}
 	}
+	if(preview) delete preview;
 	preview = new ECImage(surf);
 }
