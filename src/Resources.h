@@ -94,9 +94,22 @@ public:
 	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_PICS "menu.png");
 	R_RESOURCE(ECImage,      Menuscreen,       PKGDATADIR_PICS "menu_vide.png");
 	R_RESOURCE(ECImage,      Loadscreen,       PKGDATADIR_PICS "loading.png");
+	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
+	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
+	R_RESOURCE(ECImage,      FlecheVert,       PKGDATADIR_PICS "fleches/fleche_vert.png");
+	R_RESOURCE(ECImage,      FlecheHoriz,      PKGDATADIR_PICS "fleches/fleche_horiz.png");
+	R_RESOURCE(ECImage,      FlecheDroiteHaut, PKGDATADIR_PICS "fleches/fleche_droitehaut.png");
+	R_RESOURCE(ECImage,      FlecheDroiteBas,  PKGDATADIR_PICS "fleches/fleche_droitebas.png");
+	R_RESOURCE(ECImage,      FlecheGaucheHaut, PKGDATADIR_PICS "fleches/fleche_gauchehaut.png");
+	R_RESOURCE(ECImage,      FlecheGaucheBas,  PKGDATADIR_PICS "fleches/fleche_gauchebas.png");
+	R_RESOURCE(ECImage,      FlecheVersDroite, PKGDATADIR_PICS "fleches/fleche_vers_droite.png");
+	R_RESOURCE(ECImage,      FlecheVersGauche, PKGDATADIR_PICS "fleches/fleche_vers_gauche.png");
+	R_RESOURCE(ECImage,      FlecheVersHaut,   PKGDATADIR_PICS "fleches/fleche_vers_haut.png");
+	R_RESOURCE(ECImage,      FlecheVersBas,    PKGDATADIR_PICS "fleches/fleche_vers_bas.png");
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
 	R_RESOURCE(ECSpriteBase, NormalButton,     "normalbutton");
+	R_RESOURCE(ECSpriteBase, LitleButton,      "litlebutton");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");
 	R_RESOURCE(ECSpriteBase, CaseVille,        "cases/ville");
@@ -113,6 +126,10 @@ public:
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest, "cases/coinso");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst,  "cases/coinno");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest,"cases/coinne");
+	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
+	R_RESOURCE(ECSpriteBase, Army_Left,        "units/army/left");
+	R_RESOURCE(ECSpriteBase, Army_Right,       "units/army/right");
+	R_RESOURCE(ECSpriteBase, Army_Dos,         "units/army/dos");
 };
 
 #undef R_RESOURCE

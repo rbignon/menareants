@@ -34,9 +34,22 @@
 	R_RESOURCE(ECImage,      Titlescreen);
 	R_RESOURCE(ECImage,      Menuscreen);
 	R_RESOURCE(ECImage,      Loadscreen);
+	R_RESOURCE(ECImage,      BarreLat);
+	R_RESOURCE(ECImage,      Cadre);
+	R_RESOURCE(ECImage,      FlecheVert);
+	R_RESOURCE(ECImage,      FlecheHoriz);
+	R_RESOURCE(ECImage,      FlecheDroiteHaut);
+	R_RESOURCE(ECImage,      FlecheDroiteBas);
+	R_RESOURCE(ECImage,      FlecheGaucheHaut);
+	R_RESOURCE(ECImage,      FlecheGaucheBas);
+	R_RESOURCE(ECImage,      FlecheVersDroite);
+	R_RESOURCE(ECImage,      FlecheVersGauche);
+	R_RESOURCE(ECImage,      FlecheVersHaut);
+	R_RESOURCE(ECImage,      FlecheVersBas);
 	R_RESOURCE(ECSpriteBase, UpButton);
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);
+	R_RESOURCE(ECSpriteBase, LitleButton);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);
 	R_RESOURCE(ECSpriteBase, CaseVille);
@@ -53,6 +66,10 @@
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest);
+	R_RESOURCE(ECSpriteBase, Army_Face);
+	R_RESOURCE(ECSpriteBase, Army_Left);
+	R_RESOURCE(ECSpriteBase, Army_Right);
+	R_RESOURCE(ECSpriteBase, Army_Dos);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);
