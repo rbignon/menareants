@@ -42,6 +42,9 @@ char *get_time(time_t mytime);
 /** Retourne le temps que forme cette date */
 char *duration(int s);
 
+/** Check if the string is a number */
+int is_num(const char *num);
+
 /** Convertit d'une chaine en un type */
 template<typename T>
 T StrToTyp(const std::string & Str)

@@ -24,6 +24,13 @@
 
 #include "Outils.h"
 
+int is_num(const char *num)
+{
+   while(*num) if(!isdigit(*num++)) return 0;
+   return 1;
+}
+
+
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n")
 {
 	std::string::size_type i = 0;
