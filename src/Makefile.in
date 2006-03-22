@@ -55,13 +55,14 @@ PROGRAMS = $(bin_PROGRAMS)
 am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
 	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
-	Map.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT) \
-	Font.$(OBJEXT) Images.$(OBJEXT) Maths.$(OBJEXT) \
-	Component.$(OBJEXT) Form.$(OBJEXT) ChildForm.$(OBJEXT) \
-	Menu.$(OBJEXT) ListBox.$(OBJEXT) Boutton.$(OBJEXT) \
-	BouttonText.$(OBJEXT) Memo.$(OBJEXT) Edit.$(OBJEXT) \
-	MessageBox.$(OBJEXT) Label.$(OBJEXT) SpinEdit.$(OBJEXT) \
-	ColorEdit.$(OBJEXT) Image.$(OBJEXT) ShowMap.$(OBJEXT)
+	Map.$(OBJEXT) Units.$(OBJEXT) JoinGame.$(OBJEXT) \
+	InGame.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT) \
+	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
+	ChildForm.$(OBJEXT) Menu.$(OBJEXT) ListBox.$(OBJEXT) \
+	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
+	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
+	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
+	ShowMap.$(OBJEXT)
 euroconq_OBJECTS = $(am_euroconq_OBJECTS)
 euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -192,6 +193,7 @@ euroconq_SOURCES = \
 		Login.cpp \
 		Channels.cpp \
 		Map.cpp \
+		Units.cpp \
 		JoinGame.cpp \
 		InGame.cpp \
 		tools/Font.cpp \
@@ -309,6 +311,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sockets.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpinEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Units.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
