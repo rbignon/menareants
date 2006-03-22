@@ -22,7 +22,7 @@
 #include <sys/time.h>
 #include "Timer.h"
 
-int Timer::begin_time = 0;
+long Timer::begin_time = 0;
 float Timer::elapsed = 0;
 
 Timer::Timer()
@@ -44,8 +44,8 @@ float Timer::time_elapsed(bool update)
 {
 	if (update)
 	{
-		elapsed = (Timer::get_time() - begin_time)/1000.0f;
-		begin_time = Timer::get_time();
+		elapsed = (float(Timer::get_time()) - float(begin_time))/1000.0f;
+//		begin_time = Timer::get_time();
 	}
 
 	return elapsed;

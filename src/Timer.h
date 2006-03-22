@@ -32,7 +32,7 @@ public:
 
 protected:
 
-	static int begin_time;
+	static long begin_time;
 	static float elapsed;
 };
 
