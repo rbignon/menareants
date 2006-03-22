@@ -141,7 +141,7 @@ ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, 
  ********************************************************************************************/
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb)
-	: owner(_owner), acase(_case), type(_type), last(0), nb(_nb), lock(false), shooted(0), cost(_c)
+	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), shooted(0), cost(_c), event_type(0)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -153,26 +153,10 @@ ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e
 void ECBEntity::Played()
 {
 	restStep = myStep;
-	RemoveLast();
-}
-
-ECBEntity::~ECBEntity()
-{
-	RemoveLast();
-}
-
-void ECBEntity::RemoveLast()
-{
-	if(!last) return;
-
-	last->RemoveLast();
-	last->Case()->Entities()->Remove(last);
-	MyFree(last);
 }
 
 void ECBEntity::AddUnits(uint u)
 {
-	CreateLast();
 	nb += u;
 }
 

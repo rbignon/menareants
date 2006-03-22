@@ -96,6 +96,32 @@ bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 	return true;
 }
 
+void ECEntity::AddUnits(uint u)
+{
+	CreateLast();
+	ECBEntity::AddUnits(u);
+}
+
+void ECEntity::Played()
+{
+	ECBEntity::Played();
+	RemoveLast();
+}
+
+ECEntity::~ECEntity()
+{
+	RemoveLast();
+}
+
+void ECEntity::RemoveLast()
+{
+	if(!last) return;
+
+	last->RemoveLast();
+	last->Case()->Entities()->Remove(last);
+	MyFree(last);
+}
+
 struct SortEventsFunction
 {
 	bool operator ()(ECEvent* const& a1, ECEvent* const& a2) const

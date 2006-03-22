@@ -47,32 +47,55 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), event_type(0) {}
+	ECEntity() : Tag(0), last(0) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), event_type(0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), last(0)
 	{}
 
-	virtual ~ECEntity() { }
+	virtual ~ECEntity();
 
 /* Methodes */
 public:
+
+	/** Use this function when this entity wants to attaq someone */
+	virtual ECBCase* WantAttaq(uint x, uint y) = 0;
+
+	/** Use this function when this entity wants to move somewhere */
+	virtual ECBCase* WantMove(uint x, uint y) = 0;
+
+	/** Use this function to cancel an action of this entity */
+	virtual bool Return() = 0;
+
+	/** Use this function to create a last state of this entity (stocked in a variable) */
+	virtual void CreateLast() = 0;
+
+	/** Use this function to make an union with an other entity */
+	virtual void Union(ECEntity*) = 0;
+
+	/** Use this function to add some units in the entity */
+	virtual void AddUnits(uint units);
 
 	virtual bool Attaq(std::vector<ECEntity*> entities) = 0;
 
 	static bool AreFriends(std::vector<ECEntity*> list);
 
+	/** Use this function when an entity have played. */
+	virtual void Played();
+
 /* Attributs */
 public:
 
-	uint EventType() { return event_type; }
-	void SetEvent(uint _e) { event_type = _e; }
+	/** Return last entity */
+	ECBEntity* Last() { return last; }
+	virtual void RemoveLast();
 
 	int Tag;
 
 /* Variables privées */
 protected:
-	uint event_type;
+	ECEntity* last;
+	bool SetLast(ECEntity* e) { return (!last) ? (last = e) : false; }
 };
 
 /********************************************************************************************

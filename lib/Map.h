@@ -80,35 +80,20 @@ public:
 		E_END
 	};
 
-	ECBEntity() : owner(0), acase(0), last(0), lock(false), shooted(0), cost(0) {}
+	ECBEntity() : owner(0), acase(0), nb(0), lock(false), shooted(0), cost(0), event_type(0) {}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0);
 
-	virtual ~ECBEntity();
+	virtual ~ECBEntity() {}
 
 /* Methodes */
 public:
 
-	/** Use this function when this entity wants to attaq someone */
-	virtual ECBCase* WantAttaq(uint x, uint y) = 0;
-
-	/** Use this function when this entity wants to move somewhere */
-	virtual ECBCase* WantMove(uint x, uint y) = 0;
-
-	/** Use this function to cancel an action of this entity */
-	virtual bool Return() = 0;
+	/** Use this function to know if this entity can create an other entity */
+	virtual bool CanCreate(ECBEntity*) = 0;
 
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(ECBEntity* e) = 0;
-
-	/** Use this function to create a last state of this entity (stocked in a variable) */
-	virtual void CreateLast() = 0;
-
-	/** Use this function to make an union with an other entity */
-	virtual void Union(ECBEntity*) = 0;
-
-	/** Use this function to know if this entity can create an other entity */
-	virtual bool CanCreate(ECBEntity*) = 0;
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated();
@@ -120,7 +105,7 @@ public:
 	* It changes pointer \a acase to \a new_case too.
 	 * @param new_case this is the new case where we send our entity
 	 */
-	void ChangeCase(ECBCase* new_case);
+	virtual void ChangeCase(ECBCase* new_case);
 
 	/** Use this function when an entity have played. */
 	virtual void Played();
@@ -138,6 +123,11 @@ public:
 
 	const char* ID() { return name; }
 
+	virtual ECBEntity* Last() { return 0; }
+
+	uint EventType() { return event_type; }
+	void SetEvent(uint _e) { event_type = _e; }
+
 	e_type Type() { return type; }
 
 	/** Return the number of soldats in the army */
@@ -149,10 +139,6 @@ public:
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
 	bool Locked() { return lock; }
 	void SetLock(bool l = true) { lock = l; }
-
-	/** Return last entity */
-	ECBEntity* Last() { return last; }
-	virtual void RemoveLast();
 
 	uint MyStep() { return myStep; }
 	void SetMyStep(uint s) { myStep = s; }
@@ -168,15 +154,13 @@ protected:
 	Entity_ID name;
 	ECBCase *acase;
 	e_type type;
-	ECBEntity* last;
 	uint nb;
 	bool lock;
 	uint myStep;
 	uint restStep;
 	uint shooted;
 	uint cost;
-
-	bool SetLast(ECBEntity* e) { return (!last) ? (last = e) : false; }
+	uint event_type;
 };
 
 /********************************************************************************************
