@@ -27,6 +27,7 @@
 #include <vector>
 
 class ECase;
+class TMap;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -36,7 +37,7 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : image(0), selected(false), new_case(0) {}
+	ECEntity() : Tag(0), image(0), selected(false), new_case(0) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
 
@@ -44,6 +45,14 @@ public:
 
 /* Methodes */
 public:
+
+	virtual bool BeforeEvent() = 0;
+
+	virtual bool MakeEvent() = 0;
+
+	virtual bool AfterEvent() = 0;
+
+	virtual void ChangeCase(ECBCase* new_case);
 
 /* Attributs */
 public:
@@ -60,6 +69,8 @@ public:
 
 	void Select(bool s = true) { selected = s; }
 	bool Selected() { return selected; }
+
+	int Tag;
 
 /* Variables privées */
 protected:
@@ -202,9 +213,13 @@ public:
 
 	ECImage* Preview() { return preview; }            /**< Creation of map preview */
 
+	TMap* ShowMap() { return showmap; }
+	void SetShowMap(TMap* sm) { showmap = sm; }
+
 /* Variables privées */
 protected:
 	ECImage *preview;
+	TMap *showmap;
 
 	virtual void SetCaseAttr(ECBCase*, char);
 };

@@ -25,6 +25,7 @@
 #include "tools/Font.h"
 #include "Debug.h"
 #include "gui/ColorEdit.h"
+#include "gui/ShowMap.h"
 #include "Map.h"
 #include "Resources.h"
 #include "Channels.h"
@@ -34,7 +35,7 @@
  ********************************************************************************************/
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), image(0), selected(false), new_case(0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), new_case(0)
 {}
 
 ECEntity::~ECEntity()
@@ -64,6 +65,17 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
 	image->SetAnim(false);
+	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+}
+
+void ECEntity::ChangeCase(ECBCase* newcase)
+{
+	ECBEntity::ChangeCase(newcase);
+	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
 /********************************************************************************************
@@ -98,6 +110,9 @@ void ECase::SetImage(ECSpriteBase* spr)
 	if(image) delete image;
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
+	if(dynamic_cast<ECMap*>(map)->ShowMap())
+		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH  * x),
+		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * x));
 }
 
 /********************************************************************************************
@@ -105,13 +120,13 @@ void ECase::SetImage(ECSpriteBase* spr)
  ********************************************************************************************/
 
 ECMap::ECMap(std::vector<std::string> _map_file)
-	: ECBMap(_map_file)
+	: ECBMap(_map_file), showmap(0)
 {
 	preview = 0;
 }
 
 ECMap::ECMap(std::string filename)
-	: ECBMap(filename)
+	: ECBMap(filename), showmap(0)
 {
 	preview = 0;
 }
