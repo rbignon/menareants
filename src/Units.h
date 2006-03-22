@@ -37,6 +37,12 @@ public:
 /* Methodes */
 public:
 
+	virtual bool BeforeEvent();
+
+	virtual bool MakeEvent();
+
+	virtual bool AfterEvent();
+
 /* Attributs */
 public:
 
