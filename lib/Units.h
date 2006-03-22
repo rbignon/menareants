@@ -61,17 +61,6 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual ECBCase* WantMove(uint x, uint y);
-
-	virtual bool Return();
-
-	virtual ECBCase* WantAttaq(uint x, uint y);
-
-	virtual void CreateLast();
-
-	virtual void Union(ECBEntity*);
-
 	virtual bool CanCreate(ECBEntity*) { return false; }
 
 /* Attributs */
@@ -79,7 +68,6 @@ public:
 
 /* Variables privées */
 protected:
-	ECBCase* CheckMove(uint mx, uint my);
 };
 
 #endif /* ECLIB_UNITS_H */

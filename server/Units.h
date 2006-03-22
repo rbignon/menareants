@@ -36,6 +36,17 @@ public:
 /* Methodes */
 public:
 
+	/** @return last case */
+	virtual ECBCase* WantMove(uint x, uint y);
+
+	virtual bool Return();
+
+	virtual ECBCase* WantAttaq(uint x, uint y);
+
+	virtual void CreateLast();
+
+	virtual void Union(ECEntity*);
+
 	virtual bool Attaq(std::vector<ECEntity*> entities);
 
 /* Attributs */
@@ -43,6 +54,7 @@ public:
 
 /* Variables protégées */
 protected:
+	ECBCase* CheckMove(uint mx, uint my);
 };
 
 #endif /* ECD_UNITS_H */
