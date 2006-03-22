@@ -23,8 +23,6 @@
 #include "Resources.h"
 #include "Channels.h"
 
-#define CASE_HEIGHT 43
-#define CASE_WIDTH 43
 void TMap::Init()
 {
 	SetPosition(x, y, true);
@@ -84,20 +82,23 @@ void TMap::Draw(int _x, int _y)
 {
 	if(!map) return;
 
-	int xx = x, yy = y;
+	if(Enabled())
+	{
+		int xx = x, yy = y;
 
-	/* Changement de position automatique */
-	if(_x && _x < 15)
-		xx += 4;
-	if(_y && _y < 15)
-		yy += 4;
-	if(_x > int(SCREEN_WIDTH-15) && _x < int(SCREEN_WIDTH))
-		xx -= 4;
-	if(_y > int(SCREEN_HEIGHT-15) && _y < int(SCREEN_HEIGHT))
-		yy -= 4;
-
-	if(xx != x || yy != y)
-		SetXY(xx, yy);
+		/* Changement de position automatique */
+		if(_x && _x < 15)
+			xx += 4;
+		if(_y && _y < 15)
+			yy += 4;
+		if(_x > int(SCREEN_WIDTH-15) && _x < int(SCREEN_WIDTH))
+			xx -= 4;
+		if(_y > int(SCREEN_HEIGHT-15) && _y < int(SCREEN_HEIGHT))
+			yy -= 4;
+	
+		if(xx != x || yy != y)
+			SetXY(xx, yy);
+	}
 
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
@@ -134,9 +135,11 @@ void TMap::Draw(int _x, int _y)
 				if(my == int(c->Y()))
 				{
 					if(c->X() < entity->Case()->X())
-						Resources::FlecheVersGauche()->Draw(c->Image()->X(), c->Image()->Y());
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqGauche()
+						         : Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
 					else if(c->X() > entity->Case()->X())
-						Resources::FlecheVersDroite()->Draw(c->Image()->X(), c->Image()->Y());
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqDroite()
+						         : Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
 				}
 				else if(my > int(c->Y()))
 				{
@@ -164,9 +167,11 @@ void TMap::Draw(int _x, int _y)
 						c = dynamic_cast<ECase*>(c->MoveUp());
 				}
 				if(c->Y() < entity->Case()->Y())
-					Resources::FlecheVersHaut()->Draw(c->Image()->X(), c->Image()->Y());
+					(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqHaut()
+						         : Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
 				else if(c->Y() > entity->Case()->Y())
-					Resources::FlecheVersBas()->Draw(c->Image()->X(), c->Image()->Y());
+					(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqBas()
+						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
 			}
 		}
 	}

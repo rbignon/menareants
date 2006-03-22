@@ -42,7 +42,6 @@ public:
 
 	ECEntity* TestEntity(int mouse_x, int mouse_y);
 	ECase* TestCase(int mouse_x, int mouse_y);
-	bool Test(int mouse_x, int mouse_y);
 
 	virtual void SetXY(int x, int y);
 
