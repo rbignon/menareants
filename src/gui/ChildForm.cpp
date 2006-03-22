@@ -40,9 +40,15 @@ void TChildForm::Draw(int _x, int _y)
 		SDL_BlitSurface(background->Img,NULL,app.sdlwindow,&r_back);
 	}
 
-	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-		if((*it)->Visible())
-			(*it)->Draw(_x, _y);
+	bool first = true;
+	while(1)
+	{
+		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
+			if((*it)->Visible() && (*it)->Focused() == (first ? false : true)) // Affiche seulement à la fin les composants
+				(*it)->Draw(_x, _y);                                            // selectionnés
+		if(first) first = false;
+		else break;
+	}
 }
 
 void TChildForm::SetXY(int _x, int _y)

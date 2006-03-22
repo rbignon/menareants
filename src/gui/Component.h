@@ -22,8 +22,10 @@
 #define EC_COMPONENT_H
 
 #include <vector>
+#include <SDL_keyboard.h>
 
 typedef unsigned int   uint;
+typedef void (*TClickedFunction) (int mouse_x, int mouse_y);
 
 /********************************************************************************************
  *                               TComponent                                                 *
@@ -35,7 +37,7 @@ class TComponent
 public:
 
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
-	TComponent() : x(0), y(0), h(0), w(0), visible(true), enabled(true)
+	TComponent() : x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), clicked_func(0)
 	{}
 
 	/** Constructor with position
@@ -43,7 +45,7 @@ public:
 	 * @param _y y position
 	 */
 	TComponent(int _x, int _y)
-		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true)
+		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), clicked_func(0)
 	{}
 
 	/** Constructor with position and size
@@ -53,7 +55,7 @@ public:
 	 * @param _h heigh of component
 	 */
 	TComponent(int _x, int _y, uint _w, uint _h)
-		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true)
+		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), clicked_func(0)
 	{}
 
 	virtual ~TComponent() {}
@@ -89,12 +91,26 @@ public:
 	bool Enabled() const { return enabled; }              /**< Is this object enabled ? */
 	void SetEnabled(bool _en = true) { enabled = _en; }   /**< Set or unset this objet as enabled */
 
+	/* Le composant a le focus ? */
+	bool Focused() { return focus; }
+	virtual void SetFocus();
+	virtual void DelFocus();
+
+	virtual bool Test (int souris_x, int souris_y) const;
+	virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
+	virtual void PressKey(SDL_keysym) { return; }
+
+	void SetClickedFunc(TClickedFunction* c) { clicked_func = c; }
+	TClickedFunction* ClickedFunc() { return clicked_func; }
+
 /* Variables privées */
 protected:
 	int x, y;
 	uint h, w;
 	bool visible;
 	bool enabled;
+	bool focus;
+	TClickedFunction* clicked_func;
 };
 typedef std::vector<TComponent*> ComponentVector;
 

@@ -160,6 +160,16 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
 	}
 }
 
+void TMemo::RemoveItem (uint index)
+{
+	assert (index < m_items.size());
+	m_items.erase( m_items.begin() + index );
+
+	nb_visible_items = m_items.size();
+	if( nb_visible_items_max < nb_visible_items )
+		nb_visible_items = nb_visible_items_max;
+}
+
 void TMemo::ClearItems()
 {
 	m_items.clear();

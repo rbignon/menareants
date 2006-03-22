@@ -439,6 +439,7 @@ void Menu::scroll_in()
 	{
 		redraw((int)i);
 		i += 600 * timer.time_elapsed(true);
+		timer.reset();
 	}
 }
 
@@ -451,6 +452,7 @@ void Menu::scroll_out()
 	{
 		redraw((int)i);
 		i += 600 * timer.time_elapsed(true);
+		timer.reset();
 	}
 }
 

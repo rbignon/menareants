@@ -89,7 +89,7 @@ public:
   const std::list<uint>& GetSelection() const;
   const std::string& ReadLabel (uint index) const;
   const std::string& ReadValue (uint index) const;
-  bool Enabled(uint index);
+  bool EnabledItem(uint index);
 };
 
 #endif /* EC_LISTBOX_H */

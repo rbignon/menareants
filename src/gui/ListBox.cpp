@@ -264,7 +264,7 @@ const std::string& TListBox::ReadValue (uint index) const
   return m_items[index].value;
 }
 
-bool TListBox::Enabled (uint index)
+bool TListBox::EnabledItem (uint index)
 {
   assert (index < m_items.size());
   return m_items[index].enabled;

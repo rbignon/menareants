@@ -43,7 +43,6 @@ public:
 
   void SetImage (ECSprite *image);
 
-  bool Test (int souris_x, int souris_y) const;
   virtual void Draw (int souris_x, int souris_y);
 
   unsigned int Tag;

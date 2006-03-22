@@ -52,12 +52,6 @@ TButton::~TButton()
 
 //-----------------------------------------------------------------------------
 
-bool TButton::Test (int souris_x, int souris_y) const
-{
-  return (((x <= souris_x) && (souris_x <= int(x+w))
-	  && (y <= souris_y) && (souris_y <= int(y+h))) && enabled);
-}
-
 void TButton::Draw (int souris_x, int souris_y)
 {
    DrawImage (souris_x, souris_y);

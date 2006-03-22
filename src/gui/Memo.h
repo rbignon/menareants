@@ -68,6 +68,7 @@ public:
   void AddItem (const std::string &label, SDL_Color _color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);
+  uint NbItems() { return m_items.size(); }
   void ClearItems();
 
 };
