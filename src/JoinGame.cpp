@@ -154,9 +154,13 @@ int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(GameInfosForm->Chat)
+	if(GameInfosForm)
 		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+	if(InGameForm)
+		InGameForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+
 	return 0;
 }
 
@@ -273,9 +277,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(InGameForm && InGameForm->BarreLat)
 					{
 						InGameForm->ShowBarreLat(true);
-				 		for(;InGameForm->BarreLat->X() > SCREEN_HEIGHT + int(InGameForm->BarreLat->Width());
-				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-1, InGameForm->BarreLat->Y()),
-				 		     SDL_Delay(100));
+				 		for(;InGameForm->BarreLat->X() > SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
+				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y()),
+				 		     SDL_Delay(10));
+				 		InGameForm->Map->SetEnabled(true);
 				 	}
 				}
 				break;
@@ -285,9 +290,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	chan->SetState(EChannel::ANIMING);
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
-				 		for(;InGameForm->BarreLat->X() < SCREEN_HEIGHT;
-				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+1, InGameForm->BarreLat->Y()),
-				 		     SDL_Delay(100));
+				 		InGameForm->Map->SetEnabled(false);
+				 		for(;InGameForm->BarreLat->X() < SCREEN_WIDTH;
+				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y()),
+				 		     SDL_Delay(10));
 				 		InGameForm->ShowBarreLat(false);
 				 	}
 				 }
@@ -317,7 +323,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						if(GameInfosForm)
 							GameInfosForm->PretButton->SetEnabled(!add);
-						if(!add && chan->State() == EChannel::SENDING)
+						if(!add && (chan->State() == EChannel::SENDING || chan->State() == EChannel::ANIMING))
 							me->sendrpl(me->rpl(EC_Client::SET), "+!");
 						if(InGameForm)
 							InGameForm->BarreLat->PretButton->SetEnabled(!add);
@@ -669,10 +675,10 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 		{
 			while( SDL_PollEvent( &event) )
 			{
+				GameInfosForm->Actions(event);
 				switch(event.type)
 				{
 					case SDL_KEYUP:
-						GameInfosForm->SendMessage->PressKey(event.key.keysym);
 						switch (event.key.keysym.sym)
 						{
 							case SDLK_ESCAPE:
@@ -692,7 +698,6 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 						}
 						break;
 					case SDL_MOUSEBUTTONDOWN:
-						GameInfosForm->Chat->Clic( event.button.x, event.button.y);
 						if(client->Player()->IsPriv())
 						{
 							GameInfosForm->MapList->SetEnabled();
@@ -730,7 +735,6 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
 /*						break;
 					case SDL_MOUSEBUTTONDOWN:*/
-						GameInfosForm->SendMessage->Clic(event.button.x, event.button.y);
 						if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 							eob = true;
 						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
@@ -798,6 +802,7 @@ void EuroConqApp::ListGames()
 		}
 		while( SDL_PollEvent( &event) )
 		{
+			ListGameForm->Actions(event);
 			switch(event.type)
 			{
 				case SDL_KEYUP:
@@ -810,7 +815,6 @@ void EuroConqApp::ListGames()
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					ListGameForm->GList->Clic( event.button.x, event.button.y);
 					if(ListGameForm->JoinButton->Enabled() &&
 					   ListGameForm->JoinButton->Test(event.button.x, event.button.y))
 					{
@@ -850,11 +854,9 @@ void EuroConqApp::ListGames()
 			}
 		}
 		if(ListGameForm->GList->GetSelectedItem() >= 0 &&
-		   ListGameForm->GList->Enabled(ListGameForm->GList->GetSelectedItem()))
+		   ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
 			ListGameForm->JoinButton->SetEnabled(true);
 		ListGameForm->Update();
-
-		//big_font.WriteCenter(400,180, "Liste des parties", black_color);
 
 		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
 	} while(!eob && client->IsConnected());

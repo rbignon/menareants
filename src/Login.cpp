@@ -193,19 +193,19 @@ void EuroConqApp::request_game()
 		{
 			while( SDL_PollEvent( &event) )
 			{
+				ConnectedForm->Actions(event);
 				switch(event.type)
 				{
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
 						{
 							case SDLK_ESCAPE:
+								client->SetWantDisconnect();
+								client->sendrpl(client->rpl(EC_Client::BYE));
 								eob = true;
 								break;
 							default: break;
 						}
-						break;
-					case SDL_MOUSEBUTTONUP:
-						ConnectedForm->Motd->Clic( event.button.x, event.button.y);
 						break;
 					case SDL_MOUSEBUTTONDOWN:
 						if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y))
