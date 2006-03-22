@@ -56,6 +56,9 @@ const int COMLEN=10;
 const int SCREEN_HEIGHT = 600;
 const int SCREEN_WIDTH  = 800;
 
+const int CASE_HEIGHT = 43;
+const int CASE_WIDTH = 43;
+
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
