@@ -38,7 +38,7 @@ class TEdit : public TComponent
 /* Constructeur/Deconstructeur */
 public:
 
-	TEdit(int _x, int _y, uint _width, uint _maxlen = 0);
+	TEdit(int _x, int _y, uint _width, uint _maxlen = 0, bool show_background = true);
 	~TEdit();
 
 /* Methodes */
@@ -46,9 +46,6 @@ public:
 
 	/* Initialisation */
 	void Init ();
-
-	/* Click */
-	bool Clic (int mouse_x, int mouse_y);
 
 	/* Affiche */
 	void Draw(int m_x, int m_y);
@@ -59,11 +56,6 @@ public:
 /* Attributs */
 public:
 
-	/* Le composant a le focus ? */
-	bool Focused() { return focus; }
-	void SetFocus();
-	void DelFocus();
-
 	/* Chaine */
 	const std::string& GetString() const { return chaine; }
 	void ClearString() { chaine = ""; }
@@ -73,9 +65,9 @@ private:
 	SDL_Surface *background;
 	uint maxlen;
 	uint visible_len;
-	bool focus;
 	uint first_char;
 	std::string chaine;
+	bool show_background;
 };
 
 #endif /* EC_EDIT_H */

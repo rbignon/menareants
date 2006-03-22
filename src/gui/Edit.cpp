@@ -24,8 +24,8 @@
 #include "Edit.h"
 #include <SDL.h>
 
-TEdit::TEdit (int _x, int _y, uint _width, uint _maxlen)
-  : TComponent(_x, _y, _width, EDIT_HEIGHT)
+TEdit::TEdit (int _x, int _y, uint _width, uint _maxlen, bool _show_bg)
+  : TComponent(_x, _y, _width, EDIT_HEIGHT), show_background(_show_bg)
 {
   first_char = 0;
   maxlen = _maxlen;
@@ -48,6 +48,8 @@ void TEdit::Init()
 
   visible_len = ((w) / app.Font()->small.GetWidth("A"));
 
+  if(!show_background) return;
+
   SDL_Rect r_back = {0,0,w,h};
 
   background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
@@ -56,31 +58,13 @@ void TEdit::Init()
 
 }
 
-bool TEdit::Clic (int mouse_x, int mouse_y)
-{
-	if((x <= mouse_x) && (mouse_x <= int(x+w))
-	  && (y <= mouse_y) && (mouse_y <= int(y+h)))
-		SetFocus();
-	else
-		DelFocus();
-
-  return true;
-}
-
-void TEdit::SetFocus()
-{
-	focus = true;
-}
-
-void TEdit::DelFocus()
-{
-	focus = false;
-}
-
 void TEdit::Draw (int m_x, int m_y)
 {
-  SDL_Rect r_back = {x,y,w,h};
-  SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+  if(background)
+  {
+    SDL_Rect r_back = {x,y,w,h};
+    SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+  }
   if(!focus && chaine.empty()) return;
 
   if(chaine.size() > visible_len)
