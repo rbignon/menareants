@@ -1,3 +1,30 @@
+2005-03-19  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h, server/Map.h (EC*Entity): Passage du system de last de lib à server, et passage de event_type de server à
+	lib.
+
+	* src/data/pics/fleches: Fleches d'attaque.
+
+	* src/Units.cpp: Gestion des déplacements.
+
+	* src/gui/ShowMap.cpp: Utilisation des fleches d'attaque, et ne bouge plus quand le composant est !Enabled().
+
+	* src/gui/Components.h, src/gui/*.h: Fonctions Test(), Clic() et Focused().
+	Rajout en outre d'un pointeur vers un TClickedFunction, pour appeler une fonction dédiée lorsqu'on le clique.
+
+	* src/gui/Form.h: Fonction Actions() à appeler dans la boucle d'une fenetre. Met le focus lui même et appel la
+	fonction Clic() par default de TComponent(), ainsi que l'appel de la ClickedFunc si définie.
+
+	* src/InGame.cpp: Composants TEdit et TMemo pour l'affichag du chat.
+
+	* src/InGame.cpp, src/Map.cpp: Gestion des animations.
+
+	* src/InGame.cpp, src/Login.cpp, src/JoinGame.cpp: Utilisation de TForm::Actions().
+
+	* src/gui/Edit.h: N'affiche pas forcément le background.
+
+	* src/Timer.cpp, src/gui/Menu.cpp: Correction d'un bug.
+
 2005-03-18  Romain Bignon <progs@headfucking.net>
 
 	* lib/Outils.h (is_num): Fonction pour vérifier si une chaine est un entier.
