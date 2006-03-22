@@ -47,6 +47,49 @@ void TForm::Update(bool flip)
 	Update(-1,-1,flip);
 }
 
+void TForm::Actions(uint a)
+{
+	SDL_Event event;
+	while( SDL_PollEvent( &event) )
+	{
+		Actions(event, a);
+	}
+}
+
+void TForm::Actions(SDL_Event event, uint a)
+{
+	switch(event.type)
+	{
+		case SDL_KEYUP:
+			if(!(a & ACTION_NOKEY))
+			{
+				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+					(*it)->PressKey(event.key.keysym);
+			}
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			if(a & ACTION_NOMOUSE) break;
+			/* Va dans l'ordre inverse */
+			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+				if(a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
+				                     : (*it)->Clic(event.button.x, event.button.y))
+				{
+					if(!(a & ACTION_NOFOCUS))
+						(*it)->SetFocus();
+					if((*it)->ClickedFunc() && !(a & ACTION_NOCALL))
+						(*(*it)->ClickedFunc()) (event.button.x, event.button.y);
+					break;
+				}
+				else
+					(*it)->DelFocus();
+			break;
+		}
+		default:
+			break;
+	}
+}
+
 void TForm::Update(int x, int y, bool flip)
 {
 	if(background)
@@ -55,9 +98,15 @@ void TForm::Update(int x, int y, bool flip)
 	if(x < 0 || y < 0)
 		SDL_GetMouseState( &x, &y);
 
-	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-		if((*it)->Visible())
-			(*it)->Draw(x, y);
+	bool first = true;
+	while(1)
+	{
+		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
+			if((*it)->Visible() && (*it)->Focused() == (first ? false : true)) // Affiche seulement à la fin les composants
+				(*it)->Draw(x, y);                                             // selectionnés
+		if(first) first = false;
+		else break;
+	}
 
 	if(flip)
 		SDL_Flip(app.sdlwindow);

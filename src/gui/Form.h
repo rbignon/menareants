@@ -36,6 +36,12 @@
  * After, when you use this Form, you have to create the object.
  * You must use a no-end-loop where you call TForm::Update() function.
  * It is possible to each components to define some functions to execute when there is an action.
+ * For exemple, you can use a function like "void ButtonClick(int x, int y)" and do :
+ * <pre>
+ *   Button->SetClickedFunc(&ButtonClick);
+ * </pre>
+ * After, if you use TForm::Actions() function in your loop, when this button will be
+ * selected, it will call ButtonClick() function.
  *
  * This is an example of a derived class from TForm :
  *
@@ -72,7 +78,7 @@
  *
  * // Events
  * public:
- *    void Button1OnClick();
+ *    void Button1OnClick(int mouse_x, int mouse_y);
  *    void MyListBoxOnSelect(uint selected);
  * };
  * </pre>
@@ -102,6 +108,20 @@ public:
 	 * @param flip If true, function calls SDL_Flip() and draw directly with SDL
 	 */
 	void Update(int x, int y, bool flip);
+
+	#define ACTION_NOFOCUS       0x001
+	#define ACTION_NOCLIC        0x002
+	#define ACTION_NOCALL        0x004
+	#define ACTION_NOKEY         0x008
+	#define ACTION_NOMOUSE       (ACTION_NOCLIC|ACTION_NOFOCUS)
+	/** Call this function if you want than TForm ask SDL_PollEvent */
+	void Actions(uint a = 0);
+
+	/** When you have a loop with a SDL_PollEvent() function called, use this function.
+	 * You have to put the event variable.
+	 * This function will set any components to Focused.
+	 */
+	void Actions(SDL_Event event, uint a = 0);
 
 /* Attributs */
 public:
