@@ -106,6 +106,10 @@ public:
 	R_RESOURCE(ECImage,      FlecheVersGauche, PKGDATADIR_PICS "fleches/fleche_vers_gauche.png");
 	R_RESOURCE(ECImage,      FlecheVersHaut,   PKGDATADIR_PICS "fleches/fleche_vers_haut.png");
 	R_RESOURCE(ECImage,      FlecheVersBas,    PKGDATADIR_PICS "fleches/fleche_vers_bas.png");
+	R_RESOURCE(ECImage,      FlecheAttaqDroite,PKGDATADIR_PICS "fleches/fleche_attaq_droite.png");
+	R_RESOURCE(ECImage,      FlecheAttaqGauche,PKGDATADIR_PICS "fleches/fleche_attaq_gauche.png");
+	R_RESOURCE(ECImage,      FlecheAttaqHaut,  PKGDATADIR_PICS "fleches/fleche_attaq_haut.png");
+	R_RESOURCE(ECImage,      FlecheAttaqBas,   PKGDATADIR_PICS "fleches/fleche_attaq_bas.png");
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
 	R_RESOURCE(ECSpriteBase, NormalButton,     "normalbutton");

@@ -46,6 +46,10 @@
 	R_RESOURCE(ECImage,      FlecheVersGauche);
 	R_RESOURCE(ECImage,      FlecheVersHaut);
 	R_RESOURCE(ECImage,      FlecheVersBas);
+	R_RESOURCE(ECImage,      FlecheAttaqDroite);
+	R_RESOURCE(ECImage,      FlecheAttaqGauche);
+	R_RESOURCE(ECImage,      FlecheAttaqHaut);
+	R_RESOURCE(ECImage,      FlecheAttaqBas);
 	R_RESOURCE(ECSpriteBase, UpButton);
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);
