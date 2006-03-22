@@ -27,6 +27,7 @@
 #include "Channels.h"
 #include "Map.h"
 #include "Units.h"
+#include "Timer.h"
 
 TLoadingForm *LoadingForm = NULL;
 TInGameForm  *InGameForm  = NULL;
@@ -139,14 +140,49 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 	if(chan->State() == EChannel::ANIMING)
 	{
-		
+		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
+			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+				(*it)->SetNewCase(dynamic_cast<ECase*>((*map)(x,y))), (*it)->SetEvent(flags), (*it)->Tag = 0;
+
+		const char BEFORE_EVENT = 1;
+		const char IN_EVENT = 2;
+		const char AFTER_EVENT = 3;
+		char event_moment;
+		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
+		{
+			bool ok = false;
+			printf("nous en sommes à %d\n", event_moment);
+			while(!ok)
+			{
+				ok = true;
+				for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+					if(!(*it)->Tag)
+					{
+						switch(event_moment)
+						{
+							case BEFORE_EVENT: (*it)->Tag = (*it)->BeforeEvent() ? 1 : 0; break;
+							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent() ? 1 : 0; break;
+							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent() ? 1 : 0; break;
+						}
+						if(!(*it)->Tag) ok = false, printf("- entity pas encore prete\n");
+						else printf("- entity prete\n");
+					}
+			}
+			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+				(*it)->Tag = 0;
+		}
 	}
 	else if(chan->State() == EChannel::PLAYING)
 	{
 		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetNewCase(dynamic_cast<ECase*>((*map)(x,y)));
+				(*it)->SetNewCase(dynamic_cast<ECase*>((*map)(x,y))), (*it)->SetEvent(flags);
+		}
+		if(flags == ARM_RETURN)
+		{
+			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+				(*it)->SetNewCase(0), (*it)->SetEvent(0);
 		}
 	}
 	return 0;
@@ -169,10 +205,18 @@ void EuroConqApp::InGame()
 		bool eob = false;
 		InGameForm = new TInGameForm(chan);
 		ECEntity* selected_entity = 0;
+		Timer timer;
 		do
 		{
+			if(timer.time_elapsed(true) > 5)
+			{
+				if(InGameForm->Chat->NbItems())
+					InGameForm->Chat->RemoveItem(0);
+				timer.reset();
+			}
 			while( SDL_PollEvent( &event) )
 			{
+				InGameForm->Actions(event, ACTION_NOFOCUS);
 				switch(event.type)
 				{
 					case SDL_KEYUP:
@@ -182,6 +226,23 @@ void EuroConqApp::InGame()
 								if(selected_entity) selected_entity->Select(false);
 								selected_entity = 0;
 								break;
+							case SDLK_RETURN:
+								if(InGameForm->SendMessage->Focused())
+								{
+									client->sendrpl(client->rpl(EC_Client::MSG),
+												FormatStr(InGameForm->SendMessage->GetString().c_str()));
+									InGameForm->Chat->AddItem("<" + client->GetNick() + "> " +
+												InGameForm->SendMessage->GetString(), black_color);
+									InGameForm->SendMessage->ClearString();
+									InGameForm->SendMessage->Hide();
+									InGameForm->SendMessage->DelFocus();
+									timer.reset();
+								}
+								else
+								{
+									InGameForm->SendMessage->SetFocus();
+									InGameForm->SendMessage->Show();
+								}
 							default: break;
 						}
 						break;
@@ -252,13 +313,20 @@ TInGameForm::TInGameForm(EChannel* ch)
 
 	Map = AddComponent(new TMap(ch->Map()));
 
+	ch->Map()->SetShowMap(Map);
+
 	BarreLat = AddComponent(new TBarreLat(ch));
+
+	SendMessage = AddComponent(new TEdit(30,20,315, MAXBUFFER-20, false));
+	Chat = AddComponent(new TMemo(30,20+SendMessage->Height() + 20,315,100,5, false));
 
 	ShowBarreLat();
 }
 
 TInGameForm::~TInGameForm()
 {
+	delete Chat;
+	delete SendMessage;
 	delete BarreLat;
 	delete Map;
 }
@@ -271,7 +339,7 @@ TBarreLat::TBarreLat(EChannel* ch)
 
 	Radar = AddComponent(new TImage(7, 6));
 
-	PretButton = AddComponent(new TButtonText(30,170,50,20, "Pret"));
+	PretButton = AddComponent(new TButtonText(50,170,50,20, "Pret"));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 	PretButton->SetFont(&app.Font()->small);
 
@@ -326,6 +394,7 @@ void EuroConqApp::LoadGame(EChannel* chan)
 		{
 			while( SDL_PollEvent( &event) )
 			{
+				LoadingForm->Actions(event);
 				switch(event.type)
 				{
 					case SDL_MOUSEBUTTONDOWN:

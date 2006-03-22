@@ -28,6 +28,7 @@
 #include "gui/Memo.h"
 #include "gui/ShowMap.h"
 #include "gui/ChildForm.h"
+#include "gui/Edit.h"
 #include "gui/BouttonText.h"
 
 class EChannel;
@@ -65,6 +66,9 @@ public:
 
 	TMap*      Map;
 	TBarreLat* BarreLat;
+
+	TMemo*     Chat;
+	TEdit*     SendMessage;
 
 /* Methodes */
 public:
