@@ -464,7 +464,7 @@ std::string Menu::EnterString(std::string label, std::string last_string, bool f
 
 	while (1)
 	{
-		SDL_BlitSurface(Resources::Menuscreen()->Img,NULL,app.sdlwindow,NULL);
+		SDL_BlitSurface(Resources::Titlescreen()->Img,NULL,app.sdlwindow,NULL);
 
 		app.Font()->big.WriteLeft( 230, 330, label, black_color );
 		app.Font()->big.WriteLeft( 380, 330, new_string+"_", black_color );
