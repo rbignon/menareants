@@ -39,7 +39,7 @@ static void send_motd(TClient *cl)
 		std::string ligne;
 
 		while(std::getline(fp, ligne))
-			cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(ligne.c_str()));
+			cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(ligne).c_str());
 	}
 	cl->sendrpl(app.rpl(ECServer::ENDOFMOTD));
 	return;

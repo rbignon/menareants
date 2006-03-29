@@ -1,6 +1,6 @@
 /* src/Debug.cpp - Debug functions
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,16 +63,9 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	if(flags & W_SEND && app.getclient())
 	{
 		if(vars.empty())
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERROR), FormatStr(s.c_str()));
+			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERROR), FormatStr(s.c_str()).c_str());
 		else
-		{
-			char varsc[512];
-			/* C'est utile car si deux FormatStr sont utilisés, comme c'est une variable statique
-			 * les deux pointeurs seront sur la même variable qui aurra la valeur du second appel
-			 */
-			strcpy(varsc, FormatStr(vars.c_str()));
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s.c_str()), varsc);
-		}
+			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s).c_str(), FormatStr(s).c_str());
 	}
 
 	std::cout << s << std::endl;
