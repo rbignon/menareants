@@ -30,42 +30,30 @@
 #include <SDL_thread.h>
 
 struct SDL_Surface;
-class Menu;
 class TForm;
 class EChannel;
 class EC_Client;
 
-enum {
-	MENU_JOUER,
-	MENU_OPTIONS,
-	MENU_EXIT,
-
-	JOUER_LISTER,
-	JOUER_CREER,
-	JOUER_RETOUR,
-
-	OPTIONS_HOST,
-	OPTIONS_PORT,
-	OPTIONS_NICK,
-	OPTIONS_TEST,
-	OPTIONS_RETOUR
-};
-
 class EuroConqApp
 {
 protected:
-	Menu* menu;
+	
 	EC_Client* client;
 	Config *conf;
 	SDL_Thread* Thread;
 	Fonts *fonts;
 	std::string path;
+	bool want_quit;
 
 	void request_game();
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0);
 	void LoadGame(EChannel* ch);
 	void InGame();
+
+	static void WantQuit(void*, void*);
+	static void WantPlay(void*, void*);
+	static void WantConfig(void*, void*);
 
 public:
 	int main(int argc, char** argv);
@@ -80,15 +68,14 @@ public:
 	EC_Client* getclient() const { return client; }
 	Fonts* Font() const { return fonts; }
 	void setclient(EC_Client* c);
-	Menu* getmenu() const { return menu; }
 	std::string GetPath() const { return path; }
 
 	EuroConqApp() {
-		menu = 0;
 		client = 0;
 		conf = 0;
 		Thread = 0;
 		fonts = 0;
+		want_quit = false;
 	}
 
 	SDL_Surface* sdlwindow;

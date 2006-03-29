@@ -29,13 +29,52 @@
 #endif
 
 #include "Main.h"
-#include "gui/Menu.h"
 #include "tools/Font.h"
 #include "tools/Images.h"
 #include "Resources.h"
 #include "Debug.h"
+#include "gui/Form.h"
+#include "gui/Boutton.h"
+#include <functional>
+
+class TMainForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TMainForm();
+	~TMainForm();
+
+/* Composants */
+public:
+
+	TButton*    PlayButton;
+	TButton*    OptionsButton;
+	TButton*    CreditsButton;
+	TButton*    QuitterButton;
+
+/* Evenements */
+public:
+
+};
 
 EuroConqApp app;
+
+void EuroConqApp::WantQuit(void*, void*)
+{
+	app.want_quit = true;
+}
+
+void EuroConqApp::WantPlay(void*, void*)
+{
+	app.request_game();
+}
+
+void EuroConqApp::WantConfig(void*, void*)
+{
+	if(app.conf)
+		app.conf->Configuration();
+}
 
 void EuroConqApp::setclient(EC_Client* c)
 {
@@ -129,18 +168,18 @@ int EuroConqApp::main(int argc, char **argv)
 
 		conf->load();
 
-		menu = new Menu( std::string("Menu principal"), this);
-		menu->add_item(std::string("Jouer"), MENU_JOUER, 0);
-		menu->add_item(std::string("Options"), MENU_OPTIONS, 0);
-		menu->add_string(std::string("Serveur"), OPTIONS_HOST, M_NOFMAJ, MENU_OPTIONS, conf->hostname);
-		menu->add_value( std::string("Port"), OPTIONS_PORT, 0, MENU_OPTIONS, 100, 65535, conf->port);
-		menu->add_string(std::string("Pseudo"), OPTIONS_NICK, 0, MENU_OPTIONS, conf->nick );
+		TMainForm*     MainForm = new TMainForm;
+		MainForm->PlayButton->SetClickedFunc(EuroConqApp::WantPlay, this);
+		MainForm->QuitterButton->SetClickedFunc(EuroConqApp::WantQuit, this);
+		MainForm->OptionsButton->SetClickedFunc(EuroConqApp::WantConfig, this);
 
-		menu->add_item(  std::string("Retour"), OPTIONS_RETOUR, M_RETOUR, MENU_OPTIONS);
-		menu->add_item(std::string("Quitter"), MENU_EXIT, 0 );
+		do
+		{
+			MainForm->Actions();
+			MainForm->Update();
+		} while(!want_quit);
 
-		menu->scroll_in();
-
+#if 0
 		while (1)
 		{
 			int result = menu->execute();
@@ -186,9 +225,10 @@ int EuroConqApp::main(int argc, char **argv)
 				menu_err.scroll_out();
 			}
 		}
-
+#endif
 		quit_app(1);
 	}
+
 	catch (const std::exception &err)
 	{
 		std::cout << std::endl << "Exception caught from STL:" << std::endl;
@@ -203,4 +243,34 @@ int EuroConqApp::main(int argc, char **argv)
 int main (int argc, char **argv)
 {
   app.main(argc,argv);
+}
+
+/********************************************************************************************
+ *                                    TMainForm                                             *
+ ********************************************************************************************/
+
+TMainForm::TMainForm()
+	: TForm()
+{
+	PlayButton = AddComponent(new TButton(300,150, 150,50));
+	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), app.sdlwindow));
+
+	OptionsButton = AddComponent(new TButton(300,250, 150,50));
+	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), app.sdlwindow));
+
+	CreditsButton = AddComponent(new TButton(300,350, 150,50));
+	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), app.sdlwindow));
+
+	QuitterButton = AddComponent(new TButton(300,450, 150,50));
+	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), app.sdlwindow));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+TMainForm::~TMainForm()
+{
+	delete QuitterButton;
+	delete CreditsButton;
+	delete OptionsButton;
+	delete PlayButton;
 }
