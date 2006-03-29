@@ -83,7 +83,7 @@ class EChannel : public ECBChannel
 public:
 
 	EChannel(std::string _name)
-		: ECBChannel(_name)
+		: ECBChannel(_name), want_leave(false)
 	{}
 
 	virtual ~EChannel();
@@ -99,9 +99,12 @@ public:
 
 	ECMap* Map() const { return dynamic_cast<ECMap*>(map); }
 
+	bool WantLeave() const { return want_leave; }
+	void SetWantLeave() { want_leave = true; }
+
 /* Variables privées */
 protected:
-
+	bool want_leave;
 };
 
 #endif /* EC_CHANNELS_H */
