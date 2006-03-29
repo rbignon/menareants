@@ -55,7 +55,7 @@ const char* msgTab[] = {
      ":%s SET %s",                          /* SET - Définit ou informe les paramètres d'un jeu */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
      ":%s LEA",                             /* LEA - Un user part du saon */
-     "LSP %s %d %d",                        /* LSP - Liste les parties */
+     "LSP %s %c %d %d %s",                  /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
 
@@ -288,12 +288,18 @@ void TClient::Free()
 	EChannel *c;
 	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
-		if(c->NbPlayers() == 1) /* Dernier sur le chan */
+		if(pl->IsOwner() && c->Joinable())
+		{ /* L'owner s'en vas, le chan se clos */
+			c->RemovePlayer(pl, USE_DELETE);
+			c->ByeEveryBody();
+			delete c;
+		}
+		else if(c->NbPlayers() == 1) /* Dernier sur le chan */
 			delete c;
 		else
 		{
-			c->RemovePlayer(pl, true);
-			c->sendto_players(0, app.rpl(ECServer::LEAVE), nick, "");
+			c->RemovePlayer(pl, USE_DELETE);
+			c->sendto_players(0, app.rpl(ECServer::LEAVE), nick);
 		}
 	}
 
