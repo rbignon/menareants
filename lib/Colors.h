@@ -18,6 +18,9 @@
  * $Id$
  */
 
+#ifndef ECLIB_COLORS_H
+#define ECLIB_COLORS_H
+
 /** Color enumerator
  *
  * \warning THIS IS VERY IMPORTANT !! You have to change protocole number if you
@@ -35,3 +38,5 @@ enum e_color
 	COLOR_ORANGE,           /**< Orange color */
 	COLOR_MAX
 };
+
+#endif /* ECLIB_COLORS_H */

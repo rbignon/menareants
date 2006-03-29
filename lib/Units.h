@@ -58,6 +58,8 @@ public:
 		}
 	}
 
+	uint InitNb() { return ARMY_NB; }
+
 /* Methodes */
 public:
 

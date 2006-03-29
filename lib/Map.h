@@ -58,16 +58,18 @@ typedef char MapPlayer_ID;
 /********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
-#define ARM_MOVE      0x001
-#define ARM_SPLIT     0x002
-#define ARM_ATTAQ     0x004
-#define ARM_REMOVE    0x008
-#define ARM_LOCK      0x010
-#define ARM_TYPE      0x020
-#define ARM_NUMBER    0x040
-#define ARM_RETURN    0x080
-#define ARM_HIDE      0x100
-#define ARM_RECURSE   0x200 /* ne JAMAIS appeler */
+#define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
+                            (b)->CanAttaq(a) && !(b)->Like(a))
+#define ARM_MOVE      0x0001
+#define ARM_SPLIT     0x0002
+#define ARM_ATTAQ     0x0004
+#define ARM_REMOVE    0x0008
+#define ARM_LOCK      0x0010
+#define ARM_TYPE      0x0020
+#define ARM_NUMBER    0x0040
+#define ARM_RETURN    0x0080
+#define ARM_HIDE      0x0100
+#define ARM_RECURSE   0x0200 /* ne JAMAIS appeler */
 #define ARM_UNION     (ARM_MOVE|ARM_NUMBER)
 #define ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 class ECBEntity
@@ -94,6 +96,9 @@ public:
 
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(ECBEntity* e) = 0;
+
+	/** Use this function to know how people there are when you create this entity */
+	virtual uint InitNb() = 0;
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated();
@@ -146,7 +151,8 @@ public:
 	void SetRestStep(uint s) { restStep = s; }
 
 	uint Cost() { return cost; }
-	
+
+	std::string LongName();
 
 /* Variables protégées */
 protected:

@@ -191,6 +191,11 @@ void ECBEntity::ChangeCase(ECBCase* new_case)
 	acase = new_case;
 }
 
+std::string ECBEntity::LongName()
+{
+	return std::string(Owner() ? Owner()->GetNick() : "*") + "!" + ID();
+}
+
 /********************************************************************************************
  *                               ECBCountry                                                 *
  ********************************************************************************************/
