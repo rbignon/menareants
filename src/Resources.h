@@ -92,7 +92,6 @@ public:
 
 	/* Ne pas oublier de rajouter dans Resources.cpp */
 	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_PICS "menu.png");
-	R_RESOURCE(ECImage,      Menuscreen,       PKGDATADIR_PICS "menu_vide.png");
 	R_RESOURCE(ECImage,      Loadscreen,       PKGDATADIR_PICS "loading.png");
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
@@ -114,6 +113,10 @@ public:
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
 	R_RESOURCE(ECSpriteBase, NormalButton,     "normalbutton");
 	R_RESOURCE(ECSpriteBase, LitleButton,      "litlebutton");
+	R_RESOURCE(ECSpriteBase, PlayButton,       "playbutton");
+	R_RESOURCE(ECSpriteBase, OptionsButton,    "optionsbutton");
+	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
+	R_RESOURCE(ECSpriteBase, QuitterButton,    "quitterbutton");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");
 	R_RESOURCE(ECSpriteBase, CaseVille,        "cases/ville");

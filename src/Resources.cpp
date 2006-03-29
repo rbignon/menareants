@@ -32,7 +32,6 @@
                           type##_objects.clear()
 #define R_RESOURCE(type, name) type* Resources::spr_##name = NULL
 	R_RESOURCE(ECImage,      Titlescreen);
-	R_RESOURCE(ECImage,      Menuscreen);
 	R_RESOURCE(ECImage,      Loadscreen);
 	R_RESOURCE(ECImage,      BarreLat);
 	R_RESOURCE(ECImage,      Cadre);
@@ -54,6 +53,10 @@
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);
 	R_RESOURCE(ECSpriteBase, LitleButton);
+	R_RESOURCE(ECSpriteBase, PlayButton);
+	R_RESOURCE(ECSpriteBase, OptionsButton);
+	R_RESOURCE(ECSpriteBase, CreditsButton);
+	R_RESOURCE(ECSpriteBase, QuitterButton);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);
 	R_RESOURCE(ECSpriteBase, CaseVille);
