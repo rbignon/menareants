@@ -130,6 +130,7 @@ public:
 	 * @param y a vertical position. (optional)
 	 * @param nb number of units in entity. (optional)
 	 * @param type type of entity. (optional)
+	 * @param events this is a vector of events (in exemple for an attaq)
 	 *
 	 * Note that params \a x \a y \a nb and \a type aren't necessary and you have to put
 	 * a good flag to call them in function.
@@ -150,13 +151,16 @@ public:
 	 * ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 	 * </pre>
 	 */
-	void SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
-	             uint x=0, uint y=0, uint nb=0, uint type=0);
+	void SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
+	             uint x=0, uint y=0, uint nb=0, uint type=0, std::vector<ECEvent*> events = 0);
 
 	/** \see SendArm() */
-	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0);
-	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0);
-	void SendArm(std::vector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0);
+	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0,
+	             std::vector<ECEvent*> events = 0);
+	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0,
+	             std::vector<ECEvent*> events = 0);
+	void SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0,
+	             std::vector<ECEvent*> events = 0);
 
 	void InitAnims();
 
@@ -183,10 +187,15 @@ public:
 	ECMap *Map() const { return (ECMap*)map; }
 
 	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
-	
+
+	ECPlayer* Owner() { return owner; }
+	void SetOwner(ECPlayer* _o) { owner = _o; }
+
+	void ByeEveryBody();
+
 /* Variables privées */
 protected:
-
+	ECPlayer* owner;
 };
 
 typedef std::vector<EChannel*> ChannelVector;
