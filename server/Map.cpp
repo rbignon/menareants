@@ -28,6 +28,28 @@
 
 MapVector MapList;
 
+/********************************************************************************************
+ *                                 ECMove                                                   *
+ ********************************************************************************************/
+std::string ECMove::MovesString(ECase* end)
+{
+	ECase* c = first_case;
+	std::string s;
+	for(Vector::const_iterator it = moves.begin(); it != moves.end() && (!end || end != c); ++it)
+		switch(*it)
+		{
+			case Up: s += '^'; c = c->MoveUp(); break;
+			case Down: s += 'v'; c = c->MoveDown(); break;
+			case Left: s += '<'; c = c->MoveLeft(); break;
+			case Right: s += '>'; c = c->MoveRight(); break;
+		}
+	return s;
+}
+
+/********************************************************************************************
+ *                                 ECMap                                                    *
+ ********************************************************************************************/
+ 
 bool LoadMaps()
 {
 	std::ifstream fp(MAP_FILE);
@@ -72,20 +94,94 @@ ECMap::~ECMap()
 
 EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 {
-		for(EventVector::iterator it = map_events.begin(); it != map_events.end();)
+	for(EventVector::iterator it = map_events.begin(); it != map_events.end();)
+	{
+		if (*it == p)
 		{
-			if (*it == p)
-			{
-				if(use_delete)
-					delete p;
-				it = map_events.erase(it);
-				return it;
-			}
-			else
-				++it;
+			if(use_delete)
+				delete p;
+			it = map_events.erase(it);
+			return it;
 		}
-		return EventVector::iterator(0);
+		else
+			++it;
+	}
+	return EventVector::iterator(0);
 }
+
+ECEvent* ECMap::FindEvent(ECase* c, uint f, ECEntity* e)
+{
+	for(EventVector::iterator it = map_events.begin(); it != map_events.end(); ++it)
+		if((*it)->Case() == c && (*it)->Flags() == f && (!e || (*it)->Entities()->Find(e)))
+			return *it;
+	return 0;
+}
+
+struct SortEventsFunction
+{
+	bool operator ()(ECEvent* const& a1, ECEvent* const& a2) const
+	{
+		return (*a2) < (*a1);
+	}
+};
+void ECMap::SortEvents()
+{
+	std::sort(map_events.begin(), map_events.end(), SortEventsFunction());
+}
+
+/********************************************************************************************
+ *                                 ECEvent                                                  *
+ ********************************************************************************************/
+
+bool ECEvent::RemoveLinked(ECEvent* p, bool use_delete)
+{
+	for(EventVector::iterator it = linked.begin(); it != linked.end();)
+	{
+		if (*it == p)
+		{
+			if(use_delete)
+				delete p;
+			it = linked.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
+}
+
+bool ECEvent::operator<(const ECEvent& e) const
+{
+	const char NUMBER = 10;
+	const char CREATE = 9;
+	const char UNION = 7;
+	const char ATTAQ = 5;
+	const char MOVE = 2;
+	char me = 0, him = 0;
+	switch(flags)
+	{
+		case ARM_NUMBER: me = NUMBER; break;
+		case ARM_CREATE: me = CREATE; break;
+		case ARM_UNION: me = UNION; break;
+		case ARM_ATTAQ: me = ATTAQ; break;
+		case ARM_MOVE: me = MOVE; break;
+		default: me = 0; break;
+	}
+	switch(e.Flags())
+	{
+		case ARM_NUMBER: him = NUMBER; break;
+		case ARM_CREATE: him = CREATE; break;
+		case ARM_UNION: him = UNION; break;
+		case ARM_ATTAQ: him = ATTAQ; break;
+		case ARM_MOVE: him = MOVE; break;
+		default: him = 0; break;
+	}
+	return (me < him);
+}
+
+/********************************************************************************************
+ *                                 ECEntity                                                 *
+ ********************************************************************************************/
 
 bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 {
@@ -122,43 +218,13 @@ void ECEntity::RemoveLast()
 	MyFree(last);
 }
 
-struct SortEventsFunction
+ECEntity* ECEntity::FindLast(ECBCase* c)
 {
-	bool operator ()(ECEvent* const& a1, ECEvent* const& a2) const
+	for(ECEntity* a_l = this; a_l; a_l = a_l->Last())
 	{
-		return (*a2) < (*a1);
+		printf("(%p(%d,%d) == %p(%d,%d))\n", a_l->Case(), a_l->Case()->X(), a_l->Case()->Y(), c, c->X(), c->Y());
+		if(a_l->Case() == c)
+			return a_l;
 	}
-};
-void ECMap::SortEvents()
-{
-	std::sort(map_events.begin(), map_events.end(), SortEventsFunction());
-}
-
-bool ECEvent::operator<(const ECEvent& e) const
-{
-	const char NUMBER = 10;
-	const char CREATE = 9;
-	const char UNION = 7;
-	const char ATTAQ = 5;
-	const char MOVE = 2;
-	char me = 0, him = 0;
-	switch(flags)
-	{
-		case ARM_NUMBER: me = NUMBER; break;
-		case ARM_CREATE: me = CREATE; break;
-		case ARM_UNION: me = UNION; break;
-		case ARM_ATTAQ: me = ATTAQ; break;
-		case ARM_MOVE: me = MOVE; break;
-		default: me = 0; break;
-	}
-	switch(e.Flags())
-	{
-		case ARM_NUMBER: him = NUMBER; break;
-		case ARM_CREATE: him = CREATE; break;
-		case ARM_UNION: him = UNION; break;
-		case ARM_ATTAQ: him = ATTAQ; break;
-		case ARM_MOVE: him = MOVE; break;
-		default: him = 0; break;
-	}
-	return (me < him);
+	return 0;
 }

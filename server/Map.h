@@ -39,6 +39,53 @@ typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
 
+class ECEntity;
+
+/********************************************************************************************
+ *                                   ECMove                                                 *
+ ********************************************************************************************/
+
+class ECMove
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECMove() : first_case(0), entity(0) {}
+
+	enum E_Move {
+		Up,
+		Down,
+		Left,
+		Right
+	};
+	typedef std::vector<E_Move> Vector;
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	bool Empty() const { return moves.empty(); }
+	Vector::size_type Size() const { return moves.size(); }
+	Vector Moves() const { return moves; }
+	void AddMove(E_Move m) { moves.push_back(m); }
+	void SetMoves(Vector _moves) { moves = _moves; }
+	void SetEntity(ECEntity* et) { entity = et; }
+	ECEntity* Entity() { return entity; }
+
+	ECase* FirstCase() { return first_case; }
+	void SetFirstCase(ECase* c) { first_case = c; }
+
+	std::string MovesString(ECase* end = 0);
+
+/* Variables privées */
+protected:
+	Vector moves;
+	ECase* first_case;
+	ECEntity* entity;
+};
+
 /********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
@@ -59,10 +106,10 @@ public:
 public:
 
 	/** Use this function when this entity wants to attaq someone */
-	virtual ECBCase* WantAttaq(uint x, uint y) = 0;
+	virtual bool WantAttaq(uint x, uint y) = 0;
 
 	/** Use this function when this entity wants to move somewhere */
-	virtual ECBCase* WantMove(uint x, uint y) = 0;
+	virtual bool WantMove(ECMove::E_Move) = 0;
 
 	/** Use this function to cancel an action of this entity */
 	virtual bool Return() = 0;
@@ -87,20 +134,26 @@ public:
 public:
 
 	/** Return last entity */
-	ECBEntity* Last() { return last; }
+	ECEntity* Last() { return last; }
 	virtual void RemoveLast();
+
+	ECEntity* FindLast(ECBCase*);
 
 	int Tag;
 
 /* Variables privées */
 protected:
 	ECEntity* last;
-	bool SetLast(ECEntity* e) { return (!last) ? (last = e) : false; }
+	bool SetLast(ECEntity* e) { return (last = e); }
 };
 
 /********************************************************************************************
  *                                 ECEvent                                                  *
  ********************************************************************************************/
+/** @page ECEvent_page An ECEvent's description
+ *
+ */
+/** This is a class to describe an event maked by an or a few entity(ies). */
 class ECEvent
 {
 /* Constructeur/Destructeur */
@@ -116,20 +169,35 @@ public:
 /* Attributs */
 public:
 
+	/** C'est le type de l'evenement */
 	uint Flags() const { return flags; }
 	void SetFlags(uint _f) { flags = _f; }
 
+	/** Entitées associées. Il y en a qu'une seule *SAUF* pour les attaques */
 	ECList<ECEntity*> *Entities() { return &entities; }
+	ECEntity* Entity() { return entities.First(); }
 
+	/** Permet de comparer la priorité */
 	bool operator<(const ECEvent& e) const;
 
+	/** Case associée */
 	ECase* Case() const { return acase; }
 
+	/** Si c'est une création, une union ou autre, mettre le nombre */
 	void SetNb(uint n) { nb = n; }
 	uint Nb() { return nb; }
 
+	/** CE N'EST PAS LE TYPE DE L'ÉVENEMENT, MAIS LE TYPE ASSOCIÉ À UNE CREATION D'ENTITÉ */
 	void SetType(uint t) { type = t; }
 	uint Type() { return type; }
+
+	/** C'est utilisé pour les MOUVEMENTS */
+	ECMove* Move() { return &move; }
+
+	/** C'est utilisé pour les ATTAQUES, on link les evenements de mouvement si il y a */
+	std::vector<ECEvent*> Linked() { return linked; }
+	void AddLinked(ECEvent* li) { linked.push_back(li); }
+	bool RemoveLinked(ECEvent* li, bool use_delete = false);
 
 /* Variables privées */
 protected:
@@ -138,6 +206,8 @@ protected:
 	uint nb;
 	uint type;
 	ECList<ECEntity*> entities;
+	ECMove move;
+	std::vector<ECEvent*> linked;
 };
 
 typedef std::vector<ECEvent*> EventVector;
@@ -167,7 +237,8 @@ public:
 
 	EventVector Events() const { return map_events; }
 	void AddEvent(ECEvent* _e) { map_events.push_back(_e); }
-	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete);
+	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete = false);
+	ECEvent* FindEvent(ECase*, uint, ECEntity* = 0);
 
 /* Méthodes */
 public:
