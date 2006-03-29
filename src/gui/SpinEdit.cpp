@@ -154,6 +154,7 @@ void TSpinEdit::SetColorFont(SDL_Color new_color, Font* new_font)
 {
 	color = new_color;
 	font = new_font;
+	Init();
 }
 
 void TSpinEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
