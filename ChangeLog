@@ -1,3 +1,51 @@
+2005-03-29  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.h (nrvector): Vecteur dérivé de std::vector sans répétitions.
+	Retour de std::string plutot que de chaines dans FormatStr().
+
+	* src/gui/SpinEdit.cpp: Correction d'un petit bug.
+
+	* src/gui/ShowMap.cpp: Ne redimentionne pas quand la carte est plus petite que l'écran.
+
+	* src/gui/Label.h: Peut paramétrer la couleur du label.
+
+	* src/gui/Component.h, src/gui/Form.cpp: Pour les evenements, donne en argument le Form et un paramètre arbitraire.
+
+	* src/data: Nouvelles images plus belles (nouveau style).
+
+	* src/Map.cpp (CreatePreview): Paramètre pour ne pas afficher les numeros.
+
+	* src/gui/Menu.cpp: Suppression du menu.
+
+	* src/Login.cpp: Application du nouveau style.
+
+	* src/JoinGame.cpp: Correction de bugs (part), receptions infos pour InGame.
+
+	* src/InGame.cpp: Application nouveau style, affichage dans la BarreLat de la date, l'heure et l'argent par tour.
+
+	* server/Units.cpp, server/InGame.cpp: FONDAMENTALE: Passage à un mode de déplacement pas à pas.
+
+	* server/Server.cpp, server/Channels.cpp: Le départ de l'owner supprime le jeu.
+
+	* server/Map.h (ECMove): Cette classe compatibilise les mouvements (et passera sous peu dans lib/).
+
+	* server/Channels.cpp: Application au principe de déplacement pas-à-pas à SendArm(), support de la couleur et de la
+	position aléatoire.
+
+2005-03-25  Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: Support des hosts et correction de bugs.
+
+	* src/Main.cpp: Utilisation d'un TForm pour le menu principal.
+
+	* src/Config.cpp: Utilisation d'un TForm pour la config, support d'une liste de serveurs et de la couleur par default.
+
+	* src/gui/ColorEdit.cpp: Correction d'un bug qui n'affichait pas le label.
+
+	* src/JoinGame.cpp, server/Channels.cpp: Affiche le nom de la map et les parties jouées dans la liste.
+
+	* lib/Outils.cpp: Rajout de is_ip().
+
 2005-03-19  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h, server/Map.h (EC*Entity): Passage du system de last de lib à server, et passage de event_type de server à

@@ -3,12 +3,13 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--mettre un mode pour l'argent du début
+-finir le nouveau mode de déplacement pas-à-pas coté serveur
 
 * Urgent
+-mettre un mode pour l'argent du début
 -support des nations
 -client: composant TComboBox pour choisir une nation
--client: faire les dérivées des classes "Entity" pour arriver au graphique
+-client: gestion déplacements pas-a-pas
 
 * Bof
 -server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
@@ -17,9 +18,8 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
 
 * En parallèle (on s'en fou un peu de quand on les fait)
--client: Suppression progressive du menu pour passer uniquement à des TForm.
--passer les conversions explicites en dynamic_cast<>
--faire un éditeur de map (avec c++ builder pour que ça soit plus facile)
+-faire un éditeur de map, intégré (malheureusement) dans le jeu car c'est plus simple pour utiliser
+ les composants de gui/
 
 * Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -enrichissement du jeu.

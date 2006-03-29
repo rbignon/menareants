@@ -32,7 +32,7 @@ Sommaire:
               GO!                               :l'owner lance le jeu
          - En cours de jeu
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
-                  [/<nb>] [><pos>] [*[pos]]
+                  [/<nb>] [>] [^] [v] [<] [*<pos>]
 
       b) Serveur -> Client
          - Général
@@ -42,7 +42,8 @@ Sommaire:
               EOM                               :fin du motd
               STAT <nbactco> <nbco> <nbch>      :stats sur le serveur
                    <chinwait> <chingame> <chtot> <uptime>
-              LSP <nom> <nbjoueurs> <nbmax>     :liste une partie
+              LSP <nom> <+/-> <nbjoueurs>       :liste une partie
+                  <nbmax> [map]
               EOL                               :fin de la liste
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
               BYE [raison]                      :au revoir
@@ -59,22 +60,31 @@ Sommaire:
               EOSMAP                            :fin du SMAP
          - En cours de jeu
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
-                          [%<type>] [><pos>]
-                          [<] [-] [.]
+                          [%<type>] [<] [-] [.]
+                          [=<arm>,<pos>,<movs>]
               :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
                       OWN <nick>!<arm> <f1>
                       [<f2> ...]
 
 3) Particularités des commandes de positions
-      Les commandes de positions nécessitent des arguments de la forme suivante :
+      Voici les arguments server -> client :
          +<nb>       :ajoute des unités (donne le nombre final)
          %<type>     :définit le type de l'armée
-         /<nb>       :divise l'armée en une autre armée en indiquant sa position
-         ><pos>      :change la position
-         *[pos]      :attaque envisagée (et sans position: accepte un combat)
+         =<O!E>,<x>, :change la position (on indique l'user dans le cas d'un * qui prendrait plusieurs senders)
+          <y>,<[>][v][<][^]>
+         *<pos>      :attaque
          <           :retour
          -           :suppression de l'armée
          .           :lock                    } application encore indéfinie
+      Et client -> server :
+         >           :déplacement de un à droite
+         v           :déplacement de un vers le bas
+         <           :déplacement de un à gauche
+         ^           :déplacement de un vers le haut
+         *<pos>      :attaque une position
+         +           :création d'une entité
+         =<pos>      : |- position de départ
+         %<type>     : `- définit le type
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
