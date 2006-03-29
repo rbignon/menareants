@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <cstdarg>
+#include <netdb.h>
 
 /* Messages à envoyer */
 const char* msgTab[] = {
@@ -58,7 +59,7 @@ char *EC_Client::rpl(EC_Client::msg t)
 
 int EC_Client::sendrpl(const char *pattern, ...)
 {
-	if(!sock) return -1;
+	if(!sock || !connected && !logging) return -1;
 
 	static char buf[MAXBUFFER + 20];
 	va_list vl;
@@ -243,6 +244,7 @@ void EC_Client::Init()
 	lapp = NULL;
 	pl = NULL;
 	error = false;
+	logging = true;
 	FD_ZERO(&global_fd_set);
 
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
@@ -293,8 +295,14 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	struct sockaddr_in fsocket = {0};
 	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
+	const char* ip = hostname;
+
+	/* Si c'est une host, on la résoud */
+	if(!is_ip(hostname))
+		ip = inet_ntoa(*(struct in_addr *)(*(gethostbyname(hostname)->h_addr_list)));
+
 	fsocket.sin_family = AF_INET;
-	fsocket.sin_addr.s_addr = inet_addr(hostname);
+	fsocket.sin_addr.s_addr = inet_addr(ip);
 	fsocket.sin_port = htons(port);
 
 	/* Connexion */

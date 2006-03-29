@@ -87,6 +87,8 @@ public:
 	std::string CantConnect() const { return cantconnect; }
 	void SetCantConnect(std::string _msg) { cantconnect = _msg; error = true; }
 
+	void UnsetLogging() { logging = false; }
+
 	bool Error() { return error; }
 
 protected:
@@ -97,6 +99,7 @@ protected:
 
 	bool connected;
 	bool want_disconnect;
+	bool logging;
 
 	char readQ[MAXBUFFER + 1];
 	unsigned int readQi;
