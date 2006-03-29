@@ -57,6 +57,7 @@ public:
 public:
 
 	/* Chaine */
+	void SetString(std::string s) { chaine = s; }
 	const std::string& GetString() const { return chaine; }
 	void ClearString() { chaine = ""; }
 
