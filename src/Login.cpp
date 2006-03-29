@@ -48,6 +48,7 @@ int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->set_nick(parv[1]);
+	me->UnsetLogging();
 	me->SetConnected();
 	return 0;
 }
@@ -162,11 +163,14 @@ void EuroConqApp::request_game()
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
 
-		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 5);
+		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 1);
 
 		if(!client || !client->IsConnected())
 		{
 			std::string msg;
+			if(client)
+				client->SetWantDisconnect();
+
 			if(!client)
 				msg = "Connexion impossible";
 			else
@@ -273,19 +277,19 @@ void EuroConqApp::request_game()
 TConnectedForm::TConnectedForm()
 	: TForm()
 {
-	Welcome = AddComponent(new TLabel(200,50,"Vous êtes bien connecté", black_color, &app.Font()->big));
+	Welcome = AddComponent(new TLabel(200,100,"Vous êtes bien connecté", white_color, &app.Font()->big));
 
-	Motd = AddComponent(new TMemo(75,100,500,380, 0));
+	Motd = AddComponent(new TMemo(75,150,500,350, 0));
 
-	CreateButton = AddComponent(new TButtonText(600,100, 150,50, "Créer une partie"));
-	ListButton = AddComponent(new TButtonText(600,150,150,50, "Lister les parties"));
-	DisconnectButton = AddComponent(new TButtonText(600,200,150,50, "Se déconnecter"));
+	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie"));
+	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties"));
+	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter"));
 
-	Uptime =    AddComponent(new TLabel(75,485,"", black_color, &app.Font()->normal));
-	UserStats = AddComponent(new TLabel(75,505,"", black_color, &app.Font()->normal));
-	ChanStats = AddComponent(new TLabel(75,525,"", black_color, &app.Font()->normal));
+	Uptime =    AddComponent(new TLabel(75,510,"", white_color, &app.Font()->normal));
+	UserStats = AddComponent(new TLabel(75,530,"", white_color, &app.Font()->normal));
+	ChanStats = AddComponent(new TLabel(75,550,"", white_color, &app.Font()->normal));
 
-	SetBackground(Resources::Menuscreen());
+	SetBackground(Resources::Titlescreen());
 }
 
 TConnectedForm::~TConnectedForm()
