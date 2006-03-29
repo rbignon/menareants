@@ -44,18 +44,21 @@ void TLabel::SetCaption (std::string new_txt)
     return;
 
   caption = new_txt;
+  Reinit();
+}
 
+void TLabel::SetColor(SDL_Color new_color)
+{
+	color = new_color;
+	Reinit();
+}
+
+void TLabel::Reinit()
+{
   if (surf != NULL)
   {
     SDL_FreeSurface(surf);
   }
-
-  //Doesn't work.. don't know why...
-/*  SDL_Surface* tmp = font->Render(new_txt,color);
-  surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, tmp->w, tmp->h, 32,
-                                0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-  SDL_Rect dst_rect = {0,0,tmp->w,tmp->h};
-  SDL_BlitSurface(tmp, NULL, surf, &dst_rect);*/
 
   surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
 }

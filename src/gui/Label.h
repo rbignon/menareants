@@ -47,6 +47,7 @@ public:
 /* Attributs */
 public:
 
+	void SetColor(SDL_Color new_color);
 	void SetCaption(std::string text);
 	std::string Caption() const { return caption; }
 
@@ -57,6 +58,7 @@ protected:
 	Font* font;
 	SDL_Color color;
 
+	void Reinit();
 };
 
 #endif /* EC_LABEL_H */
