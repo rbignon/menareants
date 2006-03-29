@@ -37,11 +37,11 @@ public:
 public:
 
 	/** @return last case */
-	virtual ECBCase* WantMove(uint x, uint y);
+	virtual bool WantMove(ECMove::E_Move);
 
 	virtual bool Return();
 
-	virtual ECBCase* WantAttaq(uint x, uint y);
+	virtual bool WantAttaq(uint x, uint y);
 
 	virtual void CreateLast();
 
@@ -54,7 +54,7 @@ public:
 
 /* Variables protégées */
 protected:
-	ECBCase* CheckMove(uint mx, uint my);
+
 };
 
 #endif /* ECD_UNITS_H */
