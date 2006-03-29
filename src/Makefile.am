@@ -23,7 +23,6 @@ euroconq_SOURCES = \
 		gui/Component.cpp \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \
-		gui/Menu.cpp \
 		gui/ListBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
