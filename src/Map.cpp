@@ -202,7 +202,7 @@ ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
 }
 
 /** \note Preview use two screen pixels for one pixel in map */
-void ECMap::CreatePreview(uint width, uint height)
+void ECMap::CreatePreview(uint width, uint height, bool ingame)
 {
 	if(!initialised) return;
 
@@ -272,28 +272,31 @@ void ECMap::CreatePreview(uint width, uint height)
 		}
 
 	/* Numero du player */
-	for(std::vector<ECMapPlayer*>::iterator it = map_players.begin(); it != map_players.end(); ++it)
+	if(!ingame)
 	{
-		bool found = false;
-		std::vector<ECountry*> coun = (*it)->Countries();
-		for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end() && !found; ++ci)
+		for(std::vector<ECMapPlayer*>::iterator it = map_players.begin(); it != map_players.end(); ++it)
 		{
-			std::vector<ECBCase*> cas = (*ci)->Cases();
-			for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end() && !found; ++casi)
+			bool found = false;
+			std::vector<ECountry*> coun = (*it)->Countries();
+			for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end() && !found; ++ci)
 			{
-				if((*casi)->Flags() & (C_VILLE|C_CAPITALE)/* && ((casi+1) == cas.end() || (casi+2) == cas.end() ||
-				   ((*(casi+2))->X() == (*casi)->X()+2 && (*(casi+2))->Flags() & (C_TERRE|C_VILLE|C_CAPITALE)))*/)
+				std::vector<ECBCase*> cas = (*ci)->Cases();
+				for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end() && !found; ++casi)
 				{
-					SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->small.GetTTF()),
-					                                 TypToStr((*it)->Num()).c_str(), white_color);
-					SDL_Rect dst_rect;
-					dst_rect.x = (*casi)->X()*size_x+1;
-					dst_rect.y = (*casi)->Y()*size_y+1;
-					dst_rect.h = txtsurf->h;
-					dst_rect.w = txtsurf->w;
-					
-					SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
-					found = true;
+					if((*casi)->Flags() & (C_VILLE|C_CAPITALE)/* && ((casi+1) == cas.end() || (casi+2) == cas.end() ||
+					((*(casi+2))->X() == (*casi)->X()+2 && (*(casi+2))->Flags() & (C_TERRE|C_VILLE|C_CAPITALE)))*/)
+					{
+						SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->small.GetTTF()),
+														TypToStr((*it)->Num()).c_str(), white_color);
+						SDL_Rect dst_rect;
+						dst_rect.x = (*casi)->X()*size_x+1;
+						dst_rect.y = (*casi)->Y()*size_y+1;
+						dst_rect.h = txtsurf->h;
+						dst_rect.w = txtsurf->w;
+						
+						SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
+						found = true;
+					}
 				}
 			}
 		}
