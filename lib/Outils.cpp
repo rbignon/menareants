@@ -1,6 +1,6 @@
 /* src/Outils.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,25 @@
 
 #include "Outils.h"
 
-int is_num(const char *num)
+bool is_num(const char *num)
 {
-   while(*num) if(!isdigit(*num++)) return 0;
-   return 1;
+   while(*num) if(!isdigit(*num++)) return false;
+   return true;
+}
+
+bool is_ip(const char *ip)
+{
+        char *ptr = NULL;
+        int i = 0, d = 0;
+
+        for(; i < 4; ++i) /* 4 dots expected (IPv4) */
+        {       /* Note about strtol: stores in endptr either NULL or '\0' if conversion is complete */
+                if(!isdigit((unsigned char) *ip) /* most current case (not ip, letter host) */
+                        || (d = strtol(ip, &ptr, 10)) < 0 || d > 255 /* ok, valid number? */
+                        || (ptr && *ptr != 0 && *ptr != '.' && ptr != ip)) return false;
+                if(ptr) ip = ptr + 1, ptr = NULL; /* jump the dot */
+        }
+        return true;
 }
 
 
@@ -56,18 +71,30 @@ std::string stringtok(std::string &in, const char * const delimiters = " \t\n")
 	return s;
 }
 
-char* FormatStr(const char* s)
+std::string FormatStr(std::string s)
 {
-	static char ptr[512];
-	int i, size = sizeof ptr;
+	std::string ptr;
+	int j, size = s.size();
 
-	for(i=0; *s && (i < size); ++i,++s)
+	for(j=0; s[j] && (j < size); ++j)
 	{
-		if(*s == '\\' && *(s+1) == ' ') ptr[i++] = '\\';
-		else if(*s == ' ') ptr[i++] = '\\';
-		ptr[i] = *s;
+		if(s[j] == '\\' && s[j+1] == ' ') ptr += '\\';
+		else if(s[j] == ' ') ptr+= '\\';
+		ptr += s[j];
 	}
-	ptr[i] = '\0';
+	return ptr;
+}
+
+std::string FormatStr(const char* s)
+{
+	std::string ptr;
+
+	for(; *s; ++s)
+	{
+		if(*s == '\\' && *(s+1) == ' ') ptr += '\\';
+		else if(*s == ' ') ptr += '\\';
+		ptr += *s;
+	}
 	return ptr;
 }
 

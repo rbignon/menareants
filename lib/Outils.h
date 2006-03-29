@@ -27,7 +27,11 @@
 std::string stringtok(std::string &, const char * const);
 
 /** Formate la chaine avec des \ devant les espaces */
-char* FormatStr(const char* s);
+std::string FormatStr(const char* s);
+std::string FormatStr(std::string s);
+
+/** Retourne vrai si c'est une ip */
+bool is_ip(const char *ip);
 
 /** Formate une chaine et retourne dans une std::string */
 std::string StringF(const char* format, ...);
@@ -43,7 +47,7 @@ char *get_time(time_t mytime);
 char *duration(int s);
 
 /** Check if the string is a number */
-int is_num(const char *num);
+bool is_num(const char *num);
 
 /** Convertit d'une chaine en un type */
 template<typename T>
@@ -80,6 +84,28 @@ inline void MyFree(void *p)
 */
 
 const bool USE_DELETE = true;
+
+namespace _GLIBCXX_STD
+{
+	template<typename _Tp, typename _Alloc = std::allocator<_Tp> >
+	class nrvector : public vector<_Tp, _Alloc>
+	{
+		typedef vector<_Tp, _Alloc>                       vector_type;
+	public:
+		typedef _Tp                                        value_type;
+		typedef typename _Alloc::pointer                   pointer;
+		typedef typename _Alloc::const_pointer             const_pointer;
+		typedef __gnu_cxx::__normal_iterator<pointer, vector_type> iterator;
+		typedef __gnu_cxx::__normal_iterator<const_pointer, vector_type> const_iterator;
+		void push_back(const value_type& __x)
+		{
+			for(const_iterator it = vector_type::begin(); it != vector_type::end(); ++it)
+				if((*it) == __x)
+					return;
+			vector_type::push_back(__x);
+		}
+	};
+}
 
 template <class T>
 class ECList
@@ -124,6 +150,14 @@ public:
 				delete (*it);
 			it = list.erase(it);
 		}
+	}
+
+	T Find(T e)
+	{
+		for(iterator it = list.begin(); it != list.end();++it)
+			if((*it) == e)
+				return *it;
+		return 0;
 	}
 
 	T Find(const char* id)
@@ -178,6 +212,8 @@ public:
 			if(!(*it)->Locked()) ++i;
 		return i;
 	}
+
+	T First() { return *(list.begin()); }
 
 	std::vector<T> List() { return list; }
 
