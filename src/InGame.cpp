@@ -203,7 +203,7 @@ void EuroConqApp::InGame()
 	{
 		SDL_Event event;
 		bool eob = false;
-		InGameForm = new TInGameForm(chan);
+		InGameForm = new TInGameForm(client->Player());
 		ECEntity* selected_entity = 0;
 		Timer timer;
 		do
@@ -230,7 +230,7 @@ void EuroConqApp::InGame()
 								if(InGameForm->SendMessage->Focused())
 								{
 									client->sendrpl(client->rpl(EC_Client::MSG),
-												FormatStr(InGameForm->SendMessage->GetString().c_str()));
+												FormatStr(InGameForm->SendMessage->GetString()).c_str());
 									InGameForm->Chat->AddItem("<" + client->GetNick() + "> " +
 												InGameForm->SendMessage->GetString(), black_color);
 									InGameForm->SendMessage->ClearString();
@@ -305,9 +305,10 @@ void TInGameForm::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TInGameForm::TInGameForm(EChannel* ch)
+TInGameForm::TInGameForm(ECPlayer* pl)
 	: TForm()
 {
+	EChannel* ch = pl->Channel();
 	if(!ch || !ch->Map())
 		throw ECExcept(VPName(ch), "La partie n'existe pas ou n'a pas de map");
 
@@ -315,7 +316,7 @@ TInGameForm::TInGameForm(EChannel* ch)
 
 	ch->Map()->SetShowMap(Map);
 
-	BarreLat = AddComponent(new TBarreLat(ch));
+	BarreLat = AddComponent(new TBarreLat(pl));
 
 	SendMessage = AddComponent(new TEdit(30,20,315, MAXBUFFER-20, false));
 	Chat = AddComponent(new TMemo(30,20+SendMessage->Height() + 20,315,100,5, false));
@@ -331,26 +332,34 @@ TInGameForm::~TInGameForm()
 	delete Map;
 }
 
-TBarreLat::TBarreLat(EChannel* ch)
+TBarreLat::TBarreLat(ECPlayer* pl)
 	: TChildForm(SCREEN_WIDTH-150, 0, 150, SCREEN_HEIGHT)
 {
+	EChannel* ch = pl->Channel();
 	assert(ch && ch->Map());
 	chan = ch;
 
 	Radar = AddComponent(new TImage(7, 6));
 
-	PretButton = AddComponent(new TButtonText(50,170,50,20, "Pret"));
+	PretButton = AddComponent(new TButtonText(30,170,50,20, "Pret"));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 	PretButton->SetFont(&app.Font()->small);
 
-	ch->Map()->CreatePreview(138,138);
+	ch->Map()->CreatePreview(138,138, true);
 	Radar->SetImage(ch->Map()->Preview(), false);
+
+	Money = AddComponent(new TLabel(50, 1, TypToStr(pl->Money()) + " $", white_color, &app.Font()->small));
+	Date = AddComponent(new TLabel(5, 20, ch->Map()->Date()->String(), white_color, &app.Font()->small));
+	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(pl->TurnMoney()) + "$.t-1", white_color, &app.Font()->small));
 
 	SetBackground(Resources::BarreLat());
 }
 
 TBarreLat::~TBarreLat()
 {
+	delete TurnMoney;
+	delete Date;
+	delete Money;
 	delete PretButton;
 	delete Radar;
 }
@@ -375,6 +384,15 @@ void LoadingGame(EC_Client* me)
 			throw ECExcept(VIName((*pli)->Position()), "Position introuvable !?");
 		(*mpi)->SetPlayer(*pli);
 		(*pli)->SetMapPlayer(*mpi);
+		std::vector<ECBCountry*> ctv = (*mpi)->Countries();
+		for(std::vector<ECBCountry*>::iterator cti = ctv.begin(); cti != ctv.end(); ++cti)
+		{
+			std::vector<ECBCase*> cav = (*cti)->Cases();
+			for(std::vector<ECBCase*>::iterator cai = cav.begin(); cai != cav.end(); ++cai)
+				if((*cai)->Flags() & C_VILLE)
+					(*pli)->SetTurnMoney((*pli)->TurnMoney() +
+				                         (chan->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
+		}
 	}
 	chan->Map()->ClearMapPlayers();
 	chan->Map()->CreatePreview(300,300);
@@ -424,7 +442,7 @@ void EuroConqApp::LoadGame(EChannel* chan)
 TLoadingForm::TLoadingForm(EChannel* ch)
 	: TForm()
 {
-	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), black_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), white_color, &app.Font()->big));
 
 	MapInformations = AddComponent(new TMemo(60,150,315,200,30));
 	std::vector<std::string> map_infos = ch->Map()->MapInfos();
@@ -442,16 +460,16 @@ TLoadingForm::TLoadingForm(EChannel* ch)
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TLoadPlayerLine(dynamic_cast<ECPlayer*>(*it)));
 
-	MapTitle = AddComponent(new TLabel(400, 100, ch->Map()->Name(), black_color, &app.Font()->big));
+	MapTitle = AddComponent(new TLabel(400, 100, ch->Map()->Name(), white_color, &app.Font()->big));
 
 	Preview = AddComponent(new TImage(450, 150));
 	Preview->SetImage(ch->Map()->Preview(), false);
 
-	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), black_color, &app.Font()->normal));
+	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), white_color, &app.Font()->normal));
 
-	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", black_color, &app.Font()->large));
+	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, &app.Font()->large));
 
-	SetBackground(Resources::Menuscreen());
+	SetBackground(Resources::Titlescreen());
 }
 
 TLoadingForm::~TLoadingForm()

@@ -40,13 +40,16 @@ class ECPlayer;
 class TBarreLat : public TChildForm
 {
 public:
-	TBarreLat(EChannel*);
+	TBarreLat(ECPlayer*);
 	~TBarreLat();
 
 /* Composants */
 public:
 	TImage*      Radar;
 	TButtonText* PretButton;
+	TLabel*      Date;
+	TLabel*      Money;
+	TLabel*      TurnMoney;
 
 protected:
 	EChannel* chan;
@@ -58,7 +61,7 @@ class TInGameForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TInGameForm(EChannel*);
+	TInGameForm(ECPlayer*);
 	~TInGameForm();
 
 /* Composants */
