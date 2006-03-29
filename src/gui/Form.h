@@ -36,9 +36,9 @@
  * After, when you use this Form, you have to create the object.
  * You must use a no-end-loop where you call TForm::Update() function.
  * It is possible to each components to define some functions to execute when there is an action.
- * For exemple, you can use a function like "void ButtonClick(int x, int y)" and do :
+ * For exemple, you can use a function like "void ButtonClick(void* Form, void* data)" and do :
  * <pre>
- *   Button->SetClickedFunc(&ButtonClick);
+ *   Button->SetClickedFunc(&ButtonClick, 0);
  * </pre>
  * After, if you use TForm::Actions() function in your loop, when this button will be
  * selected, it will call ButtonClick() function.

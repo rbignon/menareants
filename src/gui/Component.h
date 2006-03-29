@@ -25,7 +25,7 @@
 #include <SDL_keyboard.h>
 
 typedef unsigned int   uint;
-typedef void (*TClickedFunction) (int mouse_x, int mouse_y);
+typedef void (*TClickedFunction) (void*, void*);
 
 /********************************************************************************************
  *                               TComponent                                                 *
@@ -100,8 +100,9 @@ public:
 	virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
 	virtual void PressKey(SDL_keysym) { return; }
 
-	void SetClickedFunc(TClickedFunction* c) { clicked_func = c; }
-	TClickedFunction* ClickedFunc() { return clicked_func; }
+	void SetClickedFunc(TClickedFunction c, void* param) { clicked_func = c; clicked_func_param = param; }
+	TClickedFunction ClickedFunc() { return clicked_func; }
+	void* ClickedFuncParam() { return clicked_func_param; }
 
 /* Variables privées */
 protected:
@@ -110,7 +111,8 @@ protected:
 	bool visible;
 	bool enabled;
 	bool focus;
-	TClickedFunction* clicked_func;
+	TClickedFunction clicked_func;
+	void* clicked_func_param;
 };
 typedef std::vector<TComponent*> ComponentVector;
 
