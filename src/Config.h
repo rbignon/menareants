@@ -22,6 +22,7 @@
 #define EC_Config_h
 
 #include <string>
+#include <vector>
 
 class Config
 {
@@ -31,15 +32,22 @@ public:
 public:
 	bool load();
 	bool save() const;
+	void Configuration();
 
 public:
 	std::string hostname;
 	int port;
 	std::string nick;
+	unsigned int color;
+	std::vector<std::string> server_list;
 
 private:
 	std::string filename;
 	bool set_defaults();
+	bool want_quit_config;
+
+	static void WantCancel(void*, void*);
+	static void WantOk(void*, void*);
 };
 
 #endif
