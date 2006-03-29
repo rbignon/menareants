@@ -41,9 +41,11 @@ void TMap::SetPosition(int _x, int _y, bool force)
 
 	if(_x > 0) _x = 0;
 	if(Xmin() <= 0 && _x < Xmin()) _x = Xmin();
+	if(Xmin() > 0) _x = x;
 	if(_y > 0) _y = 0;
 	if(Ymin() <= 0 && _y < Ymin()) _y = Ymin();
-	
+	if(Ymin() > 0) _y = y;
+
 	if(!force && x == _x && y == _y) return;
 
 	x = _x;
