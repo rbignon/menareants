@@ -34,8 +34,7 @@ TListBox::TListBox (int _x, int _y, uint _width, uint _height)
   first_visible_item = 0;
   nb_visible_items = 0;
   visible_height = 0;
-  selection_min = 1;
-  selection_max = 1;
+  m_selection = -1;
 
   cursorover_box = NULL;
   selected_box = NULL;
@@ -99,7 +98,6 @@ int TListBox::MouseIsOnWitchItem (int mouse_x, int mouse_y)
 
 bool TListBox::Clic (int mouse_x, int mouse_y)
 {
-
   // buttons for listbox with more items than visible
   if (m_items.size() > nb_visible_items_max)
   {
@@ -201,58 +199,44 @@ void TListBox::AddItem (bool selected,
 void TListBox::ClearItems()
 {
 	m_items.clear();
-	m_selection.clear();
-  height_item = 15;
-  first_visible_item = 0;
-  visible_height = 0;
-  selection_min = 1;
-  nb_visible_items = 0;
-  selection_max = 1;
+	m_selection = -1;
+	height_item = 15;
+	first_visible_item = 0;
+	visible_height = 0;
+	nb_visible_items = 0;
 }
 
 void TListBox::Select (uint index)
 {
-  if(!m_items[index].enabled) return;
-  // If they are to much selection, kick the oldest one
-  if (selection_max != -1)
-  {
-    if ((int)m_selection.size() == selection_max)
-      m_selection.erase(m_selection.begin());
-    assert ((int)m_selection.size() < selection_max);
-  }
-
-  // Add new selection
-  m_selection.push_back (index);
+	if(!m_items[index].enabled) return;
+	
+	m_selection = index;
 }
 
 //-----------------------------------------------------------------------------
 
 void TListBox::Deselect (uint index)
 {
-  if ((int)m_selection.size()-1 < selection_min) return;
-  m_selection.remove (index);
+	if (m_selection == (int)index)
+		m_selection = -1;
 }
 
 //-----------------------------------------------------------------------------
 
 bool TListBox::IsSelected (uint index)
 {
-  return std::find (m_selection.begin(), m_selection.end(), index)
-    != m_selection.end();
+	return (m_selection == (int)index);
 }
 
 //-----------------------------------------------------------------------------
 
 int TListBox::GetSelectedItem ()
 {
-  if(m_selection.size() != 1) return -1;
-
-  return m_selection.front();
+  return m_selection;
 }
 
 //-----------------------------------------------------------------------------
 
-const std::list<uint>& TListBox::GetSelection() const { return m_selection; }
 const std::string& TListBox::ReadLabel (uint index) const
 {
   assert (index < m_items.size());

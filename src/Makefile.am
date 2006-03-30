@@ -24,6 +24,7 @@ euroconq_SOURCES = \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \
 		gui/ListBox.cpp \
+		gui/ComboBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \

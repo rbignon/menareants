@@ -1,3 +1,7 @@
+2005-03-30  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ComboBox.cpp: Programmation d'un composant TComboBox.
+
 2005-03-29  Romain Bignon <progs@headfucking.net>
 
 	* lib/Outils.h (nrvector): Vecteur dérivé de std::vector sans répétitions.

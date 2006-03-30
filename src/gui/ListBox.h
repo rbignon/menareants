@@ -43,53 +43,57 @@ typedef struct s_list_box_item_t{
 /** This is a component based on TComponent and whose show a list of items */
 class TListBox : public TComponent
 {
+/* Constructeur/Destructeur */
 public:
-  int selection_min; ///< Minimal number of selected items
-  int selection_max; ///<Maximal number of selected items (-1 means no limit)
-  typedef std::list<uint>::const_iterator selection_iterator;
+	TListBox (int _x, int _y, uint _width, uint _height);
+	virtual ~TListBox();
 
-private:
-
-  uint visible_height;
-  uint nb_visible_items, nb_visible_items_max;
-  uint height_item;
-
-  // what are the items ?
-  uint first_visible_item;
-  std::vector<list_box_item_t> m_items;
-
-  //std::vector<ListBoxItem> m_items;
-  std::list<uint> m_selection;
-
-  // Buttons
-  TButton m_up, m_down;
-
-  SDL_Surface *cursorover_box;
-  SDL_Surface *selected_box;
-  SDL_Surface *background;
-
+/* Methodes */
 public:
-  TListBox (int _x, int _y, uint _width, uint _height);
-  ~TListBox();
-  void Init ();
 
-  void Draw (int mouse_x, int mouse_y);
-  bool Clic (int mouse_x, int mouse_y);
+	virtual void Init ();
+	
+	virtual void Draw (int mouse_x, int mouse_y);
+	virtual bool Clic (int mouse_x, int mouse_y);
 
-  void AddItem (bool selected,
-		const std::string &label,
-		const std::string &value,
-		SDL_Color _color, bool _enabled);
-  void ClearItems();
-  int MouseIsOnWitchItem (int mouse_x, int mouse_y);
-  void Select (uint index);
-  void Deselect (uint index);
-  bool IsSelected (uint index);
-  int GetSelectedItem (); /**< retourne -1 si non sélectionné */
-  const std::list<uint>& GetSelection() const;
-  const std::string& ReadLabel (uint index) const;
-  const std::string& ReadValue (uint index) const;
-  bool EnabledItem(uint index);
+/* Attributs */
+public:
+
+	void AddItem (bool selected,
+	              const std::string &label,
+	              const std::string &value,
+	              SDL_Color _color, bool _enabled);
+	void ClearItems();
+	int MouseIsOnWitchItem (int mouse_x, int mouse_y);
+	void Select (uint index);
+	void Deselect (uint index);
+	bool IsSelected (uint index);
+	int GetSelectedItem (); /**< retourne -1 si non sélectionné */
+	const std::string& ReadLabel (uint index) const;
+	const std::string& ReadValue (uint index) const;
+	bool EnabledItem(uint index);
+
+/* Variables publiques */
+public:
+
+/* Variables protégées */
+protected:
+
+	uint visible_height;
+	uint nb_visible_items, nb_visible_items_max;
+	uint height_item;
+	
+	// what are the items ?
+	uint first_visible_item;
+	std::vector<list_box_item_t> m_items;
+	int m_selection;
+	
+	// Buttons
+	TButton m_up, m_down;
+	
+	SDL_Surface *cursorover_box;
+	SDL_Surface *selected_box;
+	SDL_Surface *background;
 };
 
 #endif /* EC_LISTBOX_H */
