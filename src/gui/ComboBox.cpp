@@ -62,7 +62,7 @@ void TComboBox::SetBackGround(uint _h)
 	SDL_Rect r_back = {0,0,w,_h};
 	background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, _h,
 					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
+	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*5/10));
 }
 
 void TComboBox::SetOpened(bool _o)
@@ -106,6 +106,7 @@ void TComboBox::AddItem (bool selected,
 void TComboBox::ClearItems()
 {
 	TListBox::ClearItems();
+	SetOpened(false);
 	if(background)
 	{
 		SDL_FreeSurface(background);
@@ -114,26 +115,35 @@ void TComboBox::ClearItems()
 	chaine = "";
 }
 
+void TComboBox::Select (uint index)
+{
+	if(index >= m_items.size() || !m_items[index].enabled) return;
+
+	m_selection = index;
+
+	chaine = ReadLabel(m_selection);
+}
+
 void TComboBox::Deselect (uint index)
 {
+	// On ne permet pas de deselectionner dans une combobox !
 	return;
 }
 
 bool TComboBox::Clic (int mouse_x, int mouse_y)
 {
+	if(!enabled) return false;
+
 	bool r = false;
+
 	if(opened)
-	{
 		r = TListBox::Clic(mouse_x,mouse_y);
-	
-		if(m_selection != -1)
-			chaine = ReadLabel(m_selection);
-		else
-			chaine = "";
-	}
 	if(m_open.Test(mouse_x, mouse_y))
 		SetOpened(!opened), r = true;
 	if(opened && MouseIsOnWitchItem(mouse_x,mouse_y) != -1)
+		SetOpened(false), r = true;
+
+	if(!r && opened && !Test(mouse_x,mouse_y))
 		SetOpened(false), r = true;
 
 	return r;
@@ -153,10 +163,9 @@ void TComboBox::Draw (int mouse_x, int mouse_y)
 			app.Font()->small.WriteLeft(x+5, real_y, chaine, black_color);
 	}
 
-	m_open.Draw(mouse_x,mouse_y);
+	if(enabled)
+		m_open.Draw(mouse_x,mouse_y);
 
 	if(opened)
-	{
 		TListBox::Draw(mouse_x,mouse_y);
-	}
 }

@@ -34,7 +34,7 @@ class TComboBox : public TListBox
 public:
 	TComboBox(int _x, int _y, uint _width)
 		: TListBox(_x, _y, _width, COMBOBOX_HEIGHT), real_y(_y), edit_bg(0), opened(false), visible_len(0)
-	{}
+	{ gray_disable = true; }
 
 	virtual ~TComboBox();
 
@@ -48,14 +48,15 @@ public:
 /* Attributs */
 public:
 
-	bool Opened() { return opened; }
+	bool Opened() const { return opened; }
 
 	void AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
 	              SDL_Color _color = black_color, bool _enabled = true);
 	void ClearItems();
-	void Deselect (uint index);
+	virtual void Deselect (uint index);
+	virtual void Select(uint index);
 
 /* Variables privées */
 protected:
