@@ -298,6 +298,8 @@ void TClient::Free()
 			delete c;
 		else
 		{
+			if(pl->IsOwner())
+				c->SetOwner(0);
 			c->RemovePlayer(pl, USE_DELETE);
 			c->sendto_players(0, app.rpl(ECServer::LEAVE), nick);
 		}
