@@ -29,6 +29,18 @@
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
+const char *nations_str[] = {
+	/* N_NONE     */    "Aléatoire",
+	/* N_NOISY    */    "Noisy",
+	/* N_USA      */    "Etats-Unis",
+	/* N_FRANCE   */    "France",
+	/* N_URSS     */    "URSS",
+	/* N_ALQUAIDA */    "Al-Quaïda",
+	/* N_ESPAGNE  */    "Espagne",
+	/* N_JAPON    */    "Japon",
+	/* N_MAX      */    ""
+};
+
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 	: chan(_chan), owner(_owner), op(_op), turn_money(0)
 {
@@ -36,7 +48,8 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 	ready = false;
 	money = 0;
 	position = 0;
-	color = 0;
+	color = COLOR_NONE;
+	nation = N_NONE;
 }
 
 bool ECBPlayer::SetPosition(unsigned int p)
@@ -54,6 +67,16 @@ bool ECBPlayer::SetColor(unsigned int c)
 	if(c < COLOR_MAX)
 	{
 		color = c;
+		return true;
+	}
+	return false;
+}
+
+bool ECBPlayer::SetNation(unsigned int n)
+{
+	if(n < N_MAX)
+	{
+		nation = n;
 		return true;
 	}
 	return false;
@@ -141,7 +164,7 @@ std::string ECBChannel::PlayerList()
 			list += "!";
 
 		/* Informe de la place et de la couleur */
-		list += TypToStr((*it)->Position()) + "," + TypToStr((*it)->Color()) + ",";
+		list += TypToStr((*it)->Position()) + "," + TypToStr((*it)->Color()) + "," + TypToStr((*it)->Nation()) + ",";
 
 		list += (*it)->GetNick();
 	}

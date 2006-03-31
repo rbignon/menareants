@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "Outils.h"
+#include "Colors.h"
 
 class ECBChannel;
 class ECBMap;
@@ -32,6 +33,8 @@ class ECBMapPlayer;
 class ECBEntity;
 
 typedef std::vector<ECBEntity*> BEntityVector;
+
+extern const char *nations_str[];
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *
@@ -47,6 +50,20 @@ class ECBPlayer
 public:
 	ECBPlayer(ECBChannel *_chan, bool _owner, bool _op);
 	virtual ~ECBPlayer() {}
+
+	/** List of nations */
+	enum e_nations
+	{
+		N_NONE,
+		N_NOISY,
+		N_USA,
+		N_FRANCE,
+		N_URSS,
+		N_ALQUAIDA,
+		N_ESPAGNE,
+		N_JAPON,
+		N_MAX
+	};
 
 /* Méthodes */
 public:
@@ -77,7 +94,10 @@ public:
 	 * \note Colors are an enumerator defined in Colors.h.
 	 */
 	unsigned int Color() const { return color; }
-	bool SetColor(unsigned int c);                      /**< Set color of player. */
+	bool SetColor(unsigned int c);                     /**< Set color of player. */
+
+	unsigned int Nation() const { return nation; }
+	bool SetNation(unsigned int n);
 
 	/** Return nick of player. */
 	virtual const char* GetNick() const = 0;
@@ -105,6 +125,7 @@ protected:
 	bool ready;
 	ECList<ECBEntity*> entities;
 	uint turn_money;
+	unsigned int nation;
 };
 typedef std::vector<ECBPlayer*> BPlayerVector;
 
