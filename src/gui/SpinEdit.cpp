@@ -124,16 +124,19 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 
 void TSpinEdit::Draw (int mouse_x, int mouse_y)
 {
-  if(txt_label)
-    txt_label->Draw(mouse_x, mouse_y);
+	if(txt_label)
+		txt_label->Draw(mouse_x, mouse_y);
 
-  if(m_minus)
-    m_minus->Draw (mouse_x, mouse_y);
-  if(m_plus)
-    m_plus->Draw (mouse_x, mouse_y);
+	if(enabled)
+	{
+		if(m_minus)
+			m_minus->Draw (mouse_x, mouse_y);
+		if(m_plus)
+			m_plus->Draw (mouse_x, mouse_y);
+	}
 
-  if(txt_value)
-    txt_value->Draw(mouse_x, mouse_y);
+	if(txt_value)
+		txt_value->Draw(mouse_x, mouse_y);
 }
 
 //-----------------------------------------------------------------------------

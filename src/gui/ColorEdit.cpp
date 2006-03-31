@@ -98,17 +98,20 @@ bool TColorEdit::SetValue(int _value, bool first)
 
 void TColorEdit::Draw (int mouse_x, int mouse_y)
 {
-  if(txt_label)
-    txt_label->Draw(mouse_x, mouse_y);
+	if(txt_label)
+		txt_label->Draw(mouse_x, mouse_y);
+	
+	if(img)
+	{
+		SDL_Rect r_back = {imgx,y,img->Img->w,img->Img->h};
+		SDL_BlitSurface( img->Img, NULL, app.sdlwindow, &r_back);
+	}
 
-  if(img)
-  {
-    SDL_Rect r_back = {imgx,y,img->Img->w,img->Img->h};
-    SDL_BlitSurface( img->Img, NULL, app.sdlwindow, &r_back);
-  }
-
-  if(m_minus)
-    m_minus->Draw (mouse_x, mouse_y);
-  if(m_plus)
-    m_plus->Draw (mouse_x, mouse_y);
+	if(enabled)
+	{
+		if(m_minus)
+			m_minus->Draw (mouse_x, mouse_y);
+		if(m_plus)
+			m_plus->Draw (mouse_x, mouse_y);
+	}
 }
