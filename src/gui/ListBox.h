@@ -65,13 +65,14 @@ public:
 	              SDL_Color _color, bool _enabled);
 	void ClearItems();
 	int MouseIsOnWitchItem (int mouse_x, int mouse_y);
-	void Select (uint index);
-	void Deselect (uint index);
+	virtual void Select (uint index);
+	virtual void Deselect (uint index);
 	bool IsSelected (uint index);
 	int GetSelectedItem (); /**< retourne -1 si non sélectionné */
 	const std::string& ReadLabel (uint index) const;
 	const std::string& ReadValue (uint index) const;
 	bool EnabledItem(uint index);
+	void SetEnabledItem(uint index, bool e = true);
 
 /* Variables publiques */
 public:
@@ -82,15 +83,16 @@ protected:
 	uint visible_height;
 	uint nb_visible_items, nb_visible_items_max;
 	uint height_item;
-	
+
 	// what are the items ?
 	uint first_visible_item;
 	std::vector<list_box_item_t> m_items;
 	int m_selection;
-	
+	bool gray_disable;
+
 	// Buttons
 	TButton m_up, m_down;
-	
+
 	SDL_Surface *cursorover_box;
 	SDL_Surface *selected_box;
 	SDL_Surface *background;

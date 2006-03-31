@@ -35,6 +35,7 @@ TListBox::TListBox (int _x, int _y, uint _width, uint _height)
   nb_visible_items = 0;
   visible_height = 0;
   m_selection = -1;
+  gray_disable = false;
 
   cursorover_box = NULL;
   selected_box = NULL;
@@ -118,7 +119,7 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
   }
 
   int item = MouseIsOnWitchItem(mouse_x,mouse_y);
-  if (item == -1) return false;
+  if (item == -1 || !m_items[item].enabled) return false;
   if (IsSelected(item))
     Deselect (item);
   else
@@ -137,7 +138,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
   for (uint i=0; i < nb_visible_items; i++)
   {
 	// blit surfaces as SDL_FillRect don't alpha blit a rectangle
-	if(enabled)
+	if(enabled && m_items[i+first_visible_item].enabled)
 	{
 		if ( i+first_visible_item == uint(item))
 		{
@@ -154,6 +155,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 		app.Font()->small.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
+			 !m_items[i+first_visible_item].enabled && gray_disable ? gray_color :
 			 IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
   }
 
@@ -209,7 +211,7 @@ void TListBox::ClearItems()
 void TListBox::Select (uint index)
 {
 	if(!m_items[index].enabled) return;
-	
+
 	m_selection = index;
 }
 
@@ -246,6 +248,13 @@ const std::string& TListBox::ReadValue (uint index) const
 {
   assert (index < m_items.size());
   return m_items[index].value;
+}
+
+void TListBox::SetEnabledItem(uint index, bool e)
+{
+	assert (index < m_items.size());
+
+	m_items[index].enabled = !m_items[index].enabled;
 }
 
 bool TListBox::EnabledItem (uint index)
