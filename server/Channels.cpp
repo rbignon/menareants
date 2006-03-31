@@ -155,6 +155,40 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				changed = YES_WITHPARAM;
 				break;
 			}
+			case 'n':
+				if(!sender->Channel()->Joinable())
+				{
+					Debug(W_DESYNCH, "SET %cn: interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(add)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +n: sans nation"); break; }
+					uint nation = StrToTyp<uint>(parv[j++]);
+					if(nation > 0 && nation != sender->Nation())
+					{
+						if(nation >= ECPlayer::N_MAX)
+						{
+							Debug(W_DESYNCH, "SET +n %d >= %d(maxcouleur)", nation, ECPlayer::N_MAX);
+							break;
+						}
+						BPlayerVector::iterator it;
+						BPlayerVector plv = sender->Channel()->Players();
+						for(it = plv.begin(); it != plv.end() && (*it)->Nation() != nation; ++it);
+						if(it != plv.end())
+							{ Debug(W_DESYNCH, "SET +n: d'une nation déjà utilisée"); break; }
+					}
+					sender->SetNation(nation);
+					if(!need_ready) need_ready = NEEDREADY_ME;
+					changed = YES_WITHPARAM;
+				}
+				else
+				{
+					sender->SetNation(ECPlayer::N_NONE);
+					if(!need_ready) need_ready = NEEDREADY_ME;
+					changed = YES_NOPARAMS;
+				}
+				break;
 			case 'c':
 				if(!sender->Channel()->Joinable())
 				{
@@ -170,7 +204,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +c: sans couleur"); break; }
 					uint color = StrToTyp<uint>(parv[j++]);
-					if(color > 0)
+					if(color > 0 && color != sender->Color())
 					{
 						if(color >= COLOR_MAX)
 						{
@@ -189,7 +223,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				else
 				{
-					sender->SetColor(0);
+					sender->SetColor(COLOR_NONE);
 					if(!need_ready) need_ready = NEEDREADY_ME;
 					changed = YES_NOPARAMS;
 				}
@@ -209,7 +243,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +p: sans couleur"); break; }
 					uint place = StrToTyp<uint>(parv[j++]);
-					if(place > 0)
+					if(place > 0 && sender->Position() != place)
 					{
 						if(place > sender->Channel()->GetLimite())
 						{
@@ -218,9 +252,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							break;
 						}
 						BPlayerVector::iterator it;
-                                                BPlayerVector plv = sender->Channel()->Players();
-                                                for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
-                                                if(it != plv.end())
+						BPlayerVector plv = sender->Channel()->Players();
+						for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
+						if(it != plv.end())
 							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
 					}
 					sender->SetPosition(place);
@@ -307,6 +341,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					*/
 					std::list<uint> colors;
 					for(uint i = 1; i < COLOR_MAX; ++i) colors.push_back(i);
+					std::list<uint> nations;
+					for(uint i = 1; i < ECPlayer::N_MAX; ++i) nations.push_back(i);
 					std::list<uint> positions;
 					for(uint i = 1; i <= sender->Channel()->Map()->MaxPlayers(); i++) positions.push_back(i);
 
@@ -329,6 +365,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						{
 							if((*it)->Position()) positions.remove((*it)->Position());
 							if((*it)->Color()) colors.remove((*it)->Color());
+							if((*it)->Nation()) nations.remove((*it)->Nation());
 						}
 					pv = sender->Channel()->Players();
 					for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
@@ -353,7 +390,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							std::list<uint>::iterator col = colors.begin();
 							for(uint i = 0; i != p && col != colors.end(); ++col, ++i);
 							if(col != colors.end())
-								(*it)->SetPosition(*col);
+								(*it)->SetColor(*col);
 							else
 								throw ECExcept(0, "Impossible d'attribuer une couleur aleatoirement !?");
 							sender->Channel()->sendto_players(0, app.rpl(ECServer::SET),
@@ -361,10 +398,25 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							                                     std::string("+c " + TypToStr(*col)).c_str());
 							colors.erase(col);
 						}
+						if(!(*it)->Nation())
+						{
+							uint p = rand() % nations.size();
+							std::list<uint>::iterator nat = nations.begin();
+							for(uint i = 0; i != p && nat != nations.end(); ++nat, ++i);
+							if(nat != nations.end())
+								(*it)->SetNation(*nat);
+							else
+								throw ECExcept(0, "Impossible d'attribuer une nation aleatoirement !?");
+							sender->Channel()->sendto_players(0, app.rpl(ECServer::SET),
+							                                     dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
+							                                     std::string("+n " + TypToStr(*nat)).c_str());
+							nations.erase(nat);
+						}
 						BMapPlayersVector::iterator mpi;
 						for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
 						if(mpi == mpv.end())
 							throw ECExcept(VIName((*it)->Position()), "Position introuvable !?");
+						Debug(W_DEBUG, "d pos %d (%d)", (*mpi)->Num(), (*it)->Position());
 						(*mpi)->SetPlayer(*it);
 						(*it)->SetMapPlayer(*mpi);
 					}
@@ -578,7 +630,8 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	else
 	{
 		chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
-
+		if(cl->Player()->IsOwner())
+			chan->SetOwner(0);
 		chan->RemovePlayer(cl->Player(), USE_DELETE);
 		if(!chan->NbPlayers())
 			delete chan;
