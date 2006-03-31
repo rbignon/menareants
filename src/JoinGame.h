@@ -32,6 +32,7 @@
 #include "gui/SpinEdit.h"
 #include "gui/ColorEdit.h"
 #include "gui/Image.h"
+#include "gui/ComboBox.h"
 
 /********************************************************************************************
  *                               TGameInfosForm                                              *
@@ -60,6 +61,7 @@ public:
 
 	TSpinEdit*   MyPosition;
 	TColorEdit*  MyColor;
+	TComboBox*   MyNation;
 
 /* Variables publiques */
 public:
@@ -131,6 +133,7 @@ public:
 
 	TSpinEdit   *position;
 	TColorEdit  *couleur;
+	TComboBox   *nation;
 
 /* Attributs */
 public:

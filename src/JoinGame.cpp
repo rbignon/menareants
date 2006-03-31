@@ -383,6 +383,30 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pl->SetOp(add);
 				break;
 			}
+			case 'n':
+				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %cn: sans sender humain", add ? '+' : '-'); break; }
+				if(add)
+				{
+					if(j<parv.size())
+						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
+						{
+							if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
+								GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), true);
+							if(!(*it)->SetNation(StrToTyp<uint>(parv[j++])))
+								Debug(W_DESYNCH|W_SEND, "SET +n: couleur trop grande !?");
+							else if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
+								GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), false);
+						}
+					else Debug(W_DESYNCH|W_SEND, "SET +n: sans couleur");
+				}
+				else
+					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
+					{
+						if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
+							GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), true);
+						(*it)->SetNation(0);
+					}
+				break;
 			case 'c':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %cc: sans sender humain", add ? '+' : '-'); break; }
 				if(add)
@@ -390,7 +414,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(j<parv.size())
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
-							if(!(*it)->IsMe() && (*it)->Position() > 0 && GameInfosForm->MyPosition)
+							if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
 								GameInfosForm->MyColor->DelBadValue((*it)->Color());
 							if(!(*it)->SetColor(StrToTyp<uint>(parv[j++])))
 								Debug(W_DESYNCH|W_SEND, "SET +c: couleur trop grande !?");
@@ -401,7 +425,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 				else
 					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
+					{
+						if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
+							GameInfosForm->MyColor->DelBadValue((*it)->Color());
 						(*it)->SetColor(0);
+					}
 				break;
 			case 'p':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %cp: sans sender humain", add ? '+' : '-'); break; }
@@ -445,6 +473,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	std::vector<int> pos_badval;
 	std::vector<int> col_badval;
+	std::vector<int> nat_badval;
 	for(ParvList::iterator parvi=(parv.begin()+1); parvi!=parv.end(); ++parvi)
 	{
 		const char *nick = (*parvi).c_str();
@@ -458,7 +487,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			ready = true, *nick++;
 
 		std::string nb;
-		int pos = 0, col = 0;
+		int pos = 0, col = 0, nat = 0;
 		while(*nick != ',')
 			nb += *nick++;
 		nick++;
@@ -469,6 +498,12 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			nb += *nick++;
 		nick++;
 		col = StrToTyp<uint>(nb);
+
+		nb.clear();
+		while(*nick != ',')
+			nb += *nick++;
+		nick++;
+		nat = StrToTyp<uint>(nb);
 
 		ECPlayer *pl = 0;
 		if(!strcasecmp(nick, me->GetNick().c_str()))
@@ -482,6 +517,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		pl->SetColor(col);
 		pl->SetPosition(pos);
 		pl->SetReady(ready);
+		pl->SetNation(nat);
 		if(GameInfosForm)
 		{
 			TPlayerLine *pline = new TPlayerLine(pl);
@@ -492,6 +528,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyPosition->SetEnabled(false);
 				GameInfosForm->MyColor = pline->couleur;
 				GameInfosForm->MyColor->SetEnabled(false);
+				GameInfosForm->MyNation = pline->nation;
 			}
 			else
 			{ /* GameInfosForm->MyPosition et GameInfosForm->MyColor ne sont probablement pas encore défini ! */
@@ -499,6 +536,11 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					pos_badval.push_back(pos);
 				if(col > 0)
 					col_badval.push_back(col);
+				if(nat > 0)
+					nat_badval.push_back(nat);
+				pline->position->SetEnabled(false);
+				pline->couleur->SetEnabled(false);
+				pline->nation->SetEnabled(false);
 			}
 		}
 	}
@@ -518,6 +560,9 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(me->Player()->Channel()->Map())
 				GameInfosForm->MyColor->SetEnabled();
 		}
+		if(GameInfosForm->MyNation)
+			for(std::vector<int>::iterator it = nat_badval.begin(); it != nat_badval.end(); ++it)
+				GameInfosForm->MyNation->SetEnabledItem(*it, false);
 		GameInfosForm->RecalcMemo();
 	}
 	JOINED = true;
@@ -549,8 +594,12 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(GameInfosForm)
 			{
 				GameInfosForm->Chat->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
-				GameInfosForm->Players->AddLine(new TPlayerLine(pl));
+				TPlayerLine *pline;
+				GameInfosForm->Players->AddLine((pline = new TPlayerLine(pl)));
 				GameInfosForm->RecalcMemo();
+				pline->position->SetEnabled(false);
+				pline->couleur->SetEnabled(false);
+				pline->nation->SetEnabled(false);
 			}
 		}
 	}
@@ -592,6 +641,13 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			if(GameInfosForm)
 			{
+				if((*playersi)->Color() && GameInfosForm->MyColor)
+					GameInfosForm->MyColor->DelBadValue((*playersi)->Color());
+				if((*playersi)->Position() && GameInfosForm->MyPosition)
+					GameInfosForm->MyPosition->DelBadValue((*playersi)->Position());
+				if((*playersi)->Nation() && GameInfosForm->MyNation)
+					GameInfosForm->MyNation->SetEnabledItem((*playersi)->Nation());
+
 				GameInfosForm->Players->Hide();
 				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
 				                             " quitte la partie", green_color);
@@ -631,7 +687,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 				LoadingForm->Players->Show();
 			}
-			if(me->Player()->Channel()->RemovePlayer((*playersi), true))
+			if(me->Player()->Channel()->RemovePlayer((*playersi), USE_DELETE))
 				playersi = players.erase(playersi);
 			else
 			{
@@ -734,7 +790,8 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 						if(client->Player()->IsPriv())
 						{
 							GameInfosForm->MapList->SetEnabled();
-							if(GameInfosForm->MapList->Clic( event.button.x, event.button.y))
+							if(GameInfosForm->MapList->Test( event.button.x, event.button.y) &&
+							   GameInfosForm->MapList->GetSelectedItem() != -1)
 								client->sendrpl(client->rpl(EC_Client::SET),
 								                ("+m " + TypToStr(GameInfosForm->MapList->GetSelectedItem())).c_str());
 
@@ -759,13 +816,19 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 						else
 							GameInfosForm->MapList->SetEnabled(false);
 						if(GameInfosForm->MyPosition &&
-						GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
+						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
 						if(GameInfosForm->MyColor &&
-						GameInfosForm->MyColor->Clic(event.button.x, event.button.y))
+						   GameInfosForm->MyColor->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
+						bool tmp = GameInfosForm->MyNation->Opened();
+						if(GameInfosForm->MyNation &&
+						   GameInfosForm->MyNation->Clic(event.button.x, event.button.y) &&
+						  tmp && !GameInfosForm->MyNation->Opened() && GameInfosForm->MyNation->GetSelectedItem() != -1)
+								client->sendrpl(client->rpl(EC_Client::SET),
+									("+n " + TypToStr(GameInfosForm->MyNation->GetSelectedItem())).c_str());
 /*						break;
 					case SDL_MOUSEBUTTONDOWN:*/
 						if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
@@ -900,6 +963,8 @@ void EuroConqApp::ListGames()
 		if(ListGameForm->GList->GetSelectedItem() >= 0 &&
 		   ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
 			ListGameForm->JoinButton->SetEnabled(true);
+		else
+			ListGameForm->JoinButton->SetEnabled(false);
 		ListGameForm->Update();
 
 		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
@@ -916,27 +981,29 @@ void EuroConqApp::ListGames()
 TGameInfosForm::TGameInfosForm()
 	: TForm()
 {
-	Title = AddComponent(new TLabel(300,50,"Jeu", white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(300,5,"Jeu", white_color, &app.Font()->big));
 
-	Chat = AddComponent(new TMemo(60,325,315,200,30));
+	Chat = AddComponent(new TMemo(60,325,315,505,30));
 
-	SendMessage = AddComponent(new TEdit(60,530,315, MAXBUFFER-20));
-	PretButton = AddComponent(new TButtonText(600,400, 150,50, "Pret"));
+	SendMessage = AddComponent(new TEdit(60,535,315, MAXBUFFER-20));
+	PretButton = AddComponent(new TButtonText(600,450, 150,50, "Pret"));
 	PretButton->SetEnabled(false);
 
-	RetourButton = AddComponent(new TButtonText(600,450,150,50, "Retour"));
+	RetourButton = AddComponent(new TButtonText(600,500,150,50, "Retour"));
 
 	Players = AddComponent(new TList(60, 80));
 	Players->AddLine(new TPlayerLineHeader);
 
-	MapList = AddComponent(new TListBox(400, 320, 150, 225));
+	MapList = AddComponent(new TListBox(400, 400, 150, 150));
 
-	MapTitle = AddComponent(new TLabel(550, 80, "", white_color, &app.Font()->big));
-	Preview = AddComponent(new TImage(550, 110));
+	MapTitle = AddComponent(new TLabel(600, 315, "", white_color, &app.Font()->big));
+	Preview = AddComponent(new TImage(625, 348));
 
 	SetBackground(Resources::Titlescreen());
 
 	MyPosition = 0;
+	MyColor = 0;
+	MyNation = 0;
 	RecvMapList = false;
 }
 
@@ -996,14 +1063,17 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
 	h = 30;
+	w = 650;
 	position = 0;
 	couleur = 0;
+	nation = 0;
 }
 
 TPlayerLine::~TPlayerLine()
 {
-	if(position) delete position;
+	if(nation) delete nation;
 	if(couleur) delete couleur;
+	if(position) delete position;
 }
 
 void TPlayerLine::SetXY (int px, int py)
@@ -1013,6 +1083,8 @@ void TPlayerLine::SetXY (int px, int py)
 		position->SetXY(px+210, py);
 	if(couleur)
 		couleur->SetXY(px+310, py);
+	if(nation)
+		nation->SetXY(px+490, py);
 }
 
 bool TPlayerLine::OwnZone(int _x, int _y)
@@ -1032,14 +1104,19 @@ void TPlayerLine::Init()
 	position->Init();
 	couleur = new TColorEdit("",  x+340, y, 50);
 	couleur->Init();
+	nation = new TComboBox(x+490, y, 150);
+	nation->Init();
+	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
+		nation->AddItem(false, std::string(nations_str[i]), "");
 }
 
 void TPlayerLine::Draw(int souris_x, int souris_y)
 {
 	assert(pl);
 
-	if(pl->Position() != (unsigned int)position->Value()) position->SetValue(pl->Position());
-	if(pl->Color() != (unsigned int)couleur->Value()) couleur->SetValue(pl->Color());
+	if((int)pl->Position() != position->Value()) position->SetValue(pl->Position());
+	if((int)pl->Color() != couleur->Value()) couleur->SetValue(pl->Color());
+	if((int)pl->Nation() != nation->GetSelectedItem()) nation->Select(pl->Nation());
 
 	app.Font()->big.WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
 	if(pl->IsOwner())
@@ -1049,6 +1126,7 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 	app.Font()->big.WriteLeft(x+70, y, pl->GetNick(), white_color);
 	position->Draw(souris_x, souris_y);
 	couleur->Draw(souris_x, souris_y);
+	nation->Draw(souris_x, souris_y);
 }
 
 /********************************************************************************************
@@ -1058,6 +1136,7 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 TPlayerLineHeader::TPlayerLineHeader()
 {
 	h = 30;
+	w = 550;
 	label = 0;
 }
 
@@ -1066,7 +1145,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = "Pret   Pseudo        Position     Couleur";
+	std::string s = "Pret   Pseudo        Position     Couleur         Nation";
 	label = new TLabel(x, y, s, white_color, &app.Font()->big);
 }
 
