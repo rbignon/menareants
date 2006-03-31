@@ -92,6 +92,22 @@ void TList::Draw(int souris_x, int souris_y)
 	}
 }
 
+bool TList::Clic (int mouse_x, int mouse_y)
+{
+	bool click = false;
+
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
+		if(!click && (*it)->Clic(mouse_x, mouse_y))
+		{
+			(*it)->SetFocus();
+			click = true;
+		}
+		else
+			(*it)->DelFocus();
+
+	return click;
+}
+
 void TList::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);

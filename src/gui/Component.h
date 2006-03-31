@@ -188,6 +188,8 @@ public:
 	/** Initialization not requiered... But it is a virtual function so i have to implemente this  */
 	void Init() {}
 
+	virtual bool Clic (int mouse_x, int mouse_y);
+
 /* Attributs */
 public:
 

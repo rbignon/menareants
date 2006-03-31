@@ -70,16 +70,17 @@ void TForm::Actions(SDL_Event event, uint a)
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if(a & ACTION_NOMOUSE) break;
+			bool click = false;
 			/* Va dans l'ordre inverse */
 			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				if(a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
-				                     : (*it)->Clic(event.button.x, event.button.y))
+				if(!click && a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
+				                               : (*it)->Clic(event.button.x, event.button.y))
 				{
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();
 					if((*it)->ClickedFunc() && !(a & ACTION_NOCALL))
 						(*(*it)->ClickedFunc()) (this, (*it)->ClickedFuncParam());
-					break;
+					click = true;
 				}
 				else
 					(*it)->DelFocus();
