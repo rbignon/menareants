@@ -100,6 +100,7 @@ Sommaire:
         Mode pour un user:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position
+         +n <nation>         :l'user définie sa nation
          +!                  :le joueur est READY
          +$                  :l'argent du joueur (serveur -> user uniquement)
 
@@ -107,12 +108,13 @@ Sommaire:
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible
      sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la détailler:
 
-     PLS [@][!]<position>,<couleur>,<pseudo> [...]
+     PLS [@][!]<position>,<couleur>,<nation>,<pseudo> [...]
      [*]               :le joueur est owner
      [@]               :le joueur est op
      [!]               :le joueur est pret (Ready)
      <position>        :la position du joueur sur la carte
      <couleur>         :la couleur
+     <nation>          :la nation
      <pseudo>          :le pseudo du joueur
 
 6) Êtat d'une partie

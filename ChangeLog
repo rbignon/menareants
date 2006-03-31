@@ -1,3 +1,21 @@
+2005-03-31  Romain Bignon <progs@headfucking.net>
+
+	* lib/Channels.h: Gestion des nations (enumérateur, tableau d'équivalence de chaine, etc)
+
+	* server/Channels.cpp: Gestion des nations.
+
+	* src/JoinGame.cpp: Gestion des nations
+
+	* src/InGame.cpp: Evite d'appeler TFont::Write* à chaque Draw() du TPlayer*.
+
+	* src/gui/ListBox.cpp: Améliorations...
+
+	* src/gui/ComboBox.cpp: Améliorations...
+
+	* src/gui/Component.cpp, src/gui/Form.cpp: Maintenant l'affichage en tete du composant focusé est fonctionnel.
+
+	* server/InGame.cpp: Gestion des unions.
+
 2005-03-30  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ComboBox.cpp: Programmation d'un composant TComboBox.
