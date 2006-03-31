@@ -121,7 +121,8 @@ void EChannel::NextAnim()
 			break;
 		}
 		case ARM_UNION:
-			SendArm(NULL, event->Entities()->List(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+			SendArm(NULL, event->Entities()->List(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0, 0,
+			        event->Linked());
 			break;
 		case ARM_NUMBER:
 			SendArm(NULL, event->Entities()->List(), ARM_NUMBER|ARM_HIDE, 0, 0, event->Nb());
@@ -369,7 +370,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			EventVector evts = map->Events();
 			ECEvent* event_found = 0;
 			ECEvent* attaq_event = 0;
-			for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
+			ECEvent* union_event = 0;
+			for(EventVector::iterator evti = evts.begin(); evti != evts.end();)
 			{
 				bool delete_event = false;
 				Debug(W_DEBUG, "%p(%d,%d) vs %p(%d,%d)", (*evti)->Case(), (*evti)->Case()->X(), (*evti)->Case()->Y(),
@@ -395,7 +397,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 
 				if(entity->Case() == last_case)
+				{
+					++evti;
 					continue;
+				}
 
 				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
 				 * on supprime mon entité
@@ -403,6 +408,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if((*evti)->Case() == entity->Last()->Case() && (*evti)->Flags() == ARM_ATTAQ &&
 				   (*evti)->Entities()->Find(entity))
 				{
+					Debug(W_DEBUG, "Retrait d'attaquants");
 					(*evti)->Entities()->Remove(entity);
 					std::vector<ECEntity*> ents = (*evti)->Entities()->List();
 					delete_event = true;
@@ -417,14 +423,14 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								++enti;
 								continue;
 							}
-	
+
 							/* Pour cette entité, on cherche si il peut encore attaquer quelqu'un d'autre, sinon il jarte */
 							std::vector<ECEntity*>::iterator enti2;
 							for(enti2 = ents.begin();
-							    enti2 != ents.end() &&
+							    enti2 != ents.end() && (*enti2 == *enti || (*enti2)->Locked() ||
 							      (!(*enti)->CanAttaq(*enti2) || (*enti)->Like(*enti2)) &&
-							      (step != T_MOVE_STEP || !(*enti2)->CanAttaq(*enti) || (*enti2)->Like(*enti));
-							    ++enti);
+							      (step != T_MOVE_STEP || !(*enti2)->CanAttaq(*enti) || (*enti2)->Like(*enti)));
+							    ++enti2);
 							if(enti2 == ents.end())
 							{
 								if(step == T_ATTAQ_STEP && (*enti)->EventType() == ARM_ATTAQ)
@@ -433,7 +439,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 									if((*enti)->Return() && (*enti)->Owner())
 										chan->SendArm(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client(), *enti,
 										              ARM_RETURN, (*enti)->Case()->X(), (*enti)->Case()->Y());
-	
+
 									/* On supprime l'evenement de mouvement linké */
 									std::vector<ECEvent*> evs = (*evti)->Linked();
 									std::vector<ECEvent*>::iterator ev;
@@ -457,10 +463,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 									++enti;
 									continue;
 								}
-								ECList<ECEntity*>::iterator it = enti;
-								++it;
 								(*evti)->Entities()->Remove(*enti);
-								enti = it;
+								enti = ents.erase(enti);
 							}
 							else
 							{
@@ -471,11 +475,29 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						}
 				}
 
+				/* Cet evenement est une Union et en plus de ça je peux union avec l'unité en question donc je le fais */
+				if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_UNION && !attaq_event)
+				{
+					Debug(W_DEBUG, "On a trouvé un evenement d'union à investir");
+					std::vector<ECBEntity*> entities = (*evti)->Case()->Entities()->List();
+					for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+					{
+						if((*enti)->Locked() || *enti == entity) continue;
+
+						if((*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
+						{
+							dynamic_cast<ECEntity*>(*enti)->Union(entity);
+							union_event = *evti;
+							break;
+						}
+					}
+				}
+
 				/* On regarde si, sur la nouvelle case, il y a un evenement d'attaque.
 				 * Note: il n'y a pas besoin de vérifier tout le parcourt, en effet, c'est à chaque
 				 *       appel de ECEntity::WantMove() qu'il est censé le faire
 				 */
-				if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_ATTAQ)
+				if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_ATTAQ && !union_event)
 				{
 					std::vector<ECEntity*> ev_entities = (*evti)->Entities()->List();
 					std::vector<ECEntity*>::iterator et;
@@ -492,14 +514,17 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				if(delete_event)
 				{
-					evti = map->RemoveEvent(*evti, USE_DELETE);
-					--evti;
+					map->RemoveEvent(*evti, USE_DELETE);
+					evti = evts.erase(evti);
 				}
+				else
+					++evti;
 			}
 			if(entity->Case() != last_case)
 			{ /* On ne fait ça que si y a eu un changement de case */
 				if(!event_found)
 				{
+					Debug(W_DEBUG, "On créé un nouvel event MOVE");
 					event_found = new ECEvent(ARM_MOVE, entity->Case());
 					event_found->Entities()->Add(entity);
 					event_found->Move()->SetMoves(moves);
@@ -507,14 +532,20 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					event_found->Move()->SetFirstCase(last_case);
 					map->AddEvent(event_found);
 				}
+
+				/* On regarde sur la case si il y a des entités à attaquer, ou à union */
 				std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
-				if(!attaq_event)
+				if(!attaq_event || !union_event)
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-						if(*enti != entity && (entity->CanAttaq(*enti) && !entity->Like(*enti) ||
-						(*enti)->CanAttaq(entity) && !(*enti)->Like(entity)))
+					{
+						if((*enti)->Locked() || *enti == entity) continue;
+
+						if(entity->CanAttaq(*enti) && !entity->Like(*enti) ||
+						(*enti)->CanAttaq(entity) && !(*enti)->Like(entity))
 						{
 							if(!attaq_event)
 							{
+								Debug(W_DEBUG, "On créé un evenement attaque");
 								attaq_event = new ECEvent(ARM_ATTAQ, entity->Case());
 								map->AddEvent(attaq_event);
 							}
@@ -527,8 +558,18 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								map->RemoveEvent(last_move_event);
 							}
 						}
+						if(!union_event && (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
+						{
+							Debug(W_DEBUG, "On créé un evenement union");
+							dynamic_cast<ECEntity*>(*enti)->Union(entity);
+							union_event = new ECEvent(ARM_UNION, entity->Case());
+							map->AddEvent(union_event);
+						}
+					}
 				if(attaq_event)
 				{
+					Debug(W_DEBUG, "On se met dans un evenement attaq");
+					if(union_event) { delete union_event; Debug(W_WARNING, "union + attaq"); }
 					attaq_event->Entities()->Add(entity);
 					if(event_found)
 					{ /* On link dans attaq_event et on l'enlève de la boucle principale.
@@ -539,6 +580,16 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 					else
 						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement");
+				}
+				else if(union_event)
+				{
+					Debug(W_DEBUG, "On se met dans un evenement union");
+					union_event->Entities()->Add(entity);
+					if(event_found)
+					{
+						union_event->AddLinked(event_found);
+						map->RemoveEvent(event_found);
+					}
 				}
 			}
 			if(event_found)
