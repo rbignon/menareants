@@ -123,15 +123,18 @@ class TLoadPlayerLine : public TComponent
 public:
 
 	TLoadPlayerLine(ECPlayer *pl);
+	virtual ~TLoadPlayerLine();
 
 /* Methodes */
 public:
 
-	void Init() {}
+	void Init();
 	void Draw(int souris_x, int souris_y);              /**< Draw */
 
 /* Composants */
 public:
+
+	TLabel* label;
 
 /* Attributs */
 public:

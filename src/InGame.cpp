@@ -46,7 +46,7 @@ static struct
 	/* E_END  */{ NULL }
 };
 
-/** :nick!entity[,nick!entity ...] ARM [*x,y] [>x,y] [%type] [<] [-] [+[number]] */
+/** :nick!entity[,nick!entity ...] ARM [*x,y] [%type] [\<x,y] [=id,x,y,[v][^][<][>]] [-] [+[number]] */
 int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!me->Player() || me->Player()->Channel()->Joinable())
@@ -493,14 +493,23 @@ TLoadPlayerLine::TLoadPlayerLine(ECPlayer *_pl)
 	h = 20;
 }
 
+TLoadPlayerLine::~TLoadPlayerLine()
+{
+	delete label;
+}
+
+void TLoadPlayerLine::Init()
+{
+	std::string s = StringF("%c%c %-2d %-20s %s", pl->IsOwner() ? '*' : ' ',
+	                                              pl->IsOp() ? '@' : ' ',
+	                                              pl->Position(),
+	                                              pl->GetNick(),
+	                                              nations_str[pl->Nation()]);
+
+	label = new TLabel(x, y, s, *color_eq[pl->Color()], &app.Font()->normal);
+}
+
 void TLoadPlayerLine::Draw(int souris_x, int souris_y)
 {
-	assert(pl);
-
-	if(pl->IsOwner())
-		app.Font()->normal.WriteLeft(x, y, "*", *color_eq[pl->Color()]);
-	else if(pl->IsOp())
-		app.Font()->normal.WriteLeft(x, y, "@", *color_eq[pl->Color()]);
-	app.Font()->normal.WriteLeft(x+20, y, TypToStr(pl->Position()), *color_eq[pl->Color()]);
-	app.Font()->normal.WriteLeft(x+50, y, pl->GetNick(), *color_eq[pl->Color()]);
+	label->Draw(souris_x, souris_y);
 }
