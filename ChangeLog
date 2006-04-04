@@ -1,3 +1,17 @@
+2005-04-01  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp, src/gui/ShowMap.cpp: Gestion des déplacements anticipés.
+
+	* lib/Map.h, server/Map.h, src/Map.h: Passage de ECBMove dans lib/ et dérivée dans src/Map.h (ECMove)
+
+	* src/JoinGame.cpp: Amélioration de l'ergonomie.
+
+	* server/Channels.cpp (SETCommand): Gestion de problèmes liés au READY.
+
+	* src/data/anims/cases/mer: Animation de la mer.
+
+	* Changement du nom du jeu.
+
 2005-03-31  Romain Bignon <progs@headfucking.net>
 
 	* lib/Channels.h: Gestion des nations (enumérateur, tableau d'équivalence de chaine, etc)
