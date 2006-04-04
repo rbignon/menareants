@@ -129,6 +129,16 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					vDebug(W_DESYNCH, "SET +!: alors qu'il n'y a pas de map", VPName(sender->Channel()->Map()));
 					break;
 				}
+				if(sender->Channel()->Joinable() && (!sender->Channel()->Owner() || !sender->Channel()->Owner()->Ready()))
+				{
+					BPlayerVector::iterator it;
+					BPlayerVector plv = sender->Channel()->Players();
+					uint nok = 0;
+					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ++nok;
+					if(nok >= (sender->Channel()->Map()->MaxPlayers() - 1) && !sender->IsOwner())
+						break; // C'est pas forcément une erreur
+				}
+
 				ready = true;
 				sender->SetReady(add);
 				if(need_ready == NEEDREADY_ME) need_ready = 0;
@@ -416,7 +426,6 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
 						if(mpi == mpv.end())
 							throw ECExcept(VIName((*it)->Position()), "Position introuvable !?");
-						Debug(W_DEBUG, "d pos %d (%d)", (*mpi)->Num(), (*it)->Position());
 						(*mpi)->SetPlayer(*it);
 						(*it)->SetMapPlayer(*mpi);
 					}
