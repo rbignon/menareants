@@ -26,9 +26,9 @@
 #endif
 
 /* Nom complet de nom court du jeu */
-#define APP_NAME "Europa Conquest"
-#define APP_SMALLNAME "EuroConq"
-#define SERV_SMALLNAME "EuroConqD"
+#define APP_NAME "Men Are Ants"
+#define APP_SMALLNAME "MenAreAnts"
+#define SERV_SMALLNAME "MenAreAntsD"
 
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole

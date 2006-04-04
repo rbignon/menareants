@@ -35,6 +35,7 @@
 #include "Debug.h"
 #include "gui/Form.h"
 #include "gui/Boutton.h"
+#include "gui/ComboBox.h"
 #include <functional>
 
 class TMainForm : public TForm
@@ -58,31 +59,31 @@ public:
 
 };
 
-EuroConqApp app;
+MenAreAntsApp app;
 
-void EuroConqApp::WantQuit(void*, void*)
+void MenAreAntsApp::WantQuit(void*, void*)
 {
 	app.want_quit = true;
 }
 
-void EuroConqApp::WantPlay(void*, void*)
+void MenAreAntsApp::WantPlay(void*, void*)
 {
 	app.request_game();
 }
 
-void EuroConqApp::WantConfig(void*, void*)
+void MenAreAntsApp::WantConfig(void*, void*)
 {
 	if(app.conf)
 		app.conf->Configuration();
 }
 
-void EuroConqApp::setclient(EC_Client* c)
+void MenAreAntsApp::setclient(EC_Client* c)
 {
 	client = c;
 	c->lapp = this;
 }
 
-void EuroConqApp::quit_app(int value)
+void MenAreAntsApp::quit_app(int value)
 {
 		if(conf) delete conf;
 		if(fonts) delete fonts;
@@ -90,7 +91,7 @@ void EuroConqApp::quit_app(int value)
         exit(value);
 }
 
-int EuroConqApp::main(int argc, char **argv)
+int MenAreAntsApp::main(int argc, char **argv)
 {
 	try
 	{
@@ -139,13 +140,13 @@ int EuroConqApp::main(int argc, char **argv)
 		if (getenv("HOME"))
 		{
 			path = getenv("HOME");
-			path += "/.euroconq/";
+			path += "/.menareants/";
 			if (!opendir(path.c_str()))
 			{
 				mkdir( path.c_str(), 0755 );
 			}
 
-			conf = new Config( path + "euroconq.cfg" );
+			conf = new Config( path + "menareants.cfg" );
 		}
 		else
 		{
@@ -153,7 +154,7 @@ int EuroConqApp::main(int argc, char **argv)
 			quit_app(0);
 		}
 #else
-		conf = new Config("euroconq.cfg");
+		conf = new Config("menareants.cfg");
 #endif
 
 		if (TTF_Init()==-1) {
@@ -169,9 +170,9 @@ int EuroConqApp::main(int argc, char **argv)
 		conf->load();
 
 		TMainForm*     MainForm = new TMainForm;
-		MainForm->PlayButton->SetClickedFunc(EuroConqApp::WantPlay, this);
-		MainForm->QuitterButton->SetClickedFunc(EuroConqApp::WantQuit, this);
-		MainForm->OptionsButton->SetClickedFunc(EuroConqApp::WantConfig, this);
+		MainForm->PlayButton->SetClickedFunc(MenAreAntsApp::WantPlay, this);
+		MainForm->QuitterButton->SetClickedFunc(MenAreAntsApp::WantQuit, this);
+		MainForm->OptionsButton->SetClickedFunc(MenAreAntsApp::WantConfig, this);
 
 		do
 		{
@@ -179,53 +180,6 @@ int EuroConqApp::main(int argc, char **argv)
 			MainForm->Update();
 		} while(!want_quit);
 
-#if 0
-		while (1)
-		{
-			int result = menu->execute();
-
-			try
-			{
-				MenuItem* item = menu->get_item_by_id( result );
-				switch (result)
-				{
-					case MENU_JOUER:
-						request_game(); /* Entre dans le menu de jeu (socket) */
-						break;
-					case MENU_EXIT:
-						menu->scroll_out();
-						delete menu;
-						quit_app(0);
-						break;
-	     			case OPTIONS_HOST:
-    	 				conf->hostname = ((MenuItem_String*)item)->get_string();
-     					conf->save();
-     					break;
-     				case OPTIONS_PORT:
-    	 				conf->port = ( ((MenuItem_Value*)item)->get_value() );
-     					conf->save();
-     					break;
-     				case OPTIONS_NICK:
-    	 				conf->nick = ((MenuItem_String*)item)->get_string();
-     					conf->save();
-     					break;
-     				case -1: break; /**normal**/
-					default:
-						std::cout << result << std::endl;
-	     				break;
-				}
-			}
-			catch(TECExcept &e)
-			{
-				vDebug(W_ERR, e.Message, e.Vars);
-				Menu menu_err( "Shit", this);
-				menu_err.add_item(e.Message, 0, 0);
-				menu_err.scroll_in();
-				menu_err.execute();
-				menu_err.scroll_out();
-			}
-		}
-#endif
 		quit_app(1);
 	}
 

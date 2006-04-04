@@ -4,8 +4,8 @@ DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
 LIBS =
 
-bin_PROGRAMS = euroconqserver
-euroconqserver_SOURCES = \
+bin_PROGRAMS = menareantsserver
+menareantsserver_SOURCES = \
 	Main.cpp \
 	Server.cpp \
 	Config.cpp \
@@ -16,10 +16,10 @@ euroconqserver_SOURCES = \
 	Units.cpp \
 	InGame.cpp
 
-euroconqserver_LDADD =$(top_srcdir)/lib/libeuroconq.a
+menareantsserver_LDADD =$(top_srcdir)/lib/libmenareants.a
 
 install-data-local:
-	$(INSTALL_DATA) euroconqd.conf /etc/euroconqd.conf
+	$(INSTALL_DATA) menareantsd.conf /etc/menareantsd.conf
 
 clean-generic:
 	-rm -f .#* *~

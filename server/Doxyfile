@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # Project related configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "Europa Conquest :: Server"
+PROJECT_NAME           = "Men Are Ants :: Server"
 PROJECT_NUMBER         = 0.1
 OUTPUT_DIRECTORY       = ../doc
 CREATE_SUBDIRS         = NO

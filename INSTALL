@@ -1,6 +1,6 @@
-                   ********************
-                   *  Europa Conquest *
-                   ********************
+                   *******************
+                   *   Men Are Ants  *
+                   *******************
                         [ INSTALL ]
 
 Dernière modification:
@@ -16,11 +16,11 @@ Sommaire:
 1) Nécessite
 	Pour compiler il est nécessaire d'avoir :
 	- un compilateur (gcc ou autre)
-	En plus, pour le jeu EuroConq, il est requis d'avoir les librairies SDL suivantes :
+	En plus, pour le jeu MenAreAnts, il est requis d'avoir les librairies SDL suivantes :
 	- SDL_image
 	- SDL_ttf
 	- lSDL_gfx
-	Et le serveur EuroConqServer, si activé, nécessite d'avoir tout de même une
+	Et le serveur MenAreAntsServer, si activé, nécessite d'avoir tout de même une
 	bonne connexion à internet.
 
 	Il est d'ailleurs à noter que vous pouvez compiler et installer soit le jeu, soit le
@@ -34,7 +34,7 @@ Sommaire:
 	Et vous pouvez les mettre d'affilés dans la ligne de commande, par exemple:
 	$ ./configure --enable-debug --enable-server
 	Le script risque de s'arrêter si jamais il ne trouve pas sur votre système un programme
-	auquel Europa Conquest est dépendant pour fonctionner. Dans ce cas veuillez l'installer
+	auquel Men Are Ants est dépendant pour fonctionner. Dans ce cas veuillez l'installer
 	et relancer le script.
 
 3) make
@@ -49,7 +49,7 @@ Sommaire:
 
 5) Jouer
 	Maintenant vous pouvez jouer tout simplement en tapant à n'importe quelle moment en console:
-	$ euroconq
+	$ menareants
 
 
 Bon jeu !

@@ -34,7 +34,7 @@ class TForm;
 class EChannel;
 class EC_Client;
 
-class EuroConqApp
+class MenAreAntsApp
 {
 protected:
 	
@@ -70,7 +70,7 @@ public:
 	void setclient(EC_Client* c);
 	std::string GetPath() const { return path; }
 
-	EuroConqApp() {
+	MenAreAntsApp() {
 		client = 0;
 		conf = 0;
 		Thread = 0;
@@ -81,6 +81,6 @@ public:
 	SDL_Surface* sdlwindow;
 };
 
-extern EuroConqApp app;
+extern MenAreAntsApp app;
 
 #endif

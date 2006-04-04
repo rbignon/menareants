@@ -98,7 +98,7 @@ try {
 		if (getenv("HOME"))
 		{
 			path = getenv("HOME");
-			path += "/.euroconqserver/";
+			path += "/.menareantsserver/";
 			DIR *d;
 			if(!(d = opendir(path.c_str())))
 				mkdir( path.c_str(), 0755 );

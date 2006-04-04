@@ -37,6 +37,7 @@ bool ECArmy::BeforeEvent()
 
 bool ECArmy::MakeEvent()
 {
+#if 0
 	ECMap* map = dynamic_cast<ECMap*>(acase->Map());
 	switch(event_type)
 	{
@@ -82,6 +83,7 @@ bool ECArmy::MakeEvent()
 		default: break;
 	}
 	printf("? %d (%s)\n", event_type, ID());
+#endif
 	return true;
 }
 

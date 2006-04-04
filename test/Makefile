@@ -1,4 +1,4 @@
-LIBS = -lcrypt ../lib/libeuroconq.a
+LIBS = -lcrypt ../lib/libmenareants.a
 CC=g++ -g -O2 -Wall -I../lib/
 PRG=${FILE}
 CFG=./

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#LIBS = -lcrypt ../lib/libeuroconq.a
+#LIBS = -lcrypt ../lib/libmenareants.a
 #CC=g++ -g -O2 -Wall -I../lib/
 #PRG=${FILE}
 #CFG=./
@@ -20,5 +20,5 @@
 #clean:
 #        rm -f *.o *~ *.~* *.save *.bak \#*
 
-echo "g++ -g -O2 -Wall -I../lib/ ${1}.cpp -o ${1} -lcrypt ../lib/libeuroconq.a"
-g++ -g -O2 -Wall -I../lib/ ${1}.cpp -o ${1} -lcrypt ../lib/libeuroconq.a
+echo "g++ -g -O2 -Wall -I../lib/ ${1}.cpp -o ${1} -lcrypt ../lib/libmenareants.a"
+g++ -g -O2 -Wall -I../lib/ ${1}.cpp -o ${1} -lcrypt ../lib/libmenareants.a

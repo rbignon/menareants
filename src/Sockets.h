@@ -21,12 +21,12 @@
 #ifndef EC_Sockets_h
 #define EC_Sockets_h
 
-#include "Main.h"
+//#include "Main.h"
 #include "Defines.h"
 #include "Commands.h"
 
 class EC_ACommand;
-class EuroConqApp;
+class MenAreAntsApp;
 class ECPlayer;
 
 class EC_Client
@@ -77,7 +77,7 @@ public:
 	std::string GetNick() const { return nick; }
 	void set_nick(std::string _nick) { nick = _nick; }
 
-	EuroConqApp *lapp;
+	MenAreAntsApp *lapp;
 
 	/* Obtient la sturcture player si il fait partit d'un jeu */
 	ECPlayer *Player() { return pl; }

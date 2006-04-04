@@ -90,7 +90,7 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                   "supportée par le serveur");
 			break;
 		case '-':
-			me->SetCantConnect("Vous devez mettre à jour Europa Conquest pour jouer "
+			me->SetCantConnect("Vous devez mettre à jour Men Are Ants pour jouer "
 			                   "sur ce serveur");
 			break;
 		default:
@@ -148,11 +148,11 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-void EuroConqApp::request_game()
+void MenAreAntsApp::request_game()
 {
 	if(client)
 	{
-		Debug(W_SEND|W_ERR, "Appel de EuroConqApp::request_game() en étant déjà connecté !");
+		FDebug(W_SEND|W_ERR, "Appel en étant déjà connecté !");
 		return;
 	}
 

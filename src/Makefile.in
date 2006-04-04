@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(euroconq_SOURCES)
+SOURCES = $(menareants_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -39,11 +39,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-bin_PROGRAMS = euroconq$(EXEEXT)
+bin_PROGRAMS = menareants$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -52,7 +53,7 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
+am_menareants_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
 	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
 	Map.$(OBJEXT) Units.$(OBJEXT) JoinGame.$(OBJEXT) \
@@ -63,8 +64,8 @@ am_euroconq_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
 	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
 	ShowMap.$(OBJEXT)
-euroconq_OBJECTS = $(am_euroconq_OBJECTS)
-euroconq_DEPENDENCIES = ${top_builddir}/lib/libeuroconq.a
+menareants_OBJECTS = $(am_menareants_OBJECTS)
+menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -73,8 +74,8 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(euroconq_SOURCES)
-DIST_SOURCES = $(euroconq_SOURCES)
+SOURCES = $(menareants_SOURCES)
+DIST_SOURCES = $(menareants_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -183,7 +184,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 SUBDIRS = data
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
-euroconq_SOURCES = \
+menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
@@ -215,7 +216,7 @@ euroconq_SOURCES = \
 		gui/Image.cpp \
 		gui/ShowMap.cpp
 
-euroconq_LDADD = ${top_builddir}/lib/libeuroconq.a
+menareants_LDADD = ${top_builddir}/lib/libmenareants.a
 all: all-recursive
 
 .SUFFIXES:
@@ -272,9 +273,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-euroconq$(EXEEXT): $(euroconq_OBJECTS) $(euroconq_DEPENDENCIES) 
-	@rm -f euroconq$(EXEEXT)
-	$(CXXLINK) $(euroconq_LDFLAGS) $(euroconq_OBJECTS) $(euroconq_LDADD) $(LIBS)
+menareants$(EXEEXT): $(menareants_OBJECTS) $(menareants_DEPENDENCIES) 
+	@rm -f menareants$(EXEEXT)
+	$(CXXLINK) $(menareants_LDFLAGS) $(menareants_OBJECTS) $(menareants_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -851,7 +852,7 @@ uninstall-info: uninstall-info-recursive
 
 
 distclean-local:
-	rm -f euroconq.cfg
+	rm -f menareants.cfg
 
 clean-generic:
 	-rm -f .#* *~

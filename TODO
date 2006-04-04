@@ -3,24 +3,27 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--finir le nouveau mode de déplacement pas-à-pas coté serveur
+-client:InGame.cpp: gestion déplacements pas-a-pas
 
 * Urgent
--mettre un mode pour l'argent du début
--client: gestion déplacements pas-a-pas
+-server: finir le nouveau mode de déplacement pas-à-pas (split)
+
+* Après
+-client: ergonomie
 
 * Bof
--server: Dans Channels.*, surchager l'opérateur "<<" pour envoyer un message dans le chan par ce biais.
+-mettre un mode pour l'argent du début
 
-* Objectif actuel
+
+** Objectif actuel
 -jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
 
-* En parallèle (on s'en fou un peu de quand on les fait)
+** En parallèle (on s'en fou un peu de quand on les fait)
 -faire un éditeur de map, intégré (malheureusement) dans le jeu car c'est plus simple pour utiliser
  les composants de gui/
 
-* Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
+** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -enrichissement du jeu.
 
-* Sur le très long terme
+** Sur le très long terme
 -Bosser.

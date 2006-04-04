@@ -27,9 +27,9 @@
 typedef unsigned int   uint;
 
 /* Nom complet de nom court du jeu */
-#define APP_NAME "Europa Conquest Daemon"
-#define APP_SMALLNAME "EuroConqD"
-#define CLIENT_SMALLNAME "EuroConq"
+#define APP_NAME "Men Are Ants Daemon"
+#define APP_SMALLNAME "MenAreAntsD"
+#define CLIENT_SMALLNAME "MenAreAnts"
 
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
@@ -64,7 +64,7 @@ const int COMLEN=10;
 const int MAXCONNEX=100; /* de préférence un multiple de 4 */
 
 /* Config */
-#define CONFIG_FILE "/etc/euroconqd.conf"
+#define CONFIG_FILE "/etc/menareantsd.conf"
 
 /* File of maplist */
 #define MAP_FILE PKGDATADIR "maps.list"

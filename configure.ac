@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 
-AC_INIT([EuroConq], [0.1], [bugs@coderz.info], [euroconq])
+AC_INIT([MenAreAnts], [0.1], [bugs@coderz.info], [menareants])
 
 AM_CONFIG_HEADER(config.h)
 
@@ -17,7 +17,7 @@ AC_PROG_RANLIB
 # COMPILER ET INSTALLER LE SERVEUR
 
 AC_ARG_ENABLE(  server,
-                [AC_HELP_STRING([--enable-server],[compilation of Europe Conquest's server])],
+                [AC_HELP_STRING([--enable-server],[compilation of Men Are Ants's server])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 INSTALL_SERVER=server
@@ -31,7 +31,7 @@ AC_ARG_ENABLE(  server,
 INSTALL_GAME_Q=1
 
 AC_ARG_ENABLE(  game,
-                [AC_HELP_STRING([--disable-game],[compilation of Europe Conquest game])],
+                [AC_HELP_STRING([--disable-game],[compilation of Men Are Ants game])],
                 [
                         if test "x${enableval}" = "xno"; then
                                 INSTALL_GAME_Q=0

@@ -3,8 +3,8 @@ SUBDIRS = data
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 
-bin_PROGRAMS = euroconq
-euroconq_SOURCES = \
+bin_PROGRAMS = menareants
+menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
@@ -36,10 +36,10 @@ euroconq_SOURCES = \
 		gui/Image.cpp \
 		gui/ShowMap.cpp
 
-euroconq_LDADD =${top_builddir}/lib/libeuroconq.a
+menareants_LDADD =${top_builddir}/lib/libmenareants.a
 
 distclean-local:
-	rm -f euroconq.cfg
+	rm -f menareants.cfg
 
 clean-generic:
 	-rm -f .#* *~

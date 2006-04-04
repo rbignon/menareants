@@ -132,8 +132,6 @@ public:
 /* Variables protégées */
 protected:
 
-	ECImage *background;
-
 	/** Add a component */
 	template<typename T>
 	T* AddComponent(T* comp)
@@ -146,6 +144,7 @@ protected:
 /* Variables privées */
 private:
 	std::vector<TComponent*> composants;
+	ECImage *background;
 };
 
 #endif /* EC_FORM_H */

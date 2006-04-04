@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(euroconqserver_SOURCES)
+SOURCES = $(menareantsserver_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -39,11 +39,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-bin_PROGRAMS = euroconqserver$(EXEEXT)
+bin_PROGRAMS = menareantsserver$(EXEEXT)
 subdir = server
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -52,12 +53,12 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_euroconqserver_OBJECTS = Main.$(OBJEXT) Server.$(OBJEXT) \
+am_menareantsserver_OBJECTS = Main.$(OBJEXT) Server.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
 	Channels.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
 	InGame.$(OBJEXT)
-euroconqserver_OBJECTS = $(am_euroconqserver_OBJECTS)
-euroconqserver_DEPENDENCIES = $(top_srcdir)/lib/libeuroconq.a
+menareantsserver_OBJECTS = $(am_menareantsserver_OBJECTS)
+menareantsserver_DEPENDENCIES = $(top_srcdir)/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -66,8 +67,8 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(euroconqserver_SOURCES)
-DIST_SOURCES = $(euroconqserver_SOURCES)
+SOURCES = $(menareantsserver_SOURCES)
+DIST_SOURCES = $(menareantsserver_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -176,7 +177,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 SUBDIRS = maps
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
-euroconqserver_SOURCES = \
+menareantsserver_SOURCES = \
 	Main.cpp \
 	Server.cpp \
 	Config.cpp \
@@ -187,7 +188,7 @@ euroconqserver_SOURCES = \
 	Units.cpp \
 	InGame.cpp
 
-euroconqserver_LDADD = $(top_srcdir)/lib/libeuroconq.a
+menareantsserver_LDADD = $(top_srcdir)/lib/libmenareants.a
 all: all-recursive
 
 .SUFFIXES:
@@ -244,9 +245,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-euroconqserver$(EXEEXT): $(euroconqserver_OBJECTS) $(euroconqserver_DEPENDENCIES) 
-	@rm -f euroconqserver$(EXEEXT)
-	$(CXXLINK) $(euroconqserver_LDFLAGS) $(euroconqserver_OBJECTS) $(euroconqserver_LDADD) $(LIBS)
+menareantsserver$(EXEEXT): $(menareantsserver_OBJECTS) $(menareantsserver_DEPENDENCIES) 
+	@rm -f menareantsserver$(EXEEXT)
+	$(CXXLINK) $(menareantsserver_LDFLAGS) $(menareantsserver_OBJECTS) $(menareantsserver_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -550,7 +551,7 @@ uninstall-info: uninstall-info-recursive
 
 
 install-data-local:
-	$(INSTALL_DATA) euroconqd.conf /etc/euroconqd.conf
+	$(INSTALL_DATA) menareantsd.conf /etc/menareantsd.conf
 
 clean-generic:
 	-rm -f .#* *~

@@ -1,6 +1,6 @@
 /* server/Config.cpp - Configuration
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ Config::Config(std::string _filename)
 
 bool Config::set_defaults()
 {
-	servername = "Europa.Conquest";
+	servername = "Men.Are.Ants";
 	port = 5461;
 	deflimite = 10;
-	motdfile = "/etc/euroconqd.motd";
+	motdfile = "/etc/menareantsd.motd";
 	return true;
 }
 

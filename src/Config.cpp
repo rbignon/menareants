@@ -135,8 +135,8 @@ public:
 
 void Config::WantOk(void* forminst, void* configinst)
 {
-	TConfigForm* form = (TConfigForm*)forminst;
-	Config* conf = (Config*)configinst;
+	TConfigForm* form = static_cast<TConfigForm*>(forminst);
+	Config* conf = static_cast<Config*>(configinst);
 
 	conf->nick = form->Nick->GetString();
 
