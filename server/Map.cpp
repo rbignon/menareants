@@ -29,24 +29,6 @@
 MapVector MapList;
 
 /********************************************************************************************
- *                                 ECMove                                                   *
- ********************************************************************************************/
-std::string ECMove::MovesString(ECase* end)
-{
-	ECase* c = first_case;
-	std::string s;
-	for(Vector::const_iterator it = moves.begin(); it != moves.end() && (!end || end != c); ++it)
-		switch(*it)
-		{
-			case Up: s += '^'; c = c->MoveUp(); break;
-			case Down: s += 'v'; c = c->MoveDown(); break;
-			case Left: s += '<'; c = c->MoveLeft(); break;
-			case Right: s += '>'; c = c->MoveRight(); break;
-		}
-	return s;
-}
-
-/********************************************************************************************
  *                                 ECMap                                                    *
  ********************************************************************************************/
  

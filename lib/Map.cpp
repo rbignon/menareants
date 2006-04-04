@@ -26,6 +26,32 @@
 #include <fstream>
 
 /********************************************************************************************
+ *                                 ECBMove                                                  *
+ ********************************************************************************************/
+
+ECBMove::ECBMove(ECBEntity* e)
+	: first_case(0), entity(e)
+{
+	if(e) first_case = e->Case();
+}
+
+std::string ECBMove::MovesString(ECBCase* end)
+{
+	ECBCase* c = first_case;
+	if(!c) return "";
+	std::string s;
+	for(Vector::const_iterator it = moves.begin(); it != moves.end() && (!end || end != c); ++it)
+		switch(*it)
+		{
+			case Up: s += '^'; c = c->MoveUp(); break;
+			case Down: s += 'v'; c = c->MoveDown(); break;
+			case Left: s += '<'; c = c->MoveLeft(); break;
+			case Right: s += '>'; c = c->MoveRight(); break;
+		}
+	return s;
+}
+
+/********************************************************************************************
  *                               ECBDate                                                    *
  ********************************************************************************************/
 
@@ -679,8 +705,10 @@ void ECBMap::AddAnEntity(ECBEntity* e)
 	if(!e) return;
 
 	e->Case()->Entities()->Add(e);
-	if(e->Case()->Country()->Owner())
-		e->Case()->Country()->Owner()->Player()->Entities()->Add(e);
+	if(e->Owner())
+		e->Owner()->Entities()->Add(e);
+	else
+		neutres.Add(e);
 	entities.Add(e);
 }
 
@@ -692,6 +720,8 @@ void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 	entities.Remove(e);
 	if(e->Owner())
 		e->Owner()->Entities()->Remove(e);
+	else
+		neutres.Remove(e);
 	if(use_delete)
 		delete e;
 }

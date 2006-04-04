@@ -38,53 +38,7 @@ typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
-
-class ECEntity;
-
-/********************************************************************************************
- *                                   ECMove                                                 *
- ********************************************************************************************/
-
-class ECMove
-{
-/* Constructeur/Destructeur */
-public:
-
-	ECMove() : first_case(0), entity(0) {}
-
-	enum E_Move {
-		Up,
-		Down,
-		Left,
-		Right
-	};
-	typedef std::vector<E_Move> Vector;
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-	bool Empty() const { return moves.empty(); }
-	Vector::size_type Size() const { return moves.size(); }
-	Vector Moves() const { return moves; }
-	void AddMove(E_Move m) { moves.push_back(m); }
-	void SetMoves(Vector _moves) { moves = _moves; }
-	void SetEntity(ECEntity* et) { entity = et; }
-	ECEntity* Entity() { return entity; }
-
-	ECase* FirstCase() { return first_case; }
-	void SetFirstCase(ECase* c) { first_case = c; }
-
-	std::string MovesString(ECase* end = 0);
-
-/* Variables privées */
-protected:
-	Vector moves;
-	ECase* first_case;
-	ECEntity* entity;
-};
+typedef ECBMove        ECMove;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *

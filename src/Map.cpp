@@ -31,11 +31,44 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                                   ECMove                                                 *
+ ********************************************************************************************/
+
+void ECMove::EstablishDest()
+{
+	ECBCase* c = first_case;
+	if(!c) return;
+
+ printf("%d,%d\n", c->X(), c->Y());
+	for(Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
+		switch(*it)
+		{
+			case Up: c = c->MoveUp(); break;
+			case Down: c = c->MoveDown(); break;
+			case Left: c = c->MoveLeft(); break;
+			case Right: c = c->MoveRight(); break;
+		}
+	printf("%d,%d\n", c->X(), c->Y());
+	dest = c;
+}
+
+void ECMove::AddMove(E_Move m)
+{
+	ECBMove::AddMove(m);
+	EstablishDest();
+}
+void ECMove::SetMoves(Vector _moves)
+{
+	ECBMove::SetMoves(_moves);
+	EstablishDest();
+}
+
+/********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), new_case(0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), move(this)
 {}
 
 ECEntity::~ECEntity()

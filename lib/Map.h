@@ -56,6 +56,53 @@ typedef char Country_ID[3];
 typedef char MapPlayer_ID;
 
 /********************************************************************************************
+ *                                   ECBMove                                                *
+ ********************************************************************************************/
+
+class ECBMove
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECBMove(ECBEntity* e = 0);
+
+	enum E_Move {
+		Up,
+		Down,
+		Left,
+		Right
+	};
+	typedef std::vector<E_Move> Vector;
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+	bool Empty() const { return moves.empty(); }
+	Vector::size_type Size() const { return moves.size(); }
+	Vector Moves() const { return moves; }
+	void AddMove(E_Move m) { moves.push_back(m); }
+	void SetMoves(Vector _moves) { moves = _moves; }
+	void SetEntity(ECBEntity* et) { entity = et; }
+	ECBEntity* Entity() { return entity; }
+
+	ECBCase* FirstCase() { return first_case; }
+	void SetFirstCase(ECBCase* c) { first_case = c; }
+
+	std::string MovesString(ECBCase* end = 0);
+
+	void Clear() { moves.clear(); first_case = 0; }
+
+/* Variables privées */
+protected:
+	Vector moves;
+	ECBCase* first_case;
+	ECBEntity* entity;
+};
+
+/********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
 #define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
@@ -521,6 +568,7 @@ public:
 	BCountriesVector Countries() { return map_countries; }          /**< Return countries vector */
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
+	ECList<ECBEntity*> *Neutres() { return &neutres; }
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
@@ -550,6 +598,7 @@ protected:
 	std::vector<std::string> map_infos;
 
 	ECList<ECBEntity*> entities;
+	ECList<ECBEntity*> neutres;
 
 	ECBDate* date;
 

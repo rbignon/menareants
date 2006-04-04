@@ -28,6 +28,35 @@
 
 class ECase;
 class TMap;
+class ECEntity;
+
+typedef ECBMapPlayer   ECMapPlayer;
+typedef ECBCountry     ECountry;
+typedef ECBDate        ECDate;
+
+/********************************************************************************************
+ *                                   ECMove                                                 *
+ ********************************************************************************************/
+class ECMove : public ECBMove
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECMove(ECBEntity* e) : ECBMove(e), dest(0) {}
+
+/* Attributs */
+public:
+
+	void AddMove(E_Move m);
+	void SetMoves(Vector _moves);
+
+	ECBCase* Dest() { return dest; }
+	void EstablishDest();
+
+/* Variables protégées */
+protected:
+	ECBCase* dest;
+};
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -37,7 +66,7 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), image(0), selected(false), new_case(0) {}
+	ECEntity() : Tag(0), image(0), selected(false), move(this) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
 
@@ -64,19 +93,18 @@ public:
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
 
-	void SetNewCase(ECase* nc) { new_case = nc; }
-	ECase* NewCase() { return new_case; }
-
 	void Select(bool s = true) { selected = s; }
 	bool Selected() { return selected; }
 
 	int Tag;
 
+	ECMove* Move() { return &move; }
+
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
-	ECase* new_case;
+	ECMove move;
 };
 
 /********************************************************************************************
@@ -204,7 +232,7 @@ public:
 /* Methodes */
 public:
 
-	void CreatePreview(uint width = 100, uint height = 100, bool ingame = false);
+	void CreatePreview(uint width = 200, uint height = 200, bool ingame = false);
 
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
 
@@ -223,9 +251,5 @@ protected:
 
 	virtual void SetCaseAttr(ECBCase*, char);
 };
-
-typedef ECBMapPlayer   ECMapPlayer;
-typedef ECBCountry     ECountry;
-typedef ECBDate        ECDate;
 
 #endif /* EC_MAP_H */
