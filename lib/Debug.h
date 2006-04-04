@@ -33,13 +33,15 @@
 #define VPName(vr) #vr "=" + StringF("%p", vr) + "; "
 #define VHName(vr) #vr "=" + StringF("%h", vr) + "; "
 
+#define FDebug(flags, msg) Debug(flags, "%s:%s():%d; %s", __FILE__, __PRETTY_FUNCTION__, __LINE__, msg)
+
 class TECExcept
 {
 public:
 	const char* Message;
 	const char* Vars;
 #define ECExcept(vars, msg)                             \
-                TECExcept(__func__, __FILE__, __LINE__, (vars), (msg))
+                TECExcept(__PRETTY_FUNCTION__, __FILE__, __LINE__, (vars), (msg))
 	TECExcept(const char* func, const char* file, int line, std::string vars, std::string msg);
 	TECExcept(std::string msg);
 };
