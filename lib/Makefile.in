@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(libeuroconq_a_SOURCES)
+SOURCES = $(libmenareants_a_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -42,7 +42,8 @@ target_triplet = @target@
 subdir = lib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -51,12 +52,12 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 AR = ar
 ARFLAGS = cru
-libeuroconq_a_AR = $(AR) $(ARFLAGS)
-libeuroconq_a_LIBADD =
-am_libeuroconq_a_OBJECTS = Outils.$(OBJEXT) Channels.$(OBJEXT) \
+libmenareants_a_AR = $(AR) $(ARFLAGS)
+libmenareants_a_LIBADD =
+am_libmenareants_a_OBJECTS = Outils.$(OBJEXT) Channels.$(OBJEXT) \
 	Debug.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
 	Units.$(OBJEXT)
-libeuroconq_a_OBJECTS = $(am_libeuroconq_a_OBJECTS)
+libmenareants_a_OBJECTS = $(am_libmenareants_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -65,8 +66,8 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(libeuroconq_a_SOURCES)
-DIST_SOURCES = $(libeuroconq_a_SOURCES)
+SOURCES = $(libmenareants_a_SOURCES)
+DIST_SOURCES = $(libmenareants_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -166,8 +167,8 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-noinst_LIBRARIES = libeuroconq.a
-libeuroconq_a_SOURCES = Outils.cpp Channels.cpp Debug.cpp Map.cpp Batiments.cpp Units.cpp
+noinst_LIBRARIES = libmenareants.a
+libmenareants_a_SOURCES = Outils.cpp Channels.cpp Debug.cpp Map.cpp Batiments.cpp Units.cpp
 all: all-am
 
 .SUFFIXES:
@@ -204,10 +205,10 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libeuroconq.a: $(libeuroconq_a_OBJECTS) $(libeuroconq_a_DEPENDENCIES) 
-	-rm -f libeuroconq.a
-	$(libeuroconq_a_AR) libeuroconq.a $(libeuroconq_a_OBJECTS) $(libeuroconq_a_LIBADD)
-	$(RANLIB) libeuroconq.a
+libmenareants.a: $(libmenareants_a_OBJECTS) $(libmenareants_a_DEPENDENCIES) 
+	-rm -f libmenareants.a
+	$(libmenareants_a_AR) libmenareants.a $(libmenareants_a_OBJECTS) $(libmenareants_a_LIBADD)
+	$(RANLIB) libmenareants.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
