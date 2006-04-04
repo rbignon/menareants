@@ -58,26 +58,19 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	uint flags = 0;
 
 	uint y = 0, x = 0, type = 0, nb = 0;
+	std::vector<std::string> moves_str;
 	for(uint i = 1; i<parv.size(); i++)
 	{
 		switch(parv[i][0])
 		{
-			case '>':
+			case '=':
 			{
-				if(flags & ARM_ATTAQ || flags & ARM_MOVE)
-					return vDebug(W_DESYNCH|W_SEND, "ARM: Utilisation simultanée de ATTAQ et MOVE", VHName(flags));
-
-				std::string s = parv[i].substr(1);
-				x = StrToTyp<uint>(stringtok(s, ","));
-				y = StrToTyp<uint>(s);
+				moves_str.push_back(parv[i].substr(1));
 				flags |= ARM_MOVE;
 				break;
 			}
 			case '*':
 			{
-				if(flags & ARM_ATTAQ || flags & ARM_MOVE)
-					return vDebug(W_DESYNCH|W_SEND, "ARM: Utilisation simultanée de ATTAQ et MOVE", VHName(flags));
-
 				std::string s = parv[i].substr(1);
 				x = StrToTyp<uint>(stringtok(s, ","));
 				y = StrToTyp<uint>(s);
@@ -120,14 +113,34 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		std::string nick = stringtok(et_name, "!");
 
 		if(nick.empty() || et_name.empty()) continue;
-		ECPlayer* pl = chan->GetPlayer(nick.c_str());
-		if(!pl) continue;
+		ECPlayer* pl = 0;
+		if(nick != "*")
+		{
+			pl = chan->GetPlayer(nick.c_str());
+			if(!pl)
+			{
+				vDebug(W_DESYNCH|W_SEND, "ARM: Player Sender introuvable !!", VName(et_name) VName(nick));
+				continue;
+			}
+		}
 
-		ECBEntity* et = pl->Entities()->Find(et_name.c_str());
-		ECEntity* entity = dynamic_cast<ECEntity*>(et);
+		ECEntity* entity = 0;
+		printf("%s:%s:%p\n", nick.c_str(), et_name.c_str(), pl);
+		if(pl)
+		{
+			ECBEntity* et = pl->Entities()->Find(et_name.c_str());
+			entity = dynamic_cast<ECEntity*>(et);
+		}
+		else
+			entity = dynamic_cast<ECEntity*>(map->Neutres()->Find(et_name.c_str()));
+
 		if(!entity)
 		{
-			if(!(flags & ARM_TYPE)) continue;
+			if(!(flags & ARM_TYPE))
+			{
+				Debug(W_DESYNCH|W_SEND, "ARM: Entité introuvable et non créable");
+				continue;
+			}
 			if(flags != ARM_CREATE || type >= ECEntity::E_END)
 			{
 				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
@@ -136,13 +149,42 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(x,y), nb);
 			map->AddAnEntity(entity);
 		}
+		if(!moves_str.empty())
+		{
+			std::string et_longname = entity->LongName();
+			for(std::vector<std::string>::iterator it = moves_str.begin(); it != moves_str.end(); ++it)
+			{
+				std::string s = *it;
+				std::string name = stringtok(s, ",");
+				if(name == et_longname)
+				{
+					ECMove::Vector moves;
+					uint x = StrToTyp<uint>(stringtok(s, ","));
+					uint y = StrToTyp<uint>(stringtok(s, ","));
+					if(!s.empty())
+						for(std::string::iterator c = s.begin(); c != s.end(); ++c)
+							switch(*c)
+							{
+								case '>': moves.push_back(ECMove::Right); break;
+								case '<': moves.push_back(ECMove::Left); break;
+								case 'v': moves.push_back(ECMove::Down); break;
+								case '^': moves.push_back(ECMove::Up); break;
+								default: Debug(W_DESYNCH|W_SEND, "ARM =: Reception d'un flag de mouvement inconnu: %c", *c);
+							}
+					ECBCase* last = (*map)(x,y);
+					entity->Move()->SetFirstCase(last);
+					entity->ChangeCase(last);
+					entity->Move()->SetMoves(moves);
+				}
+			}
+		}
 		entities.push_back(entity);
 	}
 	if(chan->State() == EChannel::ANIMING)
 	{
 		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetNewCase(dynamic_cast<ECase*>((*map)(x,y))), (*it)->SetEvent(flags), (*it)->Tag = 0;
+				(*it)->SetEvent(flags), (*it)->Tag = 0;
 
 		const char BEFORE_EVENT = 1;
 		const char IN_EVENT = 2;
@@ -177,12 +219,12 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetNewCase(dynamic_cast<ECase*>((*map)(x,y))), (*it)->SetEvent(flags);
+				(*it)->SetEvent(flags);
 		}
 		if(flags == ARM_RETURN)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetNewCase(0), (*it)->SetEvent(0);
+				(*it)->Move()->Clear(), (*it)->SetEvent(0);
 		}
 	}
 	return 0;
@@ -192,7 +234,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  *                               TInGame                                                    *
  ********************************************************************************************/
 
-void EuroConqApp::InGame()
+void MenAreAntsApp::InGame()
 {
 	if(!client || !client->Player() || !client->Player()->Channel()->Map())
 		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
@@ -263,9 +305,34 @@ void EuroConqApp::InGame()
 						else if((acase = InGameForm->Map->TestCase(event.button.x, event.button.y)))
 						{
 							if(selected_entity && chan->State() == EChannel::PLAYING)
-								client->sendrpl(client->rpl(EC_Client::ARM),
-								std::string(std::string(selected_entity->ID()) + " >" + TypToStr(acase->X()) + "," +
-								                        TypToStr(acase->Y())).c_str());
+							{
+							 	ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
+								                                                     : selected_entity->Case();
+								printf("%d,%d\n", init_case->X(), init_case->Y());
+								if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
+								{
+									std::string move;
+									if(acase->X() != init_case->X())
+										for(uint i=init_case->X();
+											i != acase->X(); acase->X() < init_case->X() ? --i : ++i)
+											if(acase->X() < init_case->X())
+												move += "<";
+											else
+												move += ">";
+									if(acase->Y() != init_case->Y())
+										for(uint i=init_case->Y();
+											i != acase->Y(); acase->Y() < init_case->Y() ? --i : ++i)
+											if(acase->Y() < init_case->Y())
+												move += "^";
+											else
+												move += "v";
+									if(!move.empty())
+									{
+										client->sendrpl(client->rpl(EC_Client::ARM),
+										std::string(std::string(selected_entity->ID()) + " " + move).c_str());
+									}
+								}
+							}
 						}
 						break;
 					}
@@ -398,7 +465,7 @@ void LoadingGame(EC_Client* me)
 	chan->Map()->CreatePreview(300,300);
 }
 
-void EuroConqApp::LoadGame(EChannel* chan)
+void MenAreAntsApp::LoadGame(EChannel* chan)
 {
 	if(!client || !client->Player())
 		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");

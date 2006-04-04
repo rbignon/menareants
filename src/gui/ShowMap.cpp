@@ -22,6 +22,7 @@
 #include "Defines.h"
 #include "Resources.h"
 #include "Channels.h"
+#include "Debug.h"
 
 void TMap::Init()
 {
@@ -113,7 +114,7 @@ void TMap::Draw(int _x, int _y)
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-		if(entity->NewCase() && entity->Case() != entity->NewCase())
+		if(!entity->Move()->Empty())
 		{
 			if(map->Channel()->State() == EChannel::ANIMING)
 			{
@@ -122,6 +123,88 @@ void TMap::Draw(int _x, int _y)
 			else if(map->Channel()->State() == EChannel::PLAYING)
 			{
 				ECase* c = dynamic_cast<ECase*>((*enti)->Case());
+				if(c != entity->Move()->FirstCase())
+					FDebug(W_WARNING|W_SEND, "La case de l'entité et le départ du mouvement ne sont pas identiques");
+
+				ECMove::Vector moves = entity->Move()->Moves();
+				ECase* next_c = 0;
+				ECase* dest = dynamic_cast<ECase*>(entity->Move()->Dest());
+				int last_move = -1;
+				for(ECMove::Vector::iterator move = moves.begin(); move != moves.end(); ++move)
+				{
+					switch(*move)
+					{
+						case ECMove::Up: next_c = dynamic_cast<ECase*>(c->MoveUp()); break;
+						case ECMove::Down: next_c = dynamic_cast<ECase*>(c->MoveDown()); break;
+						case ECMove::Left: next_c = dynamic_cast<ECase*>(c->MoveLeft()); break;
+						case ECMove::Right: next_c = dynamic_cast<ECase*>(c->MoveRight()); break;
+					}
+					if(c->Y() == next_c->Y())
+					{
+						switch(last_move)
+						{
+							case ECMove::Up:
+								(c->X() < next_c->X() ? Resources::FlecheGaucheBas()
+								                      : Resources::FlecheDroiteBas())
+								                    ->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+							case ECMove::Down:
+								(c->X() < next_c->X() ? Resources::FlecheGaucheHaut()
+								                      : Resources::FlecheDroiteHaut())
+								                    ->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+							case ECMove::Left:
+							case ECMove::Right:
+							default:
+								Resources::FlecheHoriz()->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+						}
+					}
+					if(c->X() == next_c->X())
+					{
+						switch(last_move)
+						{
+							case ECMove::Left:
+								(c->Y() < next_c->Y() ? Resources::FlecheGaucheBas()
+								                      : Resources::FlecheGaucheHaut())
+								                    ->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+							case ECMove::Right:
+								(c->Y() < next_c->Y() ? Resources::FlecheDroiteBas()
+								                      : Resources::FlecheDroiteHaut())
+								                    ->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+							case ECMove::Up:
+							case ECMove::Down:
+							default:
+								Resources::FlecheVert()->Draw(c->Image()->X(), c->Image()->Y());
+								break;
+						}
+					}
+					last_move = *move;
+					c = next_c;
+				}
+				switch(last_move)
+				{
+					case ECMove::Right:
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqDroite()
+						         : Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
+						break;
+					case ECMove::Left:
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqGauche()
+						         : Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
+						break;
+					case ECMove::Up:
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqHaut()
+						         : Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
+						break;
+					case ECMove::Down:
+						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqBas()
+						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
+						break;
+				}
+
+#ifdef LAST_MOVE
 				int mx = entity->NewCase()->X(), my = entity->NewCase()->Y();
 
 				bool first = true;
@@ -174,6 +257,7 @@ void TMap::Draw(int _x, int _y)
 				else if(c->Y() > entity->Case()->Y())
 					(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqBas()
 						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
+#endif
 			}
 		}
 	}
