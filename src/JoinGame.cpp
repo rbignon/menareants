@@ -699,7 +699,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-bool EuroConqApp::GameInfos(const char *cname, TForm* form)
+bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 {
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
@@ -878,7 +878,7 @@ bool EuroConqApp::GameInfos(const char *cname, TForm* form)
 	return true;
 }
 
-void EuroConqApp::ListGames()
+void MenAreAntsApp::ListGames()
 {
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
@@ -981,23 +981,23 @@ void EuroConqApp::ListGames()
 TGameInfosForm::TGameInfosForm()
 	: TForm()
 {
-	Title = AddComponent(new TLabel(300,5,"Jeu", white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(350,6,"Jeu", white_color, &app.Font()->big));
 
-	Chat = AddComponent(new TMemo(60,325,315,505,30));
-
-	SendMessage = AddComponent(new TEdit(60,535,315, MAXBUFFER-20));
-	PretButton = AddComponent(new TButtonText(600,450, 150,50, "Pret"));
-	PretButton->SetEnabled(false);
-
-	RetourButton = AddComponent(new TButtonText(600,500,150,50, "Retour"));
-
-	Players = AddComponent(new TList(60, 80));
+	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
 
-	MapList = AddComponent(new TListBox(400, 400, 150, 150));
+	Chat = AddComponent(new TMemo(50,325,315,495,30));
+	SendMessage = AddComponent(new TEdit(50,555,315, MAXBUFFER-20));
 
-	MapTitle = AddComponent(new TLabel(600, 315, "", white_color, &app.Font()->big));
-	Preview = AddComponent(new TImage(625, 348));
+	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
+	Preview = AddComponent(new TImage(390, 380));
+
+	//MapList = AddComponent(new TListBox(400, 400, 150, 150));
+	MapList = AddComponent(new TListBox(600, 345, 150, 115));
+
+	PretButton = AddComponent(new TButtonText(600,470, 150,50, "Pret"));
+	PretButton->SetEnabled(false);
+	RetourButton = AddComponent(new TButtonText(600,520,150,50, "Retour"));
 
 	SetBackground(Resources::Titlescreen());
 
@@ -1022,8 +1022,8 @@ TGameInfosForm::~TGameInfosForm()
 
 void TGameInfosForm::RecalcMemo()
 {
-	Chat->SetXY(60, Players->Y() + Players->Height());
-	Chat->SetHeight(505-Players->Height()-Players->X()); /* On définit une jolie taille */
+	Chat->SetXY(50, Players->Y() + Players->Height());
+	Chat->SetHeight(545-Players->Height()-Players->Y()); /* On définit une jolie taille */
 }
 
 /********************************************************************************************
