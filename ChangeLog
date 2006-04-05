@@ -1,3 +1,17 @@
+2005-04-05  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Suppression de l'ancien code.
+
+	* src/Units.cpp: Gestion des déplacements en mode ANIMING.
+
+	* src/InGame.cpp: Amélioration de la gestion des déplacements.
+
+	* src/Main.cpp, server/Main.cpp: Un peu plus beau.
+
+	* src/Config.cpp, src/JoinGame.cpp: Nation par défaut.
+
+	* lib/Outils.cpp (GetHome): Fonction pour récupérer le $HOME.
+
 2005-04-01  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp, src/gui/ShowMap.cpp: Gestion des déplacements anticipés.
@@ -10,7 +24,9 @@
 
 	* src/data/anims/cases/mer: Animation de la mer.
 
-	* Changement du nom du jeu.
+	* lib/Debug.h: Utilisation de __PRETTY_FUNCTION__ qui renvoit un nom de fonction plus complet.
+
+	* Changement du nom du jeu (Europa Conquest -> Men Are Ants).
 
 2005-03-31  Romain Bignon <progs@headfucking.net>
 

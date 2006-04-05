@@ -3,6 +3,8 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-server: GROS BUG: Lorsque le client veut bouger et qu'il est en conflit déjà avec un mec (sans le savoir),
+                   trouver et envoyer l'evenement de mouvement, sinon le client va le faire disparaitre !
 -client:InGame.cpp: gestion déplacements pas-a-pas
 
 * Urgent
