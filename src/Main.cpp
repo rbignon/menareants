@@ -109,23 +109,20 @@ int MenAreAntsApp::main(int argc, char **argv)
 		sdlflags |= SDL_FULLSCREEN;
 #endif
 
-		if (argc > 1) {
-			if (strcmp (argv[1], "-fullscreen") == 0) {
-				sdlflags |= SDL_FULLSCREEN;
+		for(int tmp = 0; (tmp = getopt(argc, argv, "hwf")) != EOF;)
+			switch(tmp)
+			{
+				case 'f':
+					sdlflags |= SDL_FULLSCREEN;
+					break;
+				case 'w':
+					sdlflags &= ~SDL_FULLSCREEN;
+					break;
+				case 'h':
+				default:
+					std::cout << "Usage: " << argv[0] << " [-wf]" << std::endl;
+					quit_app(EXIT_FAILURE);
 			}
-			else if (strcmp (argv[1], "-window") == 0) {
-				sdlflags &= ~SDL_FULLSCREEN;
-			}
-			else if (strcmp (argv[1], "-h") == 0 ||
-					strcmp (argv[1], "-help") == 0 ||
-					strcmp (argv[1], "--help") == 0 ||
-					strcmp (argv[1], "-?") == 0 ||
-					strcmp (argv[1], "/?") == 0 ||
-					strcmp (argv[1], "/h") == 0) {
-				std::cout << "usage: " << argv[0] << " [-fullscreen | -window]" << std::endl;
-				quit_app(0);
-			}
-		}
 
 		srand( (long)time(NULL) );
 
@@ -137,24 +134,16 @@ int MenAreAntsApp::main(int argc, char **argv)
 		loading_image->Draw();
 
 #ifndef WIN32
-		if (getenv("HOME"))
-		{
-			path = getenv("HOME");
-			path += "/.menareants/";
-			if (!opendir(path.c_str()))
-			{
-				mkdir( path.c_str(), 0755 );
-			}
+		path = GetHome();
+		path += "/.menareants/";
+		DIR *d;
+		if(!(d = opendir(path.c_str())))
+			mkdir( path.c_str(), 0755 );
+		else closedir(d);
 
-			conf = new Config( path + "menareants.cfg" );
-		}
-		else
-		{
-			std::cout << "Unable to read HOME environment variable !" << std::endl;
-			quit_app(0);
-		}
+		conf = new Config( path + CONFIG_FILE );
 #else
-		conf = new Config("menareants.cfg");
+		conf = new Config(CONFIG_FILE);
 #endif
 
 		if (TTF_Init()==-1) {
