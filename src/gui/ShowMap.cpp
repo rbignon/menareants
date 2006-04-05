@@ -128,7 +128,6 @@ void TMap::Draw(int _x, int _y)
 
 				ECMove::Vector moves = entity->Move()->Moves();
 				ECase* next_c = 0;
-				ECase* dest = dynamic_cast<ECase*>(entity->Move()->Dest());
 				int last_move = -1;
 				for(ECMove::Vector::iterator move = moves.begin(); move != moves.end(); ++move)
 				{
@@ -204,60 +203,6 @@ void TMap::Draw(int _x, int _y)
 						break;
 				}
 
-#ifdef LAST_MOVE
-				int mx = entity->NewCase()->X(), my = entity->NewCase()->Y();
-
-				bool first = true;
-				while(int(c->X()) != mx)
-				{
-					if(first) first = false;
-					else Resources::FlecheHoriz()->Draw(c->Image()->X(), c->Image()->Y());
-					if(int(c->X()) < mx)
-						c = dynamic_cast<ECase*>(c->MoveRight());
-					else
-						c = dynamic_cast<ECase*>(c->MoveLeft());
-				}
-				if(my == int(c->Y()))
-				{
-					if(c->X() < entity->Case()->X())
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqGauche()
-						         : Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
-					else if(c->X() > entity->Case()->X())
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqDroite()
-						         : Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
-				}
-				else if(my > int(c->Y()))
-				{
-					if(entity->Case()->X() > c->X())
-						Resources::FlecheGaucheBas()->Draw(c->Image()->X(), c->Image()->Y());
-					else if(entity->Case()->X() < c->X())
-						Resources::FlecheDroiteBas()->Draw(c->Image()->X(), c->Image()->Y());
-				}
-				else
-				{
-					if(entity->Case()->X() > c->X())
-						Resources::FlecheGaucheHaut()->Draw(c->Image()->X(), c->Image()->Y());
-					else if(entity->Case()->X() < c->X())
-						Resources::FlecheDroiteHaut()->Draw(c->Image()->X(), c->Image()->Y());
-				}
-
-				first = true;
-				while(int(c->Y()) != my)
-				{
-					if(first) first = false;
-					else Resources::FlecheVert()->Draw(c->Image()->X(), c->Image()->Y());
-					if(int(c->Y()) < my)
-						c = dynamic_cast<ECase*>(c->MoveDown());
-					else
-						c = dynamic_cast<ECase*>(c->MoveUp());
-				}
-				if(c->Y() < entity->Case()->Y())
-					(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqHaut()
-						         : Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
-				else if(c->Y() > entity->Case()->Y())
-					(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqBas()
-						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
-#endif
 			}
 		}
 	}
