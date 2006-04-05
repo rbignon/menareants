@@ -136,6 +136,7 @@ public:
 
 	/** Case associée */
 	ECase* Case() const { return acase; }
+	void SetCase(ECase* c) { acase = c; }
 
 	/** Si c'est une création, une union ou autre, mettre le nombre */
 	void SetNb(uint n) { nb = n; }
