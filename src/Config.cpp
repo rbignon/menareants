@@ -25,29 +25,34 @@
 #include "Outils.h"
 #include "Config.h"
 #include "Resources.h"
+#include "Channels.h"
 #include "lib/Colors.h"
 #include "gui/Form.h"
 #include "gui/ListBox.h"
 #include "gui/Label.h"
 #include "gui/BouttonText.h"
 #include "gui/Edit.h"
+#include "gui/ComboBox.h"
 #include "gui/ColorEdit.h"
 
 Config::Config(std::string _filename)
 {
 	filename = _filename;
 	want_quit_config = false;
+	set_defaults(false);
 }
 
-bool Config::set_defaults()
+bool Config::set_defaults(bool want_save)
 {
 	hostname = "127.0.0.1";
 	port = 5461;
 	nick = "anonyme";
 	color = 0;
+	nation = 0;
 	server_list.push_back("127.0.0.1:5461");
 	server_list.push_back("game.coderz.info:5461");
-	save();
+	if(want_save)
+		save();
 	return true;
 }
 
@@ -69,6 +74,7 @@ bool Config::load()
 		if(key == "SERVER") hostname = ligne;
 		else if(key == "PORT" && is_num(ligne.c_str())) port = atoi(ligne.c_str());
 		else if(key == "COLOR" && is_num(ligne.c_str())) color = atoi(ligne.c_str());
+		else if(key == "NATION" && is_num(ligne.c_str())) nation = atoi(ligne.c_str());
 		else if(key == "NICK") nick = ligne;
 		else if(key == "SERVERLIST") server_list.push_back(ligne);
 		else
@@ -77,7 +83,7 @@ bool Config::load()
 			return set_defaults();
 		}
 	}
-	if(hostname.empty() || port < 1 || port > 65535 || color > COLOR_MAX)
+	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX || nation >= ECPlayer::N_MAX)
 	{
 		std::cout << "Lecture de la configuration invalide." << std::endl;
 		return set_defaults();
@@ -99,6 +105,7 @@ bool Config::save() const
     fp << "PORT " << port << std::endl;
     fp << "NICK " << nick << std::endl;
     fp << "COLOR " << color << std::endl;
+    fp << "NATION " << nation << std::endl;
     for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
     	fp << "SERVERLIST " << *it << std::endl;
 
@@ -125,8 +132,10 @@ public:
 	TListBox*       ServerList;
 	TEdit*          Nick;
 	TColorEdit*     Color;
+	TComboBox*      Nation;
 	TLabel*         Title;
 	TLabel*         NickInfo;
+	TLabel*         NationInfo;
 
 /* Evenements */
 public:
@@ -150,6 +159,7 @@ void Config::WantOk(void* forminst, void* configinst)
 	}
 
 	conf->color = form->Color->Value();
+	conf->nation = form->Nation->GetSelectedItem();
 
 	conf->save();
 	conf->want_quit_config = true;
@@ -169,6 +179,7 @@ void Config::Configuration()
 	ConfigForm->OkButton->SetClickedFunc(Config::WantOk, this);
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
+	ConfigForm->Nation->Select(nation);
 
 	bool found = false;
 	for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
@@ -203,13 +214,20 @@ TConfigForm::TConfigForm()
 	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, &app.Font()->normal));
 	Nick = AddComponent(new TEdit(300,225,200, NICKLEN));
 
-	Color = AddComponent(new TColorEdit("Couleur par default", 300, 250, 200));
-	
+	Color = AddComponent(new TColorEdit("Couleur par défaut", 300, 250, 200));
+
+	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, &app.Font()->normal));
+	Nation = AddComponent(new TComboBox(300, 300, 200));
+	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
+		Nation->AddItem(false, std::string(nations_str[i]), "");
+
 	SetBackground(Resources::Titlescreen());
 }
 
 TConfigForm::~TConfigForm()
 {
+	delete NationInfo;
+	delete Nation;
 	delete Color;
 	delete Nick;
 	delete NickInfo;

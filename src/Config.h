@@ -39,11 +39,12 @@ public:
 	int port;
 	std::string nick;
 	unsigned int color;
+	unsigned int nation;
 	std::vector<std::string> server_list;
 
 private:
 	std::string filename;
-	bool set_defaults();
+	bool set_defaults(bool want_save = true);
 	bool want_quit_config;
 
 	static void WantCancel(void*, void*);

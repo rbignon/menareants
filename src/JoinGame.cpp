@@ -753,6 +753,8 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 
 		if(chan->Map() && app.conf && app.conf->color)
 			client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(app.conf->color)).c_str());
+		if(app.conf && app.conf->nation)
+			client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " + TypToStr(app.conf->nation)).c_str());
 
 		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
 		if(client->Player()->IsOwner())
