@@ -94,6 +94,7 @@ public:
 	std::string MovesString(ECBCase* end = 0);
 
 	void Clear() { moves.clear(); first_case = 0; }
+	void Return(ECBCase*);
 
 /* Variables privées */
 protected:

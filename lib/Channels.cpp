@@ -38,6 +38,7 @@ const char *nations_str[] = {
 	/* N_ALQUAIDA */    "Al-Quaïda",
 	/* N_ESPAGNE  */    "Espagne",
 	/* N_JAPON    */    "Japon",
+	/* N_COLOMBIE */    "Colombie",
 	/* N_MAX      */    ""
 };
 

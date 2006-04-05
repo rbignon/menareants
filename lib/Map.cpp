@@ -51,6 +51,39 @@ std::string ECBMove::MovesString(ECBCase* end)
 	return s;
 }
 
+void ECBMove::Return(ECBCase* end)
+{
+	if(end == first_case)
+	{
+		Clear();
+		return;
+	}
+
+	ECBCase* c = first_case;
+	if(!c) return;
+	bool found = false;
+
+	for(Vector::iterator it = moves.begin(); it != moves.end();)
+	{
+		if(!found)
+		{
+			switch(*it)
+			{
+				case Up: c = c->MoveUp(); break;
+				case Down: c = c->MoveDown(); break;
+				case Left: c = c->MoveLeft(); break;
+				case Right: c = c->MoveRight(); break;
+			}
+			if(c == end) found = true;
+			++it;
+		}
+		else
+			it = moves.erase(it);
+	}
+	if(moves.empty())
+		first_case = 0;
+}
+
 /********************************************************************************************
  *                               ECBDate                                                    *
  ********************************************************************************************/

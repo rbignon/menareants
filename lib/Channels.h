@@ -62,6 +62,7 @@ public:
 		N_ALQUAIDA,
 		N_ESPAGNE,
 		N_JAPON,
+		N_COLOMBIE,
 		N_MAX
 	};
 
