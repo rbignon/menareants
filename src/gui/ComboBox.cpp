@@ -62,7 +62,7 @@ void TComboBox::SetBackGround(uint _h)
 	SDL_Rect r_back = {0,0,w,_h};
 	background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, _h,
 					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*5/10));
+	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*7/10));
 }
 
 void TComboBox::SetOpened(bool _o)
