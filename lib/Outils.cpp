@@ -21,8 +21,41 @@
 #include <string>
 #include <cstdarg>
 #include <fstream>
+#ifdef _WIN32
+   // To get SHGetSpecialFolderPath
+#  define _WIN32_IE   0x400
+#  include <shlobj.h>
+#else
+#  include <stdlib.h> // getenv
+#endif
 
 #include "Outils.h"
+#include "Debug.h"
+
+#ifndef WIN32
+std::string GetHome()
+{
+  char *txt = getenv("HOME");
+
+  if (txt == NULL)
+    ECExcept(0,"HOME directory (environment variable $HOME) could not be found!");
+
+  return txt;
+}
+#else
+std::string GetHome (){
+  TCHAR szPath[MAX_PATH];
+
+  // "Documents and Settings\user" is CSIDL_PROFILE
+  if(SHGetSpecialFolderPath(NULL, szPath,
+                            CSIDL_APPDATA, FALSE) == TRUE)
+  {
+    return szPath;
+  }
+  return "";
+}
+#endif
+
 
 bool is_num(const char *num)
 {

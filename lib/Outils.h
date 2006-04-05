@@ -23,6 +23,9 @@
 #include <sstream>
 #include <vector>
 
+/** Récupère le path du home */
+std::string GetHome();
+
 /** Récupère le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
 
