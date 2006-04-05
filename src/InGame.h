@@ -78,6 +78,12 @@ public:
 
 	void ShowBarreLat(bool show = true);
 
+	#define I_INFO     0x001
+	#define I_WARNING  0x002
+	#define I_ECHO     0x004
+	#define I_ERROR    0x008
+	void AddInfo(int flags, std::string line);
+
 /* Evenements */
 public:
 

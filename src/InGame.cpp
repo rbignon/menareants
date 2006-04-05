@@ -86,6 +86,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			case '<':
 			{
+				std::string s = parv[i].substr(1);
+				x = StrToTyp<uint>(stringtok(s, ","));
+				y = StrToTyp<uint>(s);
 				flags |= ARM_RETURN;
 				break;
 			}
@@ -125,7 +128,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 
 		ECEntity* entity = 0;
-		printf("%s:%s:%p\n", nick.c_str(), et_name.c_str(), pl);
 		if(pl)
 		{
 			ECBEntity* et = pl->Entities()->Find(et_name.c_str());
@@ -148,6 +150,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(x,y), nb);
 			map->AddAnEntity(entity);
+			if(InGameForm) InGameForm->AddInfo(I_INFO, "Création d'une unité pour " + nick);
 		}
 		if(!moves_str.empty())
 		{
@@ -180,11 +183,18 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		entities.push_back(entity);
 	}
+	/* AVANT ANIMATIONS */
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	{
+		if(flags & ARM_NUMBER)
+			(*it)->SetNb(nb);
+	}
+
+	/* ANIMATIONS */
 	if(chan->State() == EChannel::ANIMING)
 	{
-		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
-			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetEvent(flags), (*it)->Tag = 0;
+		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			(*it)->SetEvent(flags), (*it)->Tag = 0;
 
 		const char BEFORE_EVENT = 1;
 		const char IN_EVENT = 2;
@@ -193,7 +203,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
-			printf("nous en sommes à %d\n", event_moment);
 			while(!ok)
 			{
 				ok = true;
@@ -206,14 +215,14 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent() ? 1 : 0; break;
 							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent() ? 1 : 0; break;
 						}
-						if(!(*it)->Tag) ok = false, printf("- entity pas encore prete\n");
-						else printf("- entity prete\n");
+						if(!(*it)->Tag) ok = false;
 					}
 			}
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 				(*it)->Tag = 0;
 		}
 	}
+	/* PLAYING */
 	else if(chan->State() == EChannel::PLAYING)
 	{
 		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
@@ -224,9 +233,22 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(flags == ARM_RETURN)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->Move()->Clear(), (*it)->SetEvent(0);
+			{
+				(*it)->Move()->Return((*map)(x,y));
+				if((*it)->Move()->FirstCase())
+					(*it)->SetEvent(0);
+			}
 		}
 	}
+
+	/* APRES ANIMATIONS */
+	if(flags & ARM_REMOVE)
+		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end();)
+		{
+			map->RemoveAnEntity(*it, USE_DELETE);
+			it = entities.erase(it);
+		}
+	
 	return 0;
 }
 
@@ -255,6 +277,11 @@ void MenAreAntsApp::InGame()
 				if(InGameForm->Chat->NbItems())
 					InGameForm->Chat->RemoveItem(0);
 				timer.reset();
+			}
+			if(selected_entity && chan->State() == EChannel::ANIMING)
+			{
+				selected_entity->Select(false);
+				selected_entity = 0;
 			}
 			while( SDL_PollEvent( &event) )
 			{
@@ -293,6 +320,9 @@ void MenAreAntsApp::InGame()
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
 
+						if(!(chan->State() == EChannel::PLAYING))
+							break;
+
 						ECEntity* entity;
 						ECase* acase;
 						if((entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)) &&
@@ -316,20 +346,20 @@ void MenAreAntsApp::InGame()
 										for(uint i=init_case->X();
 											i != acase->X(); acase->X() < init_case->X() ? --i : ++i)
 											if(acase->X() < init_case->X())
-												move += "<";
+												move += " <";
 											else
-												move += ">";
+												move += " >";
 									if(acase->Y() != init_case->Y())
 										for(uint i=init_case->Y();
 											i != acase->Y(); acase->Y() < init_case->Y() ? --i : ++i)
 											if(acase->Y() < init_case->Y())
-												move += "^";
+												move += " ^";
 											else
-												move += "v";
+												move += " v";
 									if(!move.empty())
 									{
 										client->sendrpl(client->rpl(EC_Client::ARM),
-										std::string(std::string(selected_entity->ID()) + " " + move).c_str());
+										std::string(std::string(selected_entity->ID()) + move).c_str());
 									}
 								}
 							}
@@ -352,6 +382,19 @@ void MenAreAntsApp::InGame()
 	MyFree(InGameForm);
 
 	return;
+}
+
+void TInGameForm::AddInfo(int flags, std::string line)
+{
+	if(!Chat) return;
+
+	SDL_Color c = white_color;
+	if(flags & I_WARNING) c = red_color;
+	else if(flags & I_INFO) c = blue_color;
+	else if(flags & I_ECHO) c = white_color;
+	else if(flags & I_ERROR) c = red_color;
+
+	Chat->AddItem(line, c);
 }
 
 void TInGameForm::ShowBarreLat(bool show)
