@@ -79,6 +79,8 @@ typedef unsigned int   uint;
 /* Macro */
 #define ASIZE(x) 				(sizeof (x) / sizeof *(x))
 
+#define CONFIG_FILE "menareants.cfg"
+
 #ifdef PKGDATADIR /* Définition des chemins */
 #define PKGDATADIR_PICS PKGDATADIR PATH_SEPARATOR "pics" PATH_SEPARATOR
 #define PKGDATADIR_FONTS PKGDATADIR PATH_SEPARATOR "font" PATH_SEPARATOR
