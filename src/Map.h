@@ -49,6 +49,8 @@ public:
 
 	void AddMove(E_Move m);
 	void SetMoves(Vector _moves);
+	void RemoveFirst() { if(!moves.empty()) moves.erase(moves.begin()); }
+	E_Move First() { return *(moves.begin()); }
 
 	ECBCase* Dest() { return dest; }
 	void EstablishDest();
