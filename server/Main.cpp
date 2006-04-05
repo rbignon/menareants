@@ -93,82 +93,77 @@ int ECServer::main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 		}
 
-try {
-#ifndef WIN32
-		if (getenv("HOME"))
+	try {
+		path = GetHome();
+		path += "/.menareantsserver/";
+		DIR *d;
+		if(!(d = opendir(path.c_str())))
+			mkdir( path.c_str(), 0755 );
+		else closedir(d);
+
+		std::cout << "Logs dans: " << path << std::endl;
+
+		conf = new Config(conf_file);
+		if(!conf->load())
 		{
-			path = getenv("HOME");
-			path += "/.menareantsserver/";
-			DIR *d;
-			if(!(d = opendir(path.c_str())))
-				mkdir( path.c_str(), 0755 );
-			else closedir(d);
-
-			std::cout << "Logs dans: " << path << std::endl;
+				std::cout << "Erreur lors de la lecture de la configuration" << std::endl;
+				exit(EXIT_FAILURE);
 		}
-#endif
-
-	conf = new Config(conf_file);
-	if(!conf->load())
-	{
-			std::cout << "Erreur lors de la lecture de la configuration" << std::endl;
+	
+		if(!LoadMaps()) /* L'output est géré par LoadMaps() */
 			exit(EXIT_FAILURE);
-	}
-
-	if(!LoadMaps()) /* L'output est géré par LoadMaps() */
-		exit(EXIT_FAILURE);
-
-	CurrentTS = time(NULL);
-
-	/* Déclarations des commandes */
-	/*                                 NOM		flag		args */
-	Commands.push_back(new IAMCommand("IAM",	0,			0)); /* Args vérifié dans IAMCommand::Exec */
-	Commands.push_back(new PIGCommand("PIG",	0,			0));
-	Commands.push_back(new POGCommand("POG",	0,			0));
-	Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
-	Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
-	Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
-	Commands.push_back(new BYECommand("BYE",	0,			0));
-	Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
-	Commands.push_back(new ERRCommand("ERR",	0,			1));
-	Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
-	Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
-	Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
-
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGALRM, &sig_alarm);
-
-	if(background)
-	{
-		if((tmp = fork()) == -1)
+	
+		CurrentTS = time(NULL);
+	
+		/* Déclarations des commandes */
+		/*                                 NOM		flag		args */
+		Commands.push_back(new IAMCommand("IAM",	0,			0)); /* Args vérifié dans IAMCommand::Exec */
+		Commands.push_back(new PIGCommand("PIG",	0,			0));
+		Commands.push_back(new POGCommand("POG",	0,			0));
+		Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
+		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
+		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
+		Commands.push_back(new BYECommand("BYE",	0,			0));
+		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
+		Commands.push_back(new ERRCommand("ERR",	0,			1));
+		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
+		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
+		Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
+	
+		signal(SIGPIPE, SIG_IGN);
+		signal(SIGALRM, &sig_alarm);
+	
+		if(background)
 		{
-			printf("Impossible de lancer en background\n");
-			exit(0);
+			if((tmp = fork()) == -1)
+			{
+				printf("Impossible de lancer en background\n");
+				exit(0);
+			}
+			if(tmp > 1) exit(0);
 		}
-		if(tmp > 1) exit(0);
+	
+		if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
+		{
+			printf("Core size limitée à %ldk, changement en illimité.\n", rlim.rlim_cur);
+			rlim.rlim_cur = RLIM_INFINITY;
+			rlim.rlim_max = RLIM_INFINITY;
+			setrlimit(RLIMIT_CORE, &rlim);
+		}
+	
+		running = true;
+	
+		if(init_socket())
+			run_server();
+	
 	}
-
-	if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
+	catch(...)
 	{
-		printf("Core size limitée à %ldk, changement en illimité.\n", rlim.rlim_cur);
-		rlim.rlim_cur = RLIM_INFINITY;
-		rlim.rlim_max = RLIM_INFINITY;
-		setrlimit(RLIMIT_CORE, &rlim);
+
 	}
-
-	running = true;
-
-	if(init_socket())
-		run_server();
-
-}
-catch(...)
-{
 	CleanUp();
 	delete conf;
-}
-	CleanUp();
-	delete conf;
+
 	return 0;
 }
 
