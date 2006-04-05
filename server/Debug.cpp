@@ -70,7 +70,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	else if(flags & W_DEBUG)   s ="[DEBUG]   ";
 	s += msg;
 
-	if(!(flags & W_NOLOG))
+	if(!(flags & W_NOLOG) && !(flags & W_DEBUG))
 	{
 		std::ofstream file((app.GetPath() + DEBUG_LOG).c_str(), std::ios_base::app);
 		if(file)
