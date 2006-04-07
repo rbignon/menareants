@@ -22,14 +22,40 @@
 #include "Main.h"
 
 TChildForm::TChildForm(int _x, int _y, uint _w, uint _h)
-	: TComponent(_x, _y, _w, _h)
+	: TComponent(_x, _y, _w, _h), background(0), focus_order(true)
 {
-	background = NULL;
+
 }
 
 void TChildForm::SetBackground(ECImage *image)
 {
 	background = image;
+}
+
+void TChildForm::DelFocus()
+{
+	TComponent::DelFocus();
+	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
+		(*it)->DelFocus();
+}
+
+bool TChildForm::Clic(int _x, int _y)
+{
+	if(!Test(_x,_y)) return false;
+
+	bool click = false;
+	/* Va dans l'ordre inverse */
+	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		if((*it)->Visible() && !click && (*it)->Clic(_x, _y))
+		{
+			(*it)->SetFocus();
+			if((*it)->ClickedFunc())
+				(*(*it)->ClickedFunc()) (this, (*it)->ClickedFuncParam());
+			click = true;
+		}
+		else
+			(*it)->DelFocus();
+	return true;
 }
 
 void TChildForm::Draw(int _x, int _y)
@@ -40,12 +66,13 @@ void TChildForm::Draw(int _x, int _y)
 		SDL_BlitSurface(background->Img,NULL,app.sdlwindow,&r_back);
 	}
 
-	bool first = true;
+	bool first = focus_order ? true : false;
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-			if((*it)->Visible() && (*it)->Focused() == (first ? false : true)) // Affiche seulement à la fin les composants
-				(*it)->Draw(_x, _y);                                            // selectionnés
+			// Affiche seulement à la fin les composants sélectionnés
+			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+				(*it)->Draw(_x, _y);
 		if(first) first = false;
 		else break;
 	}

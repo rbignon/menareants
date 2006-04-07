@@ -25,7 +25,7 @@
 #include <SDL_keyboard.h>
 
 typedef unsigned int   uint;
-typedef void (*TClickedFunction) (void*, void*);
+typedef void (*TClickedFunction) (void* Form, void* Data);
 
 /********************************************************************************************
  *                               TComponent                                                 *
@@ -103,6 +103,8 @@ public:
 	void SetClickedFunc(TClickedFunction c, void* param) { clicked_func = c; clicked_func_param = param; }
 	TClickedFunction ClickedFunc() { return clicked_func; }
 	void* ClickedFuncParam() { return clicked_func_param; }
+
+	int Tag;
 
 /* Variables privées */
 protected:
@@ -189,6 +191,8 @@ public:
 	void Init() {}
 
 	virtual bool Clic (int mouse_x, int mouse_y);
+
+	virtual void DelFocus();
 
 /* Attributs */
 public:

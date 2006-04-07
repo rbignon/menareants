@@ -48,10 +48,12 @@ public:
 
 	virtual void SetXY(int x, int y);
 
+	virtual bool Clic(int x, int y);
+
+	virtual void DelFocus();
+
 /* Variables protégées */
 protected:
-
-	ECImage *background;
 
 	/** Add a component */
 	template<typename T>
@@ -63,9 +65,14 @@ protected:
 		return comp;
 	}
 
+	void SetFocusOrder(bool s = true) { focus_order = s; }
+	bool FocusOrder() { return focus_order; }
+
 /* Variables privées */
 private:
 	std::vector<TComponent*> composants;
+	ECImage *background;
+	bool focus_order;
 };
 
 #endif /* EC_CHILDFORM_H */

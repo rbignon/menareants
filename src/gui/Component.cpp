@@ -97,7 +97,7 @@ bool TList::Clic (int mouse_x, int mouse_y)
 	bool click = false;
 
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
-		if(!click && (*it)->Clic(mouse_x, mouse_y))
+		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y))
 		{
 			(*it)->SetFocus();
 			click = true;
@@ -106,6 +106,13 @@ bool TList::Clic (int mouse_x, int mouse_y)
 			(*it)->DelFocus();
 
 	return click;
+}
+
+void TList::DelFocus()
+{
+	TComponent::DelFocus();
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
+		(*it)->DelFocus();
 }
 
 void TList::SetXY (int px, int py)
@@ -136,7 +143,7 @@ void TComponent::DelFocus()
 
 bool TComponent::Test (int souris_x, int souris_y) const
 {
-  return (((x <= souris_x) && (souris_x <= int(x+w))
+  return (visible && ((x <= souris_x) && (souris_x <= int(x+w))
 	  && (y <= souris_y) && (souris_y <= int(y+h))) && enabled);
 }
 
