@@ -5,7 +5,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 * En cours
 -server: GROS BUG: Lorsque le client veut bouger et qu'il est en conflit déjà avec un mec (sans le savoir),
                    trouver et envoyer l'evenement de mouvement, sinon le client va le faire disparaitre !
--client:InGame.cpp: gestion déplacements pas-a-pas
+-server: Vérifier un bug qui donne une desynch au niveau des positions
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)

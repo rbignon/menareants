@@ -1,3 +1,13 @@
+2005-04-08  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Component.cpp (TList), src/gui/ChildForm.cpp: Gestion des focus et clics
+
+	* src/gui/Form.cpp: Debugage.
+
+	* src/Resources.h, src/data/pics, src/InGame.cpp: Barre d'actions.
+
+	* src/AltThread.cpp: Thread alternatif qui peut recevoir des instructions à executer.
+
 2005-04-05  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Suppression de l'ancien code.
