@@ -74,6 +74,12 @@ public:
 
 	virtual ~ECEntity();
 
+/* Informations */
+public:
+
+	virtual const char* Name() = 0;
+	virtual const char* Infos() = 0;
+
 /* Methodes */
 public:
 

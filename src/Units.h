@@ -34,6 +34,12 @@ public:
 		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
 	{ SetImage(Resources::Army_Face()); }
 
+/* Infos */
+public:
+
+	virtual const char* Name() { return "Armée"; }
+	virtual const char* Infos() { return "Armée de base"; }
+
 /* Methodes */
 public:
 

@@ -289,11 +289,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(InGameForm && InGameForm->BarreLat)
 					{
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
-						InGameForm->ShowBarreLat(true);
+				 		InGameForm->BarreLat->Show();
 				 		for(;InGameForm->BarreLat->X() > SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
 				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y()),
 				 		     SDL_Delay(10));
 				 		InGameForm->Map->SetEnabled(true);
+				 		InGameForm->ShowBarreLat(true);
 				 	}
 				}
 				break;
@@ -304,10 +305,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
 				 		InGameForm->Map->SetEnabled(false);
+				 		InGameForm->ShowBarreLat(false);
 				 		for(;InGameForm->BarreLat->X() < SCREEN_WIDTH;
 				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y()),
 				 		     SDL_Delay(10));
-				 		InGameForm->ShowBarreLat(false);
+				 		InGameForm->BarreLat->Hide();
 				 	}
 				 }
 				 break;
