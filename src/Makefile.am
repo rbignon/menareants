@@ -8,6 +8,7 @@ menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
+		AltThread.cpp \
 		Sockets.cpp \
 		Config.cpp \
 		Debug.cpp \

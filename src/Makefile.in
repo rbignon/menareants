@@ -54,16 +54,16 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareants_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
-	Resources.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
-	Map.$(OBJEXT) Units.$(OBJEXT) JoinGame.$(OBJEXT) \
-	InGame.$(OBJEXT) Font.$(OBJEXT) Images.$(OBJEXT) \
-	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
-	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
-	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
-	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
-	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
-	ShowMap.$(OBJEXT)
+	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
+	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
+	Channels.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
+	JoinGame.$(OBJEXT) InGame.$(OBJEXT) Font.$(OBJEXT) \
+	Images.$(OBJEXT) Maths.$(OBJEXT) Component.$(OBJEXT) \
+	Form.$(OBJEXT) ChildForm.$(OBJEXT) ListBox.$(OBJEXT) \
+	ComboBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
+	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
+	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
+	Image.$(OBJEXT) ShowMap.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -188,6 +188,7 @@ menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
+		AltThread.cpp \
 		Sockets.cpp \
 		Config.cpp \
 		Debug.cpp \
@@ -283,6 +284,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AltThread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Boutton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BouttonText.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
