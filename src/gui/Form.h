@@ -59,8 +59,8 @@
  *      MyListBox = AddComponent(new TListBox(300,200,200,300));
  *      Blah =      AddComponent(new TMemo(75,325,300,200,30));
  *      // Défine the events
- *      Button1->OnClick =    Button1OnClick;
- *      MyListBox->OnSelect = MyListBoxOnSelect;
+ *      Button1->SetClickedFunc(&ButtonClick, 0);
+ *      MyListBox->SetSelectedFunc(&MyListBoxOnSelect, 0);
  *    }
  *    ~TForm1()
  *    {
@@ -141,10 +141,14 @@ protected:
 		return comp;
 	}
 
+	void SetFocusOrder(bool s = true) { focus_order = s; }
+	bool FocusOrder() { return focus_order; }
+
 /* Variables privées */
 private:
 	std::vector<TComponent*> composants;
 	ECImage *background;
+	bool focus_order;
 };
 
 #endif /* EC_FORM_H */

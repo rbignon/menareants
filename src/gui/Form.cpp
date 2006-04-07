@@ -23,8 +23,9 @@
 #include <SDL.h>
 
 TForm::TForm()
+	: background(0), focus_order(true)
 {
-	background = NULL;
+
 }
 
 void TForm::SetBackground(ECImage *image)
@@ -73,8 +74,8 @@ void TForm::Actions(SDL_Event event, uint a)
 			bool click = false;
 			/* Va dans l'ordre inverse */
 			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				if(!click && a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
-				                               : (*it)->Clic(event.button.x, event.button.y))
+				if((*it)->Visible() && !click && a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
+				                                                   : (*it)->Clic(event.button.x, event.button.y))
 				{
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();
@@ -91,20 +92,21 @@ void TForm::Actions(SDL_Event event, uint a)
 	}
 }
 
-void TForm::Update(int x, int y, bool flip)
+void TForm::Update(int _x, int _y, bool flip)
 {
 	if(background)
 		SDL_BlitSurface(background->Img,NULL,app.sdlwindow,NULL);
 
-	if(x < 0 || y < 0)
-		SDL_GetMouseState( &x, &y);
+	if(_x < 0 || _y < 0)
+		SDL_GetMouseState( &_x, &_y);
 
-	bool first = true;
+	bool first = focus_order ? true : false;
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-			if((*it)->Visible() && (*it)->Focused() == (first ? false : true)) // Affiche seulement à la fin les composants
-				(*it)->Draw(x, y);                                             // selectionnés
+			// Affiche seulement à la fin les composants sélectionnés
+			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+				(*it)->Draw(_x, _y);
 		if(first) first = false;
 		else break;
 	}

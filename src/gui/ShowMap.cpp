@@ -65,6 +65,8 @@ void TMap::SetPosition(int _x, int _y, bool force)
 
 ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 {
+	if(!Focused()) return 0;
+
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 		if(dynamic_cast<ECEntity*>(*enti)->Test(mouse_x, mouse_y))
@@ -74,6 +76,8 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 
 ECase* TMap::TestCase(int mouse_x, int mouse_y)
 {
+	if(!Focused()) return 0;
+
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 		if(dynamic_cast<ECase*>(*casi)->Test(mouse_x, mouse_y))
