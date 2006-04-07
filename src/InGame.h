@@ -37,6 +37,37 @@ class ECPlayer;
 /********************************************************************************************
  *                               TInGameForm                                                *
  ********************************************************************************************/
+class TBarreAct : public TChildForm
+{
+public:
+	TBarreAct(ECPlayer*);
+	~TBarreAct();
+
+/* Composants */
+public:
+
+	TLabel*       Name;
+	TLabel*       Nb;
+	TLabel*       Owner;
+	TButtonText*  MoveButton;
+	TButtonText*  AttaqButton;
+	TButtonText*  UpButton;
+
+/* Attributs */
+public:
+
+	ECEntity* Entity() { return entity; }
+	void SetEntity(ECEntity* e);
+
+public:
+
+protected:
+	EChannel* chan;
+	ECPlayer* me;
+	ECEntity* entity;
+	static void vSetEntity(void*);
+};
+
 class TBarreLat : public TChildForm
 {
 public:
@@ -69,14 +100,18 @@ public:
 
 	TMap*      Map;
 	TBarreLat* BarreLat;
+	TBarreAct* BarreAct;
 
 	TMemo*     Chat;
 	TEdit*     SendMessage;
+
+	SDL_Thread* Thread;
 
 /* Methodes */
 public:
 
 	void ShowBarreLat(bool show = true);
+	void ShowBarreAct(bool show = true);
 
 	#define I_INFO     0x001
 	#define I_WARNING  0x002

@@ -34,6 +34,7 @@
 	R_RESOURCE(ECImage,      Titlescreen);
 	R_RESOURCE(ECImage,      Loadscreen);
 	R_RESOURCE(ECImage,      BarreLat);
+	R_RESOURCE(ECImage,      BarreAct);
 	R_RESOURCE(ECImage,      Cadre);
 	R_RESOURCE(ECImage,      FlecheVert);
 	R_RESOURCE(ECImage,      FlecheHoriz);

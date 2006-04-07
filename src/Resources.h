@@ -94,6 +94,7 @@ public:
 	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_PICS "menu.png");
 	R_RESOURCE(ECImage,      Loadscreen,       PKGDATADIR_PICS "loading.png");
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
+	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
 	R_RESOURCE(ECImage,      FlecheVert,       PKGDATADIR_PICS "fleches/fleche_vert.png");
 	R_RESOURCE(ECImage,      FlecheHoriz,      PKGDATADIR_PICS "fleches/fleche_horiz.png");
