@@ -39,7 +39,6 @@ void ECMove::EstablishDest()
 	ECBCase* c = first_case;
 	if(!c) return;
 
- printf("%d,%d\n", c->X(), c->Y());
 	for(Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
 		switch(*it)
 		{
@@ -48,7 +47,6 @@ void ECMove::EstablishDest()
 			case Left: c = c->MoveLeft(); break;
 			case Right: c = c->MoveRight(); break;
 		}
-	printf("%d,%d\n", c->X(), c->Y());
 	dest = c;
 }
 
@@ -319,7 +317,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 					if((*casi)->Flags() & (C_VILLE|C_CAPITALE)/* && ((casi+1) == cas.end() || (casi+2) == cas.end() ||
 					((*(casi+2))->X() == (*casi)->X()+2 && (*(casi+2))->Flags() & (C_TERRE|C_VILLE|C_CAPITALE)))*/)
 					{
-						SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->small.GetTTF()),
+						SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->sm.GetTTF()),
 														TypToStr((*it)->Num()).c_str(), white_color);
 						SDL_Rect dst_rect;
 						dst_rect.x = (*casi)->X()*size_x+1;

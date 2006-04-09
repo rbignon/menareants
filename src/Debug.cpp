@@ -63,7 +63,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	if(flags & W_SEND && app.getclient())
 	{
 		if(vars.empty())
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERROR), FormatStr(s.c_str()).c_str());
+			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORN), FormatStr(s.c_str()).c_str());
 		else
 			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s).c_str(), FormatStr(s).c_str());
 	}

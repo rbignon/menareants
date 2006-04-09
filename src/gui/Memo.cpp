@@ -52,7 +52,7 @@ void TMemo::Init()
   m_down.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
 
   nb_visible_items_max = h/height_item;
-  maxlen = ((w) / app.Font()->small.GetWidth("A"));
+  maxlen = ((w) / app.Font()->sm.GetWidth("A"));
 
   if ( background)
     SDL_FreeSurface( background);
@@ -101,7 +101,7 @@ void TMemo::Draw (int mouse_x, int mouse_y)
   for (uint i=0; i < nb_visible_items; i++)
   {
 	if(!m_items[i+first_visible_item].label.empty())
-		app.Font()->small.WriteLeft(x+5,
+		app.Font()->sm.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 m_items[i+first_visible_item].color) ;

@@ -26,6 +26,8 @@
 #ifndef WIN32
 #include <sys/stat.h>
 #include <dirent.h>
+#else
+#include <getopt.h>
 #endif
 
 #include "Main.h"
@@ -85,6 +87,9 @@ void MenAreAntsApp::setclient(EC_Client* c)
 
 void MenAreAntsApp::quit_app(int value)
 {
+#ifdef WIN32
+		WSACleanup();
+#endif
 		if(conf) delete conf;
 		if(fonts) delete fonts;
 		Resources::Unload();
@@ -95,7 +100,9 @@ int MenAreAntsApp::main(int argc, char **argv)
 {
 	try
 	{
+#ifndef WIN32
 		signal(SIGPIPE, SIG_IGN);
+#endif
 		if(SDL_Init(SDL_INIT_VIDEO) < 0)
 		{
 			std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
@@ -153,6 +160,12 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		fonts = new Fonts;
 
+#ifdef WIN32
+		WSADATA WSAData;
+		if(WSAStartup(MAKEWORD(2,0), &WSAData) != 0)
+			throw ECExcept(VIName(WSAGetLastError()), "Impossible d'initialiser les sockets windows");
+#endif
+
 		SDL_UpdateRect(app.sdlwindow, 0, 0, 0, 0);
 		SDL_Flip(app.sdlwindow);
 
@@ -171,7 +184,15 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		quit_app(1);
 	}
-
+	catch (const TECExcept &e)
+	{
+		std::cout << "Received an ECExcept error: " << std::endl;
+		std::cout << e.Message << std::endl;
+#ifdef DEBUG
+		std::cout << e.Vars << std::endl;
+#endif
+		quit_app(225);
+	}
 	catch (const std::exception &err)
 	{
 		std::cout << std::endl << "Exception caught from STL:" << std::endl;
@@ -185,7 +206,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 int main (int argc, char **argv)
 {
-  app.main(argc,argv);
+  return app.main(argc,argv);
 }
 
 /********************************************************************************************

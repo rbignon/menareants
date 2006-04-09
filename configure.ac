@@ -14,6 +14,16 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+dnl ========================================================================
+dnl == Set flags for various environments                                  =
+dnl ========================================================================
+case "${host}" in
+  i[[3456789]]86-*-mingw32*) WIN32="yes" ;;
+  *cygwin*) WIN32="yes" ;;
+  *) WIN32="no" ;;
+esac
+AM_CONDITIONAL([WIN32], test "$WIN32" = "yes")
+
 # COMPILER ET INSTALLER LE SERVEUR
 
 AC_ARG_ENABLE(  server,
@@ -82,6 +92,11 @@ if test "x${INSTALL_GAME_Q}" = "x1"; then
 	LIBS="$LIBS $SDL_LIBS"
 	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
+fi
+
+# WIN32
+if test "${WIN32}" = "yes"; then
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
 fi
 
 #  WARNINGS

@@ -273,7 +273,7 @@ PACKAGE_VERSION='0.1'
 PACKAGE_STRING='MenAreAnts 0.1'
 PACKAGE_BUGREPORT='bugs@coderz.info'
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB INSTALL_SERVER INSTALL_GAME SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS DATA_FILES MAP_FILES LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE RANLIB ac_ct_RANLIB WIN32_TRUE WIN32_FALSE INSTALL_SERVER INSTALL_GAME SDL_CONFIG CC CFLAGS ac_ct_CC CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE SDL_CFLAGS SDL_LIBS DATA_FILES MAP_FILES LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2655,6 +2655,22 @@ else
 fi
 
 
+case "${host}" in
+  i[3456789]86-*-mingw32*) WIN32="yes" ;;
+  *cygwin*) WIN32="yes" ;;
+  *) WIN32="no" ;;
+esac
+
+
+if test "$WIN32" = "yes"; then
+  WIN32_TRUE=
+  WIN32_FALSE='#'
+else
+  WIN32_TRUE='#'
+  WIN32_FALSE=
+fi
+
+
 # COMPILER ET INSTALLER LE SERVEUR
 
 # Check whether --enable-server or --disable-server was given.
@@ -4076,6 +4092,11 @@ if test "x${INSTALL_GAME_Q}" = "x1"; then
 	CFLAGS="$CFLAGS $SDL_CFLAGS"
 fi
 
+# WIN32
+if test "${WIN32}" = "yes"; then
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
+fi
+
 #  WARNINGS
 # Check whether --enable-warnings or --disable-warnings was given.
 if test "${enable_warnings+set}" = set; then
@@ -4223,6 +4244,13 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WIN32_TRUE}" && test -z "${WIN32_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WIN32\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WIN32\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -4822,6 +4850,8 @@ s,@am__fastdepCXX_TRUE@,$am__fastdepCXX_TRUE,;t t
 s,@am__fastdepCXX_FALSE@,$am__fastdepCXX_FALSE,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+s,@WIN32_TRUE@,$WIN32_TRUE,;t t
+s,@WIN32_FALSE@,$WIN32_FALSE,;t t
 s,@INSTALL_SERVER@,$INSTALL_SERVER,;t t
 s,@INSTALL_GAME@,$INSTALL_GAME,;t t
 s,@SDL_CONFIG@,$SDL_CONFIG,;t t

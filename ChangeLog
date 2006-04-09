@@ -1,3 +1,7 @@
+2005-04-09  Romain Bignon <progs@headfucking.net>
+
+	* src/, WIN32: Portabilité du code du jeu pour windows.
+
 2005-04-08  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Component.cpp (TList), src/gui/ChildForm.cpp: Gestion des focus et clics

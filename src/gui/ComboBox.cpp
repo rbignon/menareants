@@ -33,7 +33,7 @@ void TComboBox::Init()
 {
   // Load images
 
-  visible_len = ((w) / app.Font()->small.GetWidth("A"));
+  visible_len = ((w) / app.Font()->sm.GetWidth("A"));
 
   m_open.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
   m_open.SetXY(x+w-12, y);
@@ -157,10 +157,10 @@ void TComboBox::Draw (int mouse_x, int mouse_y)
 	if(!chaine.empty())
 	{
 		if(chaine.size() > visible_len)
-			app.Font()->small.WriteLeft(x+5, real_y,
+			app.Font()->sm.WriteLeft(x+5, real_y,
 					chaine.substr(0, visible_len), black_color);
 		else
-			app.Font()->small.WriteLeft(x+5, real_y, chaine, black_color);
+			app.Font()->sm.WriteLeft(x+5, real_y, chaine, black_color);
 	}
 
 	if(enabled)

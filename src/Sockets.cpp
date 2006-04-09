@@ -18,17 +18,19 @@
  * $Id$
  */
 
+#include <errno.h>
+#include <cstdarg>
+#ifndef WIN32
+#include <arpa/inet.h>
+#include <netdb.h>
+#endif
+
 #include "Sockets.h"
 #include "Main.h"
 #include "Commands.h"
 #include "Outils.h"
 #include "Channels.h"
 #include "Debug.h"
-
-#include <arpa/inet.h>
-#include <errno.h>
-#include <cstdarg>
-#include <netdb.h>
 
 /* Messages à envoyer */
 const char* msgTab[] = {
@@ -308,7 +310,11 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{
+#ifdef WIN32
+		SetCantConnect(std::string("API WinSock #" + TypToStr(WSAGetLastError())));
+#else
 		SetCantConnect(strerror(errno));
+#endif
 		return false;
 	}
 
@@ -319,7 +325,12 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 EC_Client::~EC_Client()
 {
-	if(connected) close(sock);
+	if(connected)
+#ifdef WIN32
+		closesocket(sock);
+#else
+		close(sock);
+#endif
 	if(pl)
 		delete pl->Channel();
 }

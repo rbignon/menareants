@@ -152,7 +152,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 		}
 	}
 	if(!m_items[i+first_visible_item].label.empty())
-		app.Font()->small.WriteLeft(x+5,
+		app.Font()->sm.WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 !m_items[i+first_visible_item].enabled && gray_disable ? gray_color :

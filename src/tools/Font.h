@@ -99,7 +99,7 @@ public:
   Font large;
   Font big;
   Font normal;
-  Font small;
+  Font sm;
   Font tiny;
 };
 

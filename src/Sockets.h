@@ -22,6 +22,9 @@
 #define EC_Sockets_h
 
 //#include "Main.h"
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 #include "Defines.h"
 #include "Commands.h"
 
@@ -47,7 +50,7 @@ public:
 		IAM,         /**< IAM */
 		PONG,        /**< POG */
 		BYE,         /**< BYE */
-		ERROR,       /**< ERR */
+		ERRORN,      /**< ERR */
 		ERRORV,      /**< ERR */
 		STAT,        /**< STAT */
 
@@ -92,7 +95,11 @@ public:
 	bool Error() { return error; }
 
 protected:
+#ifdef WIN32
+	SOCKET sock;
+#else
 	int sock;
+#endif
 
 	std::vector<EC_ACommand*> Commands;
 	void parse_message(std::string buf);

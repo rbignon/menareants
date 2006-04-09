@@ -196,6 +196,6 @@ Fonts::Fonts() :
   large(32),
   big(24),
   normal(16),
-  small(12),
+  sm(12),
   tiny(8)
 {}

@@ -23,10 +23,6 @@
 
 #include "Resources.h"
 
-#ifdef WIN32
-#	define PKGDATADIR
-#endif
-
 #define R_CLEARTYPE(type) for(std::vector<type*>::iterator it = type##_objects.begin(); it != type##_objects.end(); ++it) \
                           	delete *it; \
                           type##_objects.clear()

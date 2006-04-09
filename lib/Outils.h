@@ -23,6 +23,8 @@
 #include <sstream>
 #include <vector>
 
+typedef unsigned int   uint;
+
 /** Récupère le path du home */
 std::string GetHome();
 

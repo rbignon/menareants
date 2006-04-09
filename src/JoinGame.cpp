@@ -255,9 +255,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 						if(GameInfosForm)
 						{ /* Redéfini la limite des SpinEdit de chaques joueurs */
-							for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
-							it!=GameInfosForm->Players->GetList().end();
-							++it)
+							std::vector<TComponent*> lst = GameInfosForm->Players->GetList();
+							for(std::vector<TComponent*>::iterator it=lst.begin(); it!=lst.end(); ++it)
 							{
 								TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 								if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -730,7 +729,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	JOINED = false;
 	client->sendrpl(create ? client->rpl(EC_Client::CREATE) : client->rpl(EC_Client::JOIN), FormatStr(cname).c_str());
 
-	WAIT_EVENT_T(JOINED, i, 0.1);
+	WAIT_EVENT_T(JOINED, i, 0.2);
 	if(!JOINED)
 	{
 		if(client->Player())
@@ -791,6 +790,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 						}
 						break;
 					case SDL_MOUSEBUTTONDOWN:
+					{
 						if(client->Player()->IsPriv())
 						{
 							GameInfosForm->MapList->SetEnabled();
@@ -840,6 +840,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
 						break;
+					}
 					default:
 						break;
 				}

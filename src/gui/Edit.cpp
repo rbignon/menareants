@@ -46,7 +46,7 @@ void TEdit::Init()
   if ( background)
     SDL_FreeSurface( background);
 
-  visible_len = ((w) / app.Font()->small.GetWidth("A"));
+  visible_len = ((w) / app.Font()->sm.GetWidth("A"));
 
   if(!show_background) return;
 
@@ -68,11 +68,11 @@ void TEdit::Draw (int m_x, int m_y)
   if(!focus && chaine.empty()) return;
 
   if(chaine.size() > visible_len)
-	app.Font()->small.WriteLeft(x+5, y,
+	app.Font()->sm.WriteLeft(x+5, y,
 			 chaine.substr(first_char, first_char+visible_len) + std::string(focus ? "_" : ""),
 			 black_color);
   else
-	app.Font()->small.WriteLeft(x+5, y, chaine + std::string(focus ? "_" : ""), black_color);
+	app.Font()->sm.WriteLeft(x+5, y, chaine + std::string(focus ? "_" : ""), black_color);
 }
 
 void TEdit::PressKey(SDL_keysym key)

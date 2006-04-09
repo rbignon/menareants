@@ -23,10 +23,6 @@
 #include "Defines.h"
 #include "Debug.h"
 
-#ifdef WIN32
-#	define PKGDATADIR
-#endif
-
 SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags){
 
   SDL_Surface* surface = SDL_CreateRGBSurface(flags, width, height, 32,
@@ -282,7 +278,8 @@ ECImage &ECImage::operator=(const ECImage & src){
 void ECImage::Load(char *fichier)
 {
 	//SDL_Surface *tmp;
-	Img = IMG_Load(fichier);
+	if(!(Img = IMG_Load(fichier)))
+		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
 	SetColorKey(255,0,255);
 	//Img = SDL_DisplayFormat(tmp);
 	//SDL_FreeSurface(Img);
@@ -316,6 +313,7 @@ void ECImage::Draw()
 
 void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)
 {
+	if(!Img) return;
 	SDL_SetColorKey(Img, SDL_SRCCOLORKEY, SDL_MapRGB(Img->format, r, g, b));
 }
 

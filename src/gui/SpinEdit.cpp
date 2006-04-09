@@ -42,7 +42,7 @@ TSpinEdit::TSpinEdit(std::string _label, int _x, int _y, uint _width, int _min, 
 	txt_value = NULL;
 	m_plus = NULL;
 	m_minus = NULL;
-	font = &app.Font()->small;
+	font = &app.Font()->sm;
 	color = white_color;
 }
 

@@ -582,14 +582,14 @@ TBarreLat::TBarreLat(ECPlayer* pl)
 
 	PretButton = AddComponent(new TButtonText(30,170,50,20, "Pret"));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	PretButton->SetFont(&app.Font()->small);
+	PretButton->SetFont(&app.Font()->sm);
 
 	chan->Map()->CreatePreview(138,138, true);
 	Radar->SetImage(chan->Map()->Preview(), false);
 
-	Money = AddComponent(new TLabel(50, 1, TypToStr(pl->Money()) + " $", white_color, &app.Font()->small));
-	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->small));
-	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(pl->TurnMoney()) + "$.t-1", white_color, &app.Font()->small));
+	Money = AddComponent(new TLabel(50, 1, TypToStr(pl->Money()) + " $", white_color, &app.Font()->sm));
+	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->sm));
+	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(pl->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
 
 	SetBackground(Resources::BarreLat());
 }

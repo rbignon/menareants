@@ -21,9 +21,7 @@
 #ifndef EC_Defines_h
 #define EC_Defines_h
 
-#ifndef WIN32
-	#include <config.h>
-#endif
+#include <config.h>
 
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants"
@@ -81,15 +79,15 @@ typedef unsigned int   uint;
 
 #define CONFIG_FILE "menareants.cfg"
 
-#ifdef PKGDATADIR /* Définition des chemins */
+#ifdef WIN32
+#undef PKGDATADIR
+#define PKGDATADIR "data"
+#endif
+
+/* Définition des chemins */
 #define PKGDATADIR_PICS PKGDATADIR PATH_SEPARATOR "pics" PATH_SEPARATOR
 #define PKGDATADIR_FONTS PKGDATADIR PATH_SEPARATOR "font" PATH_SEPARATOR
 #define PKGDATADIR_ANIMS PKGDATADIR PATH_SEPARATOR "anims" PATH_SEPARATOR
-#else
-#define PKGDATADIR_PICS "pics" PATH_SEPARATOR
-#define PKGDATADIR_FONTS "font" PATH_SEPARATOR
-#define PKGDATADIR_ANIMS "anims" PATH_SEPARATOR
-#endif /* PKGDATADIR */
 
 #define WAIT_EVENT(x,y) for(int y=0; !(x) && (y)<2000; SDL_Delay(1), (y++))
 #define WAIT_EVENT_T(x,y, t) for(int y=0; !(x) && (y)<((t)*1000); SDL_Delay(1), (y++))
