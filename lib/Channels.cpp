@@ -88,11 +88,9 @@ bool ECBPlayer::SetNation(unsigned int n)
  ********************************************************************************************/
 
 ECBChannel::ECBChannel(std::string _name)
-	: name(_name)
+	: name(_name), state(WAITING), limite(0), map(0)
 {
-	state = WAITING;
-	limite = 0;
-	map = 0;
+
 }
 
 ECBChannel::~ECBChannel()
@@ -127,25 +125,6 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
-
-/** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
-std::string ECBChannel::ModesStr() const
-{
-	std::string modes = "+", params = "";
-	if(limite) modes += "l", params += " " + TypToStr(limite);
-#if 0 /* Il n'y a *PAS* d'envoie du +m là !!!!!! */
-	 if(map)    modes += "m";
-#endif
-	switch(state)
-	{
-		case WAITING: modes += "W"; break;
-		case SENDING: modes += "S"; break;
-		case PLAYING: modes += "P"; break;
-		case ANIMING: modes += "A"; break;
-	}
-	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
-	return (modes + params);
-}
 
 /** \attention En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
  * \note il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas

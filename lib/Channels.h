@@ -73,9 +73,9 @@ public:
 public:
 
 	/** Player's Channel. */
-	ECBChannel *Channel() { return chan; }
+	ECBChannel *Channel() const { return chan; }
 
-	int Money() { return money; }                      /**< This is player's money. */
+	int Money() const { return money; }                /**< This is player's money. */
 	virtual void UpMoney(int m) { money += m; }        /**< Add some money. */
 	virtual void DownMoney(int m) { money -= m; }      /**< Remove some money. */
 	virtual void SetMoney(int m) { money = m; }        /**< Set money. */
@@ -106,12 +106,12 @@ public:
 	bool Ready() const { return ready; }                /**< Is player ready ? */
 	void SetReady(bool r = true) { ready = r; }         /**< Set player. */
 
-	ECBMapPlayer* MapPlayer() { return mp; }
+	ECBMapPlayer* MapPlayer() const { return mp; }
 	void SetMapPlayer(ECBMapPlayer* _mp) { mp = _mp; }
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
-	uint TurnMoney() { return turn_money; }
+	uint TurnMoney() const { return turn_money; }
 	void SetTurnMoney(uint u) { turn_money = u; }
 
 /* Variables privées */
@@ -203,15 +203,6 @@ public:
 	 * \note Pour plus d'informations sur la syntaxe, consulter API paragraphe 5. PLS
 	 */
 	std::string PlayerList();
-
-	/** Return a formated modes list.
-	 * It is used to send to client a mode list when it joined.
-	 *
-	 * \return formated list of modes.
-	 *
-	 * \note Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
-	 */
-	std::string ModesStr() const;
 
 /* Variables privées */
 protected:
