@@ -36,7 +36,6 @@ typedef ECBMer         ECMer;
 typedef ECBTerre       ECTerre;
 typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
-typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
 
@@ -169,6 +168,21 @@ typedef std::vector<ECEvent*> EventVector;
 //typedef std::set<ECEvent*, SortEventsFunction> EventVector;
 
 /********************************************************************************************
+ *                                 ECountry                                                 *
+ ********************************************************************************************/
+class ECountry : public ECBCountry
+{
+/* Constructeur/Destructeur */
+public:
+	ECountry(ECBMap* map, const Country_ID ident) : ECBCountry(map, ident) {}
+
+/* Methodes */
+public:
+	bool ChangeOwner(ECBMapPlayer* mp);
+};
+
+
+/********************************************************************************************
  *                                 ECMap                                                    *
  ********************************************************************************************/
 class ECMap : public ECBMap
@@ -204,6 +218,7 @@ public:
 protected:
 	EventVector map_events;
 	uint i;
+	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECountry(m, ident); }
 };
 
 extern bool LoadMaps();

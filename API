@@ -103,6 +103,7 @@ Sommaire:
          +n <nation>         :l'user définie sa nation
          +!                  :le joueur est READY
          +$                  :l'argent du joueur (serveur -> user uniquement)
+         +@ <country>        :l'user possède maintenant la terre <country>
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible

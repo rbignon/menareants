@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "Debug.h"
 #include "Channels.h"
+#include "Main.h"
 #include <fstream>
 #include <algorithm>
 
@@ -109,6 +110,22 @@ struct SortEventsFunction
 void ECMap::SortEvents()
 {
 	std::sort(map_events.begin(), map_events.end(), SortEventsFunction());
+}
+
+/********************************************************************************************
+ *                                 ECountry                                                 *
+ ********************************************************************************************/
+
+bool ECountry::ChangeOwner(ECBMapPlayer* mp)
+{
+	if(ECBCountry::ChangeOwner(mp) && owner && owner->Player())
+	{
+		EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
+		chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
+		                        std::string(std::string("+@ ") + ident).c_str());
+		return true;
+	}
+	return false;
 }
 
 /********************************************************************************************
