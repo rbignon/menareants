@@ -780,7 +780,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 				if(!(*it)) continue; // Possible
 				if(!(*it)->Move()->FirstCase())
 				{
-					Debug(W_WARNING, "Il n'y a pas de FirstCase !?");
+					FDebug(W_WARNING, "Il n'y a pas de FirstCase !?");
 					continue;
 				}
 				ECEntity* entity = (*it)->Entity();
@@ -792,8 +792,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		}
 		else
 			for(std::vector<ECEntity*>::const_iterator it = et.begin(); it != et.end(); ++it)
-				to_send += " =" + (*it)->LongName() + "," + TypToStr((*it)->Case()->X()) +
-				                                      "," + TypToStr((*it)->Case()->Y());
+				to_send += " =" + (*it)->LongName() + "," + TypToStr(x) +
+				                                      "," + TypToStr(y);
 	}
 	if(flag & ARM_ATTAQ)
 		to_send += " *" + TypToStr(x) + "," + TypToStr(y);
@@ -851,8 +851,11 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
 					                                                                        to_send.c_str());
 			}
-			flag &= ~ARM_HIDE;
-			SendArm(cl, et, flag|ARM_RECURSE, x, y, nb, type, events);
+			if(!(flag & ARM_NOCONCERNED))
+			{
+				flag &= ~ARM_HIDE;
+				SendArm(cl, et, flag|ARM_RECURSE, x, y, nb, type, events);
+			}
 		}
 		else
 			sendto_players(NULL, app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
@@ -1054,4 +1057,22 @@ bool EChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
 	/// \todo supporter la suppression des unités, et la mise à neutre des territoires
 	return ECBChannel::RemovePlayer(pl, use_delete);
+}
+
+/** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
+std::string EChannel::ModesStr() const
+{
+	std::string modes = "+", params = "";
+	if(limite) modes += "l", params += " " + TypToStr(limite);
+	if(map)    modes += "m", params += " " + TypToStr(Map()->Num());
+
+	switch(state)
+	{
+		case WAITING: modes += "W"; break;
+		case SENDING: modes += "S"; break;
+		case PLAYING: modes += "P"; break;
+		case ANIMING: modes += "A"; break;
+	}
+	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
+	return (modes + params);
 }

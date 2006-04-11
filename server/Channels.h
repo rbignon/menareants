@@ -137,18 +137,20 @@ public:
 	 *
 	 * <pre>
 	 * Flags: (Definition in lib/Map.h before ECBEntity)
-	 * ARM_MOVE      0x001
-	 * ARM_SPLIT     0x002
-	 * ARM_ATTAQ     0x004
-	 * ARM_REMOVE    0x008
-	 * ARM_LOCK      0x010
-	 * ARM_TYPE      0x020
-	 * ARM_NUMBER    0x040
-	 * ARM_RETURN    0x080
-	 * ARM_HIDE      0x100  (if you want to hide informations to players who haven't any entity in \a et list)
-	 * ARM_RECURSE   0x200  (NEVER CALL IT)
-	 * ARM_UNION     (ARM_MOVE|ARM_NUMBER)
-	 * ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+	 * ARM_MOVE        0x001
+	 * ARM_SPLIT       0x002
+	 * ARM_ATTAQ       0x004
+	 * ARM_REMOVE      0x008
+	 * ARM_LOCK        0x010
+	 * ARM_TYPE        0x020
+	 * ARM_NUMBER      0x040
+	 * ARM_RETURN      0x080
+	 * ARM_HIDE        0x100  (if you want to hide informations to players who haven't any entity in \a et list)
+	 * ARM_RECURSE     0x200  (NEVER CALL IT)
+	 * ARM_NOCONCERNED 0x0400 (if you don't want to send it to the others players of owner)
+	 * ARM_UNION       (ARM_MOVE|ARM_NUMBER)
+	 * ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+
 	 * </pre>
 	 */
 	void SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
@@ -165,6 +167,15 @@ public:
 	void InitAnims();
 
 	void NextAnim();
+
+	/** Return a formated modes list.
+	 * It is used to send to client a mode list when it joined.
+	 *
+	 * \return formated list of modes.
+	 *
+	 * \note Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
+	 */
+	std::string ModesStr() const;
 	
 /* Attributs */
 public:
@@ -184,7 +195,7 @@ public:
 	 */
 	virtual void SetLimite(unsigned int l);
 
-	ECMap *Map() const { return (ECMap*)map; }
+	ECMap *Map() const { return static_cast<ECMap*>(map); }
 
 	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 
