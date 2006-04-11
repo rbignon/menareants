@@ -83,7 +83,7 @@ class EChannel : public ECBChannel
 public:
 
 	EChannel(std::string _name)
-		: ECBChannel(_name), want_leave(false)
+		: ECBChannel(_name), want_leave(false), current_event(0)
 	{}
 
 	virtual ~EChannel();
@@ -102,9 +102,13 @@ public:
 	bool WantLeave() const { return want_leave; }
 	void SetWantLeave() { want_leave = true; }
 
+	uint CurrentEvent() const { return current_event; }
+	void SetCurrentEvent(uint e) { current_event = e; }
+
 /* Variables privées */
 protected:
 	bool want_leave;
+	uint current_event;
 };
 
 #endif /* EC_CHANNELS_H */
