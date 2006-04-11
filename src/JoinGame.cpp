@@ -910,7 +910,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			}
 			GameInfosForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
-		        client->Player()->Channel()->State() != EChannel::SENDING);
+		        client->Player()->Channel()->State() == EChannel::WAITING);
 	
 	}
 	catch(TECExcept &e)
