@@ -153,11 +153,11 @@ int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(GameInfosForm)
-		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
-	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
 	if(InGameForm)
-		InGameForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
+		InGameForm->AddInfo(I_CHAT, "<" + parv[0] + "> " + parv[1],
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? 0 : *(players.begin()));
+	else if(GameInfosForm)
+		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
 
 	return 0;
@@ -284,9 +284,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					/* On incrémente la date si ce n'est pas justement le premier jour */
 					if(chan->State() != EChannel::SENDING)
 						chan->Map()->NextDay();
-					chan->SetState(EChannel::PLAYING);
 					if(InGameForm && InGameForm->BarreLat)
 					{
+						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
 				 		for(;InGameForm->BarreLat->X() > SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
@@ -295,6 +295,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 		InGameForm->Map->SetEnabled(true);
 				 		InGameForm->ShowBarreLat(true);
 				 	}
+				 	chan->SetState(EChannel::PLAYING);
 				}
 				break;
 			case 'A':
@@ -303,6 +304,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	chan->SetState(EChannel::ANIMING);
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
+				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
 				 		for(;InGameForm->BarreLat->X() < SCREEN_WIDTH;
@@ -319,8 +321,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(GameInfosForm)
 					{
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
-						GameInfosForm->MyPosition->SetEnabled();
-						GameInfosForm->MyColor->SetEnabled();
+						if(GameInfosForm->MyPosition)
+							GameInfosForm->MyPosition->SetEnabled();
+						if(GameInfosForm->MyColor)
+							GameInfosForm->MyColor->SetEnabled();
 						if(!me->Player()->IsOwner())
 							GameInfosForm->PretButton->SetEnabled(true);
 					}
@@ -330,6 +334,40 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				else
 					Debug(W_DESYNCH|W_SEND, "SET -m: theoriquement impossible");
 				break;
+			case '@':
+			{
+				if(!players.size() || !add || j >= parv.size() || !chan->Map())
+				{
+					Debug(W_DESYNCH|W_SEND, "SET %c@: incorrect", add ? '+' : '-');
+					break;
+				}
+				BCountriesVector cv = chan->Map()->Countries();
+				const char* ident = parv[j++].c_str();
+				for(BCountriesVector::iterator ci = cv.begin(); ci != cv.end(); ++ci)
+					if(!strcmp((*ci)->ID(), ident))
+					{
+						bool update = false;
+						if(InGameForm && (*ci)->Owner() && (*ci)->Owner()->Player() == me->Player())
+						{
+							update = true;
+							InGameForm->AddInfo(I_SHIT, std::string(players[0]->GetNick()) + " vient de vous piquer " +
+							                            std::string(ident));
+						}
+
+						(*ci)->ChangeOwner(players[0]->MapPlayer());
+						if(InGameForm)
+						{
+							if(!update)
+						 		InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
+						 	                                players[0]->GetNick());
+							if(InGameForm->BarreLat && players[0]->IsMe() || update)
+								InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(players[0]->TurnMoney()) + "$.t-1");
+							chan->Map()->CreatePreview(120,120, true);
+						}
+						break;
+					}
+				break;
+			}
 			case '!':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %c!: sans sender", add ? '+' : '-'); break; }
 				for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
@@ -343,6 +381,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							me->sendrpl(me->rpl(EC_Client::SET), "+!");
 						if(InGameForm)
 							InGameForm->BarreLat->PretButton->SetEnabled(!add);
+						/* En mode ANIMING, la confirmation de chaque evenement est manifesté par le +!
+						 * et marque la fin d'un evenement, donc on a plus besoin de s'en rappeler.
+						 * On peut considérer qu'on passe par là à chaques fins d'evenements
+						 */
+						if(add && chan->State() == EChannel::ANIMING)
+							chan->SetCurrentEvent(0);
 					}
 					else if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready() && GameInfosForm)
 					{
@@ -359,17 +403,22 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			case '$':
 				if(j>=parv.size()) Debug(W_DESYNCH|W_SEND, "SET %c$: sans argent", add ? '+' : '-');
+				else if(players.empty()) Debug(W_DESYNCH|W_SEND, "SET %c$: sans sender", add ? '+' : '-');
+				else if(!add) Debug(W_DESYNCH|W_SEND, "SET -$: interdit");
 				else
 				{
-					if(InGameForm)
+					int money = StrToTyp<int>(parv[j++]);
+					if(InGameForm && players[0]->IsMe())
 					{
-						SDL_Delay(100);
-						InGameForm->BarreLat->Money->SetCaption(parv[j] + " $");
+						if((money - players[0]->Money()) > 0)
+							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
+						SDL_Delay(50);
+						InGameForm->BarreLat->Money->SetCaption(TypToStr(money) + " $");
 						InGameForm->BarreLat->Money->SetColor(red_color);
-				 		SDL_Delay(300);
+				 		SDL_Delay(200);
 				 		InGameForm->BarreLat->Money->SetColor(white_color);
 					}
-					me->Player()->SetMoney(StrToTyp<int>(parv[j++]));
+					players[0]->SetMoney(money);
 				}
 				break;
 			case 'o':
@@ -876,10 +925,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			client->Player()->Channel()->SetWantLeave();
 			client->sendrpl(client->rpl(EC_Client::LEAVE));
 		}
-		
+
 		WAIT_EVENT(!JOINED, i);
 	}
-	
+
 	return true;
 }
 
