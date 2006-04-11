@@ -208,9 +208,9 @@ int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 static TPlayerLine* GetPlayerLineFromPlayer(ECPlayer* pl)
 {
 	if(GameInfosForm)
-		for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
-		it!=GameInfosForm->Players->GetList().end();
-		++it)
+	{
+		std::vector<TComponent*> list = GameInfosForm->Players->GetList();
+		for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 		{
 			TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 			if(!pline) /* Ce n'est pas un TPlayerLine */
@@ -218,6 +218,7 @@ static TPlayerLine* GetPlayerLineFromPlayer(ECPlayer* pl)
 			if(pl == pline->Player())
 				return pline;
 		}
+	}
 	return NULL;
 }
 #endif
@@ -274,8 +275,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'S':
 				if(add)
 				{
-					chan->SetState(EChannel::SENDING);
 					LoadingGame(me);
+					chan->SetState(EChannel::SENDING);
 				}
 				break;
 			case 'P':
@@ -283,7 +284,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				{
 					/* On incrémente la date si ce n'est pas justement le premier jour */
 					if(chan->State() != EChannel::SENDING)
+					{
 						chan->Map()->NextDay();
+						chan->Map()->CreatePreview(120,120, true);
+					}
 					if(InGameForm && InGameForm->BarreLat)
 					{
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
@@ -336,7 +340,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			case '@':
 			{
-				if(!players.size() || !add || j >= parv.size() || !chan->Map())
+				if(!players.size() || j >= parv.size() || !chan->Map())
 				{
 					Debug(W_DESYNCH|W_SEND, "SET %c@: incorrect", add ? '+' : '-');
 					break;
@@ -350,19 +354,26 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(InGameForm && (*ci)->Owner() && (*ci)->Owner()->Player() == me->Player())
 						{
 							update = true;
-							InGameForm->AddInfo(I_SHIT, std::string(players[0]->GetNick()) + " vient de vous piquer " +
+							if(add)
+								InGameForm->AddInfo(I_SHIT, std::string(players[0]->GetNick()) + " vient de vous piquer " +
 							                            std::string(ident));
+							else
+								InGameForm->AddInfo(I_SHIT, "Votre country "+std::string(ident) + " est devenue neutre !");
 						}
 
-						(*ci)->ChangeOwner(players[0]->MapPlayer());
+						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
 						if(InGameForm)
 						{
 							if(!update)
-						 		InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
-						 	                                players[0]->GetNick());
+							{
+								if(add)
+									InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
+								                                players[0]->GetNick());
+								else
+									InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
+							}
 							if(InGameForm->BarreLat && players[0]->IsMe() || update)
 								InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(players[0]->TurnMoney()) + "$.t-1");
-							chan->Map()->CreatePreview(120,120, true);
 						}
 						break;
 					}
@@ -737,6 +748,8 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 				LoadingForm->Players->Show();
 			}
+			if(InGameForm)
+				InGameForm->AddInfo(I_INFO, "*** " + std::string((*playersi)->GetNick()) + " quitte la partie");
 			if(me->Player()->Channel()->RemovePlayer((*playersi), USE_DELETE))
 				playersi = players.erase(playersi);
 			else
@@ -849,9 +862,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 								                ("+m " + TypToStr(GameInfosForm->MapList->GetSelectedItem())).c_str());
 
 							if(client->Player()->IsOwner())
-								for(std::vector<TComponent*>::iterator it=GameInfosForm->Players->GetList().begin();
-								it!=GameInfosForm->Players->GetList().end();
-								++it)
+							{
+								std::vector<TComponent*> list = GameInfosForm->Players->GetList();
+								for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 								{
 									TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
 									if(pll && pll->OwnZone(event.button.x, event.button.y) && !pll->Player()->IsMe() &&
@@ -865,6 +878,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 														("+o " + std::string(pll->Player()->GetNick())).c_str());
 									}
 								}
+							}
 						}
 						else
 							GameInfosForm->MapList->SetEnabled(false);

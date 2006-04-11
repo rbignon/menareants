@@ -294,6 +294,7 @@ public:
 	std::vector<ECEntity*> ECEntityList::CanCreatedBy(T c) const
 	{
 		std::vector<ECEntity*> l;
+		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
 			if(c->CanCreate(*it))
 				l.push_back(*it);

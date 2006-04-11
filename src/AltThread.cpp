@@ -33,6 +33,7 @@ int ECAltThread::Exec(void *data)
 	if(running) return 0;
 
 	running = true;
+	want_quit = false;
 	while(!want_quit)
 	{
 		if(!functions.empty())

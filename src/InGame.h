@@ -131,6 +131,7 @@ public:
 	TImage*      Radar;
 	TButtonText* PretButton;
 	TButtonText* QuitButton;
+	TButtonText* SchemaButton;
 	TLabel*      Date;
 	TLabel*      Money;
 	TLabel*      TurnMoney;

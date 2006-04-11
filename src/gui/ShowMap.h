@@ -30,7 +30,7 @@ class TMap : public TComponent
 public:
 
 	TMap(ECMap* _map)
-		: TComponent(0,0), map(_map), x_min(0), y_min(0)
+		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0)
 	{}
 
 /* Methodes */
@@ -63,13 +63,18 @@ public:
 /* Attributs */
 public:
 
-	int Xmin() { return x_min; }
-	int Ymin() { return y_min; }
+	int Xmin() const { return x_min; }
+	int Ymin() const { return y_min; }
 	void SetContraintes(int _x, int _y) { x_min = _x; y_min = _y; }
 
-/* Variables protégées */
-protected:
+	bool Schema() const { return schema; }
+	void SetSchema(bool s = true) { schema = s; }
+	void ToggleSchema() { schema = !schema; }
+
+/* Variables privées */
+private:
 	ECMap* map;
+	bool schema;
 	int x_min, y_min;
 };
 

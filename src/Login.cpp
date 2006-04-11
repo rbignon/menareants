@@ -277,7 +277,7 @@ void MenAreAntsApp::request_game()
 TConnectedForm::TConnectedForm()
 	: TForm()
 {
-	Welcome = AddComponent(new TLabel(200,100,"Vous êtes bien connecté", white_color, &app.Font()->big));
+	Welcome = AddComponent(new TLabel(100,110,"Vous êtes bien connecté", white_color, &app.Font()->big));
 
 	Motd = AddComponent(new TMemo(75,150,500,350, 0));
 

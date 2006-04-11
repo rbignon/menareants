@@ -318,11 +318,22 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 					                  marge & MARGE_RIGHT && _xx == xx+size_x-1) ? marge_color : color;
 					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r, col->g, col->b));
 				}
-			/*putpixel(surf, xx+1, yy, SDL_MapRGB(surf->format, color->r, color->g, color->b));
-			putpixel(surf, xx, yy+1, SDL_MapRGB(surf->format, color->r, color->g, color->b));
-			putpixel(surf, xx+1, yy+1, SDL_MapRGB(surf->format, color->r, color->g, color->b));
-			*/
 		}
+	/* Position des unités */
+	if(ingame)
+	{
+		std::vector<ECBEntity*> ents = entities.List();
+		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		{
+			if(!(*enti)->Owner()) continue;
+			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
+			for(uint _yy = (*enti)->Case()->Y() * size_y; _yy < yy+size_y; _yy++)
+				for(uint _xx = (*enti)->Case()->X() * size_x; _xx < xx+size_x; _xx++)
+					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r > 10 ? col->r - 10 : 0,
+					                                                  col->g > 10 ? col->g - 10 : 0,
+					                                                  col->b > 10 ? col->b - 10 : 0));
+		}
+	}
 
 	/* Numero du player */
 	if(!ingame)
