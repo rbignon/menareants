@@ -159,6 +159,8 @@ public:
 
 	void Free();
 
+	void SetImage(SDL_Surface* i) { Free(); Img = i; }
+
 /* Variables publiques */
 public:
 	SDL_Surface* Img;
