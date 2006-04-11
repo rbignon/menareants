@@ -29,6 +29,24 @@
 #include "Map.h"
 #include "Resources.h"
 #include "Channels.h"
+#include "Units.h"
+
+/********************************************************************************************
+ *                               ECEntityList                                               *
+ ********************************************************************************************/
+
+ECEntityList EntityList;
+
+ECEntityList::ECEntityList()
+{
+	entities.push_back(new ECArmy());
+}
+
+ECEntityList::~ECEntityList()
+{
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		delete *it;
+}
 
 /********************************************************************************************
  *                                   ECMove                                                 *
@@ -114,9 +132,9 @@ void ECEntity::ChangeCase(ECBCase* newcase)
  ********************************************************************************************/
 
 ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: ECBCase(_map, _x, _y, _flags, _type_id)
+	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0)
 {
-	image = 0;
+
 }
 
 ECase::~ECase()
@@ -133,7 +151,11 @@ bool ECase::Test(int souris_x, int souris_y)
 void ECase::Draw()
 {
 	if(image)
+	{
 		image->draw();
+		if(selected)
+			Resources::Cadre()->Draw(image->X(),image->Y());
+	}
 }
 
 void ECase::SetImage(ECSpriteBase* spr)
@@ -332,6 +354,8 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			}
 		}
 	}
-	if(preview) delete preview;
-	preview = new ECImage(surf);
+	if(preview)
+		preview->SetImage(surf);
+	else
+		preview = new ECImage(surf);
 }

@@ -77,8 +77,9 @@ public:
 /* Informations */
 public:
 
-	virtual const char* Name() = 0;
-	virtual const char* Infos() = 0;
+	virtual const char* Name() const = 0;
+	virtual const char* Infos() const = 0;
+	virtual ECImage* Icon() const = 0;
 
 /* Methodes */
 public:
@@ -97,7 +98,7 @@ public:
 	bool Test(int x, int y);
 
 	void Draw();
-	ECSprite* Image() { return image; }
+	ECSprite* Image() const { return image; }
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
 
@@ -124,7 +125,7 @@ class ECase : public virtual ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECase() { image = 0; }
+	ECase() : image(0), selected(0) { }
 
 	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
@@ -136,15 +137,21 @@ public:
 /* Attributs */
 public:
 
+	virtual const char* Name() const = 0;
+
 	bool Test(int x, int y);
 
 	void Draw();
-	ECSprite* Image() { return image; }
+	ECSprite* Image() const { return image; }
 	void SetImage(ECSpriteBase* spr);
+
+	void Select(bool s = true) { selected = s; }
+	bool Selected() const { return selected; }
 
 /* Variables privées */
 protected:
 	ECSprite* image;
+	bool selected;
 };
 
 /** This class is a derived class from ECBCase whose is a city */
@@ -156,6 +163,8 @@ public:
 
 /* Methodes */
 public:
+
+	virtual const char* Name() const { return flags & C_CAPITALE ? "Capitale" : "Ville"; }
 
 /* Attributs */
 public:
@@ -175,6 +184,8 @@ public:
 /* Methodes */
 public:
 
+	virtual const char* Name() const { return "Terre"; }
+
 /* Attributs */
 public:
 
@@ -193,6 +204,8 @@ public:
 /* Methodes */
 public:
 
+	virtual const char* Name() const { return "Mer"; }
+
 /* Attributs */
 public:
 
@@ -210,6 +223,8 @@ public:
 
 /* Methodes */
 public:
+
+	virtual const char* Name() const { return "Pont"; }
 
 /* Attributs */
 public:
@@ -259,5 +274,37 @@ protected:
 
 	virtual void SetCaseAttr(ECBCase*, char);
 };
+
+/********************************************************************************************
+ *                               ECEntityList                                               *
+ ********************************************************************************************/
+
+class ECEntityList
+{
+/* Constructeur/Destructeur */
+public:
+	ECEntityList();
+	~ECEntityList();
+
+/* Attributs */
+public:
+	std::vector<ECEntity*> List() const { return entities; }
+
+	template<typename T>
+	std::vector<ECEntity*> ECEntityList::CanCreatedBy(T c) const
+	{
+		std::vector<ECEntity*> l;
+		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
+			if(c->CanCreate(*it))
+				l.push_back(*it);
+		return l;
+	}
+
+/* Variables privées */
+private:
+	std::vector<ECEntity*> entities;
+};
+
+extern ECEntityList EntityList;
 
 #endif /* EC_MAP_H */
