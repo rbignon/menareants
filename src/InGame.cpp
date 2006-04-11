@@ -21,6 +21,7 @@
 #include "InGame.h"
 #include "Resources.h"
 #include "gui/ColorEdit.h"
+#include "gui/MessageBox.h"
 #include "Outils.h"
 #include "Main.h"
 #include "Debug.h"
@@ -47,6 +48,10 @@ static struct
 	/* E_END  */{ NULL }
 };
 
+#define L_INFO(x)    if(InGameForm) InGameForm->AddInfo(I_INFO,(x))
+#define L_WARNING(x) if(InGameForm) InGameForm->AddInfo(I_WARNING,(x))
+#define L_SHIT(x)    if(InGameForm) InGameForm->AddInfo(I_SHIT,(x))
+#define L_GREAT(x)   if(InGameForm) InGameForm->AddInfo(I_GREAT,(x))
 /** :nick!entity[,nick!entity ...] ARM [*x,y] [%type] [\<x,y] [=id,x,y,[v][^][<][>]] [-] [+[number]] */
 int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -81,7 +86,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case '+':
 			{
 				flags |= ARM_NUMBER;
-				if(is_num(parv[i].substr(1).c_str()))
+				if(parv[i].size() > 1 && is_num(parv[i].substr(1).c_str()))
 					nb = StrToTyp<uint>(parv[i].substr(1));
 				break;
 			}
@@ -151,7 +156,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(x,y), nb);
 			map->AddAnEntity(entity);
-			if(InGameForm) InGameForm->AddInfo(I_INFO, "Création d'une unité pour " + nick);
 		}
 		if(!moves_str.empty())
 		{
@@ -184,11 +188,21 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		entities.push_back(entity);
 	}
+	/* On en est à la première ligne de l'evenement. */
+	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent())
+		chan->SetCurrentEvent(flags);
+
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
 		if(flags & ARM_NUMBER)
+		{
 			(*it)->SetNb(nb);
+			if(chan->CurrentEvent() & ARM_ATTAQ)
+				L_GREAT("L'entité " + (*it)->LongName() + " a gagné et il lui reste " + TypToStr(nb));
+			else
+				L_INFO("L'entité " + (*it)->LongName() + " a maintenant " + TypToStr(nb) + " hommes");
+		}
 	}
 
 	/* ANIMATIONS */
@@ -201,6 +215,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
+		if(InGameForm)
+			InGameForm->Map->CenterTo(entities[0]);
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -238,20 +254,36 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				(*it)->Move()->Return((*map)(x,y));
 				if((*it)->Move()->FirstCase())
 					(*it)->SetEvent(0);
+				if(InGameForm)
+					InGameForm->Map->CenterTo(entities[0]);
+				L_INFO(std::string(entities[0]->Owner()->GetNick()) + " a refusé votre attaque en s'esquivant");
 			}
 		}
+		if(flags == ARM_CREATE && InGameForm && !entities.empty())
+			InGameForm->BarreAct->SetEntity(entities.front());
 	}
 
 	/* APRES ANIMATIONS */
 	if(flags & ARM_REMOVE)
 		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end();)
 		{
+			switch(chan->CurrentEvent())
+			{
+				case ARM_ATTAQ|ARM_MOVE:
+				case ARM_ATTAQ: L_SHIT("L'armée " + (*it)->LongName() + " a été vaincu !"); break;
+				case ARM_UNION: L_INFO("L'entité " + (*it)->LongName() + " s'est unie"); break;
+			}
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
 		}
-	
+	if(InGameForm)
+		InGameForm->BarreAct->Update();
 	return 0;
 }
+#undef L_INFO
+#undef L_WARNING
+#undef L_SHIT
+#undef L_GREAT
 
 /********************************************************************************************
  *                               TInGame                                                    *
@@ -271,24 +303,23 @@ void MenAreAntsApp::InGame()
 		InGameForm = new TInGameForm(client->Player());
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
-		Timer timer;
 		const char W_MOVE = 1;
-		const char W_ATTAQ = 2;
 		const char W_NONE = 0;
 		char want = 0;
+		Timer* timer = InGameForm->GetTimer();
+		timer->reset();
 		do
 		{
-			if(timer.time_elapsed(true) > 5)
+			if(timer->time_elapsed(true) > 5)
 			{
 				if(InGameForm->Chat->NbItems())
 					InGameForm->Chat->RemoveItem(0);
-				timer.reset();
+				timer->reset();
 			}
-			if(InGameForm->BarreAct->Entity() &&  InGameForm->BarreAct->Entity()->Selected() &&
-			   chan->State() == EChannel::ANIMING)
+			if(chan->State() == EChannel::ANIMING && InGameForm->BarreAct->Select())
 			{
-				InGameForm->BarreAct->Entity()->Select(false);
-				InGameForm->BarreAct->SetEntity(0);
+				InGameForm->BarreAct->UnSelect();
+				want = W_NONE;
 			}
 			while( SDL_PollEvent( &event) )
 			{
@@ -299,23 +330,21 @@ void MenAreAntsApp::InGame()
 						switch (event.key.keysym.sym)
 						{
 							case SDLK_ESCAPE:
-								if(InGameForm->BarreAct->Entity() && InGameForm->BarreAct->Entity()->Selected())
-								{
-									InGameForm->BarreAct->Entity()->Select(false);
-									InGameForm->BarreAct->SetEntity(0);
-								}
+								InGameForm->BarreAct->UnSelect();
 								break;
 							case SDLK_RETURN:
 								if(InGameForm->SendMessage->Focused())
 								{
-									client->sendrpl(client->rpl(EC_Client::MSG),
-												FormatStr(InGameForm->SendMessage->GetString()).c_str());
-									InGameForm->Chat->AddItem("<" + client->GetNick() + "> " +
-												InGameForm->SendMessage->GetString(), black_color);
+									if(!InGameForm->SendMessage->GetString().empty())
+									{
+										client->sendrpl(client->rpl(EC_Client::MSG),
+													FormatStr(InGameForm->SendMessage->GetString()).c_str());
+										InGameForm->AddInfo(I_CHAT, "<" + client->GetNick() + "> " +
+													InGameForm->SendMessage->GetString(), client->Player());
+									}
 									InGameForm->SendMessage->ClearString();
 									InGameForm->SendMessage->Hide();
 									InGameForm->SendMessage->DelFocus();
-									timer.reset();
 								}
 								else
 								{
@@ -329,6 +358,12 @@ void MenAreAntsApp::InGame()
 					{
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
+						{
+							TMessageBox mb(250,300, "Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
+							if(mb.Show() == BT_YES)
+								eob = true;
+						}
 
 						if(!(chan->State() == EChannel::PLAYING))
 							break;
@@ -338,32 +373,41 @@ void MenAreAntsApp::InGame()
 						if(InGameForm->BarreAct->MoveButton->Test(event.button.x, event.button.y))
 							want = W_MOVE;
 						else if(InGameForm->BarreAct->AttaqButton->Test(event.button.x, event.button.y))
-							want = W_ATTAQ;
-						else if(event.button.button == 3 || InGameForm->BarreAct->Test(event.button.x, event.button.y))
-							want = W_NONE;
-						if(event.button.button == 3 && InGameForm->BarreAct->Entity())
 						{
-							InGameForm->BarreAct->Entity()->Select(false);
-							InGameForm->BarreAct->SetEntity(0);
+							ECEntity* selected_entity = InGameForm->BarreAct->Entity();
+							ECBCase* acase = selected_entity->Move()->Dest();
+							client->sendrpl(client->rpl(EC_Client::ARM), std::string(std::string(selected_entity->ID())
+								                                           + " *" + TypToStr(acase->X()) + "," +
+								                                           TypToStr(acase->Y())).c_str());
+						}
+						else if(event.button.button == MBUTTON_RIGHT ||
+						        InGameForm->BarreAct->Test(event.button.x, event.button.y))
+							want = W_NONE;
+
+						if(InGameForm->BarreAct->Entity() &&
+						   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y))
+						{
+							client->sendrpl(client->rpl(EC_Client::ARM),
+							                 std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
+							                 " +").c_str());
+							break;
 						}
 
-						if(!want && (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
-						{
-							if(InGameForm->BarreAct->Entity())
-								InGameForm->BarreAct->Entity()->Select(false);
-							entity->Select();
+						int mywant = want;
+						if(event.button.button == MBUTTON_MIDLE)
+							mywant = W_MOVE;
+						else if(event.button.button != MBUTTON_LEFT)
+							mywant = W_NONE;
+						if(event.button.button == MBUTTON_RIGHT)
+							InGameForm->BarreAct->UnSelect();
+
+						if(!mywant && event.button.button == MBUTTON_LEFT &&
+						   (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
 							InGameForm->BarreAct->SetEntity(entity);
-						}
 						else if((acase = InGameForm->Map->TestCase(event.button.x, event.button.y)))
 						{
 							ECEntity* selected_entity = InGameForm->BarreAct->Entity();
-							if(selected_entity && want == W_ATTAQ)
-							{
-								client->sendrpl(client->rpl(EC_Client::ARM), std::string(std::string(selected_entity->ID())
-								                                           + " *" + TypToStr(acase->X()) + "," +
-								                                           TypToStr(acase->Y())).c_str());
-							}
-							if(selected_entity && want == W_MOVE)
+							if(selected_entity && mywant == W_MOVE && selected_entity->Owner() == client->Player())
 							{
 							 	ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 								                                                     : selected_entity->Case();
@@ -391,6 +435,8 @@ void MenAreAntsApp::InGame()
 									}
 								}
 							}
+							if(!mywant && event.button.button == MBUTTON_LEFT && acase->Flags() & C_VILLE)
+								InGameForm->BarreAct->SetCase(acase);
 						}
 						break;
 					}
@@ -410,21 +456,34 @@ void MenAreAntsApp::InGame()
 		MyFree(InGameForm);
 		throw;
 	}
-	SDL_KillThread(InGameForm->Thread);
 	MyFree(InGameForm);
 
 	return;
 }
 
-void TInGameForm::AddInfo(int flags, std::string line)
+void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 {
 	if(!Chat) return;
 
 	SDL_Color c = white_color;
-	if(flags & I_WARNING) c = red_color;
+	if(flags & I_WARNING) c = orange_color;
 	else if(flags & I_INFO) c = blue_color;
 	else if(flags & I_ECHO) c = white_color;
-	else if(flags & I_ERROR) c = red_color;
+	else if(flags & I_SHIT) c = red_color;
+	else if(flags & I_GREAT) c = green_color;
+	else if(flags & I_CHAT)
+	{
+		if(pl)
+			c = *color_eq[pl->Color()];
+		else
+			c = red_color; // On n'envoit pas de pl quand on veut highlight
+	}
+
+	/* Pour éviter de voir notre ligne supprimée dès l'ajout, dans le cas où le timer
+	 * arrive à expiration et qu'il n'y a rien d'affiché, on réinitialise le compteur.
+	 */
+	if(!Chat->NbItems())
+		timer.reset();
 
 	Chat->AddItem(line, c);
 }
@@ -454,9 +513,10 @@ void TInGameForm::ShowBarreLat(bool show)
 TInGameForm::TInGameForm(ECPlayer* pl)
 	: TForm()
 {
+	assert(pl && pl->Channel() && pl->Channel()->Map());
+
 	EChannel* ch = pl->Channel();
-	if(!ch || !ch->Map())
-		throw ECExcept(VPName(ch), "La partie n'existe pas ou n'a pas de map");
+	player = pl;
 
 	Map = AddComponent(new TMap(ch->Map()));
 	ch->Map()->SetShowMap(Map);
@@ -465,8 +525,9 @@ TInGameForm::TInGameForm(ECPlayer* pl)
 	BarreLat = AddComponent(new TBarreLat(pl));
 	BarreAct = AddComponent(new TBarreAct(pl));
 
-	SendMessage = AddComponent(new TEdit(30,20,315, MAXBUFFER-20, false));
-	Chat = AddComponent(new TMemo(30,20+SendMessage->Height() + 20,315,100,5, false));
+	SendMessage = AddComponent(new TEdit(30,20,400, MAXBUFFER-20, false));
+	Chat = AddComponent(new TMemo(30, 20 + SendMessage->Height() + 20,
+	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30, 6 * app.Font()->sm.GetHeight(), 5, false));
 
 	ShowBarreLat();
 
@@ -484,26 +545,203 @@ TInGameForm::~TInGameForm()
 	delete Map;
 }
 
+/********************************************************************************************
+ *                               TBarreActIcons                                             *
+ ********************************************************************************************/
+
+TBarreActIcons::~TBarreActIcons()
+{
+	Clear();
+}
+
+void TBarreActIcons::Clear()
+{
+	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it)
+		delete *it;
+	icons.clear();
+}
+
+void TBarreActIcons::Draw(int souris_x, int souris_y)
+{
+	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it)
+		if((*it)->Visible())
+			(*it)->Draw(souris_x, souris_y);
+}
+
+bool TBarreActIcons::Clic (int _x, int _y)
+{
+	if(!Test(_x,_y)) return false;
+
+	bool click = false;
+	/* Va dans l'ordre inverse */
+	for(std::vector<TImage*>::reverse_iterator it = icons.rbegin(); it != icons.rend(); ++it)
+		if((*it)->Visible() && !click && (*it)->Clic(_x, _y))
+		{
+			(*it)->SetFocus();
+			if((*it)->ClickedFunc())
+				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
+			click = true;
+		}
+		else
+			(*it)->DelFocus();
+	return true;
+}
+
+void TBarreActIcons::SetList(std::vector<ECEntity*> list)
+{
+	Clear();
+
+	int _x = x;
+	uint _h = 0;
+	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
+	{
+		TImage* i = new TImage(_x, y, (*it)->Icon(), false);
+		i->Init();
+		_x += i->Width();
+		if(i->Height() > _h) _h = i->Height();
+		i->SetClickedFunc(TBarreAct::CreateUnit, (void*)*it);
+		i->SetParent(this);
+		icons.push_back(i);
+	}
+	SetWidth(_x);
+	SetHeight(_h);
+}
+
+void TBarreActIcons::SetXY(int _x, int _y)
+{
+	for(std::vector<TImage*>::iterator it =icons.begin(); it != icons.end(); ++it)
+		(*it)->SetXY(((*it)->X() - x) + _x, ((*it)->Y() - y) + _y);
+	x = _x;
+	y = _y;
+}
+
+/********************************************************************************************
+ *                                  TBarreAct                                               *
+ ********************************************************************************************/
+
+void TBarreAct::CreateUnit(TObject* o, void* e)
+{
+	assert(o && o->Parent() && o->Parent()->Parent());
+	/* TBarreAct              Parent()
+	 * `- TBarreActIcons      Parent()
+	 *    `- TImage           o
+	 */
+	TBarreAct* thiss = static_cast<TBarreAct*>(o->Parent()->Parent());
+	int x = thiss->entity ? thiss->entity->Case()->X() : thiss->acase ? thiss->acase->X() : 0;
+	int y = thiss->entity ? thiss->entity->Case()->Y() : thiss->acase ? thiss->acase->Y() : 0;
+	std::string s = "-";
+	s += " %" + TypToStr(static_cast<ECEntity*>(e)->Type());
+	s += " =" + TypToStr(x) + "," + TypToStr(y);
+	s += " +";
+	app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
+}
+
+void TBarreAct::UnSelect()
+{
+	if(!select) return;
+	if(entity)
+		SetEntity(0);
+	if(acase)
+		SetCase(0);
+}
+
 void TBarreAct::SetEntity(ECEntity* e)
 {
 	ECAltThread::Put(TBarreAct::vSetEntity, e);
+}
+
+void TBarreAct::SetCase(ECase* c)
+{
+	ECAltThread::Put(TBarreAct::vSetCase, c);
+}
+
+void TBarreAct::vSetCase(void* _c)
+{
+	if(!InGameForm || !InGameForm->BarreAct) return;
+
+	if(InGameForm->BarreAct->entity)
+	{
+		InGameForm->BarreAct->entity->Select(false);
+		InGameForm->BarreAct->entity = 0;
+	}
+
+	ECase* c = static_cast<ECase*>(_c);
+	if(c)
+	{
+		InGameForm->BarreAct->select = true;
+		InGameForm->BarreAct->Name->SetCaption(c->Name());
+		InGameForm->BarreAct->ShowIcons(c);
+
+		InGameForm->BarreAct->MoveButton->Hide();
+		InGameForm->BarreAct->AttaqButton->Hide();
+		InGameForm->BarreAct->UpButton->Hide();
+		InGameForm->BarreAct->Nb->Hide();
+
+		if(c->Country()->Owner())
+		{
+			InGameForm->BarreAct->Owner->Show();
+			InGameForm->BarreAct->Owner->SetColor(*color_eq[c->Country()->Owner()->Player()->Color()]);
+			InGameForm->BarreAct->Owner->SetCaption(c->Country()->Owner()->Player()->GetNick());
+		}
+		else
+			InGameForm->BarreAct->Owner->Hide();
+
+		if(InGameForm->BarreAct->acase)
+			InGameForm->BarreAct->acase->Select(false);
+		c->Select();
+
+		if(!InGameForm->BarreAct->entity && !InGameForm->BarreAct->acase)
+		{
+			InGameForm->BarreAct->Show();
+			while(InGameForm->BarreAct->Y() > SCREEN_HEIGHT- int(InGameForm->BarreAct->Height()))
+				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()-4), SDL_Delay(10);
+			InGameForm->ShowBarreAct(true);
+		}
+		InGameForm->BarreAct->acase = c;
+	}
+	else
+	{
+		InGameForm->BarreAct->select = false;
+		if(InGameForm->BarreAct->acase)
+			InGameForm->BarreAct->acase->Select(false);
+		if(InGameForm->BarreAct->entity || InGameForm->BarreAct->acase)
+		{
+			InGameForm->ShowBarreAct(false);
+			while(InGameForm->BarreAct->Y() < SCREEN_HEIGHT)
+				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+4), SDL_Delay(10);
+			InGameForm->BarreAct->Hide();
+		}
+		InGameForm->BarreAct->acase = 0;
+	}
 }
 
 void TBarreAct::vSetEntity(void* _e)
 {
 	if(!InGameForm || !InGameForm->BarreAct) return;
 
+	if(InGameForm->BarreAct->acase)
+	{
+		InGameForm->BarreAct->acase->Select(false);
+		InGameForm->BarreAct->acase = 0;
+	}
+
 	ECEntity* e = static_cast<ECEntity*>(_e);
 	if(e)
 	{
+		InGameForm->BarreAct->select = true;
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
-		InGameForm->BarreAct->Nb->SetCaption(TypToStr(e->Nb()));
+		InGameForm->BarreAct->Nb->Show();
+		InGameForm->BarreAct->Nb->SetCaption(e->Nb() ? TypToStr(e->Nb()) : "???");
+		InGameForm->BarreAct->ShowIcons(e);
 
 		if(e->Owner() == InGameForm->BarreAct->me)
 		{
 			InGameForm->BarreAct->MoveButton->Show();
 			InGameForm->BarreAct->AttaqButton->Show();
 			InGameForm->BarreAct->UpButton->Show();
+			InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
+			InGameForm->BarreAct->UpButton->SetEnabled(
+					(e->CanBeCreated() && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
 		}
 		else
 		{
@@ -520,7 +758,11 @@ void TBarreAct::vSetEntity(void* _e)
 		else
 			InGameForm->BarreAct->Owner->Hide();
 
-		if(!InGameForm->BarreAct->entity)
+		if(InGameForm->BarreAct->entity)
+			InGameForm->BarreAct->entity->Select(false);
+		e->Select();
+
+		if(!InGameForm->BarreAct->entity && !InGameForm->BarreAct->acase)
 		{
 			InGameForm->BarreAct->Show();
 			while(InGameForm->BarreAct->Y() > SCREEN_HEIGHT- int(InGameForm->BarreAct->Height()))
@@ -531,7 +773,10 @@ void TBarreAct::vSetEntity(void* _e)
 	}
 	else
 	{
+		InGameForm->BarreAct->select = false;
 		if(InGameForm->BarreAct->entity)
+			InGameForm->BarreAct->entity->Select(false);
+		if(InGameForm->BarreAct->entity || InGameForm->BarreAct->acase)
 		{
 			InGameForm->ShowBarreAct(false);
 			while(InGameForm->BarreAct->Y() < SCREEN_HEIGHT)
@@ -544,7 +789,7 @@ void TBarreAct::vSetEntity(void* _e)
 }
 
 TBarreAct::TBarreAct(ECPlayer* pl)
-	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-150, 100), entity(0)
+	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-150, 100), entity(0), acase(0)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
@@ -552,18 +797,27 @@ TBarreAct::TBarreAct(ECPlayer* pl)
 
 	Name = AddComponent(new TLabel(20,5, "", black_color, &app.Font()->big));
 
-	MoveButton = AddComponent(new TButtonText(150,5,150,50, "Déplacer"));
-	AttaqButton = AddComponent(new TButtonText(300,5,150,50, "Attaquer"));
-	UpButton = AddComponent(new TButtonText(450,5,150,50, "Ajouter"));
+	MoveButton = AddComponent(new TButtonText(300,5,100,30, "Déplacer"));
+	MoveButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	MoveButton->SetFont(&app.Font()->sm);
+	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer"));
+	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	AttaqButton->SetFont(&app.Font()->sm);
+	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter"));
+	UpButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	UpButton->SetFont(&app.Font()->sm);
 
 	Nb = AddComponent(new TLabel(20,50, "", black_color, &app.Font()->normal));
 	Owner = AddComponent(new TLabel(20,30, "", black_color, &app.Font()->normal));
+
+	Icons = AddComponent(new TBarreActIcons(100, 49));
 
 	SetBackground(Resources::BarreAct());
 }
 
 TBarreAct::~TBarreAct()
 {
+	delete Icons;
 	delete Owner;
 	delete Nb;
 	delete UpButton;
@@ -572,19 +826,27 @@ TBarreAct::~TBarreAct()
 	delete Name;
 }
 
+/********************************************************************************************
+ *                               TBarreLat                                                  *
+ ********************************************************************************************/
+
 TBarreLat::TBarreLat(ECPlayer* pl)
 	: TChildForm(SCREEN_WIDTH-150, 0, 150, SCREEN_HEIGHT)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
 
-	Radar = AddComponent(new TImage(7, 6));
-
-	PretButton = AddComponent(new TButtonText(30,170,50,20, "Pret"));
+	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret"));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 	PretButton->SetFont(&app.Font()->sm);
+	QuitButton = AddComponent(new TButtonText(30,250,100,30, "Quitter"));
+	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	QuitButton->SetFont(&app.Font()->sm);
 
-	chan->Map()->CreatePreview(138,138, true);
+	chan->Map()->CreatePreview(120,120, true);
+	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
+	int _y = 55 + 60 - chan->Map()->Preview()->GetHeight() / 2 ;
+	Radar = AddComponent(new TImage(_x, _y));
 	Radar->SetImage(chan->Map()->Preview(), false);
 
 	Money = AddComponent(new TLabel(50, 1, TypToStr(pl->Money()) + " $", white_color, &app.Font()->sm));
@@ -599,6 +861,7 @@ TBarreLat::~TBarreLat()
 	delete TurnMoney;
 	delete Date;
 	delete Money;
+	delete QuitButton;
 	delete PretButton;
 	delete Radar;
 }
@@ -607,10 +870,14 @@ TBarreLat::~TBarreLat()
  *                               TLoadingForm                                               *
  ********************************************************************************************/
 
+bool sock_loading_ok = false;
+
 void LoadingGame(EC_Client* me)
 {
 	if(!me || !me->Player())
 		throw ECExcept(VPName(me), "Non connecté ou non dans un chan");
+
+	sock_loading_ok = false;
 
 	EChannel *chan = me->Player()->Channel();
 	BPlayerVector plv = chan->Players();
@@ -633,8 +900,9 @@ void LoadingGame(EC_Client* me)
 				                         (chan->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
 		}
 	}
-	chan->Map()->ClearMapPlayers();
 	chan->Map()->CreatePreview(300,300);
+	chan->Map()->ClearMapPlayers();
+	sock_loading_ok = true;
 }
 
 void MenAreAntsApp::LoadGame(EChannel* chan)
@@ -646,6 +914,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 	{
 		SDL_Event event;
 		bool eob = false;
+		WAIT_EVENT_T(sock_loading_ok, i, 0.5);
 		LoadingForm = new TLoadingForm(chan);
 		do
 		{

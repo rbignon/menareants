@@ -30,6 +30,7 @@
 #include "gui/ChildForm.h"
 #include "gui/Edit.h"
 #include "gui/BouttonText.h"
+#include "Timer.h"
 
 class EChannel;
 class ECPlayer;
@@ -37,6 +38,29 @@ class ECPlayer;
 /********************************************************************************************
  *                               TInGameForm                                                *
  ********************************************************************************************/
+
+class TBarreActIcons : public TComponent
+{
+public:
+	TBarreActIcons(int _x, int _y)
+		: TComponent(_x,_y)
+	{}
+	~TBarreActIcons();
+
+	void Init() {}
+
+	void Draw(int souris_x, int souris_y);
+	bool Clic (int mouse_x, int mouse_y);
+
+	void SetList(std::vector<ECEntity*> list);
+	void Clear();
+
+	virtual void SetXY(int _x, int _y);
+
+private:
+	std::vector<TImage*> icons;
+};
+
 class TBarreAct : public TChildForm
 {
 public:
@@ -46,26 +70,54 @@ public:
 /* Composants */
 public:
 
-	TLabel*       Name;
-	TLabel*       Nb;
-	TLabel*       Owner;
-	TButtonText*  MoveButton;
-	TButtonText*  AttaqButton;
-	TButtonText*  UpButton;
+	TLabel*         Name;
+	TLabel*         Nb;
+	TLabel*         Owner;
+	TButtonText*    MoveButton;
+	TButtonText*    AttaqButton;
+	TButtonText*    UpButton;
+	TBarreActIcons* Icons;
 
 /* Attributs */
 public:
 
-	ECEntity* Entity() { return entity; }
+	ECEntity* Entity() const { return entity; }
 	void SetEntity(ECEntity* e);
 
-public:
+	ECase* Case() const { return acase; }
+	void SetCase(ECase* c);
 
-protected:
+/* Methodes */
+public:
+	void Update() { if(entity) SetEntity(entity); }
+
+	void UnSelect();
+	bool Select() const { return select; }
+
+	static void CreateUnit(TObject* o, void* e);
+
+private:
 	EChannel* chan;
 	ECPlayer* me;
 	ECEntity* entity;
+	ECase* acase;
 	static void vSetEntity(void*);
+	static void vSetCase(void*);
+
+	template<typename T>
+	void ShowIcons(T e)
+	{
+		assert(Icons);
+		if(e)
+		{
+			std::vector<ECEntity*> elist = EntityList.CanCreatedBy(e);
+			Icons->SetList(elist);
+		}
+		else
+			Icons->Clear();
+	}
+
+	bool select;
 };
 
 class TBarreLat : public TChildForm
@@ -78,6 +130,7 @@ public:
 public:
 	TImage*      Radar;
 	TButtonText* PretButton;
+	TButtonText* QuitButton;
 	TLabel*      Date;
 	TLabel*      Money;
 	TLabel*      TurnMoney;
@@ -116,12 +169,21 @@ public:
 	#define I_INFO     0x001
 	#define I_WARNING  0x002
 	#define I_ECHO     0x004
-	#define I_ERROR    0x008
-	void AddInfo(int flags, std::string line);
+	#define I_SHIT     0x008
+	#define I_CHAT     0x010
+	#define I_GREAT    0x020
+	void AddInfo(int flags, std::string line, ECPlayer* = 0);
+
+/* Attributs */
+public:
+	Timer* GetTimer() { return &timer; }
 
 /* Evenements */
 public:
 
+private:
+	Timer timer;
+	ECPlayer* player;
 };
 
 /********************************************************************************************
