@@ -22,6 +22,10 @@
 #include "Units.h"
 #include "gui/ShowMap.h"
 
+/********************************************************************************************
+ *                                ECArmy                                                    *
+ ********************************************************************************************/
+
 bool ECArmy::BeforeEvent()
 {
 	switch(event_type)
@@ -44,6 +48,7 @@ bool ECArmy::MakeEvent()
 		case ARM_ATTAQ:
 		case ARM_MOVE:
 		case ARM_ATTAQ|ARM_MOVE:
+		case ARM_UNION:
 		{
 			if(move.Empty())
 				return true;
@@ -77,13 +82,11 @@ bool ECArmy::MakeEvent()
 					break;
 			}
 
-			printf("- %d,%d\n", image->X(), image->Y());
 			return false;
 			break;
 		}
 		default: break;
 	}
-	printf("? %d (%s)\n", event_type, LongName().c_str());
 	return true;
 }
 

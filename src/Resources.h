@@ -134,6 +134,7 @@ public:
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest, "cases/coinso");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst,  "cases/coinno");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest,"cases/coinne");
+	R_RESOURCE(ECImage,      Army_Icon,        PKGDATADIR_PICS "units/army_icon.png");
 	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
 	R_RESOURCE(ECSpriteBase, Army_Left,        "units/army/left");
 	R_RESOURCE(ECSpriteBase, Army_Right,       "units/army/right");

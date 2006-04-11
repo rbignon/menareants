@@ -70,6 +70,7 @@
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest);
+	R_RESOURCE(ECImage,      Army_Icon);
 	R_RESOURCE(ECSpriteBase, Army_Face);
 	R_RESOURCE(ECSpriteBase, Army_Left);
 	R_RESOURCE(ECSpriteBase, Army_Right);

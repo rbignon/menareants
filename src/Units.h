@@ -26,19 +26,28 @@
 #include "lib/Units.h"
 #include "Resources.h"
 
+/********************************************************************************************
+ *                                ECArmy                                                    *
+ ********************************************************************************************/
+
 class ECArmy : public ECEntity, public ECBArmy
 {
 /* Constructeur/Destructeur */
 public:
+
+	ECArmy() {}
+
 	ECArmy(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ARMY_NB)
 		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
 	{ SetImage(Resources::Army_Face()); }
 
+
 /* Infos */
 public:
 
-	virtual const char* Name() { return "Armée"; }
-	virtual const char* Infos() { return "Armée de base"; }
+	virtual const char* Name() const { return "Armée"; }
+	virtual const char* Infos() const { return "Armée de base"; }
+	virtual ECImage* Icon() const { return Resources::Army_Icon(); }
 
 /* Methodes */
 public:
