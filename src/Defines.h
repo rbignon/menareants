@@ -45,17 +45,24 @@
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
 
-/* Tailles */
+/* Tailles de buffers */
 const int MAXBUFFER=1024;
 const int NICKLEN=20;
 const int GAMELEN=15;
 const int COMLEN=10;
 
+/* Résolution de l'écran */
 const int SCREEN_HEIGHT = 600;
 const int SCREEN_WIDTH  = 800;
 
+/* Taille des cases */
 const int CASE_HEIGHT = 43;
 const int CASE_WIDTH = 43;
+
+/* Définitions des boutons de la souris */
+const int MBUTTON_LEFT = 1;
+const int MBUTTON_MIDLE = 2;
+const int MBUTTON_RIGHT = 3;
 
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
