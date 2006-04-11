@@ -195,6 +195,20 @@ ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y
 ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : this; }
 ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : this; }
 
+void ECBCase::SetCountry(ECBCountry *mc)
+{
+	map_country = mc;
+	/* On est la ville de la country, donc on défini notre état à la country */
+	if(flags & C_VILLE)
+		mc->flags = flags;
+}
+
+void ECBCase::CheckChangingOwner(ECBEntity* e)
+{
+	if(flags & C_VILLE && e->Owner() && (!Country()->Owner() || Country()->Owner()->Player() != e->Owner()))
+		Country()->ChangeOwner(e->Owner()->MapPlayer());
+}
+
 /********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
@@ -219,7 +233,7 @@ void ECBEntity::AddUnits(uint u)
 	nb += u;
 }
 
-bool ECBEntity::CanBeCreated()
+bool ECBEntity::CanBeCreated() const
 {
 	assert(acase);
 
@@ -230,7 +244,7 @@ bool ECBEntity::CanBeCreated()
 	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
 	 */
-	if(acase->Country()->Owner()->Player() == owner && acase->CanCreate(this))
+	if(acase->Country()->Owner() && acase->Country()->Owner()->Player() == owner && acase->CanCreate(this))
 		return true;
 
 	std::vector<ECBEntity*> entv = acase->Entities()->List();
@@ -266,7 +280,7 @@ ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident)
 	owner = 0;
 }
 
-void ECBCountry::ChangeOwner(ECBMapPlayer* mp, uint flags)
+bool ECBCountry::ChangeOwner(ECBMapPlayer* mp)
 {
 	if(Owner())
 	{
@@ -285,6 +299,7 @@ void ECBCountry::ChangeOwner(ECBMapPlayer* mp, uint flags)
 							          Owner()->Player()->TurnMoney() +
 							          (map->CityMoney() * (flags & C_CAPITALE ? 2 : 1)));
 	}
+	return true;
 }
 
 /********************************************************************************************
@@ -585,7 +600,7 @@ void ECBMap::Init()
 						    it != map_countries.end() && strcmp(c_id, (*it)->ID()); ++it);
 						if(it == map_countries.end())
 						{ /* La country n'existe pas encore */
-							country = new ECBCountry(this, c_id);
+							country = CreateCountry(this, c_id);
 							map_countries.push_back(country);
 						}
 						else /* La country existe déjà */
