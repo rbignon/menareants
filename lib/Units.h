@@ -47,7 +47,7 @@ public:
 /* Constantes */
 public:
 
-	bool CanAttaq(ECBEntity* e)
+	bool CanAttaq(const ECBEntity* e)
 	{
 		switch(e->Type())
 		{
@@ -58,12 +58,12 @@ public:
 		}
 	}
 
-	uint InitNb() { return ARMY_NB; }
+	uint InitNb() const { return ARMY_NB; }
 
 /* Methodes */
 public:
 
-	virtual bool CanCreate(ECBEntity*) { return false; }
+	virtual bool CanCreate(const ECBEntity*) { return false; }
 
 /* Attributs */
 public:

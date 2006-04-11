@@ -108,18 +108,20 @@ protected:
  ********************************************************************************************/
 #define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
                             (b)->CanAttaq(a) && !(b)->Like(a))
-#define ARM_MOVE      0x0001
-#define ARM_SPLIT     0x0002
-#define ARM_ATTAQ     0x0004
-#define ARM_REMOVE    0x0008
-#define ARM_LOCK      0x0010
-#define ARM_TYPE      0x0020
-#define ARM_NUMBER    0x0040
-#define ARM_RETURN    0x0080
-#define ARM_HIDE      0x0100
-#define ARM_RECURSE   0x0200 /* ne JAMAIS appeler */
-#define ARM_UNION     (ARM_MOVE|ARM_NUMBER)
-#define ARM_CREATE    (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+#define ARM_MOVE        0x0001
+#define ARM_SPLIT       0x0002
+#define ARM_ATTAQ       0x0004
+#define ARM_REMOVE      0x0008
+#define ARM_LOCK        0x0010
+#define ARM_TYPE        0x0020
+#define ARM_NUMBER      0x0040
+#define ARM_RETURN      0x0080
+#define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
+#define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+/* Concerne server:EChannel::SendArm() */
+#define ARM_HIDE        0x0100 /* cache les infos aux users non concernés */
+#define ARM_RECURSE     0x0200 /* ne JAMAIS appeler */
+#define ARM_NOCONCERNED 0x0400 /* ne pas envoyer aux users concernés */
 class ECBEntity
 {
 /* Constructor/Destructor */
@@ -140,16 +142,16 @@ public:
 public:
 
 	/** Use this function to know if this entity can create an other entity */
-	virtual bool CanCreate(ECBEntity*) = 0;
+	virtual bool CanCreate(const ECBEntity*) = 0;
 
 	/** Use this function to know if this entity is able to attaq an other entity */
-	virtual bool CanAttaq(ECBEntity* e) = 0;
+	virtual bool CanAttaq(const ECBEntity* e) = 0;
 
 	/** Use this function to know how people there are when you create this entity */
-	virtual uint InitNb() = 0;
+	virtual uint InitNb() const = 0;
 
 	/** Use this function to know if this entity can be created */
-	virtual bool CanBeCreated();
+	virtual bool CanBeCreated() const;
 
 	/** Use this function to add some units in the entity */
 	virtual void AddUnits(uint units);
@@ -169,36 +171,36 @@ public:
 public:
 
 	void SetCase(ECBCase* _c) { acase = _c; }
-	ECBCase* Case() { return acase; }
+	ECBCase* Case() const { return acase; }
 
 	void SetOwner(ECBPlayer* _p) { owner = _p; }
 	ECBPlayer* Owner() { return owner; }
 
-	const char* ID() { return name; }
+	const char* ID() const { return name; }
 
-	virtual ECBEntity* Last() { return 0; }
+	virtual ECBEntity* Last() const { return 0; }
 
-	uint EventType() { return event_type; }
+	uint EventType() const { return event_type; }
 	void SetEvent(uint _e) { event_type = _e; }
 
-	e_type Type() { return type; }
+	e_type Type() const { return type; }
 
 	/** Return the number of soldats in the army */
-	uint Nb() { return nb; }
+	uint Nb() const { return nb; }
 	void SetNb(uint n) { nb = n; }
 	void Shooted(uint n) { shooted += n; }
 	void ReleaseShoot() { nb -= (shooted > nb ? nb : shooted); shooted = 0; }
 
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
-	bool Locked() { return lock; }
+	bool Locked() const { return lock; }
 	void SetLock(bool l = true) { lock = l; }
 
-	uint MyStep() { return myStep; }
+	uint MyStep() const { return myStep; }
 	void SetMyStep(uint s) { myStep = s; }
-	uint RestStep() { return restStep; }
+	uint RestStep() const { return restStep; }
 	void SetRestStep(uint s) { restStep = s; }
 
-	uint Cost() { return cost; }
+	uint Cost() const { return cost; }
 
 	std::string LongName();
 
@@ -283,7 +285,9 @@ public:
 /* Methodes */
 public:
 
-	virtual bool CanCreate(ECBEntity*) { return false; }
+	virtual bool CanCreate(const ECBEntity*) { return false; }
+
+	void CheckChangingOwner(ECBEntity* e);
 
 /* Attributs */
 public:
@@ -298,7 +302,7 @@ public:
 	uint Flags() { return flags; }
 
 	ECBCountry* Country() { return map_country; }
-	void SetCountry(ECBCountry *mc) { map_country = mc; }
+	void SetCountry(ECBCountry *mc);
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
@@ -337,7 +341,7 @@ public:
 /* Methodes */
 public:
 
-	virtual bool CanCreate(ECBEntity* e)
+	virtual bool CanCreate(const ECBEntity* e)
 	{
 		switch(e->Type())
 		{
@@ -426,6 +430,7 @@ class ECBCountry
 public:
 
 	ECBCountry(ECBMap* map, const Country_ID ident);
+	virtual ~ECBCountry() {}
 
 /* Attributs */
 public:
@@ -438,26 +443,29 @@ public:
 
 	/** Return Owner of country */
 	ECBMapPlayer* Owner() const { return owner; }
-	void SetOwner(ECBMapPlayer* mp) { owner = mp; }
+	virtual void SetOwner(ECBMapPlayer* mp) { owner = mp; }
 
 	/** Change owner of country.
 	 * This function will remove this country from my actual owner list, and will add me
 	 * in the list of my new owner. And it will change turnmoney of the two players.
 	 * @param mp this is the new map player
-	 * @param flags this is flags of my city (to know if this is a capitale or not)
 	 */
-	void ChangeOwner(ECBMapPlayer* mp, uint flags);
+	virtual bool ChangeOwner(ECBMapPlayer* mp);
 
 	std::vector<ECBCase*> Cases() const { return cases; }
 
-	ECBMap* Map() { return map; }
+	ECBMap* Map() const { return map; }
+
+	uint Flags() const { return flags; }
 
 /* Variables privées */
 protected:
+	friend void ECBCase::SetCountry(ECBCountry *mc); /* Il touche à mes flags */
 	std::vector<ECBCase*> cases;
 	ECBMapPlayer *owner;
 	Country_ID ident;
 	ECBMap *map;
+	uint flags;
 };
 
 /********************************************************************************************
@@ -618,6 +626,8 @@ protected:
 
 	/** This function have to be redefined by client to set attributs of images in case */
 	virtual void SetCaseAttr(ECBCase*, char) {}
+
+	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECBCountry(m, ident); }
 
 	ECBMap();         /**< Disallowed */
 };
