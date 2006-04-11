@@ -25,8 +25,8 @@
 
 bool ECAltThread::want_quit = false;
 bool ECAltThread::running = false;
-std::vector<ECAltFunction> ECAltThread::functions;
-std::vector<void*> ECAltThread::args;
+ECAltThread::alt_list ECAltThread::functions;
+std::stack<void*> ECAltThread::args;
 
 int ECAltThread::Exec(void *data)
 {
@@ -38,16 +38,17 @@ int ECAltThread::Exec(void *data)
 		if(!functions.empty())
 		{
 			SDL_LockMutex((SDL_mutex*)data);
-			for(std::vector<ECAltFunction>::iterator it = functions.begin(); it != functions.end();)
+			while(!functions.empty())
 			{
-				if(args.empty()) continue;
-				(**it) (*(args.begin()));
-				it = functions.erase(it);
-				args.erase(args.begin());
+				if(args.empty())
+					break;
+				(*(functions.top())) (args.top());
+				functions.pop();
+				args.pop();
 			}
 			SDL_UnlockMutex((SDL_mutex*)data);
 		}
-		SDL_Delay(10);
+		SDL_Delay(20);
 	}
 
 	running = false;

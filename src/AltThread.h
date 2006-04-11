@@ -22,7 +22,7 @@
 #ifndef EC_ALTTHREAD_H
 #define EC_ALTTHREAD_H
 
-#include <vector>
+#include <stack>
 
 typedef void (*ECAltFunction) (void* Data1);
 
@@ -42,14 +42,15 @@ public:
 /* Attributs */
 public:
 
-	static void Put(ECAltFunction f, void* a) { functions.push_back(f); args.push_back(a); }
+	static void Put(ECAltFunction f, void* a) { functions.push(f); args.push(a); }
 
 	static void Stop() { want_quit = true; }
 
 /* Variables privées */
 private:
-	static std::vector<ECAltFunction> functions;
-	static std::vector<void*> args;
+	typedef std::stack<ECAltFunction> alt_list;
+	static alt_list functions;
+	static std::stack<void*> args;
 	static bool want_quit;
 	static bool running;
 };
