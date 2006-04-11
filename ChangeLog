@@ -1,4 +1,39 @@
+2005-04-10  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp (CheckChaningOwner): Fonction de ECBCase pour vérifier si sa prise créé un changement d'owner.
+
+	* lib/Channels.cpp, server/Channels.cpp: Passage de ModesStr() dans le serveur avec affichage de la map dans les modes.
+
+	* server/Channels.cpp, server/Map.cpp: Mode +@ pour changer l'owner d'une country.
+
+	* src/AltThread.cpp: Utilisation de stack plutot que de vector.
+
+	* src/JoinGame.cpp: Messages...
+
+	* src/gui/Object.h, src/gui/Component.h, src/gui/Form.h, src/gui/ChildForm.h:
+	  Création de TObject mère de toutes les classes graphiques (T*), avec gestion des parents.
+
+	* src/gui/ShowMap.cpp (CenterOn): Méthode pour centrer la camera sur un point particulier.
+
+	* server/InGame.cpp (SendArm): Quand il n'y a pas d'evenement de mouvement lié, utiliser x et y plutot que les
+	coordonnées de l'entité, car il est possible qu'on veuille envoyer un CREATE avant un MOVE.
+
+	* src/Map.cpp (ECEntityList): Liste des entitées qui peut etre utilisée pour récupérer la liste des entitées
+	pouvant etre créée par une case ou une autre entité (batiment).
+
+	* src/InGame.cpp (BarreAct): Possibilité de selectionner une case et de créer des unités.
+
+	* src/data/pics/units: Boutons des unités.
+
+	* src/data/barrelat.png: Nouvelle version un peu plus belle.
+
 2005-04-09  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Gestion de l'ajout d'unités, des messages d'information, et quelques corrections.
+
+	* server/InGame.cpp (ARM_NUMBER): Gestion, et n'en fait plus un evenement lors du ANIMING (les autres s'en foutent).
+
+	* src/gui/Memo.cpp: Taille maximum de caractère par ligne adapté à la chaine elle meme (meilleur resultat).
 
 	* src/, WIN32: Portabilité du code du jeu pour windows.
 

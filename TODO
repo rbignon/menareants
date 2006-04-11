@@ -9,9 +9,10 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
+-server: gérer le départ d'un joueur pendant la partie
 
 * Après
--client: ergonomie
+-gestion des perdants.
 
 * Bof
 -mettre un mode pour l'argent du début
