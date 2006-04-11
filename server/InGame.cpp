@@ -101,9 +101,7 @@ void EChannel::NextAnim()
 						}
 						SendArm(NULL, *it, ARM_NUMBER, (*it)->Case()->X(), (*it)->Case()->Y(), (*it)->Nb());
 
-						if((*it)->Owner() && (!(*it)->Case()->Country()->Owner() ||
-						   (*it)->Case()->Country()->Owner()->Player() != (*it)->Owner()))
-							(*it)->Case()->Country()->ChangeOwner((*it)->Owner()->MapPlayer(), (*it)->Case()->Flags());
+						(*it)->Case()->CheckChangingOwner(*it);
 
 						it = entv.erase(it);
 					}
@@ -121,15 +119,19 @@ void EChannel::NextAnim()
 			break;
 		}
 		case ARM_UNION:
-			SendArm(NULL, event->Entities()->List(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0, 0,
+		{
+			SendArm(NULL, event->Entity(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0, 0,
 			        event->Linked());
+			std::vector<ECEntity*> entv = event->Entities()->List();
+			if(entv.size() != 2)
+				Debug(W_ERR, "Il faudraut qu'il y ait deux entités dans la liste de UNION et il y en a %d", entv.size());
+			else
+				SendArm(NULL, entv[1], ARM_NUMBER|ARM_HIDE, 0, 0, entv[1]->Nb());
 			break;
-		case ARM_NUMBER:
-			SendArm(NULL, event->Entities()->List(), ARM_NUMBER|ARM_HIDE, 0, 0, event->Nb());
-			break;
+		}
 		case ARM_CREATE:
-			SendArm(NULL, event->Entities()->List(), ARM_CREATE|ARM_HIDE, event->Case()->X(), event->Case()->Y(),
-			                                                                       event->Nb(), event->Type());
+			SendArm(NULL, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
+			                                         event->Case()->Y(), event->Nb(), event->Type());
 			break;
 		case ARM_MOVE:
 		{
@@ -139,9 +141,7 @@ void EChannel::NextAnim()
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				if((*it)->Case()->Country()->Owner() &&
-				   (*it)->Case()->Country()->Owner()->Player() != (*it)->Owner())
-					(*it)->Case()->Country()->ChangeOwner((*it)->Owner()->MapPlayer(), (*it)->Case()->Flags());
+				(*it)->Case()->CheckChangingOwner(*it);
 			break;
 		}
 		default: break;
@@ -252,12 +252,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			case '+':
 			{
-				if(!entity)
-				{
-					if(is_num(parv[i].substr(1).c_str()))
-						nb = StrToTyp<uint>(parv[i].substr(1));
-					flags |= ARM_NUMBER;
-				}
+				flags |= ARM_NUMBER;
 				break;
 			}
 			case '%':
@@ -292,75 +287,56 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		else
 		{
-			cl->Player()->DownMoney(entity->Cost());
-
-			ECEvent* event = 0;
-
 			if(entity->Case()->Entities()->Sames(entity))
 			{ /* On peut probablement faire une union avec une entité de cette case donc bon au lieu de
 			   * se broyer les testicule on va ARM_NUMBER simplement */
-				EventVector evts = map->Events();
-				bool event_found = false;
-				for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
-				{
-					ECEntity* et = *((*evti)->Entities()->List().begin());
-					if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_NUMBER &&
-					   et->Owner() == entity->Owner() && et->Type() == entity->Type())
-					{ /* On a trouvé un ARM_NUMBER qu'on investit */
-						(*evti)->SetNb((*evti)->Nb() + entity->Nb());
-						et->AddUnits(entity->Nb());
-						MyFree(entity);
-						entity = et;
-						event = *evti;
-						Debug(W_DEBUG, "On a trouvé un ancien ARM_NUMBER qu'on investit");
+				std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
+				ECEntity* my_friend = 0;
+				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+					if(!(*enti)->Locked() && (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
+						my_friend = dynamic_cast<ECEntity*>(*enti);
+				if(!my_friend)
+					throw ECExcept(VIName(entity->Case()->Entities()->Sames(entity)) VIName(ents.size()),
+					               "Il y a comme un problème là");
 
-						event_found = true;
-						break;
-					}
-				}
-				if(!event_found)
-				{ /* On créé un nouvel evenement */
-					event = new ECEvent(ARM_NUMBER, entity->Case());
-					std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
-					ECEntity* my_friend = 0;
-					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-						if(!(*enti)->Locked() && (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
-							my_friend = dynamic_cast<ECEntity*>(*enti);
-					if(!my_friend)
-						throw ECExcept(VIName(entity->Case()->Entities()->Sames(entity)) VIName(ents.size()),
-									"Il y a comme un problème là");
-	
-					Debug(W_DEBUG, "On rajoute directement les unités dans cette armée.");
-	
-					my_friend->AddUnits(entity->Nb());
-	
-					MyFree(entity);
-					entity = my_friend;
-	
-					event->SetNb(entity->Nb());
-					event->Entities()->Add(entity);
-					map->AddEvent(event);
-				}
+				MyFree(entity);
+				entity = my_friend;
 				flags = ARM_NUMBER;
 			}
 			else
 			{
 				Debug(W_DEBUG, "On rajoute un ARM_CREATE");
-				event = new ECEvent(ARM_CREATE, entity->Case());
+				cl->Player()->DownMoney(entity->Cost());
+				ECEvent* event = new ECEvent(ARM_CREATE, entity->Case());
 				event->Entities()->Add(entity);
 				event->SetNb(entity->Nb());
 				event->SetType(entity->Type());
 				chan->Map()->AddAnEntity(entity);
 				map->AddEvent(event);
+				nb = event->Nb();
+				entity->SetEvent(flags);
 			}
-			nb = event->Nb();
-			entity->SetEvent(flags);
 		}
 	}
 	if(flags)
 	{
 		std::nrvector<TClient*> recvers;
 		std::vector<ECEvent*> events_sended;
+		if(flags == ARM_NUMBER)
+		{
+			if(entity->CanBeCreated() && int(entity->Cost()) <= cl->Player()->Money())
+			{
+				/*****************************
+				*     GESTION DES AJOUTS    *
+				*****************************/
+				entity->AddUnits(entity->InitNb());
+	
+				cl->Player()->DownMoney(entity->Cost());
+				nb = entity->Nb();
+			}
+			else
+				flags = 0;
+		}
 		if(flags == ARM_MOVE)
 		{
 			/*****************************
@@ -477,24 +453,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						}
 				}
 
-				/* Cet evenement est une Union et en plus de ça je peux union avec l'unité en question donc je le fais */
-				if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_UNION && !attaq_event)
-				{
-					Debug(W_DEBUG, "On a trouvé un evenement d'union à investir");
-					std::vector<ECBEntity*> entities = (*evti)->Case()->Entities()->List();
-					for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					{
-						if((*enti)->Locked() || *enti == entity) continue;
-
-						if((*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
-						{
-							dynamic_cast<ECEntity*>(*enti)->Union(entity);
-							union_event = *evti;
-							break;
-						}
-					}
-				}
-
 				/* On regarde si, sur la nouvelle case, il y a un evenement d'attaque.
 				 * Note: il n'y a pas besoin de vérifier tout le parcourt, en effet, c'est à chaque
 				 *       appel de ECEntity::WantMove() qu'il est censé le faire
@@ -560,19 +518,29 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								map->RemoveEvent(last_move_event);
 							}
 						}
-						if(!union_event && !attaq_event && (*enti)->Owner() == entity->Owner() &&
+						if(!union_event && (*enti)->Owner() == entity->Owner() &&
 						   (*enti)->Type() == entity->Type())
 						{
 							Debug(W_DEBUG, "On créé un evenement union");
 							dynamic_cast<ECEntity*>(*enti)->Union(entity);
 							union_event = new ECEvent(ARM_UNION, entity->Case());
 							map->AddEvent(union_event);
+							/* L'ordre est important dans l'evenement union :
+							 * 1) Celui qui va disparaitre
+							 * 2) Celui qui absorbe
+							 */
+							union_event->Entities()->Add(entity);
+							union_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
+							if(event_found)
+							{
+								union_event->AddLinked(event_found);
+								map->RemoveEvent(event_found);
+							}
 						}
 					}
-				if(attaq_event)
+				if(attaq_event && !union_event)
 				{
 					Debug(W_DEBUG, "On se met dans un evenement attaq");
-					if(union_event) { delete union_event; FDebug(W_WARNING, "union + attaq"); }
 					attaq_event->Entities()->Add(entity);
 					if(event_found)
 					{ /* On link dans attaq_event et on l'enlève de la boucle principale.
@@ -583,16 +551,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 					else
 						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement");
-				}
-				else if(union_event)
-				{
-					Debug(W_DEBUG, "On se met dans un evenement union");
-					union_event->Entities()->Add(entity);
-					if(event_found)
-					{
-						union_event->AddLinked(event_found);
-						map->RemoveEvent(event_found);
-					}
 				}
 			}
 			if(event_found)
@@ -651,9 +609,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	BCaseVector casv = map->Cases();
 	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
 	{
-		if((*casi)->Entities()->empty()) continue;
+		if((*casi)->Entities()->empty() && (!(*casi)->Country()->Owner() || !((*casi)->Flags() & C_VILLE)))
+			continue;
 		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
-		Debug(W_DEBUG, "%d,%d:", (*casi)->X(), (*casi)->Y());
+		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(), (*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
 		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 			Debug(W_DEBUG, "    [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ', (*enti)->LongName().c_str(), (*enti)->Nb());
 	}
