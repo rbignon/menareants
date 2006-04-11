@@ -144,9 +144,9 @@ public:
 
 };
 
-void Config::WantOk(void* forminst, void* configinst)
+void Config::WantOk(TObject* OkButton, void* configinst)
 {
-	TConfigForm* form = static_cast<TConfigForm*>(forminst);
+	TConfigForm* form = static_cast<TConfigForm*>(OkButton->Parent());
 	Config* conf = static_cast<Config*>(configinst);
 
 	conf->nick = form->Nick->GetString();
@@ -167,7 +167,7 @@ void Config::WantOk(void* forminst, void* configinst)
 	conf->want_quit_config = true;
 }
 
-void Config::WantCancel(void*, void* configinst)
+void Config::WantCancel(TObject*, void* configinst)
 {
 	Config* conf = (Config*)configinst;
 	conf->want_quit_config = true;

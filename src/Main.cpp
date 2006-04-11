@@ -63,17 +63,17 @@ public:
 
 MenAreAntsApp app;
 
-void MenAreAntsApp::WantQuit(void*, void*)
+void MenAreAntsApp::WantQuit(TObject*, void*)
 {
 	app.want_quit = true;
 }
 
-void MenAreAntsApp::WantPlay(void*, void*)
+void MenAreAntsApp::WantPlay(TObject*, void*)
 {
 	app.request_game();
 }
 
-void MenAreAntsApp::WantConfig(void*, void*)
+void MenAreAntsApp::WantConfig(TObject*, void*)
 {
 	if(app.conf)
 		app.conf->Configuration();

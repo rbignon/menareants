@@ -52,7 +52,6 @@ void TMemo::Init()
   m_down.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
 
   nb_visible_items_max = h/height_item;
-  maxlen = ((w) / app.Font()->sm.GetWidth("A"));
 
   if ( background)
     SDL_FreeSurface( background);
@@ -122,16 +121,13 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
 {
 	const char *_s = label.c_str();
 	/* On parse le message pour le découper en différentes lignes */
-	char *s = new char[maxlen + 2];
-	for(uint i=0;;)
-	{
-		if(*_s == '\n' || ((i > maxlen-5) && *_s == ' ') || (i > (maxlen)) || !(*_s))
-		{ /* Retour à la ligne. Si ça dépasse le MSGBOX_MAXWIDTH lettres, on laisse une chance
-		   * à un caractère ' ' ou '\n' de s'interposer pour couper proprement. A partir de
-		   * MSGBOX_MAXWIDTH + 20 on coupe net.
-		   */
-		    s[i] = '\0';
+	std::string s;
 
+	while(1)
+	{
+		uint size = app.Font()->sm.GetWidth(s);
+		if(*_s == '\n' || ((size > Width()-30) && *_s == ' ') || ((size+10) > (Width())) || !(*_s))
+		{
 			/* Suppression du premier element */
 			if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
 			else if (m_items.size() >= nb_visible_items_max) first_visible_item++;
@@ -148,7 +144,7 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
 
 			visible_height = nb_visible_items*height_item;
 			if (h < visible_height)  visible_height = h;
-			i=0;
+			s.clear();
 
 			if(*_s == '\n')
 				_s++; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
@@ -156,7 +152,7 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
 			if(!*_s) break;
 		}
 		else
-			s[i++] = *_s++;
+			s += *_s++;
 	}
 }
 

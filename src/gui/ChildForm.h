@@ -60,6 +60,7 @@ protected:
 	T* AddComponent(T* comp)
 	{
 		composants.push_back(comp);
+		comp->SetParent(this);
 		comp->SetXY(comp->X()+x, comp->Y()+y);
 		comp->Init();
 		return comp;

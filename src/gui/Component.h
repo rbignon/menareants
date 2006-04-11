@@ -23,15 +23,16 @@
 
 #include <vector>
 #include <SDL_keyboard.h>
+#include "Object.h"
 
 typedef unsigned int   uint;
-typedef void (*TClickedFunction) (void* Form, void* Data);
+typedef void (*TClickedFunction) (TObject* Object, void* Data);
 
 /********************************************************************************************
  *                               TComponent                                                 *
  ********************************************************************************************/
 /** Base of components. */
-class TComponent
+class TComponent : public TObject
 {
 /* Constructeur/Deconstructeur */
 public:
@@ -92,7 +93,7 @@ public:
 	void SetEnabled(bool _en = true) { enabled = _en; }   /**< Set or unset this objet as enabled */
 
 	/* Le composant a le focus ? */
-	bool Focused() { return focus; }
+	bool Focused() const { return focus; }
 	virtual void SetFocus();
 	virtual void DelFocus();
 
@@ -101,8 +102,8 @@ public:
 	virtual void PressKey(SDL_keysym) { return; }
 
 	void SetClickedFunc(TClickedFunction c, void* param) { clicked_func = c; clicked_func_param = param; }
-	TClickedFunction ClickedFunc() { return clicked_func; }
-	void* ClickedFuncParam() { return clicked_func_param; }
+	TClickedFunction ClickedFunc() const { return clicked_func; }
+	void* ClickedFuncParam() const { return clicked_func_param; }
 
 	int Tag;
 

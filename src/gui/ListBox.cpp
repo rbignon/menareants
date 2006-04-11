@@ -120,10 +120,12 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
 
   int item = MouseIsOnWitchItem(mouse_x,mouse_y);
   if (item == -1 || !m_items[item].enabled) return false;
+#if 0
   if (IsSelected(item))
     Deselect (item);
   else
-    Select (item);
+#endif
+  Select (item);
   return true;
 }
 

@@ -50,7 +50,7 @@ bool TChildForm::Clic(int _x, int _y)
 		{
 			(*it)->SetFocus();
 			if((*it)->ClickedFunc())
-				(*(*it)->ClickedFunc()) (this, (*it)->ClickedFuncParam());
+				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
 			click = true;
 		}
 		else

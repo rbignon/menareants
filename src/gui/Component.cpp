@@ -40,6 +40,7 @@ TList::~TList()
 void TList::AddLine(TComponent *c)
 {
 	list.push_back(c);
+	c->SetParent(this);
 	c->SetXY(x, y+h);
 	h += c->Height();
 	if(c->Width() > w) w = c->Width();
@@ -100,6 +101,8 @@ bool TList::Clic (int mouse_x, int mouse_y)
 		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y))
 		{
 			(*it)->SetFocus();
+			if((*it)->ClickedFunc())
+				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
 			click = true;
 		}
 		else

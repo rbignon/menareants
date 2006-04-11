@@ -80,7 +80,7 @@ void TForm::Actions(SDL_Event event, uint a)
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();
 					if((*it)->ClickedFunc() && !(a & ACTION_NOCALL))
-						(*(*it)->ClickedFunc()) (this, (*it)->ClickedFuncParam());
+						(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
 					click = true;
 				}
 				else

@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+class TObject;
+
 class Config
 {
 public:
@@ -47,8 +49,8 @@ private:
 	bool set_defaults(bool want_save = true);
 	bool want_quit_config;
 
-	static void WantCancel(void*, void*);
-	static void WantOk(void*, void*);
+	static void WantCancel(TObject*, void*);
+	static void WantOk(TObject*, void*);
 };
 
 #endif

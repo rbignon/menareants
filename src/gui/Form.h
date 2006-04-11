@@ -87,7 +87,7 @@
  */
 
 /** This is a class who show a form on the screen and contain some components */
-class TForm
+class TForm : public TObject
 {
 /* Constructeur/Destructeur */
 public:
@@ -137,6 +137,7 @@ protected:
 	T* AddComponent(T* comp)
 	{
 		composants.push_back(comp);
+		comp->SetParent(this);
 		comp->Init();
 		return comp;
 	}

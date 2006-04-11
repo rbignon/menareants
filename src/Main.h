@@ -25,6 +25,7 @@
 #include "Config.h"
 #include "Sockets.h"
 #include "tools/Font.h"
+#include "gui/Object.h"
 
 #include <iostream>
 #include <SDL_thread.h>
@@ -51,9 +52,9 @@ protected:
 	void LoadGame(EChannel* ch);
 	void InGame();
 
-	static void WantQuit(void*, void*);
-	static void WantPlay(void*, void*);
-	static void WantConfig(void*, void*);
+	static void WantQuit(TObject*, void*);
+	static void WantPlay(TObject*, void*);
+	static void WantConfig(TObject*, void*);
 
 public:
 	int main(int argc, char** argv);

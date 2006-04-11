@@ -46,7 +46,6 @@ private:
   uint nb_visible_items, nb_visible_items_max;
   uint height_item;
   uint maxitems;
-  uint maxlen;
 
   // what are the items ?
   uint first_visible_item;
