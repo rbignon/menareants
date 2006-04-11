@@ -36,6 +36,21 @@ void TMap::SetXY(int _x, int _y)
 	SetPosition(_x, _y);
 }
 
+void TMap::MoveTo(int _x, int _y)
+{
+	SetPosition(- _x, - _y);
+}
+
+void TMap::CenterTo(int _x, int _y)
+{
+	MoveTo(_x - SCREEN_WIDTH/2, _y - SCREEN_HEIGHT/2);
+}
+
+void TMap::ScrollTo(int _x, int _y)
+{
+	/// \todo Implementation of this function
+}
+
 void TMap::SetPosition(int _x, int _y, bool force)
 {
 	if(!map) return;

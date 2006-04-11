@@ -47,6 +47,19 @@ public:
 
 	void SetPosition(int _x, int _y, bool force = false);
 
+	/* Centre sur un objet ou des coordonées (pixels) de la carte */
+	void CenterTo(ECase* e) { CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void CenterTo(ECEntity* e) { CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void CenterTo(int _x, int _y);
+
+	/* Fait un déplacement progressif */
+	void ScrollTo(ECase* e) { ScrollTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void ScrollTo(ECEntity* e) { ScrollTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void ScrollTo(int _x, int _y);
+
+	/* Le point (0,0) de l'écran coincide avec ce point */
+	void MoveTo(int _x, int _y);
+
 /* Attributs */
 public:
 
