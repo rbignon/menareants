@@ -43,8 +43,7 @@ bin_PROGRAMS = menareants$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -53,17 +52,17 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_menareants_OBJECTS = Main.$(OBJEXT) Timer.$(OBJEXT) \
+am_menareants_OBJECTS = Font.$(OBJEXT) Images.$(OBJEXT) \
+	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
+	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
+	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
+	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
+	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
+	ShowMap.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
 	Channels.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
-	JoinGame.$(OBJEXT) InGame.$(OBJEXT) Font.$(OBJEXT) \
-	Images.$(OBJEXT) Maths.$(OBJEXT) Component.$(OBJEXT) \
-	Form.$(OBJEXT) ChildForm.$(OBJEXT) ListBox.$(OBJEXT) \
-	ComboBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
-	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
-	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
-	Image.$(OBJEXT) ShowMap.$(OBJEXT)
+	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -187,19 +186,6 @@ target_vendor = @target_vendor@
 SUBDIRS = data
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 menareants_SOURCES = \
-		Main.cpp \
-		Timer.cpp \
-		Resources.cpp \
-		AltThread.cpp \
-		Sockets.cpp \
-		Config.cpp \
-		Debug.cpp \
-		Login.cpp \
-		Channels.cpp \
-		Map.cpp \
-		Units.cpp \
-		JoinGame.cpp \
-		InGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
@@ -217,7 +203,20 @@ menareants_SOURCES = \
 		gui/SpinEdit.cpp \
 		gui/ColorEdit.cpp \
 		gui/Image.cpp \
-		gui/ShowMap.cpp
+		gui/ShowMap.cpp \
+		Main.cpp \
+		Timer.cpp \
+		Resources.cpp \
+		AltThread.cpp \
+		Sockets.cpp \
+		Config.cpp \
+		Debug.cpp \
+		Login.cpp \
+		Channels.cpp \
+		Map.cpp \
+		Units.cpp \
+		JoinGame.cpp \
+		InGame.cpp
 
 menareants_LDADD = ${top_builddir}/lib/libmenareants.a
 all: all-recursive

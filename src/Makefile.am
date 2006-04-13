@@ -5,19 +5,6 @@ INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 
 bin_PROGRAMS = menareants
 menareants_SOURCES = \
-		Main.cpp \
-		Timer.cpp \
-		Resources.cpp \
-		AltThread.cpp \
-		Sockets.cpp \
-		Config.cpp \
-		Debug.cpp \
-		Login.cpp \
-		Channels.cpp \
-		Map.cpp \
-		Units.cpp \
-		JoinGame.cpp \
-		InGame.cpp \
 		tools/Font.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
@@ -35,7 +22,21 @@ menareants_SOURCES = \
 		gui/SpinEdit.cpp \
 		gui/ColorEdit.cpp \
 		gui/Image.cpp \
-		gui/ShowMap.cpp
+		gui/ShowMap.cpp \
+		Main.cpp \
+		Timer.cpp \
+		Resources.cpp \
+		AltThread.cpp \
+		Sockets.cpp \
+		Config.cpp \
+		Debug.cpp \
+		Login.cpp \
+		Channels.cpp \
+		Map.cpp \
+		Units.cpp \
+		JoinGame.cpp \
+		InGame.cpp
+
 
 menareants_LDADD =${top_builddir}/lib/libmenareants.a
 
