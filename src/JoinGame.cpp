@@ -926,14 +926,11 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	}
 	if(!client)
 		MyFree(GameInfosForm);
-
 	else
 	{
-		if(client->Player()->Channel()->State() == EChannel::SENDING)
-		{ /* LA PARTIE SE LANCE */
-			LoadGame(chan);
-		}
-	
+		if(client->Player()->Channel()->State() >= EChannel::SENDING)
+			LoadGame(chan); /* LA PARTIE SE LANCE */
+
 		if(client->Player())
 		{
 			client->Player()->Channel()->SetWantLeave();
