@@ -28,17 +28,19 @@
 
 #include "Component.h"
 
-#define EDIT_HEIGHT 15
 #define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN123456789 .+-*/,;:!?()[]={}'\"&<>"
 
 struct SDL_Surface;
+class Font;
+
 /** This is a component whose show a box where user can type text */
 class TEdit : public TComponent
 {
 /* Constructeur/Deconstructeur */
 public:
 
-	TEdit(int _x, int _y, uint _width, uint _maxlen = 0, bool show_background = true);
+	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, char* av = EDIT_CHARS,
+	      bool show_background = true);
 	~TEdit();
 
 /* Methodes */
@@ -50,6 +52,8 @@ public:
 	/* Affiche */
 	void Draw(int m_x, int m_y);
 
+	void Redraw();
+
 	/* Une touche a été pressée */
 	void PressKey(SDL_keysym);
 
@@ -57,18 +61,30 @@ public:
 public:
 
 	/* Chaine */
-	void SetString(std::string s) { chaine = s; }
+	void SetString(std::string s);
 	const std::string& GetString() const { return chaine; }
-	void ClearString() { chaine = ""; }
+	void ClearString() { chaine = ""; caret = 0; first_char = 0; }
+
+	const char* AvailChars() const { return avail_chars; }
+	void SetAvailChars(char* c) { avail_chars = c; }
+
+	void SetFocus();
+	void DelFocus();
 
 /* Variables privées */
 private:
 	SDL_Surface *background;
+	SDL_Surface *edit;
 	uint maxlen;
 	uint visible_len;
 	uint first_char;
 	std::string chaine;
 	bool show_background;
+	uint caret;
+	char* avail_chars;
+	bool have_redraw;
+	uint EDIT_HEIGHT;
+	Font* font;
 };
 
 #endif /* EC_EDIT_H */
