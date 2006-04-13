@@ -825,7 +825,8 @@ Optional Features:
   --enable-server         compilation of Men Are Ants's server
   --disable-game          compilation of Men Are Ants game
   --disable-sdltest       Do not try to compile and run a test SDL program
-  --enable-warnings       enable warnings during compilation
+  --enable-full-warnings  enable warnings during compilation (-W -Wall)
+  --enable-warnings       enable warnings during compilation (-Wall)
   --enable-debug          enable debug
 
 Optional Packages:
@@ -4096,6 +4097,17 @@ fi
 if test "${WIN32}" = "yes"; then
 	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
 fi
+
+#  FULL-WARNINGS
+# Check whether --enable-full-warnings or --disable-full-warnings was given.
+if test "${enable_full_warnings+set}" = set; then
+  enableval="$enable_full_warnings"
+
+                        if test "x${enableval}" != "xno"; then
+                                CXXFLAGS="$CXXFLAGS -W -Wall"
+                        fi
+
+fi;
 
 #  WARNINGS
 # Check whether --enable-warnings or --disable-warnings was given.

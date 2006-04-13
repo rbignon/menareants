@@ -99,9 +99,19 @@ if test "${WIN32}" = "yes"; then
 	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
 fi
 
+#  FULL-WARNINGS
+AC_ARG_ENABLE(  full-warnings,
+                [AC_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
+                [
+                        if test "x${enableval}" != "xno"; then
+                                CXXFLAGS="$CXXFLAGS -W -Wall"
+                        fi
+                ],
+                )
+
 #  WARNINGS
 AC_ARG_ENABLE(  warnings,
-                [AC_HELP_STRING([--enable-warnings],[enable warnings during compilation])],
+                [AC_HELP_STRING([--enable-warnings],[enable warnings during compilation (-Wall)])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 CXXFLAGS="$CXXFLAGS -Wall"
