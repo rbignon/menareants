@@ -158,7 +158,7 @@ void MenAreAntsApp::request_game()
 
 	try
 	{
-		ConnectedForm = new TConnectedForm;
+		ConnectedForm = new TConnectedForm(sdlwindow);
 
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
@@ -174,8 +174,8 @@ void MenAreAntsApp::request_game()
 			if(!client)
 				msg = "Connexion impossible";
 			else
-				msg = "Connexion impossible :\n" + client->CantConnect();
-			TMessageBox mb(300,200, msg.c_str(), BT_OK, NULL);
+				msg = "Connexion impossible :\n\n" + client->CantConnect();
+			TMessageBox mb(msg.c_str(), BT_OK, NULL);
 			mb.SetBackGround(Resources::Titlescreen());
 			mb.Show();
 			if(client)
@@ -227,9 +227,8 @@ void MenAreAntsApp::request_game()
 						{
 							if(!GameInfos(NULL, ConnectedForm))
 							{
-								TMessageBox mb(250,300,
-												std::string("Impossible de créer le salon.\n"
-												"Son nom est peut être déjà utilisé.").c_str(),
+								TMessageBox mb("Impossible de créer le salon.\n"
+												"Son nom est peut être déjà utilisé.",
 												BT_OK, ConnectedForm);
 								mb.Show();
 							}
@@ -246,7 +245,7 @@ void MenAreAntsApp::request_game()
 			{
 				eob = true;
 
-				TMessageBox mb(300,200, "Vous avez été déconnecté.", BT_OK, NULL);
+				TMessageBox mb("Vous avez été déconnecté.", BT_OK, NULL);
 				mb.SetBackGround(Resources::Titlescreen());
 				mb.Show();
 			}
@@ -254,8 +253,14 @@ void MenAreAntsApp::request_game()
 	}
 	catch(const TECExcept &e)
 	{
-		Debug(W_ERR, e.Message);
-		SDL_KillThread(Thread); /* En cas d'erreur, clore arbitrairement le thread */
+		vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+		client->SetWantDisconnect();
+		TMessageBox mb("Une erreur s'est produite dans le jeu !!\n\n"
+		               "Elle a été envoyée aux programmeurs du jeu qui feront leur "
+		               "possible pour le corriger.\n\n"
+		               "Veuillez nous excuser de la gêne occasionée", BT_OK, NULL);
+				mb.SetBackGround(Resources::Titlescreen());
+				mb.Show();
 	}
 	if(client)
 	{
@@ -274,16 +279,16 @@ void MenAreAntsApp::request_game()
  *                               TConnectedForm                                             *
  ********************************************************************************************/
 
-TConnectedForm::TConnectedForm()
-	: TForm()
+TConnectedForm::TConnectedForm(SDL_Surface* w)
+	: TForm(w)
 {
 	Welcome = AddComponent(new TLabel(100,110,"Vous êtes bien connecté", white_color, &app.Font()->big));
 
-	Motd = AddComponent(new TMemo(75,150,500,350, 0));
+	Motd = AddComponent(new TMemo(&app.Font()->sm, 75,150,500,350, 0));
 
-	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie"));
-	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties"));
-	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter"));
+	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie", &app.Font()->normal));
+	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties", &app.Font()->normal));
+	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter", &app.Font()->normal));
 
 	Uptime =    AddComponent(new TLabel(75,510,"", white_color, &app.Font()->normal));
 	UserStats = AddComponent(new TLabel(75,530,"", white_color, &app.Font()->normal));
