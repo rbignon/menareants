@@ -189,8 +189,8 @@ void Config::Configuration(bool first)
 {
 	TConfigForm*     ConfigForm = new TConfigForm(app.sdlwindow);
 
-	ConfigForm->CancelButton->SetClickedFunc(Config::WantCancel, this);
-	ConfigForm->OkButton->SetClickedFunc(Config::WantOk, this);
+	ConfigForm->CancelButton->SetOnClick(Config::WantCancel, this);
+	ConfigForm->OkButton->SetOnClick(Config::WantOk, this);
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
 	ConfigForm->Nation->Select(nation);

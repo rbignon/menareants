@@ -175,9 +175,9 @@ int MenAreAntsApp::main(int argc, char **argv)
 			MenAreAntsApp::WantConfig(0,(void*)true);
 
 		TMainForm*     MainForm = new TMainForm(sdlwindow);
-		MainForm->PlayButton->SetClickedFunc(MenAreAntsApp::WantPlay, this);
-		MainForm->QuitterButton->SetClickedFunc(MenAreAntsApp::WantQuit, this);
-		MainForm->OptionsButton->SetClickedFunc(MenAreAntsApp::WantConfig, (void*)false);
+		MainForm->PlayButton->SetOnClick(MenAreAntsApp::WantPlay, this);
+		MainForm->QuitterButton->SetOnClick(MenAreAntsApp::WantQuit, this);
+		MainForm->OptionsButton->SetOnClick(MenAreAntsApp::WantConfig, (void*)false);
 
 		do
 		{
