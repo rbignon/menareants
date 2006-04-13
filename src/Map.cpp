@@ -39,7 +39,9 @@ ECEntityList EntityList;
 
 ECEntityList::ECEntityList()
 {
-	entities.push_back(new ECArmy());
+#define VECTOR
+#include "lib/UnitsList.h"
+#undef VECTOR
 }
 
 ECEntityList::~ECEntityList()
@@ -263,6 +265,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 
 	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_SWSURFACE|SDL_SRCALPHA);
 
+	SLOCK(surf);
 	/* Dessine la preview */
 	uint xx = 0, yy = 0;
 	for(uint _y = 0; _y < y; ++_y, yy+=size_y, xx=0)
@@ -365,6 +368,8 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			}
 		}
 	}
+	SUNLOCK(surf);
+
 	if(preview)
 		preview->SetImage(surf);
 	else
