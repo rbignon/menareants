@@ -29,10 +29,10 @@
 #include "Edit.h"
 #include "tools/Images.h"
 
-#define MSGBOX_MAXWIDTH 300
+#define MSGBOX_MAXWIDTH 50
 
 /** This is a complex box to show a message and some buttons */
-class TMessageBox
+class TMessageBox : public TObject
 {
 #define BT_YES		0x001               /**< Yes button */
 #define BT_NO		0x002               /**< No button */
@@ -51,14 +51,9 @@ public:
 	 * @param _b this is flags of buttons to show.
 	 * @param form if there is a TForm, to continue to show it, put it in.
 	 */
-	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0)
-		: x(_x), y(_y), b(_b)
-	{
-		Edit = 0;
-		Form = form;
-		realbg = 0;
-		Init(_s);
-	}
+	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0);
+
+	TMessageBox(const char* _s, uint _b, TForm* form = 0);
 
 	~TMessageBox() {}
 
@@ -80,7 +75,8 @@ public:
 	/** Set form */
 	void SetForm(TForm* _form) { Form = _form; }
 
-	std::string EditText() { return (Edit ? Edit->GetString() : ""); }
+	std::string EditText() const { return (edit ? edit->GetString() : ""); }
+	TEdit* Edit() const { return edit; }
 
 	/** Set real back ground. */
 	void SetBackGround(ECImage* _ebg) { realbg = _ebg; }
@@ -96,7 +92,7 @@ protected:
 	SDL_Surface *background;
 	ECImage *realbg;
 	TForm *Form;
-	TEdit *Edit;
+	TEdit *edit;
 
 	void SetButtons();
 	void SetEdit();

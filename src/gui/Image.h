@@ -39,9 +39,9 @@ public:
 /* Methodes */
 public:
 
-	void Init();
+	virtual void Init();
 
-	void Draw (int mouse_x, int mouse_y);
+	virtual void Draw (int mouse_x, int mouse_y);
 
 /* Attributs */
 public:

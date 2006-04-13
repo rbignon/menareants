@@ -21,20 +21,18 @@
 
 #include "BouttonText.h"
 
-TButtonText::TButtonText() : TButton()
+TButtonText::TButtonText() : TButton(), font(0)
 {
-  font = &app.Font()->normal;
 }
 
 //-----------------------------------------------------------------------------
 
-TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, const std::string &text)
-  : TButton(_x, _y, _w, _h)
+TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, const std::string &text, Font *f)
+  : TButton(_x, _y, _w, _h), surf(0)
 {
-  m_text = text;
-  font = &app.Font()->normal;
+  font = f;
+  SetText(text);
 }
-
 
 //-----------------------------------------------------------------------------
 
@@ -47,22 +45,37 @@ void TButtonText::SetFont (Font *font)
 
 void TButtonText::SetText(const std::string &text)
 {
+  if (surf != NULL)
+  {
+    SDL_FreeSurface(surf);
+  }
+  assert (font != NULL);
   m_text = text;
+  surf = TTF_RenderText_Blended(&(font->GetTTF()), text.c_str(), Enabled() ? white_color : gray_color);
+}
+
+void TButtonText::SetEnabled(bool b)
+{
+	TComponent::SetEnabled(b);
+	SetText(m_text);
 }
 
 //-----------------------------------------------------------------------------
 
 void TButtonText::Draw (int souris_x, int souris_y)
 {
-  if(image)
-    DrawImage (souris_x, souris_y);
+	if(image)
+		DrawImage (souris_x, souris_y);
 
-  assert (font != NULL);
+	if(!surf) return;
 
-  const int _x = X()+Width()/2;
-  const int _y = Y()+Height()/2;
+	SDL_Rect dst_rect;
+	dst_rect.x = X()+Width()/2-surf->w/2;
+	dst_rect.y = Y()+Height()/2-surf->h/2;
+	dst_rect.w = surf->w;
+	dst_rect.h = surf->h;
 
-  font->WriteCenter (_x, _y, m_text, enabled ? white_color : gray_color);
+	SDL_BlitSurface(surf,NULL,Window(), &dst_rect);
 }
 
 //-----------------------------------------------------------------------------

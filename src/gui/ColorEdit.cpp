@@ -21,7 +21,6 @@
 #include "ColorEdit.h"
 #include "tools/Maths.h"
 #include "Resources.h"
-#include "Main.h"
 
 SDL_Color *color_eq[] = {
 	/* {COLOR_NONE  */          NULL,
@@ -35,8 +34,8 @@ SDL_Color *color_eq[] = {
 	/* COLOR_MAX    */          NULL
 };
 
-TColorEdit::TColorEdit(std::string _label, int _x, int _y, uint _width, int _defvalue)
-	: TSpinEdit(_label, _x, _y, _width, COLOR_NONE, COLOR_MAX-1, 1, _defvalue)
+TColorEdit::TColorEdit(Font* f, std::string _label, int _x, int _y, uint _width, int _defvalue)
+	: TSpinEdit(f, _label, _x, _y, _width, COLOR_NONE, COLOR_MAX-1, 1, _defvalue)
 {
 	imgx = 0;
 	img = 0;
@@ -59,10 +58,13 @@ void TColorEdit::Init()
   m_plus = new TButton (x+w-5,y,5,10);
   m_minus = new TButton (x+w-max_value_w-5-2*margin,y,5,10);
 
+  MyComponent(m_plus);
+  MyComponent(m_minus);
+
   /* Images */
   /* Pas besoin de delete, ECImage le fait */
-  m_plus->SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
-  m_minus->SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
+  m_plus->SetImage (new ECSprite(Resources::UpButton(), Window()));
+  m_minus->SetImage (new ECSprite(Resources::DownButton(), Window()));
 
   /* Label */
   if(txt_label) delete txt_label;
@@ -104,7 +106,7 @@ void TColorEdit::Draw (int mouse_x, int mouse_y)
 	if(img)
 	{
 		SDL_Rect r_back = {imgx,y,img->Img->w,img->Img->h};
-		SDL_BlitSurface( img->Img, NULL, app.sdlwindow, &r_back);
+		SDL_BlitSurface( img->Img, NULL, Window(), &r_back);
 	}
 
 	if(enabled)

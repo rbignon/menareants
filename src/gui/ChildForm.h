@@ -38,7 +38,7 @@ public:
 	/* Dessine chaques composants */
 	void Draw(int x, int y);
 
-	void Init() {}
+	virtual void Init() = 0;
 
 /* Attributs */
 public:
@@ -61,6 +61,7 @@ protected:
 	{
 		composants.push_back(comp);
 		comp->SetParent(this);
+		comp->SetWindow(Window());
 		comp->SetXY(comp->X()+x, comp->Y()+y);
 		comp->Init();
 		return comp;

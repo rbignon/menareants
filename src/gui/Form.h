@@ -92,7 +92,7 @@ class TForm : public TObject
 /* Constructeur/Destructeur */
 public:
 
-	TForm();
+	TForm(SDL_Surface* window);
 	virtual ~TForm() {}
 
 /* Methodes */
@@ -138,6 +138,7 @@ protected:
 	{
 		composants.push_back(comp);
 		comp->SetParent(this);
+		comp->SetWindow(Window());
 		comp->Init();
 		return comp;
 	}

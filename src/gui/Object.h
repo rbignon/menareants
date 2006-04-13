@@ -22,6 +22,8 @@
 #ifndef EC_OBJECT_H
 #define EC_OBJECT_H
 
+struct SDL_Surface;
+
 /********************************************************************************************
  *                                  TObject                                                 *
  ********************************************************************************************/
@@ -30,14 +32,24 @@ class TObject
 {
 public:
 	TObject()
-		: parent(0)
+		: parent(0), window(0)
 	{}
+
+	TObject(SDL_Surface* w)
+		: parent(0), window(w)
+	{}
+
+	virtual ~TObject() {}
 
 	void SetParent(TObject* o) { parent = o; }
 	TObject* Parent() const { return parent; }
 
+	void SetWindow(SDL_Surface* w) { window = w; }
+	SDL_Surface* Window() const { return window; }
+
 private:
 	TObject* parent;
+	SDL_Surface* window;
 };
 
 #endif /* EC_OBJECT_H */

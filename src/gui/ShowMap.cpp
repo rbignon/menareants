@@ -126,12 +126,16 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		c->Draw();
+		if(c)
+			c->Draw();
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+	{
+		if(!(*enti)) continue;
 		dynamic_cast<ECEntity*>(*enti)->Draw();
+	}
 
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{

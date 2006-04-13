@@ -19,13 +19,12 @@
  */
 
 #include "Form.h"
-#include "Main.h"
 #include <SDL.h>
 
-TForm::TForm()
+TForm::TForm(SDL_Surface* w)
 	: background(0), focus_order(true)
 {
-
+	SetWindow(w);
 }
 
 void TForm::SetBackground(ECImage *image)
@@ -61,7 +60,7 @@ void TForm::Actions(SDL_Event event, uint a)
 {
 	switch(event.type)
 	{
-		case SDL_KEYUP:
+		case SDL_KEYDOWN:
 			if(!(a & ACTION_NOKEY))
 			{
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
@@ -81,9 +80,11 @@ void TForm::Actions(SDL_Event event, uint a)
 						(*it)->SetFocus();
 					if((*it)->ClickedFunc() && !(a & ACTION_NOCALL))
 						(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
+					if((*it)->ClickedFuncPos() && !(a & ACTION_NOCALL))
+						(*(*it)->ClickedFuncPos()) (*it, event.button.x, event.button.y);
 					click = true;
 				}
-				else
+				else if(!(*it)->ForceFocus())
 					(*it)->DelFocus();
 			break;
 		}
@@ -95,7 +96,7 @@ void TForm::Actions(SDL_Event event, uint a)
 void TForm::Update(int _x, int _y, bool flip)
 {
 	if(background)
-		SDL_BlitSurface(background->Img,NULL,app.sdlwindow,NULL);
+		SDL_BlitSurface(background->Img,NULL,Window(),NULL);
 
 	if(_x < 0 || _y < 0)
 		SDL_GetMouseState( &_x, &_y);
@@ -112,5 +113,5 @@ void TForm::Update(int _x, int _y, bool flip)
 	}
 
 	if(flip)
-		SDL_Flip(app.sdlwindow);
+		SDL_Flip(Window());
 }

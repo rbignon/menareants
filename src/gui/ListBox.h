@@ -31,6 +31,7 @@
 
 struct SDL_Surface;
 struct SDL_Color;
+class Font;
 
 /** An item of TListBox */
 typedef struct s_list_box_item_t{
@@ -45,7 +46,7 @@ class TListBox : public TComponent
 {
 /* Constructeur/Destructeur */
 public:
-	TListBox (int _x, int _y, uint _width, uint _height);
+	TListBox (Font *font, int _x, int _y, uint _width, uint _height);
 	virtual ~TListBox();
 
 /* Methodes */
@@ -96,6 +97,8 @@ protected:
 	SDL_Surface *cursorover_box;
 	SDL_Surface *selected_box;
 	SDL_Surface *background;
+
+	Font* font;
 };
 
 #endif /* EC_LISTBOX_H */

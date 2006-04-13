@@ -30,6 +30,7 @@
 
 struct SDL_Surface;
 struct SDL_Color;
+class Font;
 
 /** An item of TMemo */
 typedef struct s_memo_box_item_t{
@@ -59,7 +60,7 @@ private:
   SDL_Surface *background;
 
 public:
-  TMemo (int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
+  TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
   ~TMemo();
   void Init ();
   void Draw (int mouse_x, int mouse_y);
@@ -69,6 +70,7 @@ public:
   void RemoveItem (uint index);
   uint NbItems() { return m_items.size(); }
   void ClearItems();
+  Font* font;
 
 };
 

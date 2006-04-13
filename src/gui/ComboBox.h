@@ -25,16 +25,11 @@
 #include "ListBox.h"
 #include "tools/Font.h"
 
-#define COMBOBOX_HEIGHT 15
-
-
 class TComboBox : public TListBox
 {
 /* Constructeur/Destructeur */
 public:
-	TComboBox(int _x, int _y, uint _width)
-		: TListBox(_x, _y, _width, COMBOBOX_HEIGHT), real_y(_y), edit_bg(0), opened(false), visible_len(0)
-	{ gray_disable = true; }
+	TComboBox(Font* f, int _x, int _y, uint _width);
 
 	virtual ~TComboBox();
 
@@ -68,6 +63,7 @@ protected:
 	void SetOpened(bool _o);
 	void SetBackGround(uint _h);
 	std::string chaine;
+	uint COMBOBOX_HEIGHT;
 };
 
 #endif /* EC_COMBOBOX_H */

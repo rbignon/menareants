@@ -22,19 +22,18 @@
 #include "tools/Font.h"
 #include "tools/Maths.h"
 #include "Resources.h"
-#include "Main.h"
 #include <iostream>
 #include <sstream>
 
-TSpinEdit::TSpinEdit(std::string _label, int _x, int _y, uint _width, int _min, int _max, uint _step,
+TSpinEdit::TSpinEdit(Font* f, std::string _label, int _x, int _y, uint _width, int _min, int _max, uint _step,
                      int _defvalue)
 	: TComponent(_x, _y, _width, SPINEDIT_HEIGHT), min(_min), max(_max), step(_step),
 	  label(_label)
 {
 	/* Sécurités */
 	if(max < min) max = min;
-	if(value < min) value = min;
-	else if(value > max) value = max;
+	if(_defvalue < min) _defvalue = min;
+	else if(_defvalue > max) _defvalue = max;
 
 	value = _defvalue;
 
@@ -42,7 +41,7 @@ TSpinEdit::TSpinEdit(std::string _label, int _x, int _y, uint _width, int _min, 
 	txt_value = NULL;
 	m_plus = NULL;
 	m_minus = NULL;
-	font = &app.Font()->sm;
+	font = f;
 	color = white_color;
 }
 
@@ -69,10 +68,13 @@ void TSpinEdit::Init()
   m_plus = new TButton (x+w-5,y,5,10);
   m_minus = new TButton (x+w-max_value_w-5-2*margin,y,5,10);
 
+  MyComponent(m_plus);
+  MyComponent(m_minus);
+
   /* Images */
   /* Pas besoin de delete, ECImage le fait */
-  m_plus->SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
-  m_minus->SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
+  m_plus->SetImage (new ECSprite(Resources::UpButton(), Window()));
+  m_minus->SetImage (new ECSprite(Resources::DownButton(), Window()));
 
   /* Label */
   if(txt_label) delete txt_label;
@@ -81,6 +83,10 @@ void TSpinEdit::Init()
   uint center = (m_plus->X() +5 + m_minus->X() )/2;
   txt_label = new TLabel(x, y, label, color, font);
   txt_value = new TLabel(center, y, "", color, font);
+
+  MyComponent(txt_label);
+  MyComponent(txt_value);
+
   SetValue(value, true);
 }
 

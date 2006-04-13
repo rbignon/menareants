@@ -23,24 +23,27 @@
 #define EC_BOUTTONTEXT_H
 
 #include "Boutton.h"
-#include "Main.h"
+#include "tools/Font.h"
 #include <string>
+#include <SDL.h>
 
 class TButtonText : public TButton
 {
 private:
   std::string m_text;
+  SDL_Surface* surf;
 
   Font *font;
 
 public:
   TButtonText();
-  TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text);
+  TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text, Font* font);
   ~TButtonText() {}
 
   virtual void Draw (int souris_x, int souris_y);
   void SetText (const std::string &text);
   void SetFont (Font *font);
+  void SetEnabled(bool b = true);
 
   std::string GetText() const;
 };

@@ -39,7 +39,7 @@ public:
   TButton (int x, int y, unsigned int w, unsigned int h);
   ~TButton();
 
-  void Init() {}
+  void Init();
 
   void SetImage (ECSprite *image);
 

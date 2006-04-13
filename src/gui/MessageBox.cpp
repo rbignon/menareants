@@ -20,8 +20,8 @@
 
 #include "MessageBox.h"
 #include "Defines.h"
-#include "Main.h"
 #include "Debug.h"
+#include "Main.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -39,6 +39,24 @@ static struct ButtonList_t
 	{ BT_CANCEL,	"Annuler",	150,	50	}
 };
 
+TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form)
+	: TObject(app.sdlwindow), x(-1), y(-1), b(_b)
+{
+	edit = 0;
+	Form = form;
+	realbg = 0;
+	Init(_s);
+}
+
+TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form)
+	: TObject(app.sdlwindow), x(_x), y(_y), b(_b)
+{
+	edit = 0;
+	Form = form;
+	realbg = 0;
+	Init(_s);
+}
+
 uint TMessageBox::Show()
 {
 	SDL_Event event;
@@ -51,24 +69,24 @@ uint TMessageBox::Show()
 			{
 				switch(event.type)
 				{
-					case SDL_KEYUP:
-						if(Edit)
+					case SDL_KEYDOWN:
+						if(edit)
 						{
 							switch (event.key.keysym.sym)
 							{
 								case SDLK_RETURN:
-									if(Edit->Focused() && !boutons.empty())
+									if(edit->Focused() && !boutons.empty())
 										return boutons[0]->Tag;
 									break;
 								default: break;
 							}
-							Edit->PressKey(event.key.keysym);
+							edit->PressKey(event.key.keysym);
 						}
 						break;
 
 					case SDL_MOUSEBUTTONDOWN:
-						if(Edit)
-							Edit->Clic(event.button.x, event.button.y);
+						if(edit)
+							edit->Clic(event.button.x, event.button.y);
 						for(uint i=0; i<boutons.size();i++)
 							if(boutons[i]->Test(event.button.x, event.button.y))
 								return boutons[i]->Tag;
@@ -104,11 +122,11 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 	for (uint i=0; i < message.size(); i++, vert += height_string)
 		app.Font()->normal.WriteLeft(x+25, vert, message[i], black_color);
 
-	if(Edit)
+	if(edit)
 	{
 		vert += 10;
-		Edit->Draw(mouse_x, mouse_y);
-		vert += EDIT_HEIGHT;
+		edit->Draw(mouse_x, mouse_y);
+		vert += edit->Height();
 	}
 
 	vert += 20;
@@ -152,12 +170,12 @@ void TMessageBox::SetText(const char* _s)
 
 void TMessageBox::SetEdit()
 {
-	if(Edit) delete Edit;
+	if(edit) delete edit;
 	h += 10;
-	Edit = new TEdit(x+15,y+h,w-15-20);
-	Edit->Init();
-	Edit->SetFocus();
-	h += EDIT_HEIGHT;
+	edit = new TEdit(&app.Font()->normal, x+15,y+h,w-15-20);
+	MyComponent(edit);
+	edit->SetFocus();
+	h += edit->Height();
 }
 
 void TMessageBox::Init(const char* s)
@@ -169,11 +187,21 @@ void TMessageBox::Init(const char* s)
 		SetEdit();
 	SetButtons();
 
-        SDL_Rect r_back = {0,0,w,h};
+	SDL_Rect r_back = {0,0,w,h};
 
-        background = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, w, h,
-                                                32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-        SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
+	background = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, w, h,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
+	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*5/10));
+
+	if(x == -1 && y == -1)
+	{
+		x = SCREEN_WIDTH/2 - w / 2;
+		y = SCREEN_HEIGHT/2 - h / 2;
+		for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+			(*it)->SetXY((*it)->X() + x + 1, (*it)->Y() + y + 1);
+		if(edit)
+			edit->SetXY(edit->X() + x + 1, edit->Y() + y + 1);
+	}
 }
 
 void TMessageBox::SetButtons()
@@ -192,7 +220,8 @@ void TMessageBox::SetButtons()
 		if(b & ButtonList[i].flag)
 		{
 			TButtonText *bt = new TButtonText(tmpw, y+h, ButtonList[i].w, ButtonList[i].h,
-			                                  ButtonList[i].label);
+			                                  ButtonList[i].label, &app.Font()->normal);
+			MyComponent(bt);
 			bt->Tag = ButtonList[i].flag;
 			boutons.push_back(bt);
 			tmpw += ButtonList[i].w + 1;

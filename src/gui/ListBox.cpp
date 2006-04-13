@@ -21,16 +21,16 @@
 
 #include "tools/Font.h"
 #include "ListBox.h"
-#include "Main.h"
 #include "Resources.h"
 #include "tools/Maths.h"
 #include <algorithm>
 #include <SDL.h>
 
-TListBox::TListBox (int _x, int _y, uint _width, uint _height)
-  : TComponent(_x, _y, _width, _height)
+TListBox::TListBox (Font* f, int _x, int _y, uint _width, uint _height)
+  : TComponent(_x, _y, _width, _height), font(f)
 {
-  height_item = 15;
+  assert(font);
+  height_item = f->GetHeight();
   first_visible_item = 0;
   nb_visible_items = 0;
   visible_height = 0;
@@ -54,10 +54,11 @@ TListBox::~TListBox()
 
 void TListBox::Init()
 {
+  MyComponent(&m_up);
+  MyComponent(&m_down);
   // Load images
-
-  m_up.SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
-  m_down.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
+  m_up.SetImage (new ECSprite(Resources::UpButton(), Window()));
+  m_down.SetImage (new ECSprite(Resources::DownButton(), Window()));
 
   nb_visible_items_max = h/height_item;
 
@@ -135,7 +136,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 
   // blit a surface as SDL_FillRect don't alpha blit a rectangle
   SDL_Rect r_back = {x,y,w,h};
-  SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+  SDL_BlitSurface( background, NULL, Window(), &r_back);
 
   for (uint i=0; i < nb_visible_items; i++)
   {
@@ -145,16 +146,16 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 		if ( i+first_visible_item == uint(item))
 		{
 			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-			SDL_BlitSurface( cursorover_box, NULL, app.sdlwindow, &r);
+			SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
 		}
 		else if ( IsSelected(i+first_visible_item))
 		{
 			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-			SDL_BlitSurface( selected_box, NULL, app.sdlwindow, &r);
+			SDL_BlitSurface( selected_box, NULL, Window(), &r);
 		}
 	}
 	if(!m_items[i+first_visible_item].label.empty())
-		app.Font()->sm.WriteLeft(x+5,
+		font->WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
 			 !m_items[i+first_visible_item].enabled && gray_disable ? gray_color :
@@ -204,7 +205,6 @@ void TListBox::ClearItems()
 {
 	m_items.clear();
 	m_selection = -1;
-	height_item = 15;
 	first_visible_item = 0;
 	visible_height = 0;
 	nb_visible_items = 0;

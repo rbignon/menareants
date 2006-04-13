@@ -19,7 +19,6 @@
  */
 
 #include "Label.h"
-#include "Main.h"
 
 TLabel::TLabel(int x, int y, std::string new_txt, SDL_Color new_color, Font* new_font)
 	: TComponent(x, y)
@@ -73,5 +72,5 @@ void TLabel::Draw(int m_x, int m_y)
 	dst_rect.w = surf->w;
 	dst_rect.h = surf->h;
 
-	SDL_BlitSurface(surf,NULL,app.sdlwindow, &dst_rect);
+	SDL_BlitSurface(surf,NULL,Window(), &dst_rect);
 }

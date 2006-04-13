@@ -21,7 +21,6 @@
 
 #include "gui/Image.h"
 #include "Debug.h"
-#include "Main.h"
 
 TImage::TImage()
 	: TComponent()
@@ -52,6 +51,9 @@ void TImage::Init()
 
 void TImage::SetImage(ECImage* _img, bool _wd)
 {
+	if(wana_delete && image)
+		delete image;
+
 	image = _img;
 	wana_delete = _wd;
 	Init();
@@ -61,5 +63,5 @@ void TImage::Draw(int _x, int _y)
 {
 	if(!image) return;
 	SDL_Rect r_back = {x,y,w,h};
-	SDL_BlitSurface( image->Img, NULL, app.sdlwindow, &r_back);
+	SDL_BlitSurface( image->Img, NULL, Window(), &r_back);
 }

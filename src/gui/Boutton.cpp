@@ -22,15 +22,10 @@
 #include "Boutton.h"
 #include "tools/Images.h"
 #include "Resources.h"
-#include "Main.h"
 
 TButton::TButton ()
 {
    image = NULL;
-   x = 0;
-   y = 0;
-   w = 0;
-   h = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -39,8 +34,13 @@ TButton::TButton (int _x, int _y, unsigned int _w, unsigned int _h)
   : TComponent(_x, _y, _w, _h)
 {
 	image = NULL;
-	SetImage(new ECSprite(Resources::NormalButton(), app.sdlwindow));
 	enabled = true;
+}
+
+void TButton::Init()
+{
+	if(!image)
+		SetImage(new ECSprite(Resources::NormalButton(), Window()));
 }
 
 //-----------------------------------------------------------------------------

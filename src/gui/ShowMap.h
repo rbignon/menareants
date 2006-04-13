@@ -71,6 +71,8 @@ public:
 	void SetSchema(bool s = true) { schema = s; }
 	void ToggleSchema() { schema = !schema; }
 
+	ECMap* Map() const { return map; }
+
 /* Variables privées */
 private:
 	ECMap* map;

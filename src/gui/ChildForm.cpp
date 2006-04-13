@@ -19,7 +19,6 @@
  */
 
 #include "ChildForm.h"
-#include "Main.h"
 
 TChildForm::TChildForm(int _x, int _y, uint _w, uint _h)
 	: TComponent(_x, _y, _w, _h), background(0), focus_order(true)
@@ -51,9 +50,11 @@ bool TChildForm::Clic(int _x, int _y)
 			(*it)->SetFocus();
 			if((*it)->ClickedFunc())
 				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
+			if((*it)->ClickedFuncPos())
+				(*(*it)->ClickedFuncPos()) (*it, _x, _y);
 			click = true;
 		}
-		else
+		else if(!(*it)->ForceFocus())
 			(*it)->DelFocus();
 	return true;
 }
@@ -63,7 +64,7 @@ void TChildForm::Draw(int _x, int _y)
 	if(background)
 	{
 		SDL_Rect r_back = {x,y,w,h};
-		SDL_BlitSurface(background->Img,NULL,app.sdlwindow,&r_back);
+		SDL_BlitSurface(background->Img,NULL,Window(),&r_back);
 	}
 
 	bool first = focus_order ? true : false;

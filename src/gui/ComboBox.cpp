@@ -21,7 +21,13 @@
 
 #include "ComboBox.h"
 #include "Resources.h"
-#include "Main.h"
+
+TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
+	: TListBox(f, _x, _y, _width, f->GetHeight()), real_y(_y), edit_bg(0), opened(false), visible_len(0),
+		  COMBOBOX_HEIGHT(f->GetHeight())
+{
+	gray_disable = true;
+}
 
 TComboBox::~TComboBox()
 {
@@ -32,10 +38,12 @@ TComboBox::~TComboBox()
 void TComboBox::Init()
 {
   // Load images
+  assert(font);
+  visible_len = ((w) / font->GetWidth("A"));
 
-  visible_len = ((w) / app.Font()->sm.GetWidth("A"));
+  MyComponent(&m_open);
 
-  m_open.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
+  m_open.SetImage (new ECSprite(Resources::DownButton(), Window()));
   m_open.SetXY(x+w-12, y);
 
   if ( edit_bg)
@@ -79,14 +87,14 @@ void TComboBox::SetOpened(bool _o)
 		y = real_y + COMBOBOX_HEIGHT + 1;
 		h = height_item * m_items.size();
 		visible_height = h;
-		m_open.SetImage (new ECSprite(Resources::UpButton(), app.sdlwindow));
+		m_open.SetImage (new ECSprite(Resources::UpButton(), Window()));
 		SetBackGround(h);
 	}
 	else
 	{
 		y = real_y;
 		h = COMBOBOX_HEIGHT;
-		m_open.SetImage (new ECSprite(Resources::DownButton(), app.sdlwindow));
+		m_open.SetImage (new ECSprite(Resources::DownButton(), Window()));
 	}
 }
 
@@ -152,15 +160,15 @@ bool TComboBox::Clic (int mouse_x, int mouse_y)
 void TComboBox::Draw (int mouse_x, int mouse_y)
 {
 	SDL_Rect r_back = {x,real_y,w-13,COMBOBOX_HEIGHT};
-	SDL_BlitSurface( edit_bg, NULL, app.sdlwindow, &r_back);
+	SDL_BlitSurface( edit_bg, NULL, Window(), &r_back);
 
 	if(!chaine.empty())
 	{
 		if(chaine.size() > visible_len)
-			app.Font()->sm.WriteLeft(x+5, real_y,
+			font->WriteLeft(x+5, real_y,
 					chaine.substr(0, visible_len), black_color);
 		else
-			app.Font()->sm.WriteLeft(x+5, real_y, chaine, black_color);
+			font->WriteLeft(x+5, real_y, chaine, black_color);
 	}
 
 	if(enabled)

@@ -36,6 +36,7 @@ class TSpinEdit : public TComponent
 public:
 
 	/** Constructor
+	 * @param _font font
 	 * @param label label of component.
 	 * @param _x x position of component.
 	 * @param _y y position of component.
@@ -45,7 +46,8 @@ public:
 	 * @param _step value added or removed when user clicks on one of buttons.
 	 * @param _defvalue this is default value that component has when it is created.
 	 */
-	TSpinEdit(std::string label, int _x, int _y, uint _width, int _min, int _max, uint _step = 1, int _defvalue = 0);
+	TSpinEdit(Font *font, std::string label, int _x, int _y, uint _width, int _min, int _max, uint _step = 1,
+	          int _defvalue = 0);
 	virtual ~TSpinEdit();
 
 /* Methodes */
