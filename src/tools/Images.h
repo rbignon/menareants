@@ -24,15 +24,29 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
+class ECSpriteBase;
+
+class ECImage;
+
+void ChangePixelColor(ECImage* surf, SDL_Color last_color, SDL_Color new_color);
+Uint32 getpixel(SDL_Surface * surface, int x, int y);
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 #define EstTransparent(a)       ( (a) != 255 )
 SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags);
 SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags);
+void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
+#define sgn(x) ((x<0)?-1:((x>0)?1:0))
+#define SLOCK(surface) \
+    do { \
+        if(SDL_MUSTLOCK(surface)) \
+	    SDL_LockSurface(surface); \
+    } while(0)
 
-
-class ECSpriteBase;
-
-class ECImage;
+#define SUNLOCK(surface) \
+    do { \
+        if(SDL_MUSTLOCK(surface)) \
+	    SDL_UnlockSurface(surface); \
+    } while(0)
 
 class ECSprite
 {
@@ -87,6 +101,8 @@ public:
 	int Y() { return mY; }
 	int GetWidth();                             /**< Fonction pour la largeur */
 	int GetHeight();                            /**< Fonction pour la hauteur */
+
+	ECImage* First() const;
 
 /* Variables privées */
 private:

@@ -23,6 +23,64 @@
 #include "Defines.h"
 #include "Debug.h"
 
+void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
+{
+    int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
+
+    // Are these safety checks really needed?
+    if(x1 > screen->w)
+        x1 = screen->w - 1;
+
+    if(x2 > screen->w)
+        x2 = screen->w - 1;
+
+    if(y1 > screen->h)
+        y1 = screen->h - 1;
+
+    if(y2 > screen->h)
+        y2 = screen->h - 1;
+
+    dx = x2 - x1;               /* the horizontal distance of the line */
+    dy = y2 - y1;               /* the vertical distance of the line */
+    dxabs = abs(dx);
+    dyabs = abs(dy);
+    sdx = sgn(dx);
+    sdy = sgn(dy);
+    x = dyabs >> 1;
+    y = dxabs >> 1;
+    px = x1;
+    py = y1;
+
+    if(dxabs >= dyabs)          /* the line is more horizontal than vertical */
+    {
+        for(i = 0; i < dxabs; i++)
+        {
+            y += dyabs;
+            if(y >= dxabs)
+            {
+                y -= dxabs;
+                py += sdy;
+            }
+            px += sdx;
+            putpixel(screen, px, py, color);
+        }
+    }
+    else                        /* the line is more vertical than horizontal */
+    {
+        for(i = 0; i < dyabs; i++)
+        {
+            x += dxabs;
+            if(x >= dyabs)
+            {
+                x -= dyabs;
+                px += sdx;
+            }
+            py += sdy;
+            putpixel(screen, px, py, color);
+        }
+    }
+}
+
 SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags){
 
   SDL_Surface* surface = SDL_CreateRGBSurface(flags, width, height, 32,
@@ -62,6 +120,47 @@ SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
   return surface;
 }
 
+void ChangePixelColor(ECImage* surf, SDL_Color last_color, SDL_Color new_color)
+{
+	SLOCK(surf->Img);
+	for(uint x = 0; x < surf->GetWidth(); x++)
+		for(uint y = 0; y < surf->GetHeight(); y++)
+		{
+			Uint32 col = getpixel(surf->Img, x, y);
+			Uint8 r, g, b;
+			SDL_GetRGB(col, surf->Img->format, &r, &g, &b);
+			if(last_color.r == r && last_color.g == g && last_color.b == b)
+				putpixel(surf->Img, x, y, SDL_MapRGB(surf->Img->format, new_color.r, new_color.g, new_color.b));
+		}
+	SUNLOCK(surf->Img);
+}
+
+Uint32 getpixel(SDL_Surface * surface, int x, int y)
+{
+    int bpp = surface->format->BytesPerPixel;
+    Uint8 *p = (Uint8 *) surface->pixels + y * surface->pitch + x * bpp;
+
+    switch (bpp)
+    {
+        case 1:
+            return *p;
+
+        case 2:
+            return *(Uint16 *) p;
+
+        case 3:
+            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+                return p[0] << 16 | p[1] << 8 | p[2];
+            else
+                return p[0] | p[1] << 8 | p[2] << 16;
+
+        case 4:
+            return *(Uint32 *) p;
+
+        default:
+            return 0;
+    }
+}
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
@@ -144,6 +243,13 @@ void ECSprite::updateBG()
   srcrect.y = mY;
   mOldX=mX;mOldY=mY;
   SDL_BlitSurface(mScreen, &srcrect, mBackreplacement, NULL);
+}
+
+ECImage* ECSprite::First() const
+{
+	if(mSpriteBase->mNumframes)
+		return &mSpriteBase->mAnim[0];
+	return 0;
 }
 
 void ECSprite::draw()
@@ -287,6 +393,7 @@ void ECImage::Load(char *fichier)
 
 void ECImage::Draw(int x, int y)
 {
+  if(!Img) return;
   SDL_Rect dest;
   dest.x = x;
   dest.y = y;
@@ -295,6 +402,7 @@ void ECImage::Draw(int x, int y)
 
 void ECImage::Draw(int x, int y, int w, int h, int x2, int y2)
 {
+  if(!Img) return;
   SDL_Rect dest;
   dest.x = x;
   dest.y = y;
