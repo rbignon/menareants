@@ -34,7 +34,7 @@ public:
 public:
 	bool load();
 	bool save() const;
-	void Configuration();
+	void Configuration(bool);
 
 public:
 	std::string hostname;

@@ -34,6 +34,8 @@
 #include "gui/Edit.h"
 #include "gui/ComboBox.h"
 #include "gui/ColorEdit.h"
+#include "gui/MessageBox.h"
+#include "Main.h"
 
 Config::Config(std::string _filename)
 {
@@ -63,7 +65,10 @@ bool Config::load()
 	std::ifstream fp(filename.c_str());
 
 	if(!fp)
+	{
+		app.FirstRun();
 		return set_defaults();
+	}
 
 	std::string ligne;
 
@@ -123,7 +128,7 @@ class TConfigForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TConfigForm();
+	TConfigForm(SDL_Surface*);
 	~TConfigForm();
 
 /* Composants */
@@ -136,6 +141,7 @@ public:
 	TColorEdit*     Color;
 	TComboBox*      Nation;
 	TLabel*         Title;
+	TLabel*         Info;
 	TLabel*         NickInfo;
 	TLabel*         NationInfo;
 
@@ -148,6 +154,12 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 {
 	TConfigForm* form = static_cast<TConfigForm*>(OkButton->Parent());
 	Config* conf = static_cast<Config*>(configinst);
+
+	if(form->Nick->GetString().empty())
+	{
+		TMessageBox("Veuillez rentrer un pseudo.", BT_OK, form).Show();
+		return;
+	}
 
 	conf->nick = form->Nick->GetString();
 
@@ -173,15 +185,20 @@ void Config::WantCancel(TObject*, void* configinst)
 	conf->want_quit_config = true;
 }
 
-void Config::Configuration()
+void Config::Configuration(bool first)
 {
-	TConfigForm*     ConfigForm = new TConfigForm;
+	TConfigForm*     ConfigForm = new TConfigForm(app.sdlwindow);
 
 	ConfigForm->CancelButton->SetClickedFunc(Config::WantCancel, this);
 	ConfigForm->OkButton->SetClickedFunc(Config::WantOk, this);
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
 	ConfigForm->Nation->Select(nation);
+	if(first)
+	{
+		ConfigForm->Info->Show();
+		ConfigForm->CancelButton->SetEnabled(false);
+	}
 
 	bool found = false;
 	for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
@@ -203,23 +220,27 @@ void Config::Configuration()
 	} while(!want_quit_config);
 }
 
-TConfigForm::TConfigForm()
-	: TForm()
+TConfigForm::TConfigForm(SDL_Surface *w)
+	: TForm(w)
 {
 	Title = AddComponent(new TLabel(300,120,"Configuration", white_color, &app.Font()->big));
 
-	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK"));
-	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler"));
+	Info = AddComponent(new TLabel(160, 160,"C'est votre premier lancement, veuillez configurer votre jeu.",
+	                                        white_color, &app.Font()->normal));
+	Info->Hide();
 
-	ServerList = AddComponent(new TListBox(50, 200, 220, 300));
+	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK", &app.Font()->normal));
+	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", &app.Font()->normal));
+
+	ServerList = AddComponent(new TListBox(&app.Font()->sm, 50, 200, 220, 300));
 
 	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, &app.Font()->normal));
-	Nick = AddComponent(new TEdit(300,225,200, NICKLEN));
+	Nick = AddComponent(new TEdit(&app.Font()->sm, 300,225,200, NICKLEN, NICK_CHARS));
 
-	Color = AddComponent(new TColorEdit("Couleur par défaut", 300, 250, 200));
+	Color = AddComponent(new TColorEdit(&app.Font()->sm, "Couleur par défaut", 300, 250, 200));
 
 	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, &app.Font()->normal));
-	Nation = AddComponent(new TComboBox(300, 300, 200));
+	Nation = AddComponent(new TComboBox(&app.Font()->sm, 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 		Nation->AddItem(false, std::string(nations_str[i]), "");
 
@@ -236,5 +257,6 @@ TConfigForm::~TConfigForm()
 	delete ServerList;
 	delete CancelButton;
 	delete OkButton;
+	delete Info;
 	delete Title;
 }
