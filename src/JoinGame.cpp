@@ -766,16 +766,16 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 {
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
-		
+
 	std::string name;
 	bool create = false;
 
 	if(!cname)
 	{
 		create = true;
-		TMessageBox mb(250,300,
-						"Entrez le nom du salon à créer",
+		TMessageBox mb("Entrez le nom du salon à créer",
 						HAVE_EDIT|BT_OK, form);
+		mb.Edit()->SetAvailChars(CHAN_CHARS);
 		if(mb.Show() == BT_OK)
 			name = mb.EditText();
 		if(name.empty()) return true;
@@ -784,7 +784,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	}
 
 	/* Déclaration membres fixes */
-	GameInfosForm = new TGameInfosForm;
+	GameInfosForm = new TGameInfosForm(sdlwindow);
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(cname), green_color);
 
@@ -953,7 +953,7 @@ void MenAreAntsApp::ListGames()
 
 	SDL_Event event;
 
-	ListGameForm = new TListGameForm;
+	ListGameForm = new TListGameForm(sdlwindow);
 
 	bool eob = false, refresh = true;
 	Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
@@ -996,8 +996,7 @@ void MenAreAntsApp::ListGames()
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
 						{
-							TMessageBox mb(250,300,
-							                  std::string("Impossible de joindre le salon " +
+							TMessageBox mb(std::string("Impossible de joindre le salon " +
 							                  ListGameForm->GList->ReadValue(
 							                           ListGameForm->GList->GetSelectedItem())
 							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
@@ -1012,8 +1011,7 @@ void MenAreAntsApp::ListGames()
 					{
 						if(!GameInfos(NULL, ListGameForm))
 						{
-							TMessageBox mb(250,300,
-												std::string("Impossible de créer le salon.\n"
+							TMessageBox mb(std::string("Impossible de créer le salon.\n"
 												"Son nom est peut être déjà utilisé.").c_str(),
 												BT_OK, ListGameForm);
 							mb.Show();
@@ -1046,26 +1044,26 @@ void MenAreAntsApp::ListGames()
  *                               TListGameForm                                              *
  ********************************************************************************************/
 
-TGameInfosForm::TGameInfosForm()
-	: TForm()
+TGameInfosForm::TGameInfosForm(SDL_Surface* w)
+	: TForm(w)
 {
 	Title = AddComponent(new TLabel(350,6,"Jeu", white_color, &app.Font()->big));
 
 	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
 
-	Chat = AddComponent(new TMemo(50,325,315,495,30));
-	SendMessage = AddComponent(new TEdit(50,555,315, MAXBUFFER-20));
+	Chat = AddComponent(new TMemo(&app.Font()->sm, 50,325,315,495,30));
+	SendMessage = AddComponent(new TEdit(&app.Font()->sm, 50,555,315, MAXBUFFER-20));
 
 	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
 	Preview = AddComponent(new TImage(390, 380));
 
 	//MapList = AddComponent(new TListBox(400, 400, 150, 150));
-	MapList = AddComponent(new TListBox(600, 345, 150, 115));
+	MapList = AddComponent(new TListBox(&app.Font()->sm, 600, 345, 150, 115));
 
-	PretButton = AddComponent(new TButtonText(600,470, 150,50, "Pret"));
+	PretButton = AddComponent(new TButtonText(600,470, 150,50, "Pret", &app.Font()->normal));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(600,520,150,50, "Retour"));
+	RetourButton = AddComponent(new TButtonText(600,520,150,50, "Retour", &app.Font()->normal));
 
 	SetBackground(Resources::Titlescreen());
 
@@ -1098,17 +1096,17 @@ void TGameInfosForm::RecalcMemo()
  *                               TListGameForm                                              *
  ********************************************************************************************/
 
-TListGameForm::TListGameForm()
-	: TForm()
+TListGameForm::TListGameForm(SDL_Surface* w)
+	: TForm(w)
 {
 	Title = AddComponent(new TLabel(300,150,"Liste des parties", white_color, &app.Font()->big));
 
-	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Joindre"));
-	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser"));
-	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Creer"));
-	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour"));
+	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Joindre", &app.Font()->normal));
+	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", &app.Font()->normal));
+	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Creer", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", &app.Font()->normal));
 
-	GList = AddComponent(new TListBox(300,200,200,300));
+	GList = AddComponent(new TListBox(&app.Font()->sm, 300,200,200,300));
 
 	SetBackground(Resources::Titlescreen());
 }
@@ -1168,12 +1166,13 @@ void TPlayerLine::Init()
 	assert(pl);
 	if(position) delete position;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit("",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
-	position->Init();
-	couleur = new TColorEdit("",  x+340, y, 50);
-	couleur->Init();
-	nation = new TComboBox(x+490, y, 150);
-	nation->Init();
+	position = new TSpinEdit(&app.Font()->sm, "",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
+	MyComponent(position);
+	couleur = new TColorEdit(&app.Font()->sm, "",  x+340, y, 50);
+	MyComponent(couleur);
+	nation = new TComboBox(&app.Font()->sm, x+490, y, 150);
+	MyComponent(nation);
+
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 		nation->AddItem(false, std::string(nations_str[i]), "");
 }
@@ -1215,6 +1214,7 @@ void TPlayerLineHeader::Init()
 
 	std::string s = "Pret   Pseudo        Position     Couleur         Nation";
 	label = new TLabel(x, y, s, white_color, &app.Font()->big);
+	MyComponent(label);
 }
 
 void TPlayerLineHeader::SetXY (int px, int py)
