@@ -19,10 +19,11 @@
  */
 
 #include "Form.h"
+#include "Memo.h"
 #include <SDL.h>
 
 TForm::TForm(SDL_Surface* w)
-	: background(0), focus_order(true)
+	: background(0), focus_order(true), Hint(0)
 {
 	SetWindow(w);
 }
@@ -67,6 +68,23 @@ void TForm::Actions(SDL_Event event, uint a)
 					(*it)->PressKey(event.key.keysym);
 			}
 			break;
+		case SDL_MOUSEMOTION:
+		{
+			if(Hint)
+			{
+				Hint->ClearItems();
+				bool put_hint = false;
+				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+				{
+					if(!put_hint && Hint && (*it)->Hint() && (*it)->Test(event.button.x,event.button.y))
+					{
+						Hint->AddItem((*it)->Hint());
+						put_hint = true;
+					}
+				}
+			}
+			break;
+		}
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if(a & ACTION_NOMOUSE) break;
@@ -78,10 +96,10 @@ void TForm::Actions(SDL_Event event, uint a)
 				{
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();
-					if((*it)->ClickedFunc() && !(a & ACTION_NOCALL))
-						(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
-					if((*it)->ClickedFuncPos() && !(a & ACTION_NOCALL))
-						(*(*it)->ClickedFuncPos()) (*it, event.button.x, event.button.y);
+					if((*it)->OnClick() && !(a & ACTION_NOCALL))
+						(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
+					if((*it)->OnClickPos() && !(a & ACTION_NOCALL))
+						(*(*it)->OnClickPos()) (*it, event.button.x, event.button.y);
 					click = true;
 				}
 				else if(!(*it)->ForceFocus())
@@ -107,7 +125,11 @@ void TForm::Update(int _x, int _y, bool flip)
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+			{
+				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
+					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
 				(*it)->Draw(_x, _y);
+			}
 		if(first) first = false;
 		else break;
 	}

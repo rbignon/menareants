@@ -38,7 +38,7 @@
  * It is possible to each components to define some functions to execute when there is an action.
  * For exemple, you can use a function like "void ButtonClick(void* Form, void* data)" and do :
  * <pre>
- *   Button->SetClickedFunc(&ButtonClick, 0);
+ *   Button->SetOnClick(&ButtonClick, 0);
  * </pre>
  * After, if you use TForm::Actions() function in your loop, when this button will be
  * selected, it will call ButtonClick() function.
@@ -59,8 +59,8 @@
  *      MyListBox = AddComponent(new TListBox(300,200,200,300));
  *      Blah =      AddComponent(new TMemo(75,325,300,200,30));
  *      // Défine the events
- *      Button1->SetClickedFunc(&ButtonClick, 0);
- *      MyListBox->SetSelectedFunc(&MyListBoxOnSelect, 0);
+ *      Button1->SetOnClick(&ButtonClick, 0);
+ *      MyListBox->SetOnSelect(&MyListBoxOnSelect, 0);
  *    }
  *    ~TForm1()
  *    {
@@ -85,6 +85,8 @@
  *
  * --Progs
  */
+
+class TMemo; /* Besoin pour les Hints */
 
 /** This is a class who show a form on the screen and contain some components */
 class TForm : public TObject
@@ -129,6 +131,8 @@ public:
 	/** Set background picture */
 	void SetBackground(ECImage *image);
 
+	void SetHint(TMemo* h) { Hint = h; }
+
 /* Variables protégées */
 protected:
 
@@ -151,6 +155,7 @@ private:
 	std::vector<TComponent*> composants;
 	ECImage *background;
 	bool focus_order;
+	TMemo* Hint;
 };
 
 #endif /* EC_FORM_H */

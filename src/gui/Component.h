@@ -23,13 +23,15 @@
 
 #include <vector>
 #include <SDL_keyboard.h>
+#include <string>
 #include "Object.h"
 
 #define MyComponent(x) do { (x)->SetParent(this); (x)->SetWindow(Window()); (x)->Init(); } while(0)
 
 typedef unsigned int   uint;
-typedef void (*TClickedFunction) (TObject* Object, void* Data);
-typedef void (*TClickedFunctionPos) (TObject* Object, int x, int y);
+typedef void (*TOnClickFunction) (TObject* Object, void* Data);
+typedef void (*TOnClickPosFunction) (TObject* Object, int x, int y);
+typedef void (*TOnMouseOnFunction) (TObject* Object, void* Data);
 
 /********************************************************************************************
  *                               TComponent                                                 *
@@ -43,7 +45,7 @@ public:
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
 	TComponent(SDL_Surface* w = 0)
 		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
-		  clicked_func(0), clicked_func_pos(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
 	{}
 
 	/** Constructor with position
@@ -53,7 +55,7 @@ public:
 	 */
 	TComponent(int _x, int _y, SDL_Surface* w = 0)
 		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
-		  clicked_func(0), clicked_func_pos(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
 	{}
 
 	/** Constructor with position and size
@@ -65,7 +67,7 @@ public:
 	 */
 	TComponent(int _x, int _y, uint _w, uint _h, SDL_Surface* w = 0)
 		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
-		  clicked_func(0), clicked_func_pos(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
 	{}
 
 	virtual ~TComponent() {}
@@ -111,15 +113,22 @@ public:
 	virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
 	virtual void PressKey(SDL_keysym) { return; }
 
-	void SetClickedFunc(TClickedFunction c, void* param) { clicked_func = c; clicked_func_param = param; }
-	TClickedFunction ClickedFunc() const { return clicked_func; }
-	void* ClickedFuncParam() const { return clicked_func_param; }
+	void SetOnClick(TOnClickFunction c, void* param) { on_click_func = c; on_click_param = param; }
+	TOnClickFunction OnClick() const { return on_click_func; }
+	void* OnClickParam() const { return on_click_param; }
 
-	void SetClickedFuncPos(TClickedFunctionPos c) { clicked_func_pos = c;  }
-	TClickedFunctionPos ClickedFuncPos() const { return clicked_func_pos; }
+	void SetOnClickPos(TOnClickPosFunction c) { on_click_pos_func = c;  }
+	TOnClickPosFunction OnClickPos() const { return on_click_pos_func; }
+
+	void SetOnMouseOn(TOnMouseOnFunction m, void* param) { on_mouse_on_func = m; on_mouse_on_param = param; }
+	TOnMouseOnFunction OnMouseOn() const { return on_mouse_on_func; }
+	void* OnMouseOnParam() const { return on_mouse_on_param; }
 
 	void SetForceFocus(bool b = true) { force_focus = b; }
 	bool ForceFocus() const { return force_focus; }
+
+	void SetHint(const char* h) { hint = h; }
+	const char* Hint() const { return hint.c_str(); }
 
 	int Tag;
 
@@ -131,9 +140,12 @@ protected:
 	bool enabled;
 	bool focus;
 	bool force_focus;
-	TClickedFunction clicked_func;
-	void* clicked_func_param;
-	TClickedFunctionPos clicked_func_pos;
+	TOnClickFunction on_click_func;
+	void* on_click_param;
+	TOnClickPosFunction on_click_pos_func;
+	TOnMouseOnFunction on_mouse_on_func;
+	void* on_mouse_on_param;
+	std::string hint;
 };
 typedef std::vector<TComponent*> ComponentVector;
 

@@ -48,10 +48,10 @@ bool TChildForm::Clic(int _x, int _y)
 		if((*it)->Visible() && !click && (*it)->Clic(_x, _y))
 		{
 			(*it)->SetFocus();
-			if((*it)->ClickedFunc())
-				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
-			if((*it)->ClickedFuncPos())
-				(*(*it)->ClickedFuncPos()) (*it, _x, _y);
+			if((*it)->OnClick())
+				(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
+			if((*it)->OnClickPos())
+				(*(*it)->OnClickPos()) (*it, _x, _y);
 			click = true;
 		}
 		else if(!(*it)->ForceFocus())
@@ -67,16 +67,33 @@ void TChildForm::Draw(int _x, int _y)
 		SDL_BlitSurface(background->Img,NULL,Window(),&r_back);
 	}
 
-	bool first = focus_order ? true : false;
+	SetHint("");
+	bool first = focus_order ? true : false, put_hint = false;
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+			{
+				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
+					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
+				if(!put_hint && (*it)->Hint() && (*it)->Test(_x,_y))
+				{
+					SetHint((*it)->Hint());
+					put_hint = true;
+				}
 				(*it)->Draw(_x, _y);
+			}
 		if(first) first = false;
 		else break;
 	}
+}
+
+void TChildForm::Clear()
+{
+	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		delete *it;
+	composants.clear();
 }
 
 void TChildForm::SetXY(int _x, int _y)

@@ -87,8 +87,12 @@ void TList::Draw(int souris_x, int souris_y)
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
-			if((*it)->Visible() && (*it)->Focused() == (first ? false : true)) // Affiche seulement à la fin les composants
-				(*it)->Draw(souris_x, souris_y);                               // selectionnés
+			if((*it)->Visible() && (*it)->Focused() == (first ? false : true))
+			{ // Affiche seulement à la fin les composants selectionnés
+				if((*it)->OnMouseOn() && (*it)->Test(souris_x, souris_y))
+					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
+				(*it)->Draw(souris_x, souris_y);
+			}
 		if(first) first = false;
 		else break;
 	}
@@ -102,8 +106,10 @@ bool TList::Clic (int mouse_x, int mouse_y)
 		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y))
 		{
 			(*it)->SetFocus();
-			if((*it)->ClickedFunc())
-				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
+			if((*it)->OnClick())
+				(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
+			if((*it)->OnClickPos())
+				(*(*it)->OnClickPos()) (*it, mouse_x, mouse_y);
 			click = true;
 		}
 		else if(!(*it)->ForceFocus())

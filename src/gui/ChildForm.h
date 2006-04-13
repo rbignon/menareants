@@ -24,13 +24,16 @@
 #include "Component.h"
 #include "tools/Images.h"
 
+class TMemo;
+
+/** \warning When you use a TChildForm, you HAVE to use AddComponent() in Init() and not in the constructor !!! */
 class TChildForm : public TComponent
 {
 /* Constructeur/Destructeur */
 public:
 
 	TChildForm(int _x, int _y, uint _w, uint _h);
-	virtual ~TChildForm() {}
+	virtual ~TChildForm() { Clear(); }
 
 /* Methodes */
 public:
@@ -38,7 +41,12 @@ public:
 	/* Dessine chaques composants */
 	void Draw(int x, int y);
 
+	/** Use this function to init your components with AddComponent() */
 	virtual void Init() = 0;
+
+	virtual bool Clic(int x, int y);
+
+	void Clear();
 
 /* Attributs */
 public:
@@ -47,8 +55,6 @@ public:
 	void SetBackground(ECImage *image);
 
 	virtual void SetXY(int x, int y);
-
-	virtual bool Clic(int x, int y);
 
 	virtual void DelFocus();
 
@@ -71,7 +77,7 @@ protected:
 	bool FocusOrder() { return focus_order; }
 
 /* Variables privées */
-private:
+protected:
 	std::vector<TComponent*> composants;
 	ECImage *background;
 	bool focus_order;
