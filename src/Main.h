@@ -56,6 +56,8 @@ protected:
 	static void WantPlay(TObject*, void*);
 	static void WantConfig(TObject*, void*);
 
+	bool first_run;
+
 public:
 	int main(int argc, char** argv);
 	char *get_title() { return APP_NAME; }
@@ -71,13 +73,11 @@ public:
 	void setclient(EC_Client* c);
 	std::string GetPath() const { return path; }
 
-	MenAreAntsApp() {
-		client = 0;
-		conf = 0;
-		Thread = 0;
-		fonts = 0;
-		want_quit = false;
-	}
+	void FirstRun() { first_run = true; }
+
+	MenAreAntsApp()
+		: client(0), conf(0), Thread(0), fonts(0), want_quit(false), first_run(false), sdlwindow(0)
+	{}
 
 	SDL_Surface* sdlwindow;
 };

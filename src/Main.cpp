@@ -45,7 +45,7 @@ class TMainForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TMainForm();
+	TMainForm(SDL_Surface*);
 	~TMainForm();
 
 /* Composants */
@@ -73,10 +73,10 @@ void MenAreAntsApp::WantPlay(TObject*, void*)
 	app.request_game();
 }
 
-void MenAreAntsApp::WantConfig(TObject*, void*)
+void MenAreAntsApp::WantConfig(TObject*, void* b)
 {
 	if(app.conf)
-		app.conf->Configuration();
+		app.conf->Configuration((bool)b);
 }
 
 void MenAreAntsApp::setclient(EC_Client* c)
@@ -171,10 +171,13 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		conf->load();
 
-		TMainForm*     MainForm = new TMainForm;
+		if(first_run)
+			MenAreAntsApp::WantConfig(0,(void*)true);
+
+		TMainForm*     MainForm = new TMainForm(sdlwindow);
 		MainForm->PlayButton->SetClickedFunc(MenAreAntsApp::WantPlay, this);
 		MainForm->QuitterButton->SetClickedFunc(MenAreAntsApp::WantQuit, this);
-		MainForm->OptionsButton->SetClickedFunc(MenAreAntsApp::WantConfig, this);
+		MainForm->OptionsButton->SetClickedFunc(MenAreAntsApp::WantConfig, (void*)false);
 
 		do
 		{
@@ -213,8 +216,8 @@ int main (int argc, char **argv)
  *                                    TMainForm                                             *
  ********************************************************************************************/
 
-TMainForm::TMainForm()
-	: TForm()
+TMainForm::TMainForm(SDL_Surface* w)
+	: TForm(w)
 {
 	PlayButton = AddComponent(new TButton(300,150, 150,50));
 	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), app.sdlwindow));
