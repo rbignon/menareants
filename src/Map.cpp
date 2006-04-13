@@ -300,16 +300,19 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			const short MARGE_BOTTOM = 0x08;
 			unsigned short marge = 0;
 
-			if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country())
-				marge |= MARGE_TOP;
-			if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country())
-				marge |= MARGE_LEFT;
-			if(size_x > 5 && size_y > 5)
+			if(!(c->Flags() & C_MER))
 			{
-				if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country())
-					marge |= MARGE_BOTTOM;
-				if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country())
-					marge |= MARGE_RIGHT;
+				if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country())
+					marge |= MARGE_TOP;
+				if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country())
+					marge |= MARGE_LEFT;
+				if(size_x > 5 && size_y > 5)
+				{
+					if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country())
+						marge |= MARGE_BOTTOM;
+					if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country())
+						marge |= MARGE_RIGHT;
+				}
 			}
 
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
