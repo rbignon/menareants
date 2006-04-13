@@ -119,6 +119,8 @@ public:
 /* Methodes */
 public:
 
+	bool CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity*);
+
 /* Attributs */
 public:
 

@@ -118,11 +118,21 @@ void ECMap::SortEvents()
 
 bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 {
-	if(ECBCountry::ChangeOwner(mp) && owner && owner->Player())
+	ECBMapPlayer* last_owner = owner;
+	if(ECBCountry::ChangeOwner(mp))
 	{
-		EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
-		chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
-		                        std::string(std::string("+@ ") + ident).c_str());
+		if(owner && owner->Player())
+		{
+			EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
+			chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
+									std::string(std::string("+@ ") + ident).c_str());
+		}
+		else if(last_owner && last_owner->Player())
+		{
+			EChannel* chan = dynamic_cast<EChannel*>(last_owner->Player()->Channel());
+			chan->sendto_players(0, app.rpl(ECServer::SET), last_owner->Player()->GetNick(),
+									std::string(std::string("-@ ") + ident).c_str());
+		}
 		return true;
 	}
 	return false;
@@ -176,6 +186,90 @@ bool ECEvent::operator<(const ECEvent& e) const
 		default: him = 0; break;
 	}
 	return (me < him);
+}
+
+bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
+{
+	/* Mauvais appel */
+	if(flags != ARM_ATTAQ) return false;
+
+	EChannel* chan = dynamic_cast<EChannel*>(entity->Owner()->Channel());
+	ECMap* map = dynamic_cast<ECMap*>(chan->Map());
+
+	bool delete_event = true;
+	Debug(W_DEBUG, "Retrait d'attaquants");
+	Entities()->Remove(entity);
+	std::vector<ECEntity*> ents = Entities()->List();
+
+	const char T_ATTAQ_STEP = 0;
+	const char T_MOVE_STEP = 1;
+	const char T_END_STEP = 2;
+	for(char step = T_ATTAQ_STEP; step != T_END_STEP; ++step)
+		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end();)
+		{
+			if((*enti)->Locked())
+			{
+				++enti;
+				continue;
+			}
+
+			/* Pour cette entité, on cherche si il peut encore attaquer quelqu'un d'autre, sinon il jarte */
+			std::vector<ECEntity*>::iterator enti2;
+			for(enti2 = ents.begin();
+				enti2 != ents.end() && (*enti2 == *enti || (*enti2)->Locked() ||
+					(!(*enti)->CanAttaq(*enti2) || (*enti)->Like(*enti2)) &&
+					(step != T_MOVE_STEP || !(*enti2)->CanAttaq(*enti) || (*enti2)->Like(*enti)));
+				++enti2);
+			if(enti2 == ents.end())
+			{
+				if(step == T_ATTAQ_STEP && (*enti)->EventType() == ARM_ATTAQ)
+				{ /* C'était un attaquant, on lui fait faire un Return */
+					Debug(W_DEBUG, "il y a un attaquant qui se trouve fort sodomisé.");
+					if((*enti)->Return() && (*enti)->Owner())
+						chan->SendArm(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client(), *enti,
+										ARM_RETURN, (*enti)->Case()->X(), (*enti)->Case()->Y());
+
+					/* On supprime l'evenement de mouvement linké */
+					std::vector<ECEvent*>::iterator ev;
+					for(ev = this->linked.begin(); ev != this->linked.end() && (*ev)->Entity() != *enti; ++ev);
+					if(ev != this->linked.end())
+					{
+						delete *ev;
+						ev = this->linked.erase(ev);
+					}
+				}
+				else if(step == T_MOVE_STEP && (*enti)->EventType() == ARM_MOVE)
+				{ /* C'était un mouvement innocent, on remet juste son evenement en lieu commun */
+					std::vector<ECEvent*>::iterator ev;
+					for(ev = this->linked.begin(); ev != this->linked.end() && (*ev)->Entity() != *enti; ++ev);
+					if(ev != this->linked.end())
+					{
+						map->AddEvent(*ev);
+						ev = this->linked.erase(ev);
+					}
+				}
+				else
+				{
+					++enti;
+					continue;
+				}
+				this->Entities()->Remove(*enti);
+				enti = ents.erase(enti);
+			}
+			else
+			{
+				/* Cet evenement réuni encore des unités qui peuvent se battre */
+				delete_event = false;
+				++enti;
+			}
+		}
+#ifdef DEBUG
+	if(delete_event)
+		Debug(W_DEBUG, "On supprime bien l'evenement");
+	else
+		Debug(W_DEBUG, "On ne supprime pas, doit y avoir d'autres unités combatantes");
+#endif
+	return delete_event;
 }
 
 /********************************************************************************************
