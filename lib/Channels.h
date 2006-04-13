@@ -34,6 +34,9 @@ class ECBEntity;
 
 typedef std::vector<ECBEntity*> BEntityVector;
 
+#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_"
+#define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_@-()[]{}~"
+
 extern const char *nations_str[];
 
 /********************************************************************************************

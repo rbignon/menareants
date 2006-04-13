@@ -546,12 +546,11 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
 
 	bool create = (parv.size() == 3 && parv[2] == "$");
-	const char* nom = parv[1].c_str();
 	EChannel* chan = NULL;
 	ECPlayer* pl;
 
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
-		if(!strcasecmp((*it)->GetName(), nom))
+		if(!strcasecmp((*it)->GetName(), parv[1].c_str()))
 		{
 			chan = *it;
 			break;
@@ -559,7 +558,14 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(!chan && create)
 	{ /* Création du salon */
-		chan = new EChannel(nom);
+		for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
+			if(!strchr(CHAN_CHARS, *c))
+			{
+				vDebug(W_WARNING, "JOI: Le nom donné est incorrect", parv[1]);
+				return cl->sendrpl(app.rpl(ECServer::ERR));
+			}
+
+		chan = new EChannel(parv[1]);
 		pl = new ECPlayer(cl, chan, true, false);
 		ChanList.push_back(chan);
 		chan->SetOwner(pl);
@@ -638,10 +644,17 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	else
 	{
-		chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
 		if(cl->Player()->IsOwner())
 			chan->SetOwner(0);
+		/** \note Comme le joueur a été supprimé d'abord, on envoit à tous les joueurs et on envoie à coté
+		  *       au quitter car il n'est plus dans la liste.
+		  *       La raison pour laquelle on remove AVANT de LEAVE c'est dans le cas où le salon est en jeu,
+		  *       il faut que les suppressions d'unités et neutralités arrivent AVANT la suppression du
+		  *       joueur chez les clients
+		  */
 		chan->RemovePlayer(cl->Player(), USE_DELETE);
+		chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+		cl->sendrpl(app.rpl(ECServer::LEAVE), cl->GetNick());
 		if(!chan->NbPlayers())
 			delete chan;
 
@@ -1055,8 +1068,67 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 
 bool EChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 {
-	/// \todo supporter la suppression des unités, et la mise à neutre des territoires
-	return ECBChannel::RemovePlayer(pl, use_delete);
+	bool b = ECBChannel::RemovePlayer(pl, false);
+
+	if(!b) return false;
+
+	if(!Joinable())
+	{
+		std::vector<ECBEntity*> ents = pl->Entities()->List();
+		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		{
+			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+			SendArm(0, entity, ARM_REMOVE);
+			EventVector events = Map()->Events();
+			for(EventVector::iterator evti = events.begin(); evti != events.end();)
+			{
+				bool want_remove = false;
+				if(!(*evti)->Entities()->Find(entity))
+				{
+					++evti;
+					continue;
+				}
+				switch((*evti)->Flags())
+				{
+					case ARM_UNION:  // Concerne que des unités du même joueur
+					case ARM_MOVE:   // Forcément qu'une seule unité
+					case ARM_CREATE: // Forcément qu'une seule unité
+					case ARM_SPLIT:  // Concerne que des unités du même joueur
+						want_remove = true;
+						break;
+					case ARM_ATTAQ:
+						want_remove = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
+						break;
+					default:
+						FDebug(W_WARNING, "Vérification de la suppression d'un evenement dont le type est non géré...");
+				}
+				if(want_remove)
+				{
+					Map()->RemoveEvent(*evti, USE_DELETE);
+					evti = events.erase(evti);
+				}
+				else
+					++evti;
+			}
+			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
+			entity->Case()->Entities()->Remove(entity);
+			Map()->Entities()->Remove(entity);
+			delete entity;
+		}
+		if(pl->MapPlayer())
+		{
+			BCountriesVector conts = pl->MapPlayer()->Countries();
+			for(BCountriesVector::iterator conti = conts.begin(); conti != conts.end(); ++conti)
+			{
+				(*conti)->SetOwner(0);
+				sendto_players(0, app.rpl(ECServer::SET), pl->GetNick(),
+		                        std::string(std::string("-@ ") + (*conti)->ID()).c_str());
+			}
+		}
+	}
+	if(use_delete)
+		delete pl;
+	return true;
 }
 
 /** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
