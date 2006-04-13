@@ -23,13 +23,15 @@
 #include "Map.h"
 #include "Channels.h"
 #include "Main.h"
+#include "Debug.h"
 #include <string>
 #include <iostream>
 #include <signal.h>
 #include <sys/resource.h>
-#ifndef WIN32
-#include <dirent.h>
+#ifdef WIN32
+#error Don't compile this server under windows !!!
 #endif
+#include <dirent.h>
 
 
 ECServer app;
@@ -157,9 +159,13 @@ int ECServer::main(int argc, char **argv)
 			run_server();
 	
 	}
-	catch(...)
+	catch (const TECExcept &e)
 	{
-
+		std::cout << "Received an ECExcept error: " << std::endl;
+		std::cout << e.Message << std::endl;
+#ifdef DEBUG
+		std::cout << e.Vars << std::endl;
+#endif
 	}
 	CleanUp();
 	delete conf;
