@@ -19,6 +19,7 @@
  */
 
 #include "InGame.h"
+#include "tools/Maths.h"
 #include "Resources.h"
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
@@ -44,8 +45,7 @@ static struct
 {
 	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb);
 } entities_type[] = {
-	/* E_ARMY */{ CreateEntity<ECArmy> },
-	/* E_END  */{ NULL }
+#include "lib/UnitsList.h"
 };
 
 #define L_INFO(x)    if(InGameForm) InGameForm->AddInfo(I_INFO,(x))
@@ -154,7 +154,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
 				continue;
 			}
-			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(x,y), nb);
+			printf("t %d / %d\n", type, ASIZE( entities_type));
+			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(0,0), nb);
 			map->AddAnEntity(entity);
 		}
 		if(!moves_str.empty())
@@ -303,7 +304,7 @@ void MenAreAntsApp::InGame()
 	{
 		SDL_Event event;
 		bool eob = false;
-		InGameForm = new TInGameForm(client->Player());
+		InGameForm = new TInGameForm(sdlwindow, client->Player());
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
 		const char W_MOVE = 1;
@@ -365,7 +366,7 @@ void MenAreAntsApp::InGame()
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
 						{
-							TMessageBox mb(250,300, "Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
+							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
 							if(mb.Show() == BT_YES)
 								eob = true;
 						}
@@ -457,7 +458,8 @@ void MenAreAntsApp::InGame()
 	}
 	catch(TECExcept &e)
 	{
-		SDL_KillThread(InGameForm->Thread);
+		ECAltThread::Stop();
+		SDL_WaitThread(InGameForm->Thread, 0);
 		MyFree(InGameForm);
 		throw;
 	}
@@ -515,8 +517,8 @@ void TInGameForm::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TInGameForm::TInGameForm(ECPlayer* pl)
-	: TForm()
+TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
+	: TForm(w)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 
@@ -530,8 +532,8 @@ TInGameForm::TInGameForm(ECPlayer* pl)
 	BarreLat = AddComponent(new TBarreLat(pl));
 	BarreAct = AddComponent(new TBarreAct(pl));
 
-	SendMessage = AddComponent(new TEdit(30,20,400, MAXBUFFER-20, false));
-	Chat = AddComponent(new TMemo(30, 20 + SendMessage->Height() + 20,
+	SendMessage = AddComponent(new TEdit(&app.Font()->sm, 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
+	Chat = AddComponent(new TMemo(&app.Font()->sm, 30, 20 + SendMessage->Height() + 20,
 	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30, 6 * app.Font()->sm.GetHeight(), 5, false));
 
 	ShowBarreLat();
@@ -601,11 +603,12 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list)
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		TImage* i = new TImage(_x, y, (*it)->Icon(), false);
+		i->SetParent(this);
+		i->SetWindow(Window());
 		i->Init();
 		_x += i->Width();
 		if(i->Height() > _h) _h = i->Height();
 		i->SetClickedFunc(TBarreAct::CreateUnit, (void*)*it);
-		i->SetParent(this);
 		icons.push_back(i);
 	}
 	SetWidth(_x);
@@ -678,6 +681,7 @@ void TBarreAct::vSetCase(void* _c)
 	if(c)
 	{
 		InGameForm->BarreAct->Name->SetCaption(c->Name());
+		InGameForm->BarreAct->Icon->SetImage(c->Image()->First(), false);
 		if(c->Country()->Owner() == InGameForm->BarreAct->me->MapPlayer())
 			InGameForm->BarreAct->ShowIcons(c);
 		else
@@ -738,6 +742,7 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
 		InGameForm->BarreAct->Nb->Show();
 		InGameForm->BarreAct->Nb->SetCaption(e->Nb() ? TypToStr(e->Nb()) : "???");
+		InGameForm->BarreAct->Icon->SetImage(e->Icon(), false);
 
 		if(e->Owner() == InGameForm->BarreAct->me)
 		{
@@ -801,23 +806,25 @@ TBarreAct::TBarreAct(ECPlayer* pl)
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
 	me = pl;
+}
 
-	Name = AddComponent(new TLabel(20,5, "", black_color, &app.Font()->big));
+void TBarreAct::Init()
+{
+	Name = AddComponent(new TLabel(60,5, "", black_color, &app.Font()->big));
 
-	MoveButton = AddComponent(new TButtonText(300,5,100,30, "Déplacer"));
-	MoveButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	MoveButton->SetFont(&app.Font()->sm);
-	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer"));
-	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	AttaqButton->SetFont(&app.Font()->sm);
-	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter"));
-	UpButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	UpButton->SetFont(&app.Font()->sm);
+	MoveButton = AddComponent(new TButtonText(300,5,100,30, "Déplacer", &app.Font()->sm));
+	MoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", &app.Font()->sm));
+	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", &app.Font()->sm));
+	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
-	Nb = AddComponent(new TLabel(20,50, "", black_color, &app.Font()->normal));
-	Owner = AddComponent(new TLabel(20,30, "", black_color, &app.Font()->normal));
+	Owner = AddComponent(new TLabel(60,30, "", black_color, &app.Font()->normal));
 
-	Icons = AddComponent(new TBarreActIcons(100, 49));
+	Icon = AddComponent(new TImage(5,5));
+	Nb = AddComponent(new TLabel(5,55, "", black_color, &app.Font()->normal));
+
+	Icons = AddComponent(new TBarreActIcons(200, 49));
 
 	SetBackground(Resources::BarreAct());
 }
@@ -825,8 +832,9 @@ TBarreAct::TBarreAct(ECPlayer* pl)
 TBarreAct::~TBarreAct()
 {
 	delete Icons;
-	delete Owner;
 	delete Nb;
+	delete Icon;
+	delete Owner;
 	delete UpButton;
 	delete AttaqButton;
 	delete MoveButton;
@@ -837,31 +845,49 @@ TBarreAct::~TBarreAct()
  *                               TBarreLat                                                  *
  ********************************************************************************************/
 
+void TBarreLat::RadarClick(TObject* m, int x, int y)
+{
+	TImage* map = dynamic_cast<TImage*>(m);
+
+	if(!map || !InGameForm)
+		throw ECExcept(VPName(InGameForm) VPName(map), "Appel incorrect");
+
+	int size_x = map->Width() / InGameForm->Map->Map()->Width();
+	int size_y = map->Height() / InGameForm->Map->Map()->Height();
+	int _x = BorneInt((x - map->X()) / size_x, 0, InGameForm->Map->Map()->Width()-1);
+	int _y = BorneInt((y - map->Y()) / size_y, 0, InGameForm->Map->Map()->Height()-1);
+
+	if(InGameForm->Map->Enabled())
+		InGameForm->Map->CenterTo(dynamic_cast<ECase*>((*InGameForm->Map->Map())(_x,_y)));
+}
+
 TBarreLat::TBarreLat(ECPlayer* pl)
 	: TChildForm(SCREEN_WIDTH-150, 0, 150, SCREEN_HEIGHT)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
+	player = pl;
+}
 
-	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret"));
+void TBarreLat::Init()
+{
+	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", &app.Font()->sm));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	PretButton->SetFont(&app.Font()->sm);
-	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema"));
+	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", &app.Font()->sm));
 	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	SchemaButton->SetFont(&app.Font()->sm);
-	QuitButton = AddComponent(new TButtonText(30,280,100,30, "Quitter"));
+	QuitButton = AddComponent(new TButtonText(30,280,100,30, "Quitter", &app.Font()->sm));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	QuitButton->SetFont(&app.Font()->sm);
 
 	chan->Map()->CreatePreview(120,120, true);
 	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - chan->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y));
 	Radar->SetImage(chan->Map()->Preview(), false);
+	Radar->SetClickedFuncPos(TBarreLat::RadarClick);
 
-	Money = AddComponent(new TLabel(50, 1, TypToStr(pl->Money()) + " $", white_color, &app.Font()->sm));
+	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, &app.Font()->sm));
 	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->sm));
-	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(pl->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
+	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(player->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
 
 	SetBackground(Resources::BarreLat());
 }
@@ -920,7 +946,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 		SDL_Event event;
 		bool eob = false;
 		chan->Map()->CreatePreview(300,300);
-		LoadingForm = new TLoadingForm(chan);
+		LoadingForm = new TLoadingForm(sdlwindow, chan);
 		do
 		{
 			while( SDL_PollEvent( &event) )
@@ -952,12 +978,12 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 	return;
 }
 
-TLoadingForm::TLoadingForm(EChannel* ch)
-	: TForm()
+TLoadingForm::TLoadingForm(SDL_Surface* w, EChannel* ch)
+	: TForm(w)
 {
 	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), white_color, &app.Font()->big));
 
-	MapInformations = AddComponent(new TMemo(60,150,315,200,30));
+	MapInformations = AddComponent(new TMemo(&app.Font()->sm, 60,150,315,200,30));
 	std::vector<std::string> map_infos = ch->Map()->MapInfos();
 	if(map_infos.empty())
 		MapInformations->Hide();
@@ -1020,6 +1046,7 @@ void TLoadPlayerLine::Init()
 	                                              nations_str[pl->Nation()]);
 
 	label = new TLabel(x, y, s, *color_eq[pl->Color()], &app.Font()->normal);
+	MyComponent(label);
 }
 
 void TLoadPlayerLine::Draw(int souris_x, int souris_y)

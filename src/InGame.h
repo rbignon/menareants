@@ -32,6 +32,8 @@
 #include "gui/BouttonText.h"
 #include "Timer.h"
 
+struct SDL_Thread;
+
 class EChannel;
 class ECPlayer;
 
@@ -70,8 +72,10 @@ public:
 /* Composants */
 public:
 
+	TImage*         Icon;
 	TLabel*         Name;
 	TLabel*         Nb;
+	TLabel*         OwnerLabel;
 	TLabel*         Owner;
 	TButtonText*    MoveButton;
 	TButtonText*    AttaqButton;
@@ -90,6 +94,8 @@ public:
 /* Methodes */
 public:
 	void Update() { if(entity) SetEntity(entity); }
+
+	void Init();
 
 	void UnSelect();
 	bool Select() const { return select; }
@@ -126,6 +132,8 @@ public:
 	TBarreLat(ECPlayer*);
 	~TBarreLat();
 
+	void Init();
+
 /* Composants */
 public:
 	TImage*      Radar;
@@ -136,8 +144,13 @@ public:
 	TLabel*      Money;
 	TLabel*      TurnMoney;
 
+/* Evenements */
+public:
+	static void RadarClick(TObject*, int, int);
+
 protected:
 	EChannel* chan;
+	ECPlayer* player;
 };
 
 /** This is a form who show realy the map ! */
@@ -146,7 +159,7 @@ class TInGameForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TInGameForm(ECPlayer*);
+	TInGameForm(SDL_Surface*, ECPlayer*);
 	~TInGameForm();
 
 /* Composants */
@@ -196,7 +209,7 @@ class TLoadingForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TLoadingForm(EChannel*);
+	TLoadingForm(SDL_Surface*, EChannel*);
 	~TLoadingForm();
 
 /* Composants */
