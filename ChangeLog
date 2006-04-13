@@ -1,10 +1,37 @@
+2005-04-12  Romain Bignon <progs@headfucking.net>
+
+	* src/tools/Images.cpp: Nouvelles fonctions, modifications...
+
+	* gui/Edit.cpp: Nouvelle version du composant beaucoup plus elaborée.
+
+	* gui/: Passage à des composants qui sont indépendants de MenAreAntsApp.
+
+	* gui/Components.h (ForceFocus): Force le focus, pour T*Form.
+	(ClickedFuncPos): Fonction qui connait les coordonnées de la souris lors du click.
+
+	* src/InGame.cpp (BarreLat): Le clic sur le radar fait bouger la camera.
+
+	* server/Channels.cpp, src/Config.cpp, src/JoinGame.cpp: Utilisation de macros NICK_CHARS et CHAN_CHARS pour limiter
+	les chars autorisés.
+
+	* src/gui/MessageBox.h: Lorsqu'on ne spécifie pas de position, l'afficher au centre.
+
+	* lib/UnitsList.h, server/InGame.cpp, src/Map.cpp, src/InGame.cpp: Liste des unités qui permet de n'avoir à mettre
+	  à jour qu'ici lors d'ajout d'unités.
+
+2005-04-11  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (RemovePlayer): Gestion du départ d'un joueur pendant une partie.
+
+	* server/Map.cpp (CheckRemoveBecauseOfPartOfAttaqEntity): Fonction dont le nom est explicite :p.
+
 2005-04-10  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp (CheckChaningOwner): Fonction de ECBCase pour vérifier si sa prise créé un changement d'owner.
 
 	* lib/Channels.cpp, server/Channels.cpp: Passage de ModesStr() dans le serveur avec affichage de la map dans les modes.
 
-	* server/Channels.cpp, server/Map.cpp: Mode +@ pour changer l'owner d'une country.
+	* API, server/Channels.cpp, server/Map.cpp: Mode +@ pour changer l'owner d'une country.
 
 	* src/AltThread.cpp: Utilisation de stack plutot que de vector.
 

@@ -6,17 +6,18 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -server: GROS BUG: Lorsque le client veut bouger et qu'il est en conflit déjà avec un mec (sans le savoir),
                    trouver et envoyer l'evenement de mouvement, sinon le client va le faire disparaitre !
 -server: Vérifier un bug qui donne une desynch au niveau des positions
+-server: Gérer les attaques qui ont lieu en chemin.
+-vérifier tous les bugs que connait pankkake
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
--server: gérer le départ d'un joueur pendant la partie
 
 * Après
--gestion des perdants.
+-gestion des fins de parties.
+-configuration des boutons de la souris
 
 * Bof
 -mettre un mode pour l'argent du début
-
 
 ** Objectif actuel
 -jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
