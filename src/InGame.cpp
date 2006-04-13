@@ -154,7 +154,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
 				continue;
 			}
-			printf("t %d / %d\n", type, ASIZE( entities_type));
 			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(0,0), nb);
 			map->AddAnEntity(entity);
 		}
@@ -539,6 +538,7 @@ TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
 	ShowBarreLat();
 
 	SetFocusOrder(false);
+	SetHint(BarreLat->UnitsInfos);
 
 	Thread = 0;
 }
@@ -556,71 +556,24 @@ TInGameForm::~TInGameForm()
  *                               TBarreActIcons                                             *
  ********************************************************************************************/
 
-TBarreActIcons::~TBarreActIcons()
-{
-	Clear();
-}
-
-void TBarreActIcons::Clear()
-{
-	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it)
-		delete *it;
-	icons.clear();
-}
-
-void TBarreActIcons::Draw(int souris_x, int souris_y)
-{
-	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it)
-		if((*it)->Visible())
-			(*it)->Draw(souris_x, souris_y);
-}
-
-bool TBarreActIcons::Clic (int _x, int _y)
-{
-	if(!Test(_x,_y)) return false;
-
-	bool click = false;
-	/* Va dans l'ordre inverse */
-	for(std::vector<TImage*>::reverse_iterator it = icons.rbegin(); it != icons.rend(); ++it)
-		if((*it)->Visible() && !click && (*it)->Clic(_x, _y))
-		{
-			(*it)->SetFocus();
-			if((*it)->ClickedFunc())
-				(*(*it)->ClickedFunc()) (*it, (*it)->ClickedFuncParam());
-			click = true;
-		}
-		else
-			(*it)->DelFocus();
-	return true;
-}
-
 void TBarreActIcons::SetList(std::vector<ECEntity*> list)
 {
 	Clear();
 
-	int _x = x;
+	int _x = X();
 	uint _h = 0;
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
-		TImage* i = new TImage(_x, y, (*it)->Icon(), false);
-		i->SetParent(this);
-		i->SetWindow(Window());
-		i->Init();
+		TImage* i = AddComponent(new TImage(_x, 0, (*it)->Icon(), false));
 		_x += i->Width();
 		if(i->Height() > _h) _h = i->Height();
-		i->SetClickedFunc(TBarreAct::CreateUnit, (void*)*it);
-		icons.push_back(i);
+		i->SetOnClick(TBarreAct::CreateUnit, (void*)*it);
+		i->SetHint(std::string(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos()).c_str());
 	}
+	TComponent* parent = dynamic_cast<TComponent*>(Parent());
 	SetWidth(_x);
 	SetHeight(_h);
-}
-
-void TBarreActIcons::SetXY(int _x, int _y)
-{
-	for(std::vector<TImage*>::iterator it =icons.begin(); it != icons.end(); ++it)
-		(*it)->SetXY(((*it)->X() - x) + _x, ((*it)->Y() - y) + _y);
-	x = _x;
-	y = _y;
+	SetXY(parent->Width() - 5 - _x, Y());
 }
 
 /********************************************************************************************
@@ -829,18 +782,6 @@ void TBarreAct::Init()
 	SetBackground(Resources::BarreAct());
 }
 
-TBarreAct::~TBarreAct()
-{
-	delete Icons;
-	delete Nb;
-	delete Icon;
-	delete Owner;
-	delete UpButton;
-	delete AttaqButton;
-	delete MoveButton;
-	delete Name;
-}
-
 /********************************************************************************************
  *                               TBarreLat                                                  *
  ********************************************************************************************/
@@ -883,24 +824,15 @@ void TBarreLat::Init()
 	int _y = 55 + 60 - chan->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y));
 	Radar->SetImage(chan->Map()->Preview(), false);
-	Radar->SetClickedFuncPos(TBarreLat::RadarClick);
+	Radar->SetOnClickPos(TBarreLat::RadarClick);
 
 	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, &app.Font()->sm));
 	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->sm));
 	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(player->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
 
-	SetBackground(Resources::BarreLat());
-}
+	UnitsInfos = AddComponent(new TMemo(&app.Font()->sm, 15, Height() - 50 - 10, Width() - 15 - 10, 50));
 
-TBarreLat::~TBarreLat()
-{
-	delete TurnMoney;
-	delete Date;
-	delete Money;
-	delete QuitButton;
-	delete SchemaButton;
-	delete PretButton;
-	delete Radar;
+	SetBackground(Resources::BarreLat());
 }
 
 /********************************************************************************************

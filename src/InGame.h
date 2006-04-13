@@ -41,23 +41,16 @@ class ECPlayer;
  *                               TInGameForm                                                *
  ********************************************************************************************/
 
-class TBarreActIcons : public TComponent
+class TBarreActIcons : public TChildForm
 {
 public:
 	TBarreActIcons(int _x, int _y)
-		: TComponent(_x,_y)
+		: TChildForm(_x,_y, 0, 0)
 	{}
-	~TBarreActIcons();
 
 	void Init() {}
 
-	void Draw(int souris_x, int souris_y);
-	bool Clic (int mouse_x, int mouse_y);
-
 	void SetList(std::vector<ECEntity*> list);
-	void Clear();
-
-	virtual void SetXY(int _x, int _y);
 
 private:
 	std::vector<TImage*> icons;
@@ -67,7 +60,6 @@ class TBarreAct : public TChildForm
 {
 public:
 	TBarreAct(ECPlayer*);
-	~TBarreAct();
 
 /* Composants */
 public:
@@ -130,7 +122,6 @@ class TBarreLat : public TChildForm
 {
 public:
 	TBarreLat(ECPlayer*);
-	~TBarreLat();
 
 	void Init();
 
@@ -143,6 +134,7 @@ public:
 	TLabel*      Date;
 	TLabel*      Money;
 	TLabel*      TurnMoney;
+	TMemo*       UnitsInfos;
 
 /* Evenements */
 public:
