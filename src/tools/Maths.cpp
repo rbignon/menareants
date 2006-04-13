@@ -15,6 +15,9 @@ T BorneTpl (const T &valeur, const T &min, const T &max)
 
 //-----------------------------------------------------------------------------
 
+int BorneInt (const int &valeur, const int &min, const int &max)
+{ return BorneTpl (valeur, min, max); }
+
 long BorneLong (const long &valeur, const long &min, const long &max)
 { return BorneTpl (valeur, min, max); }
 
