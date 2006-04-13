@@ -27,6 +27,7 @@
 
 #include "Component.h"
 #include "Boutton.h"
+#include "tools/Font.h"
 
 struct SDL_Surface;
 struct SDL_Color;
@@ -59,19 +60,20 @@ private:
 
   SDL_Surface *background;
 
+  Font* font;
+
 public:
   TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
   ~TMemo();
   void Init ();
   void Draw (int mouse_x, int mouse_y);
   bool Clic (int mouse_x, int mouse_y);
-  void AddItem (const std::string &label, SDL_Color _color);
+  void AddItem (const std::string &label, SDL_Color _color = black_color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);
-  uint NbItems() { return m_items.size(); }
+  uint NbItems() const { return m_items.size(); }
   void ClearItems();
-  Font* font;
-
+  bool Empty() const { return m_items.empty(); }
 };
 
 #endif /* EC_MEMO_H */

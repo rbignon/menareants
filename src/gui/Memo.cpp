@@ -118,7 +118,7 @@ void TMemo::Draw (int mouse_x, int mouse_y)
   }
 }
 
-void TMemo::AddItem (const std::string &label, SDL_Color _color = black_color)
+void TMemo::AddItem (const std::string &label, SDL_Color _color)
 {
 	const char *_s = label.c_str();
 	/* On parse le message pour le découper en différentes lignes */

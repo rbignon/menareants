@@ -63,7 +63,7 @@ public:
 	/* Chaine */
 	void SetString(std::string s);
 	const std::string& GetString() const { return chaine; }
-	void ClearString() { chaine = ""; caret = 0; first_char = 0; }
+	void ClearString() { chaine = ""; caret = 0; first_char = 0; have_redraw = true; }
 
 	const char* AvailChars() const { return avail_chars; }
 	void SetAvailChars(char* c) { avail_chars = c; }
