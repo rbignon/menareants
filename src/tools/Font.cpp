@@ -166,8 +166,7 @@ ECImage Font::Render(const std::string &txt, const SDL_Color &color, bool cache)
     }
   } else*/
     surface = CreateSurface(txt, color);
-  
-  assert( surface.Img );
+
   return surface;
 }
 
