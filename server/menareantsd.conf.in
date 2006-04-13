@@ -15,4 +15,4 @@ PORT 5461
 DEFLIMITE 8
 
 # Path du fichier motd
-MOTDFILE /etc/menareantsd.motd
+MOTDFILE @prefix@/etc/menareantsd.motd

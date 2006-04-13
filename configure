@@ -4151,7 +4151,7 @@ MAP_FILES=`echo $MAP_FILES`
 
 
 
-                                                            ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/maps/Makefile"
+                                                                      ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4722,6 +4722,7 @@ do
   "src/data/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/data/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "server/Makefile" ) CONFIG_FILES="$CONFIG_FILES server/Makefile" ;;
+  "server/menareantsd.conf" ) CONFIG_FILES="$CONFIG_FILES server/menareantsd.conf" ;;
   "server/maps/Makefile" ) CONFIG_FILES="$CONFIG_FILES server/maps/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;

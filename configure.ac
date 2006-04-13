@@ -143,7 +143,7 @@ MAP_FILES=`echo $MAP_FILES`
 
 AC_SUBST([MAP_FILES])
 
-AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/maps/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile)
 
 AC_OUTPUT
 
