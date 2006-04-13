@@ -25,8 +25,11 @@
 #include <SDL_keyboard.h>
 #include "Object.h"
 
+#define MyComponent(x) do { (x)->SetParent(this); (x)->SetWindow(Window()); (x)->Init(); } while(0)
+
 typedef unsigned int   uint;
 typedef void (*TClickedFunction) (TObject* Object, void* Data);
+typedef void (*TClickedFunctionPos) (TObject* Object, int x, int y);
 
 /********************************************************************************************
  *                               TComponent                                                 *
@@ -38,15 +41,19 @@ class TComponent : public TObject
 public:
 
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
-	TComponent() : x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), clicked_func(0)
+	TComponent(SDL_Surface* w = 0)
+		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
+		  clicked_func(0), clicked_func_pos(0)
 	{}
 
 	/** Constructor with position
 	 * @param _x x position
 	 * @param _y y position
+	 * @param w Window
 	 */
-	TComponent(int _x, int _y)
-		: x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), clicked_func(0)
+	TComponent(int _x, int _y, SDL_Surface* w = 0)
+		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
+		  clicked_func(0), clicked_func_pos(0)
 	{}
 
 	/** Constructor with position and size
@@ -54,9 +61,11 @@ public:
 	 * @param _y y position
 	 * @param _w width of component
 	 * @param _h heigh of component
+	 * @param w Window
 	 */
-	TComponent(int _x, int _y, uint _w, uint _h)
-		: x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), clicked_func(0)
+	TComponent(int _x, int _y, uint _w, uint _h, SDL_Surface* w = 0)
+		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
+		  clicked_func(0), clicked_func_pos(0)
 	{}
 
 	virtual ~TComponent() {}
@@ -90,7 +99,8 @@ public:
 	void Hide() { visible = false; }                      /**< Set visible to false */
 
 	bool Enabled() const { return enabled; }              /**< Is this object enabled ? */
-	void SetEnabled(bool _en = true) { enabled = _en; }   /**< Set or unset this objet as enabled */
+	virtual void SetEnabled(bool _en = true)              /**< Set or unset this objet as enabled */
+		{ enabled = _en; }
 
 	/* Le composant a le focus ? */
 	bool Focused() const { return focus; }
@@ -105,6 +115,12 @@ public:
 	TClickedFunction ClickedFunc() const { return clicked_func; }
 	void* ClickedFuncParam() const { return clicked_func_param; }
 
+	void SetClickedFuncPos(TClickedFunctionPos c) { clicked_func_pos = c;  }
+	TClickedFunctionPos ClickedFuncPos() const { return clicked_func_pos; }
+
+	void SetForceFocus(bool b = true) { force_focus = b; }
+	bool ForceFocus() const { return force_focus; }
+
 	int Tag;
 
 /* Variables privées */
@@ -114,8 +130,10 @@ protected:
 	bool visible;
 	bool enabled;
 	bool focus;
+	bool force_focus;
 	TClickedFunction clicked_func;
 	void* clicked_func_param;
+	TClickedFunctionPos clicked_func_pos;
 };
 typedef std::vector<TComponent*> ComponentVector;
 
