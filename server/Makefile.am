@@ -1,6 +1,6 @@
 SUBDIRS = maps
 
-DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
+DEFS = -DCONFDIR=\"${sysconfdir}/\" -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
 LIBS =
 
@@ -19,7 +19,11 @@ menareantsserver_SOURCES = \
 menareantsserver_LDADD =$(top_srcdir)/lib/libmenareants.a
 
 install-data-local:
-	$(INSTALL_DATA) menareantsd.conf /etc/menareantsd.conf
+	if test ! -f "${sysconfdir}/menareantsd.conf"; then \
+		if test ! -d "${sysconfdir}"; then mkdir ${sysconfdir}; fi; \
+		echo "Installation de la configuration dans ${sysconfdir}"; \
+	   $(INSTALL_DATA) menareantsd.conf ${sysconfdir}/menareantsd.conf; \
+	fi;
 
 clean-generic:
 	-rm -f .#* *~

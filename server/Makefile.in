@@ -41,14 +41,16 @@ host_triplet = @host@
 target_triplet = @target@
 bin_PROGRAMS = menareantsserver$(EXEEXT)
 subdir = server
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/menareantsd.conf.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = menareantsd.conf
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -95,7 +97,7 @@ CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DATA_FILES = @DATA_FILES@
-DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
+DEFS = -DCONFDIR=\"${sysconfdir}/\" -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -223,6 +225,8 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+menareantsd.conf: $(top_builddir)/config.status $(srcdir)/menareantsd.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -552,7 +556,11 @@ uninstall-info: uninstall-info-recursive
 
 
 install-data-local:
-	$(INSTALL_DATA) menareantsd.conf /etc/menareantsd.conf
+	if test ! -f "${sysconfdir}/menareantsd.conf"; then \
+		if test ! -d "${sysconfdir}"; then mkdir ${sysconfdir}; fi; \
+		echo "Installation de la configuration dans ${sysconfdir}"; \
+	   $(INSTALL_DATA) menareantsd.conf ${sysconfdir}/menareantsd.conf; \
+	fi;
 
 clean-generic:
 	-rm -f .#* *~

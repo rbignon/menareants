@@ -64,7 +64,11 @@ const int COMLEN=10;
 const int MAXCONNEX=100; /* de préférence un multiple de 4 */
 
 /* Config */
+#ifdef CONFDIR
+#define CONFIG_FILE CONFDIR "menareantsd.conf"
+#else
 #define CONFIG_FILE "/etc/menareantsd.conf"
+#endif
 
 /* File of maplist */
 #define MAP_FILE PKGDATADIR "maps.list"
