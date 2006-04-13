@@ -666,7 +666,7 @@ void ECBMap::Init()
 	}
 	/* Vérification finale des données */
 	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
-	   !min || !max || map_players.size() != max || min > max || !date || begin_money < 0 || city_money < 0)
+	   !min || !max || map_players.size() != max || min > max || !date)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
 		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date) VIName(nb_soldats),
 		               "Fichier incorrect !");

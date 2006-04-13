@@ -40,7 +40,7 @@ public:
 		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
 	{}
 
-	ECBArmy() {}
+	ECBArmy() : ECBEntity(E_ARMY) {}
 
 	virtual ~ECBArmy() {}
 

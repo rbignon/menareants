@@ -128,11 +128,14 @@ class ECBEntity
 public:
 
 	enum e_type {
+		E_NONE,
 		E_ARMY,
 		E_END
 	};
 
-	ECBEntity() : owner(0), acase(0), nb(0), lock(false), shooted(0), cost(0), event_type(0) {}
+	ECBEntity(e_type t = E_NONE)
+		: owner(0), acase(0), type(t), nb(0), lock(false), shooted(0), cost(0), event_type(0)
+	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0);
 
