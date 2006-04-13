@@ -1,4 +1,22 @@
+2005-04-13  Romain Bignon <progs@headfucking.net>
+
+	* server/Makefile.am: Installation de la configuration dans $prefix/etc/.
+
+	* configure.ac, server/menareants.conf.in: Le path du motd dans la conf dépend du rep d'installation.
+
+	* src/JoinGame.cpp: Correction d'un bug qui posait problème lors du lancement du jeu quand c'était trop lent (desynch).
+
+	* src/Component.h, src/Form.cpp, src/ChildForm.cpp: OnMouseOn() et Hint().
+
+	* src/Main.cpp, src/Config.cpp: Nouveau nom pour On*.
+
+	* src/InGame.cpp: Affichage des icones à droite, utilisation d'un TChildForm et affichage du Hint.
+
+	* src/Map.cpp: N'affiche plus les contours sur la mer (preview).
+
 2005-04-12  Romain Bignon <progs@headfucking.net>
+
+	* src/Main.cpp, src/Config.cpp: Affiche la ConfigForm au lancement lors du premier lancement.
 
 	* src/tools/Images.cpp: Nouvelles fonctions, modifications...
 
@@ -18,6 +36,8 @@
 
 	* lib/UnitsList.h, server/InGame.cpp, src/Map.cpp, src/InGame.cpp: Liste des unités qui permet de n'avoir à mettre
 	  à jour qu'ici lors d'ajout d'unités.
+
+	* configure.ac: Paramètre --enable-full-warnings
 
 2005-04-11  Romain Bignon <progs@headfucking.net>
 
