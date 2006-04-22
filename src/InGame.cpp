@@ -704,6 +704,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->AttaqButton->Show();
 			InGameForm->BarreAct->UpButton->Show();
 			InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
+			InGameForm->BarreAct->UpButton->SetHint(std::string("Coût: " + TypToStr(e->Cost()) + " $").c_str());
 			InGameForm->BarreAct->UpButton->SetEnabled(
 					(e->CanBeCreated() && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
 		}
@@ -767,8 +768,10 @@ void TBarreAct::Init()
 
 	MoveButton = AddComponent(new TButtonText(300,5,100,30, "Déplacer", &app.Font()->sm));
 	MoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	MoveButton->SetHint("Déplacer l'unité");
 	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", &app.Font()->sm));
 	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+  AttaqButton->SetHint("L'unité déclare une attaque à l'unité atteinte");
 	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", &app.Font()->sm));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
@@ -814,10 +817,13 @@ void TBarreLat::Init()
 {
 	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", &app.Font()->sm));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	PretButton->SetHint("Cliquez ici lorsque vous avez fini vos déplacements");
 	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", &app.Font()->sm));
 	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	SchemaButton->SetHint("Voir la délimitation des territoires sur la carte");
 	QuitButton = AddComponent(new TButtonText(30,280,100,30, "Quitter", &app.Font()->sm));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+  QuitButton->SetHint("Quitter la partie");
 
 	chan->Map()->CreatePreview(120,120, true);
 	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
@@ -830,7 +836,7 @@ void TBarreLat::Init()
 	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->sm));
 	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(player->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
 
-	UnitsInfos = AddComponent(new TMemo(&app.Font()->sm, 15, Height() - 50 - 10, Width() - 15 - 10, 50));
+	UnitsInfos = AddComponent(new TMemo(&app.Font()->sm, 15, Height() - 100 - 10, Width() - 15 - 10, 100));
 
 	SetBackground(Resources::BarreLat());
 }
@@ -975,7 +981,7 @@ void TLoadPlayerLine::Init()
 	                                              pl->IsOp() ? '@' : ' ',
 	                                              pl->Position(),
 	                                              pl->GetNick(),
-	                                              nations_str[pl->Nation()]);
+	                                              nations_str[pl->Nation()].name);
 
 	label = new TLabel(x, y, s, *color_eq[pl->Color()], &app.Font()->normal);
 	MyComponent(label);
