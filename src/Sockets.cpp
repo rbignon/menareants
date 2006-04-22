@@ -20,7 +20,9 @@
 
 #include <errno.h>
 #include <cstdarg>
-#ifndef WIN32
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
 #include <netdb.h>
 #endif
@@ -88,71 +90,41 @@ int EC_Client::sendrpl(const char *pattern, ...)
 /* [:parv[0]] CMD [parv[1] [parv[2] ... [parv[parv.size()-1]]]] */
 void EC_Client::parse_message(std::string buf)
 {
-	char s[MAXBUFFER + 20];
-	std::string cmdname;
-	unsigned int i, len = (buf.size()-1);
-
 #ifdef DEBUG
 	std::cout << "R - " << buf << std::endl;
 #endif
 
+	std::string cmdname;
 	std::vector<std::string> parv;
-	std::vector<ECPlayer*> players;
-	for(i=0; i <= len; )
-	{
-		bool slash;
-		int j;
-		while(buf[i] == ' ') i++;
-		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
-			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
-				slash = true;
-			else
-				s[j++]=buf[i], slash=false;
-		s[j]='\0';
-		if(!j) continue;
-		if(cmdname.empty())
-		{
-			if(s[0] == ':')
-			{
-				std::string line = ((char*) s + 1);
-				parv.push_back(line);
-				if(pl)
-				{
-					while(!line.empty())
-					{
-						std::string tmp;
-						tmp = stringtok(line, ",");
-						if(tmp.find('!')) tmp = stringtok(tmp, "!");
-						ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
-						if(tmpl) players.push_back(tmpl);
-						/* Il est tout à fait possible que le player ne soit pas trouvé,
-						   genre si c'est un join... */
-					}
-				}
-			}
-			else
-			{
-				if(!parv.size()) parv.push_back("");
-				cmdname = s;
-			}
-		}
-		else
-			parv.push_back(std::string(s));
-	}
+
+	SplitBuf(buf, &parv, &cmdname);
 
 	EC_ACommand *cmd = NULL;
-	for(i=0;i<Commands.size() && !cmd;i++)
-		if(Commands[i]->CmdName == cmdname)
-		{
-			cmd = Commands[i];
-			break;
-		}
+	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end() && !cmd; ++it)
+		if((*it)->CmdName == cmdname)
+			cmd = *it;
 
 	if(!cmd || (parv.size()-1) < cmd->args)
 	{
 		vDebug(W_ERR|W_DESYNCH|W_SEND, "Commande incorrecte du serveur.", VSName(buf.c_str())
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
 		return;
+	}
+
+	std::vector<ECPlayer*> players;
+	if(pl && !parv[0].empty())
+	{
+		std::string line = parv[0];
+		while(!line.empty())
+		{
+			std::string tmp;
+			tmp = stringtok(line, ",");
+			if(tmp.find('!')) tmp = stringtok(tmp, "!");
+			ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
+			if(tmpl) players.push_back(tmpl);
+			/* Il est tout à fait possible que le player ne soit pas trouvé,
+			   genre si c'est un join... */
+		}
 	}
 
 	try

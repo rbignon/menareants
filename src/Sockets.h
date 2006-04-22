@@ -21,10 +21,16 @@
 #ifndef EC_Sockets_h
 #define EC_Sockets_h
 
-//#include "Main.h"
-#ifdef WIN32
-#include <winsock2.h>
+/* Ça peut parraitre bizare mais c'est pour éviter une inclusion de winsock2.h qui cause des merdes */
+typedef unsigned int SOCKET;
+#if defined(WIN32) && !defined(WINSOCK2_H) && !defined(FD_SETSIZE)
+#define FD_SETSIZE      64
+typedef struct fd_set {
+        unsigned int   fd_count;
+        SOCKET  fd_array[FD_SETSIZE];
+} fd_set;
 #endif
+
 #include "Defines.h"
 #include "Commands.h"
 
@@ -95,11 +101,7 @@ public:
 	bool Error() { return error; }
 
 protected:
-#ifdef WIN32
 	SOCKET sock;
-#else
-	int sock;
-#endif
 
 	std::vector<EC_ACommand*> Commands;
 	void parse_message(std::string buf);

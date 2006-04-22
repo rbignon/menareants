@@ -41,6 +41,9 @@ bool is_ip(const char *ip);
 /** Formate une chaine et retourne dans une std::string */
 std::string StringF(const char* format, ...);
 
+/** Mets une chaine dans un tableau de chaines */
+void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdname);
+
 /** Retourne si le fichier existe ou non */
 bool FichierExiste(const std::string &nom);
 

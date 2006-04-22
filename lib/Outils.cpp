@@ -183,3 +183,37 @@ bool FichierExiste(const std::string &nom)
   f.close();
   return existe;
 }
+
+void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdname)
+{
+	char s[1024 + 20];
+	unsigned int i, j, len = buf.length();
+
+	for(i=0; i <= len; )
+	{
+		bool slash;
+		while(buf[i] == ' ') i++;
+		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
+			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
+				slash = true;
+			else
+				s[j++]=buf[i], slash=false;
+		s[j]='\0';
+		if(!j) continue;
+		if(cmdname->empty())
+		{
+			if(s[0] == ':')
+			{
+				std::string line = ((char*) s + 1);
+				parv->push_back(line);
+			}
+			else
+			{
+				if(!parv->size()) parv->push_back("");
+				*cmdname = s;
+			}
+		}
+		else
+			parv->push_back(std::string(s));
+	}
+}
