@@ -28,6 +28,7 @@ Sommaire:
               BYE                               :au revoir
          - Dans une pré-partie
               SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
+              JIA <nom>                         :Créé une IA (par l'owner)
               KIK <nick> [raison]               :l'owner peut kicker
               GO!                               :l'owner lance le jeu
          - En cours de jeu
@@ -50,6 +51,7 @@ Sommaire:
               USED                              :pseudo déjà utilisé
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
+              ER2 <nick>                        :le pseudo de l'IA a déjà été pris
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               LSM <nom> <nbmin> <nbmax>         :envoie la liste des cartes
               EOMAP                             :fin de la liste des maps
