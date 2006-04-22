@@ -25,6 +25,7 @@
 #include "Server.h"
 #include <fcntl.h>
 #include <vector>
+#include <map>
 
 class EC_ACommand;
 
@@ -35,8 +36,6 @@ class EC_ACommand;
  */
 class ECServer
 {
-friend int TClient::exit(const char *, ...);
-friend int TClient::parse_this();
 public:
 	/** Message to send to clients.
 	 *
@@ -53,6 +52,7 @@ public:
 		STAT,         /**< STAT */
 
 		CANTJOIN,     /**< ER1 */
+		IANICKUSED,   /**< ER2 */
 
 		PING,         /**< PIG */
 		PONG,         /**< POG */
@@ -87,8 +87,6 @@ public:
 	time_t get_uptime() const { return uptime; }
 	char *rpl(ECServer::msg t);
 
-	TClient Clients[MAXCONNEX+1];
-
 	uint NBco;
 	uint NBtot;
 	uint NBchan;
@@ -109,15 +107,18 @@ public:
 	time_t Uptime() { return uptime; }
 
 	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0) {}
+	
+	TClient* FindClient(int fd) { return myClients[fd]; }
+	
+	TClient* FindClient(const char*) const;
+	
+	TClient *addclient(int fd, const char *ip);
+	void delclient(TClient *del);
 
 protected:
 	Config *conf;
 	int run_server(void);
 	int init_socket(void);
-	int parse_this(int);
-	TClient *addclient(int fd, const char *ip);
-	void delclient(TClient *del);
-	int parsemsg(TClient *cl);
 
 	static void sig_alarm(int c);
 
@@ -129,6 +130,10 @@ protected:
 
 	std::vector<EC_ACommand*> Commands;
 	void CleanUp();
+	
+	typedef std::map<int, TClient*> RealClientList;
+	std::map<int, TClient*> myClients;
+	std::vector<TClient*> Clients;
 };
 
 extern ECServer app;

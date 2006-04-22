@@ -55,8 +55,8 @@ void ECServer::sig_alarm(int c)
 	app.CurrentTS = time(NULL);
 	for(unsigned int i = 0; i<= app.highsock;i++)
 	{
-		if(app.Clients[i].GetFlags() & ECD_FREE) continue;
-		TClient *cl = &app.Clients[i];
+		if(app.Clients[i]->GetFlags() & ECD_FREE) continue;
+		TClient *cl = app.Clients[i];
 		if(IsPing(cl))
 		{
 			DelPing(cl);
@@ -122,15 +122,16 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new IAMCommand("IAM",	0,			0)); /* Args vérifié dans IAMCommand::Exec */
 		Commands.push_back(new PIGCommand("PIG",	0,			0));
 		Commands.push_back(new POGCommand("POG",	0,			0));
+		Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
+		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
 		Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
+		Commands.push_back(new JIACommand("JIA",	ECD_AUTH,	1));
 		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
 		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
 		Commands.push_back(new BYECommand("BYE",	0,			0));
 		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
 		Commands.push_back(new ERRCommand("ERR",	0,			1));
-		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
 		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
-		Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
 	
 		signal(SIGPIPE, SIG_IGN);
 		signal(SIGALRM, &sig_alarm);

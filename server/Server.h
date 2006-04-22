@@ -1,6 +1,6 @@
 /* server/Server.h - Header of Server.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #define ECD_SERVER_H
 
 #include "Defines.h"
+//#include "Main.h"
 #include <string>
 
 /* - Client */
@@ -35,52 +36,51 @@
 #define IsAuth(x)		((x)->HasFlag(ECD_AUTH))
 
 class ECPlayer;
+class TIA;
 
-/** TClient class.
- * This is class of a client.
- */
 class TClient
 {
-/* Constructeurs/Deconstructeurs */
+/* Constructeur/Destructeur */
 public:
+    TClient(int _fd, const char* _ip)
+        : lastread(0), fd(_fd), flag(0), ip(_ip), pl(0)
+    {}
+    
+    virtual ~TClient() {}
 
-/* Methodes */
+/* Méthodes */
 public:
-
-	/** Parse a messages. */
-	int parse_this();
 
 	/** Send a reply to client.
 	 * @return systematicaly 0.
 	 */
-	int sendrpl(const char *pattern, ...);
+	virtual int sendrpl(const char *pattern, ...);
 
 	/** Send an unformated message. */
-	int sendbuf(const char* buf, int len);
+	virtual int sendbuf(const char* buf, int len) = 0;
 
 	/** Close connexion with client and send a formated message. */
-	int exit(const char *, ...);
+	virtual int exit(const char *, ...);
 
-	/** Free client class. */
-	void Free();
-
-	/** Initialization of client. */
-	void Init(int fd, const char *ip);
+	int parsemsg(std::string buf);
+	
+	virtual void Free();
 
 /* Attributs */
 public:
 
 	/** Get nickname of client. */
-	char* GetNick() { return nick; }
+	const char* GetNick() const { return nick.c_str(); }
+	std::string Nick() const { return nick; }
 
 	/** Set client's nickname. */
-	void SetNick(char* _nick) { strncpy(nick, _nick, NICKLEN); }
+	void SetNick(const char* _nick) { nick = _nick; }
 
 	/** Get IP. */
-	char* GetIp() { return ip; }
+	const char* GetIp() const { return ip.c_str(); }
 
 	/** Get flags. */
-	unsigned int GetFlags() { return flag; }
+	unsigned int GetFlags() const { return flag; }
 
 	/** Set a flag. */
 	void SetFlag(unsigned int f) { flag |= f; }
@@ -89,46 +89,74 @@ public:
 	void DelFlag(unsigned int f) { flag &= ~f; }
 
 	/** Check if client has \a f flag. */
-	bool HasFlag(unsigned int f) { return (flag & f); }
+	bool HasFlag(unsigned int f) const { return (flag & f); }
 
 	/** Get last read time. */
-	time_t GetLastRead() { return lastread; }
+	time_t GetLastRead() const { return lastread; }
 
 	/** Get client's sock. */
-	int GetFd() { return fd; }
+	int GetFd() const { return fd; }
 
 	/** Get player's struct if client is in a game. */
-	ECPlayer *Player() { return pl; }
+	ECPlayer *Player() const { return pl; }
 
 	/** Set player struct */
 	void SetPlayer(ECPlayer *P) { if(!pl) pl = P; }
 
 	/** Remove player struct */
 	void ClrPlayer() { pl = NULL; }
+	
+	bool IsHuman() const { return (fd >= 0); }
+	bool IsIA() const { return (fd < 0); }
 
-/* Variables et fonctions privées */
-protected:
-	char nick[NICKLEN + 1];
-	size_t buflen;
-	size_t recvlen;
+	void SetLastRead(time_t t) { lastread = t; }
+	time_t LastRead() const { return lastread; }
+
+/* Variables privées */
+private:
+	std::string nick;
 	time_t lastread;
-	char QBuf[ECD_SENDSIZE+1];
-	char RecvBuf[ECD_RECVSIZE+1];
 	int fd;
 	unsigned int flag;	/* divers infos */
 #define ECD_AUTH 	0x01
 #define ECD_FREE 	0x02
 #define ECD_FLUSH	0x04
 #define ECD_PING	0x08
-	char ip[16];
+	std::string ip;
 	ECPlayer *pl;
+};
 
-	inline int dequeue();
-
+/** TClient class.
+ * This is class of a client.
+ */
+class TRealClient : public TClient
+{
+/* Constructeurs/Deconstructeurs */
 public:
 
-	/** Parse a message to call a function's command. */
-	int parsemsg();
+	TRealClient(int _fd, const char* _ip)
+	    : TClient(_fd, _ip), recvlen(0)
+	{}
+
+/* Methodes */
+public:
+
+	/** Parse a messages. */
+	int parse_this();
+
+	/** Send an unformated message. */
+	int sendbuf(const char* buf, int len);
+
+	/** Close connexion with client and send a formated message. */
+	int exit(const char *, ...);
+
+/* Attributs */
+public:
+
+/* Variables privées */
+private:
+    char RecvBuf[ECD_RECVSIZE+1];
+    size_t recvlen;
 };
 
 #endif
