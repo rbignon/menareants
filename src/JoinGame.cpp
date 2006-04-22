@@ -80,6 +80,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
 		else
 		{
+			GameInfosForm->Preview->Hide();
 			EChannel *chan = me->Player()->Channel();
 			ECMap *map = 0;
 			try
@@ -102,6 +103,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
+			GameInfosForm->Preview->Show();
 		}
 	}
 	return 0;
@@ -442,6 +444,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					break;
 				}
 				pl->SetOp(add);
+				if(GameInfosForm && pl->IsMe())
+					GameInfosForm->MapList->SetVisible(add);
 				break;
 			}
 			case 'n':
@@ -773,7 +777,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	if(!cname)
 	{
 		create = true;
-		TMessageBox mb("Entrez le nom du salon à créer",
+		TMessageBox mb("Entrez le nom de la partie à créer",
 						HAVE_EDIT|BT_OK, form);
 		mb.Edit()->SetAvailChars(CHAN_CHARS);
 		if(mb.Show() == BT_OK)
@@ -823,10 +827,12 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 		if(client->Player()->IsOwner())
 			GameInfosForm->PretButton->SetText("Lancer la partie");
 
-		GameInfosForm->MapList->SetEnabled(client->Player()->IsOp());
-	
+		GameInfosForm->MapList->SetVisible(client->Player()->IsPriv());
+	    Timer listmapclick;
 		do
 		{
+		    if(!GameInfosForm->MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
+		        GameInfosForm->MapList->SetEnabled();
 			while( SDL_PollEvent( &event) )
 			{
 				GameInfosForm->Actions(event);
@@ -855,11 +861,14 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 					{
 						if(client->Player()->IsPriv())
 						{
-							GameInfosForm->MapList->SetEnabled();
 							if(GameInfosForm->MapList->Test( event.button.x, event.button.y) &&
 							   GameInfosForm->MapList->GetSelectedItem() != -1)
+							{
 								client->sendrpl(client->rpl(EC_Client::SET),
 								                ("+m " + TypToStr(GameInfosForm->MapList->GetSelectedItem())).c_str());
+								listmapclick.reset();
+								GameInfosForm->MapList->SetEnabled(false);
+							}
 
 							if(client->Player()->IsOwner())
 							{
@@ -880,8 +889,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 								}
 							}
 						}
-						else
-							GameInfosForm->MapList->SetEnabled(false);
+
 						if(GameInfosForm->MyPosition &&
 						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
@@ -993,7 +1001,7 @@ void MenAreAntsApp::ListGames()
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
 						{
-							TMessageBox mb(std::string("Impossible de joindre le salon " +
+							TMessageBox mb(std::string("Impossible de joindre la partie " +
 							                  ListGameForm->GList->ReadValue(
 							                           ListGameForm->GList->GetSelectedItem())
 							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
@@ -1008,7 +1016,7 @@ void MenAreAntsApp::ListGames()
 					{
 						if(!GameInfos(NULL, ListGameForm))
 						{
-							TMessageBox mb(std::string("Impossible de créer le salon.\n"
+							TMessageBox mb(std::string("Impossible de créer la partie.\n"
 												"Son nom est peut être déjà utilisé.").c_str(),
 												BT_OK, ListGameForm);
 							mb.Show();
@@ -1055,7 +1063,6 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
 	Preview = AddComponent(new TImage(390, 380));
 
-	//MapList = AddComponent(new TListBox(400, 400, 150, 150));
 	MapList = AddComponent(new TListBox(&app.Font()->sm, 600, 345, 150, 115));
 
 	PretButton = AddComponent(new TButtonText(600,470, 150,50, "Pret", &app.Font()->normal));
@@ -1098,9 +1105,9 @@ TListGameForm::TListGameForm(SDL_Surface* w)
 {
 	Title = AddComponent(new TLabel(300,150,"Liste des parties", white_color, &app.Font()->big));
 
-	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Joindre", &app.Font()->normal));
+	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Rejoindre", &app.Font()->normal));
 	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", &app.Font()->normal));
-	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Creer", &app.Font()->normal));
+	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Créer", &app.Font()->normal));
 	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", &app.Font()->normal));
 
 	GList = AddComponent(new TListBox(&app.Font()->sm, 300,200,200,300));
@@ -1171,7 +1178,10 @@ void TPlayerLine::Init()
 	MyComponent(nation);
 
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
-		nation->AddItem(false, std::string(nations_str[i]), "");
+	{
+		uint j = nation->AddItem(false, std::string(nations_str[i].name), "");
+		nation->SetItemHint(j, nations_str[i].infos);
+  }
 }
 
 void TPlayerLine::Draw(int souris_x, int souris_y)
