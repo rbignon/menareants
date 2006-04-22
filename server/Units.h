@@ -29,9 +29,10 @@ class ECArmy : public ECEntity, public ECBArmy
 {
 /* Constructeur/Destructeur */
 public:
-	ECArmy(const Entity_ID _name, ECBPlayer* _owner, ECase* _case, uint _nb = ARMY_NB)
-		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
-	{}
+
+  ARMY_EMPTY_CONSTRUCTOR(ECArmy) {}
+  
+  ARMY_CONSTRUCTOR(ECArmy) {}
 
 /* Methodes */
 public:

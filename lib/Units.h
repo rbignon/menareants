@@ -27,20 +27,20 @@
 /********************************************************************************************
  *                               ECBArmy                                                   *
  ********************************************************************************************/
+#define ARMY_STEP                  2
+#define ARMY_NB                    100
+#define ARMY_COST                  2000
+#define ARMY_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_ARMY, ARMY_COST)
+#define ARMY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ARMY_NB) :  ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
 /** This is a simple army */
-#define ARMY_STEP         2
-#define ARMY_NB           100
-#define ARMY_COST         2000
 class ECBArmy : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ECBArmy(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ARMY_NB)
-		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
-	{}
+  ARMY_EMPTY_CONSTRUCTOR(ECBArmy) {}
 
-	ECBArmy() : ECBEntity(E_ARMY) {}
+  ARMY_CONSTRUCTOR(ECBArmy) {}
 
 	virtual ~ECBArmy() {}
 
