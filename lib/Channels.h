@@ -34,10 +34,14 @@ class ECBEntity;
 
 typedef std::vector<ECBEntity*> BEntityVector;
 
-#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_"
-#define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_@-()[]{}~"
+#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_"
+#define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 '`-_@-()[]{}~"
 
-extern const char *nations_str[];
+struct nations_str_t {
+  const char* name;
+  const char* infos;
+}; 
+extern const struct nations_str_t nations_str[];
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *

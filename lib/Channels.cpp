@@ -29,17 +29,17 @@
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
-const char *nations_str[] = {
-	/* N_NONE     */    "Aléatoire",
-	/* N_NOISY    */    "Noisy",
-	/* N_USA      */    "Etats-Unis",
-	/* N_FRANCE   */    "France",
-	/* N_URSS     */    "URSS",
-	/* N_ALQUAIDA */    "Al-Quaïda",
-	/* N_ESPAGNE  */    "Espagne",
-	/* N_JAPON    */    "Japon",
-	/* N_COLOMBIE */    "Colombie",
-	/* N_MAX      */    ""
+const struct nations_str_t nations_str[] = {
+	/* N_NONE     */   { "Aléatoire",  "Votre nation sera choisie aléatoirement." },
+	/* N_NOISY    */   { "Noisy",      "La contrée de noisy" },
+	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis" },
+	/* N_FRANCE   */   { "France",     "La france nia" },
+	/* N_URSS     */   { "URSS",       "La Russie Communiste" },
+	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda" },
+	/* N_ESPAGNE  */   { "Espagne",    "Española sienta la chiassa" },
+	/* N_JAPON    */   { "Japon",      "El Japon" },
+	/* N_COLOMBIE */   { "Colombie",   "Miss Goetz sienta la mierda" },
+	/* N_MAX      */   { "",           "" }
 };
 
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
