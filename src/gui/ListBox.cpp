@@ -137,6 +137,8 @@ void TListBox::Draw (int mouse_x, int mouse_y)
   // blit a surface as SDL_FillRect don't alpha blit a rectangle
   SDL_Rect r_back = {x,y,w,h};
   SDL_BlitSurface( background, NULL, Window(), &r_back);
+  
+  SetHint("");
 
   for (uint i=0; i < nb_visible_items; i++)
   {
@@ -147,6 +149,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 		{
 			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
 			SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
+			SetHint(m_items[i+first_visible_item].hint.c_str());
 		}
 		else if ( IsSelected(i+first_visible_item))
 		{
@@ -158,7 +161,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 		font->WriteLeft(x+5,
 			 y+i*height_item,
 			 m_items[i+first_visible_item].label,
-			 !m_items[i+first_visible_item].enabled && gray_disable ? gray_color :
+			 (!enabled || !m_items[i+first_visible_item].enabled && gray_disable) ? gray_color :
 			 IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
   }
 
@@ -175,7 +178,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 
 }
 
-void TListBox::AddItem (bool selected,
+uint TListBox::AddItem (bool selected,
 		       const std::string &label,
 		       const std::string &value, SDL_Color _color = black_color, bool enabled = true)
 {
@@ -198,7 +201,14 @@ void TListBox::AddItem (bool selected,
 
   visible_height = nb_visible_items*height_item;
   if (h < visible_height)  visible_height = h;
+  return pos;
+}
 
+void TListBox::SetItemHint(uint index, const char* Hint)
+{
+  assert(index < m_items.size());
+  
+  m_items[index].hint = Hint;
 }
 
 void TListBox::ClearItems()

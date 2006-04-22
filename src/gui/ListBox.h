@@ -37,6 +37,7 @@ class Font;
 typedef struct s_list_box_item_t{
     std::string label;
     std::string value;
+    std::string hint;
     SDL_Color color;
     bool enabled;
   } list_box_item_t;
@@ -60,10 +61,11 @@ public:
 /* Attributs */
 public:
 
-	void AddItem (bool selected,
+	uint AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
 	              SDL_Color _color, bool _enabled);
+  void SetItemHint(uint index, const char* Hint);
 	void ClearItems();
 	int MouseIsOnWitchItem (int mouse_x, int mouse_y);
 	virtual void Select (uint index);
