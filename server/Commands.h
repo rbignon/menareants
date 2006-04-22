@@ -1,6 +1,6 @@
 /* src/Commands.h - Command list
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 class EC_ACommand
 {
-friend int TClient::parsemsg();
+friend int TClient::parsemsg(std::string);
 public:
 	EC_ACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)
 		: CmdName(_CmdName), flags(_flags), args(_args)
@@ -68,6 +68,8 @@ class PIGCommand : public EC_ACommand { public: PIGCommand(const std::string _Cm
 class POGCommand : public EC_ACommand { public: POGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~POGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class JIACommand : public EC_ACommand { public: JIACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JIACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
