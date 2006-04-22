@@ -56,7 +56,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareantsserver_OBJECTS = Main.$(OBJEXT) Server.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
+	Channels.$(OBJEXT) IA.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
 	InGame.$(OBJEXT)
 menareantsserver_OBJECTS = $(am_menareantsserver_OBJECTS)
 menareantsserver_DEPENDENCIES = $(top_srcdir)/lib/libmenareants.a
@@ -187,6 +187,7 @@ menareantsserver_SOURCES = \
 	Debug.cpp \
 	Login.cpp \
 	Channels.cpp \
+	IA.cpp \
 	Map.cpp \
 	Units.cpp \
 	InGame.cpp
@@ -263,6 +264,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IA.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InGame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
@@ -556,7 +558,7 @@ uninstall-info: uninstall-info-recursive
 
 
 install-data-local:
-	if test ! -f "${sysconfdir}/menareantsd.conf"; then \
+	@if test ! -f "${sysconfdir}/menareantsd.conf"; then \
 		if test ! -d "${sysconfdir}"; then mkdir ${sysconfdir}; fi; \
 		echo "Installation de la configuration dans ${sysconfdir}"; \
 	   $(INSTALL_DATA) menareantsd.conf ${sysconfdir}/menareantsd.conf; \

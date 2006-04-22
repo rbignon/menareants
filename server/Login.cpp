@@ -18,6 +18,7 @@
  * $Id$
  */
 
+#include "lib/Channels.h"
 #include "Commands.h"
 #include "Server.h"
 #include "Outils.h"
@@ -57,9 +58,8 @@ static char *correct_nick(const char *nick)
 
 	while(*nick && i < NICKLEN)
 	{
-		if(*nick == '@') newnick[i++] = 'a';
-		else if(*nick == ' ') newnick[i++] = '_';
-		else if(isalnum(*nick) || *nick == '-' || *nick == '_') newnick[i++] = *nick;
+		if(*nick == ' ') newnick[i++] = '_';
+		else if(strchr(NICK_CHARS, *nick)) newnick[i++] = *nick;
 		*nick++;
 	}
 	newnick[i] = '\0';
@@ -97,9 +97,8 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(*nick == '\0') return cl->exit(app.rpl(ECServer::ERR));
 
-	for(unsigned int i=0; i < app.GetHighSock(); i++)
-		if(!strcasecmp(app.Clients[i].GetNick(), nick))
-			return cl->exit(app.rpl(ECServer::USED));
+	if(app.FindClient(nick))
+		return cl->exit(app.rpl(ECServer::USED));
 
 	cl->SetNick(nick);
 	SetAuth(cl);

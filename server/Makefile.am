@@ -12,6 +12,7 @@ menareantsserver_SOURCES = \
 	Debug.cpp \
 	Login.cpp \
 	Channels.cpp \
+	IA.cpp \
 	Map.cpp \
 	Units.cpp \
 	InGame.cpp
@@ -19,7 +20,7 @@ menareantsserver_SOURCES = \
 menareantsserver_LDADD =$(top_srcdir)/lib/libmenareants.a
 
 install-data-local:
-	if test ! -f "${sysconfdir}/menareantsd.conf"; then \
+	@if test ! -f "${sysconfdir}/menareantsd.conf"; then \
 		if test ! -d "${sysconfdir}"; then mkdir ${sysconfdir}; fi; \
 		echo "Installation de la configuration dans ${sysconfdir}"; \
 	   $(INSTALL_DATA) menareantsd.conf ${sysconfdir}/menareantsd.conf; \
