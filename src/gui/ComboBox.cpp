@@ -98,17 +98,18 @@ void TComboBox::SetOpened(bool _o)
 	}
 }
 
-void TComboBox::AddItem (bool selected,
+uint TComboBox::AddItem (bool selected,
 		       const std::string &label,
 		       const std::string &value, SDL_Color _color, bool enabled)
 {
-	TListBox::AddItem(selected, label, value, _color, enabled);
+	uint j = TListBox::AddItem(selected, label, value, _color, enabled);
 	if(opened)
 	{
 		h = height_item * m_items.size();
 		visible_height = h;
 		SetBackGround(h);
 	}
+	return j;
 }
 
 void TComboBox::ClearItems()

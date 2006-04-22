@@ -28,6 +28,7 @@
 #include <dirent.h>
 #else
 #include <getopt.h>
+#include <winsock2.h>
 #endif
 
 #include "Main.h"

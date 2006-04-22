@@ -77,7 +77,7 @@ void TChildForm::Draw(int _x, int _y)
 			{
 				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if(!put_hint && (*it)->Hint() && (*it)->Test(_x,_y))
+				if(!put_hint && (*it)->Visible() && (*it)->Enabled() && (*it)->Hint() && (*it)->Test(_x,_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

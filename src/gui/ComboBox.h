@@ -45,7 +45,7 @@ public:
 
 	bool Opened() const { return opened; }
 
-	void AddItem (bool selected,
+	uint AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
 	              SDL_Color _color = black_color, bool _enabled = true);

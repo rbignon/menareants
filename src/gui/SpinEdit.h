@@ -36,7 +36,7 @@ class TSpinEdit : public TComponent
 public:
 
 	/** Constructor
-	 * @param _font font
+	 * @param font font
 	 * @param label label of component.
 	 * @param _x x position of component.
 	 * @param _y y position of component.

@@ -35,6 +35,7 @@
 #include "gui/ComboBox.h"
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
+#include "gui/Memo.h"
 #include "Main.h"
 
 Config::Config(std::string _filename)
@@ -144,6 +145,7 @@ public:
 	TLabel*         Info;
 	TLabel*         NickInfo;
 	TLabel*         NationInfo;
+	TMemo*          Hints;
 
 /* Evenements */
 public:
@@ -236,19 +238,28 @@ TConfigForm::TConfigForm(SDL_Surface *w)
 
 	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, &app.Font()->normal));
 	Nick = AddComponent(new TEdit(&app.Font()->sm, 300,225,200, NICKLEN, NICK_CHARS));
+	Nick->SetHint("Votre pseudo permettra de vous distinguer des autres joueurs");
 
 	Color = AddComponent(new TColorEdit(&app.Font()->sm, "Couleur par défaut", 300, 250, 200));
+	Color->SetHint("Couleur par default dans chaques parties");
 
 	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, &app.Font()->normal));
 	Nation = AddComponent(new TComboBox(&app.Font()->sm, 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
-		Nation->AddItem(false, std::string(nations_str[i]), "");
+	{
+		uint j = Nation->AddItem(false, std::string(nations_str[i].name), "");
+		Nation->SetItemHint(j, nations_str[i].infos);
+	}
+		
+    Hints = AddComponent(new TMemo(&app.Font()->sm, 550, 200, 200, 100));
+    SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
 }
 
 TConfigForm::~TConfigForm()
 {
+	delete Hints;
 	delete NationInfo;
 	delete Nation;
 	delete Color;

@@ -51,17 +51,19 @@ void TImage::Init()
 
 void TImage::SetImage(ECImage* _img, bool _wd)
 {
+	Hide();
 	if(wana_delete && image)
 		delete image;
 
 	image = _img;
 	wana_delete = _wd;
 	Init();
+	Show();
 }
 
 void TImage::Draw(int _x, int _y)
 {
-	if(!image) return;
+	if(!image || !Window()) return;
 	SDL_Rect r_back = {x,y,w,h};
 	SDL_BlitSurface( image->Img, NULL, Window(), &r_back);
 }

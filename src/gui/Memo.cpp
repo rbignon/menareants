@@ -127,7 +127,7 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color)
 	while(1)
 	{
 		uint size = font->GetWidth(s);
-		if(*_s == '\n' || ((size > Width()-30) && *_s == ' ') || ((size+10) > (Width())) || !(*_s))
+		if(*_s == '\n' || ((size > Width()-Width()/3) && *_s == ' ') || ((size+20) > (Width())) || !(*_s))
 		{
 			/* Suppression du premier element */
 			if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
@@ -135,6 +135,7 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color)
 
 			// Push item
 			memo_box_item_t item;
+			if((size+20) > (Width())) s += "-"; // On a tronqué on rajoute un indicateur
 			item.label = s;
 			item.color = _color;
 			m_items.push_back (item);

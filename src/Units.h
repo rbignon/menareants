@@ -35,12 +35,9 @@ class ECArmy : public ECEntity, public ECBArmy
 /* Constructeur/Destructeur */
 public:
 
-	ECArmy() : ECBEntity(E_ARMY) {}
+  ARMY_EMPTY_CONSTRUCTOR(ECArmy) {}
 
-	ECArmy(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ARMY_NB)
-		: ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
-	{ SetImage(Resources::Army_Face()); }
-
+	ARMY_CONSTRUCTOR(ECArmy) { SetImage(Resources::Army_Face()); }
 
 /* Infos */
 public:

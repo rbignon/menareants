@@ -76,7 +76,8 @@ void TForm::Actions(SDL_Event event, uint a)
 				bool put_hint = false;
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 				{
-					if(!put_hint && Hint && (*it)->Hint() && (*it)->Test(event.button.x,event.button.y))
+					if(!put_hint && Hint && (*it)->Visible() && (*it)->Enabled() && (*it)->Hint() &&
+             (*it)->Test(event.button.x,event.button.y))
 					{
 						Hint->AddItem((*it)->Hint());
 						put_hint = true;

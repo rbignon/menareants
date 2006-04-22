@@ -99,6 +99,7 @@ public:
 	bool Visible() const { return visible; }              /**< Is this object visible ? */
 	void Show() { visible = true; }                       /**< Set visible to true */
 	void Hide() { visible = false; }                      /**< Set visible to false */
+	void SetVisible(bool b = true) { visible = b; }
 
 	bool Enabled() const { return enabled; }              /**< Is this object enabled ? */
 	virtual void SetEnabled(bool _en = true)              /**< Set or unset this objet as enabled */
