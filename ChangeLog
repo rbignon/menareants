@@ -1,3 +1,23 @@
+2005-04-20  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp (JIACommand): Commande pour créer une IA dans un chan.
+	(TIA): Classe de l'Intelligence Artificielle
+
+	* src/JoinGame.cpp: - La MapList n'est affichée que lorsque l'user est op ou owner.
+	                    - Délais pour eviter les clics abusifs dans la liste des maps.
+
+	* lib/Outils.cpp, src/Sockets.cpp, server/Server.cpp: Utilisation d'une fonction SplitBuf().
+
+2005-04-19  Romain Bignon <progs@headfucking.net>
+
+	* server/Server.cpp: Système des clients revisités pour accueillir l'intelligence artificielle...
+
+	* src/InGame.cpp: Affichage un peu partout d'hints...
+
+	* src/gui/ListBox.cpp: Hints pour chaques items.
+
+	* */Units.h: Macros pour les constructeurs.
+
 2005-04-13  Romain Bignon <progs@headfucking.net>
 
 	* server/Makefile.am: Installation de la configuration dans $prefix/etc/.
