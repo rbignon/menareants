@@ -329,8 +329,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
 						if(GameInfosForm->MyPosition)
 							GameInfosForm->MyPosition->SetEnabled();
-						if(GameInfosForm->MyColor)
-							GameInfosForm->MyColor->SetEnabled();
 						if(!me->Player()->IsOwner())
 							GameInfosForm->PretButton->SetEnabled(true);
 					}
@@ -592,7 +590,6 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyPosition = pline->position;
 				GameInfosForm->MyPosition->SetEnabled(false);
 				GameInfosForm->MyColor = pline->couleur;
-				GameInfosForm->MyColor->SetEnabled(false);
 				GameInfosForm->MyNation = pline->nation;
 			}
 			else
@@ -619,12 +616,8 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyPosition->SetEnabled();
 		}
 		if(GameInfosForm->MyColor)
-		{
 			for(std::vector<int>::iterator it = col_badval.begin(); it != col_badval.end(); ++it)
 				GameInfosForm->MyColor->AddBadValue(*it);
-			if(me->Player()->Channel()->Map())
-				GameInfosForm->MyColor->SetEnabled();
-		}
 		if(GameInfosForm->MyNation)
 			for(std::vector<int>::iterator it = nat_badval.begin(); it != nat_badval.end(); ++it)
 				GameInfosForm->MyNation->SetEnabledItem(*it, false);
@@ -818,10 +811,13 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			throw ECExcept(VPName(client->Player()), "Dans aucun chan");
 		chan = client->Player()->Channel();
 
-		if(chan->Map() && app.conf && app.conf->color)
-			client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(app.conf->color)).c_str());
-		if(app.conf && app.conf->nation)
-			client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " + TypToStr(app.conf->nation)).c_str());
+		if(app.conf)
+		{
+			if(app.conf->color)
+				client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(app.conf->color)).c_str());
+			if(app.conf->nation)
+				client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " + TypToStr(app.conf->nation)).c_str());
+		}
 
 		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
 		if(client->Player()->IsOwner())
@@ -1063,11 +1059,14 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
 	Preview = AddComponent(new TImage(390, 380));
 
-	MapList = AddComponent(new TListBox(&app.Font()->sm, 600, 345, 150, 115));
+	MapList = AddComponent(new TListBox(&app.Font()->sm, 625, 290, 150, 150));
 
-	PretButton = AddComponent(new TButtonText(600,470, 150,50, "Pret", &app.Font()->normal));
+	PretButton = AddComponent(new TButtonText(625,130, 150,50, "Pret", &app.Font()->normal));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(600,520,150,50, "Retour", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(625,180,150,50, "Retour", &app.Font()->normal));
+
+	Hints = AddComponent(new TMemo(&app.Font()->sm, 625, 465, 150, 100));
+	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
 
@@ -1079,6 +1078,7 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 
 TGameInfosForm::~TGameInfosForm()
 {
+	delete Hints;
 	delete Preview;
 	delete MapTitle;
 	delete MapList;
@@ -1165,6 +1165,12 @@ bool TPlayerLine::OwnZone(int _x, int _y)
 		return false;
 }
 
+bool TPlayerLine::Test (int souris_x, int souris_y) const
+{
+  return (visible && ((x <= souris_x) && (souris_x <= int(x+w))
+	  && (y <= souris_y) && (souris_y <= int((nation ? nation->RealY() + nation->Height() : y+h)))) && enabled);
+}
+
 void TPlayerLine::Init()
 {
 	assert(pl);
@@ -1172,9 +1178,11 @@ void TPlayerLine::Init()
 	                    /*  label   x    y  w  min      max                  step  defvalue */
 	position = new TSpinEdit(&app.Font()->sm, "",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
 	MyComponent(position);
-	couleur = new TColorEdit(&app.Font()->sm, "",  x+340, y, 50);
+	position->SetHint("Votre position sur la carte");
+	couleur = new TColorEdit(&app.Font()->sm, "",  x+320, y, 50);
 	MyComponent(couleur);
-	nation = new TComboBox(&app.Font()->sm, x+490, y, 150);
+	couleur->SetHint("La couleur de votre camp");
+	nation = new TComboBox(&app.Font()->sm, x+430, y, 120);
 	MyComponent(nation);
 
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
@@ -1198,9 +1206,18 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 	else if(pl->IsOp())
 		app.Font()->big.WriteLeft(x+45, y, "@", red_color);
 	app.Font()->big.WriteLeft(x+70, y, pl->GetNick(), white_color);
+
 	position->Draw(souris_x, souris_y);
 	couleur->Draw(souris_x, souris_y);
 	nation->Draw(souris_x, souris_y);
+
+	if(position->Test(souris_x, souris_y))
+		SetHint(position->Hint());
+	else if(couleur->Test(souris_x, souris_y))
+		SetHint(couleur->Hint());
+	else if(nation->Test(souris_x, souris_y))
+		SetHint(nation->Hint());
+	else SetHint("");
 }
 
 /********************************************************************************************
@@ -1219,7 +1236,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = "Pret   Pseudo        Position     Couleur         Nation";
+	std::string s = "Pret   Pseudo           Pos.    Couleur     Nation";
 	label = new TLabel(x, y, s, white_color, &app.Font()->big);
 	MyComponent(label);
 }

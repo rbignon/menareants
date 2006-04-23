@@ -59,6 +59,8 @@ public:
 	TLabel*      MapTitle;
 	TImage*      Preview;
 
+	TMemo*       Hints;
+
 	TSpinEdit*   MyPosition;
 	TColorEdit*  MyColor;
 	TComboBox*   MyNation;
@@ -127,6 +129,8 @@ public:
 	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 
 	bool OwnZone(int _x, int _y);
+
+	virtual bool Test (int souris_x, int souris_y) const;
 
 /* Composants */
 public:
