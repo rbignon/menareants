@@ -10,6 +10,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -server: voir pourquoi des fois il n'y a pas d'attaques là où il devrait y en avoir (genre y a un déplacement vers une
          case par quelqu'un avec quelque chose dessus (je ne sais), et si ce meme quelqu'un envoie une autre unité (ou
          meme peut etre un autre joueur) sur cette meme case il y a juste un mouvement après.
+-client: voir comment faire pour le Hint du GameInfosForm sur les nations (quand TList plus petit que le combobox).
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)

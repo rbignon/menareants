@@ -1,3 +1,15 @@
+2005-04-23  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp: Utilisation d'un système de Lock pour ne pas traiter les messages tout de suite.
+
+	* server/Channels.cpp (ByeEveryBody): Cette fonction peut avoir une exception.
+
+	* server/Server.cpp: Correction d'un bug concernant l'IA.
+
+	* src/JoinGame.cpp: Utilisation d'un Hint et réorganisation de la Form.
+
+	* src/gui/Components.cpp, src/gui/ChildForm.cpp: Modifs concernant les Hints.
+
 2005-04-20  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp (JIACommand): Commande pour créer une IA dans un chan.
