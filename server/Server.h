@@ -57,7 +57,7 @@ public:
 	virtual int sendrpl(const char *pattern, ...);
 
 	/** Send an unformated message. */
-	virtual int sendbuf(const char* buf, int len) = 0;
+	virtual int sendbuf(char* buf, int len) = 0;
 
 	/** Close connexion with client and send a formated message. */
 	virtual int exit(const char *, ...);
@@ -112,6 +112,10 @@ public:
 	void SetLastRead(time_t t) { lastread = t; }
 	time_t LastRead() const { return lastread; }
 
+	virtual void Lock() {}
+	virtual void UnLock() {}
+	virtual bool Locked() const { return false; }
+
 /* Variables privées */
 private:
 	std::string nick;
@@ -145,7 +149,7 @@ public:
 	int parse_this();
 
 	/** Send an unformated message. */
-	int sendbuf(const char* buf, int len);
+	int sendbuf(char* buf, int len);
 
 	/** Close connexion with client and send a formated message. */
 	int exit(const char *, ...);

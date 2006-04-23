@@ -89,8 +89,6 @@ int TRealClient::exit(const char *pattern, ...)
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
 	if(len < 0) len = sizeof buf -2;
 
-	buf[len++] = '\r';
-	buf[len++] = '\n';
 	buf[len] = 0;
 	va_end(vl);
 
@@ -100,14 +98,18 @@ int TRealClient::exit(const char *pattern, ...)
 	return 0;
 }
 
-int TRealClient::sendbuf(const char* buf, int len)
+int TRealClient::sendbuf(char* buf, int len)
 {
+	buf[len++] = '\r';
+	buf[len++] = '\n';
+	buf[len] = 0;
+
 #ifdef DEBUG
 	if(strncmp(buf, "PIG", 3) && strncmp(buf, "POG", 3))
 		printf("S(%s@%s) - %s", this->GetNick(), this->GetIp(), buf);
 #endif
 
-    send(this->GetFd(), buf, len, 0);
+	send(this->GetFd(), buf, len, 0);
 
 	return 0;
 }
@@ -122,8 +124,6 @@ int TClient::sendrpl(const char *pattern, ...)
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
 	if(len < 0) len = sizeof buf -2;
 
-	buf[len++] = '\r';
-	buf[len++] = '\n';
 	buf[len] = 0;
 	va_end(vl);
 
@@ -143,6 +143,11 @@ int TClient::parsemsg(std::string buf)
 {
 	std::string cmdname;
 	std::vector<std::string> parv;
+
+#ifdef DEBUG
+	if(strncmp(buf.c_str(), "PIG", 3) && strncmp(buf.c_str(), "POG", 3))
+		printf("R(%s@%s) - %s\n", GetNick(), GetIp(), buf.c_str());
+#endif
 
 	SplitBuf(buf, &parv, &cmdname);
 
@@ -202,10 +207,7 @@ int TRealClient::parse_this()
 			{
 				RecvBuf[recvlen-1] = 0;
 				SetLastRead(app.CurrentTS);
-#ifdef DEBUG
-				if(strncasecmp(RecvBuf, "PIG", 3) && strncasecmp(RecvBuf, "POG", 3))
-					printf("R(%s@%s) - %s\n", GetNick(), GetIp(), RecvBuf);
-#endif
+
 				parsemsg(RecvBuf);
 //				if(flag & ECD_FREE) break; /* in case of failed pass */
 
@@ -266,12 +268,11 @@ TClient *ECServer::addclient(int fd, const char *ip)
 void TClient::Free()
 {
 	EChannel *c;
-	if(pl && (c = pl->Channel())) /* Le fait partir du chan */
+	if(!IsIA() && pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
 		if(pl->IsOwner() && c->Joinable())
 		{ /* L'owner s'en vas, le chan se clos */
-			c->RemovePlayer(pl, USE_DELETE);
-			c->ByeEveryBody();
+			c->ByeEveryBody(pl);
 			delete c;
 		}
 		else if(c->NbPlayers() == 1) /* Dernier sur le chan */
@@ -296,7 +297,7 @@ void ECServer::delclient(TClient *del)
 		close(del->GetFd());
 		if((unsigned)del->GetFd() >= highsock)
 		{
-			highsock = 0;
+			highsock = sock;
 			for(RealClientList::const_iterator it = myClients.begin(); it != myClients.end(); ++it)
 				if((unsigned)it->second->GetFd() > highsock)
 					highsock = it->second->GetFd();
@@ -388,12 +389,6 @@ int ECServer::run_server(void)
 				}
 				else
 				{
-/*					if(i >= ASIZE(Clients))
-					{
-						printf("reading data from sock #%d, not registered ?", i);
-						break;
-					}*/
-
 					TRealClient *cl = dynamic_cast<TRealClient*>(myClients[i]);
 					
 					if(!cl)
