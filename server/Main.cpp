@@ -53,10 +53,10 @@ void ECServer::sig_alarm(int c)
 {
 #ifndef NOPINGCHECK
 	app.CurrentTS = time(NULL);
-	for(unsigned int i = 0; i<= app.highsock;i++)
+	for(RealClientList::const_iterator it = myClients.begin(); it != myClients.end(); ++it)
 	{
 		if(app.Clients[i]->GetFlags() & ECD_FREE) continue;
-		TClient *cl = app.Clients[i];
+		TClient *cl = *it;
 		if(IsPing(cl))
 		{
 			DelPing(cl);
