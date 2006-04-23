@@ -35,6 +35,7 @@ int TIA::LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 	for(std::vector<ECPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 		if(*it == me->Player())
 		{
+			Debug(W_DEBUG, "%s s'en va", me->GetNick());
 			app.delclient(me);
 			return 0;
 		}
@@ -60,7 +61,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				break;
 			case '!':
 			    /* Si on met -!, on remet l'IA prete */
-			    if(!add)
+			    if(!add && !me->Player()->Ready())
 					for(std::vector<ECPlayer*>::iterator it=players.begin(); it != players.end(); ++it)
 					    if(*it == me->Player())
 					    {
@@ -76,16 +77,45 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
  *                                FONCTIONS DE LA CLASSE TIA                                *
  ********************************************************************************************/
 
+void TIA::recv_msgs()
+{
+	for(std::vector<std::string>::iterator it = msgs.begin(); it != msgs.end();)
+	{
+		std::string s = *it;
+		msgs.erase(it);
+		recv_one_msg(s);
+		it = msgs.begin();
+	}
+}
+
 int TIA::ia_recv(std::string msg)
+{
+	if(Locked())
+		msgs.push_back(msg);
+	else
+	{
+		if(!msgs.empty())
+			recv_msgs();
+		return recv_one_msg(msg);
+	}
+	return 0;
+}
+
+int TIA::recv_one_msg(std::string msg)
 {
 	static struct cmds_t {
 		char cmd[COMLEN + 1];
 		int (*func) (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 		uint args;
 	} cmds[] = {
-    	{"SET",                TIA::SETCommand,             1},
-    	{"LEA",                TIA::LEACommand,             0}
+		{"SET",                TIA::SETCommand,             1},
+		{"LEA",                TIA::LEACommand,             0}
 	};
+
+#ifdef DEBUG
+	if(strncmp(msg.c_str(), "PIG", 3) && strncmp(msg.c_str(), "POG", 3))
+		printf("S(%s@%s) - %s\n", this->GetNick(), this->GetIp(), msg.c_str());
+#endif
 
 	std::string cmdname;
 	std::vector<std::string> parv;
@@ -94,7 +124,7 @@ int TIA::ia_recv(std::string msg)
 
 	cmds_t* cmd = 0;
 	for(uint i = 0; i < ASIZE(cmds) && !cmd; ++i)
-		if(!strcasecmp(cmds[i].cmd, cmdname.c_str()))
+		if(!strcmp(cmds[i].cmd, cmdname.c_str()))
 			cmd = &cmds[i];
 
 	/* Ce n'est pas forcément grave que la commande ne soit pas reconnue, dans le sens
@@ -168,7 +198,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 			return cl->sendrpl(app.rpl(ECServer::ERR));
 
 	if(app.FindClient(parv[1].c_str()))
-		return cl->exit(app.rpl(ECServer::IANICKUSED));
+		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
 		
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
 	IA->SetNick(parv[1].c_str());

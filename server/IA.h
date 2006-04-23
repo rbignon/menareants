@@ -34,23 +34,34 @@ class TIA : public TClient
 /* Constructeur/Destructeur */
 public:
 	TIA()
-	    : TClient(-1, "127.0.0.bot")
+	    : TClient(-1, "127.0.0.bot"), lock(false)
 	{}
 
 /* Methodes */
 public:
 
 	/** Send an unformated message. */
-	int sendbuf(const char* buf, int len) { return ia_recv(buf); }
+	int sendbuf(char* buf, int len) { return ia_recv(buf); }
 	
 	int ia_recv(std::string msg);
+	void recv_msgs();
+	int recv_one_msg(std::string msg);
 	
 	int ia_send(std::string msg) { return parsemsg(msg); }
+
+/* Attributs */
+public:
+
+	virtual bool Locked() const { return lock; }
+	virtual void Lock() { lock = true; }
+	virtual void UnLock() { lock = false; recv_msgs(); }
 
 /* Commandes */
 private:
 	static int SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	static int LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
+	bool lock;
+	std::vector<std::string> msgs;
 };
 
 #endif /* ECD_IA_H */
