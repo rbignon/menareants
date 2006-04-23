@@ -176,7 +176,9 @@ public:
 	 * \note Pour plus d'informations sur les modes, consulter API paragraphe 4. Modes
 	 */
 	std::string ModesStr() const;
-	
+
+	void ByeEveryBody(ECBPlayer* exception = 0);
+
 /* Attributs */
 public:
 
@@ -201,8 +203,6 @@ public:
 
 	ECPlayer* Owner() { return owner; }
 	void SetOwner(ECPlayer* _o) { owner = _o; }
-
-	void ByeEveryBody();
 
 /* Variables privées */
 protected:

@@ -74,6 +74,16 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	std::string modes, params;
 	bool last_add = true;
 
+	{
+		BPlayerVector plv = sender->Channel()->Players();
+		for(BPlayerVector::iterator pli = plv.begin(); pli != plv.end(); ++pli)
+		{
+			ECPlayer* pl = dynamic_cast<ECPlayer*>(*pli);
+			if(pl->Client())
+				pl->Client()->Lock();
+		}
+	}
+
 	for(uint i=0; i<parv[1].size(); i++)
 	{
 		char changed = 0;
@@ -203,11 +213,6 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(!sender->Channel()->Joinable())
 				{
 					Debug(W_DESYNCH, "SET %cc: interdit en cours de partie", add ? '+' : '-');
-					break;
-				}
-				if(!sender->Channel()->Map())
-				{
-					Debug(W_DESYNCH, "SET %cc: alors qu'il n'y a pas de map", add ? '+' : '-');
 					break;
 				}
 				if(add)
@@ -528,6 +533,15 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					break;
 				}
 			}
+		}
+	}
+	{
+		BPlayerVector plv = sender->Channel()->Players();
+		for(BPlayerVector::iterator pli = plv.begin(); pli != plv.end(); ++pli)
+		{
+			ECPlayer* pl = dynamic_cast<ECPlayer*>(*pli);
+			if(pl->Client())
+				pl->Client()->UnLock();
 		}
 	}
 
@@ -875,10 +889,11 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 	}
 }
 
-void EChannel::ByeEveryBody()
+void EChannel::ByeEveryBody(ECBPlayer* exception)
 {
 	for(BPlayerVector::iterator pi = players.begin(); pi != players.end(); ++pi)
 	{
+		if(!*pi || *pi == exception) continue;
 		ECPlayer *p = dynamic_cast<ECPlayer*>(*pi);
 		if(!p->Client()) continue;
 		p->Client()->sendrpl(app.rpl(ECServer::LEAVE), p->Client()->GetNick());
@@ -1052,8 +1067,6 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
 	if(len < 0) len = sizeof buf -2;
 
-	buf[len++] = '\r';
-	buf[len++] = '\n';
 	buf[len] = 0;
 	va_end(vl);
 
