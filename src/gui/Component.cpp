@@ -83,19 +83,29 @@ void TList::Rebuild()
 
 void TList::Draw(int souris_x, int souris_y)
 {
-	bool first = true;
+	bool first = true, put_hint = false;
+	printf("-\n");
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 			if((*it)->Visible() && (*it)->Focused() == (first ? false : true))
 			{ // Affiche seulement à la fin les composants selectionnés
+				(*it)->Draw(souris_x, souris_y);
 				if((*it)->OnMouseOn() && (*it)->Test(souris_x, souris_y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				(*it)->Draw(souris_x, souris_y);
+				printf("  [%s] [%s] [%s]\n", (*it)->Visible() ? "true" : "false", (*it)->Hint(),
+				 (*it)->Test(souris_x, souris_y) ? "true" : "false");
+				if((*it)->Visible() && (*it)->Hint() && (*it)->Test(souris_x, souris_y))
+				{
+					SetHint((*it)->Hint());
+					put_hint = true;
+				}
 			}
 		if(first) first = false;
 		else break;
 	}
+	if(!put_hint)
+		SetHint("");
 }
 
 bool TList::Clic (int mouse_x, int mouse_y)

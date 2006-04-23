@@ -67,7 +67,6 @@ void TChildForm::Draw(int _x, int _y)
 		SDL_BlitSurface(background->Img,NULL,Window(),&r_back);
 	}
 
-	SetHint("");
 	bool first = focus_order ? true : false, put_hint = false;
 	while(1)
 	{
@@ -77,16 +76,18 @@ void TChildForm::Draw(int _x, int _y)
 			{
 				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if(!put_hint && (*it)->Visible() && (*it)->Enabled() && (*it)->Hint() && (*it)->Test(_x,_y))
+				(*it)->Draw(_x, _y);
+				if(!put_hint && (*it)->Visible() && (*it)->Hint() && (*it)->Test(_x,_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;
 				}
-				(*it)->Draw(_x, _y);
 			}
 		if(first) first = false;
 		else break;
 	}
+	if(!put_hint)
+		SetHint("");
 }
 
 void TChildForm::Clear()
