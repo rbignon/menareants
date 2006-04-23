@@ -78,6 +78,8 @@ public:
 		NONE
 	};
 
+	typedef std::map<int, TClient*> RealClientList;
+
 public:
 	int main(int argc, char** argv);
 
@@ -111,6 +113,8 @@ public:
 	TClient* FindClient(int fd) { return myClients[fd]; }
 	
 	TClient* FindClient(const char*) const;
+
+	RealClientList MyClients() const { return myClients; }
 	
 	TClient *addclient(int fd, const char *ip);
 	void delclient(TClient *del);
@@ -131,7 +135,6 @@ protected:
 	std::vector<EC_ACommand*> Commands;
 	void CleanUp();
 	
-	typedef std::map<int, TClient*> RealClientList;
 	std::map<int, TClient*> myClients;
 	std::vector<TClient*> Clients;
 };
