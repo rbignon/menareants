@@ -53,6 +53,8 @@ public:
 	virtual void Deselect (uint index);
 	virtual void Select(uint index);
 
+	int RealY() const { return real_y; }
+
 /* Variables privées */
 protected:
 	TButton m_open;
