@@ -66,6 +66,7 @@ public:
 		LEAVE,       /**< LEA */
 		MSG,         /**< MSG */
 		SET,         /**< SET */
+		JIA,         /**< JIA */
 
 		ARM,         /**< ARM */
 

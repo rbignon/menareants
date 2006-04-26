@@ -49,6 +49,7 @@ const char* msgTab[] = {
 	"LEA",                                    /* LEA - Partir d'une partie */
 	"MSG %s",                                 /* MSG - Message dans une partie */
 	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
+	"JIA %s",                                 /* JIA - Créer une IA dans le jeu */
 
 	"ARM %s",                                 /* ARM - Envoie des infos sur une armée */
      0
