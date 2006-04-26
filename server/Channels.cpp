@@ -139,13 +139,14 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					vDebug(W_DESYNCH, "SET +!: alors qu'il n'y a pas de map", VPName(sender->Channel()->Map()));
 					break;
 				}
-				if(sender->Channel()->Joinable() && (!sender->Channel()->Owner() || !sender->Channel()->Owner()->Ready()))
+				if(sender->Channel()->Joinable() && (!sender->Channel()->Owner() || !sender->Channel()->Owner()->Ready())
+				   && !sender->IsOwner())
 				{
 					BPlayerVector::iterator it;
 					BPlayerVector plv = sender->Channel()->Players();
 					uint nok = 0;
 					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ++nok;
-					if(nok >= (sender->Channel()->Map()->MaxPlayers() - 1) && !sender->IsOwner())
+					if(nok >= (sender->Channel()->Map()->MaxPlayers() - 1))
 						break; // C'est pas forcément une erreur
 				}
 
@@ -651,8 +652,10 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	EChannel *chan = cl->Player()->Channel();
 
-	if(cl->Player()->IsOwner() && chan->Joinable())
-	{ /* L'owner s'en vas, le chan se clos */
+	if(chan->Joinable() && cl->Player()->IsOwner() || chan->NbHumains() == 1)
+	{ /* L'owner s'en vas, le chan se clos,
+	   * ou alors il n'y a plus que des IA sur le chan
+	   */
 		chan->ByeEveryBody();
 		delete chan;
 	}
@@ -721,6 +724,11 @@ void ECPlayer::SetMoney(int m)
 {
 	money = m;
 	client->sendrpl(app.rpl(ECServer::SET), GetNick(), std::string("+$ " + TypToStr(m)).c_str());
+}
+
+bool ECPlayer::IsIA() const
+{
+	return (client && client->IsIA());
 }
 
 /********************************************************************************************
@@ -999,6 +1007,15 @@ void EChannel::SetLimite(unsigned int l)
 	return;
 }
 
+BPlayerVector::size_type EChannel::NbHumains() const
+{
+	BPlayerVector::size_type s = 0;
+	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
+		if(!(*it)->IsIA())
+			++s;
+	return s;
+}
+
 void EChannel::NeedReady()
 {
 	PlayerVector plv;
@@ -1025,7 +1042,7 @@ ECPlayer *EChannel::GetPlayer(const char* nick)
 
 ECPlayer *EChannel::GetPlayer(TClient *cl)
 {
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
 		if((dynamic_cast<ECPlayer*> (*it))->Client() == cl)
 			return ((ECPlayer*) (*it));
 
@@ -1047,7 +1064,7 @@ void EChannel::send_modes(PlayerVector senders, const char* msg)
 
 	std::string snds;
 	
-	for(PlayerVector::iterator it = senders.begin(); it != senders.end(); ++it)
+	for(PlayerVector::const_iterator it = senders.begin(); it != senders.end(); ++it)
 	{
 		if(!snds.empty())
 			snds += ",";
@@ -1070,7 +1087,7 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	buf[len] = 0;
 	va_end(vl);
 
-	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
 	{
 		if(!(dynamic_cast<ECPlayer*> (*it))->Client() || *it == one) continue;
 

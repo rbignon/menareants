@@ -270,8 +270,10 @@ void TClient::Free()
 	EChannel *c;
 	if(!IsIA() && pl && (c = pl->Channel())) /* Le fait partir du chan */
 	{
-		if(pl->IsOwner() && c->Joinable())
-		{ /* L'owner s'en vas, le chan se clos */
+		if(c->Joinable() && pl->IsOwner() || c->NbHumains() == 1)
+		{ /* L'owner s'en vas, le chan se clos,
+		   * ou alors il n'y a plus que des IA sur le chan
+		   */
 			c->ByeEveryBody(pl);
 			delete c;
 		}

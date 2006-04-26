@@ -72,6 +72,8 @@ public:
 	/** Get client's nickname */
 	virtual const char* GetNick() const;
 
+	virtual bool IsIA() const;
+
 /* Variables privées */
 protected:
 	TClient *client;
@@ -154,15 +156,15 @@ public:
 	 * </pre>
 	 */
 	void SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
-	             uint x=0, uint y=0, uint nb=0, uint type=0, std::vector<ECEvent*> events = 0);
+	             uint x=0, uint y=0, uint nb=0, uint type=0, std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 
 	/** \see SendArm() */
 	void SendArm(TClient* cl, std::vector<ECEntity*> et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0,
-	             std::vector<ECEvent*> events = 0);
+	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, uint nb = 0, uint type = 0,
-	             std::vector<ECEvent*> events = 0);
+	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 	void SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, uint nb=0, uint type=0,
-	             std::vector<ECEvent*> events = 0);
+	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 
 	void InitAnims();
 
@@ -203,6 +205,8 @@ public:
 
 	ECPlayer* Owner() { return owner; }
 	void SetOwner(ECPlayer* _o) { owner = _o; }
+
+	BPlayerVector::size_type NbHumains() const;
 
 /* Variables privées */
 protected:
