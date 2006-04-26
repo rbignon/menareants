@@ -36,6 +36,7 @@ typedef std::vector<ECBEntity*> BEntityVector;
 
 #define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_"
 #define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 '`-_@-()[]{}~"
+#define IA_CHAR '~'
 
 struct nations_str_t {
   const char* name;
@@ -120,6 +121,8 @@ public:
 
 	uint TurnMoney() const { return turn_money; }
 	void SetTurnMoney(uint u) { turn_money = u; }
+
+	virtual bool IsIA() const = 0;
 
 /* Variables privées */
 protected:
