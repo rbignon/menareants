@@ -45,8 +45,9 @@ public:
 	 * @param owner if player is an owner or not.
 	 * @param op is player is an oper or not.
 	 * @param IsMe say if this player is me.
+	 * @param IsIA say if this player is an Artificial Intelligence.
 	 */
-	ECPlayer(const char* nick, EChannel* chan, bool owner, bool op, bool IsMe);
+	ECPlayer(const char* nick, EChannel* chan, bool owner, bool op, bool IsMe, bool IsIA);
 
 /* Methodes */
 public:
@@ -63,10 +64,13 @@ public:
 	/** Is this player me ? */
 	bool IsMe() const { return isme; }
 
+	virtual bool IsIA() const { return is_ia; }
+
 /* Variables privées */
 protected:
 	std::string nick;
 	bool isme;
+	bool is_ia;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

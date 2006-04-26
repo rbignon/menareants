@@ -53,6 +53,7 @@ public:
 	TEdit*       SendMessage;
 	TButtonText* RetourButton;
 	TButtonText* PretButton;
+	TButtonText* CreateIAButton;
 	TList*       Players;
 	TLabel*      Title;
 	TListBox*    MapList;

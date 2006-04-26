@@ -399,7 +399,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(add && chan->State() == EChannel::ANIMING)
 							chan->SetCurrentEvent(0);
 					}
-					else if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready() && GameInfosForm)
+					if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready() && GameInfosForm)
 					{
 						BPlayerVector::iterator it;
 						BPlayerVector plv = chan->Players();
@@ -443,7 +443,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 				pl->SetOp(add);
 				if(GameInfosForm && pl->IsMe())
+				{
 					GameInfosForm->MapList->SetVisible(add);
+					GameInfosForm->CreateIAButton->SetVisible(add);
+				}
 				break;
 			}
 			case 'n':
@@ -576,7 +579,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			pl = me->Player();
 		}
 		else
-			pl = new ECPlayer(nick, me->Player()->Channel(), owner, op, false);
+			pl = new ECPlayer(nick, me->Player()->Channel(), owner, op, false, (*nick == IA_CHAR));
 		pl->SetColor(col);
 		pl->SetPosition(pos);
 		pl->SetReady(ready);
@@ -642,13 +645,14 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(parv[0] == me->GetNick())
 		{ /* C'est moi qui join */
 			EChannel *c = new EChannel(parv[1]);
-			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, false, true));
+			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, false, true, false));
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
 			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
 
-			ECPlayer *pl = new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false, false);
+			ECPlayer *pl = new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false, false,
+			                            (parv[0][0] == IA_CHAR));
 			if(GameInfosForm)
 			{
 				GameInfosForm->Chat->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
@@ -685,10 +689,10 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if((*playersi)->IsMe())
 		{
 			EChannel *c = me->Player()->Channel();
+			JOINED = false;
 			me->ClrPlayer(); /* <=> me->pl = 0 */
 			if(GameInfosForm)
 				GameInfosForm->Players->Hide();
-			JOINED = false;
 
 			if(c->WantLeave()) MyFree(GameInfosForm);
 
@@ -746,7 +750,10 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				LoadingForm->Players->Show();
 			}
 			if(InGameForm)
+			{
 				InGameForm->AddInfo(I_INFO, "*** " + std::string((*playersi)->GetNick()) + " quitte la partie");
+				me->Player()->Channel()->Map()->CreatePreview(120,120, true);
+			}
 			if(me->Player()->Channel()->RemovePlayer((*playersi), USE_DELETE))
 				playersi = players.erase(playersi);
 			else
@@ -824,6 +831,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			GameInfosForm->PretButton->SetText("Lancer la partie");
 
 		GameInfosForm->MapList->SetVisible(client->Player()->IsPriv());
+		GameInfosForm->CreateIAButton->SetVisible(client->Player()->IsPriv());
 	    Timer listmapclick;
 		do
 		{
@@ -906,6 +914,16 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 							eob = true;
 						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+						if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
+						{
+							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
+							mb.Edit()->SetAvailChars(NICK_CHARS);
+							std::string nick;
+							if(mb.Show() == BT_OK)
+								name = mb.EditText();
+							if(!name.empty())
+								client->sendrpl(client->rpl(EC_Client::JIA), name.c_str());
+						}
 						break;
 					}
 					default:
@@ -928,7 +946,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			MyFree(GameInfosForm);
 		throw;
 	}
-	if(!client)
+	if(!client || !client->Player())
 		MyFree(GameInfosForm);
 	else
 	{
@@ -1064,6 +1082,9 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	PretButton = AddComponent(new TButtonText(625,130, 150,50, "Pret", &app.Font()->normal));
 	PretButton->SetEnabled(false);
 	RetourButton = AddComponent(new TButtonText(625,180,150,50, "Retour", &app.Font()->normal));
+	CreateIAButton = AddComponent(new TButtonText(625,230,150,50, "Ajouter IA", &app.Font()->normal));
+	CreateIAButton->Hide();
+	CreateIAButton->SetHint("Ajouter un joueur artificiel (une IA) à la partie");
 
 	Hints = AddComponent(new TMemo(&app.Font()->sm, 625, 465, 150, 100));
 	SetHint(Hints);
@@ -1083,6 +1104,7 @@ TGameInfosForm::~TGameInfosForm()
 	delete MapTitle;
 	delete MapList;
 	delete Players;
+	delete CreateIAButton;
 	delete RetourButton;
 	delete PretButton;
 	delete SendMessage;
@@ -1167,8 +1189,8 @@ bool TPlayerLine::OwnZone(int _x, int _y)
 
 bool TPlayerLine::Test (int souris_x, int souris_y) const
 {
-  return (visible && ((x <= souris_x) && (souris_x <= int(x+w))
-	  && (y <= souris_y) && (souris_y <= int((nation ? nation->RealY() + nation->Height() : y+h)))) && enabled);
+  return (visible && enabled && ((x <= souris_x) && (souris_x <= int(x+w)) && (y <= souris_y) &&
+         (souris_y <= int((nation && nation->Opened() ? nation->Y() + nation->Height() : y+h)))));
 }
 
 void TPlayerLine::Init()
