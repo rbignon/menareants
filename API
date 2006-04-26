@@ -13,6 +13,7 @@ Sommaire:
 4) Modes
 5) PLS
 6) Etat d'une partie
+7) Intelligence Artificielle
 
 1) Principe du jeu
 
@@ -125,3 +126,21 @@ Sommaire:
      SENDING           :le client créé la map physiquement et prépare toutes les données
      PLAYING           :les joueurs doivent jouer jusqu'à ce que tout le monde soit READY
      ANIMING           :animations commandées par le serveur
+
+7) Intelligence Artificielle
+     L'intelligence artificielle est implémentée dans le serveur de la manière suivante :
+     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '*', étant un
+       caractère non inclus dans NICK_CHARS.
+     - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinciton
+     - Chaque sendrpl() vers ce client est interprété ensuite par l'IA qui parse le message et le traite.
+     - Chaque message que l'IA veut envoyer est en fait redirigé vers son parsemsg().
+
+     La problematique est la suivante:
+     * Dans plusieurs fonctions ???Command::Exec() executées par une commande d'un client, il y a des messages envoyés aux
+       joueurs en prenant en compte le fait qu'aucun traitement d'un éventuel message de retour ne sera effectué avant
+       la fin de cette fonction. Le problème est que l'IA elle, lorsqu'elle reçoit le message qui a été envoyé
+       avant la fin de la fonction en question, peut interagire et répondre tout de suite, ce qui entraine un autre
+       traitement qui coupe le traitement en cours.
+     * Pour remédier à ce problème, un système de "lock" a été trouvé du coté de l'IA. Ainsi, lorsqu'elle est positionée
+       comme étant "locké", tous les messages reçus sont ajoutés dans une queue qui, une fois "delocké", sera traité
+       d'un coup.
