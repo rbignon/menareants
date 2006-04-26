@@ -82,16 +82,20 @@ std::string TypToStr( const T & Value )
 }
 
 /** Free and set pointer to 0 */
-#define MyFree(p)	do { delete (p); (p) = 0; } while(0)
-/*
-inline void MyFree(void *p)
+template<typename T>
+inline void MyFree(T* &p)
 {
-	delete &p;
+	if(!p) return;
+	delete p;
 	p = 0;
 }
-*/
+//#define MyFree(p)	do { delete (p); (p) = 0; } while(0)
 
 const bool USE_DELETE = true;
+
+#ifndef _GLIBCXX_STD
+#define _GLIBCXX_STD std
+#endif
 
 namespace _GLIBCXX_STD
 {
