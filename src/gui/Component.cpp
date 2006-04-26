@@ -27,7 +27,8 @@
 TList::TList(int _x, int _y)
 	: TComponent(_x, _y)
 {
-	list.clear(); /* On ne sait jamais */
+	list.clear();
+ dynamic_hint = true;
 }
 
 TList::~TList()
@@ -84,7 +85,6 @@ void TList::Rebuild()
 void TList::Draw(int souris_x, int souris_y)
 {
 	bool first = true, put_hint = false;
-	printf("-\n");
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
@@ -93,8 +93,6 @@ void TList::Draw(int souris_x, int souris_y)
 				(*it)->Draw(souris_x, souris_y);
 				if((*it)->OnMouseOn() && (*it)->Test(souris_x, souris_y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				printf("  [%s] [%s] [%s]\n", (*it)->Visible() ? "true" : "false", (*it)->Hint(),
-				 (*it)->Test(souris_x, souris_y) ? "true" : "false");
 				if((*it)->Visible() && (*it)->Hint() && (*it)->Test(souris_x, souris_y))
 				{
 					SetHint((*it)->Hint());

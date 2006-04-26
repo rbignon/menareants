@@ -45,7 +45,8 @@ public:
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
 	TComponent(SDL_Surface* w = 0)
 		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
-		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
+		  dynamic_hint(0)
 	{}
 
 	/** Constructor with position
@@ -55,7 +56,8 @@ public:
 	 */
 	TComponent(int _x, int _y, SDL_Surface* w = 0)
 		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
-		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
+		  dynamic_hint(0)
 	{}
 
 	/** Constructor with position and size
@@ -67,7 +69,8 @@ public:
 	 */
 	TComponent(int _x, int _y, uint _w, uint _h, SDL_Surface* w = 0)
 		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
-		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0)
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
+		  dynamic_hint(0)
 	{}
 
 	virtual ~TComponent() {}
@@ -130,6 +133,7 @@ public:
 
 	void SetHint(const char* h) { hint = h; }
 	const char* Hint() const { return hint.c_str(); }
+	bool DynamicHint() const { return dynamic_hint; }
 
 	int Tag;
 
@@ -147,6 +151,7 @@ protected:
 	TOnMouseOnFunction on_mouse_on_func;
 	void* on_mouse_on_param;
 	std::string hint;
+	bool dynamic_hint;
 };
 typedef std::vector<TComponent*> ComponentVector;
 
