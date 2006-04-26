@@ -65,4 +65,18 @@ public:
 	}
 */
 
+/* let's try not to clash with the system assert()... */
+#undef assert
+
+#ifndef assert
+# ifdef NDEBUG
+#  define assert(expr)  ((void)0)
+# else
+#  define assert(expr)                                                        \
+  ((void)(__builtin_expect(!!(expr), 1) ? 0 :                                 \
+          (throw TECExcept(__PRETTY_FUNCTION__, __FILE__, __LINE__, "", #expr), 0)))
+# endif
+#endif
+
+
 #endif /* ECLIB_DEBUG_H */
