@@ -56,8 +56,7 @@ void ECServer::sig_alarm(int c)
 	RealClientList lst = app.MyClients();
 	for(RealClientList::iterator it = lst.begin(); it != lst.end(); ++it)
 	{
-		if(app.Clients[i]->GetFlags() & ECD_FREE) continue;
-		TClient *cl = *it;
+		TClient *cl = it->second;
 		if(IsPing(cl))
 		{
 			DelPing(cl);
