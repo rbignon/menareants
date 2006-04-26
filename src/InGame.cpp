@@ -399,12 +399,10 @@ void MenAreAntsApp::InGame()
 						}
 
 						int mywant = want;
-						if(event.button.button == MBUTTON_MIDLE)
+						if(event.button.button == MBUTTON_RIGHT)
 							mywant = W_MOVE;
 						else if(event.button.button != MBUTTON_LEFT)
 							mywant = W_NONE;
-						if(event.button.button == MBUTTON_RIGHT)
-							InGameForm->BarreAct->UnSelect();
 
 						if(!mywant && event.button.button == MBUTTON_LEFT &&
 						   (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
@@ -440,8 +438,14 @@ void MenAreAntsApp::InGame()
 									}
 								}
 							}
-							if(!mywant && event.button.button == MBUTTON_LEFT && acase->Flags() & C_VILLE)
-								InGameForm->BarreAct->SetCase(acase);
+							if(!mywant && event.button.button == MBUTTON_LEFT)
+							{
+								if(acase->Flags() & C_VILLE)
+									InGameForm->BarreAct->SetCase(acase);
+								else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y) &&
+								        !InGameForm->BarreLat->Test(event.button.x, event.button.y))
+									InGameForm->BarreAct->UnSelect();
+							}
 						}
 						break;
 					}
