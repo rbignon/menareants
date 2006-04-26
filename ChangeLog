@@ -1,3 +1,28 @@
+2005-04-26  Romain Bignon <progs@headfucking.net>
+
+	* API: Paragraphe concernant l'IA.
+
+	* server/Channels.cpp, server/Server.cpp: Les IA partent bien en cours de partie si il n'y a plus aucun humain.
+
+	* server/Channels.cpp: Corrections pour le portage.
+
+	* lib/Channels.h, src/JoinGame.cpp, server/IA.cpp: Caractère ajouté devant le pseudo de l'IA poru la reconnaitre.
+
+	* src/JoinGame.cpp, src/Channels.h, lib/Channels.h: Fonction ECPlayer::IsIA(), et coté client il y a un argument
+	au constructeur.
+
+	* src/InGame.cpp: Modification de l'utilisation des boutons de la souris.
+
+	* lib/Debug.h: Ajout de assert()
+
+	* lib/Outils.h: - Fonction MyFree() (plutot que macro) avec une sécurité
+	- Portage si la std est trop vieille.
+
+2005-04-25  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Component.cpp, src/gui/Form.cpp: Rajout d'un paramètre "dynamic_hint" qui donne la priorité et qui fait
+	fonctionner les hints du GameInfosForm sur la combobox des nations.
+
 2005-04-23  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp: Utilisation d'un système de Lock pour ne pas traiter les messages tout de suite.
