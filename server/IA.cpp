@@ -201,7 +201,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
 		
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
-	IA->SetNick(parv[1].c_str());
+	IA->SetNick((IA_CHAR + parv[1]).c_str());
 	SetAuth(IA);
 
 	/* A partir de là le serveur le gere comme un client normal */
