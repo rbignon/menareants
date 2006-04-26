@@ -251,8 +251,8 @@ TConfigForm::TConfigForm(SDL_Surface *w)
 		Nation->SetItemHint(j, nations_str[i].infos);
 	}
 		
-    Hints = AddComponent(new TMemo(&app.Font()->sm, 550, 200, 200, 100));
-    SetHint(Hints);
+	Hints = AddComponent(new TMemo(&app.Font()->sm, 550, 200, 200, 100));
+	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
 }
