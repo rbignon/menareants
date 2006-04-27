@@ -1,3 +1,10 @@
+2005-04-27  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Correction d'un bug qui ne vérifiait pas les attaques dans un create, et qui envoie *tous* les
+	déplacements d'un joueur
+
+	* server/Map.h (ECEntity): Il stock maintenant tous ses déplacements.
+
 2005-04-26  Romain Bignon <progs@headfucking.net>
 
 	* API: Paragraphe concernant l'IA.
