@@ -185,7 +185,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
 		if(!entity || entity->Locked())
-			return vDebug(W_DESYNCH, "Entité introuvable", VPName(entity) VName(parv[1]));
+			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1]));
 	}
 
 	uint y = 0, x = 0, type = 0, nb = 0;
@@ -200,6 +200,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					flags |= ARM_MOVE;
 					moves.push_back(ECMove::Up);
+					entity->Move()->AddMove(ECMove::Up);
 				}
 				break;
 			case '>':
@@ -207,6 +208,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					flags |= ARM_MOVE;
 					moves.push_back(ECMove::Right);
+					entity->Move()->AddMove(ECMove::Right);
 				}
 				break;
 			case 'v':
@@ -214,6 +216,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					flags |= ARM_MOVE;
 					moves.push_back(ECMove::Down);
+					entity->Move()->AddMove(ECMove::Down);
 				}
 				break;
 			case '<':
@@ -221,21 +224,21 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					flags |= ARM_MOVE;
 					moves.push_back(ECMove::Left);
+					entity->Move()->AddMove(ECMove::Left);
 				}
 				break;
 			case '=':
 			{
 				if(!moves.empty())
-					return Debug(W_DESYNCH, "Utilisation de [v<^>] avant un =");
+					return Debug(W_DESYNCH, "ARM: Utilisation de [v<^>] avant un =");
 				if(entity)
-					return Debug(W_DESYNCH, "Utilisation de =<pos> sur une entité existante");
+					return Debug(W_DESYNCH, "ARM: Utilisation de =<pos> sur une entité existante");
 
 				std::string s = parv[i].substr(1);
 				x = StrToTyp<uint>(stringtok(s, ","));
 				y = StrToTyp<uint>(s);
 
-				if(!entity)
-					flags |= ARM_MOVE;
+				flags |= ARM_MOVE;
 				break;
 			}
 			case '*':
@@ -285,18 +288,14 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		else
 		{
-			if(entity->Case()->Entities()->Sames(entity))
+			std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
+			ECEntity* my_friend = 0;
+			for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+				if(!(*enti)->Locked() && (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
+					my_friend = dynamic_cast<ECEntity*>(*enti);
+			if(my_friend)
 			{ /* On peut probablement faire une union avec une entité de cette case donc bon au lieu de
 			   * se broyer les testicule on va ARM_NUMBER simplement */
-				std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
-				ECEntity* my_friend = 0;
-				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-					if(!(*enti)->Locked() && (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
-						my_friend = dynamic_cast<ECEntity*>(*enti);
-				if(!my_friend)
-					throw ECExcept(VIName(entity->Case()->Entities()->Sames(entity)) VIName(ents.size()),
-					               "Il y a comme un problème là");
-
 				MyFree(entity);
 				entity = my_friend;
 				flags = ARM_NUMBER;
@@ -335,7 +334,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			else
 				flags = 0;
 		}
-		if(flags == ARM_MOVE)
+		if(flags & ARM_MOVE)
 		{
 			/*****************************
 			 *  GESTION DES DÉPLACEMENTS *
@@ -381,7 +380,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
 				 * on supprime mon entité
 				 */
-				if((*evti)->Case() == entity->Last()->Case() && (*evti)->Flags() == ARM_ATTAQ &&
+				if(entity->Last() && (*evti)->Case() == entity->Last()->Case() && (*evti)->Flags() == ARM_ATTAQ &&
 				   (*evti)->Entities()->Find(entity))
 				{
 					/* On sous traite à la fonction dont le nom fait rêver */
@@ -417,7 +416,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			if(entity->Case() != last_case)
 			{ /* On ne fait ça que si y a eu un changement de case */
-				if(!event_found)
+				if(!event_found && last_case) // On vérifie bien que c'est pas un create
 				{
 					Debug(W_DEBUG, "On créé un nouvel event MOVE");
 					event_found = new ECEvent(ARM_MOVE, entity->Case());
