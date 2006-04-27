@@ -87,17 +87,20 @@ public:
 public:
 
 	/** Return last entity */
-	ECEntity* Last() { return last; }
+	ECEntity* Last() const { return last; }
 	virtual void RemoveLast();
 
 	ECEntity* FindLast(ECBCase*);
 
 	int Tag;
 
+	ECMove* Move() { return &move; }
+
 /* Variables privées */
 protected:
 	ECEntity* last;
 	bool SetLast(ECEntity* e) { return (last = e); }
+	ECMove move;
 };
 
 /********************************************************************************************
