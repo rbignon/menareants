@@ -197,7 +197,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if(!strchr(NICK_CHARS, *c))
 			return cl->sendrpl(app.rpl(ECServer::ERR));
 
-	if(app.FindClient(parv[1].c_str()))
+	if(app.FindClient((IA_CHAR + parv[1]).c_str()))
 		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
 		
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));

@@ -29,7 +29,7 @@
 #include <signal.h>
 #include <sys/resource.h>
 #ifdef WIN32
-#error Don't compile this server under windows !!!
+#error Do not compile this server under windows !!!
 #endif
 #include <dirent.h>
 

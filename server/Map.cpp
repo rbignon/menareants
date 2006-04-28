@@ -163,9 +163,9 @@ bool ECEvent::operator<(const ECEvent& e) const
 {
 	const char NUMBER = 10;
 	const char CREATE = 9;
-	const char UNION = 7;
-	const char ATTAQ = 5;
-	const char MOVE = 2;
+	const char MOVE   = 8;
+	const char UNION  = 7;
+	const char ATTAQ  = 5;
 	char me = 0, him = 0;
 	switch(flags)
 	{
