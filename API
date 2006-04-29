@@ -78,7 +78,7 @@ Sommaire:
          *<pos>      :attaque
          <           :retour
          -           :suppression de l'armée
-         .           :lock                    } application encore indéfinie
+         .           :lock
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
