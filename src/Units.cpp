@@ -61,7 +61,7 @@ bool ECArmy::MakeEvent()
 				case ECMove::Down:  image->set(image->X(), image->Y() + ARMY_VISUAL_STEP); break;
 				case ECMove::Up:    image->set(image->X(), image->Y() - ARMY_VISUAL_STEP); break;
 			}
-			SDL_Delay(50);
+			SDL_Delay(20);
 			switch(m)
 			{
 				case ECMove::Right:
