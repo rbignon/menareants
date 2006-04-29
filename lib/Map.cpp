@@ -233,9 +233,11 @@ void ECBEntity::AddUnits(uint u)
 	nb += u;
 }
 
-bool ECBEntity::CanBeCreated() const
+bool ECBEntity::CanBeCreated(ECBCase* c) const
 {
-	assert(acase);
+	if(!c)
+		c = acase;
+	assert(c);
 
 	/** \todo avec les nations, vérifier ici si ma nation peut créer cette unité, car si
 	 * ce n'est pas le cas autant se barrer de suite.
@@ -244,10 +246,10 @@ bool ECBEntity::CanBeCreated() const
 	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
 	 */
-	if(acase->Country()->Owner() && acase->Country()->Owner()->Player() == owner && acase->CanCreate(this))
+	if(c->Country()->Owner() && c->Country()->Owner()->Player() == owner && c->CanCreate(this))
 		return true;
 
-	std::vector<ECBEntity*> entv = acase->Entities()->List();
+	std::vector<ECBEntity*> entv = c->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 		if((*enti)->CanCreate(this))
 			return true;
@@ -718,14 +720,17 @@ void ECBMap::Destruct()
 	/* Libération des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;
+	map.clear();
 
 	/* Libération des MapPlayers */
 	for(std::vector<ECBMapPlayer*>::iterator it=map_players.begin(); it != map_players.end(); ++it)
 		delete *it;
+	map_players.clear();
 		
 	/* Libération des Countries */
 	for(std::vector<ECBCountry*>::iterator it=map_countries.begin(); it != map_countries.end(); ++it)
 		delete *it;
+	map_countries.clear();
 
 	delete date;
 	initialised = false;

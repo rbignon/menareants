@@ -284,7 +284,8 @@ void TClient::Free()
 			if(pl->IsOwner())
 				c->SetOwner(0);
 			c->RemovePlayer(pl, USE_DELETE);
-			c->sendto_players(0, app.rpl(ECServer::LEAVE), nick.c_str());
+			/* c->sendto_players(0, app.rpl(ECServer::LEAVE), nick.c_str())
+			 * > envoyé dans RemovePlayer */
 		}
 	}
 }
@@ -304,10 +305,10 @@ void ECServer::delclient(TClient *del)
 				if((unsigned)it->second->GetFd() > highsock)
 					highsock = it->second->GetFd();
 		}
+		NBco--;
 	}
 	Clients.erase(std::remove(Clients.begin(), Clients.end(), del), Clients.end());
 	delete del;
-	NBco--;
 	return;
 }
 

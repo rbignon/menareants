@@ -155,7 +155,7 @@ bool ECArmy::Attaq(std::vector<ECEntity*> entities)
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
 			(*it)->Shooted(killed);
-			printf("%s shoot %s de %d\n", LongName().c_str(), (*it)->LongName().c_str(), killed);
+			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
 		}
 
 	return true;

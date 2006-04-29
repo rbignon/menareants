@@ -65,6 +65,7 @@ class ECBMove
 public:
 
 	ECBMove(ECBEntity* e = 0);
+	virtual ~ECBMove() {}
 
 	enum E_Move {
 		Up,
@@ -93,7 +94,7 @@ public:
 
 	std::string MovesString(ECBCase* end = 0);
 
-	void Clear() { moves.clear(); first_case = 0; }
+	virtual void Clear(ECBCase* c = 0) { moves.clear(); first_case = c; }
 	void Return(ECBCase*);
 
 /* Variables privées */
@@ -116,6 +117,7 @@ protected:
 #define ARM_TYPE        0x0020
 #define ARM_NUMBER      0x0040
 #define ARM_RETURN      0x0080
+#define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 /* Concerne server:EChannel::SendArm() */
@@ -154,7 +156,7 @@ public:
 	virtual uint InitNb() const = 0;
 
 	/** Use this function to know if this entity can be created */
-	virtual bool CanBeCreated() const;
+	virtual bool CanBeCreated(ECBCase* c = 0) const;
 
 	/** Use this function to add some units in the entity */
 	virtual void AddUnits(uint units);
