@@ -37,6 +37,7 @@ int main(int argc, char **argv)
 	try
 	{
 		map = new ECBMap("../server/maps/" + std::string(filename));
+		map->Init();
 
 		/* Utilisation de printf parce que c'est plus beau */
 		printf("Map \"%s\" is loaded !!\n", map->Name().c_str());
