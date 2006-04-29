@@ -185,7 +185,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
 		if(!entity || entity->Locked())
-			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1]));
+			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1])
+			                          VBName(entity ? entity->Locked() : false));
 	}
 
 	uint y = 0, x = 0, type = 0, nb = 0;
@@ -465,6 +466,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							 */
 							union_event->Entities()->Add(entity);
 							union_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
+							flags |= ARM_LOCK;
 							if(event_found)
 							{
 								union_event->AddLinked(event_found);
@@ -487,8 +489,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement");
 				}
 			}
-			if(event_found)
-				events_sended.push_back(event_found);
+			/*if(event_found)
+				events_sended.push_back(event_found);*/
 		}
 		if(flags == ARM_ATTAQ)
 		{
@@ -546,7 +548,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if((*casi)->Entities()->empty() && (!(*casi)->Country()->Owner() || !((*casi)->Flags() & C_VILLE)))
 			continue;
 		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
-		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(), (*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
+		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(),
+		                (*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
 		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 			Debug(W_DEBUG, "    [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ', (*enti)->LongName().c_str(), (*enti)->Nb());
 	}
