@@ -160,8 +160,9 @@ void MenAreAntsApp::request_game()
 	{
 		ConnectedForm = new TConnectedForm(sdlwindow);
 
-		SDL_mutex *Mutex = SDL_CreateMutex();
-		Thread = SDL_CreateThread(EC_Client::read_sock, Mutex);
+		//SDL_mutex* Mutex = SDL_CreateMutex();
+		mutex = SDL_CreateMutex();
+		Thread = SDL_CreateThread(EC_Client::read_sock, mutex);
 
 		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 1);
 
@@ -188,6 +189,7 @@ void MenAreAntsApp::request_game()
 			return;
 		}
 
+		ConnectedForm->SetMutex(mutex);
 		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en temps que " +
 		                                               client->GetNick());
 
@@ -271,6 +273,12 @@ void MenAreAntsApp::request_game()
 
 	delete ConnectedForm;
 	ConnectedForm = NULL;
+
+	if(mutex)
+	{
+		SDL_DestroyMutex(mutex);
+		mutex = 0;
+	}
 
 	return;
 }
