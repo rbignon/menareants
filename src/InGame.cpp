@@ -110,6 +110,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					type = StrToTyp<uint>(parv[i].substr(1));
 				break;
 			}
+			case '.':
+				flags |= ARM_LOCK;
+				break;
 			case '/':
 			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -192,6 +195,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent())
 		chan->SetCurrentEvent(flags);
 
+	if(entities.empty())
+		return 0;
+
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
@@ -242,10 +248,21 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	/* PLAYING */
 	else if(chan->State() == EChannel::PLAYING)
 	{
-		if(flags == ARM_MOVE || flags == ARM_ATTAQ)
+		if(flags == ARM_MOVE || flags == ARM_ATTAQ || flags == ARM_PREUNION)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			{
+				if((*it)->Owner() != me->Player() && flags == ARM_ATTAQ)
+				{
+					L_WARNING(entities[0]->LongName() + " cherche à vous attaquer !!");
+					L_WARNING("Vous pouvez esquiver en déplaçant l'unité visée, l'attaque sera annulé.");
+					if(InGameForm)
+						InGameForm->Map->CenterTo(*it);
+				}
 				(*it)->SetEvent(flags);
+				if(flags == ARM_PREUNION)
+					(*it)->Lock();
+			}
 		}
 		if(flags == ARM_RETURN)
 		{
@@ -276,8 +293,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			if((*it)->Selected() && InGameForm)
 				InGameForm->BarreAct->SetEntity(0);
+
+			me->LockScreen();
+
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
+
+			me->UnlockScreen();
 		}
 	if(InGameForm)
 		InGameForm->BarreAct->Update();
@@ -304,11 +326,13 @@ void MenAreAntsApp::InGame()
 		SDL_Event event;
 		bool eob = false;
 		InGameForm = new TInGameForm(sdlwindow, client->Player());
+		InGameForm->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
 		const char W_MOVE = 1;
 		const char W_NONE = 0;
 		char want = 0;
+		InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
 		timer->reset();
 		do
@@ -370,9 +394,6 @@ void MenAreAntsApp::InGame()
 								eob = true;
 						}
 
-						if(!(chan->State() == EChannel::PLAYING))
-							break;
-
 						ECEntity* entity;
 						ECase* acase;
 						if(InGameForm->BarreAct->MoveButton->Test(event.button.x, event.button.y))
@@ -385,9 +406,6 @@ void MenAreAntsApp::InGame()
 								                                           + " *" + TypToStr(acase->X()) + "," +
 								                                           TypToStr(acase->Y())).c_str());
 						}
-						else if(event.button.button == MBUTTON_RIGHT ||
-						        InGameForm->BarreAct->Test(event.button.x, event.button.y))
-							want = W_NONE;
 
 						if(InGameForm->BarreAct->Entity() &&
 						   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y))
@@ -397,6 +415,10 @@ void MenAreAntsApp::InGame()
 							                 " +").c_str());
 							break;
 						}
+
+						if(InGameForm->BarreLat->Test(event.button.x, event.button.y) ||
+						   InGameForm->BarreAct->Test(event.button.x, event.button.y))
+							break;
 
 						int mywant = want;
 						if(event.button.button == MBUTTON_RIGHT)
@@ -410,7 +432,10 @@ void MenAreAntsApp::InGame()
 						else if((acase = InGameForm->Map->TestCase(event.button.x, event.button.y)))
 						{
 							ECEntity* selected_entity = InGameForm->BarreAct->Entity();
-							if(selected_entity && mywant == W_MOVE && selected_entity->Owner() == client->Player())
+							if(selected_entity && mywant == W_MOVE && selected_entity->Owner() == client->Player() &&
+							   !selected_entity->Locked() && chan->State() == EChannel::PLAYING &&
+							   !client->Player()->Ready())
+
 							{
 							 	ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 								                                                     : selected_entity->Case();
@@ -442,8 +467,7 @@ void MenAreAntsApp::InGame()
 							{
 								if(acase->Flags() & C_VILLE)
 									InGameForm->BarreAct->SetCase(acase);
-								else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y) &&
-								        !InGameForm->BarreLat->Test(event.button.x, event.button.y))
+								else
 									InGameForm->BarreAct->UnSelect();
 							}
 						}
@@ -586,7 +610,10 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list)
 
 void TBarreAct::CreateUnit(TObject* o, void* e)
 {
-	assert(o && o->Parent() && o->Parent()->Parent());
+	assert(o);
+	assert(o->Parent());
+	assert(o->Parent()->Parent());
+
 	/* TBarreAct              Parent()
 	 * `- TBarreActIcons      Parent()
 	 *    `- TImage           o
@@ -638,8 +665,9 @@ void TBarreAct::vSetCase(void* _c)
 	if(c)
 	{
 		InGameForm->BarreAct->Name->SetCaption(c->Name());
-		InGameForm->BarreAct->Icon->SetImage(c->Image()->First(), false);
-		if(c->Country()->Owner() == InGameForm->BarreAct->me->MapPlayer())
+		InGameForm->BarreAct->Icon->Hide();
+		if(c->Country()->Owner() == InGameForm->BarreAct->me->MapPlayer() &&
+		   !c->Country()->Owner()->Player()->Ready())
 			InGameForm->BarreAct->ShowIcons(c);
 		else
 			InGameForm->BarreAct->ShowIcons<ECase*>(0);
@@ -696,12 +724,13 @@ void TBarreAct::vSetEntity(void* _e)
 	if(e)
 	{
 		InGameForm->BarreAct->select = true;
-		InGameForm->BarreAct->Name->SetCaption(e->Name());
+		InGameForm->BarreAct->Name->SetCaption(e->Name() + std::string(e->Locked() ? " (locked)" : ""));
 		InGameForm->BarreAct->Nb->Show();
 		InGameForm->BarreAct->Nb->SetCaption(e->Nb() ? TypToStr(e->Nb()) : "???");
 		InGameForm->BarreAct->Icon->SetImage(e->Icon(), false);
+		InGameForm->BarreAct->Icon->Show();
 
-		if(e->Owner() == InGameForm->BarreAct->me)
+		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
 			InGameForm->BarreAct->ShowIcons(e);
 			InGameForm->BarreAct->MoveButton->Show();
@@ -710,7 +739,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
 			InGameForm->BarreAct->UpButton->SetHint(std::string("Coût: " + TypToStr(e->Cost()) + " $").c_str());
 			InGameForm->BarreAct->UpButton->SetEnabled(
-					(e->CanBeCreated() && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
+					(e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
 		}
 		else
 		{
@@ -775,7 +804,7 @@ void TBarreAct::Init()
 	MoveButton->SetHint("Déplacer l'unité");
 	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", &app.Font()->sm));
 	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-  AttaqButton->SetHint("L'unité déclare une attaque à l'unité atteinte");
+	AttaqButton->SetHint("L'unité déclare une attaque à l'unité atteinte par déplacement");
 	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", &app.Font()->sm));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
@@ -889,6 +918,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 		bool eob = false;
 		chan->Map()->CreatePreview(300,300);
 		LoadingForm = new TLoadingForm(sdlwindow, chan);
+		LoadingForm->SetMutex(mutex);
 		do
 		{
 			while( SDL_PollEvent( &event) )
