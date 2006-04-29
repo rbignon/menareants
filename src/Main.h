@@ -43,6 +43,7 @@ protected:
 	Config *conf;
 	SDL_Thread* Thread;
 	Fonts *fonts;
+	SDL_mutex* mutex;
 	std::string path;
 	bool want_quit;
 
@@ -75,8 +76,10 @@ public:
 
 	void FirstRun() { first_run = true; }
 
+	SDL_mutex* Mutex() const { return mutex; }
+
 	MenAreAntsApp()
-		: client(0), conf(0), Thread(0), fonts(0), want_quit(false), first_run(false), sdlwindow(0)
+		: client(0), conf(0), Thread(0), fonts(0), mutex(0), want_quit(false), first_run(false), sdlwindow(0)
 	{}
 
 	SDL_Surface* sdlwindow;

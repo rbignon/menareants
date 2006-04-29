@@ -56,12 +56,14 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(GameInfosForm->RecvMap.empty())
 		{
 			ECMap *map;
+			me->LockScreen();
 			if((map = dynamic_cast<ECMap*>(chan->Map())))
 			{
 				GameInfosForm->Preview->SetImage(NULL);
 				MyFree(map);
 			}
 			chan->SetMap(NULL);
+			me->UnlockScreen();
 		}
 		GameInfosForm->RecvMap.push_back(parv[1]);
 	}
@@ -80,7 +82,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
 		else
 		{
-			GameInfosForm->Preview->Hide();
+			me->LockScreen();
 			EChannel *chan = me->Player()->Channel();
 			ECMap *map = 0;
 			try
@@ -103,7 +105,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
-			GameInfosForm->Preview->Show();
+			me->UnlockScreen();
 		}
 	}
 	return 0;
@@ -117,12 +119,14 @@ int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(GameInfosForm)
 	{
+		me->LockScreen();
 		if(!GameInfosForm->RecvMapList)
 		{
 			GameInfosForm->RecvMapList = true;
 			GameInfosForm->MapList->ClearItems();
 		}
 		GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color, true);
+		me->UnlockScreen();
 	}
 	return 0;
 }
@@ -155,12 +159,14 @@ int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	me->LockScreen();
 	if(InGameForm)
 		InGameForm->AddInfo(I_CHAT, "<" + parv[0] + "> " + parv[1],
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? 0 : *(players.begin()));
 	else if(GameInfosForm)
 		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+	me->UnlockScreen();
 
 	return 0;
 }
@@ -174,6 +180,7 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(!ListGameForm)
 		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ListGameForm));
 
+	me->LockScreen();
 	if(parv[2][0] == '+')
 	{
 		if(parv[3] == "0")
@@ -193,6 +200,7 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	else
 		ListGameForm->GList->AddItem(false, StringF("%-8s  Playing: %s", parv[1].c_str(), parv[5].c_str()), parv[1],
 		                             red_color, false);
+	me->UnlockScreen();
 	return 0;
 }
 
@@ -288,7 +296,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(chan->State() != EChannel::SENDING)
 					{
 						chan->Map()->NextDay();
+						me->LockScreen();
 						chan->Map()->CreatePreview(120,120, true);
+						me->UnlockScreen();
 					}
 					if(InGameForm && InGameForm->BarreLat)
 					{
@@ -392,6 +402,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							me->sendrpl(me->rpl(EC_Client::SET), "+!");
 						if(InGameForm)
 							InGameForm->BarreLat->PretButton->SetEnabled(!add);
+
 						/* En mode ANIMING, la confirmation de chaque evenement est manifesté par le +!
 						 * et marque la fin d'un evenement, donc on a plus besoin de s'en rappeler.
 						 * On peut considérer qu'on passe par là à chaques fins d'evenements
@@ -410,6 +421,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						else
 							GameInfosForm->PretButton->SetEnabled(false);
 					}
+					if(add && InGameForm && chan->State() == EChannel::PLAYING)
+						InGameForm->AddInfo(I_INFO, std::string((*it)->GetNick()) + " est pret.");
 				}
 				break;
 			case '$':
@@ -651,6 +664,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{ /* C'est un user qui rejoin le chan */
 			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
 
+			me->LockScreen();
 			ECPlayer *pl = new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false, false,
 			                            (parv[0][0] == IA_CHAR));
 			if(GameInfosForm)
@@ -663,6 +677,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
 			}
+			me->UnlockScreen();
 		}
 	}
 	return 0;
@@ -684,6 +699,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
 	 *        départs ?) ou alors pour une eventuelle IA du serveur)
 	 */
+	me->LockScreen();
 	for(PlayerList::iterator playersi=players.begin(); playersi != players.end();)
 	{
 		if((*playersi)->IsMe())
@@ -697,6 +713,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(c->WantLeave()) MyFree(GameInfosForm);
 
 			delete c;
+			me->UnlockScreen();
 			return 0;
 		}
 		else
@@ -763,6 +780,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 		}
 	}
+	me->UnlockScreen();
 	return 0;
 }
 
@@ -795,7 +813,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	JOINED = false;
 	client->sendrpl(create ? client->rpl(EC_Client::CREATE) : client->rpl(EC_Client::JOIN), FormatStr(cname).c_str());
 
-	WAIT_EVENT_T(JOINED, i, 0.2);
+	WAIT_EVENT_T(JOINED, i, 0.5);
 	if(!JOINED)
 	{
 		if(client->Player())
@@ -811,6 +829,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	SDL_Event event;
 	bool eob = false;
 	EChannel *chan = NULL;
+	GameInfosForm->SetMutex(mutex);
 
 	try
 	{
@@ -973,6 +992,7 @@ void MenAreAntsApp::ListGames()
 	SDL_Event event;
 
 	ListGameForm = new TListGameForm(sdlwindow);
+	ListGameForm->SetMutex(mutex);
 
 	bool eob = false, refresh = true;
 	Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
@@ -1174,9 +1194,9 @@ void TPlayerLine::SetXY (int px, int py)
 	if(position)
 		position->SetXY(px+210, py);
 	if(couleur)
-		couleur->SetXY(px+310, py);
+		couleur->SetXY(px+320, py);
 	if(nation)
-		nation->SetXY(px+490, py);
+		nation->SetXY(px+430, py);
 }
 
 bool TPlayerLine::OwnZone(int _x, int _y)

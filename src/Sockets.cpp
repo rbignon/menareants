@@ -142,11 +142,10 @@ void EC_Client::parse_message(std::string buf)
 
 int EC_Client::read_sock(void *data)
 {
-	SDL_LockMutex((SDL_mutex*)data);
-
 	EC_Client *cl = new EC_Client;
 	app.setclient(cl);
 	cl->lapp = &app;
+	cl->mutex = reinterpret_cast<SDL_mutex*>(data);
 
 	if(!cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port))
 		return 0;
@@ -205,8 +204,19 @@ int EC_Client::read_sock(void *data)
 		}
 	}
 
-	SDL_UnlockMutex((SDL_mutex*)data);
 	return 0;
+}
+
+void EC_Client::LockScreen() const
+{
+	if(mutex)
+		SDL_LockMutex(mutex);
+}
+
+void EC_Client::UnlockScreen() const
+{
+	if(mutex)
+		SDL_UnlockMutex(mutex);
 }
 
 void EC_Client::Init()
@@ -221,6 +231,7 @@ void EC_Client::Init()
 	error = false;
 	logging = true;
 	FD_ZERO(&global_fd_set);
+	mutex = 0;
 
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
 	Commands.push_back(new HELCommand("HEL",	0,	1));

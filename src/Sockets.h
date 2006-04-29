@@ -37,6 +37,7 @@ typedef struct fd_set {
 class EC_ACommand;
 class MenAreAntsApp;
 class ECPlayer;
+struct SDL_mutex;
 
 class EC_Client
 {
@@ -101,6 +102,10 @@ public:
 
 	bool Error() { return error; }
 
+	SDL_mutex* Mutex() const { return mutex; }
+	void LockScreen() const;
+	void UnlockScreen() const;
+
 protected:
 	SOCKET sock;
 
@@ -121,6 +126,7 @@ protected:
 	bool error;
 
 	ECPlayer *pl;
+	SDL_mutex* mutex;
 
 private:
 	void Init();

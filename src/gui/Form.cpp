@@ -23,7 +23,7 @@
 #include <SDL.h>
 
 TForm::TForm(SDL_Surface* w)
-	: background(0), focus_order(true), Hint(0)
+	: background(0), focus_order(true), Hint(0), mutex(0)
 {
 	SetWindow(w);
 }
@@ -114,6 +114,9 @@ void TForm::Actions(SDL_Event event, uint a)
 
 void TForm::Update(int _x, int _y, bool flip)
 {
+	if(mutex)
+		SDL_LockMutex(mutex);
+
 	if(background)
 		SDL_BlitSurface(background->Img,NULL,Window(),NULL);
 
@@ -137,4 +140,7 @@ void TForm::Update(int _x, int _y, bool flip)
 
 	if(flip)
 		SDL_Flip(Window());
+
+	if(mutex)
+		SDL_UnlockMutex(mutex);
 }

@@ -87,6 +87,7 @@
  */
 
 class TMemo; /* Besoin pour les Hints */
+class SDL_mutex;
 
 /** This is a class who show a form on the screen and contain some components */
 class TForm : public TObject
@@ -132,6 +133,7 @@ public:
 	void SetBackground(ECImage *image);
 
 	void SetHint(TMemo* h) { Hint = h; }
+	void SetMutex(SDL_mutex* m) { mutex = m; }
 
 /* Variables protégées */
 protected:
@@ -156,6 +158,7 @@ private:
 	ECImage *background;
 	bool focus_order;
 	TMemo* Hint;
+	SDL_mutex* mutex;
 };
 
 #endif /* EC_FORM_H */
