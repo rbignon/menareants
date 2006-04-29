@@ -47,14 +47,14 @@ Config::Config(std::string _filename)
 
 bool Config::set_defaults(bool want_save)
 {
-	hostname = "127.0.0.1";
+	hostname = "game.coderz.info";
 	port = 5461;
 	nick = "anonyme";
 	color = 0;
 	nation = 0;
 	server_list.clear();
-	server_list.push_back("127.0.0.1:5461");
 	server_list.push_back("game.coderz.info:5461");
+	server_list.push_back("127.0.0.1:5461");
 	server_list.push_back("192.168.0.2:5461");
 	if(want_save)
 		save();
