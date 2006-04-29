@@ -3,18 +3,18 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--server: GROS BUG: Lorsque le client veut bouger et qu'il est en conflit déjà avec un mec (sans le savoir),
-                   trouver et envoyer l'evenement de mouvement, sinon le client va le faire disparaitre !
--server: Vérifier un bug qui donne une desynch au niveau des positions
--server: Gérer les attaques qui ont lieu en chemin.
+-server: Gérer les attaques qui ont lieu en chemin (surtout lorsque deux unités se croisent).
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
 -server: enrichissement de l'IA
+-client: gestion des accents dans TEdit
+-client: afficher sur le radar un rectangle de la position de la camera
 
 * Après
 -gestion des fins de parties.
 -configuration des boutons de la souris
+-système des bonus
 
 * Bof
 -mettre un mode pour l'argent du début
@@ -28,6 +28,12 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -enrichissement du jeu.
+
+** Idées
+-avancement des niveaux techniques des batiments, qui peuvent construire plus d'unités à chaque fois
+-limiter le nombre d'unités à construire sur les villes et les batiments
+-système de guerilla de Spouize
+
 
 ** Sur le très long terme
 -Bosser.

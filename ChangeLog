@@ -1,3 +1,25 @@
+2005-04-29  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp: Vérification des +! lors du quit.
+
+	* src/Sockets.cpp, src/gui/Form.cpp, src/JoinGame.cpp: Utilisation des mutex pour ne pas buguer.
+
+	* src/gui/ComboBox.cpp, src/JoinGame.cpp: Correction du bug de la position des nations dans GameInfos.
+
+	* server/Map.cpp: Correction du bug qui, lorsque le client veut bouger et qu'il est en conflit déjà avec un mec
+	(sans le savoir), fait disparaitre le client. Utilisation d'une mémorisation des mouvements.
+
+	* src/InGame.cpp: - On est prévenu quand un joueur veut faire une attaque explicite.
+	- Mise en "lock" lorsque l'armée a join une autre.
+	- N'ajoute rien si pas sur une bonne case.
+	- Enlevage de bugs
+
+	* src/gui/ShowMap.cpp: Elevage d'un bug concernant les mutex.
+
+	* src/Defines.h, src/data: Modification de la taille des cases à 100*100 avec de nouvelles images.
+
+	* API, server/InGame.cpp: Envoie d'un '.' pour LOCK une armée quand elle union.
+
 2005-04-27  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Correction d'un bug qui ne vérifiait pas les attaques dans un create, et qui envoie *tous* les
