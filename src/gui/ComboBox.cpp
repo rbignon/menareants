@@ -76,12 +76,10 @@ void TComboBox::SetBackGround(uint _h)
 void TComboBox::SetOpened(bool _o)
 {
 	if(m_items.empty())
-	{
 		opened = false;
-		return;
-	}
+	else
+		opened = _o;
 
-	opened = _o;
 	if(opened)
 	{
 		y = real_y + COMBOBOX_HEIGHT + 1;
@@ -177,4 +175,11 @@ void TComboBox::Draw (int mouse_x, int mouse_y)
 
 	if(opened)
 		TListBox::Draw(mouse_x,mouse_y);
+}
+
+void TComboBox::SetXY (int _x, int _y)
+{
+	x = _x;
+	real_y = _y;
+	SetOpened(Opened());
 }

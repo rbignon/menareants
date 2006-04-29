@@ -55,6 +55,8 @@ public:
 
 	int RealY() const { return real_y; }
 
+	virtual void SetXY (int _x, int _y);
+
 /* Variables privées */
 protected:
 	TButton m_open;
