@@ -295,6 +295,7 @@ void ECEntity::Played()
 {
 	ECBEntity::Played();
 	RemoveLast();
+	Move()->Clear(Case());
 }
 
 ECEntity::~ECEntity()
@@ -314,10 +315,7 @@ void ECEntity::RemoveLast()
 ECEntity* ECEntity::FindLast(ECBCase* c)
 {
 	for(ECEntity* a_l = this; a_l; a_l = a_l->Last())
-	{
-		printf("(%p(%d,%d) == %p(%d,%d))\n", a_l->Case(), a_l->Case()->X(), a_l->Case()->Y(), c, c->X(), c->Y());
 		if(a_l->Case() == c)
 			return a_l;
-	}
 	return 0;
 }
