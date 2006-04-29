@@ -54,6 +54,7 @@ public:
 
 	ECBCase* Dest() { return dest; }
 	void EstablishDest();
+	void Clear(ECBCase* c) { ECBMove::Clear(c); dest = 0; }
 
 /* Variables protégées */
 protected:
@@ -68,7 +69,9 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), image(0), selected(false), move(this) {}
+	ECEntity()
+		: Tag(0), image(0), selected(false), move(this), lock(false)
+	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
 
@@ -109,11 +112,16 @@ public:
 
 	ECMove* Move() { return &move; }
 
+	bool Locked() const { return lock; }
+	void Lock(bool b = true) { lock = b; }
+	void Unlock() { lock = false; }
+
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
 	ECMove move;
+	bool lock;
 };
 
 /********************************************************************************************
