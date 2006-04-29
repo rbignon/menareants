@@ -336,206 +336,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	/* Si tout le monde est READY, on passe d'un etat de la partie à un autre. */
 	if(ready)
-	{
-		uint c = 0;
-		BPlayerVector pv = sender->Channel()->Players();
-		for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
-			if((*it)->Ready())
-				c++;
-		if(c == sender->Channel()->NbPlayers() || sender->Channel()->State() == EChannel::WAITING)
-		{
-			switch(sender->Channel()->State())
-			{
-				case EChannel::WAITING:
-				{
-					if(c < sender->Channel()->Map()->MinPlayers() || !sender->Channel()->Owner()->Ready())
-						break; /* Si c == nbplayers, c'est ok que si nbplayers >= minplayers */
+		sender->Channel()->CheckReadys();
 
-					/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
-					* si tout le monde est READY pour, dans ce cas là, lancer la partie
-					* et jarter ceux qui sont en trop.
-					*/
-					std::list<uint> colors;
-					for(uint i = 1; i < COLOR_MAX; ++i) colors.push_back(i);
-					std::list<uint> nations;
-					for(uint i = 1; i < ECPlayer::N_MAX; ++i) nations.push_back(i);
-					std::list<uint> positions;
-					for(uint i = 1; i <= sender->Channel()->Map()->MaxPlayers(); i++) positions.push_back(i);
-
-					BMapPlayersVector mpv = sender->Channel()->Map()->MapPlayers();
-					for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
-						if(!(*it)->Ready())
-						{
-							TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
-							sender->Channel()->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
-		
-							sender->Channel()->RemovePlayer(*it, true);
-							if(!sender->Channel()->NbPlayers())
-							{
-								delete sender->Channel();
-								Debug(W_ERR, "SET:%d: heuuuu, pourquoi on passe par là ?", __LINE__);
-							}
-							cl->ClrPlayer();
-						}
-						else
-						{
-							if((*it)->Position()) positions.remove((*it)->Position());
-							if((*it)->Color()) colors.remove((*it)->Color());
-							if((*it)->Nation()) nations.remove((*it)->Nation());
-						}
-					pv = sender->Channel()->Players();
-					for(BPlayerVector::iterator it=pv.begin(); it != pv.end(); ++it)
-					{
-						if(!(*it)->Position())
-						{
-							uint p = rand() % positions.size();
-							std::list<uint>::iterator pos = positions.begin();
-							for(uint i = 0; i != p && pos != positions.end(); ++pos, ++i);
-							if(pos != positions.end())
-								(*it)->SetPosition(*pos);
-							else
-								throw ECExcept(0, "Impossible d'attribuer une position aleatoirement !?");
-							sender->Channel()->sendto_players(0, app.rpl(ECServer::SET),
-							                                     dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
-							                                     std::string("+p " + TypToStr(*pos)).c_str());
-							positions.erase(pos);
-						}
-						if(!(*it)->Color())
-						{
-							uint p = rand() % colors.size();
-							std::list<uint>::iterator col = colors.begin();
-							for(uint i = 0; i != p && col != colors.end(); ++col, ++i);
-							if(col != colors.end())
-								(*it)->SetColor(*col);
-							else
-								throw ECExcept(0, "Impossible d'attribuer une couleur aleatoirement !?");
-							sender->Channel()->sendto_players(0, app.rpl(ECServer::SET),
-							                                     dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
-							                                     std::string("+c " + TypToStr(*col)).c_str());
-							colors.erase(col);
-						}
-						if(!(*it)->Nation())
-						{
-							uint p = rand() % nations.size();
-							std::list<uint>::iterator nat = nations.begin();
-							for(uint i = 0; i != p && nat != nations.end(); ++nat, ++i);
-							if(nat != nations.end())
-								(*it)->SetNation(*nat);
-							else
-								throw ECExcept(0, "Impossible d'attribuer une nation aleatoirement !?");
-							sender->Channel()->sendto_players(0, app.rpl(ECServer::SET),
-							                                     dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
-							                                     std::string("+n " + TypToStr(*nat)).c_str());
-							nations.erase(nat);
-						}
-						BMapPlayersVector::iterator mpi;
-						for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
-						if(mpi == mpv.end())
-							throw ECExcept(VIName((*it)->Position()), "Position introuvable !?");
-						(*mpi)->SetPlayer(*it);
-						(*it)->SetMapPlayer(*mpi);
-					}
-					sender->Channel()->Map()->ClearMapPlayers();
-
-					sender->Channel()->SetState(EChannel::SENDING);
-					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
-					app.NBwchan--;
-					app.NBachan++;
-
-					BCaseVector cav = sender->Channel()->Map()->Cases();
-					for(BCaseVector::iterator cai = cav.begin(); cai != cav.end(); ++cai)
-						if((*cai)->Flags() & C_VILLE)
-						{
-							const char *e_name = sender->Channel()->FindEntityName((*cai)->Country()->Owner() ?
-							                     dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player()) : 0);
-
-							ECArmy *armee = new ECArmy(e_name,
-							                               (*cai)->Country()->Owner() ?
-							                               (*cai)->Country()->Owner()->Player() : 0,
-							                               *cai, sender->Channel()->Map()->NbSoldats());
-
-							sender->Channel()->Map()->AddAnEntity(armee);
-							sender->Channel()->SendArm(NULL, armee, ARM_CREATE|ARM_HIDE, (*cai)->X(), (*cai)->Y(),
-							                                        armee->Nb(), armee->Type());
-
-							/* On défini le nombre d'argent par tour */
-							if(!(*cai)->Country()->Owner()) continue;
-
-							(*cai)->Country()->Owner()->Player()->SetTurnMoney(
-							          (*cai)->Country()->Owner()->Player()->TurnMoney() +
-							          (sender->Channel()->Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
-						}
-					for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
-						dynamic_cast<ECPlayer*>(*it)->SetMoney(sender->Channel()->Map()->BeginMoney()),
-						Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->TurnMoney());
-
-					sender->Channel()->NeedReady();
-
-					break;
-				}
-				case EChannel::SENDING:
-				{
-					/* Le client est pret (a tout affiché, mémorisé, ...), la partie se lance donc et on
-					 * commence en PLAYING.
-					 */
-					sender->Channel()->SetState(EChannel::PLAYING);
-					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-S+P");
-					sender->Channel()->NeedReady();
-					break;
-				}
-				case EChannel::PLAYING:
-				{
-					/* Tous les clients ont fini de jouer. On va maintenant passer aux animations */
-					sender->Channel()->SetState(EChannel::ANIMING);
-					sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-P+A");
-
-					/* Initialisation des animations */
-					sender->Channel()->InitAnims();
-
-					/* Envoie la prochaine animation programmée */
-					sender->Channel()->NextAnim();
-
-					sender->Channel()->NeedReady();
-					break;
-				}
-				case EChannel::ANIMING:
-				{
-					/* Suite des animations, ou alors si il n'y en a plus on repasse en playing */
-					if(dynamic_cast<ECMap*>(sender->Channel()->Map())->Events().empty())
-					{ /* Plus d'animations */
-						sender->Channel()->SetState(EChannel::PLAYING);
-						sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
-
-						/* On attribut à tout le monde son argent */
-						for(BPlayerVector::iterator it = pv.begin(); it != pv.end(); ++it)
-							dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
-						std::vector<ECBEntity*> entv = sender->Channel()->Map()->Entities()->List();
-						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
-						{
-							Debug(W_DEBUG, "-   [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ',
-			                            (*enti)->LongName().c_str(),
-			                            (*enti)->Nb());
-							(*enti)->Played(); /* On marque bien qu'il a été joué */
-							if((*enti)->Locked())
-							{
-								ECList<ECBEntity*>::iterator it = enti;
-								++it;
-								sender->Channel()->Map()->RemoveAnEntity(*enti, USE_DELETE);
-								enti = it;
-							}
-							else
-								++enti;
-						}
-						sender->Channel()->Map()->NextDay();
-					}
-					else
-						sender->Channel()->NextAnim();
-					sender->Channel()->NeedReady();
-					break;
-				}
-			}
-		}
-	}
 	{
 		BPlayerVector plv = sender->Channel()->Players();
 		for(BPlayerVector::iterator pli = plv.begin(); pli != plv.end(); ++pli)
@@ -670,7 +472,7 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		  *       joueur chez les clients
 		  */
 		chan->RemovePlayer(cl->Player(), USE_DELETE);
-		chan->sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+		// Note: le sendto_players est dans RemovePlayer, mais on envoie quand meme le LEA à cl qui n'a rien reçu
 		cl->sendrpl(app.rpl(ECServer::LEAVE), cl->GetNick());
 		if(!chan->NbPlayers())
 			delete chan;
@@ -759,6 +561,207 @@ EChannel::~EChannel()
 		}
 		else
 			++it;
+	}
+}
+
+void EChannel::CheckReadys()
+{
+	uint c = 0;
+	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+		if((*it)->Ready())
+			c++;
+	if(c == NbPlayers() || State() == EChannel::WAITING)
+	{
+		switch(State())
+		{
+			case EChannel::WAITING:
+			{
+				if(c < Map()->MinPlayers() || !Owner()->Ready())
+					break; /* Si c == nbplayers, c'est ok que si nbplayers >= minplayers */
+
+				/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
+				* si tout le monde est READY pour, dans ce cas là, lancer la partie
+				* et jarter ceux qui sont en trop.
+				*/
+				std::list<uint> colors;
+				for(uint i = 1; i < COLOR_MAX; ++i) colors.push_back(i);
+				std::list<uint> nations;
+				for(uint i = 1; i < ECPlayer::N_MAX; ++i) nations.push_back(i);
+				std::list<uint> positions;
+				for(uint i = 1; i <= Map()->MaxPlayers(); i++) positions.push_back(i);
+
+				BMapPlayersVector mpv = Map()->MapPlayers();
+				for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+					if(!(*it)->Ready())
+					{
+						TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
+						sendto_players(0, app.rpl(ECServer::LEAVE), cl->GetNick());
+
+						delete *it;
+						it = players.erase(it);
+						cl->ClrPlayer();
+						if(!NbPlayers())
+						{
+							delete this;
+							throw ECExcept("", "Pourquoi passe-t-on par là ?");
+						}
+					}
+					else
+					{
+						if((*it)->Position()) positions.remove((*it)->Position());
+						if((*it)->Color()) colors.remove((*it)->Color());
+						if((*it)->Nation()) nations.remove((*it)->Nation());
+					}
+				for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+				{
+					if(!(*it)->Position())
+					{
+						uint p = rand() % positions.size();
+						std::list<uint>::iterator pos = positions.begin();
+						for(uint i = 0; i != p && pos != positions.end(); ++pos, ++i);
+						if(pos != positions.end())
+							(*it)->SetPosition(*pos);
+						else
+							throw ECExcept(0, "Impossible d'attribuer une position aleatoirement !?");
+						sendto_players(0, app.rpl(ECServer::SET),
+												dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
+												std::string("+p " + TypToStr(*pos)).c_str());
+						positions.erase(pos);
+					}
+					if(!(*it)->Color())
+					{
+						uint p = rand() % colors.size();
+						std::list<uint>::iterator col = colors.begin();
+						for(uint i = 0; i != p && col != colors.end(); ++col, ++i);
+						if(col != colors.end())
+							(*it)->SetColor(*col);
+						else
+							throw ECExcept(0, "Impossible d'attribuer une couleur aleatoirement !?");
+						sendto_players(0, app.rpl(ECServer::SET),
+												dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
+												std::string("+c " + TypToStr(*col)).c_str());
+						colors.erase(col);
+					}
+					if(!(*it)->Nation())
+					{
+						uint p = rand() % nations.size();
+						std::list<uint>::iterator nat = nations.begin();
+						for(uint i = 0; i != p && nat != nations.end(); ++nat, ++i);
+						if(nat != nations.end())
+							(*it)->SetNation(*nat);
+						else
+							throw ECExcept(0, "Impossible d'attribuer une nation aleatoirement !?");
+						sendto_players(0, app.rpl(ECServer::SET),
+												dynamic_cast<ECPlayer*>(*it)->Client()->GetNick(),
+												std::string("+n " + TypToStr(*nat)).c_str());
+						nations.erase(nat);
+					}
+					BMapPlayersVector::iterator mpi;
+					for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
+					if(mpi == mpv.end())
+						throw ECExcept(VIName((*it)->Position()), "Position introuvable !?");
+					(*mpi)->SetPlayer(*it);
+					(*it)->SetMapPlayer(*mpi);
+				}
+				Map()->ClearMapPlayers();
+
+				SetState(EChannel::SENDING);
+				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
+				app.NBwchan--;
+				app.NBachan++;
+
+				BCaseVector cav = Map()->Cases();
+				for(BCaseVector::iterator cai = cav.begin(); cai != cav.end(); ++cai)
+					if((*cai)->Flags() & C_VILLE)
+					{
+						const char *e_name = FindEntityName((*cai)->Country()->Owner() ?
+												dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player()) : 0);
+
+						ECArmy *armee = new ECArmy(e_name,
+														(*cai)->Country()->Owner() ?
+														(*cai)->Country()->Owner()->Player() : 0,
+														*cai, Map()->NbSoldats());
+
+						Map()->AddAnEntity(armee);
+						SendArm(NULL, armee, ARM_CREATE|ARM_HIDE, (*cai)->X(), (*cai)->Y(), armee->Nb(), armee->Type());
+
+						/* On défini le nombre d'argent par tour */
+						if(!(*cai)->Country()->Owner()) continue;
+
+						(*cai)->Country()->Owner()->Player()->SetTurnMoney(
+									(*cai)->Country()->Owner()->Player()->TurnMoney() +
+									(Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
+					}
+				for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+					dynamic_cast<ECPlayer*>(*it)->SetMoney(Map()->BeginMoney()),
+					Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->TurnMoney());
+
+				NeedReady();
+
+				break;
+			}
+			case EChannel::SENDING:
+			{
+				/* Le client est pret (a tout affiché, mémorisé, ...), la partie se lance donc et on
+					* commence en PLAYING.
+					*/
+				SetState(EChannel::PLAYING);
+				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-S+P");
+				NeedReady();
+				break;
+			}
+			case EChannel::PLAYING:
+			{
+				/* Tous les clients ont fini de jouer. On va maintenant passer aux animations */
+				SetState(EChannel::ANIMING);
+				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-P+A");
+
+				/* Initialisation des animations */
+				InitAnims();
+
+				/* Envoie la prochaine animation programmée */
+				NextAnim();
+
+				NeedReady();
+				break;
+			}
+			case EChannel::ANIMING:
+			{
+				/* Suite des animations, ou alors si il n'y en a plus on repasse en playing */
+				if(dynamic_cast<ECMap*>(Map())->Events().empty())
+				{ /* Plus d'animations */
+					SetState(EChannel::PLAYING);
+					sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
+
+					/* On attribut à tout le monde son argent */
+					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+						dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
+
+					std::vector<ECBEntity*> entv = Map()->Entities()->List();
+					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
+					{
+						Debug(W_DEBUG, "-   [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ',
+									(*enti)->LongName().c_str(),
+									(*enti)->Nb());
+						(*enti)->Played(); /* On marque bien qu'il a été joué */
+						if((*enti)->Locked())
+						{
+							ECList<ECBEntity*>::iterator it = enti;
+							++it;
+							Map()->RemoveAnEntity(*enti, USE_DELETE);
+							enti = it;
+						}
+						else
+							++enti;
+					}
+					Map()->NextDay();
+				}
+				else
+					NextAnim();
+				NeedReady();
+				break;
+			}
+		}
 	}
 }
 
@@ -1101,11 +1104,13 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 	return 0;
 }
 
-bool EChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
+bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 {
-	bool b = ECBChannel::RemovePlayer(pl, false);
+	bool b = ECBChannel::RemovePlayer(ppl, false);
 
 	if(!b) return false;
+
+	ECPlayer* pl = dynamic_cast<ECPlayer*>(ppl);
 
 	if(!Joinable())
 	{
@@ -1161,8 +1166,14 @@ bool EChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 			}
 		}
 	}
+	if(pl->Client())
+		sendto_players(0, app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
+	else
+		FDebug(W_ERR, "Pas de client !?");
+
 	if(use_delete)
 		delete pl;
+	CheckReadys();
 	return true;
 }
 

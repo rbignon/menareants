@@ -181,6 +181,8 @@ public:
 
 	void ByeEveryBody(ECBPlayer* exception = 0);
 
+	void CheckReadys();
+
 /* Attributs */
 public:
 
