@@ -56,8 +56,8 @@ const int SCREEN_HEIGHT = 600;
 const int SCREEN_WIDTH  = 800;
 
 /* Taille des cases */
-const int CASE_HEIGHT = 43;
-const int CASE_WIDTH = 43;
+const int CASE_HEIGHT = 100;
+const int CASE_WIDTH = 100;
 
 /* Définitions des boutons de la souris */
 const int MBUTTON_LEFT = 1;
