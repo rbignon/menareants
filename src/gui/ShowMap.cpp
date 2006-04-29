@@ -110,13 +110,13 @@ void TMap::Draw(int _x, int _y)
 
 		/* Changement de position automatique */
 		if(_x && _x < 15)
-			xx += 4;
+			xx += 8;
 		if(_y && _y < 15)
-			yy += 4;
+			yy += 8;
 		if(_x > int(SCREEN_WIDTH-15) && _x < int(SCREEN_WIDTH))
-			xx -= 4;
+			xx -= 8;
 		if(_y > int(SCREEN_HEIGHT-15) && _y < int(SCREEN_HEIGHT))
-			yy -= 4;
+			yy -= 8;
 	
 		if(xx != x || yy != y)
 			SetXY(xx, yy);
@@ -131,11 +131,17 @@ void TMap::Draw(int _x, int _y)
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-	{
-		if(!(*enti)) continue;
-		dynamic_cast<ECEntity*>(*enti)->Draw();
-	}
+	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end();)
+		if(!(*enti))
+		{
+			map->RemoveAnEntity(*enti);
+			enti = entities.erase(enti);
+		}
+		else
+		{
+			dynamic_cast<ECEntity*>(*enti)->Draw();
+			++enti;
+		}
 
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
