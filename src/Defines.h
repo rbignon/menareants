@@ -31,7 +31,7 @@
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"1"
+#define APP_PVERSION	"2"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
@@ -56,8 +56,8 @@ const int SCREEN_HEIGHT = 600;
 const int SCREEN_WIDTH  = 800;
 
 /* Taille des cases */
-const int CASE_HEIGHT = 100;
-const int CASE_WIDTH = 100;
+const int CASE_HEIGHT = 80;
+const int CASE_WIDTH = 80;
 
 /* Définitions des boutons de la souris */
 const int MBUTTON_LEFT = 1;
