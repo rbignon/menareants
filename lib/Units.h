@@ -25,6 +25,56 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                               ECBChar                                                    *
+ ********************************************************************************************/
+#define CHAR_STEP                  3
+#define CHAR_NB                    1000
+#define CHAR_COST                  10000
+#define CHAR_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHAR, CHAR_COST)
+#define CHAR_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHAR_NB) \
+                                     :  ECBEntity(_name, _owner, _case, E_CHAR, CHAR_STEP, CHAR_COST, _nb)
+/** This is a simple army */
+class ECBChar : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	CHAR_EMPTY_CONSTRUCTOR(ECBChar) {}
+
+	CHAR_CONSTRUCTOR(ECBChar) {}
+
+	virtual ~ECBChar() {}
+
+/* Constantes */
+public:
+
+	bool CanAttaq(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_ARMY:
+			case E_CHAR:
+			case E_CASERNE:
+			case E_CHARFACT:
+				return true;
+			default:
+				return false;
+		}
+	}
+	bool CanCreate(const ECBEntity*) { return false; }
+	uint InitNb() const { return CHAR_NB; }
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
  *                               ECBArmy                                                   *
  ********************************************************************************************/
 #define ARMY_STEP                  2
@@ -53,18 +103,19 @@ public:
 		switch(e->Type())
 		{
 			case E_ARMY:
+			case E_CASERNE:
+			case E_CHARFACT:
+			case E_CHAR:
 				return true;
 			default:
 				return false;
 		}
 	}
-
+	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return ARMY_NB; }
 
 /* Methodes */
 public:
-
-	virtual bool CanCreate(const ECBEntity*) { return false; }
 
 /* Attributs */
 public:
