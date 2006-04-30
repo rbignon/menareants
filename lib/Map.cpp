@@ -228,9 +228,10 @@ void ECBEntity::Played()
 	restStep = myStep;
 }
 
-void ECBEntity::AddUnits(uint u)
+bool ECBEntity::AddUnits(uint u)
 {
 	nb += u;
+	return true;
 }
 
 bool ECBEntity::CanBeCreated(ECBCase* c) const
@@ -243,18 +244,29 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	 * ce n'est pas le cas autant se barrer de suite.
 	 */
 
+	bool ret = false;
+	std::vector<ECBEntity*> entv = c->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+	{
+		if((*enti)->CanCreate(this))
+			ret = true;
+		/* On vérifie que :
+		 * - si les deux sont des batiments et que ce ne sont pas les memes
+		 * - si les deux ne sont pas des batiments et que ce ne sont pas les memes
+		 * on ne peut pas construire, car deux unités du meme "type" ne peuvent pas
+		 * cohabiter sur la meme case
+		 */
+		if((*enti)->IsBuilding() == this->IsBuilding() && *enti != this)
+			return false;
+	}
+
 	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
 	 */
-	if(c->Country()->Owner() && c->Country()->Owner()->Player() == owner && c->CanCreate(this))
+	if(!ret && c->Country()->Owner() && c->Country()->Owner()->Player() == owner && c->CanCreate(this))
 		return true;
 
-	std::vector<ECBEntity*> entv = c->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
-		if((*enti)->CanCreate(this))
-			return true;
-
-	return false;
+	return ret;
 }
 
 void ECBEntity::ChangeCase(ECBCase* new_case)

@@ -132,6 +132,9 @@ public:
 	enum e_type {
 		E_NONE,
 		E_ARMY,
+		E_CASERNE,
+		E_CHARFACT,
+		E_CHAR,
 		E_END
 	};
 
@@ -143,8 +146,13 @@ public:
 
 	virtual ~ECBEntity() {}
 
-/* Methodes */
+/* Constantes */
 public:
+
+	/** Use this function to know how people there are when you create this entity */
+	virtual uint InitNb() const = 0;
+
+	virtual bool IsBuilding() const { return false; }
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
@@ -152,14 +160,20 @@ public:
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(const ECBEntity* e) = 0;
 
-	/** Use this function to know how people there are when you create this entity */
-	virtual uint InitNb() const = 0;
+	/** Use this function when this entity wants to attaq someone */
+	virtual bool WantAttaq(uint x, uint y) { return true; }
+
+	/** Use this function when this entity wants to move somewhere */
+	virtual bool WantMove(ECBMove::E_Move) { return true; }
+
+/* Methodes */
+public:
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;
 
 	/** Use this function to add some units in the entity */
-	virtual void AddUnits(uint units);
+	virtual bool AddUnits(uint units);
 
 	/** This function remove entity from case where it is and add it in the new case.
 	* It changes pointer \a acase to \a new_case too.
@@ -179,7 +193,7 @@ public:
 	ECBCase* Case() const { return acase; }
 
 	void SetOwner(ECBPlayer* _p) { owner = _p; }
-	ECBPlayer* Owner() { return owner; }
+	ECBPlayer* Owner() const { return owner; }
 
 	const char* ID() const { return name; }
 
@@ -199,6 +213,8 @@ public:
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
 	bool Locked() const { return lock; }
 	void SetLock(bool l = true) { lock = l; }
+	void Lock(bool b = true) { lock = b; }
+	void Unlock() { lock = false; }
 
 	uint MyStep() const { return myStep; }
 	void SetMyStep(uint s) { myStep = s; }
@@ -375,6 +391,8 @@ public:
 
 /* Methodes */
 public:
+
+	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding()); }
 
 /* Attributs */
 public:
