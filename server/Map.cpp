@@ -285,12 +285,6 @@ bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 	return true;
 }
 
-void ECEntity::AddUnits(uint u)
-{
-	CreateLast();
-	ECBEntity::AddUnits(u);
-}
-
 void ECEntity::Played()
 {
 	ECBEntity::Played();
@@ -318,4 +312,74 @@ ECEntity* ECEntity::FindLast(ECBCase* c)
 		if(a_l->Case() == c)
 			return a_l;
 	return 0;
+}
+
+bool ECEntity::Attaq(std::vector<ECEntity*> entities)
+{
+	uint enemies = 0;
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			if(this != *it && !(*it)->Locked() && (!(*it)->Like(this) || !Like(*it)) &&
+			                                   ((*it)->CanAttaq(this) || CanAttaq(*it)))
+				enemies++;
+
+	if(!enemies) return true;
+
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if(*it != this && !(*it)->Locked() && !Like(*it) && CanAttaq(*it))
+		{
+			uint killed = rand() % (nb/2+enemies);
+			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
+			(*it)->Shooted(killed);
+			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
+		}
+
+	return true;
+}
+
+void ECEntity::Union(ECEntity* entity)
+{
+	if(entity->Type() != Type()) throw ECExcept(VIName(entity->Type()) VIName(Type()), "Union avec un autre type !?");
+
+	/* On lock car il fait maintenant partie intégrale de (*enti) */
+	entity->SetLock();
+	/* On créé un clone de l'ancienne entité. */
+	CreateLast();
+	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
+	SetNb(Nb() + entity->Nb());
+	/* Enfin on défini le nombre de pas restants */
+	SetRestStep(entity->RestStep());
+}
+
+bool ECEntity::Return()
+{
+	/* Si il n'y a pas de last on a rien à faire */
+	if(!last) return false;
+
+	/* La récurence de Return() s'arrête jusqu'à un changement d'etat
+	 * autre que la position */
+	if(last->Case() == acase) return false;
+
+	/* On appel le Return() du last */
+	last->Return();
+
+	/* On recule (forcément, car il y a un Last par pas) */
+	restStep++;
+
+	ECEntity* lastlast = last;
+
+	/* On prend comme last le last de notre last */
+	last = lastlast->Last();
+
+	/* On s'enlève de la case où on est actuellement et on se met sur l'ancienne case */
+	acase->Entities()->Remove(this);
+	acase = lastlast->Case();
+	acase->Entities()->Add(this);
+
+	/* On enlève le last de la case */
+	lastlast->Case()->Entities()->Remove(lastlast);
+
+	/* On supprime le last */
+	MyFree(lastlast);
+
+	return true;
 }

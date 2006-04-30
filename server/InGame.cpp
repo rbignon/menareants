@@ -25,6 +25,7 @@
 #include "Outils.h"
 #include "Commands.h"
 #include "Units.h"
+#include "Batiments.h"
 
 void EChannel::InitAnims()
 {
@@ -322,13 +323,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		std::vector<ECEvent*> events_sended;
 		if(flags == ARM_NUMBER)
 		{
-			if(entity->CanBeCreated() && int(entity->Cost()) <= cl->Player()->Money())
+			if(entity->CanBeCreated() && int(entity->Cost()) <= cl->Player()->Money() && entity->AddUnits(entity->InitNb()))
 			{
 				/*****************************
 				*     GESTION DES AJOUTS    *
 				*****************************/
-				entity->AddUnits(entity->InitNb());
-	
 				cl->Player()->DownMoney(entity->Cost());
 				nb = entity->Nb();
 			}

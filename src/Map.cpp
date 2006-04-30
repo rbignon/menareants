@@ -30,6 +30,7 @@
 #include "Resources.h"
 #include "Channels.h"
 #include "Units.h"
+#include "Batiments.h"
 
 /********************************************************************************************
  *                               ECEntityList                                               *
@@ -86,8 +87,7 @@ void ECMove::SetMoves(Vector _moves)
  ********************************************************************************************/
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), move(this),
-		  lock(false)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), move(this)
 {}
 
 ECEntity::~ECEntity()

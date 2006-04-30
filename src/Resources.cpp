@@ -32,6 +32,8 @@
 	R_RESOURCE(ECImage,      BarreLat);
 	R_RESOURCE(ECImage,      BarreAct);
 	R_RESOURCE(ECImage,      Cadre);
+	R_RESOURCE(ECImage,      GoodHashure);
+	R_RESOURCE(ECImage,      BadHashure);
 	R_RESOURCE(ECImage,      FlecheVert);
 	R_RESOURCE(ECImage,      FlecheHoriz);
 	R_RESOURCE(ECImage,      FlecheDroiteHaut);
@@ -75,6 +77,15 @@
 	R_RESOURCE(ECSpriteBase, Army_Left);
 	R_RESOURCE(ECSpriteBase, Army_Right);
 	R_RESOURCE(ECSpriteBase, Army_Dos);
+	R_RESOURCE(ECImage,      Caserne_Icon);
+	R_RESOURCE(ECSpriteBase, Caserne_Face);
+	R_RESOURCE(ECImage,      Char_Icon);
+	R_RESOURCE(ECSpriteBase, Char_Face);
+	R_RESOURCE(ECSpriteBase, Char_Left);
+	R_RESOURCE(ECSpriteBase, Char_Right);
+	R_RESOURCE(ECSpriteBase, Char_Dos);
+	R_RESOURCE(ECImage,      CharFact_Icon);
+	R_RESOURCE(ECSpriteBase, CharFact_Face);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

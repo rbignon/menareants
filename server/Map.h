@@ -58,25 +58,16 @@ public:
 /* Methodes */
 public:
 
-	/** Use this function when this entity wants to attaq someone */
-	virtual bool WantAttaq(uint x, uint y) = 0;
-
-	/** Use this function when this entity wants to move somewhere */
-	virtual bool WantMove(ECMove::E_Move) = 0;
-
 	/** Use this function to cancel an action of this entity */
-	virtual bool Return() = 0;
+	virtual bool Return();
 
 	/** Use this function to create a last state of this entity (stocked in a variable) */
 	virtual void CreateLast() = 0;
 
 	/** Use this function to make an union with an other entity */
-	virtual void Union(ECEntity*) = 0;
+	virtual void Union(ECEntity*);
 
-	/** Use this function to add some units in the entity */
-	virtual void AddUnits(uint units);
-
-	virtual bool Attaq(std::vector<ECEntity*> entities) = 0;
+	virtual bool Attaq(std::vector<ECEntity*> entities);
 
 	static bool AreFriends(std::vector<ECEntity*> list);
 

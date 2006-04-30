@@ -27,6 +27,42 @@
 #include "Resources.h"
 
 /********************************************************************************************
+ *                                EChar                                                     *
+ ********************************************************************************************/
+
+class EChar : public ECEntity, public ECBChar
+{
+/* Constructeur/Destructeur */
+public:
+
+	CHAR_EMPTY_CONSTRUCTOR(EChar) {}
+
+	CHAR_CONSTRUCTOR(EChar) { SetImage(Resources::Char_Face()); }
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Char"; }
+	virtual const char* Infos() const { return "Char d'assaut"; }
+	virtual ECImage* Icon() const { return Resources::Char_Icon(); }
+
+/* Methodes */
+public:
+
+	virtual bool BeforeEvent();
+
+	virtual bool MakeEvent();
+
+	virtual bool AfterEvent();
+
+/* Attributs */
+public:
+
+/* Variables protégées */
+protected:
+};
+
+/********************************************************************************************
  *                                ECArmy                                                    *
  ********************************************************************************************/
 

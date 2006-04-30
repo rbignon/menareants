@@ -70,7 +70,7 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), selected(false), move(this), lock(false)
+		: Tag(0), image(0), selected(false), move(this)
 	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
@@ -112,16 +112,11 @@ public:
 
 	ECMove* Move() { return &move; }
 
-	bool Locked() const { return lock; }
-	void Lock(bool b = true) { lock = b; }
-	void Unlock() { lock = false; }
-
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
 	ECMove move;
-	bool lock;
 };
 
 /********************************************************************************************
@@ -299,12 +294,21 @@ public:
 	std::vector<ECEntity*> List() const { return entities; }
 
 	template<typename T>
-	std::vector<ECEntity*> ECEntityList::CanCreatedBy(T c) const
+	std::vector<ECEntity*> CanCreatedBy(T c) const
 	{
 		std::vector<ECEntity*> l;
 		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
 			if(c->CanCreate(*it))
+				l.push_back(*it);
+		return l;
+	}
+
+	std::vector<ECEntity*> Buildings() const
+	{
+		std::vector<ECEntity*> l;
+		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
+			if((*it)->IsBuilding())
 				l.push_back(*it);
 		return l;
 	}

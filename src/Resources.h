@@ -96,6 +96,8 @@ public:
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
+	R_RESOURCE(ECImage,      GoodHashure,      PKGDATADIR_PICS "goodhashure.png");
+	R_RESOURCE(ECImage,      BadHashure,       PKGDATADIR_PICS "badhashure.png");
 	R_RESOURCE(ECImage,      FlecheVert,       PKGDATADIR_PICS "fleches/fleche_vert.png");
 	R_RESOURCE(ECImage,      FlecheHoriz,      PKGDATADIR_PICS "fleches/fleche_horiz.png");
 	R_RESOURCE(ECImage,      FlecheDroiteHaut, PKGDATADIR_PICS "fleches/fleche_droitehaut.png");
@@ -139,6 +141,15 @@ public:
 	R_RESOURCE(ECSpriteBase, Army_Left,        "units/army/left");
 	R_RESOURCE(ECSpriteBase, Army_Right,       "units/army/right");
 	R_RESOURCE(ECSpriteBase, Army_Dos,         "units/army/dos");
+	R_RESOURCE(ECImage,      Caserne_Icon,     PKGDATADIR_PICS "units/caserne_icon.png");
+	R_RESOURCE(ECSpriteBase, Caserne_Face,     "units/caserne");
+	R_RESOURCE(ECImage,      Char_Icon,        PKGDATADIR_PICS "units/char_icon.png");
+	R_RESOURCE(ECSpriteBase, Char_Face,        "units/char/face");
+	R_RESOURCE(ECSpriteBase, Char_Left,        "units/char/left");
+	R_RESOURCE(ECSpriteBase, Char_Right,       "units/char/right");
+	R_RESOURCE(ECSpriteBase, Char_Dos,         "units/char/dos");
+	R_RESOURCE(ECImage,      CharFact_Icon,     PKGDATADIR_PICS "units/charfact_icon.png");
+	R_RESOURCE(ECSpriteBase, CharFact_Face,     "units/charfact");
 };
 
 #undef R_RESOURCE

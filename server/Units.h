@@ -25,30 +25,57 @@
 #include "server/Map.h"
 #include "lib/Units.h"
 
-class ECArmy : public ECEntity, public ECBArmy
+/********************************************************************************************
+ *                               EChar                                                      *
+ ********************************************************************************************/
+class EChar : public ECEntity, public ECBChar
 {
 /* Constructeur/Destructeur */
 public:
 
-  ARMY_EMPTY_CONSTRUCTOR(ECArmy) {}
-  
-  ARMY_CONSTRUCTOR(ECArmy) {}
+	CHAR_EMPTY_CONSTRUCTOR(EChar) {}
+
+	CHAR_CONSTRUCTOR(EChar) {}
 
 /* Methodes */
 public:
 
 	/** @return last case */
-	virtual bool WantMove(ECMove::E_Move);
-
-	virtual bool Return();
+	virtual bool WantMove(ECBMove::E_Move);
 
 	virtual bool WantAttaq(uint x, uint y);
 
 	virtual void CreateLast();
 
-	virtual void Union(ECEntity*);
+/* Attributs */
+public:
 
-	virtual bool Attaq(std::vector<ECEntity*> entities);
+/* Variables protégées */
+protected:
+
+};
+
+/********************************************************************************************
+ *                               ECArmy                                                     *
+ ********************************************************************************************/
+class ECArmy : public ECEntity, public ECBArmy
+{
+/* Constructeur/Destructeur */
+public:
+
+	ARMY_EMPTY_CONSTRUCTOR(ECArmy) {}
+
+	ARMY_CONSTRUCTOR(ECArmy) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool WantMove(ECBMove::E_Move);
+
+	virtual bool WantAttaq(uint x, uint y);
+
+	virtual void CreateLast();
 
 /* Attributs */
 public:
