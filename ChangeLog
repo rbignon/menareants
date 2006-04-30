@@ -1,3 +1,16 @@
+2005-04-30  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp: Pas deux batiments, ou pas deux unités sur la meme case.
+
+	* src/Defines.h, src/data: Modification de la taille des cases à 80x80
+
+	* lib/Batiments.h, lib/Units.h, src/Batiments.h, src/Units.h, server/Batiments.h, server/Units.h:
+	Ajout de la caserne, du charfact et du char.
+
+	* src/InGame.cpp, src/gui/ShowMap.cpp: Création de batiments et affichage de la position de l'écran sur le radar.
+
+	* src/tools/Images.cpp (DrawRect): Fonction pour dessiner un rectangle.
+
 2005-04-29  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp: Vérification des +! lors du quit.
