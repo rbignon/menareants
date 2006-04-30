@@ -29,6 +29,7 @@
 #include "Channels.h"
 #include "Map.h"
 #include "Units.h"
+#include "Batiments.h"
 #include "Timer.h"
 #include "AltThread.h"
 
@@ -394,8 +395,31 @@ void MenAreAntsApp::InGame()
 								eob = true;
 						}
 
-						ECEntity* entity;
-						ECase* acase;
+						ECEntity* entity = 0;
+						ECase* acase = 0;
+
+						if(InGameForm->Map->CreateEntity())
+						{
+							entity = InGameForm->Map->CreateEntity();
+
+							if(event.button.button == MBUTTON_RIGHT)
+								InGameForm->Map->SetCreateEntity(0);
+							else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y) &&
+						            !InGameForm->BarreAct->Test(event.button.x, event.button.y) &&
+						            (acase = InGameForm->Map->TestCase(event.button.x, event.button.y)) &&
+							        entity->CanBeCreated(acase))
+							{
+								std::string s = "-";
+								s += " %" + TypToStr(entity->Type());
+								s += " =" + TypToStr(acase->X()) + "," + TypToStr(acase->Y());
+								s += " +";
+								client->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
+								entity->SetOwner(0);
+								InGameForm->Map->SetCreateEntity(0);
+							}
+							break;
+						}
+						
 						if(InGameForm->BarreAct->MoveButton->Test(event.button.x, event.button.y))
 							want = W_MOVE;
 						else if(InGameForm->BarreAct->AttaqButton->Test(event.button.x, event.button.y))
@@ -477,8 +501,17 @@ void MenAreAntsApp::InGame()
 						break;
 				}
 			}
+			/// \todo voir si on peut pas mettre ça ailleurs
+			InGameForm->BarreLat->ScreenPos->SetXY(
+			            InGameForm->BarreLat->Radar->X() -
+			              ((int)InGameForm->BarreLat->Radar->Width()/(int)chan->Map()->Width() *
+			               InGameForm->Map->X()/CASE_WIDTH),
+			            InGameForm->BarreLat->Radar->Y() -
+			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
+			              InGameForm->Map->Y()/CASE_HEIGHT));
 			SDL_FillRect(app.sdlwindow, NULL, 0);
 			InGameForm->Update();
+			SDL_Delay(20);
 		} while(!eob && client->IsConnected() && client->Player());
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
@@ -602,6 +635,60 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list)
 	SetWidth(_x);
 	SetHeight(_h);
 	SetXY(parent->Width() - 5 - _x, Y());
+}
+
+/********************************************************************************************
+ *                                TBarreLatIcons                                            *
+ ********************************************************************************************/
+
+void TBarreLatIcons::SelectUnit(TObject* o, void* e)
+{
+	assert(o);
+	assert(o->Parent());
+	assert(o->Parent()->Parent());
+	assert(o->Parent()->Parent()->Parent());
+
+	/* TInGameForm               Parent()
+	 * `- TBarreLat              Parent()
+	 *    `- TBarreLatIcons      Parent()
+	 *       `- TImage           o
+	 */
+	TInGameForm* ingame = static_cast<TInGameForm*>(o->Parent()->Parent()->Parent());
+	if(!ingame) return;
+
+	static_cast<ECEntity*>(e)->SetOwner(ingame->Player());
+	ingame->Map->SetCreateEntity(static_cast<ECEntity*>(e));
+}
+
+void TBarreLatIcons::SetList(std::vector<ECEntity*> list)
+{
+	Clear();
+
+	int _x = 0, _y = 0;
+	uint _h = 0, _w = 0;
+	bool left = true;
+	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it, left = !left)
+	{
+		TImage* i = AddComponent(new TImage(_x, _y, (*it)->Icon(), false));
+
+		if(i->Width() > _w) _w = i->Width();
+		if(i->Height() > _h) _h = i->Height();
+
+		if(left)
+			_x += _w;
+		else
+		{
+			_x = 0;
+			_y += _h;
+		}
+		i->SetOnClick(TBarreLatIcons::SelectUnit, (void*)*it);
+		i->SetHint(std::string(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos()).c_str());
+
+	}
+	if(!left) // c'est à dire on était à droite
+		_y += _h;
+	SetWidth(2*_w);
+	SetHeight(_y);
 }
 
 /********************************************************************************************
@@ -733,13 +820,22 @@ void TBarreAct::vSetEntity(void* _e)
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
 			InGameForm->BarreAct->ShowIcons(e);
-			InGameForm->BarreAct->MoveButton->Show();
-			InGameForm->BarreAct->AttaqButton->Show();
-			InGameForm->BarreAct->UpButton->Show();
-			InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
-			InGameForm->BarreAct->UpButton->SetHint(std::string("Coût: " + TypToStr(e->Cost()) + " $").c_str());
-			InGameForm->BarreAct->UpButton->SetEnabled(
-					(e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
+			/* On subterfuge avec ces fonctions WantMove et WantAttaq qui, dans le client,
+			 * ne font que renvoyer true ou false. Mais comme elles sont virtuelles et
+			 * surchargées sur le serveur, on se tape les arguments.
+			 */
+			InGameForm->BarreAct->MoveButton->SetVisible(e->WantMove(ECBMove::Up));
+			InGameForm->BarreAct->AttaqButton->SetVisible(e->WantAttaq(0,0));
+			if(e->AddUnits(0))
+			{
+				InGameForm->BarreAct->UpButton->Show();
+				InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
+				InGameForm->BarreAct->UpButton->SetHint(std::string("Coût: " + TypToStr(e->Cost()) + " $").c_str());
+				InGameForm->BarreAct->UpButton->SetEnabled(
+						(e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
+			}
+			else
+				InGameForm->BarreAct->UpButton->Hide();
 		}
 		else
 		{
@@ -836,6 +932,8 @@ void TBarreLat::RadarClick(TObject* m, int x, int y)
 
 	if(InGameForm->Map->Enabled())
 		InGameForm->Map->CenterTo(dynamic_cast<ECase*>((*InGameForm->Map->Map())(_x,_y)));
+
+	map->DelFocus();
 }
 
 TBarreLat::TBarreLat(ECPlayer* pl)
@@ -856,7 +954,10 @@ void TBarreLat::Init()
 	SchemaButton->SetHint("Voir la délimitation des territoires sur la carte");
 	QuitButton = AddComponent(new TButtonText(30,280,100,30, "Quitter", &app.Font()->sm));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-  QuitButton->SetHint("Quitter la partie");
+	QuitButton->SetHint("Quitter la partie");
+
+	Icons = AddComponent(new TBarreLatIcons(20, 350));
+	Icons->SetList(EntityList.Buildings());
 
 	chan->Map()->CreatePreview(120,120, true);
 	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
@@ -870,6 +971,15 @@ void TBarreLat::Init()
 	TurnMoney = AddComponent(new TLabel(80, 20, TypToStr(player->TurnMoney()) + "$.t-1", white_color, &app.Font()->sm));
 
 	UnitsInfos = AddComponent(new TMemo(&app.Font()->sm, 15, Height() - 100 - 10, Width() - 15 - 10, 100));
+
+	ScreenPos = AddComponent(new TImage(0,0));
+	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
+	DrawRect(surf, 0, 0, 120  / chan->Map()->Width()  * SCREEN_WIDTH / CASE_WIDTH,
+	                     120 / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	                     SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
+	ScreenPos->SetImage(new ECImage(surf));
+	ScreenPos->SetEnabled(false);
 
 	SetBackground(Resources::BarreLat());
 }

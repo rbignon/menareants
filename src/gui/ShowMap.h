@@ -30,7 +30,7 @@ class TMap : public TComponent
 public:
 
 	TMap(ECMap* _map)
-		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0)
+		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0)
 	{}
 
 /* Methodes */
@@ -73,11 +73,15 @@ public:
 
 	ECMap* Map() const { return map; }
 
+	void SetCreateEntity(ECEntity* e) { create_entity = e; }
+	ECEntity* CreateEntity() const { return create_entity; }
+
 /* Variables privées */
 private:
 	ECMap* map;
 	bool schema;
 	int x_min, y_min;
+	ECEntity* create_entity;
 };
 
 #endif /* EC_SHOWMAP_H */

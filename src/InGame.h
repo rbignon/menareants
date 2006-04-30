@@ -56,6 +56,22 @@ private:
 	std::vector<TImage*> icons;
 };
 
+class TBarreLatIcons : public TChildForm
+{
+public:
+	TBarreLatIcons(int _x, int _y)
+		: TChildForm(_x,_y, 0, 0)
+	{}
+
+	void Init() {}
+
+	void SetList(std::vector<ECEntity*> list);
+
+private:
+	std::vector<TImage*> icons;
+	static void SelectUnit(TObject* o, void* e);
+};
+
 class TBarreAct : public TChildForm
 {
 public:
@@ -127,14 +143,18 @@ public:
 
 /* Composants */
 public:
-	TImage*      Radar;
-	TButtonText* PretButton;
-	TButtonText* QuitButton;
-	TButtonText* SchemaButton;
-	TLabel*      Date;
-	TLabel*      Money;
-	TLabel*      TurnMoney;
-	TMemo*       UnitsInfos;
+	TImage*         Radar;
+	TButtonText*    PretButton;
+	TButtonText*    QuitButton;
+	TButtonText*    SchemaButton;
+	TLabel*         Date;
+	TLabel*         Money;
+	TLabel*         TurnMoney;
+	TMemo*          UnitsInfos;
+	TBarreLatIcons* Icons;
+	TImage*         ScreenPos;
+
+	EChannel* Channel() const { return chan; }
 
 /* Evenements */
 public:
@@ -183,6 +203,8 @@ public:
 /* Attributs */
 public:
 	Timer* GetTimer() { return &timer; }
+
+	ECPlayer* Player() const { return player; }
 
 /* Evenements */
 public:
