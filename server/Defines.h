@@ -34,7 +34,7 @@ typedef unsigned int   uint;
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"1"
+#define APP_PVERSION	"2"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
