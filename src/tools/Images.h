@@ -31,6 +31,7 @@ class ECImage;
 void ChangePixelColor(ECImage* surf, SDL_Color last_color, SDL_Color new_color);
 Uint32 getpixel(SDL_Surface * surface, int x, int y);
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
 #define EstTransparent(a)       ( (a) != 255 )
 SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags);
 SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags);

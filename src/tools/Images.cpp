@@ -23,6 +23,23 @@
 #include "Defines.h"
 #include "Debug.h"
 
+void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
+{
+    int x, y;
+
+    for(y = y1; y <= y2; y++)
+    {
+        putpixel(screen, x1, y, color);
+        putpixel(screen, x2, y, color);
+    }
+
+    for(x = x1; x <= x2; x++)
+    {
+        putpixel(screen, x, y1, color);
+        putpixel(screen, x, y2, color);
+    }
+}
+
 void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
 {
     int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
