@@ -9,7 +9,35 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
 -server: enrichissement de l'IA
 -client: gestion des accents dans TEdit
--client: afficher sur le radar un rectangle de la position de la camera
+-server: empecher deux unités d'aller sur la meme case hors attaque.
+-server: bug qui empeche de créer sur une usine de chars (probablement CanBeCreated()) :
+(note: %4 = char (10 000$), %3 = usine de chars (10 000$))
+R(Progs@87.89.221.230) - ARM - %4 =15,18 +
+[DEBUG]   event - attaq 15,18
+[DEBUG]         - Member Progs!AE (create)
+[DEBUG]         - Member zorkis!AK (move)
+[DEBUG]   event - create 14,15
+[DEBUG]         - Member zorkis!AH (move)
+[DEBUG]   event - move 15,17
+[DEBUG]         - Member zorkis!AH (move)
+R(Progs@87.89.221.230) - ARM - %3 =3,13 +
+[DEBUG]   On rajoute un ARM_CREATE
+S(Progs@87.89.221.230) - :Progs SET +$ 1000
+[DEBUG]   0x809da74(15,18) vs 0x809a764(3,13)
+[DEBUG]   0x809c13c(14,15) vs 0x809a764(3,13)
+[DEBUG]   0x809d194(15,17) vs 0x809a764(3,13)
+[DEBUG]   0x809a764(3,13) vs 0x809a764(3,13)
+S(Progs@87.89.221.230) - :Progs!AB ARM =Progs!AB,3,13 %3 +2000
+[DEBUG]   event - attaq 15,18
+[DEBUG]         - Member Progs!AE (create)
+[DEBUG]         - Member zorkis!AK (move)
+[DEBUG]   event - create 14,15
+[DEBUG]         - Member zorkis!AH (move)
+[DEBUG]   event - move 15,17
+[DEBUG]         - Member zorkis!AH (move)
+[DEBUG]   event - create 3,13
+[DEBUG]         - Member Progs!AB (create)
+
 
 * Après
 -gestion des fins de parties.
