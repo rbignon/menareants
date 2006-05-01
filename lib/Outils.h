@@ -199,13 +199,13 @@ public:
 		return i;
 	}
 
-	uint Fixed()
+	std::vector<T> Fixed()
 	{
-		uint i = 0;
+		std::vector<T> l;
 		for(iterator it = list.begin(); it != list.end(); ++it)
 			if(!(*it)->Locked() && (!(*it)->Last() || (*it)->Last()->Case() == (*it)->Case()))
-				++i;
-		return i;
+				l.push_back(*it);
+		return l;
 	}
 
 	uint Moved()
