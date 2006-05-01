@@ -314,27 +314,7 @@ ECEntity* ECEntity::FindLast(ECBCase* c)
 	return 0;
 }
 
-bool ECEntity::Attaq(std::vector<ECEntity*> entities)
-{
-	uint enemies = 0;
-	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-			if(this != *it && !(*it)->Locked() && (!(*it)->Like(this) || !Like(*it)) &&
-			                                   ((*it)->CanAttaq(this) || CanAttaq(*it)))
-				enemies++;
 
-	if(!enemies) return true;
-
-	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !(*it)->Locked() && !Like(*it) && CanAttaq(*it))
-		{
-			uint killed = rand() % (nb/2+enemies);
-			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
-			(*it)->Shooted(killed);
-			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
-		}
-
-	return true;
-}
 
 void ECEntity::Union(ECEntity* entity)
 {
@@ -380,6 +360,28 @@ bool ECEntity::Return()
 
 	/* On supprime le last */
 	MyFree(lastlast);
+
+	return true;
+}
+
+bool ECEntity::Attaq(std::vector<ECEntity*> entities)
+{
+	uint enemies = 0;
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			if(this != *it && !(*it)->Locked() && (!(*it)->Like(this) || !Like(*it)) &&
+			                                   ((*it)->CanAttaq(this) || CanAttaq(*it)))
+				enemies++;
+
+	if(!enemies) return true;
+
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if(*it != this && !(*it)->Locked() && !Like(*it) && CanAttaq(*it))
+		{
+			uint killed = rand() % (nb/2+enemies);
+			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
+			(*it)->Shooted(killed);
+			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
+		}
 
 	return true;
 }

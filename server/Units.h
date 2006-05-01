@@ -26,63 +26,64 @@
 #include "lib/Units.h"
 
 /********************************************************************************************
- *                               EChar                                                      *
+ *                               ECUnit                                                     *
  ********************************************************************************************/
-class EChar : public ECEntity, public ECBChar
+class ECUnit : public ECEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(EChar) {}
+	ECUnit() : case_flags(0) {}
 
-	CHAR_CONSTRUCTOR(EChar) {}
+	ECUnit(unsigned f) : case_flags(f) {}
 
 /* Methodes */
 public:
 
-	/** @return last case */
 	virtual bool WantMove(ECBMove::E_Move);
 
 	virtual bool WantAttaq(uint x, uint y);
 
-	virtual void CreateLast();
+/* Variables protégées */
+private:
+	unsigned case_flags;
+	
+};
 
-/* Attributs */
+/********************************************************************************************
+ *                               EChar                                                      *
+ ********************************************************************************************/
+class EChar : public ECUnit, public ECBChar
+{
+/* Constructeur/Destructeur */
 public:
 
-/* Variables protégées */
-protected:
+	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(C_VILLE|C_TERRE) {}
 
+	CHAR_CONSTRUCTOR(EChar), ECUnit(C_VILLE|C_TERRE) {}
+
+/* Methodes */
+public:
+
+	virtual void CreateLast();
 };
 
 /********************************************************************************************
  *                               ECArmy                                                     *
  ********************************************************************************************/
-class ECArmy : public ECEntity, public ECBArmy
+class ECArmy : public ECUnit, public ECBArmy
 {
 /* Constructeur/Destructeur */
 public:
 
-	ARMY_EMPTY_CONSTRUCTOR(ECArmy) {}
+	ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(C_VILLE|C_TERRE|C_PONT) {}
 
-	ARMY_CONSTRUCTOR(ECArmy) {}
+	ARMY_CONSTRUCTOR(ECArmy), ECUnit(C_VILLE|C_TERRE|C_PONT) {}
 
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool WantMove(ECBMove::E_Move);
-
-	virtual bool WantAttaq(uint x, uint y);
-
 	virtual void CreateLast();
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 #endif /* ECD_UNITS_H */
