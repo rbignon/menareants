@@ -1,3 +1,15 @@
+2005-05-01  Romain Bignon <progs@headfucking.net>
+
+	* src/Units.h, server/Units.h: Création indépendament coté serveur et coté client de ECUnit qui réunit le code
+	utilisé par EChar et ECArmy.
+
+	* server/InGame.cpp: Correction de bugs.
+
+	* src/tools/Images.cpp: Fonctions pour copier des SpriteBase et pour utiliser une coloriage de toutes images.
+
+	* src/Units.cpp: Utilisation dans ECUnit d'une liste d'images suivant la position et coloriage de la couleur
+	du propriétaire.
+
 2005-04-30  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp: Pas deux batiments, ou pas deux unités sur la meme case.
