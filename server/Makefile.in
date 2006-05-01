@@ -56,8 +56,8 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareantsserver_OBJECTS = Main.$(OBJEXT) Server.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT) IA.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
-	InGame.$(OBJEXT)
+	Channels.$(OBJEXT) IA.$(OBJEXT) Map.$(OBJEXT) \
+	Batiments.$(OBJEXT) Units.$(OBJEXT) InGame.$(OBJEXT)
 menareantsserver_OBJECTS = $(am_menareantsserver_OBJECTS)
 menareantsserver_DEPENDENCIES = $(top_srcdir)/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -189,6 +189,7 @@ menareantsserver_SOURCES = \
 	Channels.cpp \
 	IA.cpp \
 	Map.cpp \
+	Batiments.cpp \
 	Units.cpp \
 	InGame.cpp
 
@@ -261,6 +262,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Batiments.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@

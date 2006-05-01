@@ -14,6 +14,7 @@ menareantsserver_SOURCES = \
 	Channels.cpp \
 	IA.cpp \
 	Map.cpp \
+	Batiments.cpp \
 	Units.cpp \
 	InGame.cpp
 

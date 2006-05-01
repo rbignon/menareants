@@ -830,7 +830,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		}
 		else
 			for(std::vector<ECEntity*>::const_iterator it = et.begin(); it != et.end(); ++it)
-				if(!(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
+				if(flag != ARM_CREATE && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
 					to_send += " =" + (*it)->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
 					                                      "," + TypToStr((*it)->Move()->FirstCase()->Y()) +
 					                                      "," + (*it)->Move()->MovesString(0);
