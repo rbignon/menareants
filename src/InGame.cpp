@@ -235,9 +235,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						switch(event_moment)
 						{
-							case BEFORE_EVENT: (*it)->Tag = (*it)->BeforeEvent() ? 1 : 0; break;
-							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent() ? 1 : 0; break;
-							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent() ? 1 : 0; break;
+							case BEFORE_EVENT: (*it)->Tag = (*it)->BeforeEvent(entities) ? 1 : 0; break;
+							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent(entities) ? 1 : 0; break;
+							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent(entities) ? 1 : 0; break;
 						}
 						if(!(*it)->Tag) ok = false;
 					}
@@ -385,7 +385,10 @@ void MenAreAntsApp::InGame()
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
+						{
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+							InGameForm->Map->SetCreateEntity(0);
+						}
 						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
@@ -654,7 +657,7 @@ void TBarreLatIcons::SelectUnit(TObject* o, void* e)
 	 *       `- TImage           o
 	 */
 	TInGameForm* ingame = static_cast<TInGameForm*>(o->Parent()->Parent()->Parent());
-	if(!ingame) return;
+	if(!ingame || ingame->Player()->Ready()) return;
 
 	static_cast<ECEntity*>(e)->SetOwner(ingame->Player());
 	ingame->Map->SetCreateEntity(static_cast<ECEntity*>(e));

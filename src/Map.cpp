@@ -113,10 +113,15 @@ void ECEntity::Draw()
 
 void ECEntity::SetImage(ECSpriteBase* spr)
 {
-	if(image) MyFree(image);
+	bool anim = false;
+	if(image)
+	{
+		anim = image->Anim();
+		MyFree(image);
+	}
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
-	image->SetAnim(false);
+	image->SetAnim(anim);
 	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
 		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));

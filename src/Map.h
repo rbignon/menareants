@@ -87,11 +87,11 @@ public:
 /* Methodes */
 public:
 
-	virtual bool BeforeEvent() = 0;
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&) = 0;
 
-	virtual bool MakeEvent() = 0;
+	virtual bool MakeEvent(const std::vector<ECEntity*>&) = 0;
 
-	virtual bool AfterEvent() = 0;
+	virtual bool AfterEvent(const std::vector<ECEntity*>&) = 0;
 
 	virtual void ChangeCase(ECBCase* new_case);
 

@@ -27,17 +27,44 @@
 #include "Resources.h"
 
 /********************************************************************************************
- *                                ECharFact                                                     *
+ *                                ECBatiment                                                *
  ********************************************************************************************/
 
-class ECharFact : public ECEntity, public ECBCharFact
+class ECBatiment : public ECEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECBatiment() : img(0) {}
+
+	ECBatiment(ECSpriteBase* b);
+	virtual ~ECBatiment();
+
+/* Methodes */
+public:
+
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&) { return true; }
+
+	virtual bool MakeEvent(const std::vector<ECEntity*>&) { return true; }
+
+	virtual bool AfterEvent(const std::vector<ECEntity*>&) { return true; }
+
+private:
+	ECSpriteBase *img;
+};
+
+/********************************************************************************************
+ *                                ECharFact                                                 *
+ ********************************************************************************************/
+
+class ECharFact : public ECBatiment, public ECBCharFact
 {
 /* Constructeur/Destructeur */
 public:
 
 	CHARFACT_EMPTY_CONSTRUCTOR(ECharFact) {}
 
-	CHARFACT_CONSTRUCTOR(ECharFact) { SetImage(Resources::CharFact_Face()); }
+	CHARFACT_CONSTRUCTOR(ECharFact), ECBatiment(Resources::CharFact_Face()) {}
 
 /* Infos */
 public:
@@ -45,35 +72,20 @@ public:
 	virtual const char* Name() const { return "Usine de chars"; }
 	virtual const char* Infos() const { return "Construit les véhicules de votre armée."; }
 	virtual ECImage* Icon() const { return Resources::CharFact_Icon(); }
-
-/* Methodes */
-public:
-
-	virtual bool BeforeEvent() { return true; }
-
-	virtual bool MakeEvent() { return true; }
-
-	virtual bool AfterEvent() { return true; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
 };
 
 /********************************************************************************************
  *                                ECaserne                                                  *
  ********************************************************************************************/
 
-class ECaserne : public ECEntity, public ECBCaserne
+class ECaserne : public ECBatiment, public ECBCaserne
 {
 /* Constructeur/Destructeur */
 public:
 
 	CASERNE_EMPTY_CONSTRUCTOR(ECaserne) {}
 
-	CASERNE_CONSTRUCTOR(ECaserne) { SetImage(Resources::Caserne_Face()); }
+	CASERNE_CONSTRUCTOR(ECaserne), ECBatiment(Resources::Caserne_Face()) {}
 
 /* Infos */
 public:
@@ -81,21 +93,6 @@ public:
 	virtual const char* Name() const { return "Caserne"; }
 	virtual const char* Infos() const { return "Caserne pour entraîner des hommes"; }
 	virtual ECImage* Icon() const { return Resources::Caserne_Icon(); }
-
-/* Methodes */
-public:
-
-	virtual bool BeforeEvent() { return true; }
-
-	virtual bool MakeEvent() { return true; }
-
-	virtual bool AfterEvent() { return true; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
 };
 
 #endif /* EC_BATIMENTS_H */

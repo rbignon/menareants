@@ -23,6 +23,7 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <string>
 
 class ECSpriteBase;
 
@@ -54,7 +55,7 @@ class ECSprite
 /* Constructeur/Deconstructeur */
 public:
 	ECSprite(ECSpriteBase* _base, SDL_Surface* _screen) { init(_base, _screen); }
-	~ECSprite() {};
+	~ECSprite();
 
 /* Methodes */
 public:
@@ -87,6 +88,7 @@ public:
 	void startAnim() { mAnimating = 1; }
 	void stopAnim() { mAnimating = 0; }
 	void SetAnim(bool a) { mAnimating = a ? 1 : 0; }
+	bool Anim() const { return mAnimating; }
 
 	/** Repasse à la première frame */
 	void rewind() { mFrame = 0; }
@@ -104,6 +106,8 @@ public:
 	int GetHeight();                            /**< Fonction pour la hauteur */
 
 	ECImage* First() const;
+
+	void ChangeColor(SDL_Color first, SDL_Color to);
 
 /* Variables privées */
 private:
@@ -127,9 +131,11 @@ public:
 	 * Ouvre dans un répertoire le fichier info dans lequel est inscrit les informations
 	 * pour l'animation (images, frequence, etc..)
 	 */
-	int init(char *dir);
+	int init(const char *dir);
 
-	ECSpriteBase(char *dir);
+	void ChangeColor(SDL_Color from, SDL_Color to);
+
+	ECSpriteBase(const char *dir);
 	~ECSpriteBase() {}
 
 /* Variables publiques */
@@ -137,6 +143,7 @@ public:
 	ECImage *mAnim;
 	int mBuilt, mNumframes, mW, mH;
 	bool animation;
+	std::string path;
 };
 
 class ECImage

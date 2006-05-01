@@ -391,6 +391,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			case '!':
 				if(!players.size()) { Debug(W_DESYNCH|W_SEND, "SET %c!: sans sender", add ? '+' : '-'); break; }
+				me->LockScreen();
 				for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 				{
 					(*it)->SetReady(add);
@@ -424,6 +425,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(add && InGameForm && chan->State() == EChannel::PLAYING)
 						InGameForm->AddInfo(I_INFO, std::string((*it)->GetNick()) + " est pret.");
 				}
+				me->UnlockScreen();
 				break;
 			case '$':
 				if(j>=parv.size()) Debug(W_DESYNCH|W_SEND, "SET %c$: sans argent", add ? '+' : '-');

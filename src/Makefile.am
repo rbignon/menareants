@@ -33,6 +33,7 @@ menareants_SOURCES = \
 		Login.cpp \
 		Channels.cpp \
 		Map.cpp \
+		Batiments.cpp \
 		Units.cpp \
 		JoinGame.cpp \
 		InGame.cpp

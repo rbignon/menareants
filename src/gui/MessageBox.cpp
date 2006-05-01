@@ -22,6 +22,7 @@
 #include "Defines.h"
 #include "Debug.h"
 #include "Main.h"
+#include "Resources.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -33,10 +34,10 @@ static struct ButtonList_t
 	uint w;
 	uint h;
 } ButtonList[] = {
-	{ BT_OK,		"OK",		150,	50	},
-	{ BT_YES,		"Oui",		150,	50	},
-	{ BT_NO,		"Non",		150,	50	},
-	{ BT_CANCEL,	"Annuler",	150,	50	}
+	{ BT_OK,        "OK",       100,    30  },
+	{ BT_YES,       "Oui",      100,    30  },
+	{ BT_NO,        "Non",      100,    30  },
+	{ BT_CANCEL,    "Annuler",  100,    30  }
 };
 
 TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form)
@@ -223,6 +224,7 @@ void TMessageBox::SetButtons()
 			                                  ButtonList[i].label, &app.Font()->normal);
 			MyComponent(bt);
 			bt->Tag = ButtonList[i].flag;
+			bt->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 			boutons.push_back(bt);
 			tmpw += ButtonList[i].w + 1;
 			if(tmph < ButtonList[i].h) tmph = ButtonList[i].h;

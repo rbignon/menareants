@@ -228,6 +228,7 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   mLastupdate = 0;
   mX = 0; mY = 0; mOldX = 0; mOldY = 0;
 
+  //mSpriteBase = new ECSpriteBase(base->path.c_str());
   mSpriteBase = base;
   if(mSpriteBase->mBuilt)
   {
@@ -236,6 +237,12 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   }
   mScreen = screen;
   return 0;
+}
+
+ECSprite::~ECSprite()
+{
+/*	if(mSpriteBase)
+		delete mSpriteBase;*/
 }
 
 void ECSprite::clearBG()
@@ -300,11 +307,16 @@ int ECSprite::GetHeight()
 	return (mSpriteBase ? mSpriteBase->mH : 0);
 }
 
+void ECSprite::ChangeColor(SDL_Color first, SDL_Color to)
+{
+	mSpriteBase->ChangeColor(first, to);
+}
+
 /****************************************************************************************
  *                                      ECSpriteBase                                    *
  ****************************************************************************************/
 
-ECSpriteBase::ECSpriteBase(char *dir)
+ECSpriteBase::ECSpriteBase(const char *dir)
 {
 	mAnim = 0;
 	mBuilt = 0;
@@ -316,7 +328,7 @@ ECSpriteBase::ECSpriteBase(char *dir)
 	init(dir);
 }
 
-int ECSpriteBase::init(char *dir)
+int ECSpriteBase::init(const char *dir)
 {
   char buffer[255];
   char filename[255];
@@ -327,10 +339,7 @@ int ECSpriteBase::init(char *dir)
   sprintf(filename, PKGDATADIR_ANIMS "%s/info", dir);
 
   if((fp=fopen(filename, "r")) == NULL)
-  {
-    printf("ERROR opening file %s\n\n", filename);
-    return -1;
-  }
+    throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
 
   fgets(buffer, 255, fp);
   sscanf(buffer, "FILES: %d", &mNumframes);
@@ -346,7 +355,8 @@ int ECSpriteBase::init(char *dir)
       sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
       sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
       SDL_Surface *temp;
-      if((temp = IMG_Load(filename)) == NULL) { printf("die (%s)\n", filename); return -1; }
+      if((temp = IMG_Load(filename)) == NULL)
+         throw ECExcept(filename, "Impossible de charger une image.");
       if(r >= 0) SDL_SetColorKey(temp, SDL_SRCCOLORKEY, SDL_MapRGB(temp->format, r, g, b));
       mAnim[count].Img = SDL_DisplayFormat(temp);
       SDL_FreeSurface(temp);
@@ -360,10 +370,15 @@ int ECSpriteBase::init(char *dir)
     }
   }
   fclose(fp);
+  path = dir;
   return 0;
 }
 
-
+void ECSpriteBase::ChangeColor(SDL_Color from, SDL_Color to)
+{
+	for(int i=0; i < mNumframes; ++i)
+		ChangePixelColor(&mAnim[i], from, to);
+}
 
 /****************************************************************************************
  *                                      ECImage                                         *

@@ -62,8 +62,8 @@ am_menareants_OBJECTS = Font.$(OBJEXT) Images.$(OBJEXT) \
 	ShowMap.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
 	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT) Map.$(OBJEXT) Units.$(OBJEXT) \
-	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
+	Units.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -215,6 +215,7 @@ menareants_SOURCES = \
 		Login.cpp \
 		Channels.cpp \
 		Map.cpp \
+		Batiments.cpp \
 		Units.cpp \
 		JoinGame.cpp \
 		InGame.cpp
@@ -287,6 +288,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AltThread.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Batiments.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Boutton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BouttonText.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@

@@ -21,17 +21,37 @@
 
 #include "Units.h"
 #include "gui/ShowMap.h"
+#include "gui/ColorEdit.h"
+#include "Channels.h"
 
 /********************************************************************************************
- *                                EChar                                                     *
+ *                                ECUnit                                                     *
  ********************************************************************************************/
 
-bool EChar::BeforeEvent()
+void ECUnit::PutImage(imgs_t i, ECSpriteBase* b)
+{
+	images.insert(ImgList::value_type(i, new ECSpriteBase(b->path.c_str())));
+
+	if(Owner())
+		images[i]->ChangeColor(white_color, *color_eq[Owner()->Color()]);
+
+	if(i == I_Down) SetImage(images[i]);
+}
+
+ECUnit::~ECUnit()
+{
+	for(ImgList::iterator it = images.begin(); it != images.end(); ++it)
+		delete it->second;
+}
+
+bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&)
 {
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
 		case ARM_MOVE:
+			if(!move.Empty())
+				SetImage(images[(imgs_t)move.First()]);
 			SetAnim(true);
 			break;
 		default: break;
@@ -39,8 +59,7 @@ bool EChar::BeforeEvent()
 	return true;
 }
 
-#define CHAR_VISUAL_STEP 5
-bool EChar::MakeEvent()
+bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities)
 {
 	ECMap* map = dynamic_cast<ECMap*>(acase->Map());
 	switch(event_type)
@@ -51,17 +70,21 @@ bool EChar::MakeEvent()
 		case ARM_UNION:
 		{
 			if(move.Empty())
+			{
+				if(event_type & ARM_ATTAQ)
+					SetImage(images[I_Attaq]);
 				return true;
+			}
 
 			ECMove::E_Move m = move.First();
 			switch(m)
 			{
-				case ECMove::Right: image->set(image->X() + CHAR_VISUAL_STEP, image->Y()); break;
-				case ECMove::Left:  image->set(image->X() - CHAR_VISUAL_STEP, image->Y()); break;
-				case ECMove::Down:  image->set(image->X(), image->Y() + CHAR_VISUAL_STEP); break;
-				case ECMove::Up:    image->set(image->X(), image->Y() - CHAR_VISUAL_STEP); break;
+				case ECMove::Right: image->set(image->X() + visual_step, image->Y()); break;
+				case ECMove::Left:  image->set(image->X() - visual_step, image->Y()); break;
+				case ECMove::Down:  image->set(image->X(), image->Y() + visual_step); break;
+				case ECMove::Up:    image->set(image->X(), image->Y() - visual_step); break;
 			}
-			SDL_Delay(20);
+			SDL_Delay(20/entities.size());
 			switch(m)
 			{
 				case ECMove::Right:
@@ -81,7 +104,8 @@ bool EChar::MakeEvent()
 						ChangeCase(acase->MoveUp()), move.RemoveFirst();
 					break;
 			}
-
+			if(!move.Empty() && m != move.First())
+				SetImage(images[(imgs_t)move.First()]);
 			return false;
 			break;
 		}
@@ -90,93 +114,14 @@ bool EChar::MakeEvent()
 	return true;
 }
 
-bool EChar::AfterEvent()
+bool ECUnit::AfterEvent(const std::vector<ECEntity*>&)
 {
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		case ARM_MOVE:
-			SetAnim(false);
-			break;
-		default: break;
-	}
-	return true;
-}
-
-
-/********************************************************************************************
- *                                ECArmy                                                    *
- ********************************************************************************************/
-
-bool ECArmy::BeforeEvent()
-{
-	switch(event_type)
-	{
-		case ARM_ATTAQ:
-		case ARM_MOVE:
-			SetAnim(true);
-			break;
-		default: break;
-	}
-	return true;
-}
-
-#define ARMY_VISUAL_STEP 3
-bool ECArmy::MakeEvent()
-{
-	ECMap* map = dynamic_cast<ECMap*>(acase->Map());
-	switch(event_type)
-	{
-		case ARM_ATTAQ:
-		case ARM_MOVE:
 		case ARM_ATTAQ|ARM_MOVE:
-		case ARM_UNION:
-		{
-			if(move.Empty())
-				return true;
-
-			ECMove::E_Move m = move.First();
-			switch(m)
-			{
-				case ECMove::Right: image->set(image->X() + ARMY_VISUAL_STEP, image->Y()); break;
-				case ECMove::Left:  image->set(image->X() - ARMY_VISUAL_STEP, image->Y()); break;
-				case ECMove::Down:  image->set(image->X(), image->Y() + ARMY_VISUAL_STEP); break;
-				case ECMove::Up:    image->set(image->X(), image->Y() - ARMY_VISUAL_STEP); break;
-			}
-			SDL_Delay(20);
-			switch(m)
-			{
-				case ECMove::Right:
-					if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= image->X())
-						ChangeCase(acase->MoveRight()), move.RemoveFirst();
-					break;
-				case ECMove::Left:
-					if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= image->X())
-						ChangeCase(acase->MoveLeft()), move.RemoveFirst();
-					break;
-				case ECMove::Down:
-					if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= image->Y())
-						ChangeCase(acase->MoveDown()), move.RemoveFirst();
-					break;
-				case ECMove::Up:
-					if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= image->Y())
-						ChangeCase(acase->MoveUp()), move.RemoveFirst();
-					break;
-			}
-
-			return false;
-			break;
-		}
-		default: break;
-	}
-	return true;
-}
-
-bool ECArmy::AfterEvent()
-{
-	switch(event_type)
-	{
-		case ARM_ATTAQ:
+			SDL_Delay(500);
+			SetImage(images[I_Down]);
 		case ARM_MOVE:
 			SetAnim(false);
 			break;

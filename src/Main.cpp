@@ -184,6 +184,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 		{
 			MainForm->Actions();
 			MainForm->Update();
+			SDL_Delay(20);
 		} while(!want_quit);
 
 		quit_app(1);

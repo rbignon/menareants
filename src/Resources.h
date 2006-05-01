@@ -148,8 +148,8 @@ public:
 	R_RESOURCE(ECSpriteBase, Char_Left,        "units/char/left");
 	R_RESOURCE(ECSpriteBase, Char_Right,       "units/char/right");
 	R_RESOURCE(ECSpriteBase, Char_Dos,         "units/char/dos");
-	R_RESOURCE(ECImage,      CharFact_Icon,     PKGDATADIR_PICS "units/charfact_icon.png");
-	R_RESOURCE(ECSpriteBase, CharFact_Face,     "units/charfact");
+	R_RESOURCE(ECImage,      CharFact_Icon,    PKGDATADIR_PICS "units/charfact_icon.png");
+	R_RESOURCE(ECSpriteBase, CharFact_Face,    "units/charfact");
 };
 
 #undef R_RESOURCE
