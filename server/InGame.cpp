@@ -95,14 +95,26 @@ void EChannel::NextAnim()
 					}
 					else if(state == S_WINERS || (*it)->Tag == T_STOP)
 					{
-						if(event->Case()->Entities()->Fixed() && (*it)->Last() &&
-						   (*it)->Last()->Case() != event->Case())
-						{
-							/// \todo Gérer le déplacement quand il y a plusieurs entitées sur la case
-						}
-						SendArm(NULL, *it, ARM_NUMBER, (*it)->Case()->X(), (*it)->Case()->Y(), (*it)->Nb());
+						std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
+						std::vector<ECBEntity*>::iterator fix = fixed.end();
+						if(!fixed.empty() && !(*it)->Locked())
+							for(fix = fixed.begin(); fix != fixed.end() &&
+							    (*fix)->Type() != (*it)->Type() && (*fix)->Owner() != (*it)->Owner();
+							     ++fix);
 
-						(*it)->Case()->CheckChangingOwner(*it);
+						if(fix != fixed.end())
+						{
+							ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
+							gobeur->Union(*it);
+							SendArm(NULL, *it, ARM_NUMBER|ARM_REMOVE);
+							SendArm(NULL, gobeur, ARM_NUMBER, gobeur->Case()->X(), gobeur->Case()->Y(), gobeur->Nb());
+							map->RemoveAnEntity(*it, USE_DELETE);
+						}
+						else
+						{
+							SendArm(NULL, *it, ARM_NUMBER, (*it)->Case()->X(), (*it)->Case()->Y(), (*it)->Nb());
+							(*it)->Case()->CheckChangingOwner(*it);
+						}
 
 						it = entv.erase(it);
 					}
@@ -380,8 +392,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
 				 * on supprime mon entité
 				 */
-				if(entity->Last() && (*evti)->Case() == entity->Last()->Case() && (*evti)->Flags() == ARM_ATTAQ &&
-				   (*evti)->Entities()->Find(entity))
+				if((*evti)->Case() == last_case && (*evti)->Flags() == ARM_ATTAQ && (*evti)->Entities()->Find(entity))
 				{
 					/* On sous traite à la fonction dont le nom fait rêver */
 					delete_event = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
@@ -539,18 +550,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			else
 			  Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
 		}
-	}
-
-	BCaseVector casv = map->Cases();
-	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
-	{
-		if((*casi)->Entities()->empty() && (!(*casi)->Country()->Owner() || !((*casi)->Flags() & C_VILLE)))
-			continue;
-		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
-		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(),
-		                (*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
-		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
-			Debug(W_DEBUG, "    [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ', (*enti)->LongName().c_str(), (*enti)->Nb());
 	}
 	return 0;
 }
