@@ -257,7 +257,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 		 * cohabiter sur la meme case
 		 */
 		if((!(*enti)->IsBuilding() || this->IsBuilding()) && *enti != this && !(*enti)->Locked() &&
-		   ((*enti)->Owner() != entity->Owner() || (*enti)->Type() != entity->Type()))
+		   ((*enti)->Owner() != this->Owner() || (*enti)->Type() != this->Type()))
 			return false;
 	}
 
