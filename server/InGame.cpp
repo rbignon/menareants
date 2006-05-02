@@ -98,7 +98,7 @@ void EChannel::NextAnim()
 						std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
 						if(!fixed.empty() && !(*it)->Locked())
-							for(fix = fixed.begin(); fix != fixed.end() &&
+							for(fix = fixed.begin(); fix != fixed.end() && *fix != *it &&
 							    (*fix)->Type() != (*it)->Type() && (*fix)->Owner() != (*it)->Owner();
 							     ++fix);
 
@@ -537,6 +537,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		chan->SendArm(recvers, entity, flags, x, y, nb, type, events_sended);
 
 	}
+#ifdef DEBUG
 	EventVector evts = map->Events();
 
 	for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
@@ -551,5 +552,20 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			  Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
 		}
 	}
+#endif
+
+#if 0
+	BCaseVector casv = map->Cases();
+	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
+	{
+		if((*casi)->Entities()->empty() && (!(*casi)->Country()->Owner() || !((*casi)->Flags() & C_VILLE)))
+			continue;
+		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
+		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(),
+						(*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
+		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+			Debug(W_DEBUG, "    [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ', (*enti)->LongName().c_str(), (*enti)->Nb());
+	}
+#endif
 	return 0;
 }
