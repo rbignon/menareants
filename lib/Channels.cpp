@@ -31,14 +31,14 @@
 
 const struct nations_str_t nations_str[] = {
 	/* N_NONE     */   { "Aléatoire",  "Votre nation sera choisie aléatoirement." },
-	/* N_NOISY    */   { "Noisy",      "La contrée de noisy" },
-	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis" },
-	/* N_FRANCE   */   { "France",     "La france nia" },
-	/* N_URSS     */   { "URSS",       "La Russie Communiste" },
-	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda" },
-	/* N_ESPAGNE  */   { "Espagne",    "Española sienta la chiassa" },
-	/* N_JAPON    */   { "Japon",      "El Japon" },
-	/* N_COLOMBIE */   { "Colombie",   "Miss Goetz sienta la mierda" },
+	/* N_NOISY    */   { "Noisy",      "La contrée de Noisy et ses cavernes." },
+	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis investissent le monde avec des McDonalds." },
+	/* N_FRANCE   */   { "France",     "La france de Dominique de Villepin." },
+	/* N_URSS     */   { "URSS",       "L'URSS et ses goulags..." },
+	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda et ses boïngs détournés." },
+	/* N_ESPAGNE  */   { "Espagne",    "La prof d'espagnol qui impose des règles débiles et nous emmerde." },
+	/* N_JAPON    */   { "Japon",      "Les touristes japonais et l'avantage de la photographie." },
+	/* N_COLOMBIE */   { "Colombie",   "La Colombie productrive de cocaïne." },
 	/* N_MAX      */   { "",           "" }
 };
 

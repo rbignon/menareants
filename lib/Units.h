@@ -29,7 +29,7 @@
  ********************************************************************************************/
 #define CHAR_STEP                  3
 #define CHAR_NB                    1000
-#define CHAR_COST                  10000
+#define CHAR_COST                  20000
 #define CHAR_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHAR, CHAR_COST)
 #define CHAR_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHAR_NB) \
                                      :  ECBEntity(_name, _owner, _case, E_CHAR, CHAR_STEP, CHAR_COST, _nb)

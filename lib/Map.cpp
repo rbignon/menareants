@@ -256,8 +256,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 		 * on ne peut pas construire, car deux unités du meme "type" ne peuvent pas
 		 * cohabiter sur la meme case
 		 */
-		if((!(*enti)->IsBuilding() || this->IsBuilding()) && *enti != this && !(*enti)->Locked() &&
-		   ((*enti)->Owner() != this->Owner() || (*enti)->Type() != this->Type()))
+		if((*enti)->IsBuilding() && this->IsBuilding() && *enti != this)
 			return false;
 	}
 

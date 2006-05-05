@@ -34,10 +34,6 @@ class ECBEntity;
 
 typedef std::vector<ECBEntity*> BEntityVector;
 
-#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_"
-#define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 '`-_@-()[]{}~"
-#define IA_CHAR '~'
-
 struct nations_str_t {
   const char* name;
   const char* infos;

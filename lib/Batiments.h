@@ -29,8 +29,8 @@
  ********************************************************************************************/
 /** This is a caserne */
 #define CHARFACT_STEP                  0
-#define CHARFACT_NB                    2000
-#define CHARFACT_COST                  10000
+#define CHARFACT_NB                    1000
+#define CHARFACT_COST                  20000
 #define CHARFACT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHARFACT, CHARFACT_COST)
 #define CHARFACT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHARFACT_NB) \
                                        :  ECBEntity(_name, _owner, _case, E_CHARFACT, CHARFACT_COST, CHARFACT_COST, _nb)
@@ -92,8 +92,8 @@ protected:
  ********************************************************************************************/
 /** This is a caserne */
 #define CASERNE_STEP                  0
-#define CASERNE_NB                    1000
-#define CASERNE_COST                  2000
+#define CASERNE_NB                    500
+#define CASERNE_COST                  9000
 #define CASERNE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CASERNE, CASERNE_COST)
 #define CASERNE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CASERNE_NB) \
                                        :  ECBEntity(_name, _owner, _case, E_CASERNE, CASERNE_COST, CASERNE_COST, _nb)
