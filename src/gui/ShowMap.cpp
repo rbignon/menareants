@@ -82,6 +82,17 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 {
 	if(!Focused()) return 0;
 
+	ECase* c = TestCase(mouse_x, mouse_y);
+
+	if(c->Entities()->empty()) return 0;
+
+	ECBEntity* e = c->Entities()->First();
+
+	c->Entities()->Remove(e);
+	c->Entities()->Add(e);
+
+	return dynamic_cast<ECEntity*>(e);
+#if 0
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 
 	/* On porte la priorité sur la selection des entités plutot que des batiments */
@@ -94,6 +105,7 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 				return et;
 		}
 	return et;
+#endif
 }
 
 ECase* TMap::TestCase(int mouse_x, int mouse_y)
@@ -116,14 +128,14 @@ void TMap::Draw(int _x, int _y)
 		int xx = x, yy = y;
 
 		/* Changement de position automatique */
-		if(_x && _x < 15)
-			xx += 8;
-		if(_y && _y < 15)
-			yy += 8;
-		if(_x > int(SCREEN_WIDTH-15) && _x < int(SCREEN_WIDTH))
-			xx -= 8;
-		if(_y > int(SCREEN_HEIGHT-15) && _y < int(SCREEN_HEIGHT))
-			yy -= 8;
+		if(_x >=0 && _x < 15)
+			xx += 15;
+		if(_y >= 0 && _y < 15)
+			yy += 15;
+		if(_x > int(SCREEN_WIDTH-15) && _x <= int(SCREEN_WIDTH))
+			xx -= 15;
+		if(_y > int(SCREEN_HEIGHT-15) && _y <= int(SCREEN_HEIGHT))
+			yy -= 15;
 	
 		if(xx != x || yy != y)
 			SetXY(xx, yy);
@@ -134,11 +146,13 @@ void TMap::Draw(int _x, int _y)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
 		if(c)
+		{
 			c->Draw();
-		if(CreateEntity() && c->Test(_x, _y))
-				(CreateEntity()->CanBeCreated(c) ? Resources::GoodHashure()
-				                                 : Resources::BadHashure())
-				                     ->Draw(c->Image()->X(), c->Image()->Y());
+			if(CreateEntity() && c->Test(_x, _y))
+					(CreateEntity()->CanBeCreated(c) ? Resources::GoodHashure()
+					                                 : Resources::BadHashure())
+					                     ->Draw(c->Image()->X(), c->Image()->Y());
+		}
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
