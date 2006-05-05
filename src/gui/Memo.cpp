@@ -124,10 +124,12 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color)
 	/* On parse le message pour le découper en différentes lignes */
 	std::string s;
 
+	int marge = Width() < 200 ? Width()/4 : 100;
+
 	while(1)
 	{
 		uint size = font->GetWidth(s);
-		if(*_s == '\n' || ((size > Width()-Width()/3) && *_s == ' ') || ((size+20) > (Width())) || !(*_s))
+		if(*_s == '\n' || ((size > Width()-marge) && *_s == ' ') || ((size+20) > (Width())) || !(*_s))
 		{
 			/* Suppression du premier element */
 			if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
@@ -166,6 +168,9 @@ void TMemo::RemoveItem (uint index)
 	nb_visible_items = m_items.size();
 	if( nb_visible_items_max < nb_visible_items )
 		nb_visible_items = nb_visible_items_max;
+
+	visible_height = nb_visible_items*height_item;
+	if (h < visible_height)  visible_height = h;
 }
 
 void TMemo::ClearItems()
