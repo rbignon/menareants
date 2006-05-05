@@ -60,6 +60,8 @@ void TLabel::Reinit()
   }
 
   surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
+  SetHeight(font->GetHeight());
+  SetWidth(font->GetWidth(caption));
 }
 
 void TLabel::Draw(int m_x, int m_y)
