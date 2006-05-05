@@ -56,12 +56,13 @@ protected:
 	static void WantQuit(TObject*, void*);
 	static void WantPlay(TObject*, void*);
 	static void WantConfig(TObject*, void*);
+	static void WantCredits(TObject*, void*);
 
 	bool first_run;
 
 public:
 	int main(int argc, char** argv);
-	char *get_title() { return APP_NAME; }
+	char *get_title();
 #ifndef WIN32
 	void quit_app(int value) __attribute__ ((noreturn));
 #else
