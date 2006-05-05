@@ -51,6 +51,8 @@ private:
 
 	static void WantCancel(TObject*, void*);
 	static void WantOk(TObject*, void*);
+	static void WantAddServer(TObject*, void*);
+	static void WantDelServer(TObject*, void*);
 };
 
 #endif

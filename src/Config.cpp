@@ -49,13 +49,12 @@ bool Config::set_defaults(bool want_save)
 {
 	hostname = "game.coderz.info";
 	port = 5461;
-	nick = "anonyme";
+	nick = "";
 	color = 0;
 	nation = 0;
 	server_list.clear();
 	server_list.push_back("game.coderz.info:5461");
 	server_list.push_back("127.0.0.1:5461");
-	server_list.push_back("192.168.0.2:5461");
 	if(want_save)
 		save();
 	return true;
@@ -87,13 +86,15 @@ bool Config::load()
 		else if(key == "SERVERLIST") server_list.push_back(ligne);
 		else
 		{
-			std::cout << "Fichier incorrect" << std::endl;
+			std::cerr << "Fichier incorrect" << std::endl;
+			app.FirstRun();
 			return set_defaults();
 		}
 	}
-	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX || nation >= ECPlayer::N_MAX)
+	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX || nation >= ECPlayer::N_MAX || nick.empty())
 	{
-		std::cout << "Lecture de la configuration invalide." << std::endl;
+		std::cerr << "Lecture de la configuration invalide." << std::endl;
+		app.FirstRun();
 		return set_defaults();
 	}
 
@@ -146,11 +147,58 @@ public:
 	TLabel*         NickInfo;
 	TLabel*         NationInfo;
 	TMemo*          Hints;
+	TEdit*          NewServer;
+	TButtonText*    AddServerButton;
+	TButtonText*    DelServerButton;
 
 /* Evenements */
 public:
 
 };
+
+void Config::WantAddServer(TObject* OkButton, void* configinst)
+{
+	TConfigForm* form = static_cast<TConfigForm*>(OkButton->Parent());
+	Config* conf = static_cast<Config*>(configinst);
+
+	std::string port = form->NewServer->Text();
+	if(port.empty())
+	{
+		TMessageBox("Entrez un serveur ! (sous la forme \"host:port\").", BT_OK, form).Show();
+		return;
+	}
+	std::string host = stringtok(port, ":");
+	if(port.empty())
+		port = "5461";
+	else if(!is_num(port.c_str()))
+	{
+		TMessageBox("Le port doit être une valeur numerique.", BT_OK, form).Show();
+		return;
+	}
+	host = host + ":" + port;
+	conf->server_list.push_back(host);
+	form->ServerList->AddItem(true, host, host, black_color, true);
+	return;
+}
+
+void Config::WantDelServer(TObject* OkButton, void* configinst)
+{
+	TConfigForm* form = static_cast<TConfigForm*>(OkButton->Parent());
+	Config* conf = static_cast<Config*>(configinst);
+
+	if(form->ServerList->GetSelectedItem() < 0)
+		return;
+
+	std::string text = form->ServerList->ReadValue(form->ServerList->GetSelectedItem());
+	form->ServerList->RemoveItem(form->ServerList->GetSelectedItem());
+
+	for(std::vector<std::string>::iterator it = conf->server_list.begin(); it != conf->server_list.end(); ++it)
+		if((*it) == text)
+		{
+			conf->server_list.erase(it);
+			break;
+		}
+}
 
 void Config::WantOk(TObject* OkButton, void* configinst)
 {
@@ -164,6 +212,12 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 	}
 
 	conf->nick = form->Nick->GetString();
+
+	if(form->ServerList->GetSelectedItem() < 0)
+	{
+		TMessageBox("Veuillez sélectionner un serveur.", BT_OK, form).Show();
+		return;
+	}
 
 	std::string p = form->ServerList->ReadValue(form->ServerList->GetSelectedItem());
 	std::string h = stringtok(p, ":");
@@ -183,7 +237,7 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 
 void Config::WantCancel(TObject*, void* configinst)
 {
-	Config* conf = (Config*)configinst;
+	Config* conf = static_cast<Config*>(configinst);
 	conf->want_quit_config = true;
 }
 
@@ -193,6 +247,8 @@ void Config::Configuration(bool first)
 
 	ConfigForm->CancelButton->SetOnClick(Config::WantCancel, this);
 	ConfigForm->OkButton->SetOnClick(Config::WantOk, this);
+	ConfigForm->AddServerButton->SetOnClick(Config::WantAddServer, this);
+	ConfigForm->DelServerButton->SetOnClick(Config::WantDelServer, this);
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
 	ConfigForm->Nation->Select(nation);
@@ -220,6 +276,8 @@ void Config::Configuration(bool first)
 		ConfigForm->Actions();
 		ConfigForm->Update();
 	} while(!want_quit_config);
+
+	delete ConfigForm;
 }
 
 TConfigForm::TConfigForm(SDL_Surface *w)
@@ -235,6 +293,17 @@ TConfigForm::TConfigForm(SDL_Surface *w)
 	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", &app.Font()->normal));
 
 	ServerList = AddComponent(new TListBox(&app.Font()->sm, 50, 200, 220, 300));
+	ServerList->SetHint("Sélectionnez le serveur auquel vous souhaitez vous connecter.");
+
+	NewServer = AddComponent(new TEdit(&app.Font()->sm, 50,510,220));
+	NewServer->SetHint("Serveur à ajouter sous la forme \"host[:port]\"");
+
+	DelServerButton = AddComponent(new TButtonText(280,460,100,30, "Supprimer", &app.Font()->sm));
+	DelServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	DelServerButton->SetHint("Supprimer le serveur sélectionné dans la liste.");
+	AddServerButton = AddComponent(new TButtonText(280,500,100,30, "Ajouter", &app.Font()->sm));
+	AddServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	AddServerButton->SetHint("Ajouter un serveur à la liste.");
 
 	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, &app.Font()->normal));
 	Nick = AddComponent(new TEdit(&app.Font()->sm, 300,225,200, NICKLEN, NICK_CHARS));
@@ -250,7 +319,7 @@ TConfigForm::TConfigForm(SDL_Surface *w)
 		uint j = Nation->AddItem(false, std::string(nations_str[i].name), "");
 		Nation->SetItemHint(j, nations_str[i].infos);
 	}
-		
+
 	Hints = AddComponent(new TMemo(&app.Font()->sm, 550, 200, 200, 100));
 	SetHint(Hints);
 
@@ -265,6 +334,9 @@ TConfigForm::~TConfigForm()
 	delete Color;
 	delete Nick;
 	delete NickInfo;
+	delete AddServerButton;
+	delete DelServerButton;
+	delete NewServer;
 	delete ServerList;
 	delete CancelButton;
 	delete OkButton;
