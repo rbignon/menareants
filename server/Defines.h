@@ -21,20 +21,16 @@
 #ifndef ECD_Defines_h
 #define ECD_Defines_h
 
-#if !defined(WIN32) && defined(HAVE_CONFIG_H)
-	#include <config.h>
-#endif
+#include <config.h>
+
 typedef unsigned int   uint;
+
+#include "lib/Defines.h"
 
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants Daemon"
 #define APP_SMALLNAME "MenAreAntsD"
 #define CLIENT_SMALLNAME "MenAreAnts"
-
-/* Version protocolaire
- * À incrémenter en cas de modification du protocole
- */
-#define APP_PVERSION	"2"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"

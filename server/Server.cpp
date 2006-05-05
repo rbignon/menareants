@@ -323,7 +323,7 @@ int ECServer::init_socket(void)
 	sock = socket(AF_INET, SOCK_STREAM, 0); /* on demande un socket */
 	if(sock < 0)
 	{
-		std::cout << "Impossible de lancer le serveur. (socket non créé)" << std::endl;
+		std::cerr << "Impossible de lancer le serveur. (socket non créé)" << std::endl;
 		return 0;
 	}
 	fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -336,7 +336,7 @@ int ECServer::init_socket(void)
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		std::cout << "Impossible d'écouter au port " << conf->Port() << " pour le serveur." << std::endl;
+		std::cerr << "Impossible d'écouter au port " << conf->Port() << " pour le serveur." << std::endl;
 		close(sock);
 		return 0;
 	}

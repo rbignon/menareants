@@ -31,7 +31,8 @@ typedef struct fd_set {
 } fd_set;
 #endif
 
-#include "Defines.h"
+const int MAXBUFFER=1024;
+
 #include "Commands.h"
 
 class EC_ACommand;

@@ -372,18 +372,13 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						}
 
 						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
-						if(InGameForm)
+						if(InGameForm && !update)
 						{
-							if(!update)
-							{
-								if(add)
-									InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
-								                                players[0]->GetNick());
-								else
-									InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
-							}
-							if(InGameForm->BarreLat && players[0]->IsMe() || update)
-								InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(players[0]->TurnMoney()) + "$.t-1");
+							if(add)
+								InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
+							                                players[0]->GetNick());
+							else
+								InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
 						}
 						break;
 					}
@@ -437,7 +432,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(InGameForm && players[0]->IsMe())
 					{
 						if((money - players[0]->Money()) > 0)
+						{
+							InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(money - players[0]->Money()) + "$.t-1");
 							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
+						}
 						SDL_Delay(50);
 						InGameForm->BarreLat->Money->SetCaption(TypToStr(money) + " $");
 						InGameForm->BarreLat->Money->SetColor(red_color);

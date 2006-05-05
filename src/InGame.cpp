@@ -173,7 +173,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					ECMove::Vector moves;
 					uint x = StrToTyp<uint>(stringtok(s, ","));
 					uint y = StrToTyp<uint>(stringtok(s, ","));
+					ECBCase* last = (*map)(x,y);
 					if(!s.empty())
+					{
 						for(std::string::iterator c = s.begin(); c != s.end(); ++c)
 							switch(*c)
 							{
@@ -183,10 +185,10 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								case '^': moves.push_back(ECMove::Up); break;
 								default: Debug(W_DESYNCH|W_SEND, "ARM =: Reception d'un flag de mouvement inconnu: %c", *c);
 							}
-					ECBCase* last = (*map)(x,y);
-					entity->Move()->SetFirstCase(last);
+						entity->Move()->SetFirstCase(last);
+						entity->Move()->SetMoves(moves);
+					}
 					entity->ChangeCase(last);
-					entity->Move()->SetMoves(moves);
 				}
 			}
 		}

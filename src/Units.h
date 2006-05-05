@@ -71,15 +71,15 @@ private:
 /********************************************************************************************
  *                                EChar                                                     *
  ********************************************************************************************/
-
+#define CHAR_VISUAL_STEP  3
 class EChar : public ECUnit, public ECBChar
 {
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(3) {}
+	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP) {}
 
-	CHAR_CONSTRUCTOR(EChar), ECUnit(3)
+	CHAR_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Char_Dos());
 		PutImage(I_Down, Resources::Char_Face());
@@ -99,15 +99,15 @@ public:
 /********************************************************************************************
  *                                ECArmy                                                    *
  ********************************************************************************************/
-
+#define ARMY_VISUAL_STEP 2
 class ECArmy : public ECUnit, public ECBArmy
 {
 /* Constructeur/Destructeur */
 public:
 
-  ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(2) {}
+  ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP) {}
 
-	ARMY_CONSTRUCTOR(ECArmy), ECUnit(2)
+	ARMY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Army_Dos());
 		PutImage(I_Down, Resources::Army_Face());

@@ -23,19 +23,16 @@
 
 #include <config.h>
 
+#include "lib/Defines.h"
+
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants"
 #define APP_SMALLNAME "MenAreAnts"
 #define SERV_SMALLNAME "MenAreAntsD"
 
-/* Version protocolaire
- * À incrémenter en cas de modification du protocole
- */
-#define APP_PVERSION	"2"
-
 /* Version du jeu (forme alpha.beta[-patch]) */
-#define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"1"
+#define APP_VERSION_MAJOR	"0"
+#define APP_VERSION_MINOR	"10"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
@@ -45,11 +42,9 @@
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
 
-/* Tailles de buffers */
-const int MAXBUFFER=1024;
+/* Tailles de variables */
 const int NICKLEN=20;
 const int GAMELEN=15;
-const int COMLEN=10;
 
 /* Résolution de l'écran */
 const int SCREEN_HEIGHT = 600;
@@ -68,9 +63,9 @@ const int MBUTTON_RIGHT = 3;
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
 #ifdef APP_VERSION_PATCH
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
+#	define APP_VERSION APP_VERSION_MAJOR "." APP_VERSION_MINOR "-" APP_PVERSION "-" APP_VERSION_PATCH
 #else
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
+#	define APP_VERSION APP_VERSION_MAJOR "." APP_VERSION_MINOR "-" APP_PVERSION
 #endif
 
 #if defined(WIN32) || defined(__MINGW32__)

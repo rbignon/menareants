@@ -164,7 +164,7 @@ void MenAreAntsApp::request_game()
 		mutex = SDL_CreateMutex();
 		Thread = SDL_CreateThread(EC_Client::read_sock, mutex);
 
-		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 1);
+		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 5);
 
 		if(!client || !client->IsConnected())
 		{
