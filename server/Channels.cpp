@@ -693,8 +693,7 @@ void EChannel::CheckReadys()
 									(Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
 					}
 				for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
-					dynamic_cast<ECPlayer*>(*it)->SetMoney(Map()->BeginMoney()),
-					Debug(W_DEBUG, "%s a %d $ par tours", (*it)->GetNick(), dynamic_cast<ECPlayer*>(*it)->TurnMoney());
+					dynamic_cast<ECPlayer*>(*it)->SetMoney(Map()->BeginMoney());
 
 				NeedReady();
 
@@ -738,22 +737,8 @@ void EChannel::CheckReadys()
 						dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
 
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
-					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
-					{
-						Debug(W_DEBUG, "-   [%c] %s (%d)", (*enti)->Locked() ? '*' : ' ',
-									(*enti)->LongName().c_str(),
-									(*enti)->Nb());
+					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 						(*enti)->Played(); /* On marque bien qu'il a été joué */
-						if((*enti)->Locked())
-						{
-							ECList<ECBEntity*>::iterator it = enti;
-							++it;
-							Map()->RemoveAnEntity(*enti, USE_DELETE);
-							enti = it;
-						}
-						else
-							++enti;
-					}
 					Map()->NextDay();
 				}
 				else
@@ -830,7 +815,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		}
 		else
 			for(std::vector<ECEntity*>::const_iterator it = et.begin(); it != et.end(); ++it)
-				if(flag != ARM_CREATE && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
+				if(flag != ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
 					to_send += " =" + (*it)->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
 					                                      "," + TypToStr((*it)->Move()->FirstCase()->Y()) +
 					                                      "," + (*it)->Move()->MovesString(0);

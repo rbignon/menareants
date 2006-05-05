@@ -95,7 +95,7 @@ EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 ECEvent* ECMap::FindEvent(ECase* c, uint f, ECEntity* e)
 {
 	for(EventVector::iterator it = map_events.begin(); it != map_events.end(); ++it)
-		if((*it)->Case() == c && (*it)->Flags() == f && (!e || (*it)->Entities()->Find(e)))
+		if((!c || (*it)->Case() == c) && (*it)->Flags() == f && (!e || (*it)->Entities()->Find(e)))
 			return *it;
 	return 0;
 }
@@ -301,8 +301,11 @@ void ECEntity::RemoveLast()
 {
 	if(!last) return;
 
-	last->RemoveLast();
+	//last->RemoveLast();
 	last->Case()->Entities()->Remove(last);
+	last->Case()->Map()->Entities()->Remove(last);
+
+	// Le destructeur va appeler le RemoveLast() de l'entité last
 	MyFree(last);
 }
 
@@ -314,7 +317,12 @@ ECEntity* ECEntity::FindLast(ECBCase* c)
 	return 0;
 }
 
-
+ECEntity* ECEntity::FindNext()
+{
+	ECEntity* a_l = this;
+	for(; a_l->Next(); a_l = a_l->Next());
+	return a_l;
+}
 
 void ECEntity::Union(ECEntity* entity)
 {
@@ -327,28 +335,39 @@ void ECEntity::Union(ECEntity* entity)
 	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
 	SetNb(Nb() + entity->Nb());
 	/* Enfin on défini le nombre de pas restants */
-	SetRestStep(entity->RestStep());
+	SetRestStep(RestStep() > entity->RestStep() ? RestStep() - entity->RestStep() : 0);
 }
 
-bool ECEntity::Return()
+bool ECEntity::Return(ECBCase* c)
 {
 	/* Si il n'y a pas de last on a rien à faire */
 	if(!last) return false;
 
 	/* La récurence de Return() s'arrête jusqu'à un changement d'etat
-	 * autre que la position */
-	if(last->Case() == acase) return false;
+	 * autre que la position, ou si, dans le cas d'une case spécifiée,
+	 * on a atteint le last qui est sur cette case.
+	 */
+	if(!c && last->Case() == acase || c == acase) return false;
 
 	/* On appel le Return() du last */
-	last->Return();
-
-	/* On recule (forcément, car il y a un Last par pas) */
-	restStep++;
+	last->Return(c);
 
 	ECEntity* lastlast = last;
 
+	if(last)
+	{
+		move = *(last->Move());
+	}
+
 	/* On prend comme last le last de notre last */
 	last = lastlast->Last();
+
+	/* On récupère les pas */
+	if(!c || last->Case() == acase)
+		restStep = !last ? myStep : (last->RestStep()) ? last->RestStep() - 1 : 0;
+
+	if(last)
+		last->next = this;
 
 	/* On s'enlève de la case où on est actuellement et on se met sur l'ancienne case */
 	acase->Entities()->Remove(this);
@@ -368,14 +387,14 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 {
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-			if(this != *it && !(*it)->Locked() && (!(*it)->Like(this) || !Like(*it)) &&
+			if(this != *it && (!(*it)->Like(this) || !Like(*it)) &&
 			                                   ((*it)->CanAttaq(this) || CanAttaq(*it)))
 				enemies++;
 
 	if(!enemies) return true;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !(*it)->Locked() && !Like(*it) && CanAttaq(*it))
+		if(*it != this && !Like(*it) && CanAttaq(*it))
 		{
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
