@@ -73,6 +73,9 @@ void EChannel::NextAnim()
 			const char T_CONTINUE = 1;
 			const char T_STOP = 0;
 			char state = S_ATTAQ;
+			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
+			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+				(*it)->Lock();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END;)
 			{
 				if(state == S_ATTAQ)
@@ -90,30 +93,33 @@ void EChannel::NextAnim()
 					{
 						SendArm(NULL, *it, ARM_REMOVE);
 						event->Entities()->Remove(*it);
-						map->RemoveAnEntity(*it, USE_DELETE);
+						//map->RemoveAnEntity(*it, USE_DELETE);
 						it = entv.erase(it);
 					}
 					else if(state == S_WINERS || (*it)->Tag == T_STOP)
 					{
 						std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
-						if(!fixed.empty() && !(*it)->Locked())
-							for(fix = fixed.begin(); fix != fixed.end() && *fix != *it &&
-							    (*fix)->Type() != (*it)->Type() && (*fix)->Owner() != (*it)->Owner();
+						if(!fixed.empty())
+							for(fix = fixed.begin(); fix != fixed.end() && (*fix == *it ||
+							    (*fix)->Type() != (*it)->Type() && (*fix)->Owner() != (*it)->Owner());
 							     ++fix);
 
 						if(fix != fixed.end())
 						{
 							ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
 							gobeur->Union(*it);
-							SendArm(NULL, *it, ARM_NUMBER|ARM_REMOVE);
-							SendArm(NULL, gobeur, ARM_NUMBER, gobeur->Case()->X(), gobeur->Case()->Y(), gobeur->Nb());
-							map->RemoveAnEntity(*it, USE_DELETE);
+							SendArm(NULL, *it, ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+							SendArm(NULL, gobeur, ARM_NUMBER, 0, 0, gobeur->Nb());
+							/* Pas besoin de lock, il l'est déjà.
+							 * (*it)->SetLock();
+							 */
 						}
 						else
 						{
-							SendArm(NULL, *it, ARM_NUMBER, (*it)->Case()->X(), (*it)->Case()->Y(), (*it)->Nb());
+							SendArm(NULL, *it, ARM_NUMBER, 0, 0, (*it)->Nb());
 							(*it)->Case()->CheckChangingOwner(*it);
+							(*it)->Unlock();
 						}
 
 						it = entv.erase(it);
@@ -443,10 +449,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(!attaq_event && !union_event)
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 					{
-						if((*enti)->Locked() || *enti == entity) continue;
+						if(*enti == entity) continue;
 
-						if(entity->CanAttaq(*enti) && !entity->Like(*enti) ||
-						(*enti)->CanAttaq(entity) && !(*enti)->Like(entity))
+						if((entity->CanAttaq(*enti) && !entity->Like(*enti) ||
+						    (*enti)->CanAttaq(entity) && !(*enti)->Like(entity))
+						  &&
+						   (!(*enti)->Locked() ||
+						    (*enti)->MyStep() - (*enti)->RestStep() == entity->MyStep() - entity->RestStep()))
 						{
 							if(!attaq_event)
 							{
@@ -454,16 +463,21 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								attaq_event = new ECEvent(ARM_ATTAQ, entity->Case());
 								map->AddEvent(attaq_event);
 							}
+							ECEntity* enti2 = dynamic_cast<ECEntity*>(*enti)->FindNext();
 							attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
-							ECEvent* last_move_event = map->FindEvent(entity->Case(), ARM_MOVE,
-							                                          dynamic_cast<ECEntity*>(*enti));
+
+							ECEvent* last_move_event = map->FindEvent(enti2->Case(), ARM_MOVE,
+							                                          enti2);
 							if(last_move_event)
 							{
 								attaq_event->AddLinked(last_move_event);
 								map->RemoveEvent(last_move_event);
+								Debug(W_DEBUG, "Mouvement d'un MOVE dans l'ATTAQ");
 							}
+							if(enti2->Locked())
+								enti2->Return(entity->Case());
 						}
-						if(!union_event && (*enti)->Owner() == entity->Owner() &&
+						if(!union_event && !(*enti)->Locked() && (*enti)->Owner() == entity->Owner() &&
 						   (*enti)->Type() == entity->Type())
 						{
 							Debug(W_DEBUG, "On créé un evenement union");
@@ -517,7 +531,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				attaq_event->Entities()->Add(entity);
 				std::vector<ECBEntity*> entities = (*map)(x,y)->Entities()->List();
 				for(std::vector<ECBEntity*>::const_iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					if(*enti != entity && (entity->CanAttaq(*enti) && !entity->Like(*enti) ||
+					if(!(*enti)->Locked() && *enti != entity && (entity->CanAttaq(*enti) && !entity->Like(*enti) ||
 					   (*enti)->CanAttaq(entity) && !(*enti)->Like(entity)))
 					{
 						attaq_event->Entities()->Add(entity);
@@ -529,7 +543,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				std::vector<ECEntity*> entities = attaq_event->Entities()->List();
 				for(std::vector<ECEntity*>::const_iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					if((*enti)->Owner())
+					if((*enti)->Owner() && !(*enti)->Locked())
 						recvers.push_back(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client());
 			}
 		}
@@ -554,7 +568,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 #endif
 
-#if 0
+#if defined(DEBUG)
 	BCaseVector casv = map->Cases();
 	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
 	{

@@ -29,7 +29,9 @@
 
 void EChar::CreateLast()
 {
+	next = this;
 	ECEntity* e = new EChar(*this);
+	next = 0;
 	e->SetLock();
 	SetLast(e);
 	e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */
@@ -41,7 +43,9 @@ void EChar::CreateLast()
 
 void ECArmy::CreateLast()
 {
+	next = this;
 	ECEntity* e = new ECArmy(*this);
+	next = 0;
 	e->SetLock();
 	SetLast(e);
 	e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */
@@ -64,7 +68,7 @@ bool ECUnit::WantAttaq(uint mx, uint my)
 	std::vector<ECBEntity*> ents = Case()->Entities()->List();
 	std::vector<ECBEntity*>::iterator enti;
 	for(enti = ents.begin(); enti != ents.end() &&
-		(!CanAttaq(*enti) || Like(*enti));
+		((*enti)->Locked() || !CanAttaq(*enti) || Like(*enti));
 		++enti);
 
 	if(enti == ents.end())
@@ -95,15 +99,12 @@ bool ECUnit::WantMove(ECBMove::E_Move move)
 
 	/* Si sur la case actuelle il y a une attaque, on ne bouge pas meme si on dit
 	 * que si au client.
-	 * Note: Si je n'ai encore jamais bougé, je peux quand meme bougé si je suis attaqué (evite l'attaque)
 	 */
-	if(Last() && Last()->Case() != acase)
-	{
-		std::vector<ECBEntity*> ents = Case()->Entities()->List();
-		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-			if(ThereIsAttaq(*enti, this))
-				return true;
-	}
+	std::vector<ECBEntity*> ents = Case()->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		if((*enti)->MyStep() - (*enti)->RestStep() == this->MyStep() - this->RestStep() &&
+		   ThereIsAttaq(*enti, this))
+			return true;
 
 	CreateLast();
 	ChangeCase(c);
