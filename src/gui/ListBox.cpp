@@ -204,6 +204,23 @@ uint TListBox::AddItem (bool selected,
   return pos;
 }
 
+void TListBox::RemoveItem (uint index)
+{
+	assert (index < m_items.size());
+
+	if(m_selection == (int)index)
+		m_selection = -1;
+
+	m_items.erase( m_items.begin() + index );
+
+	nb_visible_items = m_items.size();
+	if( nb_visible_items_max < nb_visible_items )
+		nb_visible_items = nb_visible_items_max;
+
+	visible_height = nb_visible_items*height_item;
+	if (h < visible_height)  visible_height = h;
+}
+
 void TListBox::SetItemHint(uint index, const char* Hint)
 {
   assert(index < m_items.size());

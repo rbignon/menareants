@@ -65,7 +65,8 @@ public:
 	              const std::string &label,
 	              const std::string &value,
 	              SDL_Color _color, bool _enabled);
-  void SetItemHint(uint index, const char* Hint);
+	void RemoveItem (uint index);
+	void SetItemHint(uint index, const char* Hint);
 	void ClearItems();
 	int MouseIsOnWitchItem (int mouse_x, int mouse_y);
 	virtual void Select (uint index);
