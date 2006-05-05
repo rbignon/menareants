@@ -59,6 +59,8 @@ void TForm::Actions(uint a)
 
 void TForm::Actions(SDL_Event event, uint a)
 {
+	if(mutex)
+		SDL_LockMutex(mutex);
 	switch(event.type)
 	{
 		case SDL_KEYDOWN:
@@ -110,6 +112,8 @@ void TForm::Actions(SDL_Event event, uint a)
 		default:
 			break;
 	}
+	if(mutex)
+		SDL_UnlockMutex(mutex);
 }
 
 void TForm::Update(int _x, int _y, bool flip)
