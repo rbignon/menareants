@@ -156,12 +156,10 @@ public:
 
 	void Clear(bool use_delete = false)
 	{
-		for(iterator it = list.begin(); it != list.end();)
-		{
-			if(use_delete)
+		if(use_delete)
+			for(iterator it = list.begin(); it != list.end(); ++it)
 				delete (*it);
-			it = list.erase(it);
-		}
+		list.clear();
 	}
 
 	T Find(T e)
@@ -203,7 +201,7 @@ public:
 	{
 		std::vector<T> l;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Locked() && (!(*it)->Last() || (*it)->Last()->Case() == (*it)->Case()))
+			if(!(*it)->Locked())
 				l.push_back(*it);
 		return l;
 	}
