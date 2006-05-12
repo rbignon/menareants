@@ -67,6 +67,7 @@ public:
 		CREATE,      /**< JOI $ */
 		LEAVE,       /**< LEA */
 		MSG,         /**< MSG */
+		AMSG,        /**< AMSG */
 		SET,         /**< SET */
 		JIA,         /**< JIA */
 
