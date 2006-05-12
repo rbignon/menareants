@@ -194,8 +194,11 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return cl->sendrpl(app.rpl(ECServer::ERR));
 
 	for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
+	{
 		if(!strchr(NICK_CHARS, *c))
 			return cl->sendrpl(app.rpl(ECServer::ERR));
+		else if(*c == ' ') *c = '_';
+	}
 
 	if(app.FindClient((IA_CHAR + parv[1]).c_str()))
 		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
@@ -208,6 +211,6 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	IA->ia_send("JOI " + std::string(chan->GetName()));
 	if(chan->Map())
 	    IA->ia_send("SET +!");
-	    
+
 	return 0;
 }

@@ -50,9 +50,6 @@ typedef unsigned int   uint;
 /* Interval */
 const int PINGINTERVAL=30;
 
-/* Tailles */
-const int NICKLEN=20;
-
 const int MAXBUFFER=1024;
 const uint ECD_SENDSIZE=1024;
 const uint ECD_RECVSIZE=256;

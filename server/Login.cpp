@@ -54,7 +54,7 @@ static void send_motd(TClient *cl)
 static char *correct_nick(const char *nick)
 {
 	static char newnick[NICKLEN + 1];
-	int i = 0;
+	uint i = 0;
 
 	while(*nick && i < NICKLEN)
 	{
