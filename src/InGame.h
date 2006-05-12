@@ -85,7 +85,7 @@ public:
 	TLabel*         Nb;
 	TLabel*         OwnerLabel;
 	TLabel*         Owner;
-	TButtonText*    MoveButton;
+	TButtonText*    DeployButton;
 	TButtonText*    AttaqButton;
 	TButtonText*    UpButton;
 	TBarreActIcons* Icons;
@@ -147,6 +147,7 @@ public:
 	TButtonText*    PretButton;
 	TButtonText*    QuitButton;
 	TButtonText*    SchemaButton;
+	TButtonText*    OptionsButton;
 	TLabel*         Date;
 	TLabel*         Money;
 	TLabel*         TurnMoney;
@@ -212,6 +213,73 @@ public:
 private:
 	Timer timer;
 	ECPlayer* player;
+};
+
+/********************************************************************************************
+ *                               TOptionsForm                                               *
+ ********************************************************************************************/
+/** There is options. */
+class TOptionsForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TOptionsForm(SDL_Surface*, ECPlayer*, EChannel*);
+	~TOptionsForm();
+
+/* Composants */
+public:
+
+	TList*       Players;
+
+	TButtonText* OkButton;
+
+/* Evenements */
+public:
+
+};
+
+/********************************************************************************************
+ *                               TOptionsPlayerLine                                         *
+ ********************************************************************************************/
+/** This is a line to show a player in TOptionsForm form */
+class TOptionsPlayerLine : public TComponent
+{
+/* Constructeur/Destructeur */
+public:
+
+	TOptionsPlayerLine(ECPlayer* me, ECPlayer *pl);
+	virtual ~TOptionsPlayerLine();
+
+/* Methodes */
+public:
+
+	void Init();
+	void Draw(int souris_x, int souris_y);              /**< Draw */
+
+	bool AllieZone(int _x, int _y);
+
+/* Composants */
+public:
+
+	TLabel* label;
+	TLabel* allie;
+	TLabel* recipr;
+
+/* Attributs */
+public:
+	ECPlayer* Player() { return pl; }
+
+/* Variables privées */
+private:
+
+	/* Privatisation de constructeurs à rendre inaccessibles */
+	TOptionsPlayerLine();
+	TOptionsPlayerLine(int _x, int _y);
+	TOptionsPlayerLine(int _x, int _y, uint _w, uint _h);
+
+	ECPlayer *pl;
+	ECPlayer *me;
 };
 
 /********************************************************************************************
