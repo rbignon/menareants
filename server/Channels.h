@@ -210,6 +210,8 @@ public:
 
 	BPlayerVector::size_type NbHumains() const;
 
+	void operator<< (std::string os);
+
 /* Variables privées */
 protected:
 	ECPlayer* owner;

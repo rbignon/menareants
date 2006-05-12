@@ -37,6 +37,34 @@ ChannelVector ChanList;
  *                              Commandes                                                   *
  ********************************************************************************************/
 
+/** A player wants to send a message to his allies.
+ *
+ * Syntax: AMSG message
+ */
+int AMSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	if(!cl->Player())
+		return vDebug(W_DESYNCH, "AMSG en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
+
+	static char buf[MAXBUFFER + 1];
+	int len;
+
+	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), cl->GetNick(), FormatStr("[private] " + parv[1]).c_str());
+
+	if(len < 0) len = sizeof buf -2;
+
+	buf[len] = 0;
+
+	BPlayerVector pls = cl->Player()->Allies();
+	for(BPlayerVector::const_iterator it=pls.begin(); it != pls.end(); ++it)
+	{
+		if(!(dynamic_cast<ECPlayer*> (*it))->Client()) continue;
+
+		(dynamic_cast<ECPlayer*> (*it))->Client()->sendbuf(buf, len);
+	}
+	return 0;
+}
+
 /** A player wants to send a message to channel.
  *
  * Syntax: MSG message
@@ -175,6 +203,17 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				pl->SetOp(add);
 				changed = YES_WITHPARAM;
 				break;
+			}
+			case 'a':
+			{
+				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %ca: pas de nick", add ? '+' : '-'); break; }
+				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
+				if(!pl) { Debug(W_DESYNCH, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
+				if(add)
+					sender->AddAllie(pl);
+				else if(!sender->RemoveAllie(pl))
+					Debug(W_DESYNCH, "SET -a %s: il n'est pas allié avec lui", pl->GetNick());
+				changed = YES_WITHPARAM;
 			}
 			case 'n':
 				if(!sender->Channel()->Joinable())
@@ -365,6 +404,9 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	bool create = (parv.size() == 3 && parv[2] == "$");
 	EChannel* chan = NULL;
 	ECPlayer* pl;
+
+	if(parv[1].size() > GAMELEN)
+		parv[1] = parv[1].substr(0,GAMELEN);
 
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
 		if(!strcasecmp((*it)->GetName(), parv[1].c_str()))
@@ -737,8 +779,19 @@ void EChannel::CheckReadys()
 						dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
 
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
-					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
+					{
 						(*enti)->Played(); /* On marque bien qu'il a été joué */
+						if((*enti)->Locked())
+						{
+							ECList<ECBEntity*>::iterator it = enti;
+							++it;
+							Map()->RemoveAnEntity(*enti, USE_DELETE);
+							enti = it;
+						}
+						else
+							++enti;
+					}
 					Map()->NextDay();
 				}
 				else
@@ -788,7 +841,7 @@ void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uin
 void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type,
                        std::vector<ECEvent*> events)
 {
-	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE)))
+	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY)))
 		return;
 
 	std::string to_send;
@@ -841,6 +894,12 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		to_send += " .";
 	if(flag & ARM_REMOVE)
 		to_send += " -";
+	if(flag & ARM_DEPLOY)
+	{
+		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
+		else
+			to_send += (et.front()->Deployed()) ? " {" : " }";
+	}
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
 	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)
@@ -1119,6 +1178,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 					case ARM_MOVE:   // Forcément qu'une seule unité
 					case ARM_CREATE: // Forcément qu'une seule unité
 					case ARM_SPLIT:  // Concerne que des unités du même joueur
+					case ARM_DEPLOY: // Forcément qu'une seule unité
 						want_remove = true;
 						break;
 					case ARM_ATTAQ:
@@ -1178,4 +1238,9 @@ std::string EChannel::ModesStr() const
 	}
 	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
 	return (modes + params);
+}
+
+void EChannel::operator<< (std::string os)
+{
+	sendto_players(0, app.rpl(ECServer::INFO), FormatStr(os).c_str());
 }
