@@ -69,6 +69,8 @@ public:
 	const char* AvailChars() const { return avail_chars; }
 	void SetAvailChars(char* c) { avail_chars = c; }
 
+	void SetMaxLen(uint m) { maxlen = m; }
+
 	void SetFocus();
 	void DelFocus();
 

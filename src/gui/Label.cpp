@@ -23,27 +23,27 @@
 TLabel::TLabel(int x, int y, std::string new_txt, SDL_Color new_color, Font* new_font)
 	: TComponent(x, y)
 {
-  assert(new_font!=NULL);
-  color = new_color;
-  caption = "";
-  font = new_font;
-  surf = NULL;
-  SetCaption(new_txt);
+	assert(new_font!=NULL);
+	color = new_color;
+	caption = "";
+	surf = 0;
+	font = new_font;
+	SetCaption(new_txt);
 }
 
 TLabel::~TLabel()
 {
-  if(surf!=NULL)
-    SDL_FreeSurface(surf);
+	if(surf)
+		SDL_FreeSurface(surf);
 }
 
 void TLabel::SetCaption (std::string new_txt)
 {
-  if(caption == new_txt)
-    return;
-
-  caption = new_txt;
-  Reinit();
+	if(caption == new_txt)
+		return;
+	
+	caption = new_txt;
+	Reinit();
 }
 
 void TLabel::SetColor(SDL_Color new_color)
@@ -54,14 +54,14 @@ void TLabel::SetColor(SDL_Color new_color)
 
 void TLabel::Reinit()
 {
-  if (surf != NULL)
-  {
-    SDL_FreeSurface(surf);
-  }
+	if (surf != NULL)
+	{
+		SDL_FreeSurface(surf);
+	}
 
-  surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
-  SetHeight(font->GetHeight());
-  SetWidth(font->GetWidth(caption));
+	surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
+	SetHeight(font->GetHeight());
+	SetWidth(font->GetWidth(caption));
 }
 
 void TLabel::Draw(int m_x, int m_y)

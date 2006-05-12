@@ -111,6 +111,8 @@ void TEdit::Redraw()
 {
 	if(!focus && chaine.empty())
 	{
+		if(edit)
+			SDL_FreeSurface(edit);
 		edit = 0;
 		return;
 	}
@@ -156,7 +158,7 @@ void TEdit::PressKey(SDL_keysym key)
 			}
 			break;
 		case SDLK_DELETE:
-			if(chaine.size() > 0 && caret <= chaine.size())
+			if(chaine.size() > 0 && caret < chaine.size())
 			{
 				chaine.erase(chaine.begin() + caret);
 				have_redraw = true;
