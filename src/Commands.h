@@ -97,6 +97,8 @@ class LEACommand : public EC_ACommand { public: LEACommand(const std::string _Cm
 
 class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class INFOCommand : public EC_ACommand { public: INFOCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~INFOCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
 /* RECEPTION MAPS */

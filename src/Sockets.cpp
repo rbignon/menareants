@@ -48,6 +48,7 @@ const char* msgTab[] = {
 	"JOI %s $",                               /* JOI $ - Crée une partie */
 	"LEA",                                    /* LEA - Partir d'une partie */
 	"MSG %s",                                 /* MSG - Message dans une partie */
+	"AMSG %s",                                /* AMSG - Envoie un message à ses alliés */
 	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
 	"JIA %s",                                 /* JIA - Créer une IA dans le jeu */
 
@@ -252,6 +253,7 @@ void EC_Client::Init()
 	Commands.push_back(new PLSCommand("PLS",	0,	1));
 	Commands.push_back(new LEACommand("LEA",	0,	0));
 	Commands.push_back(new MSGCommand("MSG",	0,	1));
+	Commands.push_back(new INFOCommand("INFO",	0,	1));
 
 	Commands.push_back(new LSMCommand("LSM",	0,	3));
 	Commands.push_back(new EOMAPCommand("EOMAP",0,	0));
@@ -315,6 +317,9 @@ EC_Client::~EC_Client()
 #else
 		close(sock);
 #endif
+	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end(); ++it)
+		delete *it;
+
 	if(pl)
 		delete pl->Channel();
 }
