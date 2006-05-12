@@ -54,12 +54,14 @@ public:
 		switch(e->Type())
 		{
 			case E_ARMY:
+			case E_CHAR:
 				return true;
 			default:
 				return false;
 		}
 	}
 
+	virtual const char* Qual() const { return "l'usine de chars"; }
 	virtual uint InitNb() const { return CHARFACT_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
@@ -71,6 +73,7 @@ public:
 		switch(e->Type())
 		{
 			case ECBEntity::E_CHAR:
+			case ECBEntity::E_MISSILAUNCHER:
 				return true;
 			default:
 				return false;
@@ -117,12 +120,14 @@ public:
 		switch(e->Type())
 		{
 			case E_ARMY:
+			case E_CHAR:
 				return true;
 			default:
 				return false;
 		}
 	}
 
+	virtual const char* Qual() const { return "la caserne"; }
 	virtual uint InitNb() const { return CASERNE_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }

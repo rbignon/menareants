@@ -13,4 +13,5 @@ U_DECL(ECArmy)
 U_DECL(ECaserne)
 U_DECL(ECharFact)
 U_DECL(EChar)
+U_DECL(ECMissiLauncher)
 U_END

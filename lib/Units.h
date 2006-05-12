@@ -25,6 +25,63 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                               ECBMissiLauncher                                           *
+ ********************************************************************************************/
+#define MISSILAUNCHER_STEP                  1
+#define MISSILAUNCHER_NB                    100
+#define MISSILAUNCHER_COST                  6000
+#define MISSILAUNCHER_PORTY                 6
+#define MISSILAUNCHER_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_MISSILAUNCHER, MISSILAUNCHER_COST)
+#define MISSILAUNCHER_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, \
+                                                uint _nb = MISSILAUNCHER_NB) \
+                                            :  ECBEntity(_name, _owner, _case, E_MISSILAUNCHER, MISSILAUNCHER_STEP, \
+                                                       MISSILAUNCHER_COST, _nb)
+/** This is a simple army */
+class ECBMissiLauncher : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECBMissiLauncher) {}
+
+	MISSILAUNCHER_CONSTRUCTOR(ECBMissiLauncher) {}
+
+	virtual ~ECBMissiLauncher() {}
+
+/* Constantes */
+public:
+
+	bool CanAttaq(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_ARMY:
+			case E_CHAR:
+			case E_CASERNE:
+			case E_CHARFACT:
+			case E_MISSILAUNCHER:
+				return true;
+			default:
+				return false;
+		}
+	}
+	virtual const char* Qual() const { return "le lance-missiles"; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	uint InitNb() const { return MISSILAUNCHER_NB; }
+	virtual bool WantDeploy() { return true; } ///< Default = false
+	virtual bool WantAttaq(uint, uint) { return Deployed(); }
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
  *                               ECBChar                                                    *
  ********************************************************************************************/
 #define CHAR_STEP                  3
@@ -55,12 +112,14 @@ public:
 			case E_ARMY:
 			case E_CHAR:
 			case E_CASERNE:
+			case E_MISSILAUNCHER:
 			case E_CHARFACT:
 				return true;
 			default:
 				return false;
 		}
 	}
+	virtual const char* Qual() const { return "le char"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return CHAR_NB; }
 
@@ -106,11 +165,13 @@ public:
 			case E_CASERNE:
 			case E_CHARFACT:
 			case E_CHAR:
+			case E_MISSILAUNCHER:
 				return true;
 			default:
 				return false;
 		}
 	}
+	virtual const char* Qual() const { return "l'armée"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return ARMY_NB; }
 
