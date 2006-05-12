@@ -103,6 +103,8 @@ void MenAreAntsApp::quit_app(int value)
 		if(conf) delete conf;
 		if(fonts) delete fonts;
 		Resources::Unload();
+		TTF_Quit();
+		SDL_Quit();
         exit(value);
 }
 
@@ -118,7 +120,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 			std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
 			return 0;
 		}
-		atexit(SDL_Quit);
 		SDL_EnableUNICODE(1);
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
 		int sdlflags = SDL_SWSURFACE|SDL_HWPALETTE;
@@ -184,7 +185,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 		if(first_run)
 			MenAreAntsApp::WantConfig(0,(void*)true);
 
-		TMainForm*     MainForm = new TMainForm(sdlwindow);
+		TMainForm* MainForm = new TMainForm(sdlwindow);
 		MainForm->PlayButton->SetOnClick(MenAreAntsApp::WantPlay, this);
 		MainForm->QuitterButton->SetOnClick(MenAreAntsApp::WantQuit, this);
 		MainForm->CreditsButton->SetOnClick(MenAreAntsApp::WantCredits, this);
@@ -196,6 +197,8 @@ int MenAreAntsApp::main(int argc, char **argv)
 			MainForm->Update();
 			SDL_Delay(20);
 		} while(!want_quit);
+
+		delete MainForm;
 
 		quit_app(1);
 	}
@@ -323,7 +326,7 @@ TCredits::TCredits(SDL_Surface* w)
 	Label4 = AddComponent(new TLabel(50,235,"* Graphiste", blue_color, &app.Font()->big));
 
 	Label5 = AddComponent(new TLabel(500,205,"Mathieu Nicolas", fwhite_color, &app.Font()->big));
-	Label6 = AddComponent(new TLabel(500,235,"* Participation à l'idée", fwhite_color, &app.Font()->big));
+	Label6 = AddComponent(new TLabel(500,235,"* Idée originale", fwhite_color, &app.Font()->big));
 	Label7 = AddComponent(new TLabel(500,265,"* Musique", fwhite_color, &app.Font()->big));
 
 	Memo = AddComponent(new TMemo(&app.Font()->normal, 50, 350, SCREEN_WIDTH-50-50, 150, 0, false));
@@ -333,7 +336,8 @@ TCredits::TCredits(SDL_Surface* w)
 	              "cours d'histoire et d'espagnol. Je tiens d'ailleurs à remercier le manque "
 	              "d'autorité de Mme Gay (histoire) et Mme Goetz (espagnol).\n"
 	              "\n"
-                  "Merci également à Zic, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
+                  "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
+	Memo->ScrollUp();
 
 	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,530, 150,50, "Retour", &app.Font()->normal));
 
