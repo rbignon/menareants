@@ -1,3 +1,80 @@
+2005-05-12  Romain Bignon <progs@headfucking.net>
+
+	* server/Map.cpp (Return), server/InGame.cpp: Correction d'un bug qui, lors d'un combat en cours de chemin, faisait buguer.
+
+	* API, lib/Channels.h, server/Channels.cpp, src/InGame.cpp, src/JoinGame.cpp: Gestion des alliances. Menu "Options".
+
+	* lib/Map.h (ECBEntity): Fonction CanBeCreated(ECBPlayer*) pour vérifier si un player peu globalement créer l'unité (avec
+	les nations).
+
+	* src/InGame.cpp: On ne peut plus cliquer sur l'icone d'un batiment si on a pas assez d'argent.
+
+	* src/Map.h: Vérification si un batiment peut etre construit par le player.
+
+2005-05-09  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h, lib/Units.h, lib/Batiments.h: Utilisation d'une fonction Qual() qui retourne un qualificatif pour
+	une entité ("l'armée", "la caserne", etc) utilisé dans un message au joueur.
+
+	* server/Units.cpp (ECMissiLauncher): Le lance missile peut louper sa cible si la distance est trop élevée, et la distance
+	influe sur les degats.
+
+	* src/InGame.cpp: Modification des messages en réponse à ARM.
+
+2005-05-08  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.h: Opérateur << sur EChannel& qui envoie un message INFO à ses users.
+
+	* API, server/Server.h: Message INFO qui affiche une info sur l'écran du joueur.
+
+	* src/InGame.cpp: Réception des INFO et modification du TMemo des messages.
+
+	* API, server/Channels.cpp, src/InGame.cpp: Changement du protocole sur les déploiements, utilisation de '{' et '}'
+	pour que ça soit plus explicite niveau client.
+
+2005-05-07  Romain Bignon <progs@headfucking.net>
+
+	* lib/Units.h, server/Units.cpp, src/Units.cpp (EC[B]MissiLauncher): Support des attaques uniquement en déployé.
+
+	* API, server/InGame.cpp, server/Channels.cpp, src/InGame.cpp: Support du deploiement ('#').
+
+2005-05-06  Romain Bignon <progs@headfucking.net>
+
+	* data/case.png, src/gui/ShowMap.cpp: En mode "schema" affichage du quadrillage.
+
+	* src/gui/BouttonText.cpp, src/tools/Images.cpp, src/gui/MessageBox.cpp: Corrections.
+
+	* src/gui/Images.cpp: Correction d'un bug assez fondamental qui ne libérait pas les ressources.
+
+	* data/pics/units/missilauncher_pics.png, lib/Units.h, server/Units.h, src/Units.h: Création du lanceur de missiles.
+
+	* server/IA.cpp: Remplace les ' ' par des '_' dans le pseudo de l'IA.
+
+2005-05-03  Romain Bignon <progs@headfucking.net>
+
+	* src/Config.cpp: Possibilité d'ajouter ou de supprimer un serveur à la liste.
+
+	* src/gui/ListBox.cpp: Possibilité de retirer un item.
+
+	* src/Main.cpp: Affichage des Credits.
+
+	* src/gui/ShowMap.cpp: Possibilité de selectionner plusieurs entités qui sont sur la meme case
+	(répétition du clic sur la case).
+
+	* server/Units.cpp, server/InGame.cpp: Gestion des attaques en cours de chemin.
+
+	* server/Channels.cpp, server/Map.cpp: Correction de bugs.
+
+	* lib/Outils.h: Correction de ECList::Clear().
+
+2005-05-02  Romain Bignon <progs@headfucking.net>
+
+	* src/Main.cpp: Affichage du numero de version.
+
+	* lib/Map.cpp: Correction du bug de la création des entités.
+
+	* server/InGame.cpp: Correction du bug des attaques tuaient des entités qui devaient vivre.
+
 2005-05-01  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.h, server/Units.h: Création indépendament coté serveur et coté client de ECUnit qui réunit le code
