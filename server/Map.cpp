@@ -165,6 +165,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 	const char CREATE = 9;
 	const char MOVE   = 8;
 	const char UNION  = 7;
+	const char DEPLOY = 6;
 	const char ATTAQ  = 5;
 	char me = 0, him = 0;
 	switch(flags)
@@ -172,6 +173,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 		case ARM_NUMBER: me = NUMBER; break;
 		case ARM_CREATE: me = CREATE; break;
 		case ARM_UNION: me = UNION; break;
+		case ARM_DEPLOY: me = DEPLOY; break;
 		case ARM_ATTAQ: me = ATTAQ; break;
 		case ARM_MOVE: me = MOVE; break;
 		default: me = 0; break;
@@ -182,6 +184,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 		case ARM_CREATE: him = CREATE; break;
 		case ARM_UNION: him = UNION; break;
 		case ARM_ATTAQ: him = ATTAQ; break;
+		case ARM_DEPLOY: him = DEPLOY; break;
 		case ARM_MOVE: him = MOVE; break;
 		default: him = 0; break;
 	}
@@ -280,7 +283,7 @@ bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 {
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
 		for(std::vector<ECEntity*>::iterator ti = list.begin(); ti != list.end(); ++ti)
-			if(!(*ti)->Like(*it) || !(*it)->Like(*ti))
+			if(!(*ti)->Like(*it) && !(*it)->Like(*ti))
 				return false;
 	return true;
 }
@@ -295,6 +298,14 @@ void ECEntity::Played()
 ECEntity::~ECEntity()
 {
 	RemoveLast();
+}
+
+EChannel* ECEntity::Channel() const
+{
+	assert(Case());
+	assert(Case()->Map());
+	assert(Case()->Map()->Channel());
+	return dynamic_cast<EChannel*>(Case()->Map()->Channel());
 }
 
 void ECEntity::RemoveLast()
@@ -340,6 +351,8 @@ void ECEntity::Union(ECEntity* entity)
 
 bool ECEntity::Return(ECBCase* c)
 {
+	printf("engoument.... (%d,%d)\n", acase->X(), acase->Y());
+
 	/* Si il n'y a pas de last on a rien à faire */
 	if(!last) return false;
 
@@ -347,10 +360,11 @@ bool ECEntity::Return(ECBCase* c)
 	 * autre que la position, ou si, dans le cas d'une case spécifiée,
 	 * on a atteint le last qui est sur cette case.
 	 */
-	if(!c && last->Case() == acase || c == acase) return false;
+	if(!c && last->Case() == Case() || c == Case()) return false;
 
 	/* On appel le Return() du last */
 	last->Return(c);
+	printf("on sort d'un engouement (%d,%d)\n", last->Case()->X(), last->Case()->Y());
 
 	ECEntity* lastlast = last;
 
@@ -361,9 +375,12 @@ bool ECEntity::Return(ECBCase* c)
 
 	/* On prend comme last le last de notre last */
 	last = lastlast->Last();
+	lastlast->last = 0;
+
+	printf("last = (%d,%d)\n", last ? last->Case()->X() : 0, last ? last->Case()->Y():0);
 
 	/* On récupère les pas */
-	if(!c || last->Case() == acase)
+	if(last && last->Case() != acase)
 		restStep = !last ? myStep : (last->RestStep()) ? last->RestStep() - 1 : 0;
 
 	if(last)
@@ -371,11 +388,14 @@ bool ECEntity::Return(ECBCase* c)
 
 	/* On s'enlève de la case où on est actuellement et on se met sur l'ancienne case */
 	acase->Entities()->Remove(this);
+	printf("on se vire de (%d,%d)\n", acase->X(), acase->Y());
 	acase = lastlast->Case();
 	acase->Entities()->Add(this);
+	printf("on s'ajoute sur (%d,%d)\n", acase->X(), acase->Y());
 
 	/* On enlève le last de la case */
 	lastlast->Case()->Entities()->Remove(lastlast);
+	printf("on vire un last de (%d,%d)\n", lastlast->Case()->X(), lastlast->Case()->Y());
 
 	/* On supprime le last */
 	MyFree(lastlast);
@@ -387,14 +407,13 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 {
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-			if(this != *it && (!(*it)->Like(this) || !Like(*it)) &&
-			                                   ((*it)->CanAttaq(this) || CanAttaq(*it)))
-				enemies++;
+		if(this != *it && (*it)->Case() == Case() && !Like(*it) && CanAttaq(*it))
+			enemies++;
 
-	if(!enemies) return true;
+	if(!enemies) return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !Like(*it) && CanAttaq(*it))
+		if(*it != this && (*it)->Case() == Case() && !Like(*it) && CanAttaq(*it))
 		{
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);

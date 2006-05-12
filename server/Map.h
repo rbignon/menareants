@@ -38,10 +38,19 @@ typedef ECBPont        ECPont;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
+class EChannel;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
+#define ENTITY_CREATE_LAST(x) void CreateLast() { \
+                                   next = this; \
+                                   ECEntity* e = new (x) (*this); \
+                                   next = 0; \
+                                   e->SetLock(); \
+                                   SetLast(e); \
+                                   e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */ \
+                              }
 class ECEntity : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -88,6 +97,8 @@ public:
 	int Tag;
 
 	ECMove* Move() { return &move; }
+
+	EChannel* Channel() const;
 
 /* Variables privées */
 protected:
