@@ -31,7 +31,10 @@ Sommaire:
               SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
               JIA <nom>                         :Créé une IA (par l'owner)
               KIK <nick> [raison]               :l'owner peut kicker
+              LEA                               :partir
               GO!                               :l'owner lance le jeu
+              MSG <message>                     :envoie un message à tous les joueurs
+              AMSG <message>                    :envoie un message à ses alliés
          - En cours de jeu
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [>] [^] [v] [<] [*<pos>]
@@ -59,15 +62,14 @@ Sommaire:
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA                       :un user part (ou a été kické)
+              :<nick> MSG <message>             :message reçue
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
+              INFO <msg>                        :message envoyé par le serveur qui s'affiche à l'écran des joueurs
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
-              :<nick>!<arm>[,<nick>!<arm> ...]  :ARM1 a battu ARM2 (et il reste tant...)
-                      OWN <nick>!<arm> <f1>
-                      [<f2> ...]
 
 3) Particularités des commandes de positions
       Voici les arguments server -> client :
@@ -79,6 +81,8 @@ Sommaire:
          <           :retour
          -           :suppression de l'armée
          .           :lock
+         {           :deploiement
+         }           :reployé
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
@@ -88,6 +92,7 @@ Sommaire:
          +           :création d'une entité
          =<pos>      : |- position de départ
          %<type>     : `- définit le type
+         #           :deploiement.
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
@@ -107,6 +112,7 @@ Sommaire:
          +!                  :le joueur est READY
          +$                  :l'argent du joueur (serveur -> user uniquement)
          +@ <country>        :l'user possède maintenant la terre <country>
+         +a <nick>           :définie un user comme allié de lui
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible
