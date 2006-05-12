@@ -371,6 +371,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 						dst_rect.w = txtsurf->w;
 						
 						SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
+						SDL_FreeSurface(txtsurf);
 						found = true;
 					}
 				}

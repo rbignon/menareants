@@ -304,11 +304,11 @@ public:
 		return l;
 	}
 
-	std::vector<ECEntity*> Buildings() const
+	std::vector<ECEntity*> Buildings(ECBPlayer* pl = 0) const
 	{
 		std::vector<ECEntity*> l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if((*it)->IsBuilding())
+			if((*it)->IsBuilding() && !pl || (*it)->CanBeCreated(pl))
 				l.push_back(*it);
 		return l;
 	}
