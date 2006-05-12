@@ -186,6 +186,12 @@ void MenAreAntsApp::request_game()
 			}
 			delete ConnectedForm;
 			ConnectedForm = 0;
+			SDL_WaitThread(Thread, 0);
+			if(mutex)
+			{
+				SDL_DestroyMutex(mutex);
+				mutex = 0;
+			}
 			return;
 		}
 
@@ -309,6 +315,7 @@ TConnectedForm::~TConnectedForm()
 {
 	delete ChanStats;
 	delete UserStats;
+	delete Uptime;
 	delete DisconnectButton;
 	delete ListButton;
 	delete CreateButton;
