@@ -214,7 +214,7 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
  ********************************************************************************************/
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb)
-	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), shooted(0), cost(_c), event_type(0)
+	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), shooted(0), cost(_c), event_type(0)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -223,14 +223,28 @@ ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e
 	restStep = Step;
 }
 
+bool ECBEntity::Like(ECBEntity* e)
+{
+	return (owner == e->Owner() || owner && owner->IsAllie(e->Owner()));
+}
+
 void ECBEntity::Played()
 {
 	restStep = myStep;
+	event_type = 0;
 }
 
 bool ECBEntity::AddUnits(uint u)
 {
 	nb += u;
+	return true;
+}
+
+bool ECBEntity::CanBeCreated(ECBPlayer* pl) const
+{
+	/** \todo avec les nations, vérifier ici si ma nation peut créer cette unité, car si
+	 * ce n'est pas le cas autant se barrer de suite.
+	 */
 	return true;
 }
 
@@ -240,9 +254,8 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 		c = acase;
 	assert(c);
 
-	/** \todo avec les nations, vérifier ici si ma nation peut créer cette unité, car si
-	 * ce n'est pas le cas autant se barrer de suite.
-	 */
+	if(owner && !CanBeCreated(owner))
+		return false;
 
 	bool ret = false;
 	std::vector<ECBEntity*> entv = c->Entities()->List();

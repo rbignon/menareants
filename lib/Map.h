@@ -117,6 +117,7 @@ protected:
 #define ARM_TYPE        0x0020
 #define ARM_NUMBER      0x0040
 #define ARM_RETURN      0x0080
+#define ARM_DEPLOY      0x0800
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -135,11 +136,12 @@ public:
 		E_CASERNE,
 		E_CHARFACT,
 		E_CHAR,
+		E_MISSILAUNCHER,
 		E_END
 	};
 
 	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), shooted(0), cost(_cost), event_type(0)
+		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), shooted(0), cost(_cost), event_type(0)
 	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0);
@@ -157,6 +159,9 @@ public:
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
 
+	/** Qualitatif */
+	virtual const char* Qual() const = 0;
+
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(const ECBEntity* e) = 0;
 
@@ -166,11 +171,16 @@ public:
 	/** Use this function when this entity wants to move somewhere */
 	virtual bool WantMove(ECBMove::E_Move) { return true; }
 
+	/** Use this function to deploy your entity */
+	virtual bool WantDeploy() { return false; }
+
 /* Methodes */
 public:
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const;
 
 	/** Use this function to add some units in the entity */
 	virtual bool AddUnits(uint units);
@@ -184,7 +194,7 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
-	bool Like(ECBEntity* e) { return (owner == e->Owner()); }
+	bool Like(ECBEntity* e);
 
 /* Attributs */
 public:
@@ -221,6 +231,9 @@ public:
 	uint RestStep() const { return restStep; }
 	void SetRestStep(uint s) { restStep = s; }
 
+	void SetDeployed(bool d = true) { deployed = d; }
+	bool Deployed() const { return deployed; }
+
 	uint Cost() const { return cost; }
 
 	std::string LongName();
@@ -233,6 +246,7 @@ protected:
 	e_type type;
 	uint nb;
 	bool lock;
+	bool deployed;
 	uint myStep;
 	uint restStep;
 	uint shooted;
