@@ -29,6 +29,10 @@
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"2"
+#define APP_PVERSION	"3"
+
+/* Tailles de variables */
+const unsigned int NICKLEN=10;
+const unsigned int GAMELEN=20;
 
 #endif /* ECLIB_Defines_h */
