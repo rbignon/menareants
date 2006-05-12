@@ -51,6 +51,7 @@ protected:
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0);
 	void LoadGame(EChannel* ch);
+	void Options(EChannel* ch);
 	void InGame();
 
 	static void WantQuit(TObject*, void*);
