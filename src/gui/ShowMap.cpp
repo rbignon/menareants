@@ -152,6 +152,8 @@ void TMap::Draw(int _x, int _y)
 					(CreateEntity()->CanBeCreated(c) ? Resources::GoodHashure()
 					                                 : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
+			if(schema)
+				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
 		}
 	}
 
