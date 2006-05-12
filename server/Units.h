@@ -51,6 +51,30 @@ private:
 };
 
 /********************************************************************************************
+ *                               ECMissiLauncher                                            *
+ ********************************************************************************************/
+class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
+{
+/* Constructeur/Destructeur */
+public:
+
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_VILLE|C_PONT|C_TERRE) {}
+
+	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_VILLE|C_PONT|C_TERRE) {}
+
+	ENTITY_CREATE_LAST(ECMissiLauncher);
+
+/* Methodes */
+public:
+
+	virtual bool Attaq(std::vector<ECEntity*> entities);
+
+	virtual bool WantAttaq(uint x, uint y);
+
+	virtual bool WantDeploy();
+};
+
+/********************************************************************************************
  *                               EChar                                                      *
  ********************************************************************************************/
 class EChar : public ECUnit, public ECBChar
@@ -62,10 +86,7 @@ public:
 
 	CHAR_CONSTRUCTOR(EChar), ECUnit(C_VILLE|C_TERRE) {}
 
-/* Methodes */
-public:
-
-	virtual void CreateLast();
+	ENTITY_CREATE_LAST(EChar);
 };
 
 /********************************************************************************************
@@ -80,10 +101,7 @@ public:
 
 	ARMY_CONSTRUCTOR(ECArmy), ECUnit(C_VILLE|C_TERRE|C_PONT) {}
 
-/* Methodes */
-public:
-
-	virtual void CreateLast();
+	ENTITY_CREATE_LAST(ECArmy);
 };
 
 #endif /* ECD_UNITS_H */
