@@ -60,6 +60,7 @@ const char* msgTab[] = {
      "LSP %s %c %d %d %s",                  /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
+     "INFO %s",                             /* INFO - Envoie des messages à afficher dans le jeu des joueurs */
 
      "LSM %s %d %d",                        /* LSM - Liste les maps disponibles (nom, min, max) */
      "EOMAP",                               /* EOMAP - Fin de la liste des maps */

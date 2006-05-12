@@ -66,6 +66,7 @@ public:
 		GLIST,        /**< LSP */
 		EOGLIST,      /**< EOL */
 		MSG,          /**< MSG */
+		INFO,         /**< INFO */
 
 
 		LISTMAP,      /**< LSM */

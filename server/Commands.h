@@ -77,6 +77,8 @@ class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _Cm
 
 class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
+class AMSGCommand : public EC_ACommand { public: AMSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~AMSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
 class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };

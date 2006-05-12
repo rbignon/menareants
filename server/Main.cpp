@@ -124,12 +124,13 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new POGCommand("POG",	0,			0));
 		Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
 		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
+		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
+		Commands.push_back(new AMSGCommand("AMSG",	ECD_AUTH,	1));
 		Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
 		Commands.push_back(new JIACommand("JIA",	ECD_AUTH,	1));
 		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
 		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
 		Commands.push_back(new BYECommand("BYE",	0,			0));
-		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
 		Commands.push_back(new ERRCommand("ERR",	0,			1));
 		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
 	
