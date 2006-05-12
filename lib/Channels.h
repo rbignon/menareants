@@ -40,6 +40,9 @@ struct nations_str_t {
 }; 
 extern const struct nations_str_t nations_str[];
 
+class ECBPlayer;
+typedef std::vector<ECBPlayer*> BPlayerVector;
+
 /********************************************************************************************
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
@@ -118,6 +121,12 @@ public:
 	uint TurnMoney() const { return turn_money; }
 	void SetTurnMoney(uint u) { turn_money = u; }
 
+	BPlayerVector::size_type NbAllies() const { return allies.size(); }
+	void AddAllie(ECBPlayer*);
+	bool RemoveAllie(ECBPlayer*);
+	bool IsAllie(ECBPlayer*) const;
+	BPlayerVector Allies() const { return allies; }
+
 	virtual bool IsIA() const = 0;
 
 /* Variables privées */
@@ -133,8 +142,8 @@ protected:
 	ECList<ECBEntity*> entities;
 	uint turn_money;
 	unsigned int nation;
+	BPlayerVector allies;
 };
-typedef std::vector<ECBPlayer*> BPlayerVector;
 
 /********************************************************************************************
  *                               ECBChannel                                                 *

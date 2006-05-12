@@ -53,6 +53,35 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 	nation = N_NONE;
 }
 
+void ECBPlayer::AddAllie(ECBPlayer* pl)
+{
+	allies.push_back(pl);
+}
+
+bool ECBPlayer::RemoveAllie(ECBPlayer* pl)
+{
+	for (BPlayerVector::iterator it = allies.begin(); it != allies.end(); )
+	{
+		if (*it == pl)
+		{
+			it = allies.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
+}
+
+bool ECBPlayer::IsAllie(ECBPlayer* p) const
+{
+	for(BPlayerVector::const_iterator it = allies.begin(); it != allies.end(); ++it)
+		if(*it == p)
+			return true;
+
+	return false;
+}
+
 bool ECBPlayer::SetPosition(unsigned int p)
 {
 	if(p <= chan->GetLimite())
