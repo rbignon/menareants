@@ -55,7 +55,7 @@ public:
 
 	TMessageBox(const char* _s, uint _b, TForm* form = 0);
 
-	~TMessageBox() {}
+	~TMessageBox();
 
 /* Methodes */
 public:

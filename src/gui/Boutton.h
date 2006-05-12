@@ -31,24 +31,31 @@
  */
 class TButton : public TComponent
 {
-protected:
-  ECSprite *image;
-
+/* Constructeur/Destructeur */
 public:
-  TButton();
-  TButton (int x, int y, unsigned int w, unsigned int h);
-  ~TButton();
+	TButton();
+	TButton (int x, int y, unsigned int w, unsigned int h);
+	~TButton();
 
-  void Init();
+/* Methodes */
+public:
+	void Init();
 
-  void SetImage (ECSprite *image);
+	virtual void Draw (int souris_x, int souris_y);
 
-  virtual void Draw (int souris_x, int souris_y);
+/* Attributs */
+public:
 
-  unsigned int Tag;
+	unsigned int Tag;
 
+	void SetImage (ECSprite *image);
+
+/* Variables protégées */
 protected:
-  void DrawImage (int souris_x, int souris_y);
+
+	ECSprite *image;
+
+	void DrawImage (int souris_x, int souris_y);
 };
 
 

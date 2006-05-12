@@ -241,6 +241,8 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
 
 ECSprite::~ECSprite()
 {
+	if(mBackreplacement)
+		SDL_FreeSurface(mBackreplacement);
 /*	if(mSpriteBase)
 		delete mSpriteBase;*/
 }
@@ -326,6 +328,12 @@ ECSpriteBase::ECSpriteBase(const char *dir)
 	animation = false;
 
 	init(dir);
+}
+
+ECSpriteBase::~ECSpriteBase()
+{
+	if(mAnim)
+		delete [] mAnim;
 }
 
 int ECSpriteBase::init(const char *dir)
@@ -415,12 +423,12 @@ ECImage &ECImage::operator=(const ECImage & src){
 
 void ECImage::Load(char *fichier)
 {
-	//SDL_Surface *tmp;
-	if(!(Img = IMG_Load(fichier)))
+	SDL_Surface *tmp = 0;
+	if(!(tmp = IMG_Load(fichier)))
 		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
+	Img = SDL_DisplayFormat(tmp);
+	SDL_FreeSurface(tmp);
 	SetColorKey(255,0,255);
-	//Img = SDL_DisplayFormat(tmp);
-	//SDL_FreeSurface(Img);
 }
 
 void ECImage::Draw(int x, int y)

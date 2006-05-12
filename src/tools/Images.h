@@ -136,7 +136,7 @@ public:
 	void ChangeColor(SDL_Color from, SDL_Color to);
 
 	ECSpriteBase(const char *dir);
-	~ECSpriteBase() {}
+	~ECSpriteBase();
 
 /* Variables publiques */
 public:

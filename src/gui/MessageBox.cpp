@@ -58,6 +58,17 @@ TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form)
 	Init(_s);
 }
 
+TMessageBox::~TMessageBox()
+{
+	for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+		delete *it;
+
+	if ( background)
+		SDL_FreeSurface( background);
+
+	delete edit;
+}
+
 uint TMessageBox::Show()
 {
 	SDL_Event event;

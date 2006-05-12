@@ -31,10 +31,8 @@ TButton::TButton ()
 //-----------------------------------------------------------------------------
 
 TButton::TButton (int _x, int _y, unsigned int _w, unsigned int _h)
-  : TComponent(_x, _y, _w, _h)
+  : TComponent(_x, _y, _w, _h), image(0)
 {
-	image = NULL;
-	enabled = true;
 }
 
 void TButton::Init()
@@ -73,7 +71,9 @@ void TButton::DrawImage (int souris_x, int souris_y)
 
 void TButton::SetImage (ECSprite *_image)
 {
-	if(image) delete image;
+	if(image)
+		delete image;
+
 	image = _image;
  
 	if(!_image) return;

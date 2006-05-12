@@ -21,7 +21,7 @@
 
 #include "BouttonText.h"
 
-TButtonText::TButtonText() : TButton(), font(0)
+TButtonText::TButtonText() : TButton(), surf(0), font(0)
 {
 }
 
@@ -32,6 +32,12 @@ TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, cons
 {
   font = f;
   SetText(text);
+}
+
+TButtonText::~TButtonText()
+{
+	if (surf)
+		SDL_FreeSurface(surf);
 }
 
 //-----------------------------------------------------------------------------

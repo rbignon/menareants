@@ -38,7 +38,7 @@ private:
 public:
   TButtonText();
   TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text, Font* font);
-  ~TButtonText() {}
+  ~TButtonText();
 
   virtual void Draw (int souris_x, int souris_y);
   void SetText (const std::string &text);
