@@ -37,6 +37,7 @@
 
 extern TLoadingForm   *LoadingForm;
 extern TInGameForm    *InGameForm;
+extern TOptionsForm   *OptionsForm;
 void LoadingGame(EC_Client* cl);
 
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
@@ -150,6 +151,22 @@ int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	JOINED = false;
+	return 0;
+}
+
+/** We received an information showed in the player's screen.
+ *
+ * Syntax: INFO message
+ */
+int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(InGameForm)
+	{
+		me->LockScreen();
+		InGameForm->AddInfo(I_INFO, parv[1], 0);
+		me->UnlockScreen();
+	}
+
 	return 0;
 }
 
@@ -459,6 +476,90 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				{
 					GameInfosForm->MapList->SetVisible(add);
 					GameInfosForm->CreateIAButton->SetVisible(add);
+				}
+				break;
+			}
+			case 'a':
+			{
+				if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET %ca: sans nick", add ? '+' : '-'); break; }
+				ECPlayer *pl = chan->GetPlayer(parv[j++].c_str());
+				if(!pl)
+				{
+					Debug(W_DESYNCH|W_SEND, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str());
+					break;
+				}
+				if(add)
+				{
+					sender->AddAllie(pl);
+					if(InGameForm)
+					{
+						if(sender->IsMe())
+							InGameForm->AddInfo(I_INFO, "*** Vous vous alliez avec " + std::string(pl->GetNick()));
+						else if(pl->IsMe())
+						{
+							if(pl->IsAllie(sender))
+								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
+								                            " a accepté votre alliance");
+							else
+								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
+								                            " s'est allié avec vous et vous propose de faire de même");
+						}
+						else
+							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " s'est allié avec " +
+							                            pl->GetNick());
+					}
+					if(OptionsForm)
+					{
+						std::vector<TComponent*> list = OptionsForm->Players->GetList();
+						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+						{
+							TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
+							if(pll)
+							{
+								if(pll->Player() == pl && sender->IsMe())
+									pll->allie->SetCaption(">");
+								else if(pll->Player() == sender && pl->IsMe())
+									pll->recipr->SetCaption("<");
+							}
+						}
+					}
+				}
+				else
+				{
+					if(!sender->RemoveAllie(pl))
+						Debug(W_DESYNCH|W_SEND, "SET -a %s: Il se trouve qu'il n'était pas mon allié !!", pl->GetNick());
+					else if(InGameForm)
+					{
+						if(sender->IsMe())
+							InGameForm->AddInfo(I_INFO, "*** Vous n'êtes plus allié avec " + std::string(pl->GetNick()));
+						else if(pl->IsMe())
+						{
+							if(pl->IsAllie(sender))
+								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " vous a trahis et a "
+								                            "brisé votre alliance !");
+							else
+								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " n'est plus allié "
+								                            "avec vous");
+						}
+						else
+							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
+							                            " a rompu son alliance avec " + pl->GetNick());
+					}
+					if(OptionsForm)
+					{
+						std::vector<TComponent*> list = OptionsForm->Players->GetList();
+						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+						{
+							TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
+							if(pll)
+							{
+								if(pll->Player() == pl && sender->IsMe())
+									pll->allie->SetCaption(" ");
+								else if(pll->Player() == sender && pl->IsMe())
+									pll->recipr->SetCaption(" ");
+							}
+						}
+					}
 				}
 				break;
 			}
@@ -798,6 +899,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 		TMessageBox mb("Entrez le nom de la partie à créer",
 						HAVE_EDIT|BT_OK, form);
 		mb.Edit()->SetAvailChars(CHAN_CHARS);
+		mb.Edit()->SetMaxLen(GAMELEN);
 		if(mb.Show() == BT_OK)
 			name = mb.EditText();
 		if(name.empty()) return true;
@@ -859,6 +961,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			while( SDL_PollEvent( &event) )
 			{
 				GameInfosForm->Actions(event);
+				client->LockScreen();
 				switch(event.type)
 				{
 					case SDL_KEYUP:
@@ -937,17 +1040,19 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 						{
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
 							mb.Edit()->SetAvailChars(NICK_CHARS);
+							mb.Edit()->SetMaxLen(NICKLEN);
 							std::string nick;
 							if(mb.Show() == BT_OK)
 								name = mb.EditText();
 							if(!name.empty())
-								client->sendrpl(client->rpl(EC_Client::JIA), name.c_str());
+								client->sendrpl(client->rpl(EC_Client::JIA), FormatStr(name).c_str());
 						}
 						break;
 					}
 					default:
 						break;
 				}
+				client->UnlockScreen();
 			}
 			GameInfosForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
