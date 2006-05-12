@@ -32,6 +32,7 @@
 	R_RESOURCE(ECImage,      BarreLat);
 	R_RESOURCE(ECImage,      BarreAct);
 	R_RESOURCE(ECImage,      Cadre);
+	R_RESOURCE(ECImage,      Case);
 	R_RESOURCE(ECImage,      GoodHashure);
 	R_RESOURCE(ECImage,      BadHashure);
 	R_RESOURCE(ECImage,      FlecheVert);
@@ -86,6 +87,11 @@
 	R_RESOURCE(ECSpriteBase, Char_Dos);
 	R_RESOURCE(ECImage,      CharFact_Icon);
 	R_RESOURCE(ECSpriteBase, CharFact_Face);
+	R_RESOURCE(ECImage,      MissiLauncher_Icon);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Face);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Left);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Right);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

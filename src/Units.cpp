@@ -25,6 +25,28 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                                ECMissiLauncher                                           *
+ ********************************************************************************************/
+
+bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+		case ARM_MOVE:
+		case ARM_ATTAQ|ARM_MOVE:
+		case ARM_UNION:
+			return MoveEffect(entities);
+		case ARM_DEPLOY:
+			if(!Owner() || !dynamic_cast<ECPlayer*>(Owner())->IsMe())
+				SetDeployed(!Deployed());
+			break;
+		default: break;
+	}
+	return true;
+}
+
+/********************************************************************************************
  *                                ECUnit                                                     *
  ********************************************************************************************/
 
@@ -59,56 +81,58 @@ bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&)
 	return true;
 }
 
+bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
+{
+	ECMap* map = dynamic_cast<ECMap*>(Case()->Map());
+	if(move.Empty())
+	{
+		if(event_type & ARM_ATTAQ)
+			SetImage(images[I_Attaq]);
+		return true;
+	}
+
+	ECMove::E_Move m = move.First();
+	switch(m)
+	{
+		case ECMove::Right: image->set(image->X() + visual_step, image->Y()); break;
+		case ECMove::Left:  image->set(image->X() - visual_step, image->Y()); break;
+		case ECMove::Down:  image->set(image->X(), image->Y() + visual_step); break;
+		case ECMove::Up:    image->set(image->X(), image->Y() - visual_step); break;
+	}
+	SDL_Delay(20/entities.size());
+	switch(m)
+	{
+		case ECMove::Right:
+			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= image->X())
+				ChangeCase(acase->MoveRight()), move.RemoveFirst();
+			break;
+		case ECMove::Left:
+			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= image->X())
+				ChangeCase(acase->MoveLeft()), move.RemoveFirst();
+			break;
+		case ECMove::Down:
+			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= image->Y())
+				ChangeCase(acase->MoveDown()), move.RemoveFirst();
+			break;
+		case ECMove::Up:
+			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= image->Y())
+				ChangeCase(acase->MoveUp()), move.RemoveFirst();
+			break;
+	}
+	if(!move.Empty() && m != move.First())
+		SetImage(images[(imgs_t)move.First()]);
+	return false;
+}
+
 bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities)
 {
-	ECMap* map = dynamic_cast<ECMap*>(acase->Map());
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
 		case ARM_MOVE:
 		case ARM_ATTAQ|ARM_MOVE:
 		case ARM_UNION:
-		{
-			if(move.Empty())
-			{
-				if(event_type & ARM_ATTAQ)
-					SetImage(images[I_Attaq]);
-				return true;
-			}
-
-			ECMove::E_Move m = move.First();
-			switch(m)
-			{
-				case ECMove::Right: image->set(image->X() + visual_step, image->Y()); break;
-				case ECMove::Left:  image->set(image->X() - visual_step, image->Y()); break;
-				case ECMove::Down:  image->set(image->X(), image->Y() + visual_step); break;
-				case ECMove::Up:    image->set(image->X(), image->Y() - visual_step); break;
-			}
-			SDL_Delay(20/entities.size());
-			switch(m)
-			{
-				case ECMove::Right:
-					if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= image->X())
-						ChangeCase(acase->MoveRight()), move.RemoveFirst();
-					break;
-				case ECMove::Left:
-					if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= image->X())
-						ChangeCase(acase->MoveLeft()), move.RemoveFirst();
-					break;
-				case ECMove::Down:
-					if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= image->Y())
-						ChangeCase(acase->MoveDown()), move.RemoveFirst();
-					break;
-				case ECMove::Up:
-					if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= image->Y())
-						ChangeCase(acase->MoveUp()), move.RemoveFirst();
-					break;
-			}
-			if(!move.Empty() && m != move.First())
-				SetImage(images[(imgs_t)move.First()]);
-			return false;
-			break;
-		}
+			return MoveEffect(entities);
 		default: break;
 	}
 	return true;

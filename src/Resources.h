@@ -96,6 +96,7 @@ public:
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
+	R_RESOURCE(ECImage,      Case,             PKGDATADIR_PICS "case.png");
 	R_RESOURCE(ECImage,      GoodHashure,      PKGDATADIR_PICS "goodhashure.png");
 	R_RESOURCE(ECImage,      BadHashure,       PKGDATADIR_PICS "badhashure.png");
 	R_RESOURCE(ECImage,      FlecheVert,       PKGDATADIR_PICS "fleches/fleche_vert.png");
@@ -150,6 +151,11 @@ public:
 	R_RESOURCE(ECSpriteBase, Char_Dos,         "units/char/dos");
 	R_RESOURCE(ECImage,      CharFact_Icon,    PKGDATADIR_PICS "units/charfact_icon.png");
 	R_RESOURCE(ECSpriteBase, CharFact_Face,    "units/charfact");
+	R_RESOURCE(ECImage,      MissiLauncher_Icon, PKGDATADIR_PICS "units/missilauncher_icon.png");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Face, "units/char/face");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Left, "units/char/left");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Right,"units/char/right");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos,  "units/char/dos");
 };
 
 #undef R_RESOURCE

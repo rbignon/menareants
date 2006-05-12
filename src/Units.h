@@ -41,7 +41,8 @@ public:
 		I_Down=ECMove::Down,
 		I_Left=ECMove::Left,
 		I_Right=ECMove::Right,
-		I_Attaq
+		I_Attaq,
+		I_Deployed,
 	};
 	typedef std::map<imgs_t, ECSpriteBase*> ImgList;
 
@@ -62,10 +63,49 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&);
 
+/* Mathodes protégées */
+protected:
+	bool MoveEffect(const std::vector<ECEntity*>&);
+
 /* Variables protégées */
 private:
 	uint visual_step;
 	ImgList images;
+};
+
+/********************************************************************************************
+ *                                ECMissiLauncher                                           *
+ ********************************************************************************************/
+#define MISSILAUNCHER_VISUAL_STEP  1
+class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
+{
+/* Constructeur/Destructeur */
+public:
+
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP) {}
+
+	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::MissiLauncher_Dos());
+		PutImage(I_Down, Resources::MissiLauncher_Face());
+		PutImage(I_Right, Resources::MissiLauncher_Right());
+		PutImage(I_Left, Resources::MissiLauncher_Left());
+		PutImage(I_Attaq, Resources::MissiLauncher_Face());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Lance-missile"; }
+	virtual const char* Infos() const
+		{ return "Véhicule lanceur de missiles à portée de 6 cases une fois déployé."; }
+	virtual ECImage* Icon() const { return Resources::MissiLauncher_Icon(); }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+
+/* Methodes */
+public:
+	virtual bool MakeEvent(const std::vector<ECEntity*>&);
 };
 
 /********************************************************************************************
