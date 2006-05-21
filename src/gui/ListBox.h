@@ -81,6 +81,9 @@ public:
 	bool Empty() const { return m_items.empty(); }
 	void ScrollTo(uint id);
 
+	bool NoItemHint() const { return no_item_hint; }
+	void SetNoItemHint(bool b = true) { no_item_hint = b; }
+
 /* Variables protégées */
 protected:
 
@@ -93,6 +96,7 @@ protected:
 	std::vector<list_box_item_t> m_items;
 	int m_selection;
 	bool gray_disable;
+	bool no_item_hint;
 
 	// Buttons
 	TButton m_up, m_down;

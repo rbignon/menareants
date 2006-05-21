@@ -27,7 +27,7 @@
 #include <SDL.h>
 
 TListBox::TListBox (Font* f, int _x, int _y, uint _width, uint _height)
-  : TComponent(_x, _y, _width, _height), font(f)
+  : TComponent(_x, _y, _width, _height), no_item_hint(false), font(f)
 {
   assert(font);
   height_item = f->GetHeight();
@@ -100,13 +100,15 @@ int TListBox::MouseIsOnWitchItem (int mouse_x, int mouse_y)
 
 void TListBox::ScrollTo(uint id)
 {
-	if(( m_items.size() - id >= nb_visible_items_max ) ||
+	if(m_items.size() <= nb_visible_items_max) return;
+
+	if(( m_items.size() - id >= nb_visible_items_max ) &&
 	   (id >= 0))
 		first_visible_item = id;
 
 	else if(id < 0) first_visible_item = 0;
 	else if(m_items.size()-1 - id < nb_visible_items_max)
-		first_visible_item = m_items.size()-1 - nb_visible_items_max;
+		first_visible_item = m_items.size() - nb_visible_items_max;
 }
 
 bool TListBox::Clic (int mouse_x, int mouse_y)
@@ -148,8 +150,9 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 	// blit a surface as SDL_FillRect don't alpha blit a rectangle
 	SDL_Rect r_back = {x,y,w,h};
 	SDL_BlitSurface( background, NULL, Window(), &r_back);
-	
-	SetHint("");
+
+	if(!NoItemHint())
+		SetHint("");
 
 	for (uint i=0; i < nb_visible_items; i++)
 	{
@@ -161,7 +164,8 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 			{
 				SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
 				SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
-				SetHint(m_items[i+first_visible_item].hint.c_str());
+				if(!NoItemHint())
+					SetHint(m_items[i+first_visible_item].hint.c_str());
 			}
 			else if ( IsSelected(i+first_visible_item))
 			{
