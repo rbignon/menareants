@@ -82,7 +82,8 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 			case '+': add = true; break;
 			case '-': add = false; break;
 			case 'P':
-				me->FirstMovements();
+				if(add)
+					me->FirstMovements();
 				break;
 			case 'a':
 			{
