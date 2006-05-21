@@ -1,3 +1,48 @@
+2005-05-21  Romain Bignon <progs@headfucking.net>
+
+	* src/data/anims/cases/pont*, src/Resources.h, src/Map.cpp: Implémentation des ponts.
+
+	* server/maps: Utilisations des ponts.
+
+2005-05-20  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (SetMap): N'envoie plus les lignes UNIT qui sont inutiles au client.
+
+	* src/Map.cpp: Affichage sans l'aide des villes des numeros des joueurs à des positions satisfaisantes. Affichage de
+	couleurs dans la preview dans la pré-partie pour savoir quels territoires appartiennent à qui.
+
+	* server/IA.cpp: Accepte les alliances, corrige le bug des \r\n non supprimés et fait pour le moment des déplacements
+	bateaux.
+
+	* lib/Map.cpp: Lors de la vérification de si on change d'owner, on ne peut plus piquer les countries de ses alliés !
+
+	* src/MapEditor.cpp: L'éditeur de maps est fini.
+
+2005-05-18  Romain Bignon <progø@headfucking.net>
+
+	* server/IA.cpp (SETCommand): En PLAYING, ne se +! que quand tous les humains sont +!.
+
+2005-05-17  Romain Bignon <progs@headfucking.net>
+
+	* src/Map.h, src/Units.h, src/Batiments.h (RefreshColor): Permet de modifier la couleur attribuée à une unité.
+
+	* src/Map.cpp: Correction pour l'affichage des unités sur la preview.
+
+2005-05-14  Romain Bignon <progs@headfucking.net>
+
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h: Passage des villes en unités à part entières.
+
+	* lib/Map.h, server/Map.h, server/InGame.cpp, src/InGame.cpp, src/Map.h: Suppression des cases ville et capitale.
+
+2005-05-13  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp, server/Channels.cpp: Programmation du support d'UNIT dans les fichiers maps pour décider à l'avance
+	des unités présentent sur la carte au lancement. Suppression de SOLDATS.
+
+	* src/Main.cpp, src/MapEditor.cpp, src/ShowMap.cpp: Création d'un éditeur de maps.
+
+	* server/InGame.cpp: Correction d'un bug lors des animations des unions.
+
 2005-05-12  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp (Return), server/InGame.cpp: Correction d'un bug qui, lors d'un combat en cours de chemin, faisait buguer.

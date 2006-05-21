@@ -4,15 +4,16 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 * En cours
 -client: gestion unité MissiLauncher (graphiquement notament, il faut les images !)
+-client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
--server: enrichissement de l'IA
 -server: si jamais il y a un attaqué qui bouge, voir si l'attaquant (explicite) est toujours à sa portée (donc ne
  concerne pas les combats corps à corps), et si oui créer un nouvel evenement sur la nouvelle case.
 -client: gestion des accents dans TEdit
 
 * Après
+-server: enrichissement de l'IA
 -introduction de la ressource petrolière pour les vehicules
 -gestion des fins de parties.
 -configuration des boutons de la souris
@@ -25,8 +26,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
 
 ** En parallèle (on s'en fou un peu de quand on les fait)
--faire un éditeur de map, intégré (malheureusement) dans le jeu car c'est plus simple pour utiliser
- les composants de gui/
+-mot de passe éventuel pour accéder à un serveur
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -enrichissement du jeu.
