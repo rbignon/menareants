@@ -28,6 +28,7 @@
 
 #include "Boutton.h"
 #include "Component.h"
+#include "tools/Font.h"
 
 struct SDL_Surface;
 struct SDL_Color;
@@ -64,7 +65,7 @@ public:
 	uint AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
-	              SDL_Color _color, bool _enabled);
+	              SDL_Color _color = black_color, bool _enabled = true);
 	void RemoveItem (uint index);
 	void SetItemHint(uint index, const char* Hint);
 	void ClearItems();
@@ -77,9 +78,8 @@ public:
 	const std::string& ReadValue (uint index) const;
 	bool EnabledItem(uint index);
 	void SetEnabledItem(uint index, bool e = true);
-
-/* Variables publiques */
-public:
+	bool Empty() const { return m_items.empty(); }
+	void ScrollTo(uint id);
 
 /* Variables protégées */
 protected:

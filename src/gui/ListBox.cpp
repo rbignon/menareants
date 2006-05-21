@@ -98,6 +98,17 @@ int TListBox::MouseIsOnWitchItem (int mouse_x, int mouse_y)
   return BorneLong(index+first_visible_item, 0, m_items.size()-1);
 }
 
+void TListBox::ScrollTo(uint id)
+{
+	if(( m_items.size() - id >= nb_visible_items_max ) ||
+	   (id >= 0))
+		first_visible_item = id;
+
+	else if(id < 0) first_visible_item = 0;
+	else if(m_items.size()-1 - id < nb_visible_items_max)
+		first_visible_item = m_items.size()-1 - nb_visible_items_max;
+}
+
 bool TListBox::Clic (int mouse_x, int mouse_y)
 {
   // buttons for listbox with more items than visible
@@ -106,7 +117,7 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
     if ( m_down.Test(mouse_x, mouse_y) )
     {
       // bottom button
-      if ( m_items.size()-1 - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
+      if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
       return true;
     }
 
@@ -132,55 +143,54 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
 
 void TListBox::Draw (int mouse_x, int mouse_y)
 {
-  int item = MouseIsOnWitchItem(mouse_x, mouse_y);
+	int item = MouseIsOnWitchItem(mouse_x, mouse_y);
+	
+	// blit a surface as SDL_FillRect don't alpha blit a rectangle
+	SDL_Rect r_back = {x,y,w,h};
+	SDL_BlitSurface( background, NULL, Window(), &r_back);
+	
+	SetHint("");
 
-  // blit a surface as SDL_FillRect don't alpha blit a rectangle
-  SDL_Rect r_back = {x,y,w,h};
-  SDL_BlitSurface( background, NULL, Window(), &r_back);
-  
-  SetHint("");
-
-  for (uint i=0; i < nb_visible_items; i++)
-  {
-	// blit surfaces as SDL_FillRect don't alpha blit a rectangle
-	if(enabled && m_items[i+first_visible_item].enabled)
+	for (uint i=0; i < nb_visible_items; i++)
 	{
-		if ( i+first_visible_item == uint(item))
+		// blit surfaces as SDL_FillRect don't alpha blit a rectangle
+		if(i+first_visible_item >= m_items.size()) continue;
+		if(enabled && m_items[i+first_visible_item].enabled)
 		{
-			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-			SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
-			SetHint(m_items[i+first_visible_item].hint.c_str());
+			if ( i+first_visible_item == uint(item))
+			{
+				SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
+				SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
+				SetHint(m_items[i+first_visible_item].hint.c_str());
+			}
+			else if ( IsSelected(i+first_visible_item))
+			{
+				SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
+				SDL_BlitSurface( selected_box, NULL, Window(), &r);
+			}
 		}
-		else if ( IsSelected(i+first_visible_item))
-		{
-			SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-			SDL_BlitSurface( selected_box, NULL, Window(), &r);
-		}
+		if(!m_items[i+first_visible_item].label.empty())
+			font->WriteLeft(x+5,
+				y+i*height_item,
+				m_items[i+first_visible_item].label,
+				(!enabled || !m_items[i+first_visible_item].enabled && gray_disable) ? gray_color :
+				IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
 	}
-	if(!m_items[i+first_visible_item].label.empty())
-		font->WriteLeft(x+5,
-			 y+i*height_item,
-			 m_items[i+first_visible_item].label,
-			 (!enabled || !m_items[i+first_visible_item].enabled && gray_disable) ? gray_color :
-			 IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
-  }
 
-  // buttons for listbox with more items than visible
-  if (m_items.size() > nb_visible_items_max)
-  {
-    m_up.SetXY(x+w-12, y+2);
-    m_down.SetXY(x+w-12, y+h-7);
-
-    m_up.Draw (mouse_x, mouse_y);
-    m_down.Draw (mouse_x, mouse_y);
-  }
-
-
+	// buttons for listbox with more items than visible
+	if (m_items.size() > nb_visible_items_max)
+	{
+		m_up.SetXY(x+w-12, y+2);
+		m_down.SetXY(x+w-12, y+h-7);
+	
+		m_up.Draw (mouse_x, mouse_y);
+		m_down.Draw (mouse_x, mouse_y);
+	}
 }
 
 uint TListBox::AddItem (bool selected,
 		       const std::string &label,
-		       const std::string &value, SDL_Color _color = black_color, bool enabled = true)
+		       const std::string &value, SDL_Color _color, bool enabled)
 {
   uint pos = m_items.size();
 
