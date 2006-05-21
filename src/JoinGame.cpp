@@ -98,6 +98,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				Debug(W_ERR, "Unable to load a map :");
 				vDebug(W_ERR|W_SEND, e.Message, e.Vars);
 				GameInfosForm->RecvMap.clear();
+				me->UnlockScreen();
 				return 0;
 			}
 			chan->SetMap(map);
@@ -448,7 +449,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					int money = StrToTyp<int>(parv[j++]);
 					if(InGameForm && players[0]->IsMe())
 					{
-						if((money - players[0]->Money()) > 0)
+						if(money > players[0]->Money())
 						{
 							InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(money - players[0]->Money()) + "$.t-1");
 							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
@@ -890,7 +891,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	if(!client)
 		throw ECExcept(VPName(client), "Non connecté");
 
-	std::string name;
+	std::string name; /* note: comme cpath va pointer sur la valeur de name tout au long du truc, il est préferable
+	                   *       de le laisser en global de la fonction et pas uniquement dans le bloc if(!cname)
+	                   */
 	bool create = false;
 
 	if(!cname)
@@ -1041,7 +1044,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
 							mb.Edit()->SetAvailChars(NICK_CHARS);
 							mb.Edit()->SetMaxLen(NICKLEN);
-							std::string nick;
+							std::string name;
 							if(mb.Show() == BT_OK)
 								name = mb.EditText();
 							if(!name.empty())
@@ -1134,6 +1137,14 @@ void MenAreAntsApp::ListGames()
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
+					if(ListGameForm->GList->Test(event.button.x, event.button.y))
+					{
+						if(ListGameForm->GList->GetSelectedItem() >= 0 &&
+						ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
+							ListGameForm->JoinButton->SetEnabled(true);
+						else
+							ListGameForm->JoinButton->SetEnabled(false);
+					}
 					if(ListGameForm->JoinButton->Enabled() &&
 					   ListGameForm->JoinButton->Test(event.button.x, event.button.y))
 					{
@@ -1170,11 +1181,6 @@ void MenAreAntsApp::ListGames()
 					break;
 			}
 		}
-		if(ListGameForm->GList->GetSelectedItem() >= 0 &&
-		   ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
-			ListGameForm->JoinButton->SetEnabled(true);
-		else
-			ListGameForm->JoinButton->SetEnabled(false);
 		ListGameForm->Update();
 
 		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
@@ -1201,6 +1207,8 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 
 	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
 	Preview = AddComponent(new TImage(390, 380));
+	Preview->SetHint("Note: les couleurs sont là uniquement pour distinguer les emplacements disponibles et ne seront "
+	                 "plus valables durant la partie.");
 
 	MapList = AddComponent(new TListBox(&app.Font()->sm, 625, 290, 150, 150));
 

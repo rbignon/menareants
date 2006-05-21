@@ -226,10 +226,12 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   mDrawn = 0;
   mSpeed = 1;
   mLastupdate = 0;
+  mBackreplacement = 0;
   mX = 0; mY = 0; mOldX = 0; mOldY = 0;
 
   //mSpriteBase = new ECSpriteBase(base->path.c_str());
   mSpriteBase = base;
+
   if(mSpriteBase->mBuilt)
   {
     if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=1;
@@ -273,7 +275,7 @@ void ECSprite::updateBG()
 
 ECImage* ECSprite::First() const
 {
-	if(mSpriteBase->mNumframes)
+	if(mSpriteBase && mSpriteBase->mNumframes)
 		return &mSpriteBase->mAnim[0];
 	return 0;
 }
@@ -386,6 +388,13 @@ void ECSpriteBase::ChangeColor(SDL_Color from, SDL_Color to)
 {
 	for(int i=0; i < mNumframes; ++i)
 		ChangePixelColor(&mAnim[i], from, to);
+}
+
+ECImage* ECSpriteBase::First() const
+{
+	if(mNumframes)
+		return &mAnim[0];
+	return 0;
 }
 
 /****************************************************************************************

@@ -38,23 +38,32 @@ void TChildForm::DelFocus()
 		(*it)->DelFocus();
 }
 
+void TChildForm::PressKey(SDL_keysym k)
+{
+	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		(*it)->PressKey(k);
+}
+
 bool TChildForm::Clic(int _x, int _y)
 {
 	if(!Test(_x,_y)) return false;
 
-	bool click = false;
+	TComponent* clicked = 0;
 	/* Va dans l'ordre inverse */
 	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-		if((*it)->Visible() && !click && (*it)->Clic(_x, _y))
+		if((*it)->Visible() && !clicked && (*it)->Clic(_x, _y))
 		{
 			(*it)->SetFocus();
 			if((*it)->OnClick())
 				(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
 			if((*it)->OnClickPos())
 				(*(*it)->OnClickPos()) (*it, _x, _y);
-			click = true;
+			clicked = *it;
+			break;
 		}
-		else if(!(*it)->ForceFocus())
+
+	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		if(!(*it)->ForceFocus() && *it != clicked)
 			(*it)->DelFocus();
 	return true;
 }

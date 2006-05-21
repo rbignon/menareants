@@ -23,7 +23,7 @@
 #include "Resources.h"
 
 SDL_Color *color_eq[] = {
-	/* {COLOR_NONE  */          NULL,
+	/* {COLOR_NONE  */          &white_color,
 	/* COLOR_GRAY   */          &gray_color,
 	/* COLOR_BLUE   */          &fblue_color,
 	/* COLOR_RED    */          &fred_color,

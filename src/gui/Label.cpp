@@ -59,6 +59,8 @@ void TLabel::Reinit()
 		SDL_FreeSurface(surf);
 	}
 
+	if(caption.empty()) return;
+
 	surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
 	SetHeight(font->GetHeight());
 	SetWidth(font->GetWidth(caption));

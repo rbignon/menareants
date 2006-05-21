@@ -65,6 +65,7 @@ public:
 	const std::string& GetString() const { return chaine; }
 	const std::string& Text() const { return chaine; }
 	void ClearString() { chaine = ""; caret = 0; first_char = 0; have_redraw = true; }
+	bool Empty() const { return chaine.empty(); }
 
 	const char* AvailChars() const { return avail_chars; }
 	void SetAvailChars(char* c) { avail_chars = c; }

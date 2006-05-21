@@ -138,6 +138,8 @@ public:
 	ECSpriteBase(const char *dir);
 	~ECSpriteBase();
 
+	ECImage* First() const;
+
 /* Variables publiques */
 public:
 	ECImage *mAnim;

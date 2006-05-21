@@ -27,6 +27,10 @@
 class TMemo;
 
 /** \warning When you use a TChildForm, you HAVE to use AddComponent() in Init() and not in the constructor !!! */
+/* note pour mémoire: c'est parce que lors de la construction la variable Windows() n'est pas encore affectée, alors
+ *                    que AddComponent() va la transmettre. Donc créer les composants dans Init() permet que nous meme
+ *                    nous soyons bien initialisés par notre Parent
+ */
 class TChildForm : public TComponent
 {
 /* Constructeur/Destructeur */
@@ -57,6 +61,8 @@ public:
 	virtual void SetXY(int x, int y);
 
 	virtual void DelFocus();
+
+	virtual void PressKey(SDL_keysym);
 
 /* Variables protégées */
 protected:

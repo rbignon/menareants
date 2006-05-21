@@ -147,4 +147,6 @@ void TForm::Update(int _x, int _y, bool flip)
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);
+
+	SDL_Delay(20);
 }

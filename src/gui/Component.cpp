@@ -161,8 +161,8 @@ void TComponent::DelFocus()
 
 bool TComponent::Test (int souris_x, int souris_y) const
 {
-  return (visible && ((x <= souris_x) && (souris_x <= int(x+w))
-	  && (y <= souris_y) && (souris_y <= int(y+h))) && enabled);
+  return (visible && ((x <= souris_x) && (souris_x < int(x+w))
+	  && (y <= souris_y) && (souris_y < int(y+h))) && enabled);
 }
 
 void TComponent::SetXY (int px, int py) { x = px; y = py; }
