@@ -118,9 +118,6 @@ public:
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
-	uint TurnMoney() const { return turn_money; }
-	void SetTurnMoney(uint u) { turn_money = u; }
-
 	BPlayerVector::size_type NbAllies() const { return allies.size(); }
 	void AddAllie(ECBPlayer*);
 	bool RemoveAllie(ECBPlayer*);
@@ -140,7 +137,6 @@ protected:
 	ECBMapPlayer* mp;
 	bool ready;
 	ECList<ECBEntity*> entities;
-	uint turn_money;
 	unsigned int nation;
 	BPlayerVector allies;
 };

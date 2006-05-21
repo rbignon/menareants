@@ -43,9 +43,10 @@ const struct nations_str_t nations_str[] = {
 };
 
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
-	: chan(_chan), owner(_owner), op(_op), turn_money(0)
+	: chan(_chan), owner(_owner), op(_op)
 {
-	chan->AddPlayer(this);
+	if(chan)
+		chan->AddPlayer(this);
 	ready = false;
 	money = 0;
 	position = 0;
