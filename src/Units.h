@@ -55,17 +55,19 @@ public:
 /* Methodes */
 public:
 
-	void PutImage(imgs_t, ECSpriteBase*);
-
 	virtual bool BeforeEvent(const std::vector<ECEntity*>&);
 
 	virtual bool MakeEvent(const std::vector<ECEntity*>&);
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&);
 
+	void RefreshColor(SDL_Color last);
+
 /* Mathodes protégées */
 protected:
 	bool MoveEffect(const std::vector<ECEntity*>&);
+
+	void PutImage(imgs_t, ECSpriteBase*);
 
 /* Variables protégées */
 private:

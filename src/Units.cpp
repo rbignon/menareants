@@ -54,10 +54,16 @@ void ECUnit::PutImage(imgs_t i, ECSpriteBase* b)
 {
 	images.insert(ImgList::value_type(i, new ECSpriteBase(b->path.c_str())));
 
-	if(Owner())
+	if(Owner() && Owner()->Color())
 		images[i]->ChangeColor(white_color, *color_eq[Owner()->Color()]);
 
 	if(i == I_Down) SetImage(images[i]);
+}
+
+void ECUnit::RefreshColor(SDL_Color last)
+{
+	for(ImgList::iterator it = images.begin(); it != images.end(); ++it)
+		it->second->ChangeColor(last, Owner() ? *color_eq[Owner()->Color()] : white_color);
 }
 
 ECUnit::~ECUnit()
@@ -94,28 +100,28 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	ECMove::E_Move m = move.First();
 	switch(m)
 	{
-		case ECMove::Right: image->set(image->X() + visual_step, image->Y()); break;
-		case ECMove::Left:  image->set(image->X() - visual_step, image->Y()); break;
-		case ECMove::Down:  image->set(image->X(), image->Y() + visual_step); break;
-		case ECMove::Up:    image->set(image->X(), image->Y() - visual_step); break;
+		case ECMove::Right: Image()->set(Image()->X() + visual_step, Image()->Y()); break;
+		case ECMove::Left:  Image()->set(Image()->X() - visual_step, Image()->Y()); break;
+		case ECMove::Down:  Image()->set(Image()->X(), Image()->Y() + visual_step); break;
+		case ECMove::Up:    Image()->set(Image()->X(), Image()->Y() - visual_step); break;
 	}
 	SDL_Delay(20/entities.size());
 	switch(m)
 	{
 		case ECMove::Right:
-			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= image->X())
+			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
 				ChangeCase(acase->MoveRight()), move.RemoveFirst();
 			break;
 		case ECMove::Left:
-			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= image->X())
+			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
 				ChangeCase(acase->MoveLeft()), move.RemoveFirst();
 			break;
 		case ECMove::Down:
-			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= image->Y())
+			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
 				ChangeCase(acase->MoveDown()), move.RemoveFirst();
 			break;
 		case ECMove::Up:
-			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= image->Y())
+			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
 				ChangeCase(acase->MoveUp()), move.RemoveFirst();
 			break;
 	}
