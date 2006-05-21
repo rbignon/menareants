@@ -25,16 +25,129 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                               ECBCapitale                                                *
+ ********************************************************************************************/
+#define CAPITALE_STEP                  0
+#define CAPITALE_NB                    2000
+#define CAPITALE_COST                  0
+#define CAPITALE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CAPITALE, CAPITALE_COST)
+#define CAPITALE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CAPITALE_NB) \
+                                       :  ECBEntity(_name, _owner, _case, E_CAPITALE, CAPITALE_COST, CAPITALE_COST, _nb)
+/** This is a city */
+class ECBCapitale : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	CAPITALE_EMPTY_CONSTRUCTOR(ECBCapitale) {}
+
+	CAPITALE_CONSTRUCTOR(ECBCapitale) {}
+
+	virtual ~ECBCapitale() {}
+
+/* Constantes */
+public:
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "la capitale"; }
+	virtual uint InitNb() const { return CAPITALE_NB; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool IsCountryMaker() { return true; }
+	virtual int TurnMoney() { return 2 * Case()->Map()->CityMoney(); }
+
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_ARMY:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
+ *                               ECBCity                                                    *
+ ********************************************************************************************/
+#define CITY_STEP                  0
+#define CITY_NB                    1000
+#define CITY_COST                  0
+#define CITY_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CITY, CITY_COST)
+#define CITY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CITY_NB) \
+                                       :  ECBEntity(_name, _owner, _case, E_CITY, CITY_COST, CITY_COST, _nb)
+/** This is a city */
+class ECBCity : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	CITY_EMPTY_CONSTRUCTOR(ECBCity) {}
+
+	CITY_CONSTRUCTOR(ECBCity) {}
+
+	virtual ~ECBCity() {}
+
+/* Constantes */
+public:
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "la ville"; }
+	virtual uint InitNb() const { return CITY_NB; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool IsCountryMaker() { return true; }
+	virtual int TurnMoney() { return Case()->Map()->CityMoney(); }
+
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_ARMY:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
  *                               ECBCharFact                                                *
  ********************************************************************************************/
-/** This is a caserne */
 #define CHARFACT_STEP                  0
 #define CHARFACT_NB                    1000
 #define CHARFACT_COST                  20000
 #define CHARFACT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHARFACT, CHARFACT_COST)
 #define CHARFACT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHARFACT_NB) \
                                        :  ECBEntity(_name, _owner, _case, E_CHARFACT, CHARFACT_COST, CHARFACT_COST, _nb)
-/** This is a simple army */
+/** This is a char factory */
 class ECBCharFact : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -93,14 +206,13 @@ protected:
 /********************************************************************************************
  *                               ECBCaserne                                                 *
  ********************************************************************************************/
-/** This is a caserne */
 #define CASERNE_STEP                  0
 #define CASERNE_NB                    500
 #define CASERNE_COST                  9000
 #define CASERNE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CASERNE, CASERNE_COST)
 #define CASERNE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CASERNE_NB) \
                                        :  ECBEntity(_name, _owner, _case, E_CASERNE, CASERNE_COST, CASERNE_COST, _nb)
-/** This is a simple army */
+/** This is a caserne */
 class ECBCaserne : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
