@@ -22,4 +22,8 @@
 #ifndef ECD_INGAME_H
 #define ECD_INGAME_H
 
+#include "Map.h"
+
+ECEntity* CreateAnEntity(uint type, const Entity_ID _name, ECBPlayer* _owner, ECase* _case);
+
 #endif /* ECD_INGAME_H */

@@ -52,12 +52,12 @@ void EChannel::NextAnim()
 	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); )
 	{
 		Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
-		if((*enti)->Locked())
+	/*	if((*enti)->Locked())
 		{
 			event->Entities()->Remove(*enti);
 			enti = ents.erase(enti);
 		}
-		else
+		else*/
 			++enti;
 	}
 	/* Si l'evenement ne comptenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
@@ -156,7 +156,7 @@ void EChannel::NextAnim()
 			        event->Linked());
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			if(entv.size() != 2)
-				Debug(W_ERR, "Il faudraut qu'il y ait deux entités dans la liste de UNION et il y en a %d", entv.size());
+				Debug(W_ERR, "Il faudrait qu'il y ait deux entités dans la liste de UNION et il y en a %d", entv.size());
 			else
 				SendArm(NULL, entv[1], ARM_NUMBER|ARM_HIDE, 0, 0, entv[1]->Nb());
 			break;
@@ -196,6 +196,11 @@ static struct
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
+
+ECEntity* CreateAnEntity(uint type, const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
+{
+	return entities_type[type].func (_name, _owner, _case);
+}
 
 /** Modification of an army.
  *
@@ -633,7 +638,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	BCaseVector casv = map->Cases();
 	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
 	{
-		if((*casi)->Entities()->empty() && (!(*casi)->Country()->Owner() || !((*casi)->Flags() & C_VILLE)))
+		if((*casi)->Entities()->empty())
 			continue;
 		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
 		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(),
