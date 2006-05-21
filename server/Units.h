@@ -58,9 +58,9 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_VILLE|C_PONT|C_TERRE) {}
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
 
-	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_VILLE|C_PONT|C_TERRE) {}
+	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
 
 	ENTITY_CREATE_LAST(ECMissiLauncher);
 
@@ -82,9 +82,9 @@ class EChar : public ECUnit, public ECBChar
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(C_VILLE|C_TERRE) {}
+	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
 
-	CHAR_CONSTRUCTOR(EChar), ECUnit(C_VILLE|C_TERRE) {}
+	CHAR_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
 
 	ENTITY_CREATE_LAST(EChar);
 };
@@ -97,9 +97,9 @@ class ECArmy : public ECUnit, public ECBArmy
 /* Constructeur/Destructeur */
 public:
 
-	ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(C_VILLE|C_TERRE|C_PONT) {}
+	ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
 
-	ARMY_CONSTRUCTOR(ECArmy), ECUnit(C_VILLE|C_TERRE|C_PONT) {}
+	ARMY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
 
 	ENTITY_CREATE_LAST(ECArmy);
 };
