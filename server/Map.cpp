@@ -121,6 +121,29 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 	ECBMapPlayer* last_owner = owner;
 	if(ECBCountry::ChangeOwner(mp))
 	{
+		for(BCaseVector::iterator c = cases.begin(); c != cases.end(); ++c)
+		{
+			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
+			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+				if((*it)->IsCountryMaker())
+				{
+					EChannel* c = dynamic_cast<EChannel*>(Map()->Channel());
+					ECEntity* et = dynamic_cast<ECEntity*>(*it);
+					c->SendArm(NULL, et, ARM_REMOVE);
+					et->SetOwner(owner ? owner->Player() : 0);
+					if(last_owner && last_owner->Player())
+						last_owner->Player()->Entities()->Remove(et);
+					else
+						c->Map()->Neutres()->Remove(et);
+					if(owner && owner->Player())
+						owner->Player()->Entities()->Add(et);
+					else
+						c->Map()->Neutres()->Add(et);
+					et->SetID(c->FindEntityName(owner ? dynamic_cast<ECPlayer*>(owner->Player()) : 0));
+					c->SendArm(NULL, et, ARM_CREATE|ARM_HIDE, (et)->Case()->X(), (et)->Case()->Y(),
+					                                          (et)->Nb(), (et)->Type());
+				}
+		}
 		if(owner && owner->Player())
 		{
 			EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
@@ -351,8 +374,6 @@ void ECEntity::Union(ECEntity* entity)
 
 bool ECEntity::Return(ECBCase* c)
 {
-	printf("engoument.... (%d,%d)\n", acase->X(), acase->Y());
-
 	/* Si il n'y a pas de last on a rien à faire */
 	if(!last) return false;
 
@@ -364,7 +385,6 @@ bool ECEntity::Return(ECBCase* c)
 
 	/* On appel le Return() du last */
 	last->Return(c);
-	printf("on sort d'un engouement (%d,%d)\n", last->Case()->X(), last->Case()->Y());
 
 	ECEntity* lastlast = last;
 
@@ -377,8 +397,6 @@ bool ECEntity::Return(ECBCase* c)
 	last = lastlast->Last();
 	lastlast->last = 0;
 
-	printf("last = (%d,%d)\n", last ? last->Case()->X() : 0, last ? last->Case()->Y():0);
-
 	/* On récupère les pas */
 	if(last && last->Case() != acase)
 		restStep = !last ? myStep : (last->RestStep()) ? last->RestStep() - 1 : 0;
@@ -388,14 +406,12 @@ bool ECEntity::Return(ECBCase* c)
 
 	/* On s'enlève de la case où on est actuellement et on se met sur l'ancienne case */
 	acase->Entities()->Remove(this);
-	printf("on se vire de (%d,%d)\n", acase->X(), acase->Y());
+
 	acase = lastlast->Case();
 	acase->Entities()->Add(this);
-	printf("on s'ajoute sur (%d,%d)\n", acase->X(), acase->Y());
 
 	/* On enlève le last de la case */
 	lastlast->Case()->Entities()->Remove(lastlast);
-	printf("on vire un last de (%d,%d)\n", lastlast->Case()->X(), lastlast->Case()->Y());
 
 	/* On supprime le last */
 	MyFree(lastlast);

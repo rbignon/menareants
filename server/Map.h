@@ -31,7 +31,6 @@
  */
 
 typedef ECBCase        ECase;
-typedef ECBVille       ECVille;
 typedef ECBMer         ECMer;
 typedef ECBTerre       ECTerre;
 typedef ECBPont        ECPont;
@@ -76,8 +75,12 @@ public:
 	/** Use this function to make an union with an other entity */
 	virtual void Union(ECEntity*);
 
+	/** This function is a default method used by entities to attaq someone.
+	 * An entity can redefine this method to shoot others entities as it wants
+	 */
 	virtual bool Attaq(std::vector<ECEntity*> entities);
 
+	/** This \a static method will check if the entities in list are friends */
 	static bool AreFriends(std::vector<ECEntity*> list);
 
 	/** Use this function when an entity have played. */
@@ -90,8 +93,13 @@ public:
 	ECEntity* Last() const { return last; }
 	virtual void RemoveLast();
 
+	/** Search a last entity */
 	ECEntity* FindLast(ECBCase*);
+
+	/** Return the last next entity */
 	ECEntity* FindNext();
+
+	/** This is the next entity */
 	ECEntity* Next() const { return next; }
 
 	int Tag;
@@ -127,6 +135,9 @@ public:
 /* Methodes */
 public:
 
+	/** This method will check if a player who leaves channel or event will change something to this event
+	 * \note this is a beautiful name !
+	 */
 	bool CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity*);
 
 /* Attributs */
@@ -212,8 +223,10 @@ public:
 /* Attributs */
 public:
 
+	/** Number in the map list of server */
 	uint Num() { return i; }
 
+	/** All events of this map */
 	EventVector Events() const { return map_events; }
 	void AddEvent(ECEvent* _e) { map_events.push_back(_e); }
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete = false);
