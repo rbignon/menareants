@@ -30,9 +30,9 @@
 #define APP_SMALLNAME "MenAreAnts"
 #define SERV_SMALLNAME "MenAreAntsD"
 
-/* Version du jeu (forme alpha.beta[-patch]) */
+/* Version du jeu (forme major.minor[-patch]) */
 #define APP_VERSION_MAJOR	"0"
-#define APP_VERSION_MINOR	"11"
+#define APP_VERSION_MINOR	"20"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
@@ -41,6 +41,8 @@
 #define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
+
+#define APP_SITE "http://menareants.coderz.info/"
 
 /* Résolution de l'écran */
 const int SCREEN_HEIGHT = 600;
