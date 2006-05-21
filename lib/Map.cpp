@@ -134,7 +134,7 @@ ECBDate& ECBDate::operator++ ()
 ECBDate ECBDate::operator++ (int)
 {
 	ECBDate ans = *this;
-	++(*this);  // ou appeler simplement operator++()
+	++(*this);  // on appelle simplement operator++()
 	return ans;
 }
 
@@ -162,8 +162,8 @@ void ECBDate::SetDate(std::string date)
 	unsigned short n = 0;
 	while(n<3)
 	{
-		std::string s = stringtok(date, " ");
-		if(s.empty())
+		std::string s = stringtok(date, " /");
+		if(s.empty() || !is_num(s.c_str()))
 			throw ECExcept(VName(s), "Date incorrecte");
 		switch(n)
 		{
@@ -198,15 +198,19 @@ ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, 
 void ECBCase::SetCountry(ECBCountry *mc)
 {
 	map_country = mc;
-	/* On est la ville de la country, donc on défini notre état à la country */
-	if(flags & C_VILLE)
-		mc->flags = flags;
 }
 
 void ECBCase::CheckChangingOwner(ECBEntity* e)
 {
-	if(flags & C_VILLE && e->Owner() && (!Country()->Owner() || Country()->Owner()->Player() != e->Owner()))
-		Country()->ChangeOwner(e->Owner()->MapPlayer());
+	std::vector<ECBEntity*> ents = entities.List();
+	for(std::vector<ECBEntity*>::const_iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		if((*enti)->IsCountryMaker())
+		{
+			if(e->Owner() && (!Country()->Owner() ||
+			    (Country()->Owner()->Player() != e->Owner() && !e->Owner()->IsAllie(Country()->Owner()->Player()))))
+				Country()->ChangeOwner(e->Owner()->MapPlayer());
+			break;
+		}
 }
 
 /********************************************************************************************
@@ -221,6 +225,13 @@ ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e
 	strcpy(name, _name);
 	myStep = Step;
 	restStep = Step;
+}
+
+void ECBEntity::SetID(const char* _name)
+{
+	if(strlen(_name) != (sizeof name)-1)
+		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
+	strcpy(name, _name);
 }
 
 bool ECBEntity::Like(ECBEntity* e)
@@ -261,7 +272,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	std::vector<ECBEntity*> entv = c->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 	{
-		if((*enti)->CanCreate(this))
+		if((*enti)->CanCreate(this) && (*enti)->Owner() == owner)
 			ret = true;
 		/* On vérifie que :
 		 * - si les deux sont des batiments et que ce ne sont pas les memes
@@ -310,23 +321,26 @@ ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident)
 bool ECBCountry::ChangeOwner(ECBMapPlayer* mp)
 {
 	if(Owner())
-	{
 		Owner()->RemoveCountry(this);
-		if(Owner()->Player())
-			Owner()->Player()->SetTurnMoney(
-							          Owner()->Player()->TurnMoney() -
-							          (map->CityMoney() * (flags & C_CAPITALE ? 2 : 1)));
-	}
+
 	SetOwner(mp);
 	if(Owner())
-	{
 		mp->AddCountry(this);
-		if(Owner()->Player())
-			Owner()->Player()->SetTurnMoney(
-							          Owner()->Player()->TurnMoney() +
-							          (map->CityMoney() * (flags & C_CAPITALE ? 2 : 1)));
-	}
 	return true;
+}
+
+void ECBCountry::RemoveCase(ECBCase* _case)
+{
+	for (std::vector<ECBCase*>::iterator it = cases.begin(); it != cases.end(); )
+	{
+		if (*it == _case)
+		{
+			it = cases.erase(it);
+			return;
+		}
+		else
+			++it;
+	}
 }
 
 /********************************************************************************************
@@ -374,8 +388,6 @@ static struct
 	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
 	uint flags;
 } case_type[] = {
-	{ 'v', CreateCase<ECBVille>, C_VILLE            },
-	{ 'V', CreateCase<ECBVille>, C_VILLE|C_CAPITALE },
 	{ 'm', CreateCase<ECBMer>,   C_MER              },
 	{ 't', CreateCase<ECBTerre>, C_TERRE            },
 	{ 'p', CreateCase<ECBPont>,  C_PONT             }
@@ -397,7 +409,8 @@ ECBMap::ECBMap(std::vector<std::string> _map_file)
 	map_file = _map_file;
 }
 
-ECBMap::ECBMap(std::string filename)
+ECBMap::ECBMap(std::string _filename)
+	: filename(_filename)
 {
 	initialised = false;
 
@@ -447,7 +460,7 @@ ECBMap::ECBMap(std::string filename)
  *   ..
  *   INFO [ligne]
  *   INFO [ligne]
- *   SOLDATS [nb]
+ *   UNIT [type] [owner] [x],[y] [number]
  * </pre>
  *
  *  1) NAME [name]
@@ -474,8 +487,6 @@ ECBMap::ECBMap(std::string filename)
  *                       WXXYZ
  *
  *   W = Type of terrain (a city, sea)
- *      'v' = ville.
- *      'V' = ville | capitale.
  *      'm' = mer.
  *      't' = terre.
  *      'p' = pont.
@@ -514,9 +525,9 @@ ECBMap::ECBMap(std::string filename)
  *   This is one of lines who is a short text of map.
  *   </pre>
  *
- *  9) SOLDATS [nb]
+ *  9) UNIT [type] [owner] [x],[y] [number]
  *   <pre>
- *   This is the number of soldats who are in initiales armies (neutral and players).
+ *   Put an unit on the map, on a case, to one player.
  *   </pre>
  *
  * @author Progs
@@ -533,6 +544,8 @@ void ECBMap::Init()
 	min = 0;
 	max = 0;
 	date = 0;
+	begin_money = 0;
+	city_money = 0;
 	
 	std::string ligne;
 
@@ -566,7 +579,7 @@ void ECBMap::Init()
 				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
 				if(it != map_players.end())
 					throw ECExcept(VCName(ligne[0]), "L'identifiant est déjà utilisé");
-				map_players.push_back(new ECBMapPlayer(ligne[0], ++num_player));
+				map_players.push_back(CreateMapPlayer(ligne[0], ++num_player));
 			}
 			else if(key == "MAP") recv_map = true;
 			else if(key == "BEGIN") begin_money = atoi(ligne.c_str());
@@ -575,7 +588,24 @@ void ECBMap::Init()
 			else if(key == "MAX") max = atoi(ligne.c_str());
 			else if(key == "DATE") date = new ECBDate(ligne);
 			else if(key == "INFO") map_infos.push_back(ligne);
-			else if(key == "SOLDATS") nb_soldats = atoi(ligne.c_str());
+			else if(key == "UNIT")
+			{
+				std::string line = ligne;
+				std::string type = stringtok(line, " ");
+				std::string owner = stringtok(line, " ");
+				if(owner[0] == '*')
+					AddNeutralUnit(ligne);
+				else
+				{
+					BMapPlayersVector::iterator it = map_players.begin();
+					for(; it != map_players.end() && (*it)->ID() != owner[0]; ++it);
+					if(it == map_players.end())
+						throw ECExcept(VName(owner), "Déclaration d'une unité pour un owner qui n'existe pas");
+	
+					(*it)->AddUnit(ligne);
+				}
+				VirtualAddUnit(ligne);
+			}
 			else
 				throw ECExcept(VName(key) VName(name), "Fichier map incorrect");
 		}
@@ -695,9 +725,10 @@ void ECBMap::Init()
 	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
 	   !min || !max || map_players.size() != max || min > max || !date)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
-		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date) VIName(nb_soldats),
+		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date),
 		               "Fichier incorrect !");
 
+#if 0 /** \todo les villes sont des unités, il faut voir si on ne fait pas une vérification auprès des UNIT */
 	/* On vérifie si il y a bien une ville par country */
 	for(std::vector<ECBCountry*>::iterator it= map_countries.begin(); it != map_countries.end(); ++it)
 	{
@@ -711,6 +742,7 @@ void ECBMap::Init()
 			throw ECExcept(VIName(count) VSName((*it)->ID()),
 			               count > 1 ? "La country a trop de villes !" : "La country n'a pas de ville !");
 	}
+#endif
 
 	/* La map est *bien* initialisée !! */
 	initialised = true;
@@ -724,6 +756,11 @@ void ECBMap::ClearMapPlayers()
 			BCountriesVector countries = (*it)->Countries();
 			for(BCountriesVector::iterator cvi = countries.begin(); cvi != countries.end(); ++cvi)
 				(*cvi)->SetOwner(NULL);
+
+			std::vector<std::string> sts = (*it)->Units();
+			for(std::vector<std::string>::iterator st = sts.begin(); st != sts.end(); ++st)
+				neutres_units.push_back(*st);
+
 			delete *it;
 			it = map_players.erase(it);
 		}
@@ -757,7 +794,8 @@ void ECBMap::Destruct()
 		delete *it;
 	map_countries.clear();
 
-	delete date;
+	if(initialised)
+		delete date;
 	initialised = false;
 }
 
@@ -766,10 +804,10 @@ ECBMap::~ECBMap()
 	Destruct();
 }
 
-ECBCase* ECBMap::operator() (uint _x, uint _y) const
+ECBCase*& ECBMap::operator() (uint _x, uint _y)
 {
 	if(!initialised)
-		throw ECExcept(0, "ECBMap n'est pas initialisé");
+		throw ECExcept("", "ECBMap n'est pas initialisé");
 
 	if (_x >= x || _y >= y)
 		throw ECExcept(VIName(x) VIName(y) VIName(_x) VIName(_y), "Access à un element hors du tableau");

@@ -81,21 +81,24 @@ public:
 /* Attributs */
 public:
 
-	bool Empty() const { return moves.empty(); }
-	Vector::size_type Size() const { return moves.size(); }
-	Vector Moves() const { return moves; }
-	void AddMove(E_Move m) { moves.push_back(m); }
-	void SetMoves(Vector _moves) { moves = _moves; }
-	void SetEntity(ECBEntity* et) { entity = et; }
+	bool Empty() const { return moves.empty(); }                    ///< There isn't movements ?
+	Vector::size_type Size() const { return moves.size(); }         ///< Number of movements
+	Vector Moves() const { return moves; }                          ///< Get movements' vector
+	void AddMove(E_Move m) { moves.push_back(m); }                  ///< Add a movement as a E_Move enumerator
+	void SetMoves(Vector _moves) { moves = _moves; }                ///< Define a movement's vector. This remove actuals moves.
+	void SetEntity(ECBEntity* et) { entity = et; }                  ///< Set an entity
 	ECBEntity* Entity() { return entity; }
 
-	ECBCase* FirstCase() { return first_case; }
-	void SetFirstCase(ECBCase* c) { first_case = c; }
+	ECBCase* FirstCase() { return first_case; }                     ///< This is the first case, where the movement begin
+	void SetFirstCase(ECBCase* c) { first_case = c; }               ///< Define the first case
 
+	/** Put all movements in a string.
+	 * @param end is setted, this is the last case of movement
+	 */
 	std::string MovesString(ECBCase* end = 0);
 
-	virtual void Clear(ECBCase* c = 0) { moves.clear(); first_case = c; }
-	void Return(ECBCase*);
+	virtual void Clear(ECBCase* c = 0) { moves.clear(); first_case = c; }   ///< Clear all movements
+	void Return(ECBCase*);                                                  ///< Remove all movements after a case
 
 /* Variables privées */
 protected:
@@ -107,6 +110,7 @@ protected:
 /********************************************************************************************
  *                               ECBEntity                                                  *
  ********************************************************************************************/
+/* Documentation is in server/Channels.h:EChannel::SendArm() */
 #define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
                             (b)->CanAttaq(a) && !(b)->Like(a))
 #define ARM_MOVE        0x0001
@@ -137,6 +141,8 @@ public:
 		E_CHARFACT,
 		E_CHAR,
 		E_MISSILAUNCHER,
+		E_CITY,
+		E_CAPITALE,
 		E_END
 	};
 
@@ -174,12 +180,19 @@ public:
 	/** Use this function to deploy your entity */
 	virtual bool WantDeploy() { return false; }
 
+	/** Is it an entity who sets the country's owner ? */
+	virtual bool IsCountryMaker() { return false; }
+
+	/** If this entity add money, use this function to return how many money it will add or remove */
+	virtual int TurnMoney() { return 0; }
+
 /* Methodes */
 public:
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;
 
+	/** Use this function to know if this entity can be created <b>by this player</b> (about nations)*/
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
 
 	/** Use this function to add some units in the entity */
@@ -194,24 +207,35 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
+	/** Does this entity like an other entity ? */
 	bool Like(ECBEntity* e);
 
 /* Attributs */
 public:
 
-	void SetCase(ECBCase* _c) { acase = _c; }
+	/** This is the case where this entity is */
 	ECBCase* Case() const { return acase; }
+	void SetCase(ECBCase* _c) { acase = _c; }
 
-	void SetOwner(ECBPlayer* _p) { owner = _p; }
+	/** Owner of this entity (return a \a player !) */
 	ECBPlayer* Owner() const { return owner; }
+	void SetOwner(ECBPlayer* _p) { owner = _p; }
 
+	/** This is an identificator of this entity (xy, x ¤ [A..z], y ¤ [A..z]) */
 	const char* ID() const { return name; }
+	void SetID(const char* s);
 
+	/** Return a long identificator in form Owner!xy (x ¤ [A..z], y ¤ [A..z]) */
+	std::string LongName();
+
+	/** This is used by server (so, why is it here ??) */
 	virtual ECBEntity* Last() const { return 0; }
 
+	/** This is events of this entity */
 	uint EventType() const { return event_type; }
 	void SetEvent(uint _e) { event_type = _e; }
 
+	/** This is the type of entity */
 	e_type Type() const { return type; }
 
 	/** Return the number of soldats in the army */
@@ -226,17 +250,23 @@ public:
 	void Lock(bool b = true) { lock = b; }
 	void Unlock() { lock = false; }
 
+	/** This is my maximum steps */
 	uint MyStep() const { return myStep; }
 	void SetMyStep(uint s) { myStep = s; }
+
+	/** This is my rest steps */
 	uint RestStep() const { return restStep; }
 	void SetRestStep(uint s) { restStep = s; }
 
-	void SetDeployed(bool d = true) { deployed = d; }
+	/** Is this entity deployed ?
+	 * An entity can be deployed to use a special attaq, for example a Missile Launcher must be deployed to
+	 * shoot someone.
+	 */
 	bool Deployed() const { return deployed; }
+	void SetDeployed(bool d = true) { deployed = d; }
 
+	/** This is the price of this entity */
 	uint Cost() const { return cost; }
-
-	std::string LongName();
 
 /* Variables protégées */
 protected:
@@ -270,6 +300,7 @@ public:
 
 	std::string String();
 
+	/** Check if this date is correct */
 	void CheckDate();
 
 /* Attributs */
@@ -285,8 +316,8 @@ public:
 
 	void SetDate(std::string date);
 
-	ECBDate& operator++ ();    // prefix ++
-	ECBDate  operator++ (int); // postfix ++
+	ECBDate& operator++ ();    ///< prefix ++
+	ECBDate  operator++ (int); ///< postfix ++
 
 /* Variables privées */
 protected:
@@ -299,11 +330,9 @@ protected:
  *                               ECBCase                                                    *
  ********************************************************************************************/
 
-#define C_VILLE          0x0001
-#define C_CAPITALE       0x0002
-#define C_TERRE          0x0004
-#define C_MER            0x0008
-#define C_PONT           0x0010
+#define C_TERRE          0x0001
+#define C_MER            0x0002
+#define C_PONT           0x0004
 
 /** This is a Case's class...
  */
@@ -365,36 +394,6 @@ protected:
 	ECList<ECBEntity*> entities;
 };
 
-/** This class is a derived class from ECBCase whose is a city */
-class ECBVille : public virtual ECBCase
-{
-/* Constructeur/Destructeur */
-public:
-	ECBVille(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
-	ECBVille() {}
-
-/* Methodes */
-public:
-
-	virtual bool CanCreate(const ECBEntity* e)
-	{
-		switch(e->Type())
-		{
-			case ECBEntity::E_ARMY:
-				return true;
-			default:
-				return false;
-		}
-	}
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
-};
-
 /** This class is a derived class from ECBCase whose is a land */
 class ECBTerre : public virtual ECBCase
 {
@@ -406,6 +405,7 @@ public:
 /* Methodes */
 public:
 
+	/** ECBTerre can create all buildings */
 	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding()); }
 
 /* Attributs */
@@ -474,6 +474,7 @@ public:
 
 	/** Add case to country */
 	void AddCase(ECBCase* _case) { cases.push_back(_case); }
+	void RemoveCase(ECBCase* _case);
 
 	/** Return country ID (two chars) */
 	const char* ID() const { return ident; }
@@ -484,7 +485,7 @@ public:
 
 	/** Change owner of country.
 	 * This function will remove this country from my actual owner list, and will add me
-	 * in the list of my new owner. And it will change turnmoney of the two players.
+	 * in the list of my new owner.
 	 * @param mp this is the new map player
 	 */
 	virtual bool ChangeOwner(ECBMapPlayer* mp);
@@ -521,6 +522,8 @@ public:
 		: id(_id), num(_num), pl(0)
 	{}
 
+	virtual ~ECBMapPlayer() {}
+
 /* Attributs */
 public:
 
@@ -539,12 +542,19 @@ public:
 
 	std::vector<ECBCountry*> Countries() { return countries; }
 
+	/** This is all entity who will be created by server when the game will start.
+	 * For now, this is only in text format
+	 */
+	std::vector<std::string> Units() const { return units; }
+	void AddUnit(std::string s) { units.push_back(s); }
+
 /* Variables privées */
-public:
+protected:
 	MapPlayer_ID id;
 	uint num;
 	ECBPlayer* pl;
 	std::vector<ECBCountry*> countries;
+	std::vector<std::string> units;
 
 };
 
@@ -590,21 +600,19 @@ public:
 public:
 
 	/** Name of channel */
-	std::string Name() { return name; }
+	std::string& Name() { return name; }
 
 	/** Channel linked to map */
 	ECBChannel* Channel() { return chan; }
 	void SetChannel(ECBChannel* c) { chan = c; }
 
-	int BeginMoney() { return begin_money; }           /**< All players have this money when they begin the game */
-	int CityMoney() { return city_money; }             ///< This is money that is given to players at each turn by cities
-	uint MinPlayers() { return min; }                  /**< Min players to play */
-	uint MaxPlayers() { return max; }                  /**< Max players to play */
+	int& BeginMoney() { return begin_money; }          /**< All players have this money when they begin the game */
+	int& CityMoney() { return city_money; }            ///< This is money that is given to players at each turn by cities
+	uint& MinPlayers() { return min; }                 /**< Min players to play */
+	uint& MaxPlayers() { return max; }                 /**< Max players to play */
 	uint NbCases() { return map.size(); }              /**< Number of cases */
 	uint NbMapPlayers() { return map_players.size(); } /**< Number of map players */
 	uint NbCountries() { return map_countries.size(); }/**< Number of map countries */
-
-	uint NbSoldats() { return nb_soldats; }            /**< This is the number of initiales soldats in armies */
 
 	uint Width() { return x; }
 	uint Height() { return y; }
@@ -613,23 +621,27 @@ public:
 	BMapPlayersVector MapPlayers() { return map_players; }          /**< Return map players vector */
 	BCountriesVector Countries() { return map_countries; }          /**< Return countries vector */
 
-	ECList<ECBEntity*> *Entities() { return &entities; }
-	ECList<ECBEntity*> *Neutres() { return &neutres; }
+	ECList<ECBEntity*> *Entities() { return &entities; }            ///< All entities of game (with neutrales entities)
+	ECList<ECBEntity*> *Neutres() { return &neutres; }              ///< All neutrales entities
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
-	ECBDate* Date() { return date; }
+	ECBDate* Date() { return date; }                                ///< Date of day
 	ECBDate* NextDay() { return &(++(*date)); }                     /**< Increment date to next day */
 
 	std::vector<std::string> MapInfos() { return map_infos; }       /**< Map informations */
 	
 	/** Access to a case of map 
-	 * Example: map(x,y)
+	 * \example: map(x,y)
 	 */
-	ECBCase* operator() (uint x, uint y) const;
+	ECBCase*& operator() (uint x, uint y);
 
 	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
 	void AddAnEntity(ECBEntity*);
+
+	/** There are all neutrales units in text format. See ECBMapPlayer::Units()'s documentation */
+	std::vector<std::string> NeutralUnits() const { return neutres_units; }
+	void AddNeutralUnit(std::string s) { neutres_units.push_back(s); }
 
 /* Variables privées */
 protected:
@@ -646,16 +658,18 @@ protected:
 	ECList<ECBEntity*> entities;
 	ECList<ECBEntity*> neutres;
 
+	std::vector<std::string> neutres_units;
+
 	ECBDate* date;
 
 	ECBChannel *chan;
 	std::string name;
+	std::string filename;
 
 	uint x, y;
 	uint min, max;
-	uint nb_soldats;
 
-	uint begin_money, city_money;
+	int begin_money, city_money;
 
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
 
@@ -665,6 +679,9 @@ protected:
 	virtual void SetCaseAttr(ECBCase*, char) {}
 
 	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECBCountry(m, ident); }
+
+	virtual ECBMapPlayer* CreateMapPlayer(char _id, uint _num) { return new ECBMapPlayer(_id, _num); }
+	virtual void VirtualAddUnit(std::string line) { return; }
 
 	ECBMap();         /**< Disallowed */
 };
