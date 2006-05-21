@@ -1,53 +1,91 @@
+# Veuillez ne pas éditer le fichier map à la main.
+# Utilisez plutôt l'éditeur de carte intégré au jeu.
 NAME First Map
-
 PLAYER A
 PLAYER B
 PLAYER C
 PLAYER D
-
 X 36
 Y 22
-
 MAP
-
-# WXXYZ
-# W ¤ {'v', 'V', 't', 'm', 'p' }
-# XX ¤ ['AA';'ZZ']
-# Y ¤ {'A', 'B', 'D' }
-# Z ¤ R
-#    #    #
-# 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 |
 mAAAmmAAAmmAAAmmAAAgmAAAbmAAAbmAAAbmAAAbmAAAbmAB*hmAB*mmAB*mmAB*mmNA*mmNA*mmNA*mmNA*mmNA*mmNE*mmNE*mmNE*mmNE*mmNE*mmDA*gmDA*bmDA*bmDA*bmDBDhmDBDmmDBDmmDCDmmDCDmmDCDmmDCDmmDCDmmDCDm
 mAAAmmAAAmmAAAmmAAAdtAAAttAAAttAAAttAAAttAAAtmAB*cmAB*mmAB*mmAB*mmNA*gmNA*bmNA*bmNA*bmNA*bmNE*bmNE*bmNE*bmNE*bmNE*hmDA*dtDA*ttDA*ttDA*tmDBDcmDBDmmDBDgmDCDbmDCDbmDCDbmDCDbmDCDhmDCDm
-mAAAmmAAAmmAAAgmAAAktAAAttAAAtvAAAvtAAAttAAAtmAB*lmAB*bmAB*bmAB*hmNA*dtNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tmNE*cmDA*dtDA*ttDA*ttDA*tmDBDcmDBDgmDBDktDCDttDCDttDCDttDCDtmDCDcmDCDm
-mAAAmmAAAmmAAAdtAAAttAAAttAAAttAAAttAAAttAAAttAB*ttAB*ttAB*tmAB*cmNA*dtNA*tvNA*vtNA*ttNA*ttNE*ttNE*tvNE*vtNE*tmNE*cmDA*dtDA*tvDA*vtDA*tmDBDlmDBDktDBDttDCDttDCDttDCDttDCDtmDCDlmDCDh
-mAAAmmAAAmmAAAdtAAAttAAAttAAAttAAAttAAAttAAAttAB*ttAB*ttAB*tmAB*lmNA*ktNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tmNE*lmDA*ktDA*ttDA*ttDA*ttDBDttDBDttDBDttDCDtvDCDvtDCDttDCDttDCDtmDCDc
-mADAmmADAgmADAktADAttADAttACAttACAttACAttACAttAB*ttAB*ttAB*ttAB*ttNA*ttNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*ttNE*ttDA*ttDA*ttDA*ttDA*ttDBDttDBDttDBDttDCDttDCDttDCDttDCDttDCDtmDCDc
-mADAmmADAdtADAttADAttADAttACAtvACAvtACAttACAttAB*ttAB*ttAB*tmAB*jmNB*itNB*ttNB*ttNB*ttNB*ttNF*ttNF*ttNF*ttNF*tmNF*jmDBDitDBDttDBDttDBDttDBDtvDBDvtDBDttDBDttDEDttDEDttDEDttDEDtmDEDc
-mADAgmADAktADAtVADAVtADAttACAttACAttACAttACAttAB*tvAB*vtAB*tmAB*cmNB*dtNB*tvNB*vtNB*ttNB*ttNF*ttNF*tvNF*vtNF*tmNF*cmDBDdtDBDttDBDttDBDttDBDttDBDttDBDttDBDttDEDttDEDttDEDttDEDtmDEDc
-mADAdtADAttADAttADAttADAttAE*ttAE*ttAE*ttAE*ttAB*ttAB*ttAB*tmAB*cmNB*dtNB*ttNB*ttNB*ttNB*ttNF*ttNF*ttNF*ttNF*tmNF*cmDD*dtDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDEDttDEDtvDEDvtDEDtmDEDc
-mADAdtADAttADAttADAttADAttAE*ttAE*tvAE*vtAE*ttAE*ttAE*tmAE*jmAE*emNB*fmNB*amNB*amNB*itNB*ttNF*tmNF*jmNF*amNF*amNF*emDD*fmDD*itDD*ttDD*tvDD*vtDD*ttDD*ttDD*ttDEDttDEDttDEDttDEDtmDEDc
-mBABdtBABttBABttBABttBABttAE*ttAE*ttAE*ttAE*ttAE*ttAE*tmAE*cmAE*mmNC*mmNC*mmNC*mmNC*dtNC*ttNG*tmNG*cmNG*mmNG*mmNG*mmDD*gmDD*ktDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDEDttDEDttDEDttDEDtmDEDc
-mBABdtBABttBABttBABttBABttAE*ttAE*ttBD*ttBD*ttBD*ttBD*tmBD*cmBD*mmNC*gmNC*bmNC*bmNC*ktNC*ttNG*tmNG*lmNG*bmNG*bmNG*hmCA*dtCA*ttCA*ttCA*ttDD*ttDD*ttDD*ttDD*ttCCCttCCCttCCCttCCCtmCCCc
-mBABdtBABttBABtVBABVtBABttBBBttBBBttBD*ttBD*ttBD*ttBD*tmBD*lmBD*hmNC*dtNC*ttNC*ttNC*ttNC*ttNG*ttNG*ttNG*ttNG*tmNG*cmCA*dtCA*tvCA*vtCA*ttDD*ttDD*ttDD*ttDD*ttCCCtvCCCvtCCCttCCCtmCCCc
-mBABdtBABttBABttBABttBABttBBBttBBBttBD*tvBD*vtBD*ttBD*ttBD*tmBD*cmNC*dtNC*tvNC*vtNC*ttNC*ttNG*ttNG*tvNG*vtNG*tmNG*cmCA*dtCA*ttCA*ttCA*ttCBCttCBCttCBCttCBCttCCCttCCCttCCCttCCCtmCCCc
-mBABdtBABttBABttBABttBBBttBBBttBBBttBD*ttBD*ttBD*ttBD*ttBD*tmBD*lmNC*ktNC*ttNC*ttNC*ttNC*ttNG*ttNG*ttNG*ttNG*tmNG*lmCA*ktCA*ttCA*ttCA*ttCBCttCBCttCBCttCBCttCCCttCCCttCCCttCCCtmCCCc
-mBCBdtBCBttBCBttBCBttBBBtvBBBvtBBBttBBBttBE*ttBE*ttBE*ttBE*ttBE*ttND*ttND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*ttNH*ttCA*ttCA*ttCA*ttCA*ttCBCtvCBCvtCBCttCBCttCCCttCCCttCCCtmCCCjmCCCe
-mBCBdtBCBttBCBttBCBttBBBttBBBttBBBttBBBttBE*ttBE*ttBE*ttBE*tmBE*jmND*itND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tmNH*jmCD*itCD*ttCD*ttCD*ttCBCttCBCttCBCttCBCttCECttCECttCECtmCECcmCECm
-mBCBfmBCBitBCBttBCBttBCBtmBBBjmBBBamBBBitBE*tvBE*vtBE*ttBE*tmBE*cmND*dtND*tvND*vtND*ttND*ttNH*ttNH*tvNH*vtNH*tmNH*cmCD*dtCD*ttCD*ttCD*ttCBCttCBCttCBCttCBCtvCECvtCECttCECtmCECcmCECm
-mBCBmmBCBdtBCBtvBCBvtBCBtmBBBcmBBBmmBBBdtBE*ttBE*ttBE*tmBE*jmBE*emND*dtND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tmNH*cmCD*dtCD*tvCD*vtCD*tmCBCjmCBCitCBCttCBCttCECttCECttCECtmCECcmCECm
+mAAAmmAAAmmAAAgmAAAktAAAttAAAttAAAttAAAttAAAtmAB*lmAB*bmAB*bmAB*hmNA*dtNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tmNE*cmDA*dtDA*ttDA*ttDA*tmDBDcmDBDgmDBDktDCDttDCDttDCDttDCDtmDCDcmDCDm
+mAAAmmAAAmmAAAdtAAAttAAAttAAAttAAAttAAAttAAAttAB*ttAB*ttAB*tmAB*cmNA*dtNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tmNE*cmDA*dtDA*ttDA*ttDA*tmDBDlmDBDktDBDttDCDttDCDttDCDttDCDtmDCDlmDCDh
+mAAAmmAAAmmAAAdtAAAttAAAttAAAttAAAttAAAttAAAttAB*ttAB*ttAB*tmAB*cmNA*dtNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tmNE*cmDA*dtDA*ttDA*ttDA*ttDBDttDBDttDBDttDCDttDCDttDCDttDCDttDCDtmDCDc
+mADAmmADAgmADAktADAttADAttACAttACAttACAttACAttAB*ttAB*ttAB*tpAB*ppNA*qtNA*ttNA*ttNA*ttNA*ttNE*ttNE*ttNE*ttNE*tpNE*ppDA*qtDA*ttDA*ttDA*ttDBDttDBDttDBDttDCDttDCDttDCDttDCDttDCDtmDCDc
+mADAmmADAdtADAttADAttADAttACAttACAttACAttACAttAB*ttAB*ttAB*tmAB*cmNB*dtNB*ttNB*ttNB*ttNB*ttNF*ttNF*ttNF*ttNF*tmNF*cmDBDdtDBDttDBDttDBDttDBDttDBDttDBDttDBDttDEDttDEDttDEDttDEDtmDEDc
+mADAgmADAktADAttADAttADAttACAttACAttACAttACAttAB*ttAB*ttAB*tmAB*cmNB*dtNB*ttNB*ttNB*ttNB*ttNF*ttNF*ttNF*ttNF*tmNF*cmDBDdtDBDttDBDttDBDttDBDttDBDttDBDttDBDttDEDttDEDttDEDttDEDtmDEDc
+mADAdtADAttADAttADAttADAttAE*ttAE*ttAE*ttAE*ttAB*ttAB*ttAB*tmAB*cmNB*dtNB*ttNB*ttNB*ttNB*ttNF*ttNF*ttNF*ttNF*tmNF*cmDD*dtDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDEDttDEDttDEDttDEDtmDEDc
+mADAdtADAttADAttADAttADAttAE*ttAE*ttAE*ttAE*ttAE*ttAE*tmAE*jmAE*emNB*fmNB*apNB*rmNB*amNB*amNF*amNF*apNF*rmNF*amNF*emDD*fmDD*itDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDEDttDEDttDEDttDEDtmDEDc
+mBABdtBABttBABttBABttBABttAE*ttAE*ttAE*ttAE*ttAE*ttAE*tmAE*cmAE*mmNC*mmNC*mpNC*omNC*mmNC*mmNG*mmNG*mpNG*omNG*mmNG*mmDD*gmDD*ktDD*ttDD*ttDD*ttDD*ttDD*ttDD*ttDEDttDEDttDEDttDEDtmDEDc
+mBABdtBABttBABttBABttBABttAE*ttAE*ttBD*ttBD*ttBD*ttBD*tmBD*cmBD*mmNC*gmNC*bpNC*smNC*bmNC*bmNG*bmNG*bpNG*smNG*bmNG*hmCA*dtCA*ttCA*ttCA*ttDD*ttDD*ttDD*ttDD*ttCCCttCCCttCCCttCCCtmCCCc
+mBABdtBABttBABttBABttBABttBBBttBBBttBD*ttBD*ttBD*ttBD*tmBD*lmBD*hmNC*dtNC*ttNC*ttNC*ttNC*ttNG*ttNG*ttNG*ttNG*tmNG*cmCA*dtCA*ttCA*ttCA*ttDD*ttDD*ttDD*ttDD*ttCCCttCCCttCCCttCCCtmCCCc
+mBABdtBABttBABttBABttBABttBBBttBBBttBD*ttBD*ttBD*ttBD*ttBD*tmBD*cmNC*dtNC*ttNC*ttNC*ttNC*ttNG*ttNG*ttNG*ttNG*tmNG*cmCA*dtCA*ttCA*ttCA*ttCBCttCBCttCBCttCBCttCCCttCCCttCCCttCCCtmCCCc
+mBABdtBABttBABttBABttBBBttBBBttBBBttBD*ttBD*ttBD*ttBD*ttBD*tmBD*cmNC*dtNC*ttNC*ttNC*ttNC*ttNG*ttNG*ttNG*ttNG*tmNG*cmCA*dtCA*ttCA*ttCA*ttCBCttCBCttCBCttCBCttCCCttCCCttCCCttCCCtmCCCc
+mBCBdtBCBttBCBttBCBttBBBttBBBttBBBttBBBttBE*ttBE*ttBE*ttBE*tpBE*ppND*qtND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tpNH*ppCA*qtCA*ttCA*ttCA*ttCBCttCBCttCBCttCBCttCCCttCCCttCCCtmCCCjmCCCe
+mBCBdtBCBttBCBttBCBttBBBttBBBttBBBttBBBttBE*ttBE*ttBE*ttBE*tmBE*cmND*dtND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tmNH*cmCD*dtCD*ttCD*ttCD*ttCBCttCBCttCBCttCBCttCECttCECttCECtmCECcmCECm
+mBCBfmBCBitBCBttBCBttBCBtmBBBjmBBBamBBBitBE*ttBE*ttBE*ttBE*tmBE*cmND*dtND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tmNH*cmCD*dtCD*ttCD*ttCD*ttCBCttCBCttCBCttCBCttCECttCECttCECtmCECcmCECm
+mBCBmmBCBdtBCBttBCBttBCBtmBBBcmBBBmmBBBdtBE*ttBE*ttBE*tmBE*jmBE*emND*dtND*ttND*ttND*ttND*ttNH*ttNH*ttNH*ttNH*tmNH*cmCD*dtCD*ttCD*ttCD*tmCBCjmCBCitCBCttCBCttCECttCECttCECtmCECcmCECm
 mBCBmmBCBdtBCBttBCBttBCBtmBBBcmBBBmmBBBdtBE*ttBE*ttBE*tmBE*cmBE*mmND*fmND*amND*amND*amND*amNH*amNH*amNH*amNH*amNH*emCD*dtCD*ttCD*tmCD*jmCBCemCBCdtCBCttCBCttCECttCECtmCECjmCECemCECm
 mBCBmmBCBdtBCBttBCBttBCBtmBBBcmBBBmmBBBfmBE*amBE*amBE*amBE*emBE*mmND*mmND*mmND*mmND*mmND*mmNH*mmNH*mmNH*mmNH*mmNH*mmCD*dtCD*ttCD*tmCD*cmCBCmmCBCfmCBCamCBCitCECttCECtmCECcmCECmmCECm
 mBCBmmBCBfmBCBamBCBamBCBamBBBemBBBmmBBBmmBE*mmBE*mmBE*mmBE*mmBE*mmND*mmND*mmND*mmND*mmND*mmNH*mmNH*mmNH*mmNH*mmNH*mmCD*fmCD*amCD*amCD*emCBCmmCBCmmCBCmmCBCfmCECamCECamCECemCECmmCECm
-
 EOM
-
 BEGIN 15000
 CITY 1000
 MIN 2
 MAX 4
-DATE 28 04 2006
-
-SOLDATS 1000
-
+DATE 28/4/2006
 INFO Map de la chiasse
+UNIT 6 A 6,3 1000
+UNIT 7 A 3,9 2000
+UNIT 6 A 6,7 1000
+UNIT 1 A 6,3 1000
+UNIT 1 A 6,7 1000
+UNIT 1 A 3,9 1000
+UNIT 7 B 2,13 2000
+UNIT 6 B 3,18 1000
+UNIT 6 B 6,15 1000
+UNIT 1 B 2,13 1000
+UNIT 1 B 6,15 1000
+UNIT 1 B 3,18 1000
+UNIT 6 C 29,16 1000
+UNIT 6 C 32,18 1000
+UNIT 7 C 32,12 2000
+UNIT 1 C 32,12 1000
+UNIT 1 C 29,16 1000
+UNIT 1 C 32,18 1000
+UNIT 7 D 31,3 2000
+UNIT 6 D 32,7 1000
+UNIT 6 D 28,5 1000
+UNIT 1 D 31,3 1000
+UNIT 1 D 28,5 1000
+UNIT 1 D 32,7 1000
+UNIT 6 * 9,17 1000
+UNIT 6 * 15,13 1000
+UNIT 6 * 15,17 1000
+UNIT 6 * 20,17 1000
+UNIT 6 * 20,13 1000
+UNIT 6 * 15,7 1000
+UNIT 6 * 15,3 1000
+UNIT 6 * 20,3 1000
+UNIT 6 * 20,7 1000
+UNIT 6 * 25,2 1000
+UNIT 6 * 25,13 1000
+UNIT 6 * 25,18 1000
+UNIT 6 * 9,12 1000
+UNIT 6 * 27,9 1000
+UNIT 1 * 9,17 1000
+UNIT 1 * 9,12 1000
+UNIT 1 * 15,17 1000
+UNIT 1 * 15,13 1000
+UNIT 1 * 20,13 1000
+UNIT 1 * 20,17 1000
+UNIT 1 * 15,3 1000
+UNIT 1 * 20,3 1000
+UNIT 1 * 15,7 1000
+UNIT 1 * 20,7 1000
+UNIT 1 * 25,2 1000
+UNIT 1 * 27,9 1000
+UNIT 1 * 25,13 1000
+UNIT 1 * 25,18 1000

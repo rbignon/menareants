@@ -1,53 +1,52 @@
+# Veuillez ne pas éditer le fichier map à la main.
+# Utilisez plutôt l'éditeur de carte intégré au jeu.
 NAME My Map
-
 PLAYER A
 PLAYER B
-
 X 13
 Y 9
-
 MAP
-
-# WXXYZ
-# W ¤ {'v', 'V', 't', 'm', 'p' }
-# XX ¤ ['AA';'ZZ']
-# Y ¤ {'A', 'B', 'D' }
-# Z ¤ R
-#    #    #
-mAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAbmBABmmBABmmBABmmBABmmBABmmBABm
-mAAAmmAAAgmAAAmtAAAttAAAttAAAtmAAAmtBABmtBABttBABttBABtmBABmmBABm
-mAAAmmAAAdtAAAttAAAtVAAAVtAAAtmAAAttBABttBABttBABtVBABVtBABtmBABm
-mABAmmABAdtABAttAAAttAAAttAAAtpAAAttBBBttBBBttBBBttBBBttBBBtmBBBm
-mABAmmABAdvABAvtABAttABAttABAtmABAmtBBBtvBBBvtBBBttBBBttBC*tmBC*m
-mABAmmABAdtABAttABAttAC*ttAC*tmAC*mmBBBmtBBBttBC*tvBC*vtBC*tmBC*m
-mABAmmABAfmAC*mtAC*mtAC*tvAC*vtAC*tmBC*mtBC*ttBC*ttBC*tmBC*mmBC*m
-mABAmmAC*mmAC*mmAC*mtAC*ttAC*ttAC*tmBC*mmBC*ttBC*ttBC*tmBC*mmBC*m
-mAC*mmAC*mmAC*mmAC*mmAC*mmAC*mmAC*mmBC*mmBC*mmBC*mmBC*mmBC*mmBC*m
-
+mAAAmmAAAmmAAAgmAAAbmAAAbmAAAbmAAAhmBABgmBABbmBABbmBABbmBABhmBABm
+mAAAmmAAAgmAAAktAAAttAAAttAAAtmAAAcmBABdtBABttBABttBABtmBABlmBABh
+mAAAmmAAAdtAAAttAAAttAAAttAAAtmAAAcmBABdtBABttBABttBABttBABtmBABc
+mABAmmABAdtABAttAAAttAAAttAAAtpAAAppBBBqtBBBttBBBttBBBttBBBtmBBBc
+mABAmmABAdtABAttABAttABAttABAtmABAcmBBBdtBBBttBBBttBBBttBBBtmBC*c
+mABAmmABAdtABAttABAttAC*ttAC*tmAC*cmBBBdtBBBttBC*ttBC*ttBC*tmBC*c
+mABAmmABAfmAC*amAC*itAC*ttAC*tmAC*cmBC*fmBC*itBC*ttBC*tmBC*jmBC*e
+mABAmmAC*mmAC*mmAC*dtAC*ttAC*tmAC*lmBC*hmBC*dtBC*ttBC*tmBC*cmBC*m
+mAC*mmAC*mmAC*mmAC*fmAC*amAC*amAC*amBC*emBC*fmBC*amBC*amBC*emBC*m
 EOM
-
 BEGIN 15000
-CITY 1000
+CITY 4000
 MIN 2
 MAX 2
-DATE 13 08 1988
-
-SOLDATS 1000
-
+DATE 13/8/1988
 INFO Alors
-INFO
+INFO 
 INFO Cette map sent la moule fraiche.
 INFO En effet elle présente une petite ile de merde
 INFO où il n'y a que deux joueurs.
 INFO Oui, elle ne sert à rien !
-INFO
+INFO 
 INFO En effet, c'est une map de test !
-INFO
+INFO 
 INFO Bon encore quelques lignes,
 INFO juste histoire de faire un
 INFO peu déborder le TMemo !!
-INFO
-INFO Ça devrait être bon là, non ?
+INFO 
+INFO Ça detrait être bon là, non ?
 INFO Allez, stop !!!
-INFO
+INFO 
 INFO Note: ça pue
+UNIT 6 A 4,1 1000
+UNIT 1 A 4,1 1000
+UNIT 7 A 2,4 2000
+UNIT 1 A 2,4 1000
+UNIT 6 B 9,1 1000
+UNIT 1 B 9,1 1000
+UNIT 1 B 11,4 1000
+UNIT 7 B 11,4 2000
+UNIT 6 * 4,7 1000
+UNIT 1 * 4,7 1000
+UNIT 6 * 9,7 1000
+UNIT 1 * 9,7 1000
