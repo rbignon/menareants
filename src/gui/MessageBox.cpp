@@ -203,7 +203,7 @@ void TMessageBox::Init(const char* s)
 
 	background = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, w, h,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*5/10));
+	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*7/10));
 
 	if(x == -1 && y == -1)
 	{
