@@ -33,7 +33,8 @@
  */
 static void send_motd(TClient *cl)
 {
-	std::ifstream fp(app.GetConf()->MotdFile().c_str());
+	std::string file = app.GetConf()->MotdFile();
+	std::ifstream fp(file.c_str());
 
 	if(fp)
 	{
