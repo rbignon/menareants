@@ -69,8 +69,9 @@ void TMap::SetPosition(int _x, int _y, bool force)
 
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
-		dynamic_cast<ECase*>(*casi)->Image()->set(x+(CASE_WIDTH  * (*casi)->X()),
-		                                          y+(CASE_HEIGHT * (*casi)->Y()));
+		if(*casi)
+			dynamic_cast<ECase*>(*casi)->Image()->set(x+(CASE_WIDTH  * (*casi)->X()),
+		                                              y+(CASE_HEIGHT * (*casi)->Y()));
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
@@ -114,7 +115,7 @@ ECase* TMap::TestCase(int mouse_x, int mouse_y)
 
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
-		if(dynamic_cast<ECase*>(*casi)->Test(mouse_x, mouse_y))
+		if(*casi && dynamic_cast<ECase*>(*casi)->Test(mouse_x, mouse_y))
 			return dynamic_cast<ECase*>(*casi);
 	return 0;
 }
@@ -149,8 +150,8 @@ void TMap::Draw(int _x, int _y)
 		{
 			c->Draw();
 			if(CreateEntity() && c->Test(_x, _y))
-					(CreateEntity()->CanBeCreated(c) ? Resources::GoodHashure()
-					                                 : Resources::BadHashure())
+					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
+					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
@@ -170,7 +171,8 @@ void TMap::Draw(int _x, int _y)
 			++enti;
 		}
 
-	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+	if(map->Channel())
+		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 		if(!entity->Move()->Empty())

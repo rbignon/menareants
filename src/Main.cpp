@@ -59,6 +59,7 @@ public:
 	TButton*    OptionsButton;
 	TButton*    CreditsButton;
 	TButton*    QuitterButton;
+	TButtonText* MapEditorButton;
 	TLabel*     Version;
 
 /* Evenements */
@@ -81,6 +82,11 @@ void MenAreAntsApp::WantQuit(TObject*, void*)
 void MenAreAntsApp::WantPlay(TObject*, void*)
 {
 	app.request_game();
+}
+
+void MenAreAntsApp::WantMapEditor(TObject*, void*)
+{
+	app.MapEditor();
 }
 
 void MenAreAntsApp::WantConfig(TObject*, void* b)
@@ -189,13 +195,13 @@ int MenAreAntsApp::main(int argc, char **argv)
 		MainForm->PlayButton->SetOnClick(MenAreAntsApp::WantPlay, this);
 		MainForm->QuitterButton->SetOnClick(MenAreAntsApp::WantQuit, this);
 		MainForm->CreditsButton->SetOnClick(MenAreAntsApp::WantCredits, this);
+		MainForm->MapEditorButton->SetOnClick(MenAreAntsApp::WantMapEditor, this);
 		MainForm->OptionsButton->SetOnClick(MenAreAntsApp::WantConfig, (void*)false);
 
 		do
 		{
 			MainForm->Actions();
 			MainForm->Update();
-			SDL_Delay(20);
 		} while(!want_quit);
 
 		delete MainForm;
@@ -211,12 +217,14 @@ int MenAreAntsApp::main(int argc, char **argv)
 #endif
 		quit_app(225);
 	}
+#ifndef DEBUG
 	catch (const std::exception &err)
 	{
 		std::cout << std::endl << "Exception caught from STL:" << std::endl;
 		std::cout << err.what() << std::endl;
 		quit_app(255);
 	}
+#endif
 
 	return 0;
 
@@ -237,13 +245,19 @@ TMainForm::TMainForm(SDL_Surface* w)
 	PlayButton = AddComponent(new TButton(300,150, 150,50));
 	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), app.sdlwindow));
 
-	OptionsButton = AddComponent(new TButton(300,250, 150,50));
+	OptionsButton = AddComponent(new TButton(300,230, 150,50));
 	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), app.sdlwindow));
 
-	CreditsButton = AddComponent(new TButton(300,350, 150,50));
+	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, "Editeur de maps", &app.Font()->normal));
+	/** \todo utiliser une image bouton comme pour les autres
+	 MapEditorButton = AddComponent(new TButton(300,310, 150,50));
+	 MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), app.sdlwindow));
+	 */
+
+	CreditsButton = AddComponent(new TButton(300,390, 150,50));
 	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), app.sdlwindow));
 
-	QuitterButton = AddComponent(new TButton(300,450, 150,50));
+	QuitterButton = AddComponent(new TButton(300,470, 150,50));
 	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), app.sdlwindow));
 
 	Version = AddComponent(new TLabel(750,105,APP_VERSION, white_color, &app.Font()->big));
@@ -257,6 +271,7 @@ TMainForm::~TMainForm()
 	delete Version;
 	delete QuitterButton;
 	delete CreditsButton;
+	delete MapEditorButton;
 	delete OptionsButton;
 	delete PlayButton;
 }
@@ -329,7 +344,7 @@ TCredits::TCredits(SDL_Surface* w)
 	Label6 = AddComponent(new TLabel(500,235,"* Idée originale", fwhite_color, &app.Font()->big));
 	Label7 = AddComponent(new TLabel(500,265,"* Musique", fwhite_color, &app.Font()->big));
 
-	Memo = AddComponent(new TMemo(&app.Font()->normal, 50, 350, SCREEN_WIDTH-50-50, 150, 0, false));
+	Memo = AddComponent(new TMemo(&app.Font()->normal, 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->AddItem("Merci au lycée Corneilles pour nous avoir mis dans le contexte emmerdant qui "
 	              "nous a permit de trouver des idées \"amusantes\" pour passer le temps et qui "
 	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "

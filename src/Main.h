@@ -53,11 +53,13 @@ protected:
 	void LoadGame(EChannel* ch);
 	void Options(EChannel* ch);
 	void InGame();
+	void MapEditor();
 
 	static void WantQuit(TObject*, void*);
 	static void WantPlay(TObject*, void*);
 	static void WantConfig(TObject*, void*);
 	static void WantCredits(TObject*, void*);
+	static void WantMapEditor(TObject*, void*);
 
 	bool first_run;
 

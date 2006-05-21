@@ -48,7 +48,7 @@ public:
 	void SetPosition(int _x, int _y, bool force = false);
 
 	/* Centre sur un objet ou des coordonées (pixels) de la carte */
-	void CenterTo(ECase* e) { CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void CenterTo(ECase* e) { if(!e) return; CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
 	void CenterTo(ECEntity* e) { CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
 	void CenterTo(int _x, int _y);
 
