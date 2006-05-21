@@ -27,10 +27,15 @@ ECBatiment::ECBatiment(ECSpriteBase* b)
 {
 	img = new ECSpriteBase(b->path.c_str());
 
-	if(Owner())
+	if(Owner() && Owner()->Color())
 		img->ChangeColor(white_color, *color_eq[Owner()->Color()]);
 
 	SetImage(img);
+}
+
+void ECBatiment::RefreshColor(SDL_Color last)
+{
+	img->ChangeColor(last, Owner() ? *color_eq[Owner()->Color()] : white_color);
 }
 
 ECBatiment::~ECBatiment()

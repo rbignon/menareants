@@ -49,8 +49,52 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&) { return true; }
 
+	virtual void RefreshColor(SDL_Color last);
+
 private:
 	ECSpriteBase *img;
+};
+
+/********************************************************************************************
+ *                                ECapitale                                                 *
+ ********************************************************************************************/
+
+class ECapitale : public ECBatiment, public ECBCapitale
+{
+/* Constructeur/Destructeur */
+public:
+
+	CAPITALE_EMPTY_CONSTRUCTOR(ECapitale) {}
+
+	CAPITALE_CONSTRUCTOR(ECapitale), ECBatiment(Resources::Capitale_Face()) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Ville"; }
+	virtual const char* Infos() const { return "Rapporte deux fois plus d'argent qu'une ville"; }
+	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
+};
+
+/********************************************************************************************
+ *                                ECity                                                     *
+ ********************************************************************************************/
+
+class ECity : public ECBatiment, public ECBCity
+{
+/* Constructeur/Destructeur */
+public:
+
+	CITY_EMPTY_CONSTRUCTOR(ECity) {}
+
+	CITY_CONSTRUCTOR(ECity), ECBatiment(Resources::City_Face()) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Ville"; }
+	virtual const char* Infos() const { return "Rapporte une certaine somme par tours"; }
+	virtual ECImage* Icon() const { return Resources::City_Icon(); }
 };
 
 /********************************************************************************************
