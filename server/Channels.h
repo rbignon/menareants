@@ -139,17 +139,19 @@ public:
 	 *
 	 * <pre>
 	 * Flags: (Definition in lib/Map.h before ECBEntity)
-	 * ARM_MOVE        0x001
-	 * ARM_SPLIT       0x002
-	 * ARM_ATTAQ       0x004
-	 * ARM_REMOVE      0x008
-	 * ARM_LOCK        0x010
-	 * ARM_TYPE        0x020
-	 * ARM_NUMBER      0x040
-	 * ARM_RETURN      0x080
-	 * ARM_HIDE        0x100  (if you want to hide informations to players who haven't any entity in \a et list)
-	 * ARM_RECURSE     0x200  (NEVER CALL IT)
-	 * ARM_NOCONCERNED 0x0400 (if you don't want to send it to the others players of owner)
+	 * ARM_MOVE        0x0001  (=id,x,r,[<>^v])
+	 * ARM_SPLIT       0x0002  (/nb)
+	 * ARM_ATTAQ       0x0004  (*x,y)
+	 * ARM_REMOVE      0x0008  (-)
+	 * ARM_LOCK        0x0010  (.)
+	 * ARM_TYPE        0x0020  (%n)
+	 * ARM_NUMBER      0x0040  (+n)
+	 * ARM_RETURN      0x0080  (\<x,y)
+	 * ARM_HIDE        0x0100  (if you want to hide informations to players who haven't any entity in \a et list)
+	 * ARM_RECURSE     0x0200  (NEVER CALL IT)
+	 * ARM_NOCONCERNED 0x0400  (if you don't want to send it to the others players of owner)
+	 * ARM_DEPLOY      0x0800  ({ or })
+	 * ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 	 * ARM_UNION       (ARM_MOVE|ARM_NUMBER)
 	 * ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
 
@@ -179,8 +181,10 @@ public:
 	 */
 	std::string ModesStr() const;
 
+	/** Send a LEA message to all players and close this channel */
 	void ByeEveryBody(ECBPlayer* exception = 0);
 
+	/** Check if every body is ready, and do a lot of things if it is true */
 	void CheckReadys();
 
 /* Attributs */
@@ -205,11 +209,14 @@ public:
 
 	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 
+	/** This owner of this channel */
 	ECPlayer* Owner() { return owner; }
 	void SetOwner(ECPlayer* _o) { owner = _o; }
 
+	/** Number of humans players in this channel */
 	BPlayerVector::size_type NbHumains() const;
 
+	/** This operator can be used to send a INFO message to all players */
 	void operator<< (std::string os);
 
 /* Variables privées */

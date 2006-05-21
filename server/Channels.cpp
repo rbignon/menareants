@@ -28,6 +28,7 @@
 #include "Map.h"
 #include "Colors.h"
 #include "Units.h"
+#include "InGame.h"
 #include <cstdarg>
 #include <list>
 
@@ -214,6 +215,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				else if(!sender->RemoveAllie(pl))
 					Debug(W_DESYNCH, "SET -a %s: il n'est pas allié avec lui", pl->GetNick());
 				changed = YES_WITHPARAM;
+				break;
 			}
 			case 'n':
 				if(!sender->Channel()->Joinable())
@@ -633,7 +635,7 @@ void EChannel::CheckReadys()
 				for(uint i = 1; i <= Map()->MaxPlayers(); i++) positions.push_back(i);
 
 				BMapPlayersVector mpv = Map()->MapPlayers();
-				for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
+				for(BPlayerVector::iterator it=players.begin(); it != players.end();)
 					if(!(*it)->Ready())
 					{
 						TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
@@ -653,6 +655,7 @@ void EChannel::CheckReadys()
 						if((*it)->Position()) positions.remove((*it)->Position());
 						if((*it)->Color()) colors.remove((*it)->Color());
 						if((*it)->Nation()) nations.remove((*it)->Nation());
+						++it;
 					}
 				for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 				{
@@ -712,6 +715,37 @@ void EChannel::CheckReadys()
 				app.NBwchan--;
 				app.NBachan++;
 
+				for(BPlayerVector::iterator pl=players.begin();; ++pl)
+				{
+					std::vector<std::string> units = (pl==players.end() ? Map()->NeutralUnits() : (*pl)->MapPlayer()->Units());
+					for(std::vector<std::string>::iterator it = units.begin(); it != units.end(); ++it)
+					{
+						std::string line = *it;
+						std::string type = stringtok(line, " ");
+						std::string owner = stringtok(line, " ");
+						std::string acaca = stringtok(line, " ");
+						uint x, y;
+						x = StrToTyp<uint>(stringtok(acaca, ","));
+						y = StrToTyp<uint>(acaca);
+						std::string number = line;
+						if(type.empty() || owner.empty() || acaca.empty() || number.empty())
+							vDebug(W_ERR, "La déclaration d'une unité sur la map est invalide.",
+							              VName(type) VName(owner) VName(acaca) VName(number));
+
+						const char *e_name = FindEntityName(pl == players.end() ? 0 : dynamic_cast<ECPlayer*>(*pl));
+						ECEntity* entity = CreateAnEntity(StrToTyp<uint>(type), e_name, pl == players.end() ? 0 : *pl,
+						                                  (*map)(x,y));
+						entity->SetNb(StrToTyp<uint>(number));
+						Map()->AddAnEntity(entity);
+						SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y(), entity->Nb(),
+						                                          entity->Type());
+					}
+					if(pl == players.end())
+						break;
+					dynamic_cast<ECPlayer*>(*pl)->SetMoney(Map()->BeginMoney());
+				}
+
+#if 0
 				BCaseVector cav = Map()->Cases();
 				for(BCaseVector::iterator cai = cav.begin(); cai != cav.end(); ++cai)
 					if((*cai)->Flags() & C_VILLE)
@@ -736,6 +770,7 @@ void EChannel::CheckReadys()
 					}
 				for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					dynamic_cast<ECPlayer*>(*it)->SetMoney(Map()->BeginMoney());
+#endif
 
 				NeedReady();
 
@@ -774,10 +809,6 @@ void EChannel::CheckReadys()
 					SetState(EChannel::PLAYING);
 					sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
 
-					/* On attribut à tout le monde son argent */
-					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
-						dynamic_cast<ECPlayer*>(*it)->UpMoney(dynamic_cast<ECPlayer*>(*it)->TurnMoney());
-
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 					{
@@ -792,6 +823,16 @@ void EChannel::CheckReadys()
 						else
 							++enti;
 					}
+					/* On attribut à tout le monde son argent */
+					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+					{
+						int money = 0;
+						std::vector<ECBEntity*> entv = (*it)->Entities()->List();
+						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+							money += (*enti)->TurnMoney();
+						dynamic_cast<ECPlayer*>(*it)->UpMoney(money);
+					}
+
 					Map()->NextDay();
 				}
 				else
@@ -956,8 +997,13 @@ void EChannel::ByeEveryBody(ECBPlayer* exception)
 		if(!*pi || *pi == exception) continue;
 		ECPlayer *p = dynamic_cast<ECPlayer*>(*pi);
 		if(!p->Client()) continue;
-		p->Client()->sendrpl(app.rpl(ECServer::LEAVE), p->Client()->GetNick());
-		p->Client()->ClrPlayer();
+		if(p->Client()->IsIA())
+			app.delclient(p->Client());
+		else
+		{
+			p->Client()->sendrpl(app.rpl(ECServer::LEAVE), p->Client()->GetNick());
+			p->Client()->ClrPlayer();
+		}
 	}
 }
 
@@ -973,12 +1019,12 @@ const char* EChannel::FindEntityName(ECPlayer* pl)
 	num[2] = '\0';
 
 	bool unchecked = false;
-	BEntityVector ev = pl ? pl->Entities()->List() : map->Entities()->List();
+	BEntityVector ev = pl ? pl->Entities()->List() : map->Neutres()->List();
 
 	do
 	{
 		BEntityVector::iterator it;
-		for(it = ev.begin(); it != ev.end() && !((pl || !(*it)->Owner()) && !strcmp((*it)->ID(), num)); it++);
+		for(it = ev.begin(); it != ev.end() && strcmp((*it)->ID(), num); it++);
 
 		if(it == ev.end())
 			unchecked = true;
@@ -1038,7 +1084,11 @@ void EChannel::SetMap(ECBMap *m)
 	/* Envoie d'une map */
 	std::vector<std::string> map_file = map->MapFile();
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
+	{
+		const char* c = (*it).c_str();
+		if(!strncmp(c, "UNIT", 4)) continue;
 		sendto_players(NULL, app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+	}
 	sendto_players(NULL, app.rpl(ECServer::ENDOFSMAP));
 	return;
 }
@@ -1226,7 +1276,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 std::string EChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
-	if(limite) modes += "l", params += " " + TypToStr(limite);
+	if(limite) modes += "l", params = " " + TypToStr(limite);
 	if(map)    modes += "m", params += " " + TypToStr(Map()->Num());
 
 	switch(state)
