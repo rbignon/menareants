@@ -1075,9 +1075,12 @@ void TOptionsMap::Options(TObject*, void* m)
 								TMessageBox mb("L'identifiant est déjà utilisé", BT_OK, OptionsMap);
 								mb.Show();
 							}
-							map->AddCountry(c_id.c_str());
-							OptionsMap->AddCountryEdit->ClearString();
-							OptionsMap->Refresh();
+							else
+							{
+								map->AddCountry(c_id.c_str());
+								OptionsMap->AddCountryEdit->ClearString();
+								OptionsMap->Refresh();
+							}
 						}
 						else if(OptionsMap->Countries->GetSelectedItem() < 0 ||
 						  !(id = OptionsMap->Countries->ReadValue(OptionsMap->Countries->GetSelectedItem()).c_str()))
@@ -1102,7 +1105,7 @@ void TOptionsMap::Options(TObject*, void* m)
 
 							OptionsMap->CountryPlayer->SetEnabled();
 							OptionsMap->CountryPlayer->ClearItems();
-							OptionsMap->CountryPlayer->AddItem(true, "*", "*");
+							OptionsMap->CountryPlayer->AddItem(true, "Neutre", "*");
 							BMapPlayersVector mps = map->MapPlayers();
 							for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
 								OptionsMap->CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
@@ -1156,7 +1159,7 @@ void TOptionsMap::Refresh()
 	Countries->ClearItems();
 	BCountriesVector cts = map->Countries();
 	for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
-		Countries->AddItem(false, (*it)->ID(), (*it)->ID());
+		Countries->AddItem(false, (*it)->ID(), (*it)->ID(), (*it)->Cases().empty() ? green_color : black_color);
 
 	Players->ClearItems();
 	CountryPlayer->ClearItems();
@@ -1181,7 +1184,11 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 
 	OkButton = AddComponent(new TButtonText(600,500,150,50, "OK", &app.Font()->normal));
 
+	PlayersLabel = AddComponent(new TLabel(100, 130, "Joueurs :", white_color, &app.Font()->normal));
 	Players = AddComponent(new TListBox(&app.Font()->sm, 100,150,150,200));
+	Players->SetNoItemHint();
+	Players->SetHint("Ce sont les différents joueurs susceptibles d'être joués.\nChaque territoire et unité peut être lié à "
+	                 " un joueur.");
 
 	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, "Ajouter", &app.Font()->normal));
 	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
@@ -1189,7 +1196,11 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, "Supprimer", &app.Font()->normal));
 	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 
+	CountriesLabel = AddComponent(new TLabel(400, 130, "Territoires :", white_color, &app.Font()->normal));
 	Countries = AddComponent(new TListBox(&app.Font()->sm, 400,150,150,200));
+	Countries->SetNoItemHint();
+	Countries->SetHint("Liste des différents territoires. Vous pouvez assigner chaque case à un territoire.\n"
+	                   "Vous ne pouvez supprimer que les territoires en vert, qui ne sont assignés à aucune case.");
 
 	AddCountryEdit = AddComponent(new TEdit(&app.Font()->sm, 400,360,150, 2, COUNTRY_CHARS));
 
@@ -1199,8 +1210,12 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, "Supprimer", &app.Font()->normal));
 	DelCountryButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
 
-	CountryPlayer = AddComponent(new TComboBox(&app.Font()->sm, 560, 150, 70));
+	CountryPlayerLabel = AddComponent(new TLabel(560, 150, "Appartient à :", white_color, &app.Font()->sm));
+	CountryPlayer = AddComponent(new TComboBox(&app.Font()->sm, 560 + CountryPlayerLabel->Width(), 150, 70));
 	CountryPlayer->SetEnabled(false);
+	CountryPlayer->SetNoItemHint();
+	CountryPlayer->SetHint("Propriétaire du territoire sélectionné.\n"
+	                       "Un territoire neutre n'appartiendra à personne au début de la partie.");
 
 	NameLabel = AddComponent(new TLabel(50,380, "Nom de la carte", white_color, &app.Font()->normal));
 	Name = AddComponent(new TEdit(&app.Font()->sm, 50, 400, 150, 50, EDIT_CHARS));
@@ -1215,11 +1230,15 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 	BeginLabel = AddComponent(new TLabel(50,500, "Argent au début de la partie", white_color, &app.Font()->normal));
 	Begin = AddComponent(new TEdit(&app.Font()->sm, 50, 520, 150, 5, "0123456789"));
 
+	Hints = AddComponent(new TMemo(&app.Font()->sm, 300, 480, 290, 100));
+	SetHint(Hints);
+
 	SetBackground(Resources::Titlescreen());
 }
 
 TOptionsMap::~TOptionsMap()
 {
+	delete Hints;
 	delete Begin;
 	delete BeginLabel;
 	delete City;
@@ -1229,13 +1248,16 @@ TOptionsMap::~TOptionsMap()
 	delete Name;
 	delete NameLabel;
 	delete CountryPlayer;
+	delete CountryPlayerLabel;
 	delete DelCountryButton;
 	delete AddCountryButton;
 	delete AddCountryEdit;
 	delete Countries;
+	delete CountriesLabel;
 	delete DelPlayerButton;
 	delete AddPlayerButton;
 	delete Players;
+	delete PlayersLabel;
 	delete OkButton;
 }
 

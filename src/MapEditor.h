@@ -32,6 +32,7 @@
 #include "gui/Image.h"
 #include "gui/Edit.h"
 #include "gui/ComboBox.h"
+#include "gui/Memo.h"
 #include "gui/Label.h"
 
 /********************************************************************************************
@@ -257,13 +258,16 @@ public:
 public:
 
 	TButtonText* OkButton;
+	TLabel*      PlayersLabel;
 	TListBox*    Players;
 	TButtonText* AddPlayerButton;
 	TButtonText* DelPlayerButton;
+	TLabel*      CountriesLabel;
 	TListBox*    Countries;
 	TEdit*       AddCountryEdit;
 	TButtonText* AddCountryButton;
 	TButtonText* DelCountryButton;
+	TLabel*      CountryPlayerLabel;
 	TComboBox*   CountryPlayer;
 
 	TLabel*      NameLabel;
@@ -276,7 +280,9 @@ public:
 	TEdit*       City;
 
 	TLabel*      BeginLabel;
-	TEdit*      Begin;
+	TEdit*       Begin;
+
+	TMemo*       Hints;
 
 /* Methodes */
 public:
