@@ -26,6 +26,32 @@
 #include "Debug.h"
 
 /********************************************************************************************
+ *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
+ ********************************************************************************************/
+
+
+void TIA::FirstMovements()
+{
+	std::vector<ECBEntity*> ents = Player()->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	{
+		std::string msg;
+		for(int k = 0; k < 2; k++)
+		{
+			int i = rand()%4;
+			switch(i)
+			{
+				case 0: msg += " <"; break;
+				case 1: msg += " >"; break;
+				case 2: msg += " ^"; break;
+				case 3: msg += " v"; break;
+			}
+		}
+		ia_send("ARM " + std::string((*enti)->ID()) + msg);
+	}
+}
+
+/********************************************************************************************
  *                        COMMANDES RECUES PAR LES IA DU SERVEUR                            *
  ********************************************************************************************/
 
@@ -50,24 +76,52 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 
 	bool add = true;
 
-	for(uint i=0; i<parv[1].size(); i++)
+	for(uint i=0, j=2; i<parv[1].size(); i++)
 		switch(parv[1][i])
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 'P':
+				me->FirstMovements();
+				break;
+			case 'a':
+			{
+				printf("%s\n", parv[j].c_str());
+				if(strcasecmp(me->Player()->GetNick(), parv[j++].c_str())) break;
+
+				me->ia_send("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
+				break;
+			}
 			case 'm':
 				if(add && !me->Player()->Ready())
 				    me->ia_send("SET +!");
 				break;
 			case '!':
 			    /* Si on met -!, on remet l'IA prete */
-			    if(!add && !me->Player()->Ready())
+			    if(!add && !me->Player()->Ready() && me->Player()->Channel()->State() != EChannel::PLAYING)
+			    {
 					for(std::vector<ECPlayer*>::iterator it=players.begin(); it != players.end(); ++it)
 					    if(*it == me->Player())
 					    {
 							me->ia_send("SET +!");
 							break;
 						}
+				}
+				else if(add && !me->Player()->Ready() && me->Player()->Channel()->State() == EChannel::PLAYING)
+				{
+					BPlayerVector pls = me->Player()->Channel()->Players();
+					uint counter = 0, humans = 0;
+					for(BPlayerVector::const_iterator it = pls.begin(); it != pls.end(); ++it)
+						if(!(*it)->IsIA())
+						{
+							humans++;
+							if((*it)->Ready())
+								counter++;
+						}
+					if(counter == humans)
+						me->ia_send("SET +!");
+				}
+
 				break;
 		}
 	return 0;
@@ -111,6 +165,9 @@ int TIA::recv_one_msg(std::string msg)
 		{"SET",                TIA::SETCommand,             1},
 		{"LEA",                TIA::LEACommand,             0}
 	};
+
+	while(msg[msg.size()-1] == '\n' || msg[msg.size()-1] == '\r')
+		msg = msg.substr(0, msg.size()-2);
 
 #ifdef DEBUG
 	if(strncmp(msg.c_str(), "PIG", 3) && strncmp(msg.c_str(), "POG", 3))
