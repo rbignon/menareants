@@ -83,7 +83,6 @@ public:
 	TImage*         Icon;
 	TLabel*         Name;
 	TLabel*         Nb;
-	TLabel*         OwnerLabel;
 	TLabel*         Owner;
 	TButtonText*    DeployButton;
 	TButtonText*    AttaqButton;
@@ -95,9 +94,6 @@ public:
 
 	ECEntity* Entity() const { return entity; }
 	void SetEntity(ECEntity* e);
-
-	ECase* Case() const { return acase; }
-	void SetCase(ECase* c);
 
 /* Methodes */
 public:
@@ -114,17 +110,15 @@ private:
 	EChannel* chan;
 	ECPlayer* me;
 	ECEntity* entity;
-	ECase* acase;
 	static void vSetEntity(void*);
-	static void vSetCase(void*);
 
 	template<typename T>
-	void ShowIcons(T e)
+	void ShowIcons(T e, ECBPlayer* pl)
 	{
 		assert(Icons);
 		if(e)
 		{
-			std::vector<ECEntity*> elist = EntityList.CanCreatedBy(e);
+			std::vector<ECEntity*> elist = EntityList.CanCreatedBy(e, pl);
 			Icons->SetList(elist);
 		}
 		else
