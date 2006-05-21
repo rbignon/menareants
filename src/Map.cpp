@@ -31,6 +31,7 @@
 #include "Channels.h"
 #include "Units.h"
 #include "Batiments.h"
+#include "MapEditor.h"
 
 /********************************************************************************************
  *                               ECEntityList                                               *
@@ -97,8 +98,8 @@ ECEntity::~ECEntity()
 
 bool ECEntity::Test(int souris_x, int souris_y)
 {
-	return (image && ((image->X() <= souris_x) && (souris_x <= (int)(image->X()+image->GetWidth()))
-	         && (image->Y() <= souris_y) && (souris_y <= int(image->Y()+image->GetHeight()))));
+	return (image && ((image->X() <= souris_x) && (souris_x < (int)(image->X()+image->GetWidth()))
+	         && (image->Y() <= souris_y) && (souris_y < int(image->Y()+image->GetHeight()))));
 }
 
 void ECEntity::Draw()
@@ -152,8 +153,8 @@ ECase::~ECase()
 
 bool ECase::Test(int souris_x, int souris_y)
 {
-	return (image && ((image->X() <= souris_x) && (souris_x <= (int)(image->X()+image->GetWidth()))
-	         && (image->Y() <= souris_y) && (souris_y <= int(image->Y()+image->GetHeight()))));
+	return (image && ((image->X() <= souris_x) && (souris_x < (int)(image->X()+image->GetWidth()))
+	         && (image->Y() <= souris_y) && (souris_y < int(image->Y()+image->GetHeight()))));
 }
 
 void ECase::Draw()
@@ -197,28 +198,71 @@ ECMap::~ECMap()
 	if(preview) delete preview;
 }
 
-static struct
-{
-	char c;
-	ECSpriteBase* (*spr) ();
-} case_img[] = {
-	{ 't', Resources::CaseTerre },
-	{ 'm', Resources::CaseMer },
-	{ 'v', Resources::CaseVille },
-	{ 'V', Resources::CaseCapitale },
-	{ 'a', Resources::CaseBordSud },
-	{ 'b', Resources::CaseBordNord },
-	{ 'c', Resources::CaseBordEst },
-	{ 'd', Resources::CaseBordOuest },
-	{ 'e', Resources::CaseBordSudEst },
-	{ 'f', Resources::CaseBordSudOuest },
-	{ 'g', Resources::CaseBordNordOuest },
-	{ 'h', Resources::CaseBordNordEst },
-	{ 'i', Resources::CaseCoinNordOuest },
-	{ 'j', Resources::CaseCoinNordEst },
-	{ 'k', Resources::CaseCoinSudEst },
-	{ 'l', Resources::CaseCoinSudOuest }
+struct case_img_t case_img[] = {
+	{ 't', Resources::CaseTerre,           't' },
+	{ 'm', Resources::CaseMer,             'm' },
+	{ 'a', Resources::CaseBordSud,         'm' },
+	{ 'b', Resources::CaseBordNord,        'm' },
+	{ 'c', Resources::CaseBordEst,         'm' },
+	{ 'd', Resources::CaseBordOuest,       'm' },
+	{ 'e', Resources::CaseBordSudEst,      'm' },
+	{ 'f', Resources::CaseBordSudOuest,    'm' },
+	{ 'g', Resources::CaseBordNordOuest,   'm' },
+	{ 'h', Resources::CaseBordNordEst,     'm' },
+	{ 'i', Resources::CaseCoinNordOuest,   'm' },
+	{ 'j', Resources::CaseCoinNordEst,     'm' },
+	{ 'k', Resources::CaseCoinSudEst,      'm' },
+	{ 'l', Resources::CaseCoinSudOuest,    'm' },
+	{ 'n', Resources::CasePontHorizontal,  'p' },
+	{ 'o', Resources::CasePontVertical,    'p' },
+	{ 'p', Resources::CasePontGauche,      'p' },
+	{ 'q', Resources::CasePontDroite,      'p' },
+	{ 'r', Resources::CasePontHaut,        'p' },
+	{ 's', Resources::CasePontBas,         'p' },
 };
+
+void TBarreCaseIcons::GoLast(TObject* o, void* e)
+{
+	TBarreCaseIcons* parent = dynamic_cast<TBarreCaseIcons*>(o->Parent());
+
+	assert(parent);
+
+	if(parent->first > 0) --parent->first;
+
+	parent->SetList();
+}
+
+void TBarreCaseIcons::GoNext(TObject* o, void* e)
+{
+	TBarreCaseIcons* parent = dynamic_cast<TBarreCaseIcons*>(o->Parent());
+
+	assert(parent);
+
+	if(parent->first < (ASIZE(case_img)-1)) ++parent->first;
+
+	parent->SetList();
+}
+
+void TBarreCaseIcons::SetList()
+{
+	Clear();
+
+	Init();
+
+	int _x = X();
+	uint _h = 0;
+	TBarreCase* parent = dynamic_cast<TBarreCase*>(Parent());
+	for(uint _i = first; _i < ASIZE(case_img); ++_i)
+	{
+		TImage* i = AddComponent(new TImage(_x, 0, case_img[_i].spr()->First(), false));
+		_x += i->Width() + 1;
+		if(i->Height() > _h) _h = i->Height();
+		i->SetOnClick(TBarreCaseIcons::SelectCase, &case_img[_i]);
+		if(_x + (2 * i->Width()) >= parent->Width()) break;
+	}
+	SetWidth(parent->Width()-X());
+	SetHeight(_h);
+}
 
 void ECMap::SetCaseAttr(ECBCase* c, char id)
 {
@@ -228,6 +272,7 @@ void ECMap::SetCaseAttr(ECBCase* c, char id)
 		if(case_img[j].c == id)
 		{
 			dynamic_cast<ECase*>(c)->SetImage(case_img[j].spr());
+			dynamic_cast<ECase*>(c)->SetImgID(id);
 			return;
 		}
 
@@ -246,8 +291,6 @@ static struct
 	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
 	uint flags;
 } case_type[] = {
-	{ 'v', CreateCase<ECVille>, C_VILLE            },
-	{ 'V', CreateCase<ECVille>, C_VILLE|C_CAPITALE },
 	{ 'm', CreateCase<ECMer>,   C_MER              },
 	{ 't', CreateCase<ECTerre>, C_TERRE            },
 	{ 'p', CreateCase<ECPont>,  C_PONT             }
@@ -277,7 +320,9 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 	for(uint _y = 0; _y < y; ++_y, yy+=size_y, xx=0)
 		for(uint _x = 0; _x < x; ++_x, xx+=size_x)
 		{
-			ECase *c = dynamic_cast<ECase*>(map[ _y * x + _x ]);
+			ECBCase* cc = map[ _y * x + _x ];
+			ECase *c = dynamic_cast<ECase*>(cc);
+			if(!c) continue;
 			SDL_Color *color = 0;
 			switch(c->TypeID())
 			{
@@ -286,8 +331,11 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 					color = &red_color;
 					break;
 				case 't':
-					color = (c->Country()->Owner() && c->Country()->Owner()->Player()) ?
-					        color_eq[c->Country()->Owner()->Player()->Color()] : &brown_color;
+					color = (c->Country() && c->Country()->Owner()) ?
+					          c->Country()->Owner()->Player() ?
+					            color_eq[c->Country()->Owner()->Player()->Color()]
+					          : color_eq[c->Country()->Owner()->ID()%COLOR_MAX]
+					        : &brown_color;
 					break;
 				case 'p':
 					color = &gray_color;
@@ -308,15 +356,15 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 
 			if(!(c->Flags() & C_MER))
 			{
-				if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country())
+				if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country() && !(map[(_y-1) * x + _x]->Flags() & C_MER))
 					marge |= MARGE_TOP;
-				if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country())
+				if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country() && !(map[_y * x + _x-1]->Flags() & C_MER))
 					marge |= MARGE_LEFT;
 				if(size_x > 5 && size_y > 5)
 				{
-					if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country())
+					if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country() && !(map[(_y+1) * x+_x]->Flags() & C_MER))
 						marge |= MARGE_BOTTOM;
-					if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country())
+					if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country() && !(map[_y * x + _x+1]->Flags() & C_MER))
 						marge |= MARGE_RIGHT;
 				}
 			}
@@ -339,11 +387,13 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 		{
 			if(!(*enti)->Owner()) continue;
 			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
-			for(uint _yy = (*enti)->Case()->Y() * size_y; _yy < yy+size_y; _yy++)
-				for(uint _xx = (*enti)->Case()->X() * size_x; _xx < xx+size_x; _xx++)
-					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r > 10 ? col->r - 10 : 0,
-					                                                  col->g > 10 ? col->g - 10 : 0,
-					                                                  col->b > 10 ? col->b - 10 : 0));
+			yy = (*enti)->Case()->Y() * size_y;
+			xx = (*enti)->Case()->X() * size_x;
+			for(uint _yy = yy; _yy < yy+size_y; _yy++)
+				for(uint _xx = xx; _xx < xx+size_x; _xx++)
+					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r > 100 ? col->r - 30 : col->r + 30,
+					                                                  col->g > 100 ? col->g - 30 : col->g + 30,
+					                                                  col->b > 100 ? col->b - 30 : col->b + 30));
 		}
 	}
 
@@ -352,32 +402,35 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 	{
 		for(std::vector<ECMapPlayer*>::iterator it = map_players.begin(); it != map_players.end(); ++it)
 		{
-			bool found = false;
+			uint begin_x = Width(), begin_y = Height(), max_x = 0, max_y = 0;
 			std::vector<ECountry*> coun = (*it)->Countries();
-			for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end() && !found; ++ci)
+			for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end(); ++ci)
 			{
 				std::vector<ECBCase*> cas = (*ci)->Cases();
-				for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end() && !found; ++casi)
+				for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end(); ++casi)
 				{
-					if((*casi)->Flags() & (C_VILLE|C_CAPITALE)/* && ((casi+1) == cas.end() || (casi+2) == cas.end() ||
-					((*(casi+2))->X() == (*casi)->X()+2 && (*(casi+2))->Flags() & (C_TERRE|C_VILLE|C_CAPITALE)))*/)
+					if((*casi)->Flags() & (C_TERRE))
 					{
-						SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->sm.GetTTF()),
-														TypToStr((*it)->Num()).c_str(), white_color);
-						SDL_Rect dst_rect;
-						dst_rect.x = (*casi)->X()*size_x+1;
-						dst_rect.y = (*casi)->Y()*size_y+1;
-						dst_rect.h = txtsurf->h;
-						dst_rect.w = txtsurf->w;
-						
-						SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
-						SDL_FreeSurface(txtsurf);
-						found = true;
+						if(begin_x > (*casi)->X()) begin_x = (*casi)->X();
+						if(begin_y > (*casi)->Y()) begin_y = (*casi)->Y();
+						if(max_x < (*casi)->X()) max_x = (*casi)->X();
+						if(max_y < (*casi)->Y()) max_y = (*casi)->Y();
 					}
 				}
 			}
+			SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->sm.GetTTF()),
+			                                  TypToStr((*it)->Num()).c_str(), white_color);
+			SDL_Rect dst_rect;
+			dst_rect.x = (begin_x+max_x)/2 * size_x;
+			dst_rect.y = (begin_y+max_y)/2 * size_y;
+			dst_rect.h = txtsurf->h;
+			dst_rect.w = txtsurf->w;
+
+			SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
+			SDL_FreeSurface(txtsurf);
 		}
 	}
+
 	SUNLOCK(surf);
 
 	if(preview)

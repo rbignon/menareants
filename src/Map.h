@@ -30,6 +30,14 @@ class ECase;
 class TMap;
 class ECEntity;
 
+struct case_img_t
+{
+	char c;
+	ECSpriteBase* (*spr) ();
+	char type;
+};
+extern struct case_img_t case_img[];
+
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
@@ -95,6 +103,8 @@ public:
 
 	virtual void ChangeCase(ECBCase* new_case);
 
+	virtual void RefreshColor(SDL_Color) = 0;
+
 /* Attributs */
 public:
 
@@ -113,8 +123,10 @@ public:
 	ECMove* Move() { return &move; }
 
 /* Variables privées */
-protected:
+private:
 	ECSprite* image;
+
+protected:
 	bool selected;
 	ECMove move;
 };
@@ -151,30 +163,14 @@ public:
 	void Select(bool s = true) { selected = s; }
 	bool Selected() const { return selected; }
 
+	void SetImgID(char id) { img_id = id; }
+	char ImgID() const { return img_id; }
+
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
-};
-
-/** This class is a derived class from ECBCase whose is a city */
-class ECVille : public ECBVille, public ECase
-{
-/* Constructeur/Destructeur */
-public:
-	ECVille(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
-
-/* Methodes */
-public:
-
-	virtual const char* Name() const { return flags & C_CAPITALE ? "Capitale" : "Ville"; }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
+	char img_id;
 };
 
 /** This class is a derived class from ECBCase whose is a land */
@@ -270,12 +266,12 @@ public:
 	TMap* ShowMap() { return showmap; }
 	void SetShowMap(TMap* sm) { showmap = sm; }
 
+	virtual void SetCaseAttr(ECBCase*, char);
+
 /* Variables privées */
 protected:
 	ECImage *preview;
 	TMap *showmap;
-
-	virtual void SetCaseAttr(ECBCase*, char);
 };
 
 /********************************************************************************************
@@ -294,12 +290,12 @@ public:
 	std::vector<ECEntity*> List() const { return entities; }
 
 	template<typename T>
-	std::vector<ECEntity*> CanCreatedBy(T c) const
+	std::vector<ECEntity*> CanCreatedBy(T c, ECBPlayer* pl) const
 	{
 		std::vector<ECEntity*> l;
 		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if(c->CanCreate(*it))
+			if(c->CanCreate(*it) && (*it)->CanBeCreated(pl))
 				l.push_back(*it);
 		return l;
 	}
@@ -308,7 +304,7 @@ public:
 	{
 		std::vector<ECEntity*> l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if((*it)->IsBuilding() && !pl || (*it)->CanBeCreated(pl))
+			if((*it)->IsBuilding() && (!pl || (*it)->CanBeCreated(pl)))
 				l.push_back(*it);
 		return l;
 	}
