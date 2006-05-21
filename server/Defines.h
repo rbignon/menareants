@@ -34,7 +34,7 @@ typedef unsigned int   uint;
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"1"
+#define APP_VERSION_BETA	"20"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
