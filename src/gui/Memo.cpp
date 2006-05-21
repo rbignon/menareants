@@ -92,30 +92,31 @@ bool TMemo::Clic (int mouse_x, int mouse_y)
 
 void TMemo::Draw (int mouse_x, int mouse_y)
 {
-  if(background)
-  {
-	SDL_Rect r_back = {x,y,w,h};
-	SDL_BlitSurface( background, NULL, Window(), &r_back);
-  }
+	if(background)
+	{
+		SDL_Rect r_back = {x,y,w,h};
+		SDL_BlitSurface( background, NULL, Window(), &r_back);
+	}
 
-  for (uint i=0; i < nb_visible_items; i++)
-  {
-	if(!m_items[i+first_visible_item].label.empty())
-		font->WriteLeft(x+5,
-			 y+i*height_item,
-			 m_items[i+first_visible_item].label,
-			 m_items[i+first_visible_item].color) ;
-  }
+	for (uint i=0; i < nb_visible_items; i++)
+	{
+		if(i+first_visible_item >= m_items.size()) continue;
+		if(!m_items[i+first_visible_item].label.empty())
+			font->WriteLeft(x+5,
+				y+i*height_item,
+				m_items[i+first_visible_item].label,
+				m_items[i+first_visible_item].color) ;
+	}
 
-  // buttons for listbox with more items than visible
-  if (m_items.size() > nb_visible_items_max)
-  {
-    m_up.SetXY(x+w-12, y+2);
-    m_down.SetXY(x+w-12, y+h-7);
-
-    m_up.Draw (mouse_x, mouse_y);
-    m_down.Draw (mouse_x, mouse_y);
-  }
+	// buttons for listbox with more items than visible
+	if (m_items.size() > nb_visible_items_max)
+	{
+		m_up.SetXY(x+w-12, y+2);
+		m_down.SetXY(x+w-12, y+h-7);
+	
+		m_up.Draw (mouse_x, mouse_y);
+		m_down.Draw (mouse_x, mouse_y);
+	}
 }
 
 void TMemo::AddItem (const std::string &label, SDL_Color _color)
