@@ -1,5 +1,11 @@
 2005-05-21  Romain Bignon <progs@headfucking.net>
 
+	* src/gui/ListBox.cpp: Correction d'un bug de ScrollTo().
+
+	* server/Login.cpp: Tentative de correction d'un bug.
+
+	* src/MapEditor.cpp (OptionsMap): Rajouts de labels et de hints pour que ça soit plus explicite.
+
 	* src/data/anims/cases/pont*, src/Resources.h, src/Map.cpp: Implémentation des ponts.
 
 	* server/maps: Utilisations des ponts.
