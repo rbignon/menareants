@@ -26,6 +26,66 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                               ECapitale                                                  *
+ ********************************************************************************************/
+class ECapitale : public ECEntity, public ECBCapitale
+{
+/* Constructeur/Destructeur */
+public:
+
+	CAPITALE_EMPTY_CONSTRUCTOR(ECapitale) {}
+
+	CAPITALE_CONSTRUCTOR(ECapitale) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+
+/* Attributs */
+public:
+
+/* Variables protégées */
+protected:
+
+};
+
+/********************************************************************************************
+ *                               ECity                                                      *
+ ********************************************************************************************/
+class ECity : public ECEntity, public ECBCity
+{
+/* Constructeur/Destructeur */
+public:
+
+	CITY_EMPTY_CONSTRUCTOR(ECity) {}
+
+	CITY_CONSTRUCTOR(ECity) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+
+/* Attributs */
+public:
+
+/* Variables protégées */
+protected:
+
+};
+
+/********************************************************************************************
  *                               ECharFact                                                  *
  ********************************************************************************************/
 class ECharFact : public ECEntity, public ECBCharFact
