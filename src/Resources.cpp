@@ -73,6 +73,12 @@
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst);
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest);
+	R_RESOURCE(ECSpriteBase, CasePontHorizontal);
+	R_RESOURCE(ECSpriteBase, CasePontVertical);
+	R_RESOURCE(ECSpriteBase, CasePontHaut);
+	R_RESOURCE(ECSpriteBase, CasePontBas);
+	R_RESOURCE(ECSpriteBase, CasePontGauche);
+	R_RESOURCE(ECSpriteBase, CasePontDroite);
 	R_RESOURCE(ECImage,      Army_Icon);
 	R_RESOURCE(ECSpriteBase, Army_Face);
 	R_RESOURCE(ECSpriteBase, Army_Left);
@@ -92,6 +98,10 @@
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Left);
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Right);
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos);
+	R_RESOURCE(ECImage,      City_Icon);
+	R_RESOURCE(ECSpriteBase, City_Face);
+	R_RESOURCE(ECImage,      Capitale_Icon);
+	R_RESOURCE(ECSpriteBase, Capitale_Face);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

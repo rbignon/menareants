@@ -137,6 +137,12 @@ public:
 	R_RESOURCE(ECSpriteBase, CaseCoinSudOuest, "cases/coinso");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordEst,  "cases/coinno");
 	R_RESOURCE(ECSpriteBase, CaseCoinNordOuest,"cases/coinne");
+	R_RESOURCE(ECSpriteBase, CasePontHorizontal,"cases/ponthorizontal");
+	R_RESOURCE(ECSpriteBase, CasePontVertical, "cases/pontvertical");
+	R_RESOURCE(ECSpriteBase, CasePontHaut,     "cases/ponthaut");
+	R_RESOURCE(ECSpriteBase, CasePontBas,      "cases/pontbas");
+	R_RESOURCE(ECSpriteBase, CasePontGauche,   "cases/pontgauche");
+	R_RESOURCE(ECSpriteBase, CasePontDroite,   "cases/pontdroite");
 	R_RESOURCE(ECImage,      Army_Icon,        PKGDATADIR_PICS "units/army_icon.png");
 	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
 	R_RESOURCE(ECSpriteBase, Army_Left,        "units/army/left");
@@ -156,6 +162,10 @@ public:
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Left, "units/char/left");
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Right,"units/char/right");
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos,  "units/char/dos");
+	R_RESOURCE(ECImage,      City_Icon,          PKGDATADIR_PICS "units/city_icon.png");
+	R_RESOURCE(ECSpriteBase, City_Face,          "cases/ville");
+	R_RESOURCE(ECImage,      Capitale_Icon,      PKGDATADIR_PICS "units/capitale_icon.png");
+	R_RESOURCE(ECSpriteBase, Capitale_Face,      "cases/capitale");
 };
 
 #undef R_RESOURCE
