@@ -63,7 +63,8 @@ am_menareants_OBJECTS = Font.$(OBJEXT) Images.$(OBJEXT) \
 	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
 	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
 	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
-	Units.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+	Units.$(OBJEXT) MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) \
+	InGame.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -217,6 +218,7 @@ menareants_SOURCES = \
 		Map.cpp \
 		Batiments.cpp \
 		Units.cpp \
+		MapEditor.cpp \
 		JoinGame.cpp \
 		InGame.cpp
 
@@ -310,6 +312,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Login.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Map.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MapEditor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Maths.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Memo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageBox.Po@am__quote@

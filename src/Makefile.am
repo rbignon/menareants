@@ -35,6 +35,7 @@ menareants_SOURCES = \
 		Map.cpp \
 		Batiments.cpp \
 		Units.cpp \
+		MapEditor.cpp \
 		JoinGame.cpp \
 		InGame.cpp
 
