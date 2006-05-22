@@ -32,7 +32,7 @@
 
 /* Version du jeu (forme major.minor[-patch]) */
 #define APP_VERSION_MAJOR	"0"
-#define APP_VERSION_MINOR	"20"
+#define APP_VERSION_MINOR	"2.1"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
