@@ -57,8 +57,9 @@ public:
 
 	ECEntity() : Tag(0), last(0), next(0), move(this) {}
 
-	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), last(0), next(0), move(this)
+	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
+	         uint _visibility = 3)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), last(0), next(0), move(this)
 	{}
 
 	virtual ~ECEntity();
