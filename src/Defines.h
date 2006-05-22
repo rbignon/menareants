@@ -30,18 +30,6 @@
 #define APP_SMALLNAME "MenAreAnts"
 #define SERV_SMALLNAME "MenAreAntsD"
 
-/* Version du jeu (forme major.minor[-patch]) */
-#define APP_VERSION_MAJOR	"0"
-#define APP_VERSION_MINOR	"2.1"
-
-/* Définir un (seul) des "patch" suivant (ou aucun) */
-#define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
-#if 0
-#define	APP_VERSION_PATCH	"pre1"	/* première pré release */
-#define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
-#define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
-#endif
-
 #define APP_SITE "http://menareants.coderz.info/"
 
 /* Résolution de l'écran */
@@ -61,9 +49,9 @@ const int MBUTTON_RIGHT = 3;
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
 #ifdef APP_VERSION_PATCH
-#	define APP_VERSION APP_VERSION_MAJOR "." APP_VERSION_MINOR "-" APP_PVERSION "-" APP_VERSION_PATCH
+#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_PVERSION "-" APP_VERSION_PATCH
 #else
-#	define APP_VERSION APP_VERSION_MAJOR "." APP_VERSION_MINOR "-" APP_PVERSION
+#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_PVERSION
 #endif
 
 #if defined(WIN32) || defined(__MINGW32__)

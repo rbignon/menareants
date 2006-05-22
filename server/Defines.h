@@ -32,18 +32,6 @@ typedef unsigned int   uint;
 #define APP_SMALLNAME "MenAreAntsD"
 #define CLIENT_SMALLNAME "MenAreAnts"
 
-/* Version du jeu (forme alpha.beta[-patch]) */
-#define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"20"
-
-/* Définir un (seul) des "patch" suivant (ou aucun) */
-#define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
-#if 0
-#define	APP_VERSION_PATCH	"pre1"	/* première pré release */
-#define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
-#define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
-#endif
-
 /* Fichier de debugage */
 #define DEBUG_LOG       "errors.log"     /* Fichier de DEBUG */
 

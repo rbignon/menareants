@@ -33,6 +33,18 @@
  */
 #define APP_PVERSION	"4"
 
+/* Version du jeu (forme alpha.beta[-patch]) */
+#define APP_VERSION_ALPHA	"0"
+#define APP_VERSION_BETA	"2.1"
+
+/* Définir un (seul) des "patch" suivant (ou aucun) */
+#define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
+#if 0
+#define	APP_VERSION_PATCH	"pre1"	/* première pré release */
+#define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
+#define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
+#endif
+
 /* Tailles de variables */
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
