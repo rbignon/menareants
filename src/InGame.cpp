@@ -166,7 +166,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
 				continue;
 			}
-			entity = entities_type[type].create(et_name.c_str(), pl, (*map)(0,0), nb);
+			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb);
 			map->AddAnEntity(entity);
 		}
 		if(!moves_str.empty())
@@ -196,7 +196,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						entity->Move()->SetFirstCase(last);
 						entity->Move()->SetMoves(moves);
 					}
-					entity->ChangeCase(last);
+					if(entity->Case() != last)
+						entity->ChangeCase(last);
 				}
 			}
 		}
@@ -235,7 +236,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
-		if(InGameForm)
+		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0)
 			InGameForm->Map->CenterTo(entities[0]);
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
@@ -319,6 +320,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 			me->LockScreen();
 
+			(*it)->SetShowedCases(false);
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
 
@@ -656,6 +658,8 @@ TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
 
 	Map = AddComponent(new TMap(ch->Map()));
 	ch->Map()->SetShowMap(Map);
+	dynamic_cast<ECMap*>(ch->Map())->SetBrouillard();
+
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
 
 	BarreLat = AddComponent(new TBarreLat(pl));

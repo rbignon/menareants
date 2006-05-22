@@ -105,26 +105,32 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 		case ECMove::Down:  Image()->set(Image()->X(), Image()->Y() + visual_step); break;
 		case ECMove::Up:    Image()->set(Image()->X(), Image()->Y() - visual_step); break;
 	}
+
 	SDL_Delay(20/entities.size());
+	bool changed_case = false;
 	switch(m)
 	{
 		case ECMove::Right:
 			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
-				ChangeCase(acase->MoveRight()), move.RemoveFirst();
+				ChangeCase(acase->MoveRight()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Left:
 			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
-				ChangeCase(acase->MoveLeft()), move.RemoveFirst();
+				ChangeCase(acase->MoveLeft()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Down:
 			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
-				ChangeCase(acase->MoveDown()), move.RemoveFirst();
+				ChangeCase(acase->MoveDown()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Up:
 			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
-				ChangeCase(acase->MoveUp()), move.RemoveFirst();
+				ChangeCase(acase->MoveUp()), move.RemoveFirst(), changed_case = true;
 			break;
 	}
+	if(changed_case && entities.size() == 1 && dynamic_cast<ECase*>(Case())->Showed() > 0 &&
+	   dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+		dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
+
 	if(!move.Empty() && m != move.First())
 		SetImage(images[(imgs_t)move.First()]);
 	return false;

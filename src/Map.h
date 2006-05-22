@@ -79,9 +79,11 @@ public:
 
 	ECEntity()
 		: Tag(0), image(0), selected(false), move(this)
-	{}
+	{ //SetShowedCases(true);
+	}
 
-	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0);
+	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
+	         uint _visibility = 3);
 
 	virtual ~ECEntity();
 
@@ -104,6 +106,8 @@ public:
 	virtual void ChangeCase(ECBCase* new_case);
 
 	virtual void RefreshColor(SDL_Color) = 0;
+
+	virtual void SetShowedCases(bool show);
 
 /* Attributs */
 public:
@@ -140,7 +144,7 @@ class ECase : public virtual ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECase() : image(0), selected(0) { }
+	ECase() : image(0), selected(0), img_id(0), showed(-1) { }
 
 	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
@@ -166,11 +170,20 @@ public:
 	void SetImgID(char id) { img_id = id; }
 	char ImgID() const { return img_id; }
 
+	/** Is this case is showed ?
+	 * o -1 = hidden
+	 * o 0  = shadowed
+	 * o >0 = showed
+	 */
+	int Showed() const { return showed; }
+	void SetShowed(uint s) { showed = s; }
+
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
 	char img_id;
+	int showed;
 };
 
 /** This class is a derived class from ECBCase whose is a land */
@@ -268,10 +281,14 @@ public:
 
 	virtual void SetCaseAttr(ECBCase*, char);
 
+	bool Brouillard() const { return brouillard; }
+	void SetBrouillard(bool b = true) { brouillard = b; }
+
 /* Variables privées */
 protected:
 	ECImage *preview;
 	TMap *showmap;
+	bool brouillard;
 };
 
 /********************************************************************************************

@@ -29,6 +29,20 @@ void TMap::Init()
 	SetPosition(x, y, true);
 	h = CASE_HEIGHT * map->Height();
 	w = CASE_WIDTH  * map->Width();
+
+	if(brouillard)
+		SDL_FreeSurface(brouillard);
+
+	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
+	brouillard = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, CASE_WIDTH, CASE_HEIGHT,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
+	SDL_FillRect( brouillard, &r_back, SDL_MapRGBA( brouillard->format,0, 0, 0, 255*5/10));
+}
+
+TMap::~TMap()
+{
+	if(brouillard)
+		SDL_FreeSurface(brouillard);
 }
 
 void TMap::SetXY(int _x, int _y)
@@ -75,8 +89,9 @@ void TMap::SetPosition(int _x, int _y, bool force)
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-		dynamic_cast<ECEntity*>(*enti)->Image()->set(x+(CASE_WIDTH  * (*enti)->Case()->X()),
-		                                          y+(CASE_HEIGHT * (*enti)->Case()->Y()));
+		if((*enti)->Case())
+			dynamic_cast<ECEntity*>(*enti)->Image()->set(x+(CASE_WIDTH  * (*enti)->Case()->X()),
+		                                                 y+(CASE_HEIGHT * (*enti)->Case()->Y()));
 }
 
 ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
@@ -146,13 +161,18 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c)
+		if(c && (!HaveBrouillard() || c->Showed() >= 0))
 		{
 			c->Draw();
 			if(CreateEntity() && c->Test(_x, _y))
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
 					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
+			if(HaveBrouillard() && c->Showed() == 0)
+			{
+				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),brouillard->w,brouillard->h};
+				SDL_BlitSurface(brouillard, NULL, Window(), &r_back);
+			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
 		}
@@ -167,9 +187,20 @@ void TMap::Draw(int _x, int _y)
 		}
 		else
 		{
-			dynamic_cast<ECEntity*>(*enti)->Draw();
+			if(!HaveBrouillard() || dynamic_cast<ECase*>((*enti)->Case())->Showed() > 0)
+				dynamic_cast<ECEntity*>(*enti)->Draw();
 			++enti;
 		}
+#if 0
+	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
+		if(dynamic_cast<ECase*>(*casi)->Showed() == 0)
+		{
+			SDL_Rect dest;
+			dest.x = dynamic_cast<ECase*>(*casi)->Image()->X();
+			dest.y = dynamic_cast<ECase*>(*casi)->Image()->Y();
+			SDL_BlitSurface(brouillard, NULL, Window(), &dest);
+		}
+#endif
 
 	if(map->Channel())
 		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)

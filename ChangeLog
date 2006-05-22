@@ -1,3 +1,9 @@
+2005-05-22  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp: Visibilité.
+
+	* src/Map.cpp, src/InGame.cpp, src/gui/ShowMap.cpp, src/MapEditor.cpp: Affichage d'un brouillard de guerre.
+
 2005-05-21  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Correction d'un bug de ScrollTo().

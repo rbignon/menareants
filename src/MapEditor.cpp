@@ -540,6 +540,7 @@ TMapEditor::TMapEditor(SDL_Surface* w, ECMap *m)
 {
 	Map = AddComponent(new TMap(m));
 	m->SetShowMap(Map);
+	Map->SetBrouillard(false);
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
 
 	BarreLat = AddComponent(new TEditBarreLat);

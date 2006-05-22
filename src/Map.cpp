@@ -87,9 +87,12 @@ void ECMove::SetMoves(Vector _moves)
  *                                 ECEntity                                                 *
  ********************************************************************************************/
 
-ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb), Tag(0), image(0), selected(false), move(this)
-{}
+ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
+                   uint _visibility)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false), move(this)
+{
+	//SetShowedCases(true);
+}
 
 ECEntity::~ECEntity()
 {
@@ -123,17 +126,44 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
 	image->SetAnim(anim);
-	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
 		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
 void ECEntity::ChangeCase(ECBCase* newcase)
 {
+	SetShowedCases(false);
 	ECBEntity::ChangeCase(newcase);
+	SetShowedCases(true);
+
 	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
 		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+}
+
+void ECEntity::SetShowedCases(bool show)
+{
+	if(!Case() || !Owner() || !dynamic_cast<ECPlayer*>(Owner())->IsMe())
+		return;
+
+	ECBCase* c = Case()->MoveLeft(Visibility());
+	c = c->MoveUp(Visibility());
+
+	for(uint i=0; i <= 2*Visibility(); ++i)
+	{
+		for(uint j=0; j <= 2*Visibility(); ++j, c = c->MoveRight())
+		{
+			ECase* cc = dynamic_cast<ECase*>(c);
+			if(show)
+				cc->SetShowed(cc->Showed() < 0 ? 1 : cc->Showed() + 1);
+			else if(cc->Showed() > 0)
+				cc->SetShowed(cc->Showed()-1);
+			//printf("(%d,%d) = %d\n", cc->X(), cc->Y(), cc->Showed());
+		}
+		c = c->MoveDown();
+		c = c->MoveLeft(2*Visibility()+1);
+	}
 }
 
 /********************************************************************************************
@@ -141,7 +171,7 @@ void ECEntity::ChangeCase(ECBCase* newcase)
  ********************************************************************************************/
 
 ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0)
+	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0), showed(-1)
 {
 
 }
@@ -182,13 +212,13 @@ void ECase::SetImage(ECSpriteBase* spr)
  ********************************************************************************************/
 
 ECMap::ECMap(std::vector<std::string> _map_file)
-	: ECBMap(_map_file), showmap(0)
+	: ECBMap(_map_file), showmap(0), brouillard(false)
 {
 	preview = 0;
 }
 
 ECMap::ECMap(std::string filename)
-	: ECBMap(filename), showmap(0)
+	: ECBMap(filename), showmap(0), brouillard(false)
 {
 	preview = 0;
 }
@@ -322,7 +352,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 		{
 			ECBCase* cc = map[ _y * x + _x ];
 			ECase *c = dynamic_cast<ECase*>(cc);
-			if(!c) continue;
+			if(!c || Brouillard() && c->Showed() < 0) continue;
 			SDL_Color *color = 0;
 			switch(c->TypeID())
 			{
@@ -376,7 +406,10 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 					                  marge & MARGE_LEFT && _xx == xx ||
 					                  marge & MARGE_BOTTOM && _yy == yy+size_y-1 ||
 					                  marge & MARGE_RIGHT && _xx == xx+size_x-1) ? marge_color : color;
-					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r, col->g, col->b));
+					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
+					              (Brouillard() && c->Showed()<=0) ? (col->r>60) ? col->r - 60 : 0 : col->r,
+					              (Brouillard() && c->Showed()<=0) ? (col->g>60) ? col->g - 60 : 0 : col->g,
+					              (Brouillard() && c->Showed()<=0) ? (col->b>60) ? col->b - 60 : 0 : col->b));
 				}
 		}
 	/* Position des unités */
@@ -385,7 +418,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 		std::vector<ECBEntity*> ents = entities.List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)->Owner()) continue;
+			if(!(*enti)->Owner() || Brouillard() && dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0) continue;
 			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
 			yy = (*enti)->Case()->Y() * size_y;
 			xx = (*enti)->Case()->X() * size_x;
