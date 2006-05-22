@@ -190,10 +190,10 @@ ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
 	map_country = 0;
 }
 
-ECBCase* ECBCase::MoveUp(uint c)    { return y >= c ? (*map)(x, y-c) : this; }
-ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y+c) : this; }
-ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : this; }
-ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : this; }
+ECBCase* ECBCase::MoveUp(uint c)    { return y >= c ? (*map)(x, y-c) : (*map)(x, 0); }
+ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y+c) : (*map)(x, map->Height()-1); }
+ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : (*map)(0, y); }
+ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : (*map)(map->Width()-1, y); }
 
 void ECBCase::SetCountry(ECBCountry *mc)
 {
@@ -217,8 +217,10 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
  *                               ECBEntity                                                  *
  ********************************************************************************************/
 
-ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb)
-	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), shooted(0), cost(_c), event_type(0)
+ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb,
+                     uint _visibility)
+	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), shooted(0), cost(_c), event_type(0),
+	  visibility(_visibility)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -295,9 +297,10 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 
 void ECBEntity::ChangeCase(ECBCase* new_case)
 {
-	assert(new_case && acase);
+	assert(new_case);
 
-	acase->Entities()->Remove(this);
+	if(acase)
+		acase->Entities()->Remove(this);
 	new_case->Entities()->Add(this);
 	acase = new_case;
 }
@@ -820,7 +823,8 @@ void ECBMap::AddAnEntity(ECBEntity* e)
 {
 	if(!e) return;
 
-	e->Case()->Entities()->Add(e);
+	if(e->Case())
+		e->Case()->Entities()->Add(e);
 	if(e->Owner())
 		e->Owner()->Entities()->Add(e);
 	else

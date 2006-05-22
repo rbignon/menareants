@@ -147,10 +147,11 @@ public:
 	};
 
 	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), shooted(0), cost(_cost), event_type(0)
+		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), shooted(0), cost(_cost), event_type(0), visibility(3)
 	{}
 
-	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0);
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0,
+	          uint visibility = 3);
 
 	virtual ~ECBEntity() {}
 
@@ -268,6 +269,9 @@ public:
 	/** This is the price of this entity */
 	uint Cost() const { return cost; }
 
+	/** This is the visibility of this entity (rayon) */
+	uint Visibility() const { return visibility; }
+
 /* Variables protégées */
 protected:
 	ECBPlayer* owner;
@@ -282,6 +286,7 @@ protected:
 	uint shooted;
 	uint cost;
 	uint event_type;
+	uint visibility;
 };
 
 /********************************************************************************************
