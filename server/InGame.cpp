@@ -323,7 +323,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		/******************************
 		 *    GESTION DES CRÉATIONS   *
 		 ******************************/
-		if(flags != ARM_CREATE || type >= ECBEntity::E_END)
+		if(flags != ARM_CREATE || type == ECBEntity::E_NONE || type >= ECBEntity::E_END)
 			return Debug(W_DESYNCH, "ARM: Création d'une entité incorrecte");
 
 		const char *e_name = chan->FindEntityName(cl->Player());
@@ -489,7 +489,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				else
 					++evti;
 			}
-			if(last_case && entity->Case() != last_case)
+			/* On ne vérifie pas si last_case != 0, car si c'est le cas c'est une creation, et donc dans ce cas
+			 * là on vérifie bien si y a attaque (on peut considérer qu'il était pas sur la meme case avant)
+			 */
+			if(entity->Case() != last_case)
 			{ /* On ne fait ça que si y a eu un changement de case */
 				if(!event_found && last_case) // On vérifie bien que c'est pas un create
 				{
