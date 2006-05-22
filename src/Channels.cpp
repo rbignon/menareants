@@ -41,6 +41,14 @@ EChannel::~EChannel()
 	if(map) MyFree(map);
 }
 
+ECPlayer *EChannel::GetMe()
+{
+	BPlayerVector::iterator it;
+	for(it=players.begin(); it != players.end() && !dynamic_cast<ECPlayer*>(*it)->IsMe(); ++it);
+
+	return (it == players.end() ? 0 : (dynamic_cast<ECPlayer*>(*it)));
+}
+
 ECPlayer *EChannel::GetPlayer(const char* nick)
 {
 	BPlayerVector::iterator it;

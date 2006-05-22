@@ -101,6 +101,8 @@ public:
 	/** Get a player in channel by his nickname. */
 	ECPlayer* GetPlayer(const char* nick);
 
+	ECPlayer* GetMe();
+
 	ECMap* Map() const { return dynamic_cast<ECMap*>(map); }
 
 	bool WantLeave() const { return want_leave; }

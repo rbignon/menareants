@@ -144,7 +144,8 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 
 void ECEntity::SetShowedCases(bool show)
 {
-	if(!Case() || !Owner() || !dynamic_cast<ECPlayer*>(Owner())->IsMe())
+	if(!Case() || !Owner() || show &&
+	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe()))
 		return;
 
 	ECBCase* c = Case()->MoveLeft(Visibility());
@@ -152,17 +153,23 @@ void ECEntity::SetShowedCases(bool show)
 
 	for(uint i=0; i <= 2*Visibility(); ++i)
 	{
-		for(uint j=0; j <= 2*Visibility(); ++j, c = c->MoveRight())
+		uint j=0;
+		for(; j <= 2*Visibility(); ++j)
 		{
 			ECase* cc = dynamic_cast<ECase*>(c);
 			if(show)
 				cc->SetShowed(cc->Showed() < 0 ? 1 : cc->Showed() + 1);
 			else if(cc->Showed() > 0)
 				cc->SetShowed(cc->Showed()-1);
-			//printf("(%d,%d) = %d\n", cc->X(), cc->Y(), cc->Showed());
+
+			if(c->X() == c->Map()->Width()-1)
+				break;
+			c = c->MoveRight();
 		}
+		if(c->Y() == c->Map()->Height()-1)
+			break;
 		c = c->MoveDown();
-		c = c->MoveLeft(2*Visibility()+1);
+		c = c->MoveLeft(j);
 	}
 }
 

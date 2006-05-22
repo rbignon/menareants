@@ -442,7 +442,10 @@ void MenAreAntsApp::InGame()
 						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
+						{
 							Options(chan);
+							InGameForm->Map->Map()->CreatePreview(120,120, true);
+						}
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
 						{
 							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
