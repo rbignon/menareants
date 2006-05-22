@@ -566,7 +566,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				{ /* On affiche ou cache les territoires où était les unités de mes alliés */
 					std::vector<ECBEntity*> ents = sender->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-						dynamic_cast<ECEntity*>(*enti)->SetShowedCases(add);
+						dynamic_cast<ECEntity*>(*enti)->SetShowedCases(add, true);
 				}
 				break;
 			}

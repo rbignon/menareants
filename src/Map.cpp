@@ -142,9 +142,9 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
-void ECEntity::SetShowedCases(bool show)
+void ECEntity::SetShowedCases(bool show, bool forced)
 {
-	if(!Case() || !Owner() || show &&
+	if(!Case() || !Owner() || !forced &&
 	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe()))
 		return;
 

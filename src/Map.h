@@ -107,7 +107,7 @@ public:
 
 	virtual void RefreshColor(SDL_Color) = 0;
 
-	virtual void SetShowedCases(bool show);
+	virtual void SetShowedCases(bool show, bool forced = false);
 
 /* Attributs */
 public:
