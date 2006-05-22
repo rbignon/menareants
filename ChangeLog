@@ -4,6 +4,9 @@
 
 	* src/Map.cpp, src/InGame.cpp, src/gui/ShowMap.cpp, src/MapEditor.cpp: Affichage d'un brouillard de guerre.
 
+	* server/InGame.cpp: Correction d'un bug qui ne faisait pas d'attaques lorsqu'on créait une unité sur une ville et
+	que quelqu'un avait commencé à bouger dessus (le pire c'est que je l'avais déjà corrigé, et je l'ai recréé).
+
 2005-05-21  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Correction d'un bug de ScrollTo().
