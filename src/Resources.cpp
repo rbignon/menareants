@@ -98,6 +98,10 @@
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Left);
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Right);
 	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Deployed);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Reployed);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Missile_Up);
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Missile_Down);
 	R_RESOURCE(ECImage,      City_Icon);
 	R_RESOURCE(ECSpriteBase, City_Face);
 	R_RESOURCE(ECImage,      Capitale_Icon);

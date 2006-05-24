@@ -158,10 +158,14 @@ public:
 	R_RESOURCE(ECImage,      CharFact_Icon,    PKGDATADIR_PICS "units/charfact_icon.png");
 	R_RESOURCE(ECSpriteBase, CharFact_Face,    "units/charfact");
 	R_RESOURCE(ECImage,      MissiLauncher_Icon, PKGDATADIR_PICS "units/missilauncher_icon.png");
-	R_RESOURCE(ECSpriteBase, MissiLauncher_Face, "units/char/face");
-	R_RESOURCE(ECSpriteBase, MissiLauncher_Left, "units/char/left");
-	R_RESOURCE(ECSpriteBase, MissiLauncher_Right,"units/char/right");
-	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos,  "units/char/dos");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Face, "units/missilauncher/face");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Left, "units/missilauncher/left");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Right,"units/missilauncher/right");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Dos,  "units/missilauncher/dos");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Deployed,"units/missilauncher/deployed");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Reployed,"units/missilauncher/reployed");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Missile_Up,  "units/missilauncher/missile_up");
+	R_RESOURCE(ECSpriteBase, MissiLauncher_Missile_Down,"units/missilauncher/missile_down");
 	R_RESOURCE(ECImage,      City_Icon,          PKGDATADIR_PICS "units/city_icon.png");
 	R_RESOURCE(ECSpriteBase, City_Face,          "cases/ville");
 	R_RESOURCE(ECImage,      Capitale_Icon,      PKGDATADIR_PICS "units/capitale_icon.png");
