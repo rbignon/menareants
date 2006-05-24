@@ -316,6 +316,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->Map()->NextDay();
 						me->LockScreen();
 						chan->Map()->CreatePreview(120,120, true);
+						std::vector<ECBEntity*> ents = chan->Map()->Entities()->List();
+						for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+							(*enti)->Played();
 						me->UnlockScreen();
 					}
 					if(InGameForm && InGameForm->BarreLat)

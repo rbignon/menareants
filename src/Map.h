@@ -29,6 +29,7 @@
 class ECase;
 class TMap;
 class ECEntity;
+class EC_Client;
 
 struct case_img_t
 {
@@ -78,9 +79,8 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), selected(false), move(this)
-	{ //SetShowedCases(true);
-	}
+		: Tag(0), image(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
+	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
 	         uint _visibility = 3);
@@ -97,11 +97,11 @@ public:
 /* Methodes */
 public:
 
-	virtual bool BeforeEvent(const std::vector<ECEntity*>&) = 0;
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) = 0;
 
-	virtual bool MakeEvent(const std::vector<ECEntity*>&) = 0;
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) = 0;
 
-	virtual bool AfterEvent(const std::vector<ECEntity*>&) = 0;
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) = 0;
 
 	virtual void ChangeCase(ECBCase* new_case);
 
@@ -109,12 +109,14 @@ public:
 
 	virtual void SetShowedCases(bool show, bool forced = false);
 
+	virtual void Played();
+
 /* Attributs */
 public:
 
 	bool Test(int x, int y);
 
-	void Draw();
+	virtual void Draw();
 	ECSprite* Image() const { return image; }
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
@@ -124,7 +126,17 @@ public:
 
 	int Tag;
 
+	void ImageSetXY(int x, int y);
+
+	ECase* Case() const;
+
 	ECMove* Move() { return &move; }
+
+	bool IWantDeploy() const { return want_deploy; }
+	void SetWantDeploy(bool b = true) { want_deploy = b; }
+
+	ECase* AttaquedCase() const { return attaqued_case; }
+	void SetAttaquedCase(ECase* c) { attaqued_case = c; }
 
 /* Variables privées */
 private:
@@ -133,6 +145,8 @@ private:
 protected:
 	bool selected;
 	ECMove move;
+	bool want_deploy;
+	ECase* attaqued_case;
 };
 
 /********************************************************************************************
@@ -144,7 +158,7 @@ class ECase : public virtual ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECase() : image(0), selected(0), img_id(0), showed(-1) { }
+	ECase() : image(0), selected(0), img_id(0), showed(-1), must_redraw(true) { }
 
 	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
@@ -178,12 +192,16 @@ public:
 	int Showed() const { return showed; }
 	void SetShowed(uint s) { showed = s; }
 
+	bool MustRedraw() const { return must_redraw; }
+	void SetMustRedraw(bool b = true) { must_redraw = b; }
+
 /* Variables privées */
 protected:
 	ECSprite* image;
 	bool selected;
 	char img_id;
 	int showed;
+	bool must_redraw;
 };
 
 /** This class is a derived class from ECBCase whose is a land */
