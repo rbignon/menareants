@@ -208,7 +208,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		chan->SetCurrentEvent(flags);
 
 	if(entities.empty())
-		return 0;
+		return FDebug(W_WARNING|W_SEND, "Pas d'entités ???");
 
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
@@ -224,6 +224,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			(*it)->SetNb(nb);
 		}
+		if(flags & ARM_DEPLOY)
+		{
+			(*it)->SetWantDeploy(chan->State() == EChannel::PLAYING && (*it)->Deployed() != deployed);
+			(*it)->SetDeployed(deployed);
+		}
+		if(flags & ARM_ATTAQ)
+			(*it)->SetAttaquedCase(dynamic_cast<ECase*>((*map)(x,y)));
 	}
 
 	/* ANIMATIONS */
@@ -238,6 +245,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		char event_moment;
 		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0)
 			InGameForm->Map->CenterTo(entities[0]);
+		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -249,9 +257,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						switch(event_moment)
 						{
-							case BEFORE_EVENT: (*it)->Tag = (*it)->BeforeEvent(entities) ? 1 : 0; break;
-							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent(entities) ? 1 : 0; break;
-							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent(entities) ? 1 : 0; break;
+							case BEFORE_EVENT: (*it)->Tag = (*it)->BeforeEvent(entities, event_case,me) ? 1 : 0; break;
+							case IN_EVENT: (*it)->Tag = (*it)->MakeEvent(entities, event_case,me) ? 1 : 0; break;
+							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent(entities, event_case,me) ? 1 : 0; break;
 						}
 						if(!(*it)->Tag) ok = false;
 					}
@@ -298,9 +306,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 
 	/* APRES ANIMATIONS */
-	if(flags & ARM_DEPLOY)
-			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-				(*it)->SetDeployed(deployed);
 	if(flags & ARM_REMOVE)
 		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end();)
 		{
@@ -573,7 +578,7 @@ void MenAreAntsApp::InGame()
 			            InGameForm->BarreLat->Radar->Y() -
 			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
 			              InGameForm->Map->Y()/CASE_HEIGHT));
-			SDL_FillRect(app.sdlwindow, NULL, 0);
+			//SDL_FillRect(app.sdlwindow, NULL, 0);
 			InGameForm->Update();
 		} while(!eob && client->IsConnected() && client->Player());
 		ECAltThread::Stop();
@@ -812,12 +817,21 @@ void TBarreAct::vSetEntity(void* _e)
 	if(e)
 	{
 		InGameForm->BarreAct->select = true;
-		InGameForm->BarreAct->Name->SetCaption(e->Name() + std::string(e->Locked() ? " (locked)" :
-		                                                               e->Deployed() ? " (deployed)" : ""));
-		InGameForm->BarreAct->Nb->Show();
-		InGameForm->BarreAct->Nb->SetCaption(e->Nb() ? TypToStr(e->Nb()) : "???");
+		InGameForm->BarreAct->Name->SetCaption(e->Name());
+		InGameForm->BarreAct->Nb->SetCaption(
+		    e->Nb() ?
+		       (TypToStr(e->Nb()) + (e->Owner() != InGameForm->BarreAct->me && !InGameForm->BarreAct->me->IsAllie(e->Owner()) ?
+		          " (valeur approximative relevée lors de son dernier combat)"
+		          : ""))
+		       : "???");
+
+		if(e->Deployed())
+			InGameForm->BarreAct->Infos->SetCaption((e->IWantDeploy() ? "Va se déployer" : "Déployé"));
+		else if(e->Locked())
+			InGameForm->BarreAct->Infos->SetCaption("Vérouillée");
+		else
+			InGameForm->BarreAct->Infos->SetCaption("");
 		InGameForm->BarreAct->Icon->SetImage(e->Icon(), false);
-		InGameForm->BarreAct->Icon->Show();
 
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
@@ -910,6 +924,7 @@ void TBarreAct::Init()
 
 	Icon = AddComponent(new TImage(5,5));
 	Nb = AddComponent(new TLabel(5,55, "", black_color, &app.Font()->normal));
+	Infos = AddComponent(new TLabel(5, 75, "", red_color, &app.Font()->normal));
 
 	Icons = AddComponent(new TBarreActIcons(200, 49));
 
