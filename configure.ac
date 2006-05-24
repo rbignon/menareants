@@ -119,6 +119,16 @@ AC_ARG_ENABLE(  warnings,
                 ],
                 )
 
+# GPROF
+AC_ARG_ENABLE(  gprof,
+                [AC_HELP_STRING([--enable-gprof],[used to have some cpu's informations])],
+                [
+                        if test "x${enableval}" != "xno"; then
+                                CXXFLAGS="$CXXFLAGS -pg"
+                        fi
+                ],
+                )
+
 #  DEBUG
 AC_ARG_ENABLE(  debug,
                 [AC_HELP_STRING([--enable-debug],[enable debug])],

@@ -43,11 +43,11 @@ public:
 /* Methodes */
 public:
 
-	virtual bool BeforeEvent(const std::vector<ECEntity*>&) { return true; }
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
 
-	virtual bool MakeEvent(const std::vector<ECEntity*>&) { return true; }
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
 
-	virtual bool AfterEvent(const std::vector<ECEntity*>&) { return true; }
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
 
 	virtual void RefreshColor(SDL_Color last);
 
