@@ -1,3 +1,32 @@
+2005-05-24  Romain Bignon <progs@headfucking.net>
+
+	* src/Resources.h, src/data/anims/cases/terre/2.png, src/Units.cpp: Affichage d'un "cratère" quand y a eu un combat.
+
+	* src/Resources.h, src/data/anims/units/missilauncher, src/Units.cpp: Propres images au lance-missile.
+
+	* src/Images.cpp: Rajout d'un système de selection de l'ordre de lecture, de répétition ou non, quelques corrections.
+
+	* server/InGame.cpp: Correction d'un bug sur les attaques (lors d'une attaque en cours de chemin d'un autre type, vérifier
+	si il n'avait pas une attaque plus loins, et si oui se barrer).
+
+	* src/Map.h, src/JoinGame.cpp: Corrections pour le lance missile dans la barreact, pour les boutons, et affichage d'un
+	label en bas pour des infos (déployé, en instance de déploiement et locked).
+
+	* src/gui/Label.cpp: Correction d'un crash en cas de chaine vide.
+
+	* src/gui/ShowMap.cpp: Affichage d'un trait rouge lors d'une attaque à distance.
+
+	* server/Channels.cpp: On voit les infos cachées de ses alliés.
+
+	* src/Map.cpp: Affiche un rayon.
+
+2005-05-23  Romain Bignon <progs@headfucking.net>
+
+	* src/MapEditor.cpp: Ne permet pas la sauvegarde tant qu'on n'a pas configuré la map. En outre, faire toutes les
+	vérifications minimum.
+
+	* src/Map.cpp, src/gui/ShowMap.cpp: Actualisation des images des cases uniquement quand c'est nécessaire.
+
 2005-05-22  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp: Visibilité.
