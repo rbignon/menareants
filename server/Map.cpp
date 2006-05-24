@@ -95,7 +95,7 @@ EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 ECEvent* ECMap::FindEvent(ECase* c, uint f, ECEntity* e)
 {
 	for(EventVector::iterator it = map_events.begin(); it != map_events.end(); ++it)
-		if((!c || (*it)->Case() == c) && (*it)->Flags() == f && (!e || (*it)->Entities()->Find(e)))
+		if((!c || (*it)->Case() == c) && (!f || (*it)->Flags() == f) && (!e || (*it)->Entities()->Find(e)))
 			return *it;
 	return 0;
 }

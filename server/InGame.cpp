@@ -46,23 +46,21 @@ void EChannel::NextAnim()
 	if(!event)
 		throw ECExcept(VPName(event) VIName(dynamic_cast<ECMap*>(map)->Events().size()), "Evenement vide");
 
+#ifdef DEBUG
+{
 	Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT(event->Flags()), event->Case()->X(),
 									event->Case()->Y());
+
 	std::vector<ECEntity*> ents = event->Entities()->List();
-	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); )
+	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
-	/*	if((*enti)->Locked())
-		{
-			event->Entities()->Remove(*enti);
-			enti = ents.erase(enti);
-		}
-		else*/
-			++enti;
 	}
-	/* Si l'evenement ne comptenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
+
 	if(ents.empty())
 		return;
+}
+#endif
 
 	switch(event->Flags())
 	{
@@ -82,8 +80,19 @@ void EChannel::NextAnim()
 			const char T_STOP = 0;
 			char state = S_ATTAQ;
 			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
-			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				(*it)->Lock();
+			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end();)
+			{
+				if((*it)->Locked())
+					it = entv.erase(it);
+				else
+				{
+					(*it)->Lock();
+					++it;
+				}
+			}
+			/* Si l'evenement ne comptenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
+			if(entv.empty())
+				return;
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
 			{
 				if(it == entv.end())
@@ -541,7 +550,15 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							if((*enti)->Locked())
 							{
 								Debug(W_DEBUG, "Il avait fait un déplacement qu'on annule pour revenir à la case du combat");
+								ECBCase* c = entity2->Case();
 								entity2->Return(entity->Case());
+								ECEvent* evnt = map->FindEvent(c, 0, entity2);
+								if(evnt->CheckRemoveBecauseOfPartOfAttaqEntity(entity2))
+								{
+									Debug(W_DEBUG, "On jarte un ancien event auquel j'assistais sur mon ancienne case (%d)",
+									               SHOW_EVENT(evnt->Flags()));
+									map->RemoveEvent(evnt, USE_DELETE);
+								}
 							}
 						}
 						if(!union_event && !(*enti)->Locked() && (*enti)->Owner() == entity->Owner() &&
