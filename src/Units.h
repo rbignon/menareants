@@ -43,6 +43,7 @@ public:
 		I_Right=ECMove::Right,
 		I_Attaq,
 		I_Deployed,
+		I_Reployed
 	};
 	typedef std::map<imgs_t, ECSpriteBase*> ImgList;
 
@@ -55,11 +56,11 @@ public:
 /* Methodes */
 public:
 
-	virtual bool BeforeEvent(const std::vector<ECEntity*>&);
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	virtual bool MakeEvent(const std::vector<ECEntity*>&);
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	virtual bool AfterEvent(const std::vector<ECEntity*>&);
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
 	void RefreshColor(SDL_Color last);
 
@@ -68,6 +69,8 @@ protected:
 	bool MoveEffect(const std::vector<ECEntity*>&);
 
 	void PutImage(imgs_t, ECSpriteBase*);
+
+	ECSpriteBase* GetSprite(imgs_t t) { return images[t]; }
 
 /* Variables protégées */
 private:
@@ -79,20 +82,23 @@ private:
  *                                ECMissiLauncher                                           *
  ********************************************************************************************/
 #define MISSILAUNCHER_VISUAL_STEP  1
+#define MISSILAUNCHER_MISSILE_STEP 5
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 {
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP) {}
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(0) {}
 
-	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP)
+	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(0)
 	{
 		PutImage(I_Up, Resources::MissiLauncher_Dos());
 		PutImage(I_Down, Resources::MissiLauncher_Face());
 		PutImage(I_Right, Resources::MissiLauncher_Right());
 		PutImage(I_Left, Resources::MissiLauncher_Left());
-		PutImage(I_Attaq, Resources::MissiLauncher_Face());
+		PutImage(I_Attaq, Resources::MissiLauncher_Right());
+		PutImage(I_Deployed, Resources::MissiLauncher_Deployed());
+		PutImage(I_Reployed, Resources::MissiLauncher_Reployed());
 	}
 
 /* Infos */
@@ -100,14 +106,27 @@ public:
 
 	virtual const char* Name() const { return "Lance-missile"; }
 	virtual const char* Infos() const
-		{ return "Véhicule lanceur de missiles à portée de 6 cases une fois déployé."; }
+		{ return "Véhicule lanceur de missiles à portée de 8 cases une fois déployé."; }
 	virtual ECImage* Icon() const { return Resources::MissiLauncher_Icon(); }
+	virtual bool WantAttaq(uint, uint) { return Deployed() && !IWantDeploy(); }
 
-	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	//virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
 /* Methodes */
 public:
-	virtual bool MakeEvent(const std::vector<ECEntity*>&);
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual void Draw();
+
+/* Variables privées */
+private:
+	ECSprite* missile;
+
+	void SetMissile(ECSpriteBase* c);
 };
 
 /********************************************************************************************
