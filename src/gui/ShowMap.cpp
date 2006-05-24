@@ -23,6 +23,7 @@
 #include "Resources.h"
 #include "Channels.h"
 #include "Debug.h"
+#include "tools/Font.h"
 
 void TMap::Init()
 {
@@ -37,6 +38,8 @@ void TMap::Init()
 	brouillard = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, CASE_WIDTH, CASE_HEIGHT,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
 	SDL_FillRect( brouillard, &r_back, SDL_MapRGBA( brouillard->format,0, 0, 0, 255*5/10));
+
+	SetMustRedraw();
 }
 
 TMap::~TMap()
@@ -92,6 +95,8 @@ void TMap::SetPosition(int _x, int _y, bool force)
 		if((*enti)->Case())
 			dynamic_cast<ECEntity*>(*enti)->Image()->set(x+(CASE_WIDTH  * (*enti)->Case()->X()),
 		                                                 y+(CASE_HEIGHT * (*enti)->Case()->Y()));
+
+	SetMustRedraw();
 }
 
 ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
@@ -161,8 +166,14 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c && (!HaveBrouillard() || c->Showed() >= 0))
+		if(c && (MustRedraw() || c->MustRedraw()))
 		{
+			if(HaveBrouillard() && c->Showed() < 0)
+			{
+				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+				SDL_FillRect(Window(), &r_back, 0);
+				continue;
+			}
 			c->Draw();
 			if(CreateEntity() && c->Test(_x, _y))
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
@@ -172,6 +183,8 @@ void TMap::Draw(int _x, int _y)
 			{
 				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),brouillard->w,brouillard->h};
 				SDL_BlitSurface(brouillard, NULL, Window(), &r_back);
+				//SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+				//SDL_FillRect( Window(), &r_back, SDL_MapRGBA( Window()->format,0, 0, 0, 255*5/10));
 			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
@@ -206,6 +219,14 @@ void TMap::Draw(int _x, int _y)
 		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+		if(entity->Selected() && entity->AttaquedCase() && entity->AttaquedCase() != entity->Case())
+		{
+			DrawLine(Window(), entity->Image()->X()+entity->Image()->GetWidth()/2,
+			                   entity->Image()->Y()+entity->Image()->GetHeight()/2,
+			                   entity->AttaquedCase()->Image()->X()+entity->AttaquedCase()->Image()->GetWidth()/2,
+			                   entity->AttaquedCase()->Image()->Y()+entity->AttaquedCase()->Image()->GetHeight()/2,
+			                   SDL_MapRGB(Window()->format, red_color.r, red_color.g, red_color.b));
+		}
 		if(!entity->Move()->Empty())
 		{
 			if(map->Channel()->State() == EChannel::ANIMING)
@@ -278,19 +299,19 @@ void TMap::Draw(int _x, int _y)
 				switch(last_move)
 				{
 					case ECMove::Right:
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqDroite()
+						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqDroite()
 						         : Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
 						break;
 					case ECMove::Left:
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqGauche()
+						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqGauche()
 						         : Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
 						break;
 					case ECMove::Up:
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqHaut()
+						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqHaut()
 						         : Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
 						break;
 					case ECMove::Down:
-						(entity->EventType() == ARM_ATTAQ ? Resources::FlecheAttaqBas()
+						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqBas()
 						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
 						break;
 				}
@@ -298,4 +319,5 @@ void TMap::Draw(int _x, int _y)
 			}
 		}
 	}
+	SetMustRedraw(false);
 }

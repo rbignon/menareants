@@ -30,7 +30,8 @@ class TMap : public TComponent
 public:
 
 	TMap(ECMap* _map)
-		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0), brouillard(0), have_brouillard(true)
+		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0), brouillard(0), have_brouillard(true),
+		  must_redraw(true)
 	{}
 
 	~TMap();
@@ -81,6 +82,9 @@ public:
 	bool HaveBrouillard() const { return have_brouillard; }
 	void SetBrouillard(bool b = true) { have_brouillard = b; }
 
+	bool MustRedraw() const { return must_redraw; }
+	void SetMustRedraw(bool b = true) { must_redraw = b; }
+
 /* Variables privées */
 private:
 	ECMap* map;
@@ -89,6 +93,7 @@ private:
 	ECEntity* create_entity;
 	SDL_Surface* brouillard;
 	bool have_brouillard;
+	bool must_redraw;
 };
 
 #endif /* EC_SHOWMAP_H */
