@@ -221,12 +221,14 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
 {
   assert(base);
   assert(screen);
-  mAnimating = 0;
+  mAnimating = false;
   mFrame = 0;
   mDrawn = 0;
   mSpeed = 1;
   mLastupdate = 0;
   mBackreplacement = 0;
+  order = true;
+  repeat = true;
   mX = 0; mY = 0; mOldX = 0; mOldY = 0;
 
   //mSpriteBase = new ECSpriteBase(base->path.c_str());
@@ -234,7 +236,7 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
 
   if(mSpriteBase->mBuilt)
   {
-    if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=1;
+    if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=true;
     mBackreplacement = SDL_DisplayFormat(mSpriteBase->mAnim[0].Img);
   }
   mScreen = screen;
@@ -273,6 +275,18 @@ void ECSprite::updateBG()
   SDL_BlitSurface(mScreen, &srcrect, mBackreplacement, NULL);
 }
 
+bool ECSprite::Anim() const { return (mSpriteBase->animation && mAnimating); }
+
+void ECSprite::SetFrame(uint nr)
+{
+	mFrame = nr < mSpriteBase->mNumframes ? nr : mSpriteBase->mNumframes-1;
+}
+
+uint ECSprite::NbFrames() const
+{
+	return mSpriteBase ? mSpriteBase->mNumframes : 0;
+}
+
 ECImage* ECSprite::First() const
 {
 	if(mSpriteBase && mSpriteBase->mNumframes)
@@ -282,24 +296,45 @@ ECImage* ECSprite::First() const
 
 void ECSprite::draw()
 {
-  if(mAnimating == 1)
-  {
-    if(mLastupdate + mSpriteBase->mAnim[mFrame].pause * mSpeed<SDL_GetTicks())
-    {
-      mFrame++;
-      if(mFrame>mSpriteBase->mNumframes-1) mFrame=0;
-      mLastupdate = SDL_GetTicks();
-    }
-  }
-
-  if(mDrawn==0) mDrawn=1;
-
-  SDL_Rect dest;
-  dest.x = mX;
-  dest.y = mY;
-  dest.w = GetWidth();
-  dest.h = GetHeight();
-  SDL_BlitSurface(mSpriteBase->mAnim[mFrame].Img, NULL, mScreen, &dest);
+	if(mAnimating && mSpriteBase->animation)
+	{
+		if(mLastupdate + mSpriteBase->mAnim[mFrame].pause * mSpeed<SDL_GetTicks())
+		{
+			if(order)
+			{
+				if(mFrame >= mSpriteBase->mNumframes-1)
+				{
+					if(!repeat)
+						mAnimating = false;
+					else
+						mFrame=0;
+				}
+				else
+					mFrame++;
+			}
+			else
+			{
+				if(!mFrame)
+				{
+					if(!repeat)
+						mAnimating = false;
+					else
+						mFrame = mSpriteBase->mNumframes-1;
+				}
+				else mFrame--;
+			}
+			mLastupdate = SDL_GetTicks();
+		}
+	}
+	
+	if(mDrawn==0) mDrawn=1;
+	
+	SDL_Rect dest;
+	dest.x = mX;
+	dest.y = mY;
+	dest.w = GetWidth();
+	dest.h = GetHeight();
+	SDL_BlitSurface(mSpriteBase->mAnim[mFrame].Img, NULL, mScreen, &dest);
 }
 
 int ECSprite::GetWidth()
@@ -357,7 +392,7 @@ int ECSpriteBase::init(const char *dir)
 
   mBuilt = 1;
 
-  for(int count=0;!feof(fp) && count<mNumframes;)
+  for(uint count=0;!feof(fp) && count<mNumframes;)
   {
     fgets(buffer, 255, fp);
     if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n')
@@ -386,7 +421,7 @@ int ECSpriteBase::init(const char *dir)
 
 void ECSpriteBase::ChangeColor(SDL_Color from, SDL_Color to)
 {
-	for(int i=0; i < mNumframes; ++i)
+	for(uint i=0; i < mNumframes; ++i)
 		ChangePixelColor(&mAnim[i], from, to);
 }
 

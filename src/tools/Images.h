@@ -24,6 +24,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <string>
+#include "Defines.h"
 
 class ECSpriteBase;
 
@@ -76,8 +77,9 @@ public:
 public:
 
 	/** Paramètre ou retourne le nombre de frames */
-	void setFrame(int nr) { mFrame = nr; }
-	int getFrame() { return mFrame; }
+	void SetFrame(uint nr);
+	uint Frame() { return mFrame; }
+	uint NbFrames() const;
 
 	/** Paramètre ou retourne la vitesse */
 	void setSpeed(float nr) { mSpeed = nr; }
@@ -85,10 +87,16 @@ public:
 
 	/** Active/Desactive l'animation */
 	void toggleAnim() { mAnimating = !mAnimating; }
-	void startAnim() { mAnimating = 1; }
-	void stopAnim() { mAnimating = 0; }
-	void SetAnim(bool a) { mAnimating = a ? 1 : 0; }
-	bool Anim() const { return mAnimating; }
+	void startAnim() { mAnimating = true; }
+	void stopAnim() { mAnimating = false; }
+	void SetAnim(bool a) { mAnimating = a; }
+	bool Anim() const;
+
+	bool Order() const { return order; }
+	void SetOrder(bool b) { order = b; }
+
+	bool Repeat() const { return repeat; }
+	void SetRepeat(bool b = true) { repeat = b; }
 
 	/** Repasse à la première frame */
 	void rewind() { mFrame = 0; }
@@ -109,14 +117,17 @@ public:
 
 	void ChangeColor(SDL_Color first, SDL_Color to);
 
+	SDL_Surface* Window() const { return mScreen; }
+
 /* Variables privées */
 private:
-	int mFrame;
+	uint mFrame;
 	int mX, mY, mOldX, mOldY;
-	int mAnimating;
+	bool mAnimating;
 	int mDrawn;
 	float mSpeed;
 	long mLastupdate;
+	bool order, repeat;
 	ECSpriteBase *mSpriteBase;
 	SDL_Surface *mBackreplacement;
 	SDL_Surface *mScreen;
@@ -143,7 +154,8 @@ public:
 /* Variables publiques */
 public:
 	ECImage *mAnim;
-	int mBuilt, mNumframes, mW, mH;
+	int mBuilt, mW, mH;
+	uint mNumframes;
 	bool animation;
 	std::string path;
 };
