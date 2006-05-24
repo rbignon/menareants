@@ -962,7 +962,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
 			{
 				std::vector<ECEntity*>::iterator it;
-				for(it = et.begin(); it != et.end() && (*it)->Owner() != *pl; ++it);
+				for(it = et.begin();
+				    it != et.end() && (*it)->Owner() != *pl && (!(*it)->Owner() || !(*it)->Owner()->IsAllie(*pl)); ++it);
 				if(it != et.end())
 					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
 					                                                                        to_send.c_str());
@@ -974,7 +975,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
 			{
 				std::vector<ECEntity*>::iterator it;
-				for(it = et.begin(); it != et.end() && (*it)->Owner() != *pl; ++it);
+				for(it = et.begin();
+				    it != et.end() && (*it)->Owner() != *pl && (!(*it)->Owner() || !(*it)->Owner()->IsAllie(*pl)); ++it);
 				if(it == et.end())
 					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
 					                                                                        to_send.c_str());
