@@ -87,7 +87,6 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				break;
 			case 'a':
 			{
-				printf("%s\n", parv[j].c_str());
 				if(strcasecmp(me->Player()->GetNick(), parv[j++].c_str())) break;
 
 				me->ia_send("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
