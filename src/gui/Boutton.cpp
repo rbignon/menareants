@@ -63,7 +63,7 @@ void TButton::DrawImage (int souris_x, int souris_y)
 
   unsigned int frame = Test(souris_x,souris_y) ? 1 : 0;
 
-  image->setFrame(frame);
+  image->SetFrame(frame);
   image->set(x, y);
   image->draw();
 

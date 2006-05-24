@@ -79,6 +79,7 @@ public:
 	bool EnabledItem(uint index);
 	void SetEnabledItem(uint index, bool e = true);
 	bool Empty() const { return m_items.empty(); }
+	std::vector<list_box_item_t>::size_type Size() const { return m_items.size(); }
 	void ScrollTo(uint id);
 
 	bool NoItemHint() const { return no_item_hint; }
