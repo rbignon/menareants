@@ -30,7 +30,7 @@
 #define MISSILAUNCHER_STEP                  1
 #define MISSILAUNCHER_NB                    100
 #define MISSILAUNCHER_COST                  6000
-#define MISSILAUNCHER_PORTY                 6
+#define MISSILAUNCHER_PORTY                 8
 #define MISSILAUNCHER_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_MISSILAUNCHER, MISSILAUNCHER_COST)
 #define MISSILAUNCHER_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, \
                                                 uint _nb = MISSILAUNCHER_NB) \
@@ -68,7 +68,7 @@ public:
 	virtual const char* Qual() const { return "le lance-missiles"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return MISSILAUNCHER_NB; }
-	virtual bool WantDeploy() { return true; } ///< Default = false
+	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
 	virtual bool WantAttaq(uint, uint) { return Deployed(); }
 
 /* Methodes */
@@ -85,7 +85,7 @@ protected:
  *                               ECBChar                                                    *
  ********************************************************************************************/
 #define CHAR_STEP                  3
-#define CHAR_NB                    1000
+#define CHAR_NB                    1500
 #define CHAR_COST                  20000
 #define CHAR_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHAR, CHAR_COST)
 #define CHAR_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHAR_NB) \

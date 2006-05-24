@@ -60,6 +60,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	if(Case()->X() == mx && Case()->Y() == my)
 		return false;
 
+#if 0
 	uint dx = 0, dy = 0;
 	for(uint x=Case()->X(); x != mx; dx++) x < mx ? ++x : --x;
 	for(uint y=Case()->Y(); y != my; dy++) y < my ? ++y : --y;
@@ -67,7 +68,15 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	/* On ne tire que dans un rayon de quatre cases. */
 	if(dx > MISSILAUNCHER_PORTY || dy > MISSILAUNCHER_PORTY)
 		return false;
+#else
+	uint d = 0;
+	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
 
+	/* On ne tire que dans un rayon de quatre cases. */
+	if(d > MISSILAUNCHER_PORTY)
+		return false;
+#endif
 	ECBCase* c = (*Case()->Map())(mx, my);
 
 	/* Si il n'y a personne à attaquer on n'attaque pas */
@@ -95,12 +104,12 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 		return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !Like(*it) && CanAttaq(*it))
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case())
 		{
 			uint dx = 0, dy = 0;
 			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;
 			for(uint y=Case()->Y(); y != (*it)->Case()->Y(); dy++) y < (*it)->Case()->Y() ? ++y : --y;
-			uint d = dx > dy ? dx : dy;
+			uint d = dx + dy;
 			float coef = 0;
 			switch(d)
 			{
@@ -110,7 +119,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 				case 3: coef = 1.5f; break;
 				case 4: coef = 1.0f; break;
 				case 5: coef = 0.9f; break;
-				case 6: coef = 0.8f; break;
+				case 6: coef = 0.7f; break;
 				case 7: coef = 0.5f; break;
 				case 8: coef = 0.3f; break;
 			}
@@ -119,33 +128,35 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 			 * - 7 cases = 1 chance sur 3
 			 * - 8 cases = 1 chance sur 2
 			 */
-			if(d >= 7)
+			if(d >= MISSILAUNCHER_PORTY-1)
 			{
-				int l = rand() % 9-d;
+				int l = rand() % (MISSILAUNCHER_PORTY+1-d);
 				if(!l)
 					loupe = true;
 			}
 			if(loupe)
-				(*Channel()) << "Le lance missile " + (*it)->LongName() + " a loupé sa cible !!";
+				(*Channel()) << "Le lance missile " + LongName() + " a loupé sa cible !!";
 			else
 			{
 				uint killed = 0;
 				switch((*it)->Type())
 				{
-					case E_ARMY: killed = uint(Nb() / 4 * coef); break;
-					case E_CHAR: killed = uint(Nb() * 5 * coef); break;
+					case E_ARMY: killed = uint(Nb() * coef); break;
+					case E_CHAR: killed = uint(Nb() * 4 * coef); break;
 					case E_MISSILAUNCHER: killed = uint(Nb() * 2 * coef); break;
 					default:
 						if((*it)->IsBuilding())
-							killed = uint(Nb() * 9 * coef);
+							killed = uint(Nb() * 7 * coef);
 						else
 						{
 							FDebug(W_WARNING, "Shoot d'un type non supporté");
 							continue;
 						}
 				}
+				if(!killed) continue;
+
 				(*it)->Shooted(killed);
-				(*Channel()) << "Le lance missile " + (*it)->LongName() + " dégomme " + (*it)->Qual() + " " +
+				(*Channel()) << "Le lance missile " + LongName() + " dégomme " + (*it)->Qual() + " " +
 				                (*it)->LongName() + " de " + TypToStr(killed);
 			}
 		}
