@@ -57,6 +57,7 @@ void TLabel::Reinit()
 	if (surf != NULL)
 	{
 		SDL_FreeSurface(surf);
+		surf = 0;
 	}
 
 	if(caption.empty()) return;
