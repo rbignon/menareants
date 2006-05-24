@@ -59,7 +59,7 @@ bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase*
 	{
 		case ARM_ATTAQ:
 		{
-			if(c == Case()) return true;
+			if(c == Case() || Case()->Showed() <= 0) return true;
 
 			if(!missile)
 			{
@@ -98,7 +98,7 @@ bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c
 		case ARM_ATTAQ:
 		case ARM_ATTAQ|ARM_MOVE:
 		{
-			if(c == Case() || !missile) return true;
+			if(c == Case() || !missile || c->Showed() <= 0) return true;
 
 			missile->set(missile->X(), missile->Y() + MISSILAUNCHER_MISSILE_STEP);
 			if(missile->Y() >= c->Image()->Y())
@@ -242,6 +242,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			return MoveEffect(entities);
 		case ARM_DEPLOY:
 		{
+			if(Case()->Showed() <= 0) return true;
 			if(Deployed())
 			{
 				ECSpriteBase* sprite = images[I_Deployed];
