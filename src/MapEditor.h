@@ -57,7 +57,7 @@ class EMap : public ECMap
 public:
 	EMap(std::string filename, uint x, uint y, std::string date);
 	EMap(std::string f)
-		: ECMap(f)
+		: ECMap(f), can_save(false)
 	{}
 
 /* Methodes */
@@ -72,8 +72,13 @@ public:
 	bool RemovePlayer(const char id);
 	ECBMapPlayer* GetPlayer(const char id);
 
+	bool CanSave() const { return can_save; }
+	void SetCanSave(bool b = true) { can_save = b; }
+
 /* variables privées */
 private:
+
+	bool can_save;
 
 	virtual ECBMapPlayer* CreateMapPlayer(char _id, uint _num)
 	{

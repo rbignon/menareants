@@ -19,6 +19,9 @@
  * $Id$
  */
 
+#if 0
+#include <windows.h>
+#endif
 #include "Main.h"
 #include "Resources.h"
 #include "Map.h"
@@ -175,7 +178,7 @@ void EMap::AddCountry(const char* id)
 }
 
 EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
-	: ECMap(std::vector<std::string>(0))
+	: ECMap(std::vector<std::string>(0)), can_save(false)
 {
 	chan = 0;
 	min = 0;
@@ -330,6 +333,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		{
 			map = new EMap(path);
 			map->Init();
+			map->SetCanSave();
 		}
 		catch(const TECExcept &e)
 		{
@@ -406,23 +410,38 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						}
 						if(MapEditor->BarreLat->SaveButton->Test(event.button.x, event.button.y))
 						{
-								try
-								{
-									map->Save();
-									TMessageBox m("Sauvegarde effectuée", BT_OK, MapEditor);
-									m.Show();
-								}
-								catch(const TECExcept &e)
-								{
-									TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
-									               e.Message).c_str(), BT_OK, MapEditor);
-									m.Show();
-								}
+							if(!map->CanSave())
+							{
+								TMessageBox("Vous ne pouvez pas sauvegarder tant que vous n'avez pas configuré la carte.",
+								              BT_OK, MapEditor).Show();
+								break;
+							}
+							try
+							{
+								map->Save();
+								TMessageBox("Sauvegarde effectuée", BT_OK, MapEditor).Show();
+							}
+							catch(const TECExcept &e)
+							{
+								TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
+								               e.Message).c_str(), BT_OK, MapEditor);
+								m.Show();
+							}
 						}
 						if(MapEditor->BarreLat->QuitButton->Test(event.button.x, event.button.y))
 						{
-							TMessageBox mb("Voulez-vous sauvegarder la carte ?", BT_YES|BT_NO|BT_CANCEL, MapEditor);
-							uint result = mb.Show();
+							uint result = 0;
+							if(map->CanSave())
+							{
+								TMessageBox mb("Voulez-vous sauvegarder la carte ?", BT_YES|BT_NO|BT_CANCEL, MapEditor);
+								result = mb.Show();
+							}
+							else
+							{
+								TMessageBox mb("Vous n'avez pas configuré la carte, vous ne pouvez donc pas la sauvegarder.\n"
+								               "Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL, MapEditor);
+								result = mb.Show();
+							}
 							if(result != BT_CANCEL)
 							{
 								try
@@ -448,6 +467,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							MapEditor->BarreEntity->UnSelect();
 							map->RemoveAnEntity(entity);
 							map->CreatePreview(120,120,true);
+							break;
 						}
 
 						if(MapEditor->BarreEntity->Test(event.button.x, event.button.y) ||
@@ -1021,26 +1041,20 @@ void TOptionsMap::Options(TObject*, void* m)
 						if(OptionsMap->OkButton->Test(event.button.x, event.button.y))
 						{
 							if(OptionsMap->Name->Text().empty())
-							{
-								TMessageBox mb("Veuillez donner un nom à la carte !", BT_OK, OptionsMap);
-								mb.Show();
-							}
-							else if(OptionsMap->Players->Empty())
-							{
-								TMessageBox mb("Il doit y avoir au moins un joueur", BT_OK, OptionsMap);
-								mb.Show();
-							}
+								TMessageBox("Veuillez donner un nom à la carte !", BT_OK, OptionsMap).Show();
+							else if(OptionsMap->Players->Size() < 2)
+								TMessageBox("Il doit y avoir au moins deux joueur", BT_OK, OptionsMap).Show();
 							else if(OptionsMap->Countries->Empty())
-							{
-								TMessageBox mb("Il doit y avoir au moins une country", BT_OK, OptionsMap);
-								mb.Show();
-							}
+								TMessageBox("Il doit y avoir au moins une country", BT_OK, OptionsMap).Show();
 							else if(OptionsMap->Begin->Empty() || OptionsMap->City->Empty())
-							{
-								TMessageBox mb("Vous devez mettre l'argent de début de partie et l'argent des villes",
-								               BT_OK, OptionsMap);
-								mb.Show();
-							}
+								TMessageBox("Vous devez mettre l'argent de début de partie et l'argent des villes",
+								               BT_OK, OptionsMap).Show();
+							else if(OptionsMap->MinPlayers->Value() < 2)
+								TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
+								            OptionsMap).Show();
+							else if(OptionsMap->MaxPlayers->Value() < OptionsMap->MinPlayers->Value())
+								TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de joueurs "
+								            "minimal", BT_OK, OptionsMap).Show();
 							else
 								eob = true;
 						}
@@ -1152,7 +1166,7 @@ void TOptionsMap::Options(TObject*, void* m)
 	
 	MyFree(OptionsMap);
 	map->CreatePreview(120,120, true);
-
+	map->SetCanSave();
 }
 
 void TOptionsMap::Refresh()
@@ -1337,6 +1351,24 @@ void MenAreAntsApp::MapEditor()
 void TLoadMapFile::Refresh()
 {
 	MapsList->ClearItems();
+#if 0
+	WIN32_FIND_DATA File;
+	HANDLE hSearch;
+	BOOL re;
+	
+	hSearch=FindFirstFile("*.map", &File);
+	if(hSearch ==  INVALID_HANDLE_VALUE)
+		return;
+	
+	re=TRUE;
+	do
+	{
+		/* Traitement */
+		re = FindNextFile(hSearch, &File);
+	} while(re);
+	
+	FindClose(hSearch);
+#else
 	struct dirent *lecture;
 	DIR *rep;
 	rep = opendir(app.GetPath().c_str());
@@ -1349,6 +1381,7 @@ void TLoadMapFile::Refresh()
 			                             black_color, true);
 	}
 	closedir(rep);
+#endif
 }
 
 TLoadMapFile::TLoadMapFile(SDL_Surface* w)
