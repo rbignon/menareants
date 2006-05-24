@@ -89,7 +89,8 @@ void ECMove::SetMoves(Vector _moves)
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
                    uint _visibility)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false), move(this)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false), move(this),
+		  want_deploy(false), attaqued_case(0)
 {
 	//SetShowedCases(true);
 }
@@ -97,6 +98,14 @@ ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_t
 ECEntity::~ECEntity()
 {
 	delete image;
+}
+
+void ECEntity::Played()
+{
+	ECBEntity::Played();
+	attaqued_case = 0;
+	want_deploy = false;
+	Move()->Clear(Case());
 }
 
 bool ECEntity::Test(int souris_x, int souris_y)
@@ -115,6 +124,29 @@ void ECEntity::Draw()
 	}
 }
 
+ECase* ECEntity::Case() const
+{
+	return dynamic_cast<ECase*>(acase);
+}
+
+void ECEntity::ImageSetXY(int x, int y)
+{
+	if(!image)
+		return;
+
+	image->set(x,y);
+	ECase* c = dynamic_cast<ECase*>(Case());
+	c->SetMustRedraw();
+	if(x > c->Image()->X())
+		dynamic_cast<ECase*>(c->MoveRight())->SetMustRedraw();
+	if(x < c->Image()->X())
+		dynamic_cast<ECase*>(c->MoveLeft())->SetMustRedraw();
+	if(y > c->Image()->Y())
+		dynamic_cast<ECase*>(c->MoveDown())->SetMustRedraw();
+	if(y < c->Image()->Y())
+		dynamic_cast<ECase*>(c->MoveUp())->SetMustRedraw();
+}
+
 void ECEntity::SetImage(ECSpriteBase* spr)
 {
 	bool anim = false;
@@ -123,6 +155,9 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 		anim = image->Anim();
 		MyFree(image);
 	}
+	if(Case())
+		dynamic_cast<ECase*>(Case())->SetMustRedraw();
+	
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
 	image->SetAnim(anim);
@@ -178,7 +213,7 @@ void ECEntity::SetShowedCases(bool show, bool forced)
  ********************************************************************************************/
 
 ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0), showed(-1)
+	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0), showed(-1), must_redraw(true)
 {
 
 }
@@ -207,6 +242,7 @@ void ECase::Draw()
 void ECase::SetImage(ECSpriteBase* spr)
 {
 	if(image) delete image;
+	SetMustRedraw();
 	if(!spr) return;
 	image = new ECSprite(spr, app.sdlwindow);
 	if(dynamic_cast<ECMap*>(map)->ShowMap())
