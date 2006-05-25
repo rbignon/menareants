@@ -132,7 +132,7 @@ public:
 	bool ForceFocus() const { return force_focus; }
 
 	void SetHint(const char* h) { hint = h; }
-	const char* Hint() const { return hint.c_str(); }
+	const char* Hint() { return hint.empty() ? "" : hint.c_str(); }
 	bool DynamicHint() const { return dynamic_hint; }
 
 	int Tag;

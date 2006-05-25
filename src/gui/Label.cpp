@@ -69,7 +69,7 @@ void TLabel::Reinit()
 
 void TLabel::Draw(int m_x, int m_y)
 {
-	if(!surf) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
+	if(!surf || caption.empty()) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
 
 	SDL_Rect dst_rect;
 	dst_rect.x = x;
