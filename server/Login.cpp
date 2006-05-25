@@ -33,16 +33,11 @@
  */
 static void send_motd(TClient *cl)
 {
-	std::string file = app.GetConf()->MotdFile();
-	std::ifstream fp(file.c_str());
+	std::vector<std::string> motd = app.GetConf()->Motd();
 
-	if(fp)
-	{
-		std::string ligne;
+	for(std::vector<std::string>::iterator it = motd.begin(); it != motd.end(); ++it)
+		cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(*it).c_str());
 
-		while(std::getline(fp, ligne))
-			cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(ligne).c_str());
-	}
 	cl->sendrpl(app.rpl(ECServer::ENDOFMOTD));
 	return;
 }

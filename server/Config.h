@@ -22,6 +22,7 @@
 #define ECD_Config_h
 
 #include <string>
+#include <vector>
 
 /** Config class.
  * \todo documente.
@@ -37,13 +38,13 @@ public:
 	std::string ServerName() const { return servername; }
 	int Port() const { return port; }
 	int DefLimite() const { return deflimite; }
-	std::string MotdFile() const { return motdfile; }
+	std::vector<std::string> Motd() const { return motd; }
 
 private:
 	std::string servername;
 	int port;
 	int deflimite;
-	std::string motdfile;
+	std::vector<std::string> motd;
 
 private:
 	std::string filename;

@@ -36,7 +36,6 @@ bool Config::set_defaults()
 	servername = "Men.Are.Ants";
 	port = 5461;
 	deflimite = 10;
-	motdfile = "/etc/menareantsd.motd";
 	return true;
 }
 
@@ -59,18 +58,29 @@ bool Config::load()
 		if(key == "SERVERNAME") servername = ligne;
 		else if(key == "PORT") port = atoi(ligne.c_str());
 		else if(key == "DEFLIMITE") deflimite = atoi(ligne.c_str());
-		else if(key == "MOTDFILE") motdfile = ligne;
+		else if(key == "MOTDFILE")
+		{
+			std::ifstream fp(ligne.c_str());
+
+			if(fp)
+			{
+				std::string line;
+
+				while(std::getline(fp, line))
+					motd.push_back(line);
+			}
+			else
+				Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", ligne.c_str());
+		}
 		else
 			Debug(W_WARNING|W_ECHO, "Ligne incorrecte (variable %s introuvable):\n%s %s",
 			                        key.c_str(), key.c_str(), ligne.c_str());
 	}
 	if(port < 1 || port > 65535 || deflimite < 2)
 	{
-		std::cout << "Lecture de la configuration invalide" << std::endl;
+		std::cerr << "Lecture de la configuration invalide" << std::endl;
 		return false;
 	}
-	if(!std::ifstream(motdfile.c_str()))
-		Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", motdfile.c_str());
 
 	return true;
 }
