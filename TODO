@@ -3,15 +3,15 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
+-server: si jamais il y a un attaqué qui bouge, voir si l'attaquant (explicite) est toujours à sa portée (donc ne
+ concerne pas les combats corps à corps), et si oui créer un nouvel evenement sur la nouvelle case.
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
--server: si jamais il y a un attaqué qui bouge, voir si l'attaquant (explicite) est toujours à sa portée (donc ne
- concerne pas les combats corps à corps), et si oui créer un nouvel evenement sur la nouvelle case.
 -client: gestion des accents dans TEdit
 
 * Après
+-client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 -server: enrichissement de l'IA
 -introduction de la ressource petrolière pour les vehicules
 -gestion des fins de parties.
@@ -34,6 +34,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -avancement des niveaux techniques des batiments, qui peuvent construire plus d'unités à chaque fois
 -limiter le nombre d'unités à construire sur les villes et les batiments
 -système de guerilla de Spouize
+-mode de jeu qui permet d'utiliser que certaines unités (genre le mode que vehicules, que naval (plus tard), etc)
 
 
 ** Sur le très long terme

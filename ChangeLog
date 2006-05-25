@@ -1,3 +1,14 @@
+2005-05-25  Romain Bignon <progs@headfucking.net>
+
+	* src/Map.cpp, src/data/ShowMap.cpp, src/Units.cpp: Corrections pour les attaques du lance missile ou déploiement hors
+	champ de vision.
+
+	* server/InGame.cpp: Correction pour les combats qui ne sont pas "jusqu'à la mort".
+
+	* server/Config.cpp, server/Login.cpp: Stockage du motd dès le début.
+
+	* src/Doxyfile, server/Doxyfile: Affiche la doc de lib/ dans les deux, ce qui devient plus interressant.
+
 2005-05-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Resources.h, src/data/anims/cases/terre/2.png, src/Units.cpp: Affichage d'un "cratère" quand y a eu un combat.
