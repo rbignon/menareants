@@ -59,21 +59,25 @@ bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase*
 	{
 		case ARM_ATTAQ:
 		{
-			if(c == Case() || Case()->Showed() <= 0) return true;
+			if(c == Case()) return true;
 
 			if(!missile)
 			{
 				me->LockScreen();
-				dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
 				SetImage(GetSprite(I_Reployed));
 				Image()->SetAnim(false);
 				SetMissile(Resources::MissiLauncher_Missile_Up());
-				missile->set(Image()->X(), Image()->Y());
 				me->UnlockScreen();
+				if(Case()->Showed() > 0)
+				{
+					dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
+					missile->set(Image()->X(), Image()->Y());
+					SDL_Delay(200);
+				}
 				return false;
 			}
 			missile->set(Image()->X(), missile->Y() - MISSILAUNCHER_MISSILE_STEP);
-			if(missile->Y() + missile->GetHeight() <= 0)
+			if(missile->Y() + missile->GetHeight() <= 0 || Case()->Showed() <= 0)
 			{
 				me->LockScreen();
 				dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(c);
@@ -98,10 +102,10 @@ bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c
 		case ARM_ATTAQ:
 		case ARM_ATTAQ|ARM_MOVE:
 		{
-			if(c == Case() || !missile || c->Showed() <= 0) return true;
+			if(c == Case() || !missile) return true;
 
 			missile->set(missile->X(), missile->Y() + MISSILAUNCHER_MISSILE_STEP);
-			if(missile->Y() >= c->Image()->Y())
+			if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
 			{
 				me->LockScreen();
 				MyFree(missile);
@@ -130,10 +134,8 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
 			if(c->Flags() & (C_TERRE))
 				c->Image()->SetFrame(1);
 
-			SDL_Delay(300);
-   return true;
-
-			break;
+			SDL_Delay(800);
+			return true;
 		}
 		default:
 			return ECUnit::AfterEvent(entities,c, me);
@@ -242,26 +244,58 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			return MoveEffect(entities);
 		case ARM_DEPLOY:
 		{
-			if(Case()->Showed() <= 0) return true;
 			if(Deployed())
 			{
 				ECSpriteBase* sprite = images[I_Deployed];
 				if(!sprite) break;
 				SetImage(sprite);
-				Image()->SetRepeat(false);
-				Image()->SetAnim(true);
-				WAIT_EVENT_T(!Image()->Anim(), i, 10);
+				if(Case()->Showed() <= 0)
+					Image()->SetFrame(Image()->NbFrames()-1);
+				else
+				{
+					Image()->SetRepeat(false);
+					Image()->SetAnim(true);
+					WAIT_EVENT_T(!Image()->Anim(), i, 10);
+					Image()->SetRepeat(true);
+					Image()->SetAnim(false);
+				}
 			}
+			/* C'est le reploiement alors que je viens de tirer, donc il n'y a plus de missile sur la rampe */
+			else if(dynamic_cast<EChannel*>(Case()->Map()->Channel())->CurrentEvent() & ARM_ATTAQ)
+			{
+				if(Case()->Showed() > 0)
+				{
+					ECSpriteBase* sprite = images[I_Reployed];
+					if(!sprite) break;
+					SetImage(sprite);
+					Image()->SetRepeat(false);
+					Image()->SetAnim(true);
+					WAIT_EVENT_T(!Image()->Anim(), i, 10);
+					Image()->SetRepeat(true);
+					Image()->SetAnim(false);
+					SDL_Delay(20);
+				}
+				SetImage(images[I_Right]);
+			}
+			/* C'est un reploiement sans tirer, donc on utilise l'image du déploiement avec missile, mais dans l'ordre
+			 * inverse */
 			else
 			{
-				ECSpriteBase* sprite = images[I_Reployed];
-				if(!sprite) break;
-				SetImage(sprite);
-				Image()->SetRepeat(false);
-				Image()->SetAnim(true);
-				WAIT_EVENT_T(!Image()->Anim(), i, 10);
-				Image()->SetRepeat(true);
-				SDL_Delay(20);
+				if(Case()->Showed() > 0)
+				{
+					ECSpriteBase* sprite = images[I_Deployed];
+					if(!sprite) break;
+					SetImage(sprite);
+					Image()->SetOrder(false);
+					Image()->SetFrame(Image()->NbFrames()-1);
+					Image()->SetRepeat(false);
+					Image()->SetAnim(true);
+					WAIT_EVENT_T(!Image()->Anim(), i, 10);
+					Image()->SetRepeat(true);
+					Image()->SetAnim(false);
+					Image()->SetOrder(true);
+					SDL_Delay(20);
+				}
 				SetImage(images[I_Right]);
 			}
 			break;

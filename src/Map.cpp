@@ -116,7 +116,7 @@ bool ECEntity::Test(int souris_x, int souris_y)
 
 void ECEntity::Draw()
 {
-	if(image)
+	if(image && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
 		image->draw();
 		if(selected)

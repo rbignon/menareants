@@ -200,8 +200,7 @@ void TMap::Draw(int _x, int _y)
 		}
 		else
 		{
-			if(!HaveBrouillard() || dynamic_cast<ECase*>((*enti)->Case())->Showed() > 0)
-				dynamic_cast<ECEntity*>(*enti)->Draw();
+			dynamic_cast<ECEntity*>(*enti)->Draw();
 			++enti;
 		}
 #if 0
