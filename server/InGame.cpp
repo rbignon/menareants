@@ -74,10 +74,10 @@ void EChannel::NextAnim()
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			const char S_ATTAQ = 1;
 			const char S_REMOVE = 2;
-			const char S_WINERS = 3;
-			const char S_END = 4;
+			const char S_END = 3;
 			const char T_CONTINUE = 1;
 			const char T_STOP = 0;
+			const char T_SLEEP = -1;
 			char state = S_ATTAQ;
 			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end();)
@@ -87,75 +87,85 @@ void EChannel::NextAnim()
 				else
 				{
 					(*it)->Lock();
+					(*it)->Tag = T_CONTINUE;
 					++it;
 				}
 			}
-			/* Si l'evenement ne comptenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
+			/* Si l'evenement ne contenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
 			if(entv.empty())
 				return;
+			std::vector<ECEntity*>::size_type nb_entities = entv.size();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
 			{
 				if(it == entv.end())
 				{
 					it = entv.begin();
-					if(state == S_REMOVE && !ECEntity::AreFriends(entv)) state = S_ATTAQ;
+					if(state == S_REMOVE && nb_entities > 0) state = S_ATTAQ;
 					else state++;
 					continue;
 				}
 
 				if(state == S_ATTAQ)
 				{
-					(*it)->Tag = (*it)->Attaq(entv) ? T_CONTINUE : T_STOP;
+					if((*it)->Tag == T_CONTINUE)
+						(*it)->Tag = (*it)->Attaq(entv) ? T_CONTINUE : T_STOP;
 					++it;
 				}
-				else if(state == S_REMOVE || state == S_WINERS)
+				else if(state == S_REMOVE)
 				{
-					if(state == S_REMOVE)
-						(*it)->ReleaseShoot(),
-						Debug(W_DEBUG, "- %s reste %d", (*it)->LongName().c_str(), (*it)->Nb());
+					(*it)->ReleaseShoot();
+					Debug(W_DEBUG, "- %s reste %d", (*it)->LongName().c_str(), (*it)->Nb());
 
-					if(!(*it)->Nb())
+					if(!(*it)->Nb() || (*it)->Tag == T_STOP)
 					{
-						SendArm(NULL, *it, ARM_REMOVE);
-						event->Entities()->Remove(*it);
-						/* On ne remove pas car il est locked et sera supprimé lors du
-						 * passage de la boucle principale.
-						 */
-						//map->RemoveAnEntity(*it, USE_DELETE);
-						it = entv.erase(it);
-					}
-					else if(state == S_WINERS || (*it)->Tag == T_STOP)
-					{
-						std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
-						std::vector<ECBEntity*>::iterator fix = fixed.end();
-						if(!fixed.empty())
-							for(fix = fixed.begin(); fix != fixed.end() && (*fix == *it ||
-							    (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
-							     ++fix);
-
-						if(fix != fixed.end() && (*it)->Case() == (*fix)->Case())
-						{
-							ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
-							gobeur->Union(*it);
-							(*it)->Move()->Clear();
-							SendArm(NULL, *it, ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
-							SendArm(NULL, gobeur, ARM_NUMBER, 0, 0, gobeur->Nb());
-							/* Pas besoin de lock, il l'est déjà.
-							 * (*it)->SetLock();
-							 */
-						}
+						if(!(*it)->Nb())
+							it = entv.erase(it);
 						else
-						{
-							SendArm(NULL, *it, ARM_NUMBER, 0, 0, (*it)->Nb());
-							(*it)->Case()->CheckChangingOwner(*it);
-							(*it)->Unlock();
-						}
-
-						it = entv.erase(it);
+							(*it)->Tag = T_SLEEP;
+						nb_entities--;
 					}
 					else ++it;
 				}
 				else ++it;
+			}
+			entv = event->Entities()->List();
+			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+			{
+				if(!(*it)->Nb())
+				{
+					SendArm(NULL, *it, ARM_REMOVE);
+					/* On ne remove pas car il est locked et sera supprimé lors du
+						* passage de la boucle principale.
+						*/
+					//map->RemoveAnEntity(*it, USE_DELETE);
+				}
+				else
+				{
+					std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
+					std::vector<ECBEntity*>::iterator fix = fixed.end();
+					if(!fixed.empty())
+						for(fix = fixed.begin(); fix != fixed.end() && (*fix == *it ||
+							(*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
+								++fix);
+
+					if(fix != fixed.end() && (*it)->Case() == (*fix)->Case())
+					{
+						ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
+						gobeur->Union(*it);
+						(*it)->Move()->Clear();
+						SendArm(NULL, *it, ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+						SendArm(NULL, gobeur, ARM_NUMBER, 0, 0, gobeur->Nb());
+						/* Pas besoin de lock, il l'est déjà.
+							* (*it)->SetLock();
+							*/
+					}
+					else
+					{
+						SendArm(NULL, *it, ARM_NUMBER, 0, 0, (*it)->Nb());
+						(*it)->Case()->CheckChangingOwner(*it);
+						(*it)->Unlock();
+					}
+				}
 			}
 			break;
 		}
@@ -553,7 +563,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								ECBCase* c = entity2->Case();
 								entity2->Return(entity->Case());
 								ECEvent* evnt = map->FindEvent(c, 0, entity2);
-								if(evnt->CheckRemoveBecauseOfPartOfAttaqEntity(entity2))
+								if(evnt && evnt->CheckRemoveBecauseOfPartOfAttaqEntity(entity2))
 								{
 									Debug(W_DEBUG, "On jarte un ancien event auquel j'assistais sur mon ancienne case (%d)",
 									               SHOW_EVENT(evnt->Flags()));
