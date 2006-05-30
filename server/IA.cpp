@@ -265,7 +265,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	SetAuth(IA);
 
 	/* A partir de là le serveur le gere comme un client normal */
-	IA->ia_send("JOI " + std::string(chan->GetName()));
+	IA->ia_send("JOI " + FormatStr(chan->GetName()));
 	if(chan->Map())
 	    IA->ia_send("SET +!");
 

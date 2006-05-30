@@ -123,44 +123,29 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 				case 7: coef = 0.5f; break;
 				case 8: coef = 0.3f; break;
 			}
-			bool loupe = false;
-			/* Le lance missile peut rater sa cible à partir d'une distance de 7 cases :
-			 * - 7 cases = 1 chance sur 3
-			 * - 8 cases = 1 chance sur 2
-			 */
-			if(d >= MISSILAUNCHER_PORTY-1)
+			uint killed = 0;
+			switch((*it)->Type())
 			{
-				int l = rand() % (MISSILAUNCHER_PORTY+1-d);
-				if(!l)
-					loupe = true;
+				case E_ARMY: killed = uint(Nb() * coef); break;
+				case E_CHAR: killed = uint(Nb() * 4 * coef); break;
+				case E_MISSILAUNCHER: killed = uint(Nb() * 2 * coef); break;
+				default:
+					if((*it)->IsBuilding())
+						killed = uint(Nb() * 7 * coef);
+					else
+					{
+						FDebug(W_WARNING, "Shoot d'un type non supporté");
+						continue;
+					}
 			}
-			if(loupe)
-				(*Channel()) << "Le lance missile " + LongName() + " a loupé sa cible !!";
-			else
-			{
-				uint killed = 0;
-				switch((*it)->Type())
-				{
-					case E_ARMY: killed = uint(Nb() * coef); break;
-					case E_CHAR: killed = uint(Nb() * 4 * coef); break;
-					case E_MISSILAUNCHER: killed = uint(Nb() * 2 * coef); break;
-					default:
-						if((*it)->IsBuilding())
-							killed = uint(Nb() * 7 * coef);
-						else
-						{
-							FDebug(W_WARNING, "Shoot d'un type non supporté");
-							continue;
-						}
-				}
-				if(!killed) continue;
+			if(!killed) continue;
 
-				(*it)->Shooted(killed);
-				(*Channel()) << "Le lance missile " + LongName() + " dégomme " + (*it)->Qual() + " " +
-				                (*it)->LongName() + " de " + TypToStr(killed);
-			}
+			(*it)->Shooted(killed);
+			(*Channel()) << "Le lance missile " + LongName() + " dégomme " + (*it)->Qual() + " " +
+							(*it)->LongName() + " de " + TypToStr(killed);
 		}
 
+#if 0 // Uniquement si on veut qu'un lance-missile se reploie après avoir tiré
 	/* Si on est déployé (ça devrait etre le cas !!), on se remet normal pour faire perdre un tour
 	 * au joueur si il veut retirer (il faut se redeployer)
 	 */
@@ -171,6 +156,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 	}
 	else
 		FDebug(W_WARNING, "On n'est pas deployé !?");
+#endif
 
 	return false;
 }
