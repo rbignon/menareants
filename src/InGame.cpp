@@ -210,7 +210,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		chan->SetCurrentEvent(flags);
 
 	if(entities.empty())
-		return FDebug(W_WARNING|W_SEND, "Pas d'entités ???");
+		return 0;
 
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
