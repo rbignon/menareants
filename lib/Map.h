@@ -122,6 +122,7 @@ protected:
 #define ARM_NUMBER      0x0040
 #define ARM_RETURN      0x0080
 #define ARM_DEPLOY      0x0800
+#define ARM_FORCEATTAQ  0x1000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -235,6 +236,8 @@ public:
 	/** This is events of this entity */
 	uint EventType() const { return event_type; }
 	void SetEvent(uint _e) { event_type = _e; }
+	void AddEvent(uint _e) { event_type |= _e; }
+	void DelEvent(uint _e) { event_type &= ~(_e); }
 
 	/** This is the type of entity */
 	e_type Type() const { return type; }
@@ -637,7 +640,7 @@ public:
 	std::vector<std::string> MapInfos() { return map_infos; }       /**< Map informations */
 	
 	/** Access to a case of map 
-	 * \example: map(x,y)
+	 * example: map(x,y)
 	 */
 	ECBCase*& operator() (uint x, uint y);
 
