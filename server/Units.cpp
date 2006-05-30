@@ -53,7 +53,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	 * - que ça soit notre première action
 	 * - qu'on n'ait pas déjà prévu une attaque
 	 */
-	if(!Deployed() || Last() || EventType() & ARM_ATTAQ)
+	if(!Deployed() || Last())
 		return false;
 
 	/* On n'attaque pas sur notre case */

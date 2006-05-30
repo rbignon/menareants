@@ -151,6 +151,7 @@ public:
 	 * ARM_RECURSE     0x0200  (NEVER CALL IT)
 	 * ARM_NOCONCERNED 0x0400  (if you don't want to send it to the others players of owner)
 	 * ARM_DEPLOY      0x0800  ({ or })
+	 * ARM_FORCEATTAQ  0x1000  (!, to force an attaq to a specific case)
 	 * ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 	 * ARM_UNION       (ARM_MOVE|ARM_NUMBER)
 	 * ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)

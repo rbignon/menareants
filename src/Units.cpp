@@ -35,7 +35,7 @@ void ECMissiLauncher::Draw()
 	ECEntity::Draw();
 	if(missile)
 		missile->draw();
-#ifndef WIN32
+#if 0
 	if(Selected())
 		circleColor(Image()->Window(), Image()->X() + Image()->GetWidth()/2, Image()->Y() + Image()->GetHeight()/2,
 		            MISSILAUNCHER_PORTY * CASE_WIDTH,
