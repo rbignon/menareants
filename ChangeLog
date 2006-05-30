@@ -1,3 +1,20 @@
+2005-05-28  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Correction d'un bug, si jamais un evenement d'une attaque contient des locked, surtout ne pas
+	envoyer le ARM* et surtout supprimer l'evenement, sinon boucle infinie !
+
+	* src/InGame.cpp: Correction d'un bug qui faisait apparaitre un mouvement non réel si jamais le serveur envoyait un
+	ARM*= pour une unité qui finalement ne bougeait pas (mais qui avait quand meme un évenement lié, cf attaque en chemin).
+
+2005-05-27  Romain Bignon <progs@headfucking.net>
+
+	* API, server/Map.cpp, server/InGame.cpp, src/InGame.cpp: Possibilité d'attaques "maintenues" ou "volatiles". Dans le
+	premier cas, il faut maintenir ctrl enfoncé lors du clic pour l'attaque. L'attaque volatile permet que si une unité de
+	la case visée bouge, il y ait un déplacement de la cible de l'attaque.
+
+	* src/Map.cpp, src/InGame.cpp, src/MapEditor.cpp: Modification de la preview pour que chaque pixel soit uniformisé,
+	ça fait plus beau.
+
 2005-05-25  Romain Bignon <progs@headfucking.net>
 
 	* src/Map.cpp, src/data/ShowMap.cpp, src/Units.cpp: Corrections pour les attaques du lance missile ou déploiement hors

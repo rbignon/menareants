@@ -3,8 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--server: si jamais il y a un attaqué qui bouge, voir si l'attaquant (explicite) est toujours à sa portée (donc ne
- concerne pas les combats corps à corps), et si oui créer un nouvel evenement sur la nouvelle case.
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
