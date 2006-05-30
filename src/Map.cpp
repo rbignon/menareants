@@ -384,6 +384,9 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 	if(!initialised) return;
 
 	uint size_x = width/x, size_y = height/y;
+	if(size_x > size_y) size_x = size_y;
+	else size_y = size_x;
+	pixel_size = size_y;
 
 	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_SWSURFACE|SDL_SRCALPHA);
 

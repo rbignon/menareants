@@ -998,8 +998,8 @@ void TEditBarreLat::Init()
 	ScreenPos = AddComponent(new TImage(0,0));
 	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	DrawRect(surf, 0, 0, 120  / editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
-	                     120 / editor->Map->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	DrawRect(surf, 0, 0, editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
+	                     editor->Map->Map()->Preview()->GetHeight()/editor->Map->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
 	                     SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
 	ScreenPos->SetImage(new ECImage(surf));
 	ScreenPos->SetEnabled(false);

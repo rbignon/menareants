@@ -303,11 +303,14 @@ public:
 	bool Brouillard() const { return brouillard; }
 	void SetBrouillard(bool b = true) { brouillard = b; }
 
+	uint PixelSize() const { return pixel_size; }
+
 /* Variables privées */
 protected:
 	ECImage *preview;
 	TMap *showmap;
 	bool brouillard;
+	uint pixel_size;
 };
 
 /********************************************************************************************
