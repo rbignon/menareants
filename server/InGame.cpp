@@ -58,7 +58,10 @@ void EChannel::NextAnim()
 	}
 
 	if(ents.empty())
+	{
+		dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
 		return;
+	}
 }
 #endif
 
@@ -66,12 +69,6 @@ void EChannel::NextAnim()
 	{
 		case ARM_ATTAQ:
 		{
-			uint flags = ARM_ATTAQ;
-			if(!event->Linked().empty())
-				flags |= ARM_MOVE;
-			SendArm(NULL, event->Entities()->List(), flags, event->Case()->X(), event->Case()->Y(), 0, 0, event->Linked());
-
-			std::vector<ECEntity*> entv = event->Entities()->List();
 			const char S_ATTAQ = 1;
 			const char S_REMOVE = 2;
 			const char S_END = 3;
@@ -79,7 +76,9 @@ void EChannel::NextAnim()
 			const char T_STOP = 0;
 			const char T_SLEEP = -1;
 			char state = S_ATTAQ;
+
 			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
+			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end();)
 			{
 				if((*it)->Locked())
@@ -91,9 +90,18 @@ void EChannel::NextAnim()
 					++it;
 				}
 			}
-			/* Si l'evenement ne contenait que des unités locked, on s'en va (genre elle a été supprimée précédemment */
+			/* Si l'evenement ne contenait que des unités locked, on s'en va (genre elle a été supprimée précédemment) */
 			if(entv.empty())
+			{
+				dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
 				return;
+			}
+
+			uint flags = ARM_ATTAQ;
+			if(!event->Linked().empty())
+				flags |= ARM_MOVE;
+			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, 0, event->Linked());
+
 			std::vector<ECEntity*>::size_type nb_entities = entv.size();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
 			{
@@ -307,7 +315,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				x = StrToTyp<uint>(stringtok(s, ","));
 				y = StrToTyp<uint>(s);
 
-				if(entity && entity->WantAttaq(x, y))
+				if(entity && !(entity->EventType() & ARM_ATTAQ) && entity->WantAttaq(x, y))
 					flags |= ARM_ATTAQ;
 				break;
 			}
@@ -329,6 +337,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				if(entity && entity->WantDeploy())
 					flags |= ARM_DEPLOY;
+				break;
+			}
+			case '!':
+			{
+				flags |= ARM_FORCEATTAQ;
 				break;
 			}
 			case '/':
@@ -610,7 +623,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			/*if(event_found)
 				events_sended.push_back(event_found);*/
 		}
-		if(flags == ARM_ATTAQ)
+		// ARM_ATTAQ.(1 + ARM_FORCEATTAQ)
+		if(flags & ARM_ATTAQ)
 		{
 			/*****************************
 			 *    GESTION DES ATTAQUES   *
@@ -628,20 +642,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				std::vector<ECBEntity*> entities = c->Entities()->List();
 				for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 					if(!(*enti)->Locked() && *enti != entity && entity->CanAttaq(*enti) && !entity->Like(*enti))
-					{
 						attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
-						if((*enti)->Owner())
-							recvers.push_back(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client());
-					}
 			}
 			else
-			{
-				Debug(W_DEBUG, "Il y a déjà une attaque, on prévient juste les autres");
-				std::vector<ECEntity*> entities = attaq_event->Entities()->List();
-				for(std::vector<ECEntity*>::const_iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					if((*enti)->Owner() && !(*enti)->Locked())
-						recvers.push_back(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client());
-			}
+				Debug(W_DEBUG, "Il y a déjà une attaque, on ne prévient PAS les attaqués");
 		}
 		recvers.push_back(cl);
 		chan->SendArm(recvers, entity, flags, x, y, nb, type, events_sended);
