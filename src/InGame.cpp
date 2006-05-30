@@ -196,6 +196,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						entity->Move()->SetFirstCase(last);
 						entity->Move()->SetMoves(moves);
 					}
+					else
+						entity->Move()->Clear(last);
 					if(entity->Case() != last)
 						entity->ChangeCase(last);
 				}
@@ -218,7 +220,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(nb != (*it)->Nb())
 			{
 				if(chan->CurrentEvent() & ARM_ATTAQ)
-					L_GREAT("Il reste " + TypToStr(nb) + " à " + (*it)->Qual() + " " + (*it)->LongName());
+					L_GREAT("Il reste " + TypToStr(nb) + " pour " + (*it)->Qual() + " " + (*it)->LongName());
 				else
 					L_INFO(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a maintenant " + TypToStr(nb));
 			}
@@ -275,13 +277,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 			{
-				if((*it)->Owner() != me->Player() && flags == ARM_ATTAQ)
-				{
-					L_WARNING(std::string(entities[0]->Qual())+" "+entities[0]->LongName()+" cherche à vous attaquer !!");
-					L_WARNING("Vous pouvez esquiver en déplaçant l'unité visée, l'attaque sera annulé.");
-					if(InGameForm)
-						InGameForm->Map->CenterTo(*it);
-				}
 				(*it)->SetEvent(flags);
 				if(flags == ARM_PREUNION)
 					(*it)->Lock();
@@ -295,10 +290,6 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				(*it)->Move()->Return((*map)(x,y));
 				if((*it)->Move()->FirstCase())
 					(*it)->SetEvent(0);
-				if(InGameForm)
-					InGameForm->Map->CenterTo(entities[0]);
-				L_INFO(std::string(entities[0]->Qual()) + " " + entities[0]->LongName() + " annule son déplacement car "
-				                                 "l'entité qu'elle a voulu attaquer a refusé en s'esquivant !");
 			}
 		}
 		if(flags == ARM_CREATE && InGameForm && !entities.empty())
@@ -557,7 +548,7 @@ void MenAreAntsApp::InGame()
 									client->sendrpl(client->rpl(EC_Client::ARM),
 									                                       std::string(std::string(selected_entity->ID())
 								                                           + " *" + TypToStr(acase->X()) + "," +
-								                                           TypToStr(acase->Y())).c_str());
+								                                           TypToStr(acase->Y()) + (ctrl ? " !" : "")).c_str());
 									want = W_NONE;
 								}
 							}
@@ -995,8 +986,8 @@ void TBarreLat::Init()
 	ScreenPos = AddComponent(new TImage(0,0));
 	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	DrawRect(surf, 0, 0, 120  / chan->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
-	                     120 / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	DrawRect(surf, 0, 0, chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
+	                     chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
 	                     SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
 	ScreenPos->SetImage(new ECImage(surf));
 	ScreenPos->SetEnabled(false);
