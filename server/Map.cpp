@@ -227,6 +227,13 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 	Entities()->Remove(entity);
 	std::vector<ECEntity*> ents = Entities()->List();
 
+	/* La première étape est de virer tous les attaquants qui n'ont plus rien à attaquer, et de passer ceux qui souhaitent
+	 * maintenir leur attaque ET qu'ils tiennent encore l'unité qui se retire dans dans leur portée, de changer l'orientation
+	 * de leur attaque et de passer l'attaque sur une autre case.
+	 * Par la suite, on recherche les déplacements faits vers la case de l'attaque et qui ne cherchent aucunement
+	 * à se faire sodomiser l'anus par un bétail. Si jamais après le retrait de cette entité il n'y a plus d'attaque entre
+	 * lui et les autres, on le retire de la liste des attaquants et on met son mouvement, s'il existe, dans la liste globale.
+	 */
 	const char T_ATTAQ_STEP = 0;
 	const char T_MOVE_STEP = 1;
 	const char T_END_STEP = 2;
@@ -239,6 +246,36 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 				continue;
 			}
 
+			if(step == T_ATTAQ_STEP && (*enti)->EventType() & ARM_ATTAQ && !((*enti)->EventType() & ARM_FORCEATTAQ) &&
+			   entity->Case() != Case() && (*enti)->WantAttaq(entity->Case()->X(), entity->Case()->Y()))
+			{
+				Debug(W_DEBUG, "On déokace notre évenement");
+				ECEvent* attaq_event = dynamic_cast<ECMap*>(Case()->Map())->FindEvent(entity->Case(), ARM_ATTAQ);
+				if(!attaq_event)
+				{
+					Debug(W_DEBUG, "Création d'un evenement ATTAQ issue d'un déplacement de cible");
+					attaq_event = new ECEvent(ARM_ATTAQ, entity->Case());
+					dynamic_cast<ECMap*>(Case()->Map())->AddEvent(attaq_event);
+					std::vector<ECBEntity*> entities = entity->Case()->Entities()->List();
+					for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+						if(!(*it)->Locked() && *it != *enti && (*enti)->CanAttaq(*it) && !(*enti)->Like(*it))
+							attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*it));
+				}
+				attaq_event->Entities()->Add(*enti);
+
+				std::vector<ECEvent*>::iterator ev;
+				for(ev = this->linked.begin(); ev != this->linked.end() && (*ev)->Entity() != *enti; ++ev);
+				if(ev != this->linked.end())
+				{
+					attaq_event->AddLinked(*ev);
+					ev = this->linked.erase(ev);
+				}
+
+				this->Entities()->Remove(*enti);
+				enti = ents.erase(enti);
+				continue;
+			}
+
 			/* Pour cette entité, on cherche si il peut encore attaquer quelqu'un d'autre, sinon il jarte */
 			std::vector<ECEntity*>::iterator enti2;
 			for(enti2 = ents.begin();
@@ -246,9 +283,11 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 					(!(*enti)->CanAttaq(*enti2) || (*enti)->Like(*enti2)) &&
 					(step != T_MOVE_STEP || !(*enti2)->CanAttaq(*enti) || (*enti2)->Like(*enti)));
 				++enti2);
+
+			/* Il n'y a personne qu'il veut/peut attaquer et personne qui veut/peut l'attaquer */
 			if(enti2 == ents.end())
 			{
-				if(step == T_ATTAQ_STEP && (*enti)->EventType() == ARM_ATTAQ)
+				if(step == T_ATTAQ_STEP && (*enti)->EventType() & ARM_ATTAQ && !((*enti)->EventType() & ARM_FORCEATTAQ))
 				{ /* C'était un attaquant, on lui fait faire un Return */
 					Debug(W_DEBUG, "il y a un attaquant qui se trouve fort sodomisé.");
 					if((*enti)->Return() && (*enti)->Owner())
@@ -423,7 +462,7 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 {
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(this != *it && (*it)->Case() == Case() && !Like(*it) && CanAttaq(*it))
+		if(this != *it && (*it)->Case() == Case() && !Like(*it) && (*it)->Nb() && CanAttaq(*it))
 			enemies++;
 
 	if(!enemies) return false;

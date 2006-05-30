@@ -93,6 +93,7 @@ Sommaire:
          =<pos>      : |- position de départ
          %<type>     : `- définit le type
          #           :deploiement.
+         !           :lors d'une attaque, force la case
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
