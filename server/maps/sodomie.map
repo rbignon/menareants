@@ -1,6 +1,6 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
-NAME Sodomie a sec
+NAME Îles sanglantes
 PLAYER A
 PLAYER B
 X 20
@@ -53,3 +53,4 @@ UNIT 6 * 7,12 1000
 UNIT 1 * 7,12 1000
 UNIT 6 * 12,12 1000
 UNIT 1 * 12,12 1000
+INFO Carte pour deux joueurs sur deux petites iles

@@ -1,6 +1,6 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
-NAME My Map
+NAME Îlot
 PLAYER A
 PLAYER B
 X 13
@@ -21,7 +21,7 @@ CITY 4000
 MIN 2
 MAX 2
 DATE 13/8/1988
-INFO Alors
+INFO C'est une ile minuscule qui accueil deux joueurs pour un combat rapide.
 INFO 
 INFO Cette map sent la moule fraiche.
 INFO En effet elle présente une petite ile de merde
