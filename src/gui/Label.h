@@ -32,7 +32,8 @@ class TLabel : public TComponent
 /* Constructeur/Destructeur */
 public:
 
-	TLabel(int x, int y, std::string s, SDL_Color new_color, Font* new_font);
+	TLabel(int x, int y, std::string s, SDL_Color new_color, Font* new_font, bool shadowed = false);
+	TLabel(const TLabel&);
 	~TLabel();
 
 /* Methodes */
@@ -55,8 +56,11 @@ public:
 protected:
 	std::string caption;
 	SDL_Surface* surf;
+	SDL_Surface* background;
 	Font* font;
 	SDL_Color color;
+	bool shadowed;
+	uint bg_offset;
 
 	void Reinit();
 };

@@ -115,7 +115,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 /** This is map list.
  *
- * Syntax: LSM nom min max
+ * Syntax: LSM nom min max infos
  */
 int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -127,7 +127,10 @@ int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			GameInfosForm->RecvMapList = true;
 			GameInfosForm->MapList->ClearItems();
 		}
-		GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color, true);
+		uint i = GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color,
+		                                         true);
+		if(parv.size() > 4)
+			GameInfosForm->MapList->SetItemHint(i, parv[4].c_str());
 		me->UnlockScreen();
 	}
 	return 0;

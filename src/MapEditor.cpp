@@ -203,6 +203,7 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 			map.push_back(c);
 		}
 
+	map_infos.push_back("Map créée par " + app.getconf()->nick);
 	initialised = true;
 }
 

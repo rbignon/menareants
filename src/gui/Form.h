@@ -135,6 +135,9 @@ public:
 	void SetHint(TMemo* h) { Hint = h; }
 	void SetMutex(SDL_mutex* m) { mutex = m; }
 
+	void LockScreen() const;
+	void UnlockScreen() const;
+
 /* Variables protégées */
 protected:
 

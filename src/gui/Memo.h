@@ -27,17 +27,11 @@
 
 #include "Component.h"
 #include "Boutton.h"
-#include "tools/Font.h"
+#include "gui/Label.h"
 
 struct SDL_Surface;
 struct SDL_Color;
 class Font;
-
-/** An item of TMemo */
-typedef struct s_memo_box_item_t{
-    std::string label;
-    SDL_Color color;
-  } memo_box_item_t;
 
 /** This is a component derived of TComponent whose show a box with text lines */
 class TMemo : public TComponent
@@ -51,7 +45,7 @@ private:
 
   // what are the items ?
   uint first_visible_item;
-  std::vector<memo_box_item_t> m_items;
+  std::vector<TLabel*> m_items;
 
   // Buttons
   TButton m_up, m_down;
@@ -61,6 +55,8 @@ private:
   SDL_Surface *background;
 
   Font* font;
+
+  bool shadowed;
 
 public:
   TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
@@ -74,6 +70,7 @@ public:
   uint NbItems() const { return m_items.size(); }
   void ClearItems();
   bool Empty() const { return m_items.empty(); }
+  void SetShadowed(bool b = true) { shadowed = b; }
 };
 
 #endif /* EC_MEMO_H */

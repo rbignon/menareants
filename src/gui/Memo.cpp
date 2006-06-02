@@ -27,7 +27,7 @@
 #include <SDL.h>
 
 TMemo::TMemo (Font* f, int _x, int _y, uint _width, uint _height, uint max_items, bool _show_background)
-  : TComponent(_x, _y, _width, _height), show_background(_show_background), font(f)
+  : TComponent(_x, _y, _width, _height), show_background(_show_background), font(f), shadowed(false)
 {
   height_item = f->GetHeight();
   first_visible_item = 0;
@@ -40,8 +40,10 @@ TMemo::TMemo (Font* f, int _x, int _y, uint _width, uint _height, uint max_items
 
 TMemo::~TMemo()
 {
-   if ( background)
-     SDL_FreeSurface( background);
+	if ( background)
+		SDL_FreeSurface( background);
+	for(std::vector<TLabel*>::iterator it = m_items.begin(); it != m_items.end(); ++it)
+		delete *it;
 }
 
 void TMemo::Init()
@@ -98,14 +100,12 @@ void TMemo::Draw (int mouse_x, int mouse_y)
 		SDL_BlitSurface( background, NULL, Window(), &r_back);
 	}
 
-	for (uint i=0; i < nb_visible_items; i++)
+	uint i=0;
+	for(std::vector<TLabel*>::iterator it = m_items.begin()+first_visible_item;
+	    i < nb_visible_items && it != m_items.end(); i++, ++it)
 	{
-		if(i+first_visible_item >= m_items.size()) continue;
-		if(!m_items[i+first_visible_item].label.empty())
-			font->WriteLeft(x+5,
-				y+i*height_item,
-				m_items[i+first_visible_item].label,
-				m_items[i+first_visible_item].color) ;
+		(*it)->SetXY(x+5, y+i*height_item);
+		(*it)->Draw(mouse_x, mouse_y);
 	}
 
 	// buttons for listbox with more items than visible
@@ -130,18 +130,22 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color)
 	while(1)
 	{
 		uint size = font->GetWidth(s);
-		if(*_s == '\n' || ((size > Width()-marge) && *_s == ' ') || ((size+20) > (Width())) || !(*_s))
+		if(*_s == '\n' || ((size > Width()-marge) && *_s == ' ') || ((size+20) > Width()) || !(*_s))
 		{
 			/* Suppression du premier element */
-			if(maxitems && m_items.size() >= maxitems) m_items.erase(m_items.begin());
+			if(maxitems && m_items.size() >= maxitems)
+			{
+				delete m_items.front();
+				m_items.erase(m_items.begin());
+			}
 			else if (m_items.size() >= nb_visible_items_max) first_visible_item++;
 
 			// Push item
-			memo_box_item_t item;
 			if((size+20) > (Width())) s += "-"; // On a tronqué on rajoute un indicateur
-			item.label = s;
-			item.color = _color;
-			m_items.push_back (item);
+
+			TLabel* label = new TLabel(x,y, s, _color, font, shadowed);
+			MyComponent(label);
+			m_items.push_back (label);
 
 			nb_visible_items = m_items.size();
 			if (nb_visible_items_max < nb_visible_items)
@@ -164,6 +168,7 @@ void TMemo::AddItem (const std::string &label, SDL_Color _color)
 void TMemo::RemoveItem (uint index)
 {
 	assert (index < m_items.size());
+	delete *(m_items.begin() + index);
 	m_items.erase( m_items.begin() + index );
 
 	nb_visible_items = m_items.size();
@@ -176,6 +181,8 @@ void TMemo::RemoveItem (uint index)
 
 void TMemo::ClearItems()
 {
+	for(std::vector<TLabel*>::iterator it = m_items.begin(); it != m_items.end(); ++it)
+		delete *it;
 	m_items.clear();
 	first_visible_item = 0;
 	visible_height = 0;

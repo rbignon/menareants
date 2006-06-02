@@ -355,6 +355,7 @@ void MenAreAntsApp::InGame()
 		const char W_NONE = 0;
 		char want = 0;
 		bool ctrl = false;
+		bool shift = false;
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
@@ -416,6 +417,9 @@ void MenAreAntsApp::InGame()
 							case SDLK_LCTRL:
 								ctrl = false;
 								break;
+							case SDLK_LSHIFT:
+								shift = false;
+								break;
 							default: break;
 						}
 						break;
@@ -424,6 +428,9 @@ void MenAreAntsApp::InGame()
 						{
 							case SDLK_LCTRL:
 								ctrl = true;
+								break;
+							case SDLK_LSHIFT:
+								shift = true;
 								break;
 							default: break;
 						}
@@ -505,6 +512,8 @@ void MenAreAntsApp::InGame()
 							mywant = W_MOVE;
 						else if(event.button.button != MBUTTON_LEFT)
 							mywant = W_NONE;
+						else if(ctrl || shift)
+							mywant = W_ATTAQ;
 
 						if(!mywant && event.button.button == MBUTTON_LEFT &&
 						   (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
@@ -611,10 +620,12 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 	/* Pour éviter de voir notre ligne supprimée dès l'ajout, dans le cas où le timer
 	 * arrive à expiration et qu'il n'y a rien d'affiché, on réinitialise le compteur.
 	 */
+	LockScreen();
 	if(!Chat->NbItems())
 		timer.reset();
 
 	Chat->AddItem(line, c);
+	UnlockScreen();
 }
 
 void TInGameForm::ShowBarreAct(bool show)
@@ -665,8 +676,10 @@ TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
 	BarreAct = AddComponent(new TBarreAct(pl));
 
 	SendMessage = AddComponent(new TEdit(&app.Font()->sm, 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
+	SendMessage->SetColor(white_color);
 	Chat = AddComponent(new TMemo(&app.Font()->sm, 30, 20 + SendMessage->Height() + 20,
 	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30, 10 * app.Font()->sm.GetHeight(), 9, false));
+	Chat->SetShadowed();
 
 	ShowBarreLat();
 

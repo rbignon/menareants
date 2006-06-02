@@ -72,6 +72,8 @@ public:
 
 	void SetMaxLen(uint m) { maxlen = m; }
 
+	void SetColor(SDL_Color c) { color = c; }
+
 	void SetFocus();
 	void DelFocus();
 
@@ -89,6 +91,7 @@ private:
 	bool have_redraw;
 	uint EDIT_HEIGHT;
 	Font* font;
+	SDL_Color color;
 };
 
 #endif /* EC_EDIT_H */

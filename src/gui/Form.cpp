@@ -28,6 +28,18 @@ TForm::TForm(SDL_Surface* w)
 	SetWindow(w);
 }
 
+void TForm::LockScreen() const
+{
+	if(mutex)
+		SDL_LockMutex(mutex);
+}
+
+void TForm::UnlockScreen() const
+{
+	if(mutex)
+		SDL_UnlockMutex(mutex);
+}
+
 void TForm::SetBackground(ECImage *image)
 {
 	background = image;

@@ -25,7 +25,8 @@
 #include <SDL.h>
 
 TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool _show_bg)
-  : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f)
+  : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f),
+    color(black_color)
 {
   assert(font);
 
@@ -128,14 +129,14 @@ void TEdit::Redraw()
 		SDL_FreeSurface(edit);
 
 	/* Le " " est nécessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
-	edit = TTF_RenderText_Blended(&(font->GetTTF()), std::string(substring + " ").c_str(), black_color);
+	edit = TTF_RenderText_Blended(&(font->GetTTF()), std::string(substring + " ").c_str(), color);
 
 	if(Focused())
 	{
 		uint caret_x = font->GetWidth(substring.substr(0, caret-first_char));
 		SLOCK(edit);
 		DrawLine(edit, caret_x, 1, caret_x, h-2,
-		        SDL_MapRGB(edit->format, black_color.r, black_color.g, black_color.b));
+		        SDL_MapRGB(edit->format, color.r, color.g, color.b));
 		SUNLOCK(edit);
 	}
 	have_redraw = false;
