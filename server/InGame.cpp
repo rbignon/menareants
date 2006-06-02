@@ -635,14 +635,37 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			ECEvent* attaq_event = map->FindEvent(c, ARM_ATTAQ, entity);
 			if(!attaq_event)
 			{
-				Debug(W_DEBUG, "Création d'un evenement ATTAQ");
-				attaq_event = new ECEvent(ARM_ATTAQ, c);
-				map->AddEvent(attaq_event);
-				attaq_event->Entities()->Add(entity);
 				std::vector<ECBEntity*> entities = c->Entities()->List();
 				for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					if(!(*enti)->Locked() && *enti != entity && entity->CanAttaq(*enti) && !entity->Like(*enti))
+				{
+					bool can_attaq = false;
+					/* La ligne "entity->Move()->Empty()" s'explique simplement par le fait que le client ne voit pas
+					 * les déplacements faits par les autres. Donc il ne peut faire une attaque sur une case anticipée
+					 * d'une autre entité. C'est pourquoi si jamais l'unité de cette case a déjà fait un mouvement, c'est
+					 * que le client qui veut attaquer anticipe une case qui lui semble vide. En tous cas il n'y voit pas
+					 * cette unité.
+					 * Si jamais par contre il a cliqué sur la position de cette entité sur sa case d'origine, des
+					 * dispositions sont là pour ramener l'attaque à la case d'arrivée.
+					 */
+					if(!(*enti)->Locked() && *enti != entity && entity->CanAttaq(*enti) && !entity->Like(*enti) &&
+					   entity->Move()->Empty())
+						can_attaq = true;
+					/* On créé cette evenement en cas de FORCEATTAQ meme si on y rencontre pas d'unité visé (ex: bombe H) */
+					if(!attaq_event && (can_attaq || flags & ARM_FORCEATTAQ))
+					{
+						Debug(W_DEBUG, "Création d'un evenement ATTAQ");
+						attaq_event = new ECEvent(ARM_ATTAQ, c);
+						map->AddEvent(attaq_event);
+						attaq_event->Entities()->Add(entity);
+					}
+					if(can_attaq)
 						attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
+				}
+				if(!attaq_event)
+				{
+					Debug(W_DEBUG, "Finalement on ne fait pas d'attaque");
+					flags &= ~ARM_ATTAQ;
+				}
 			}
 			else
 				Debug(W_DEBUG, "Il y a déjà une attaque, on ne prévient PAS les attaqués");

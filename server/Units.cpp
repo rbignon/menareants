@@ -60,7 +60,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	if(Case()->X() == mx && Case()->Y() == my)
 		return false;
 
-#if 0
+#if 0 // Ancienne méthode de détection de la portée
 	uint dx = 0, dy = 0;
 	for(uint x=Case()->X(); x != mx; dx++) x < mx ? ++x : --x;
 	for(uint y=Case()->Y(); y != my; dy++) y < my ? ++y : --y;
@@ -77,6 +77,10 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	if(d > MISSILAUNCHER_PORTY)
 		return false;
 #endif
+
+#if 0 /* Ce détail est géré dans ARMCommand::Exec(), et permet, en cas d'attaque maintenue, d'attaquer tout de
+         meme une case sans qu'il y ait d'unité */
+
 	ECBCase* c = (*Case()->Map())(mx, my);
 
 	/* Si il n'y a personne à attaquer on n'attaque pas */
@@ -91,7 +95,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 
 	if(enti == ents.end())
 		return false;
-
+#endif
 	return true;
 }
 

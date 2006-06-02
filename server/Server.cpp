@@ -62,7 +62,7 @@ const char* msgTab[] = {
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
      "INFO %s",                             /* INFO - Envoie des messages à afficher dans le jeu des joueurs */
 
-     "LSM %s %d %d",                        /* LSM - Liste les maps disponibles (nom, min, max) */
+     "LSM %s %d %d %s",                     /* LSM - Liste les maps disponibles (nom, min, max, info) */
      "EOMAP",                               /* EOMAP - Fin de la liste des maps */
      "SMAP %s",                             /* SMAP - Envoie une ligne d'une map */
      "EOSMAP",                              /* EOSMAP - Fin de l'envoie d'une map */

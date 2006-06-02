@@ -468,7 +468,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
 		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name()).c_str(),
-		                                        (*it)->MinPlayers(), (*it)->MaxPlayers());
+		                                        (*it)->MinPlayers(), (*it)->MaxPlayers(),
+		                                      ((*it)->MapInfos().empty() ? "" : FormatStr((*it)->MapInfos().front()).c_str()));
 	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
 
 	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
