@@ -57,7 +57,7 @@ Sommaire:
               ER1                               :ne peut pas joindre
               ER2 <nick>                        :le pseudo de l'IA a déjà été pris
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
-              LSM <nom> <nbmin> <nbmax>         :envoie la liste des cartes
+              LSM <nom> <nbmin> <nbmax> <infos> :envoie la liste des cartes
               EOMAP                             :fin de la liste des maps
               :<nick> JOI <nom> <sets>          :un user join
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
