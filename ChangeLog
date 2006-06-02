@@ -1,3 +1,29 @@
+2005-06-02  Romain Bignon <progs@headfucking.net>
+
+	* servers/maps/three.map: Map pour trois joueurs
+
+	* src/gui/*: Petites modifs rapides à faire et longues à retrouver.
+
+2005-06-01  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Label.cpp: Utilisation d'une variable "shadowed" pour afficher un petit fond qui permet de bien voir.
+
+	* src/gui/Memo.cpp: Utilisations de TLabels plutot que de la classe exotique propre à TMemo. Ceci permet d'utiliser
+	le shadowed du Label, et surtout d'éviter les nombreux TFont::WriteLeft() qui bouffent à mort.
+
+2005-05-31  Romain Bignon <progs@headfucking.net>
+
+	* server/Units.cpp, server/Units.cpp: Délégation de la détection d'unité sur la case cible à ARMCommand::Exec.
+
+	* src/MapEditor.cpp: INFO par defaut.
+
+	* API, server/Channels.cpp, src/JoinGame.cpp: Affichage dans le Hint de la première ligne d'infos des maps.
+
+	* server/maps: Modification des titres et des infos.
+
+	* src/InGame.cpp: Ctrl + clic: attaque maintenue, shift + clic: attaque volatile. (note: sans avoir besoin de cliquer
+	sur "Attaquer")
+
 2005-05-28  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Correction d'un bug, si jamais un evenement d'une attaque contient des locked, surtout ne pas
