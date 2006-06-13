@@ -100,21 +100,21 @@ if test "${WIN32}" = "yes"; then
 fi
 
 #  FULL-WARNINGS
-AC_ARG_ENABLE(  full-warnings,
-                [AC_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
-                [
-                        if test "x${enableval}" != "xno"; then
-                                CXXFLAGS="$CXXFLAGS -W -Wall"
-                        fi
-                ],
-                )
+#AC_ARG_ENABLE(  full-warnings,
+#                [AC_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
+#                [
+#                        if test "x${enableval}" != "xno"; then
+#                                CXXFLAGS="$CXXFLAGS -W -Wall"
+#                        fi
+#                ],
+#                )
 
 #  WARNINGS
 AC_ARG_ENABLE(  warnings,
                 [AC_HELP_STRING([--enable-warnings],[enable warnings during compilation (-Wall)])],
                 [
                         if test "x${enableval}" != "xno"; then
-                                CXXFLAGS="$CXXFLAGS -Wall"
+                                WARNINGS=1
                         fi
                 ],
                 )
@@ -139,16 +139,57 @@ AC_ARG_ENABLE(  debug,
                 ],
                 [DEBUG=0 ]
         )
-if test "x${DEBUG}" = "x1"; then
-        AC_DEFINE_UNQUOTED(DEBUG, 1, [Defined if debug is enabled])
+
+if test "x$GCC" = "xyes"; then
+    dnl get gcc version
+    AC_MSG_CHECKING([gcc version])
+            gccver=$($CC -dumpversion)
+            gccvermajor=$(echo $gccver | cut -d . -f1)
+            gccverminor=$(echo $gccver | cut -d . -f2)
+            gccvernum=$(expr $gccvermajor "*" 100 + $gccverminor)
+    AC_MSG_RESULT($gccver)
+
+    if test "x${WARNINGS}" = "x1"; then
+      dnl Enable all warnings
+# en résèrve: -Weffc++ (il fait bien mal aux variables non initialisées)
+#             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
+#             -Wold-style-cast (prohibe les anciens styles de conversions)
+      GCC_FLAGS="-Wall -ansi -Wstrict-null-sentinel"
+
+      dnl Enable *more* warnings
+      if test "$gccvernum" -ge "400"; then
+                  dnl gcc 4.0 or later
+          GCC_FLAGS="$GCC_FLAGS -Wextra"
+      else
+          GCC_FLAGS="$GCC_FLAGS -W"
+      fi
+
+      dnl Skip 'unused parameter' warning
+      GCC_FLAGS="$GCC_FLAGS -Wno-unused-parameter"
+    fi
+
+    if test "x${DEBUG}" = "x1"; then
+        GCC_FLAGS="$GCC_FLAGS -O0 -g -DDEBUG"
+    else
+        GCC_FLAGS="$GCC_FLAGS -O2"
+    fi
+
+    CFLAGS="$CFLAGS $GCC_FLAGS"
+    CXXFLAGS="$CXXFLAGS $GCC_FLAGS"
+else
+    if test "x${DEBUG}" = "x1"; then
+        CFLAGS="$CFLAGS -DDEBUG"
+        CXXFLAGS="$CXXFLAGS -DDEBUG"
+    fi
 fi
 
-DATA_FILES=`cd src/data ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+
+DATA_FILES=`cd src/data ; find . -name CVS -prune -o -name .cvsignore -o -name "Makefile*" -o -name ".#*" -o -type d -o -print | grep -v .svn`
 DATA_FILES=`echo $DATA_FILES`
 
 AC_SUBST([DATA_FILES])
 
-MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name "Makefile*" -o -name ".#*" -o -type d -o -print | grep -v .svn`
 MAP_FILES=`echo $MAP_FILES`
 
 AC_SUBST([MAP_FILES])

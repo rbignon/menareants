@@ -825,7 +825,6 @@ Optional Features:
   --enable-server         compilation of Men Are Ants's server
   --disable-game          compilation of Men Are Ants game
   --disable-sdltest       Do not try to compile and run a test SDL program
-  --enable-full-warnings  enable warnings during compilation (-W -Wall)
   --enable-warnings       enable warnings during compilation (-Wall)
   --enable-gprof          used to have some cpu's informations
   --enable-debug          enable debug
@@ -4105,15 +4104,14 @@ if test "${WIN32}" = "yes"; then
 fi
 
 #  FULL-WARNINGS
-# Check whether --enable-full-warnings or --disable-full-warnings was given.
-if test "${enable_full_warnings+set}" = set; then
-  enableval="$enable_full_warnings"
-
-                        if test "x${enableval}" != "xno"; then
-                                CXXFLAGS="$CXXFLAGS -W -Wall"
-                        fi
-
-fi;
+#AC_ARG_ENABLE(  full-warnings,
+#                [AC_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
+#                [
+#                        if test "x${enableval}" != "xno"; then
+#                                CXXFLAGS="$CXXFLAGS -W -Wall"
+#                        fi
+#                ],
+#                )
 
 #  WARNINGS
 # Check whether --enable-warnings or --disable-warnings was given.
@@ -4121,7 +4119,7 @@ if test "${enable_warnings+set}" = set; then
   enableval="$enable_warnings"
 
                         if test "x${enableval}" != "xno"; then
-                                CXXFLAGS="$CXXFLAGS -Wall"
+                                WARNINGS=1
                         fi
 
 fi;
@@ -4150,20 +4148,54 @@ else
   DEBUG=0
 
 fi;
-if test "x${DEBUG}" = "x1"; then
 
-cat >>confdefs.h <<_ACEOF
-#define DEBUG 1
-_ACEOF
+if test "x$GCC" = "xyes"; then
+        echo "$as_me:$LINENO: checking gcc version" >&5
+echo $ECHO_N "checking gcc version... $ECHO_C" >&6
+            gccver=$($CC -dumpversion)
+            gccvermajor=$(echo $gccver | cut -d . -f1)
+            gccverminor=$(echo $gccver | cut -d . -f2)
+            gccvernum=$(expr $gccvermajor "*" 100 + $gccverminor)
+    echo "$as_me:$LINENO: result: $gccver" >&5
+echo "${ECHO_T}$gccver" >&6
 
+    if test "x${WARNINGS}" = "x1"; then
+      # en résèrve: -Weffc++ (il fait bien mal aux variables non initialisées)
+#             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
+#             -Wold-style-cast (prohibe les anciens styles de conversions)
+      GCC_FLAGS="-Wall -ansi -Wstrict-null-sentinel"
+
+            if test "$gccvernum" -ge "400"; then
+                            GCC_FLAGS="$GCC_FLAGS -Wextra"
+      else
+          GCC_FLAGS="$GCC_FLAGS -W"
+      fi
+
+            GCC_FLAGS="$GCC_FLAGS -Wno-unused-parameter"
+    fi
+
+    if test "x${DEBUG}" = "x1"; then
+        GCC_FLAGS="$GCC_FLAGS -O0 -g -DDEBUG"
+    else
+        GCC_FLAGS="$GCC_FLAGS -O2"
+    fi
+
+    CFLAGS="$CFLAGS $GCC_FLAGS"
+    CXXFLAGS="$CXXFLAGS $GCC_FLAGS"
+else
+    if test "x${DEBUG}" = "x1"; then
+        CFLAGS="$CFLAGS -DDEBUG"
+        CXXFLAGS="$CXXFLAGS -DDEBUG"
+    fi
 fi
 
-DATA_FILES=`cd src/data ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+
+DATA_FILES=`cd src/data ; find . -name CVS -prune -o -name .cvsignore -o -name "Makefile*" -o -name ".#*" -o -type d -o -print | grep -v .svn`
 DATA_FILES=`echo $DATA_FILES`
 
 
 
-MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name ".svn*" -o -name "Makefile*" -o -name ".#*" -o -type d -o -print`
+MAP_FILES=`cd server/maps ; find . -name CVS -prune -o -name .cvsignore -o -name "Makefile*" -o -name ".#*" -o -type d -o -print | grep -v .svn`
 MAP_FILES=`echo $MAP_FILES`
 
 

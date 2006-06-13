@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Defined if debug is enabled */
-#undef DEBUG
-
 /* Define to 1 if you have the `SDL_gfx' library (-lSDL_gfx). */
 #undef HAVE_LIBSDL_GFX
 
