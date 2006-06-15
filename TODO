@@ -3,9 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--client: vraiment en cours: j'avais ajouté une variable ECImage dans ECEntity nomée "trajectoire" qui sauvegarde la trajectoire
- de l'unité. J'avais déterminé le dessin (meme si c'est vraiment à revoir, dans SetAttaquedCase()), il ne manque plus que
- l'afficher dans Draw().
 -server: finir en gros le nouveau mode d'attaques
 
 * Urgent

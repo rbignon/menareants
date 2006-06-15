@@ -89,42 +89,21 @@ void ECMove::SetMoves(Vector _moves)
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
                    uint _visibility)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), trajectoire(0), selected(false),
-		  move(this), want_deploy(false), attaqued_case(0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false), move(this),
+		  want_deploy(false), attaqued_case(0)
 {
-
+	//SetShowedCases(true);
 }
 
 ECEntity::~ECEntity()
 {
 	delete image;
-	delete trajectoire;
-}
-
-void ECEntity::SetAttaquedCase(ECase* c)
-{
-	attaqued_case = c;
-
-	MyFree(trajectoire);
-	if(attaqued_case)
-	{
-		int dx = abs(c->Image()->X() - Image()->X());
-		int dy = abs(c->Image()->Y() - Image()->Y());
-		SDL_Surface* surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, dx, dy,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-		DrawLine(surf,        attaqued_case->X() < Case()->X() ? 0 : dx-1,
-			                   attaqued_case->Y() < Case()->Y() ? 0 : dy-1,
-			                   attaqued_case->X() < Case()->X() ? dx-1 : 0,
-			                   attaqued_case->Y() < Case()->Y() ? dy-1 : 0,
-			                   SDL_MapRGB(surf->format, red_color.r, red_color.g, red_color.b));
-		trajectoire = new ECImage(surf);
-	}
 }
 
 void ECEntity::Played()
 {
 	ECBEntity::Played();
-	SetAttaquedCase(0);
+	attaqued_case = 0;
 	want_deploy = false;
 	Move()->Clear(Case());
 }

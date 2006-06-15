@@ -102,8 +102,11 @@ void TListBox::ScrollTo(uint id)
 {
 	if(m_items.size() <= nb_visible_items_max) return;
 
-	if( m_items.size() - id >= nb_visible_items_max)
+	if(( m_items.size() - id >= nb_visible_items_max ) &&
+	   (id >= 0))
 		first_visible_item = id;
+
+	else if(id < 0) first_visible_item = 0;
 	else if(m_items.size()-1 - id < nb_visible_items_max)
 		first_visible_item = m_items.size() - nb_visible_items_max;
 }

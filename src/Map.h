@@ -79,7 +79,7 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), trajectoire(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
+		: Tag(0), image(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
 	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
@@ -136,12 +136,11 @@ public:
 	void SetWantDeploy(bool b = true) { want_deploy = b; }
 
 	ECase* AttaquedCase() const { return attaqued_case; }
-	void SetAttaquedCase(ECase* c);
+	void SetAttaquedCase(ECase* c) { attaqued_case = c; }
 
 /* Variables privées */
 private:
 	ECSprite* image;
-	ECImage* trajectoire;
 
 protected:
 	bool selected;

@@ -79,7 +79,6 @@ void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color
                 py += sdy;
             }
             px += sdx;
-            if(px < 0) continue;
             putpixel(screen, px, py, color);
         }
     }
@@ -94,7 +93,6 @@ void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color
                 px += sdx;
             }
             py += sdy;
-            if(py < 0) continue;
             putpixel(screen, px, py, color);
         }
     }
@@ -184,7 +182,6 @@ Uint32 getpixel(SDL_Surface * surface, int x, int y)
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
     int bpp = surface->format->BytesPerPixel;
-    if(x<0 || y<0 || x >= surface->w || y >= surface->h) return;
     /* Here p is the address to the pixel we want to set */
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
