@@ -360,6 +360,10 @@ void MenAreAntsApp::InGame()
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
 		timer->reset();
+		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
+		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
+		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
+		InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
 		do
 		{
 			if(timer->time_elapsed(true) > 10)

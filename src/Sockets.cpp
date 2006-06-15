@@ -154,7 +154,7 @@ int EC_Client::read_sock(void *data)
 	//EC_Client* cl = app.getclient();
 
 	fd_set tmp_fdset;
-	struct timeval timeout = {0};
+	struct timeval timeout = {0,0};
 
 	while(cl != NULL && !cl->WantDisconnect())
 	{
@@ -280,7 +280,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	if(connected) return false;
 
 	/* Création du socket*/
-	struct sockaddr_in fsocket = {0};
+	struct sockaddr_in fsocket = {0,0,{0},0};
 	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	const char* ip = hostname;
