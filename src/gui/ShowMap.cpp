@@ -24,6 +24,7 @@
 #include "Channels.h"
 #include "Debug.h"
 #include "tools/Font.h"
+#include <SDL_gfxPrimitives.h>
 
 void TMap::Init()
 {
@@ -221,7 +222,7 @@ void TMap::Draw(int _x, int _y)
 		if(entity->Selected() && entity->AttaquedCase() && entity->AttaquedCase() != entity->Case())
 		{
 			SLOCK(Window());
-			DrawLine(Window(), entity->Image()->X()+entity->Image()->GetWidth()/2,
+			DrawLine(Window(),entity->Image()->X()+entity->Image()->GetWidth()/2,
 			                   entity->Image()->Y()+entity->Image()->GetHeight()/2,
 			                   entity->AttaquedCase()->Image()->X()+entity->AttaquedCase()->Image()->GetWidth()/2,
 			                   entity->AttaquedCase()->Image()->Y()+entity->AttaquedCase()->Image()->GetHeight()/2,
