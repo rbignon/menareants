@@ -184,8 +184,9 @@ bool ECEvent::RemoveLinked(ECEvent* p, bool use_delete)
 
 bool ECEvent::operator<(const ECEvent& e) const
 {
-	const char NUMBER = 10;
-	const char CREATE = 9;
+	const char NUMBER = 13;
+	const char CREATE = 11;
+	const char REPLOY = 9;
 	const char MOVE   = 8;
 	const char UNION  = 7;
 	const char DEPLOY = 6;
@@ -196,7 +197,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 		case ARM_NUMBER: me = NUMBER; break;
 		case ARM_CREATE: me = CREATE; break;
 		case ARM_UNION: me = UNION; break;
-		case ARM_DEPLOY: me = DEPLOY; break;
+		case ARM_DEPLOY: me = Entity()->Deployed() ? DEPLOY : REPLOY; break;
 		case ARM_ATTAQ: me = ATTAQ; break;
 		case ARM_MOVE: me = MOVE; break;
 		default: me = 0; break;
@@ -207,7 +208,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 		case ARM_CREATE: him = CREATE; break;
 		case ARM_UNION: him = UNION; break;
 		case ARM_ATTAQ: him = ATTAQ; break;
-		case ARM_DEPLOY: him = DEPLOY; break;
+		case ARM_DEPLOY: him = e.Entity()->Deployed() ? DEPLOY : REPLOY; break;
 		case ARM_MOVE: him = MOVE; break;
 		default: him = 0; break;
 	}

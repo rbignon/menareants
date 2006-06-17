@@ -223,7 +223,7 @@ public:
 		return i;
 	}
 
-	T First() { return *(list.begin()); }
+	T First() const { return list.front(); }
 
 	std::vector<T> List() { return list; }
 

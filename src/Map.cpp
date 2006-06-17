@@ -106,7 +106,7 @@ void ECEntity::SetAttaquedCase(ECase* c)
 	attaqued_case = c;
 
 	MyFree(trajectoire);
-	if(attaqued_case)
+	if(AttaquedCase() && AttaquedCase() != Case())
 	{
 		int dx = abs(c->Image()->X() - Image()->X());
 		int dy = abs(c->Image()->Y() - Image()->Y());
@@ -140,8 +140,14 @@ void ECEntity::Draw()
 	if(image && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
 		image->draw();
-		if(selected)
+		if(Selected())
+		{
 			Resources::Cadre()->Draw(image->X(),image->Y());
+			if(trajectoire)
+				trajectoire->Draw(
+				    AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
+			        AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2);
+		}
 	}
 }
 

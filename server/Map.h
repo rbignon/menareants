@@ -150,7 +150,7 @@ public:
 
 	/** Entitées associées. Il y en a qu'une seule *SAUF* pour les attaques */
 	ECList<ECEntity*> *Entities() { return &entities; }
-	ECEntity* Entity() { return entities.First(); }
+	ECEntity* Entity() const { return entities.First(); }
 
 	/** Permet de comparer la priorité */
 	bool operator<(const ECEvent& e) const;

@@ -219,16 +219,6 @@ void TMap::Draw(int _x, int _y)
 		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-		if(entity->Selected() && entity->AttaquedCase() && entity->AttaquedCase() != entity->Case())
-		{
-			SLOCK(Window());
-			DrawLine(Window(),entity->Image()->X()+entity->Image()->GetWidth()/2,
-			                   entity->Image()->Y()+entity->Image()->GetHeight()/2,
-			                   entity->AttaquedCase()->Image()->X()+entity->AttaquedCase()->Image()->GetWidth()/2,
-			                   entity->AttaquedCase()->Image()->Y()+entity->AttaquedCase()->Image()->GetHeight()/2,
-			                   SDL_MapRGB(Window()->format, red_color.r, red_color.g, red_color.b));
-			SUNLOCK(Window());
-		}
 		if(!entity->Move()->Empty())
 		{
 			if(map->Channel()->State() == EChannel::ANIMING)
