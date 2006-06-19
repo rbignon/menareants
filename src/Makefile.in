@@ -53,15 +53,15 @@ PROGRAMS = $(bin_PROGRAMS)
 am_menareants_OBJECTS = Font.$(OBJEXT) Images.$(OBJEXT) \
 	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
 	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
-	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
-	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
-	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
-	ShowMap.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
-	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
-	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
-	Units.$(OBJEXT) MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) \
-	InGame.$(OBJEXT)
+	CheckBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
+	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
+	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
+	Image.$(OBJEXT) ShowMap.$(OBJEXT) Main.$(OBJEXT) \
+	Timer.$(OBJEXT) Resources.$(OBJEXT) AltThread.$(OBJEXT) \
+	Sockets.$(OBJEXT) Config.$(OBJEXT) Debug.$(OBJEXT) \
+	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
+	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
+	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -193,6 +193,7 @@ menareants_SOURCES = \
 		gui/ChildForm.cpp \
 		gui/ListBox.cpp \
 		gui/ComboBox.cpp \
+		gui/CheckBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \
@@ -291,6 +292,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Boutton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BouttonText.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChildForm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ColorEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ComboBox.Po@am__quote@
@@ -445,6 +447,20 @@ ComboBox.obj: gui/ComboBox.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/ComboBox.cpp' object='ComboBox.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ComboBox.obj `if test -f 'gui/ComboBox.cpp'; then $(CYGPATH_W) 'gui/ComboBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/ComboBox.cpp'; fi`
+
+CheckBox.o: gui/CheckBox.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CheckBox.o -MD -MP -MF "$(DEPDIR)/CheckBox.Tpo" -c -o CheckBox.o `test -f 'gui/CheckBox.cpp' || echo '$(srcdir)/'`gui/CheckBox.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CheckBox.Tpo" "$(DEPDIR)/CheckBox.Po"; else rm -f "$(DEPDIR)/CheckBox.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/CheckBox.cpp' object='CheckBox.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CheckBox.o `test -f 'gui/CheckBox.cpp' || echo '$(srcdir)/'`gui/CheckBox.cpp
+
+CheckBox.obj: gui/CheckBox.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CheckBox.obj -MD -MP -MF "$(DEPDIR)/CheckBox.Tpo" -c -o CheckBox.obj `if test -f 'gui/CheckBox.cpp'; then $(CYGPATH_W) 'gui/CheckBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/CheckBox.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CheckBox.Tpo" "$(DEPDIR)/CheckBox.Po"; else rm -f "$(DEPDIR)/CheckBox.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/CheckBox.cpp' object='CheckBox.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CheckBox.obj `if test -f 'gui/CheckBox.cpp'; then $(CYGPATH_W) 'gui/CheckBox.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/CheckBox.cpp'; fi`
 
 Boutton.o: gui/Boutton.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Boutton.o -MD -MP -MF "$(DEPDIR)/Boutton.Tpo" -c -o Boutton.o `test -f 'gui/Boutton.cpp' || echo '$(srcdir)/'`gui/Boutton.cpp; \

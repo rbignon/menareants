@@ -76,6 +76,8 @@ public:
 
 		ARM,          /**< ARM */
 
+		SCORE,        /**< SCO */
+
 		NONE
 	};
 

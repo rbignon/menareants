@@ -59,7 +59,7 @@ bool LoadMaps()
 		{
 			delete map;
 			Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
-			vDebug(W_ERR|W_ECHO, e.Message, e.Vars);
+			vDebug(W_ERR|W_ECHO, e.Message(), e.Vars());
 			continue;
 		}
 		nbmaps++;
@@ -363,6 +363,22 @@ ECEntity::~ECEntity()
 	RemoveLast();
 }
 
+void ECEntity::Shoot(ECEntity* e, uint k)
+{
+	if(Owner())
+		dynamic_cast<ECPlayer*>(Owner())->Stats()->shooted += k;
+
+	e->Shooted(k);
+}
+
+void ECEntity::ReleaseShoot()
+{
+	nb -= (shooted > nb ? nb : shooted);
+	if(Owner())
+		dynamic_cast<ECPlayer*>(Owner())->Stats()->killed += shooted;
+	shooted = 0;
+}
+
 EChannel* ECEntity::Channel() const
 {
 	assert(Case());
@@ -473,7 +489,7 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 		{
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
-			(*it)->Shooted(killed);
+			Shoot(*it, killed);
 			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
 		}
 

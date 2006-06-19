@@ -287,7 +287,7 @@ public:
 /* Methodes */
 public:
 
-	void CreatePreview(uint width = 200, uint height = 200, bool ingame = false);
+	void CreatePreview(uint width = 150, uint height = 150, bool ingame = false);
 
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
 

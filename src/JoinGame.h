@@ -33,6 +33,7 @@
 #include "gui/ColorEdit.h"
 #include "gui/Image.h"
 #include "gui/ComboBox.h"
+#include "gui/CheckBox.h"
 
 /********************************************************************************************
  *                               TGameInfosForm                                              *
@@ -57,6 +58,7 @@ public:
 	TList*       Players;
 	TLabel*      Title;
 	TListBox*    MapList;
+	TCheckBox*   SpeedGame;
 	TLabel*      MapTitle;
 	TImage*      Preview;
 
@@ -79,6 +81,8 @@ public:
 
 	/* Calcul la taille du TMemo */
 	void RecalcMemo();
+
+	void ChangeStatus(bool);
 
 };
 

@@ -55,11 +55,11 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), last(0), next(0), move(this) {}
+	ECEntity() : Tag(0), last(0), next(0), move(this), shooted(0) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
 	         uint _visibility = 3)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), last(0), next(0), move(this)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), last(0), next(0), move(this), shooted(0)
 	{}
 
 	virtual ~ECEntity();
@@ -86,6 +86,11 @@ public:
 
 	/** Use this function when an entity have played. */
 	virtual void Played();
+
+	/** Shoot an entity */
+	void Shoot(ECEntity*, uint);
+	void Shooted(uint n) { shooted += n; }
+	void ReleaseShoot();
 
 /* Attributs */
 public:
@@ -115,6 +120,7 @@ protected:
 	ECEntity* next;
 	bool SetLast(ECEntity* e) { return (last = e); }
 	ECMove move;
+	uint shooted;
 };
 
 /********************************************************************************************

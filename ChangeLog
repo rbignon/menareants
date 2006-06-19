@@ -1,9 +1,28 @@
+2005-06-19  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Affichage d'un panneau de scores.
+
+	* API, server/Main.h, server/Server.cpp, src/Commands.h, src/Sockets.cpp, server/Channels.cpp:
+	- Commande SCO pour les scores.
+
+	* server/Channels.cpp, server/InGame.cpp, server/Map.cpp: Stats du joueur.
+
+	* lib/Map.h, server/Map.h: Passage de "shooted" et du ReleaseShoot() dans le serveur.
+
+	* server/Channels.cpp: Détermination, grace notament au +r(partie rapide), si un joueur a perdu, et quand on passe en +E.
+
+	* API, src/JoinGame.cpp, server/Channels.cpp: Mode +£ pour indiquer qu'un joueur a perdu, et +E pour les scores.
+
 2005-06-17  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp (ECEvent/operator<): Le "reploiement" se fait maintenant avant un déplacement.
 
 	* src/Map.cpp, src/ShowMap.cpp: Stockage de l'image de la trajectoire d'une attaque dans l'entité même qui l'affiche lui
 	même sur l'écran. Ça évite de tout redessiner à chaques fois et surtout les plantages.
+
+	* src/gui/CheckBox.cpp, src/data/anims/checkbox (TCheckBox): Programmation d'un nouveau composant TCheckBox.
+
+	* API, src/JoinGame.cpp, server/Channels.cpp: Nouveau mode +r (Partie rapide).
 
 2005-06-13  Romain Bignon <progs@headfucking.net>
 

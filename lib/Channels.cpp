@@ -43,7 +43,7 @@ const struct nations_str_t nations_str[] = {
 };
 
 ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
-	: chan(_chan), owner(_owner), op(_op)
+	: chan(_chan), owner(_owner), op(_op), lost(false)
 {
 	if(chan)
 		chan->AddPlayer(this);

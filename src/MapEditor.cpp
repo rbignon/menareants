@@ -321,7 +321,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		}
 		catch(const TECExcept &e)
 		{
-			vDebug(W_ERR, e.Message, e.Vars);
+			vDebug(W_ERR, e.Message(), e.Vars());
 			MyFree(map);
 			return false;
 		}
@@ -332,13 +332,14 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 
 		try
 		{
+			TMessageBox("Chargement de la map en cours...", 0, form).Draw();
 			map = new EMap(path);
 			map->Init();
 			map->SetCanSave();
 		}
 		catch(const TECExcept &e)
 		{
-			vDebug(W_ERR, e.Message, e.Vars);
+			vDebug(W_ERR, e.Message(), e.Vars());
 			MyFree(map);
 			return false;
 		}
@@ -425,7 +426,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							catch(const TECExcept &e)
 							{
 								TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
-								               e.Message).c_str(), BT_OK, MapEditor);
+								               e.Message()).c_str(), BT_OK, MapEditor);
 								m.Show();
 							}
 						}
@@ -454,7 +455,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								catch(const TECExcept &e)
 								{
 									TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
-									               e.Message).c_str(), BT_OK, MapEditor);
+									               e.Message()).c_str(), BT_OK, MapEditor);
 									m.Show();
 								}
 							}

@@ -584,7 +584,9 @@ void MenAreAntsApp::InGame()
 			              InGameForm->Map->Y()/CASE_HEIGHT));
 			//SDL_FillRect(app.sdlwindow, NULL, 0);
 			InGameForm->Update();
-		} while(!eob && client->IsConnected() && client->Player());
+		} while(!eob && client->IsConnected() && client->Player() &&
+		        client->Player()->Channel()->State() != EChannel::SCORING);
+
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
 		if(Mutex)
@@ -599,6 +601,11 @@ void MenAreAntsApp::InGame()
 		throw;
 	}
 	MyFree(InGameForm);
+
+	if(client->Player() && client->Player()->Channel()->State() == EChannel::SCORING)
+	{
+		Scores(client->Player()->Channel());
+	}
 
 	return;
 }
@@ -1269,4 +1276,135 @@ void TLoadPlayerLine::Init()
 void TLoadPlayerLine::Draw(int souris_x, int souris_y)
 {
 	label->Draw(souris_x, souris_y);
+}
+
+/********************************************************************************************
+ *                                   TScoresForm                                            *
+ ********************************************************************************************/
+
+TScoresForm* ScoresForm = 0;
+
+/** Scores of a player
+ *
+ * Syntax: nick SCO killed shooted created score
+ */
+int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(!ScoresForm)
+		ScoresForm = new TScoresForm(app.sdlwindow, me->Player()->Channel());
+
+	ScoresForm->Players->AddLine(new TScoresPlayerLine(players[0]->GetNick(), *color_eq[players[0]->Color()],
+	                                                   parv[1], parv[2], parv[3], parv[4]));
+	return 0;
+}
+
+void TScoresForm::WantLeave(TObject* o, void* cl)
+{
+	EC_Client* client = static_cast<EC_Client*>(cl);
+	if(!client) return;
+
+	client->sendrpl(client->rpl(EC_Client::LEAVE));
+}
+
+void MenAreAntsApp::Scores(EChannel* chan)
+{
+	if(!client || !client->Player())
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+
+	try
+	{
+		bool eob = false;
+		WAIT_EVENT_T(ScoresForm,i,5);
+		if(!ScoresForm)
+			return;
+
+		ScoresForm->SetMutex(mutex);
+		ScoresForm->RetourButton->SetOnClick(TScoresForm::WantLeave, client);
+		do
+		{
+			ScoresForm->Actions();
+			ScoresForm->Update();
+		} while(!eob && client->IsConnected() && client->Player() &&
+		        chan->State() == EChannel::SCORING);
+	
+	}
+	catch(TECExcept &e)
+	{
+		MyFree(ScoresForm);
+		throw;
+	}
+	MyFree(ScoresForm);
+
+	return;
+}
+
+TScoresForm::TScoresForm(SDL_Surface* w, EChannel* ch)
+	: TForm(w)
+{
+	Title = AddComponent(new TLabel(250,100,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
+	                      &app.Font()->large));
+
+	Players = AddComponent(new TList(70, 250));
+	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meutres", "Créations", "Score"));
+
+	Date = AddComponent(new TLabel(200, 150, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
+	                               &app.Font()->big));
+
+//	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, &app.Font()->large));
+
+	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", &app.Font()->normal));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+TScoresForm::~TScoresForm()
+{
+	delete RetourButton;
+	delete Date;
+	delete Players;
+	delete Title;
+}
+
+/********************************************************************************************
+ *                               TScoresPlayerLine                                          *
+ ********************************************************************************************/
+
+TScoresPlayerLine::TScoresPlayerLine(std::string n, SDL_Color col, std::string _k, std::string _s, std::string _c,
+                                     std::string _sc)
+	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
+{
+	h = 40;
+}
+
+TScoresPlayerLine::~TScoresPlayerLine()
+{
+	delete Score;
+	delete Created;
+	delete Shooted;
+	delete Killed;
+	delete Nick;
+}
+
+void TScoresPlayerLine::Init()
+{
+	Nick = new TLabel(x, y, nick, color, &app.Font()->big);
+
+	Killed = new TLabel(x+170, y, killed, color, &app.Font()->big);
+	Shooted = new TLabel(x+300, y, shooted, color, &app.Font()->big);
+	Created = new TLabel(x+420, y, created, color, &app.Font()->big);
+	Score = new TLabel(x+580, y, score, color, &app.Font()->big);
+	MyComponent(Nick);
+	MyComponent(Killed);
+	MyComponent(Shooted);
+	MyComponent(Score);
+	MyComponent(Created);
+}
+
+void TScoresPlayerLine::Draw(int souris_x, int souris_y)
+{
+	Nick->Draw(souris_x, souris_y);
+	Shooted->Draw(souris_x, souris_y);
+	Killed->Draw(souris_x, souris_y);
+	Created->Draw(souris_x, souris_y);
+	Score->Draw(souris_x, souris_y);
 }

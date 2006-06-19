@@ -54,6 +54,7 @@ protected:
 	void Options(EChannel* ch);
 	void InGame();
 	void MapEditor();
+	void Scores(EChannel*);
 
 	static void WantQuit(TObject*, void*);
 	static void WantPlay(TObject*, void*);

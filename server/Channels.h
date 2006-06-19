@@ -74,9 +74,23 @@ public:
 
 	virtual bool IsIA() const;
 
+	struct stats_t
+	{
+		stats_t() : killed(0), shooted(0), created(0), score(0) {}
+		uint killed;
+		uint shooted;
+		uint created;
+		uint score;
+	};
+
+	stats_t Stats() const { return stats; }
+	stats_t* Stats() { return &stats; }
+
 /* Variables privées */
 protected:
 	TClient *client;
+
+	stats_t stats;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 
@@ -220,9 +234,13 @@ public:
 	/** This operator can be used to send a INFO message to all players */
 	void operator<< (std::string os);
 
+	bool FastGame() const { return fast_game; }
+	void SetFastGame(bool b = true) { fast_game = b; }
+
 /* Variables privées */
 protected:
 	ECPlayer* owner;
+	bool fast_game;
 };
 
 typedef std::vector<EChannel*> ChannelVector;

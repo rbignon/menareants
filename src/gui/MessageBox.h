@@ -69,6 +69,9 @@ public:
 	/** Draw box */
 	void Draw (uint mouse_x, uint mouse_y);
 
+	/** To draw this box only one time */
+	void Draw();
+
 /* Attributs */
 public:
 

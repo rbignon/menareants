@@ -37,9 +37,13 @@
 
 class TECExcept
 {
+private:
+	std::string message;
+	std::string vars;
 public:
-	const char* Message;
-	const char* Vars;
+	const char* Message() const { return message.c_str(); }
+	const char* Vars() const { return vars.c_str(); }
+
 #define ECExcept(vars, msg)                             \
                 TECExcept(__PRETTY_FUNCTION__, __FILE__, __LINE__, (vars), (msg))
 	TECExcept(const char* func, const char* file, int line, std::string vars, std::string msg);

@@ -261,7 +261,7 @@ void MenAreAntsApp::request_game()
 	}
 	catch(const TECExcept &e)
 	{
-		vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
 		client->SetWantDisconnect();
 		TMessageBox mb("Une erreur s'est produite dans le jeu !!\n\n"
 		               "Elle a été envoyée aux programmeurs du jeu qui feront leur "

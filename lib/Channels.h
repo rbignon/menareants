@@ -126,6 +126,9 @@ public:
 
 	virtual bool IsIA() const = 0;
 
+	bool Lost() const { return lost; }
+	void SetLost(bool b = true) { lost = b; }
+
 /* Variables privées */
 protected:
 	ECBChannel *chan;
@@ -139,6 +142,7 @@ protected:
 	ECList<ECBEntity*> entities;
 	unsigned int nation;
 	BPlayerVector allies;
+	bool lost;
 };
 
 /********************************************************************************************
@@ -163,7 +167,8 @@ public:
 		WAITING,           /**< Game has been created and is able to be joined. */
 		SENDING,           /**< Informations about game are sending. */
 		PLAYING,           /**< Players are playing. */
-		ANIMING            /**< Game is in animation. */
+		ANIMING,           /**< Game is in animation. */
+		SCORING            /**< End of game. */
 	};
 
 /* Methodes */

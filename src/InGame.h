@@ -345,4 +345,67 @@ private:
 	ECPlayer *pl;
 };
 
+/********************************************************************************************
+ *                               TScoresForm                                                *
+ ********************************************************************************************/
+/** This is a form who shows the channel's scores. */
+class TScoresForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TScoresForm(SDL_Surface*, EChannel*);
+	~TScoresForm();
+
+/* Composants */
+public:
+
+	TLabel*      Title;
+	TLabel*      Date;
+
+	TButtonText* RetourButton;
+
+	TList*       Players;
+
+/* Evenements */
+public:
+
+	static void WantLeave(TObject*, void*);
+};
+
+/********************************************************************************************
+ *                               TScoresPlayerLine                                          *
+ ********************************************************************************************/
+/** This is a line to show a player in TScoresForm form */
+class TScoresPlayerLine : public TComponent
+{
+/* Constructeur/Destructeur */
+public:
+
+	TScoresPlayerLine(std::string nick, SDL_Color, std::string killed, std::string shooted, std::string created,
+	                  std::string score);
+	virtual ~TScoresPlayerLine();
+
+/* Methodes */
+public:
+
+	void Init();
+	void Draw(int souris_x, int souris_y);              /**< Draw */
+
+/* Composants */
+public:
+
+	TLabel* Nick;
+	TLabel* Killed;
+	TLabel* Shooted;
+	TLabel* Created;
+	TLabel* Score;
+
+/* Variables privées */
+private:
+	std::string nick;
+	SDL_Color color;
+	std::string killed, shooted, created, score;
+};
+
 #endif /* EC_INGAME_H */

@@ -64,6 +64,8 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				MyFree(map);
 			}
 			chan->SetMap(NULL);
+			GameInfosForm->Hints->ClearItems();
+			GameInfosForm->Hints->AddItem("Chargement de la carte...");
 			me->UnlockScreen();
 		}
 		GameInfosForm->RecvMap.push_back(parv[1]);
@@ -96,7 +98,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				delete map;
 				Debug(W_ERR, "Unable to load a map :");
-				vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+				vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
 				GameInfosForm->RecvMap.clear();
 				me->UnlockScreen();
 				return 0;
@@ -107,6 +109,10 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
+			GameInfosForm->Preview->SetXY(GameInfosForm->Preview->X(), 565-GameInfosForm->Preview->Height());
+			GameInfosForm->MapTitle->SetXY(GameInfosForm->MapTitle->X(),
+			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
+			GameInfosForm->Hints->ClearItems();
 			me->UnlockScreen();
 		}
 	}
@@ -354,6 +360,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	}
 				 }
 				 break;
+			case 'E': if(add) chan->SetState(EChannel::SCORING); break;
 			case 'm':
 				if(add)
 				{
@@ -480,9 +487,24 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 				pl->SetOp(add);
 				if(GameInfosForm && pl->IsMe())
+					GameInfosForm->ChangeStatus(add);
+				break;
+			}
+			case 'r':
+			{
+				if(GameInfosForm)
+					GameInfosForm->SpeedGame->Check(add);
+				break;
+			}
+			case '£':
+			{
+				if(!add) { Debug(W_DESYNCH|W_SEND, "SET -£: theoriquement impossible, on ne peut pas \"déperdre\""); break; }
+				if(InGameForm)
 				{
-					GameInfosForm->MapList->SetVisible(add);
-					GameInfosForm->CreateIAButton->SetVisible(add);
+					if(sender->IsMe())
+						InGameForm->AddInfo(I_SHIT, "*** VOUS AVEZ PERDU !!!");
+					else
+						InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " a perdu.");
 				}
 				break;
 			}
@@ -966,8 +988,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 		if(client->Player()->IsOwner())
 			GameInfosForm->PretButton->SetText("Lancer la partie");
 
-		GameInfosForm->MapList->SetVisible(client->Player()->IsPriv());
-		GameInfosForm->CreateIAButton->SetVisible(client->Player()->IsPriv());
+		GameInfosForm->ChangeStatus(client->Player()->IsPriv());
 	    Timer listmapclick;
 		do
 		{
@@ -1051,6 +1072,8 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 							eob = true;
 						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+						if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y))
+							client->sendrpl(client->rpl(EC_Client::SET), GameInfosForm->SpeedGame->Checked() ? "+r" : "-r");
 						if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
 						{
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
@@ -1203,8 +1226,15 @@ void MenAreAntsApp::ListGames()
 }
 
 /********************************************************************************************
- *                               TListGameForm                                              *
+ *                               TGameInfosForm                                             *
  ********************************************************************************************/
+
+void TGameInfosForm::ChangeStatus(bool add)
+{
+	MapList->SetVisible(add);
+	CreateIAButton->SetVisible(add);
+	SpeedGame->SetEnabled(add);
+}
 
 TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	: TForm(w)
@@ -1219,19 +1249,20 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 
 	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
 	Preview = AddComponent(new TImage(390, 380));
-	Preview->SetHint("Note: les couleurs sont là uniquement pour distinguer les emplacements disponibles et ne seront "
-	                 "plus valables durant la partie.");
 
-	MapList = AddComponent(new TListBox(&app.Font()->sm, 625, 290, 150, 150));
+	MapList = AddComponent(new TListBox(&app.Font()->sm, 625, 270, 150, 80));
+	SpeedGame = AddComponent(new TCheckBox(&app.Font()->normal, 625, 360, "Partie rapide", white_color));
+	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
+	SpeedGame->Check();
 
-	PretButton = AddComponent(new TButtonText(625,130, 150,50, "Pret", &app.Font()->normal));
+	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", &app.Font()->normal));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(625,180,150,50, "Retour", &app.Font()->normal));
-	CreateIAButton = AddComponent(new TButtonText(625,230,150,50, "Ajouter IA", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", &app.Font()->normal));
+	CreateIAButton = AddComponent(new TButtonText(625,210,150,50, "Ajouter IA", &app.Font()->normal));
 	CreateIAButton->Hide();
 	CreateIAButton->SetHint("Ajouter un joueur artificiel (une IA) à la partie");
 
-	Hints = AddComponent(new TMemo(&app.Font()->sm, 625, 465, 150, 100));
+	Hints = AddComponent(new TMemo(&app.Font()->sm, 625, 505, 150, 60));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
@@ -1245,15 +1276,16 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 TGameInfosForm::~TGameInfosForm()
 {
 	delete Hints;
-	delete Preview;
-	delete MapTitle;
-	delete MapList;
-	delete Players;
 	delete CreateIAButton;
 	delete RetourButton;
 	delete PretButton;
+	delete SpeedGame;
+	delete MapList;
+	delete Preview;
+	delete MapTitle;
 	delete SendMessage;
 	delete Chat;
+	delete Players;
 	delete Title;
 }
 

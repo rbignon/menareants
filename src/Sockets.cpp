@@ -135,7 +135,7 @@ void EC_Client::parse_message(std::string buf)
 	}
 	catch(TECExcept &e)
 	{
-		vDebug(W_ERR|W_SEND, e.Message, e.Vars);
+		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
 	}
 
 	return;
@@ -248,6 +248,8 @@ void EC_Client::Init()
 	Commands.push_back(new LSPCommand("LSP",	0,	3));
 	Commands.push_back(new EOLCommand("EOL",	0,	0));
 
+	Commands.push_back(new ARMCommand("ARM",	0,	0));
+
 	Commands.push_back(new JOICommand("JOI",	0,	1));
 	Commands.push_back(new SETCommand("SET",	0,	1));
 	Commands.push_back(new PLSCommand("PLS",	0,	1));
@@ -260,7 +262,7 @@ void EC_Client::Init()
 	Commands.push_back(new SMAPCommand("SMAP",	0,	1));
 	Commands.push_back(new EOSMAPCommand("EOSMAP",0,0));
 
-	Commands.push_back(new ARMCommand("ARM",	0,	0));
+	Commands.push_back(new SCOCommand("SCO",	0,	4));
 	
 }
 

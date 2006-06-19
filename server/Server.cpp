@@ -71,6 +71,8 @@ const char* msgTab[] = {
                                              *       C'est normal qu'il n'y ait pas d'espace après ARM.
                                              *       Utiliser la fonction EChannel::SendArm().
                                              */
+
+     ":%s SCO %d %d %d %d",                 /* SCO - Affiche les scores (nick, killed, shooted, created, score) */
      0
 };
 
@@ -172,7 +174,7 @@ int TClient::parsemsg(std::string buf)
 	}
 	catch(TECExcept &e)
 	{
-		vDebug(W_ERR, e.Message, e.Vars);
+		vDebug(W_ERR, e.Message(), e.Vars());
 		exit(app.rpl(ECServer::ERR));
 	}
 

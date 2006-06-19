@@ -144,7 +144,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 			}
 			if(!killed) continue;
 
-			(*it)->Shooted(killed);
+			Shoot(*it, killed);
 			(*Channel()) << "Le lance missile " + LongName() + " dégomme " + (*it)->Qual() + " " +
 							(*it)->LongName() + " de " + TypToStr(killed);
 		}

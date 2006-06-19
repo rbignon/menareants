@@ -124,6 +124,18 @@ uint TMessageBox::Show()
 	return 0;
 }
 
+void TMessageBox::Draw()
+{
+	int x,y;
+	SDL_GetMouseState( &x, &y);
+	if(realbg)
+		SDL_BlitSurface(realbg->Img, NULL, app.sdlwindow, NULL);
+	if(Form)
+		Form->Update(x,y,false);
+	Draw(x,y);
+	SDL_Flip(app.sdlwindow);
+}
+
 void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 {
 	SDL_Rect r_back = {x,y,w,h};

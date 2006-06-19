@@ -70,6 +70,9 @@ Sommaire:
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
+         - Lors des scores
+              <nick> SCO <killed> <shooted>     :score d'un joueur
+                         <created> <score>
 
 3) Particularités des commandes de positions
       Voici les arguments server -> client :
@@ -102,15 +105,18 @@ Sommaire:
          +l <limite>         :paramètre la limite (serveur -> user uniquement)
          +o <user>           :met op un user
          +m <map>            :définie la map du jeu
+         +r                  :partie rapide
          +W                  :pré-partie (WAITING)
          +S                  :envoie des infos (SENDING)
          +P                  :jeu (PLAYING)
          +A                  :animation (ANIMING)
+         +E                  :fin du jeu (SCORING)
         Mode pour un user:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position
          +n <nation>         :l'user définie sa nation
          +!                  :le joueur est READY
+         +£                  :le joueur a perdu
          +$                  :l'argent du joueur (serveur -> user uniquement)
          +@ <country>        :l'user possède maintenant la terre <country>
          +a <nick>           :définie un user comme allié de lui

@@ -113,6 +113,8 @@ class EOSMAPCommand : public EC_ACommand { public: EOSMAPCommand(const std::stri
 
 class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class SCOCommand : public EC_ACommand { public: SCOCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SCOCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 #else
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
@@ -131,6 +133,14 @@ DECLARE_CMD ( PLS );
 DECLARE_CMD ( LEA );
 DECLARE_CMD ( MSG );
 DECLARE_CMD ( SET );
+
+DECLARE_CMD ( LSM );
+DECLARE_CMD ( EOMAP );
+DECLARE_CMD ( SMAP );
+DECLARE_CMD ( EOSMAP );
+DECLARE_CMD ( ARM );
+
+DECLARE_CMD ( SCO );
 #endif
 
 #endif

@@ -383,6 +383,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				Debug(W_DEBUG, "On rajoute un ARM_CREATE");
 				cl->Player()->DownMoney(entity->Cost());
+				cl->Player()->Stats()->created += entity->Nb();
 				ECEvent* event = new ECEvent(ARM_CREATE, entity->Case());
 				event->Entities()->Add(entity);
 				event->SetNb(entity->Nb());
@@ -405,6 +406,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				/*****************************
 				*     GESTION DES AJOUTS    *
 				*****************************/
+				cl->Player()->Stats()->created += entity->InitNb();
 				cl->Player()->DownMoney(entity->Cost());
 				nb = entity->Nb();
 			}

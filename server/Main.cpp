@@ -164,9 +164,9 @@ int ECServer::main(int argc, char **argv)
 	catch (const TECExcept &e)
 	{
 		std::cout << "Received an ECExcept error: " << std::endl;
-		std::cout << e.Message << std::endl;
+		std::cout << e.Message() << std::endl;
 #ifdef DEBUG
-		std::cout << e.Vars << std::endl;
+		std::cout << e.Vars() << std::endl;
 #endif
 	}
 	CleanUp();

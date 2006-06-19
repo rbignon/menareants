@@ -13,6 +13,7 @@ menareants_SOURCES = \
 		gui/ChildForm.cpp \
 		gui/ListBox.cpp \
 		gui/ComboBox.cpp \
+		gui/CheckBox.cpp \
 		gui/Boutton.cpp \
 		gui/BouttonText.cpp \
 		gui/Memo.cpp \

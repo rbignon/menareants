@@ -30,12 +30,12 @@ TECExcept::TECExcept(const char* func, const char* file, int line, std::string v
   s += "():";
   s += TypToStr(line);
   s += "; " + buf;
-  Message = s.c_str();
-  Vars = vars.c_str();
+  message = s;
+  vars = vars;
 }
 
 TECExcept::TECExcept(std::string buf)
 {
-	Message = buf.c_str();
-	Vars = NULL;
+	message = buf;
+	vars = "";
 }

@@ -214,7 +214,7 @@ int TIA::recv_one_msg(std::string msg)
 	}
 	catch(TECExcept &e)
 	{
-        vDebug(W_ERR, e.Message, e.Vars);
+        vDebug(W_ERR, e.Message(), e.Vars());
 	}
 	return 0;
 }

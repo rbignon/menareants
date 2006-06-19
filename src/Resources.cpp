@@ -57,6 +57,7 @@
 	R_RESOURCE(ECSpriteBase, OptionsButton);
 	R_RESOURCE(ECSpriteBase, CreditsButton);
 	R_RESOURCE(ECSpriteBase, QuitterButton);
+	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);
 	R_RESOURCE(ECSpriteBase, CaseVille);

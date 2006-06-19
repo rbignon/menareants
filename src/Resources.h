@@ -121,6 +121,7 @@ public:
 	R_RESOURCE(ECSpriteBase, OptionsButton,    "optionsbutton");
 	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
 	R_RESOURCE(ECSpriteBase, QuitterButton,    "quitterbutton");
+	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");
 	R_RESOURCE(ECSpriteBase, CaseVille,        "cases/ville");

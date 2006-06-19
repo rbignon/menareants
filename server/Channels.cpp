@@ -184,6 +184,22 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(need_ready == NEEDREADY_ME) need_ready = 0;
 				changed = YES_NOPARAMS;
 				break;
+			case 'r':
+			{
+				if(!sender->Channel()->Joinable())
+				{
+					Debug(W_DESYNCH, "SET %cr: interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->IsPriv())
+				{
+					Debug(W_DESYNCH, "SET %cr: d'un non privilégié", add ? '+' : '-');
+					break;
+				}
+				sender->Channel()->SetFastGame(add);
+				changed = YES_NOPARAMS;
+				break;
+			}
 			case 'o':
 			{
 				if(!sender->Channel()->Joinable())
@@ -583,7 +599,7 @@ bool ECPlayer::IsIA() const
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name)
-	: ECBChannel(_name), owner(0)
+	: ECBChannel(_name), owner(0), fast_game(true)
 {
 	limite = app.GetConf()->DefLimite(); /* Limite par default */
 	app.NBchan++;
@@ -807,8 +823,6 @@ void EChannel::CheckReadys()
 				/* Suite des animations, ou alors si il n'y en a plus on repasse en playing */
 				if(dynamic_cast<ECMap*>(Map())->Events().empty())
 				{ /* Plus d'animations */
-					SetState(EChannel::PLAYING);
-					sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
 
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
@@ -824,21 +838,72 @@ void EChannel::CheckReadys()
 						else
 							++enti;
 					}
+					std::vector<ECBPlayer*> plrs;
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
-						int money = 0;
+						int money = 0, nb_units = 0;
 						std::vector<ECBEntity*> entv = (*it)->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
+						{
 							money += (*enti)->TurnMoney();
-						dynamic_cast<ECPlayer*>(*it)->UpMoney(money);
+							if((*enti)->IsBuilding() || !FastGame())
+								nb_units++;
+						}
+						if(!nb_units)
+						{
+							sendto_players(0, app.rpl(ECServer::SET), (*it)->GetNick(), "+£");
+							(*it)->SetLost();
+							for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
+							{
+								ECList<ECBEntity*>::iterator it = enti;
+								++it;
+								SendArm(NULL, dynamic_cast<ECEntity*>(*enti), ARM_REMOVE);
+								Map()->RemoveAnEntity(*enti, USE_DELETE);
+								enti = it;
+							}
+						}
+						else
+						{
+							dynamic_cast<ECPlayer*>(*it)->UpMoney(money);
+							plrs.push_back(*it);
+						}
 					}
 
-					Map()->NextDay();
+					bool end_of_game = true;
+					for(std::vector<ECBPlayer*>::iterator it = plrs.begin(); it != plrs.end() && end_of_game; ++it)
+						for(std::vector<ECBPlayer*>::iterator it2 = plrs.begin(); it2 != plrs.end() && end_of_game; ++it2)
+						{
+							if(*it != *it2 && !(*it)->IsAllie(*it2))
+								end_of_game = false;
+						}
+					if(end_of_game)
+					{
+						SetState(EChannel::SCORING);
+						sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
+						for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
+						{
+							ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
+							sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
+							                                            pl->Stats()->shooted, pl->Stats()->created,
+							                                            pl->Stats()->score);
+						}
+					}
+					else
+					{
+						SetState(EChannel::PLAYING);
+						sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
+						Map()->NextDay();
+					}
 				}
 				else
 					NextAnim();
 				NeedReady();
+				break;
+			}
+			case EChannel::SCORING:
+			{
+				/* on s'en branle il ne se passe rien, en SCORING tout ce qu'on attend d'un joueur c'est un LEA */
 				break;
 			}
 		}
@@ -1077,7 +1142,7 @@ void EChannel::SetMap(ECBMap *m)
 	catch(TECExcept &e)
 	{
 		delete _new_map;
-		vDebug(W_ERR, e.Message, e.Vars);
+		vDebug(W_ERR, e.Message(), e.Vars());
 		return;
 	}
 
@@ -1279,8 +1344,9 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 std::string EChannel::ModesStr() const
 {
 	std::string modes = "+", params = "";
-	if(limite) modes += "l", params = " " + TypToStr(limite);
-	if(map)    modes += "m", params += " " + TypToStr(Map()->Num());
+	if(limite)    modes += "l", params = " " + TypToStr(limite);
+	if(map)       modes += "m", params += " " + TypToStr(Map()->Num());
+	if(fast_game) modes += "r";
 
 	switch(state)
 	{
@@ -1288,6 +1354,7 @@ std::string EChannel::ModesStr() const
 		case SENDING: modes += "S"; break;
 		case PLAYING: modes += "P"; break;
 		case ANIMING: modes += "A"; break;
+		case SCORING: modes += "E"; break;
 	}
 	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
 	return (modes + params);
