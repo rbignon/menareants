@@ -842,6 +842,7 @@ void EChannel::CheckReadys()
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
+						if((*it)->Lost()) continue;
 						int money = 0, nb_units = 0;
 						std::vector<ECBEntity*> entv = (*it)->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
