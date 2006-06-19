@@ -148,7 +148,7 @@ public:
 	};
 
 	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), shooted(0), cost(_cost), event_type(0), visibility(3)
+		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3)
 	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0,
@@ -245,8 +245,6 @@ public:
 	/** Return the number of soldats in the army */
 	uint Nb() const { return nb; }
 	void SetNb(uint n) { nb = n; }
-	void Shooted(uint n) { shooted += n; }
-	void ReleaseShoot() { nb -= (shooted > nb ? nb : shooted); shooted = 0; }
 
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
 	bool Locked() const { return lock; }
@@ -286,7 +284,6 @@ protected:
 	bool deployed;
 	uint myStep;
 	uint restStep;
-	uint shooted;
 	uint cost;
 	uint event_type;
 	uint visibility;

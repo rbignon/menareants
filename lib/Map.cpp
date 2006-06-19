@@ -219,7 +219,7 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb,
                      uint _visibility)
-	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), shooted(0), cost(_c), event_type(0),
+	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), cost(_c), event_type(0),
 	  visibility(_visibility)
 {
 	if(strlen(_name) != (sizeof name)-1)
