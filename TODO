@@ -3,7 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--server: finir en gros le nouveau mode d'attaques
 
 * Urgent
 -server: finir le nouveau mode de déplacement pas-à-pas (split)
@@ -52,7 +51,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 -server: enrichissement de l'IA
 -introduction de la ressource petrolière pour les vehicules
--gestion des fins de parties.
 -configuration des boutons de la souris
 -système des bonus
 

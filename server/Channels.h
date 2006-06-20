@@ -202,6 +202,9 @@ public:
 	/** Check if every body is ready, and do a lot of things if it is true */
 	void CheckReadys();
 
+	/** Check if this is the end of the game */
+	bool CheckEndOfGame();
+
 /* Attributs */
 public:
 

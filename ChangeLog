@@ -1,3 +1,9 @@
+2005-06-20  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Support des attaques sur la case de départ d'une unité qui a bougé.
+
+	* server/Channels.cpp: Corrections concernant les fins de jeux.
+
 2005-06-19  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Affichage d'un panneau de scores.

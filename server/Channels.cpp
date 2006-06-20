@@ -838,7 +838,6 @@ void EChannel::CheckReadys()
 						else
 							++enti;
 					}
-					std::vector<ECBPlayer*> plrs;
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
@@ -865,32 +864,10 @@ void EChannel::CheckReadys()
 							}
 						}
 						else
-						{
 							dynamic_cast<ECPlayer*>(*it)->UpMoney(money);
-							plrs.push_back(*it);
-						}
 					}
 
-					bool end_of_game = true;
-					for(std::vector<ECBPlayer*>::iterator it = plrs.begin(); it != plrs.end() && end_of_game; ++it)
-						for(std::vector<ECBPlayer*>::iterator it2 = plrs.begin(); it2 != plrs.end() && end_of_game; ++it2)
-						{
-							if(*it != *it2 && !(*it)->IsAllie(*it2))
-								end_of_game = false;
-						}
-					if(end_of_game)
-					{
-						SetState(EChannel::SCORING);
-						sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
-						for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
-						{
-							ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
-							sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
-							                                            pl->Stats()->shooted, pl->Stats()->created,
-							                                            pl->Stats()->score);
-						}
-					}
-					else
+					if(!CheckEndOfGame())
 					{
 						SetState(EChannel::PLAYING);
 						sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
@@ -909,6 +886,38 @@ void EChannel::CheckReadys()
 			}
 		}
 	}
+}
+
+bool EChannel::CheckEndOfGame()
+{
+	if(State() != EChannel::PLAYING && State() != EChannel::ANIMING)
+		return false;
+
+	bool end_of_game = true;
+	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end() && end_of_game; ++it)
+	{
+		if((*it)->Lost()) continue;
+		for(std::vector<ECBPlayer*>::iterator it2 = players.begin(); it2 != players.end() && end_of_game; ++it2)
+		{
+			if((*it)->Lost()) continue;
+			if(*it != *it2 && !(*it)->IsAllie(*it2))
+				end_of_game = false;
+		}
+	}
+	if(end_of_game)
+	{
+		SetState(EChannel::SCORING);
+		sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
+		for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
+		{
+			ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
+			sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
+														pl->Stats()->shooted, pl->Stats()->created,
+														pl->Stats()->score);
+		}
+		return true;
+	}
+	return false;
 }
 
 void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type,
@@ -1317,7 +1326,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
 			entity->Case()->Entities()->Remove(entity);
 			Map()->Entities()->Remove(entity);
-			delete entity;
+			MyFree(entity);
 		}
 		if(pl->MapPlayer())
 		{
@@ -1337,7 +1346,9 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 
 	if(use_delete)
 		delete pl;
-	CheckReadys();
+
+	if(State() != EChannel::PLAYING || !CheckEndOfGame())
+		CheckReadys();
 	return true;
 }
 
