@@ -103,6 +103,7 @@ void EChannel::NextAnim()
 			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, 0, event->Linked());
 
 			std::vector<ECEntity*>::size_type nb_entities = entv.size();
+			std::vector<ECEntity*> entities_save = entv;
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
 			{
 				if(it == entv.end())
@@ -136,7 +137,7 @@ void EChannel::NextAnim()
 				}
 				else ++it;
 			}
-			entv = event->Entities()->List();
+			entv = entities_save;
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
 			{
 				if(!(*it)->Nb())

@@ -1,6 +1,9 @@
 2005-06-20  Romain Bignon <progs@headfucking.net>
 
-	* server/InGame.cpp: Support des attaques sur la case de départ d'une unité qui a bougé.
+	* server/InGame.cpp:
+	- Support des attaques sur la case de départ d'une unité qui a bougé.
+	- Correction d'un bug qui faisait inclure dans un combat toutes les unités d'une case lors des resultats et qui pouvaient
+	  faire revivre une unité disparue lors d'une union, soit resupprimer une unité lors d'un double combat.
 
 	* server/Channels.cpp: Corrections concernant les fins de jeux.
 
