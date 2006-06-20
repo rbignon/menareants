@@ -7,6 +7,13 @@
 
 	* server/Channels.cpp: Corrections concernant les fins de jeux.
 
+	* src/Map.cpp: Petite correction, on ne voyait pas le trait si il était vertical.
+
+	* server/Channels.cpp (SendArm): En cas de mouvement, n'afficher les déplacements que jusqu'à la case actuel du joueur
+	pour eviter les desynch. Note que ça ne résoud tout de même pas le problème qui fait que lorsqu'un attaquant s'enlève
+	d'une attaque, les autres attaquants "passifs" qui récupèrent leur mouvement vont avancer au maximum jusqu'à la case
+	de l'attaque, et pas plus loins comme le mec l'avait prévu.
+
 2005-06-19  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Affichage d'un panneau de scores.

@@ -203,6 +203,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				}
 			}
 		}
+		else if(chan->State() == EChannel::ANIMING)
+			entity->Move()->Clear(entity->Case());
 		entities.push_back(entity);
 	}
 	/* On en est à la première ligne de l'evenement. */

@@ -5,31 +5,29 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 * En cours
 
 * Urgent
--server: finir le nouveau mode de déplacement pas-à-pas (split)
 -client: gestion des accents dans TEdit
--Des fois après une attaque (ou une attaque qui aurrait pu avoir lieu en chemin), il y a un desynch et une unité se visualise pas
- sur la bonne case, ce qui apparait quand on veut bouger l'unité (l'unité bouge d'un coup sur la bonne case)
 
 * Après
--client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 -server: enrichissement de l'IA
--introduction de la ressource petrolière pour les vehicules
 -configuration des boutons de la souris
 -système des bonus
 
 * Bof
 -mettre un mode pour l'argent du début
+-voir si on fait les splits
 
 ** Objectif actuel
--jouabilité du client (affichage, mode PLAYING et mode ANIMING) très pauvre (juste ECArmy comme entité)
+-Unités de base
 
 ** En parallèle (on s'en fou un peu de quand on les fait)
 -mot de passe éventuel pour accéder à un serveur
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
--enrichissement du jeu.
+-Unités des nations
 
 ** Idées
+-client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
+-introduction de la ressource petrolière pour les vehicules
 -avancement des niveaux techniques des batiments, qui peuvent construire plus d'unités à chaque fois
 -limiter le nombre d'unités à construire sur les villes et les batiments
 -système de guerilla de Spouize

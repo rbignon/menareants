@@ -899,7 +899,7 @@ bool EChannel::CheckEndOfGame()
 		if((*it)->Lost()) continue;
 		for(std::vector<ECBPlayer*>::iterator it2 = players.begin(); it2 != players.end() && end_of_game; ++it2)
 		{
-			if((*it)->Lost()) continue;
+			if((*it2)->Lost()) continue;
 			if(*it != *it2 && !(*it)->IsAllie(*it2))
 				end_of_game = false;
 		}
@@ -980,7 +980,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 				to_send += " =" + entity->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
 				                                       "," + TypToStr((*it)->Move()->FirstCase()->Y());
 				if(!(*it)->Move()->Empty())
-					to_send += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*map)(x,y) : 0);
+					to_send += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*map)(x,y) : (*it)->Case());
 			}
 		}
 		else

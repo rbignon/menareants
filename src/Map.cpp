@@ -108,8 +108,8 @@ void ECEntity::SetAttaquedCase(ECase* c)
 	MyFree(trajectoire);
 	if(AttaquedCase() && AttaquedCase() != Case())
 	{
-		int dx = abs(c->Image()->X() - Image()->X());
-		int dy = abs(c->Image()->Y() - Image()->Y());
+		int dx = abs(c->Image()->X() - Image()->X() + 1);
+		int dy = abs(c->Image()->Y() - Image()->Y() + 1);
 		SDL_Surface* surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, dx, dy,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
 		DrawLine(surf,        attaqued_case->X() < Case()->X() ? 0 : dx-1,
