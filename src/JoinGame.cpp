@@ -490,6 +490,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					GameInfosForm->ChangeStatus(add);
 				break;
 			}
+			case 'b':
+				if(GameInfosForm && j<parv.size())
+					GameInfosForm->BeginMoney->SetValue(StrToTyp<int>(parv[j++]));
+				break;
 			case 'r':
 			{
 				if(GameInfosForm)
@@ -1051,30 +1055,32 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 								}
 							}
 						}
-
+						bool tmp = GameInfosForm->MyNation->Opened();
 						if(GameInfosForm->MyPosition &&
 						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
-						if(GameInfosForm->MyColor &&
+						else if(GameInfosForm->MyColor &&
 						   GameInfosForm->MyColor->Clic(event.button.x, event.button.y))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
-						bool tmp = GameInfosForm->MyNation->Opened();
-						if(GameInfosForm->MyNation &&
+						else if(GameInfosForm->MyNation &&
 						   GameInfosForm->MyNation->Clic(event.button.x, event.button.y) &&
 						  tmp && !GameInfosForm->MyNation->Opened() && GameInfosForm->MyNation->GetSelectedItem() != -1)
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+n " + TypToStr(GameInfosForm->MyNation->GetSelectedItem())).c_str());
 /*						break;
 					case SDL_MOUSEBUTTONDOWN:*/
-						if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
 							eob = true;
-						if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
-						if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET), GameInfosForm->SpeedGame->Checked() ? "+r" : "-r");
-						if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->BeginMoney->Test(event.button.x, event.button.y))
+							client->sendrpl(client->rpl(EC_Client::SET),
+							   ("+b " + TypToStr(GameInfosForm->BeginMoney->Value())).c_str());
+						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
 						{
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
 							mb.Edit()->SetAvailChars(NICK_CHARS);
@@ -1234,6 +1240,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 	MapList->SetVisible(add);
 	CreateIAButton->SetVisible(add);
 	SpeedGame->SetEnabled(add);
+	BeginMoney->SetEnabled(add);
 }
 
 TGameInfosForm::TGameInfosForm(SDL_Surface* w)
@@ -1254,6 +1261,10 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	SpeedGame = AddComponent(new TCheckBox(&app.Font()->normal, 625, 360, "Partie rapide", white_color));
 	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
 	SpeedGame->Check();
+
+	                                                          /*  label        x    y    w  min   max  step   defvalue */
+	BeginMoney = AddComponent(new TSpinEdit(&app.Font()->normal, "Argent: ",  625, 385, 150, 0, 50000, 5000,    15000));
+	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
 
 	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", &app.Font()->normal));
 	PretButton->SetEnabled(false);
@@ -1279,6 +1290,7 @@ TGameInfosForm::~TGameInfosForm()
 	delete CreateIAButton;
 	delete RetourButton;
 	delete PretButton;
+	delete BeginMoney;
 	delete SpeedGame;
 	delete MapList;
 	delete Preview;

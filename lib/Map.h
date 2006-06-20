@@ -611,7 +611,6 @@ public:
 	ECBChannel* Channel() { return chan; }
 	void SetChannel(ECBChannel* c) { chan = c; }
 
-	int& BeginMoney() { return begin_money; }          /**< All players have this money when they begin the game */
 	int& CityMoney() { return city_money; }            ///< This is money that is given to players at each turn by cities
 	uint& MinPlayers() { return min; }                 /**< Min players to play */
 	uint& MaxPlayers() { return max; }                 /**< Max players to play */
@@ -674,7 +673,7 @@ protected:
 	uint x, y;
 	uint min, max;
 
-	int begin_money, city_money;
+	int city_money;
 
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
 

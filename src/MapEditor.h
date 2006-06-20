@@ -284,9 +284,6 @@ public:
 	TLabel*      CityLabel;
 	TEdit*       City;
 
-	TLabel*      BeginLabel;
-	TEdit*       Begin;
-
 	TMemo*       Hints;
 
 /* Methodes */

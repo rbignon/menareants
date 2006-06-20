@@ -65,8 +65,8 @@ void TSpinEdit::Init()
   if(m_plus) delete m_plus;
   if(m_minus) delete m_minus;
 
-  m_plus = new TButton (x+w-5,y,5,10);
-  m_minus = new TButton (x+w-max_value_w-5-2*margin,y,5,10);
+  m_plus = new TButton (x+w-10,y,10,10);
+  m_minus = new TButton (x+w-max_value_w-10-2*margin,y,10,10);
 
   MyComponent(m_plus);
   MyComponent(m_minus);
@@ -80,9 +80,8 @@ void TSpinEdit::Init()
   if(txt_label) delete txt_label;
   if(txt_value) delete txt_value;
 
-  uint center = (m_plus->X() +5 + m_minus->X() )/2;
   txt_label = new TLabel(x, y, label, color, font);
-  txt_value = new TLabel(center, y, "", color, font);
+  txt_value = new TLabel(x, y, "", color, font);
 
   MyComponent(txt_label);
   MyComponent(txt_value);
@@ -102,6 +101,9 @@ bool TSpinEdit::SetValue(int _value, bool first)
 
   std::string s(value_s.str());
   txt_value->SetCaption(s);
+
+  uint center = (m_plus->X() +10 + m_minus->X() )/2 - font->GetWidth(s)/2;
+  txt_value->SetXY(center, txt_value->Y());
 
   return true;
 }

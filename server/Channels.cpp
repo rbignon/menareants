@@ -122,6 +122,30 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 'b':
+			{
+				if(!sender->Channel()->Joinable())
+				{
+					Debug(W_DESYNCH, "SET %cb: interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->IsPriv())
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
+
+				if(add)
+				{
+					if(j<parv.size())
+					{
+						sender->Channel()->BeginMoney() = StrToTyp<uint>(parv[j++]);
+						changed = YES_WITHPARAM;
+					}
+					else
+						Debug(W_DESYNCH, "SET +b: sans argument");
+				}
+				else
+					Debug(W_DESYNCH, "SET -b: interdit.");
+				break;
+			}
 			case 'm':
 				if(!sender->Channel()->Joinable())
 				{
@@ -599,7 +623,7 @@ bool ECPlayer::IsIA() const
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name)
-	: ECBChannel(_name), owner(0), fast_game(true)
+	: ECBChannel(_name), owner(0), fast_game(true), begin_money(15000)
 {
 	limite = app.GetConf()->DefLimite(); /* Limite par default */
 	app.NBchan++;
@@ -759,7 +783,7 @@ void EChannel::CheckReadys()
 					}
 					if(pl == players.end())
 						break;
-					dynamic_cast<ECPlayer*>(*pl)->SetMoney(Map()->BeginMoney());
+					dynamic_cast<ECPlayer*>(*pl)->SetMoney(BeginMoney());
 				}
 
 #if 0
@@ -1355,10 +1379,11 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 /** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
 std::string EChannel::ModesStr() const
 {
-	std::string modes = "+", params = "";
-	if(limite)    modes += "l", params = " " + TypToStr(limite);
-	if(map)       modes += "m", params += " " + TypToStr(Map()->Num());
-	if(fast_game) modes += "r";
+	std::string     modes = "+", params = "";
+	if(limite)      modes += "l", params = " " + TypToStr(limite);
+	if(map)         modes += "m", params += " " + TypToStr(Map()->Num());
+	                modes += "b", params += " " + TypToStr(begin_money);
+	if(fast_game)   modes += "r";
 
 	switch(state)
 	{

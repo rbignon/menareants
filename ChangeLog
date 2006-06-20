@@ -14,6 +14,12 @@
 	d'une attaque, les autres attaquants "passifs" qui récupèrent leur mouvement vont avancer au maximum jusqu'à la case
 	de l'attaque, et pas plus loins comme le mec l'avait prévu.
 
+	* API, server/Channels.cpp, src/JoinGame.cpp: Mode +b pour définir l'argent de début de partie.
+
+	* lib/Map.cpp, src/MapEditor.cpp: Suppression du BEGIN des maps.
+
+	* src/gui/SpinEdit.cpp, src/gui/ColorEdit.cpp: Corrections...
+
 2005-06-19  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Affichage d'un panneau de scores.

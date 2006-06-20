@@ -55,8 +55,8 @@ void TColorEdit::Init()
   if(m_plus) delete m_plus;
   if(m_minus) delete m_minus;
 
-  m_plus = new TButton (x+w-5,y,5,10);
-  m_minus = new TButton (x+w-max_value_w-5-2*margin,y,5,10);
+  m_plus = new TButton (x+w-10,y,10,10);
+  m_minus = new TButton (x+w-max_value_w-10-2*margin,y,10,10);
 
   MyComponent(m_plus);
   MyComponent(m_minus);

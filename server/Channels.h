@@ -240,10 +240,13 @@ public:
 	bool FastGame() const { return fast_game; }
 	void SetFastGame(bool b = true) { fast_game = b; }
 
+	int& BeginMoney() { return begin_money; }
+
 /* Variables privées */
 protected:
 	ECPlayer* owner;
 	bool fast_game;
+	int begin_money;
 };
 
 typedef std::vector<EChannel*> ChannelVector;

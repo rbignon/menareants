@@ -547,7 +547,6 @@ void ECBMap::Init()
 	min = 0;
 	max = 0;
 	date = 0;
-	begin_money = 0;
 	city_money = 0;
 	
 	std::string ligne;
@@ -585,7 +584,7 @@ void ECBMap::Init()
 				map_players.push_back(CreateMapPlayer(ligne[0], ++num_player));
 			}
 			else if(key == "MAP") recv_map = true;
-			else if(key == "BEGIN") begin_money = atoi(ligne.c_str());
+			else if(key == "BEGIN") {}
 			else if(key == "CITY") city_money = atoi(ligne.c_str());
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());
@@ -725,10 +724,10 @@ void ECBMap::Init()
 		}
 	}
 	/* Vérification finale des données */
-	if(!begin_money || !city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
+	if(!city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
 	   !min || !max || map_players.size() != max || min > max || !date)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
-		               VIName(max) VIName(begin_money) VIName(map_countries.size()) VPName(date),
+		               VIName(max) VIName(map_countries.size()) VPName(date),
 		               "Fichier incorrect !");
 
 #if 0 /** \todo les villes sont des unités, il faut voir si on ne fait pas une vérification auprès des UNIT */

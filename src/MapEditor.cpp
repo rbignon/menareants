@@ -186,7 +186,6 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 	y = _y;
 	max = 0;
 	date = new ECDate(d);
-	begin_money = 0;
 	city_money = 0;
 	filename = _filename;
 
@@ -243,7 +242,6 @@ void EMap::Save()
 	}
 
 	fp << "EOM" << std::endl;
-	fp << "BEGIN " << BeginMoney() << std::endl;
 	fp << "CITY " << CityMoney() << std::endl;
 	fp << "MIN " << MinPlayers() << std::endl;
 	fp << "MAX " << MaxPlayers() << std::endl;
@@ -1029,7 +1027,6 @@ void TOptionsMap::Options(TObject*, void* m)
 		OptionsMap->MinPlayers->SetValue(map->MinPlayers());
 		OptionsMap->MaxPlayers->SetValue(map->MaxPlayers());
 		OptionsMap->City->SetString(TypToStr(map->CityMoney()));
-		OptionsMap->Begin->SetString(TypToStr(map->BeginMoney()));
 
 		do
 		{
@@ -1048,8 +1045,8 @@ void TOptionsMap::Options(TObject*, void* m)
 								TMessageBox("Il doit y avoir au moins deux joueur", BT_OK, OptionsMap).Show();
 							else if(OptionsMap->Countries->Empty())
 								TMessageBox("Il doit y avoir au moins une country", BT_OK, OptionsMap).Show();
-							else if(OptionsMap->Begin->Empty() || OptionsMap->City->Empty())
-								TMessageBox("Vous devez mettre l'argent de début de partie et l'argent des villes",
+							else if(OptionsMap->City->Empty())
+								TMessageBox("Vous devez mettre l'argent des villes",
 								               BT_OK, OptionsMap).Show();
 							else if(OptionsMap->MinPlayers->Value() < 2)
 								TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
@@ -1163,7 +1160,6 @@ void TOptionsMap::Options(TObject*, void* m)
 	map->Name() = OptionsMap->Name->Text();
 	map->MaxPlayers() = OptionsMap->MaxPlayers->Value();
 	map->MinPlayers() = OptionsMap->MinPlayers->Value();
-	map->BeginMoney() = StrToTyp<int>(OptionsMap->Begin->Text());
 	map->CityMoney()  = StrToTyp<int>(OptionsMap->City->Text());
 	
 	MyFree(OptionsMap);
@@ -1244,9 +1240,6 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 	CityLabel = AddComponent(new TLabel(50,460, "Argent par villes", white_color, &app.Font()->normal));
 	City = AddComponent(new TEdit(&app.Font()->sm, 50, 480, 150, 5, "0123456789"));
 
-	BeginLabel = AddComponent(new TLabel(50,500, "Argent au début de la partie", white_color, &app.Font()->normal));
-	Begin = AddComponent(new TEdit(&app.Font()->sm, 50, 520, 150, 5, "0123456789"));
-
 	Hints = AddComponent(new TMemo(&app.Font()->sm, 300, 480, 290, 100));
 	SetHint(Hints);
 
@@ -1256,8 +1249,6 @@ TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
 TOptionsMap::~TOptionsMap()
 {
 	delete Hints;
-	delete Begin;
-	delete BeginLabel;
 	delete City;
 	delete CityLabel;
 	delete MaxPlayers;

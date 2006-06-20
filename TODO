@@ -13,8 +13,16 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -système des bonus
 
 * Bof
--mettre un mode pour l'argent du début
 -voir si on fait les splits
+-lorsqu'il y a :
+  BA -> AA -> (mouvement de BA deux fois vers la droite en passant par AA (1))
+ il y a donc un combat prévu entre BA et AA, et si AA bouge vers le haut (2), le mouvement original de
+ BA est censé revenir, sauf qu'il va s'arreter sur l'ex-case de AA au lieu d'avancer de deux cases.
+ Ceci est du que lorsque BA a voulu faire son déplacement il n'a jamais pu aller plus loins que AA,
+ et on sait pas ce qui l'attend après donc on peut pas mettre arbitrairement à (2) la nouvelle position
+ de BA dans la case finale de son mouvement. Il faudrait refaire les WantMove() pour les mouvements
+ présents dans ses mouvements. Je proposerais une annulation du mouvement et un appel arbitraire à
+ ARMCommand::Exec pour ne pas avoir à réécrire tout le code.
 
 ** Objectif actuel
 -Unités de base

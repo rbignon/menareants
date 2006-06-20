@@ -105,6 +105,7 @@ Sommaire:
          +l <limite>         :paramètre la limite (serveur -> user uniquement)
          +o <user>           :met op un user
          +m <map>            :définie la map du jeu
+         +b <money>          :l'argent de départ pour chaque joueur
          +r                  :partie rapide
          +W                  :pré-partie (WAITING)
          +S                  :envoie des infos (SENDING)
