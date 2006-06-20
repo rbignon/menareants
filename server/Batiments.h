@@ -86,6 +86,36 @@ protected:
 };
 
 /********************************************************************************************
+ *                               ECShipyard                                                 *
+ ********************************************************************************************/
+class ECShipyard : public ECEntity, public ECBShipyard
+{
+/* Constructeur/Destructeur */
+public:
+
+	SHIPYARD_EMPTY_CONSTRUCTOR(ECShipyard) {}
+
+	SHIPYARD_CONSTRUCTOR(ECShipyard) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+
+/* Attributs */
+public:
+
+/* Variables protégées */
+protected:
+
+};
+
+/********************************************************************************************
  *                               ECharFact                                                  *
  ********************************************************************************************/
 class ECharFact : public ECEntity, public ECBCharFact

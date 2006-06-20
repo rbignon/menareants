@@ -107,6 +107,13 @@
 	R_RESOURCE(ECSpriteBase, City_Face);
 	R_RESOURCE(ECImage,      Capitale_Icon);
 	R_RESOURCE(ECSpriteBase, Capitale_Face);
+	R_RESOURCE(ECImage,      Shipyard_Icon);
+	R_RESOURCE(ECSpriteBase, Shipyard_Face);
+	R_RESOURCE(ECImage,      Boat_Icon);
+	R_RESOURCE(ECSpriteBase, Boat_Face);
+	R_RESOURCE(ECSpriteBase, Boat_Left);
+	R_RESOURCE(ECSpriteBase, Boat_Right);
+	R_RESOURCE(ECSpriteBase, Boat_Dos);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

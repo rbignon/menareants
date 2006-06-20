@@ -139,6 +139,70 @@ protected:
 };
 
 /********************************************************************************************
+ *                               ECBShipyard                                                *
+ ********************************************************************************************/
+#define SHIPYARD_STEP                  0
+#define SHIPYARD_NB                    200
+#define SHIPYARD_COST                  4000
+#define SHIPYARD_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_SHIPYARD, SHIPYARD_COST)
+#define SHIPYARD_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = SHIPYARD_NB) \
+                                       :  ECBEntity(_name, _owner, _case, E_SHIPYARD, SHIPYARD_COST, SHIPYARD_COST, _nb)
+/** This is a char factory */
+class ECBShipyard : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	SHIPYARD_EMPTY_CONSTRUCTOR(ECBShipyard) {}
+
+	SHIPYARD_CONSTRUCTOR(ECBShipyard) {}
+
+	virtual ~ECBShipyard() {}
+
+/* Constantes */
+public:
+
+	virtual bool CanAttaq(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_BOAT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	virtual const char* Qual() const { return "le port"; }
+	virtual uint InitNb() const { return SHIPYARD_NB; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool IsNaval() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantAttaq(uint x, uint y) { return false; }
+
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_BOAT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
  *                               ECBCharFact                                                *
  ********************************************************************************************/
 #define CHARFACT_STEP                  0

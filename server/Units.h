@@ -51,6 +51,21 @@ private:
 };
 
 /********************************************************************************************
+ *                               ECBoat                                                     *
+ ********************************************************************************************/
+class ECBoat : public ECUnit, public ECBBoat
+{
+/* Constructeur/Destructeur */
+public:
+
+	BOAT_EMPTY_CONSTRUCTOR(ECBoat), ECUnit(C_MER) {}
+
+	BOAT_CONSTRUCTOR(ECBoat), ECUnit(C_MER) {}
+
+	ENTITY_CREATE_LAST(ECBoat);
+};
+
+/********************************************************************************************
  *                               ECMissiLauncher                                            *
  ********************************************************************************************/
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher

@@ -85,7 +85,7 @@ Sommaire:
          -           :suppression de l'armée
          .           :lock
          {           :deploiement
-         }           :reployé
+         }           :reploiement
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
@@ -143,7 +143,7 @@ Sommaire:
 
 7) Intelligence Artificielle
      L'intelligence artificielle est implémentée dans le serveur de la manière suivante :
-     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '*', étant un
+     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '~', étant un
        caractère non inclus dans NICK_CHARS.
      - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinciton
      - Chaque sendrpl() vers ce client est interprété ensuite par l'IA qui parse le message et le traite.

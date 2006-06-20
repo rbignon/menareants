@@ -172,6 +172,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(!moves_str.empty())
 		{
 			std::string et_longname = entity->LongName();
+			/* En prevention, si jamais j'avais prevu un mouvement mais qu'il n'a pas lieu à cause d'une attaque contre moi,
+			 * pour eviter de bouger et les desynch. On ne le fait qu'en animation, car je ne vois pas pourquoi un problème
+			 * de desynch pourrait arriver en PLAYING, et surtout il est possible que ça supprime les attaques anticipées
+			 * incorrectement.
+			 */
+			if(chan->State() == EChannel::ANIMING)
+				entity->Move()->Clear(entity->Case());
 			for(std::vector<std::string>::iterator it = moves_str.begin(); it != moves_str.end(); ++it)
 			{
 				std::string s = *it;
@@ -483,6 +490,7 @@ void MenAreAntsApp::InGame()
 								client->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
 								entity->SetOwner(0);
 								InGameForm->Map->SetCreateEntity(0);
+								InGameForm->Map->Map()->CreatePreview(120,120, true);
 							}
 							break;
 						}

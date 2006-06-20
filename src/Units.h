@@ -130,6 +130,35 @@ private:
 };
 
 /********************************************************************************************
+ *                                ECBoat                                                    *
+ ********************************************************************************************/
+#define BOAT_VISUAL_STEP  3
+class ECBoat : public ECUnit, public ECBBoat
+{
+/* Constructeur/Destructeur */
+public:
+
+	BOAT_EMPTY_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP) {}
+
+	BOAT_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::Boat_Dos());
+		PutImage(I_Down, Resources::Boat_Face());
+		PutImage(I_Right, Resources::Boat_Right());
+		PutImage(I_Left, Resources::Boat_Left());
+		PutImage(I_Attaq, Resources::Boat_Face());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Bateau"; }
+	virtual const char* Infos() const { return "Bateau de transport"; }
+	virtual ECImage* Icon() const { return Resources::Boat_Icon(); }
+};
+
+
+/********************************************************************************************
  *                                EChar                                                     *
  ********************************************************************************************/
 #define CHAR_VISUAL_STEP  3

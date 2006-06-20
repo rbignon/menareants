@@ -171,6 +171,13 @@ public:
 	R_RESOURCE(ECSpriteBase, City_Face,          "cases/ville");
 	R_RESOURCE(ECImage,      Capitale_Icon,      PKGDATADIR_PICS "units/capitale_icon.png");
 	R_RESOURCE(ECSpriteBase, Capitale_Face,      "cases/capitale");
+	R_RESOURCE(ECImage,      Shipyard_Icon,      PKGDATADIR_PICS "units/shipyard_icon.png");
+	R_RESOURCE(ECSpriteBase, Shipyard_Face,      "units/shipyard");
+	R_RESOURCE(ECImage,      Boat_Icon,        PKGDATADIR_PICS "units/boat_icon.png");
+	R_RESOURCE(ECSpriteBase, Boat_Face,        "units/boat/face");
+	R_RESOURCE(ECSpriteBase, Boat_Left,        "units/boat/left");
+	R_RESOURCE(ECSpriteBase, Boat_Right,       "units/boat/right");
+	R_RESOURCE(ECSpriteBase, Boat_Dos,         "units/boat/dos");
 };
 
 #undef R_RESOURCE

@@ -98,6 +98,27 @@ public:
 };
 
 /********************************************************************************************
+ *                                ECShipyard                                                *
+ ********************************************************************************************/
+
+class ECShipyard : public ECBatiment, public ECBShipyard
+{
+/* Constructeur/Destructeur */
+public:
+
+	SHIPYARD_EMPTY_CONSTRUCTOR(ECShipyard) {}
+
+	SHIPYARD_CONSTRUCTOR(ECShipyard), ECBatiment(Resources::Shipyard_Face()) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Chantier naval"; }
+	virtual const char* Infos() const { return "Construit des bateaux"; }
+	virtual ECImage* Icon() const { return Resources::Shipyard_Icon(); }
+};
+
+/********************************************************************************************
  *                                ECharFact                                                 *
  ********************************************************************************************/
 

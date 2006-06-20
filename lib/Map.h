@@ -144,6 +144,8 @@ public:
 		E_MISSILAUNCHER,
 		E_CITY,
 		E_CAPITALE,
+		E_SHIPYARD,
+		E_BOAT,
 		E_END
 	};
 
@@ -163,6 +165,7 @@ public:
 	virtual uint InitNb() const = 0;
 
 	virtual bool IsBuilding() const { return false; }
+	virtual bool IsNaval() const { return false; }
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
@@ -411,7 +414,7 @@ public:
 public:
 
 	/** ECBTerre can create all buildings */
-	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding()); }
+	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && !e->IsNaval()); }
 
 /* Attributs */
 public:
@@ -431,6 +434,8 @@ public:
 
 /* Methodes */
 public:
+
+	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && e->IsNaval()); }
 
 /* Attributs */
 public:

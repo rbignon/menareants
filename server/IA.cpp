@@ -36,17 +36,37 @@ void TIA::FirstMovements()
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		std::string msg;
-		for(int k = 0; k < 2; k++)
+		if((*enti)->IsBuilding())
 		{
-			int i = rand()%4;
-			switch(i)
+			int i = rand()%ECBEntity::E_END;
+			if(i)
+				ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
+				                  TypToStr(i));
+		}
+		else
+		{
+			std::vector<ECBEntity*> es = (*enti)->Case()->Entities()->List();
+			for(std::vector<ECBEntity*>::iterator e = es.begin(); e != es.end(); ++e)
 			{
-				case 0: msg += " <"; break;
-				case 1: msg += " >"; break;
-				case 2: msg += " ^"; break;
-				case 3: msg += " v"; break;
+				if((*e)->CanCreate(*enti) && (*e)->Owner() == Player())
+				{
+					for(int i = rand()%2; !i ;i = rand()%3)
+						ia_send("ARM " + std::string((*enti)->ID()) + " +");
+				}
+			}
+			for(int k = 0; k < 2; k++)
+			{
+				int i = rand()%4;
+				switch(i)
+				{
+					case 0: msg += " <"; break;
+					case 1: msg += " >"; break;
+					case 2: msg += " ^"; break;
+					case 3: msg += " v"; break;
+				}
 			}
 		}
+		if(msg.empty()) continue;
 		ia_send("ARM " + std::string((*enti)->ID()) + msg);
 	}
 }
