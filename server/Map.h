@@ -46,7 +46,7 @@ class EChannel;
                                    next = this; \
                                    ECEntity* e = new (x) (*this); \
                                    next = 0; \
-                                   e->SetLock(); \
+                                   e->SetShadowed(); \
                                    SetLast(e); \
                                    e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */ \
                               }
@@ -55,11 +55,12 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), last(0), next(0), move(this), shooted(0) {}
+	ECEntity() : Tag(0), last(0), next(0), move(this), shooted(0), shadow(false) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
 	         uint _visibility = 3)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), last(0), next(0), move(this), shooted(0)
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), last(0), next(0), move(this), shooted(0),
+		  shadow(false)
 	{}
 
 	virtual ~ECEntity();
@@ -90,7 +91,7 @@ public:
 	/** Shoot an entity */
 	void Shoot(ECEntity*, uint);
 	void Shooted(uint n) { shooted += n; }
-	void ReleaseShoot();
+	virtual void ReleaseShoot();
 
 /* Attributs */
 public:
@@ -114,6 +115,9 @@ public:
 
 	EChannel* Channel() const;
 
+	void SetShadowed(bool b = true) { shadow = b; }
+	bool Shadowed() const { return shadow; }
+
 /* Variables privées */
 protected:
 	ECEntity* last;
@@ -121,6 +125,7 @@ protected:
 	bool SetLast(ECEntity* e) { return (last = e); }
 	ECMove move;
 	uint shooted;
+	bool shadow;
 };
 
 /********************************************************************************************

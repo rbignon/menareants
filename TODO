@@ -3,9 +3,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-gestion du de-contenage.
 
 * Urgent
 -client: gestion des accents dans TEdit
+-server: Lors d'un combat, n'afficher les nombres restants qu'à ceux qui ont fait partit du combat.
 
 * Après
 -server: enrichissement de l'IA

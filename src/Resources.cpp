@@ -35,6 +35,7 @@
 	R_RESOURCE(ECImage,      Case);
 	R_RESOURCE(ECImage,      GoodHashure);
 	R_RESOURCE(ECImage,      BadHashure);
+	R_RESOURCE(ECImage,      HelpScreen);
 	R_RESOURCE(ECImage,      FlecheVert);
 	R_RESOURCE(ECImage,      FlecheHoriz);
 	R_RESOURCE(ECImage,      FlecheDroiteHaut);

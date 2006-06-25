@@ -123,9 +123,13 @@ protected:
 #define ARM_RETURN      0x0080
 #define ARM_DEPLOY      0x0800
 #define ARM_FORCEATTAQ  0x1000
+#define ARM_CONTENER    0x2000
+#define ARM_UNCONTENER  0x4000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
+#define ARM_CONTAIN     (ARM_CONTENER|ARM_MOVE)
+#define ARM_UNCONTAIN   (ARM_UNCONTENER|ARM_MOVE)
 /* Concerne server:EChannel::SendArm() */
 #define ARM_HIDE        0x0100 /* cache les infos aux users non concernés */
 #define ARM_RECURSE     0x0200 /* ne JAMAIS appeler */
@@ -150,7 +154,7 @@ public:
 	};
 
 	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3)
+		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3), parent(0)
 	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0,
@@ -170,6 +174,8 @@ public:
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
 
+	virtual bool CanContain(const ECBEntity*) { return false; }
+
 	/** Qualitatif */
 	virtual const char* Qual() const = 0;
 
@@ -180,7 +186,7 @@ public:
 	virtual bool WantAttaq(uint x, uint y) { return true; }
 
 	/** Use this function when this entity wants to move somewhere */
-	virtual bool WantMove(ECBMove::E_Move) { return true; }
+	virtual bool WantMove(ECBMove::E_Move, bool force = false) { return true; }
 
 	/** Use this function to deploy your entity */
 	virtual bool WantDeploy() { return false; }
@@ -276,6 +282,14 @@ public:
 	/** This is the visibility of this entity (rayon) */
 	uint Visibility() const { return visibility; }
 
+	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel à Shadowed(), qui ne sera utilisé que dans le serveur.
+	 * En effet ce dernier a que des instances de ECEntity qui eux contiennent bien Shadowed().
+	 */
+	virtual bool Shadowed() const { return false; }
+
+	ECBEntity* Parent() const { return parent; }
+	void SetParent(ECBEntity* e) { parent = e; }
+
 /* Variables protégées */
 protected:
 	ECBPlayer* owner;
@@ -290,6 +304,7 @@ protected:
 	uint cost;
 	uint event_type;
 	uint visibility;
+	ECBEntity* parent;
 };
 
 /********************************************************************************************

@@ -786,33 +786,6 @@ void EChannel::CheckReadys()
 					dynamic_cast<ECPlayer*>(*pl)->SetMoney(BeginMoney());
 				}
 
-#if 0
-				BCaseVector cav = Map()->Cases();
-				for(BCaseVector::iterator cai = cav.begin(); cai != cav.end(); ++cai)
-					if((*cai)->Flags() & C_VILLE)
-					{
-						const char *e_name = FindEntityName((*cai)->Country()->Owner() ?
-												dynamic_cast<ECPlayer*>((*cai)->Country()->Owner()->Player()) : 0);
-
-						ECArmy *armee = new ECArmy(e_name,
-														(*cai)->Country()->Owner() ?
-														(*cai)->Country()->Owner()->Player() : 0,
-														*cai, Map()->NbSoldats());
-
-						Map()->AddAnEntity(armee);
-						SendArm(NULL, armee, ARM_CREATE|ARM_HIDE, (*cai)->X(), (*cai)->Y(), armee->Nb(), armee->Type());
-
-						/* On défini le nombre d'argent par tour */
-						if(!(*cai)->Country()->Owner()) continue;
-
-						(*cai)->Country()->Owner()->Player()->SetTurnMoney(
-									(*cai)->Country()->Owner()->Player()->TurnMoney() +
-									(Map()->CityMoney() * ((*cai)->Flags() & C_CAPITALE ? 2 : 1)));
-					}
-				for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
-					dynamic_cast<ECPlayer*>(*it)->SetMoney(Map()->BeginMoney());
-#endif
-
 				NeedReady();
 
 				break;
@@ -852,7 +825,7 @@ void EChannel::CheckReadys()
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 					{
 						(*enti)->Played(); /* On marque bien qu'il a été joué */
-						if((*enti)->Locked())
+						if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
 						{
 							ECList<ECBEntity*>::iterator it = enti;
 							++it;
@@ -982,7 +955,7 @@ void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uin
 void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type,
                        std::vector<ECEvent*> events)
 {
-	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY)))
+	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY|ARM_CONTENER|ARM_UNCONTENER)))
 		return;
 
 	std::string to_send;
@@ -1009,7 +982,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		}
 		else
 			for(std::vector<ECEntity*>::const_iterator it = et.begin(); it != et.end(); ++it)
-				if(flag != ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
+				if(!(flag & ARM_TYPE) && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
 					to_send += " =" + (*it)->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
 					                                      "," + TypToStr((*it)->Move()->FirstCase()->Y()) +
 					                                      "," + (*it)->Move()->MovesString(0);
@@ -1040,6 +1013,12 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
 		else
 			to_send += (et.front()->Deployed()) ? " {" : " }";
+	}
+	if(flag & ARM_CONTENER && !et.empty())
+	{
+		if(!et.front()->Parent()) FDebug(W_WARNING, "SendArm(ARM_CONTENER): L'entité n'est pas membre d'un contener");
+		else
+			to_send += " )" + et.front()->Parent()->LongName();
 	}
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */

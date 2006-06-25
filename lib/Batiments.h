@@ -32,7 +32,7 @@
 #define CAPITALE_COST                  0
 #define CAPITALE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CAPITALE, CAPITALE_COST)
 #define CAPITALE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CAPITALE_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CAPITALE, CAPITALE_COST, CAPITALE_COST, _nb)
+                                       :  ECBEntity(_name, _owner, _case, E_CAPITALE, CAPITALE_STEP, CAPITALE_COST, _nb)
 /** This is a city */
 class ECBCapitale : public virtual ECBEntity
 {
@@ -54,7 +54,7 @@ public:
 	virtual uint InitNb() const { return CAPITALE_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() { return true; }
@@ -89,7 +89,7 @@ protected:
 #define CITY_COST                  0
 #define CITY_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CITY, CITY_COST)
 #define CITY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CITY_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CITY, CITY_COST, CITY_COST, _nb)
+                                       :  ECBEntity(_name, _owner, _case, E_CITY, CITY_STEP, CITY_COST, _nb)
 /** This is a city */
 class ECBCity : public virtual ECBEntity
 {
@@ -111,7 +111,7 @@ public:
 	virtual uint InitNb() const { return CITY_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() { return true; }
@@ -146,7 +146,7 @@ protected:
 #define SHIPYARD_COST                  4000
 #define SHIPYARD_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_SHIPYARD, SHIPYARD_COST)
 #define SHIPYARD_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = SHIPYARD_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_SHIPYARD, SHIPYARD_COST, SHIPYARD_COST, _nb)
+                                       :  ECBEntity(_name, _owner, _case, E_SHIPYARD, SHIPYARD_STEP, SHIPYARD_COST, _nb)
 /** This is a char factory */
 class ECBShipyard : public virtual ECBEntity
 {
@@ -178,7 +178,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsNaval() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -210,7 +210,7 @@ protected:
 #define CHARFACT_COST                  20000
 #define CHARFACT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHARFACT, CHARFACT_COST)
 #define CHARFACT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHARFACT_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CHARFACT, CHARFACT_COST, CHARFACT_COST, _nb)
+                                       :  ECBEntity(_name, _owner, _case, E_CHARFACT, CHARFACT_STEP, CHARFACT_COST, _nb)
 /** This is a char factory */
 class ECBCharFact : public virtual ECBEntity
 {
@@ -242,7 +242,7 @@ public:
 	virtual uint InitNb() const { return CHARFACT_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -275,7 +275,7 @@ protected:
 #define CASERNE_COST                  9000
 #define CASERNE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CASERNE, CASERNE_COST)
 #define CASERNE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CASERNE_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CASERNE, CASERNE_COST, CASERNE_COST, _nb)
+                                       :  ECBEntity(_name, _owner, _case, E_CASERNE, CASERNE_STEP, CASERNE_COST, _nb)
 /** This is a caserne */
 class ECBCaserne : public virtual ECBEntity
 {
@@ -307,7 +307,7 @@ public:
 	virtual uint InitNb() const { return CASERNE_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)

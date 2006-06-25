@@ -182,7 +182,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Locked() && ((*it)->Like(t) || t->Like(*it)) && (*it)->Type() == t->Type())
+			if(t != *it && !(*it)->Shadowed() && ((*it)->Like(t) || t->Like(*it)) && (*it)->Type() == t->Type())
 				++i;
 		return i;
 	}
@@ -191,7 +191,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Locked() && (!(*it)->Like(t) || !t->Like(*it)) &&
+			if(t != *it && !(*it)->Shadowed() && (!(*it)->Like(t) || !t->Like(*it)) &&
 			                                   ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
 				++i;
 		return i;
@@ -201,7 +201,7 @@ public:
 	{
 		std::vector<T> l;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Locked())
+			if(!(*it)->Shadowed())
 				l.push_back(*it);
 		return l;
 	}
@@ -210,7 +210,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Locked() && (*it)->Last() && (*it)->Last()->Case() != (*it)->Case())
+			if(!(*it)->Shadowed() && (*it)->Last() && (*it)->Last()->Case() != (*it)->Case())
 				++i;
 		return i;
 	}
@@ -219,7 +219,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Locked()) ++i;
+			if(!(*it)->Shadowed()) ++i;
 		return i;
 	}
 

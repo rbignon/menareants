@@ -20,3 +20,39 @@
  */
 
 #include "Units.h"
+
+ECBContainer::~ECBContainer()
+{
+
+}
+
+bool ECBContainer::Contain(ECBEntity* entity)
+{
+	if(!entity || Containing())
+		return false;
+
+	SetContaining(entity);
+
+	entity->Lock();
+	if(entity->Case())
+		entity->Case()->Entities()->Remove(entity);
+
+	entity->SetParent(this);
+
+	return true;
+}
+
+bool ECBContainer::UnContain()
+{
+	if(!Containing())
+		return false;
+
+	Containing()->Unlock();
+	Case()->Entities()->Add(Containing());
+	Containing()->SetParent(0);
+	Containing()->SetCase(Case());
+
+	SetContaining(0);
+
+	return true;
+}

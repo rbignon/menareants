@@ -229,7 +229,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 	std::vector<ECEntity*> ents = Entities()->List();
 
 	/* La première étape est de virer tous les attaquants qui n'ont plus rien à attaquer, et de passer ceux qui souhaitent
-	 * maintenir leur attaque ET qu'ils tiennent encore l'unité qui se retire dans dans leur portée, de changer l'orientation
+	 * maintenir leur attaque ET qui tiennent encore l'unité qui se retire dans dans leur portée, de changer l'orientation
 	 * de leur attaque et de passer l'attaque sur une autre case.
 	 * Par la suite, on recherche les déplacements faits vers la case de l'attaque et qui ne cherchent aucunement
 	 * à se faire sodomiser l'anus par un bétail. Si jamais après le retrait de cette entité il n'y a plus d'attaque entre
@@ -241,7 +241,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 	for(char step = T_ATTAQ_STEP; step != T_END_STEP; ++step)
 		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end();)
 		{
-			if((*enti)->Locked())
+			if((*enti)->Shadowed())
 			{
 				++enti;
 				continue;
@@ -259,7 +259,8 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 					dynamic_cast<ECMap*>(Case()->Map())->AddEvent(attaq_event);
 					std::vector<ECBEntity*> entities = entity->Case()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-						if(!(*it)->Locked() && *it != *enti && (*enti)->CanAttaq(*it) && !(*enti)->Like(*it))
+						if(!dynamic_cast<ECEntity*>(*it)->Shadowed() && *it != *enti && (*enti)->CanAttaq(*it) &&
+						   !(*enti)->Like(*it))
 							attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*it));
 				}
 				attaq_event->Entities()->Add(*enti);
@@ -280,7 +281,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 			/* Pour cette entité, on cherche si il peut encore attaquer quelqu'un d'autre, sinon il jarte */
 			std::vector<ECEntity*>::iterator enti2;
 			for(enti2 = ents.begin();
-				enti2 != ents.end() && (*enti2 == *enti || (*enti2)->Locked() ||
+				enti2 != ents.end() && (*enti2 == *enti || (*enti2)->Shadowed() ||
 					(!(*enti)->CanAttaq(*enti2) || (*enti)->Like(*enti2)) &&
 					(step != T_MOVE_STEP || !(*enti2)->CanAttaq(*enti) || (*enti2)->Like(*enti)));
 				++enti2);
@@ -419,7 +420,7 @@ void ECEntity::Union(ECEntity* entity)
 	if(entity->Type() != Type()) throw ECExcept(VIName(entity->Type()) VIName(Type()), "Union avec un autre type !?");
 
 	/* On lock car il fait maintenant partie intégrale de (*enti) */
-	entity->SetLock();
+	entity->SetShadowed();
 	/* On créé un clone de l'ancienne entité. */
 	CreateLast();
 	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */

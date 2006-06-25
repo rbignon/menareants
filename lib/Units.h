@@ -25,6 +25,36 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                               ECBContainer                                               *
+ ********************************************************************************************/
+class ECBContainer : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+	ECBContainer()
+		: unit(0)
+	{}
+
+	virtual ~ECBContainer();
+
+/* Methodes */
+public:
+
+	bool Contain(ECBEntity*);
+	bool UnContain();
+
+/* Attributs */
+public:
+
+	ECBEntity* Containing() const { return unit; }
+	void SetContaining(ECBEntity* e) { unit = e; }
+
+/* Variables privées */
+private:
+	ECBEntity* unit;
+};
+
+/********************************************************************************************
  *                               ECBBoat                                                    *
  ********************************************************************************************/
 #define BOAT_STEP                  4
@@ -33,8 +63,8 @@
 #define BOAT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_BOAT, BOAT_COST)
 #define BOAT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = BOAT_NB) \
                                      :  ECBEntity(_name, _owner, _case, E_BOAT, BOAT_STEP, BOAT_COST, _nb)
-/** This is a simple army */
-class ECBBoat : public virtual ECBEntity
+/** This is a boat. */
+class ECBBoat : public ECBContainer
 {
 /* Constructeur/Destructeur */
 public:
@@ -47,6 +77,17 @@ public:
 
 /* Constantes */
 public:
+
+	virtual bool CanContain(const ECBEntity* et)
+	{
+		switch(et->Type())
+		{
+			case E_ARMY:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -110,6 +151,8 @@ public:
 			case E_CASERNE:
 			case E_CHARFACT:
 			case E_MISSILAUNCHER:
+			case E_SHIPYARD:
+			case E_BOAT:
 				return true;
 			default:
 				return false;
@@ -216,6 +259,8 @@ public:
 			case E_CHARFACT:
 			case E_CHAR:
 			case E_MISSILAUNCHER:
+			case E_BOAT:
+			case E_SHIPYARD:
 				return true;
 			default:
 				return false;

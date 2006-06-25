@@ -14,6 +14,7 @@ Sommaire:
 5) PLS
 6) Etat d'une partie
 7) Intelligence Artificielle
+8) Entités Conteneurs
 
 1) Principe du jeu
 
@@ -86,6 +87,8 @@ Sommaire:
          .           :lock
          {           :deploiement
          }           :reploiement
+         )<entité>   :s'envoyer dans une unité de conteneur (voir 8. Entités Conteneurs)
+         (<entité>   :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
@@ -97,6 +100,8 @@ Sommaire:
          %<type>     : `- définit le type
          #           :deploiement.
          !           :lors d'une attaque, force la case
+         )<entité>   :s'envoyer dans une unité conteneur (voir 8. Entités Conteneurs)
+         (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
@@ -158,3 +163,29 @@ Sommaire:
      * Pour remédier à ce problème, un système de "lock" a été trouvé du coté de l'IA. Ainsi, lorsqu'elle est positionée
        comme étant "locké", tous les messages reçus sont ajoutés dans une queue qui, une fois "delocké", sera traité
        d'un coup.
+
+8) Entités Conteneurs
+     Les unités conteneurs peuvent transporter une autre unité.
+     * Le protocole pour la mise dans une unité est le suivant :
+         - PLAYING:
+         > ARM AA )AB
+         < :NICK!AA ARM )NICK!AB =NICK!AA,x,y,<
+         - ANIMING:
+         < :NICK!AA ARM )NICK!AB =NICK!AA,x,y,<
+     * Le protocole pour extraire une unité est le suivant:
+         - PLAYING:
+         > ARM AB (x+1,y
+         < :NICK!AA ARM (NICK!AB =NICK!AA,x,y,>
+         - ANIMING:
+         < :NICK!AA ARM (NICK!AB =NICK!AA,x,y,>
+
+     Concrètement, une classe de base EConteneur aurrait une variable avec un pointeur vers l'entité.
+     * Lorsqu'on met dans le conteneur, l'unité est supprimée de la liste globale des unités et de celle des joueurs,
+       et stockée dans l'unité ECounteneur. Les clients en font de même et stockent également dans EConteneur.
+     * Lors d'une attaque d'un conteneur avec une unité, l'unité conteneur appelle celle contenue pour se battre.
+     * Lors de l'extraction, l'unité est remise en bien commun et vidé du conteneur, et les clients la ressortent également.
+
+     Il faut que le conteneur gère le fait que si celui ci bouge il faut que son contenu bouge aussi (seulement son pointeur
+     case et non se mettre dans la liste des entités d'une case, vu qu'elle ne doit plsu exister).
+
+     Il faut également que la taille maximale à contenir soit proportionnel au "nombre" du conteneur.

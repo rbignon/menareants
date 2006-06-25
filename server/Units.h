@@ -40,7 +40,7 @@ public:
 /* Methodes */
 public:
 
-	virtual bool WantMove(ECBMove::E_Move);
+	virtual bool WantMove(ECBMove::E_Move, bool force = false);
 
 	virtual bool WantAttaq(uint x, uint y);
 
@@ -51,16 +51,46 @@ private:
 };
 
 /********************************************************************************************
- *                               ECBoat                                                     *
+ *                               EContainer                                                 *
  ********************************************************************************************/
-class ECBoat : public ECUnit, public ECBBoat
+class EContainer : public ECBContainer, public ECUnit
 {
 /* Constructeur/Destructeur */
 public:
 
-	BOAT_EMPTY_CONSTRUCTOR(ECBoat), ECUnit(C_MER) {}
+	EContainer() {}
 
-	BOAT_CONSTRUCTOR(ECBoat), ECUnit(C_MER) {}
+	EContainer(unsigned f) : ECUnit(f) {}
+
+	virtual ~EContainer() {}
+
+/* Methodes */
+public:
+
+	virtual void ChangeCase(ECBCase* new_case);
+
+	virtual bool Attaq(std::vector<ECEntity*> entities);
+
+	virtual bool WantContain(ECEntity*);
+
+	virtual bool WantUnContain(uint x, uint y);
+
+	virtual void Union(ECEntity*);
+
+	void ReleaseShoot();
+};
+
+/********************************************************************************************
+ *                               ECBoat                                                     *
+ ********************************************************************************************/
+class ECBoat : public EContainer, public ECBBoat
+{
+/* Constructeur/Destructeur */
+public:
+
+	BOAT_EMPTY_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
+
+	BOAT_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
 
 	ENTITY_CREATE_LAST(ECBoat);
 };

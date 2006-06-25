@@ -66,6 +66,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	uint flags = 0;
 
 	uint y = 0, x = 0, type = 0, nb = 0;
+	EContainer* container = 0;
 	bool deployed = false;
 	std::vector<std::string> moves_str;
 	for(uint i = 1; i<parv.size(); i++)
@@ -122,6 +123,23 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case '}':
 				flags |= ARM_DEPLOY;
 				break;
+			case ')':
+				flags |= ARM_CONTENER;
+			case '(':
+			{
+				if(!(flags & ARM_CONTENER))
+					flags |= ARM_UNCONTENER;
+
+				std::string entity = parv[i].substr(1);
+				std::string owner = stringtok(entity, "!");
+				ECPlayer* pl = chan->GetPlayer(owner.c_str());
+				if(!pl)
+					{ Debug(W_DESYNCH|W_SEND, "ARM ): Nick %s inconnu", owner.c_str()); break; }
+				ECBEntity* et = pl->Entities()->Find(entity.c_str());
+				if(!et || !(container = dynamic_cast<EContainer*>(et)))
+					{ Debug(W_DESYNCH|W_SEND, "ARM %s: L'entité est introuvable ou inconnue", parv[i].c_str()); break; }
+				break;
+			}
 			case '/':
 			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -306,6 +324,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 
 	/* APRES ANIMATIONS */
+	if(flags & ARM_CONTENER && container && chan->State() == EChannel::ANIMING)
+		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			container->Contain(*it);
 	if(flags & ARM_REMOVE)
 		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end();)
 		{
@@ -313,12 +334,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				case ARM_ATTAQ|ARM_MOVE:
 				case ARM_ATTAQ:
-					if(flags == ARM_MOVE)
-						L_INFO(std::string((*it)->Qual()) + " " + (*it)->LongName() + " s'est unie :");
-					else
-						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
+					L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
 					break;
-				case ARM_UNION: L_INFO(std::string((*it)->Qual()) + " " + (*it)->LongName() + " s'est unie"); break;
 			}
 			if((*it)->Selected() && InGameForm)
 				InGameForm->BarreAct->SetEntity(0);
@@ -344,6 +361,16 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  *                               TInGame                                                    *
  ********************************************************************************************/
 
+class THelpForm : public TForm
+{
+public:
+	THelpForm(SDL_Surface* window)
+		: TForm(window)
+	{
+		SetBackground(Resources::HelpScreen());
+	}
+};
+
 void MenAreAntsApp::InGame()
 {
 	if(!client || !client->Player() || !client->Player()->Channel()->Map())
@@ -365,6 +392,7 @@ void MenAreAntsApp::InGame()
 		char want = 0;
 		bool ctrl = false;
 		bool shift = false;
+		bool alt = false;
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
@@ -394,6 +422,27 @@ void MenAreAntsApp::InGame()
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
 						{
+							case SDLK_F1:
+							{
+								if(client->Player()->Channel()->State() != EChannel::PLAYING)
+									break;
+								THelpForm* HelpForm = new THelpForm(sdlwindow);
+								SDL_Event ev;
+								bool eobb = false;
+								do
+								{
+									while(SDL_PollEvent(&ev))
+									{
+										HelpForm->Actions(ev);
+										if(ev.type == SDL_KEYUP && ev.key.keysym.sym == SDLK_F1)
+											eobb = true;
+									}
+									HelpForm->Update();
+								} while(!eobb && client->IsConnected() && client->Player() &&
+								        client->Player()->Channel()->State() == EChannel::PLAYING);
+								MyFree(HelpForm);
+								break;
+							}
 							case SDLK_ESCAPE:
 								InGameForm->BarreAct->UnSelect();
 								break;
@@ -433,6 +482,9 @@ void MenAreAntsApp::InGame()
 							case SDLK_LSHIFT:
 								shift = false;
 								break;
+							case SDLK_LALT:
+								alt = false;
+								break;
 							default: break;
 						}
 						break;
@@ -444,6 +496,9 @@ void MenAreAntsApp::InGame()
 								break;
 							case SDLK_LSHIFT:
 								shift = true;
+								break;
+							case SDLK_LALT:
+								alt = true;
 								break;
 							default: break;
 						}
@@ -540,6 +595,20 @@ void MenAreAntsApp::InGame()
 							{
 								if(mywant == W_MOVE)
 								{
+									if(!alt)
+									{
+										EContainer* contener = 0;
+										std::vector<ECBEntity*> ents = acase->Entities()->List();
+										for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+											if((contener = dynamic_cast<EContainer*>(*it)))
+												break;
+										if(contener && contener->CanContain(selected_entity))
+										{
+											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
+											                " )" + std::string(contener->ID())).c_str());
+											break;
+										}
+									}
 									ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 																						: selected_entity->Case();
 									if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
@@ -566,7 +635,7 @@ void MenAreAntsApp::InGame()
 										}
 									}
 								}
-								if(mywant == W_ATTAQ)
+								else if(mywant == W_ATTAQ)
 								{
 									client->sendrpl(client->rpl(EC_Client::ARM),
 									                                       std::string(std::string(selected_entity->ID())
@@ -845,9 +914,7 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
 		InGameForm->BarreAct->Nb->SetCaption(
 		    e->Nb() ?
-		       (TypToStr(e->Nb()) + (e->Owner() != InGameForm->BarreAct->me && !InGameForm->BarreAct->me->IsAllie(e->Owner()) ?
-		          " (valeur approximative relevée lors de son dernier combat)"
-		          : ""))
+		       ((e->Owner() != InGameForm->BarreAct->me) ? "~ " : "" + TypToStr(e->Nb()))
 		       : "???");
 
 		if(e->Deployed())
@@ -861,7 +928,7 @@ void TBarreAct::vSetEntity(void* _e)
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
 			InGameForm->BarreAct->ShowIcons(e, e->Owner());
-			/* On subterfuge avec ces fonctions WantDeploy et WantAttaq qui, dans le client,
+			/* On subterfuge avec ces fonctions WantDeploy, AddUnits et WantAttaq qui, dans le client,
 			 * ne font que renvoyer true ou false. Mais comme elles sont virtuelles et
 			 * surchargées sur le serveur, on se tape les arguments.
 			 */
@@ -885,6 +952,23 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->AttaqButton->Hide();
 			InGameForm->BarreAct->UpButton->Hide();
 		}
+
+		EContainer* container = dynamic_cast<EContainer*>(e);
+		if(container && container->Containing())
+		{
+			InGameForm->BarreAct->ChildIcon->Show();
+			InGameForm->BarreAct->ChildNb->Show();
+			InGameForm->BarreAct->ChildIcon->SetImage(dynamic_cast<ECEntity*>(container->Containing())->Icon(), false);
+			InGameForm->BarreAct->ChildNb->SetCaption(container->Containing()->Nb() ?
+			               (container->Containing()->Owner() != InGameForm->BarreAct->me ? "~ " : "" +
+			                 TypToStr(container->Containing()->Nb())) : "???");
+		}
+		else
+		{
+			InGameForm->BarreAct->ChildIcon->Hide();
+			InGameForm->BarreAct->ChildNb->Hide();
+		}
+		
 		if(e->Owner())
 		{
 			InGameForm->BarreAct->Owner->Show();
@@ -952,6 +1036,10 @@ void TBarreAct::Init()
 	Infos = AddComponent(new TLabel(5, 75, "", red_color, &app.Font()->normal));
 
 	Icons = AddComponent(new TBarreActIcons(200, 49));
+
+	ChildIcon = AddComponent(new TImage(200,50));
+	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
+	ChildNb = AddComponent(new TLabel(260,70, "", black_color, &app.Font()->normal));
 
 	SetBackground(Resources::BarreAct());
 }
@@ -1077,7 +1165,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 				}
 			}
 			OptionsForm->Update();
-		} while(!eob && client->IsConnected() && client->Player());
+		} while(!eob && client->IsConnected() && client->Player() && client->Player()->Channel()->State() == EChannel::PLAYING);
 	
 	}
 	catch(TECExcept &e)

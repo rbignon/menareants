@@ -90,6 +90,9 @@ public:
 	TButtonText*    UpButton;
 	TBarreActIcons* Icons;
 
+	TImage*         ChildIcon;
+	TLabel*         ChildNb;
+
 /* Attributs */
 public:
 

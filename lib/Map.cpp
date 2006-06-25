@@ -220,7 +220,7 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint Step, uint _c, uint _nb,
                      uint _visibility)
 	: owner(_owner), acase(_case), type(_type), nb(_nb), lock(false), deployed(false), cost(_c), event_type(0),
-	  visibility(_visibility)
+	  visibility(_visibility), parent(0)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");

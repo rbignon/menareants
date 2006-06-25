@@ -1,3 +1,31 @@
+2005-06-24  Romain Bignon <progs@headfucking.net>
+
+	* src/Units.cpp (ECMissiLauncher): Lors d'une attaque composée d'un mouvement, le lance-missile réagissait anormalement
+	en se reployant...
+
+	* src/InGame.cpp (ARMCommand): Support du containing (in).
+
+	* server/Units.cpp (EContainer): Gestion des unions, des attaques etc pour les conteneurs.
+
+	* src/InGame.cpp (BarreAct): Affichage de l'objet contenue.
+
+	* server/InGame.cpp (NextAnim): Gestion des contenings, des unions par conteneurs, etc.
+
+2005-06-22  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp (Options): Si jamais le jeu se met brusquement à passer en ANIMING ou autre, fermer cet écran.
+
+	* src/data/pics/help.png: Image d'aide lorsqu'on appuie sur F1.
+
+2005-06-21  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp, server/Channels.cpp, API: Programmation du ')' (contenir).
+
+	* lib/Units.h, server/Units.h (EC[B]Container): Classe de base pour les unités conteneurs.
+
+	* lib/Map.h, server/Map.h, server/InGame.cpp: Remplacement de l'utilisation dans le serveur des Locked() par des Shadowed()
+	pour pouvoir se servir de Locked() dans le cas d'une unité verouillée MAIS NON A SUPPRIMER.
+
 2005-06-20  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp:

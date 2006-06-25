@@ -58,6 +58,7 @@ bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase*
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
+		case ARM_ATTAQ|ARM_MOVE:
 		{
 			if(c == Case()) return true;
 
@@ -128,6 +129,7 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
+		case ARM_ATTAQ|ARM_MOVE:
 		{
 			if(c == Case()) return true;
 
@@ -171,15 +173,11 @@ ECUnit::~ECUnit()
 
 bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&, ECase*, EC_Client*)
 {
-	switch(event_type)
+	if(event_type & ARM_MOVE)
 	{
-		case ARM_MOVE:
-		case ARM_ATTAQ|ARM_MOVE:
-			if(!move.Empty())
-				SetImage(images[(imgs_t)move.First()]);
-			SetAnim(true);
-			break;
-		default: break;
+		if(!move.Empty())
+			SetImage(images[(imgs_t)move.First()]);
+		SetAnim(true);
 	}
 	return true;
 }
@@ -237,11 +235,6 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 {
 	switch(event_type)
 	{
-		case ARM_ATTAQ:
-		case ARM_MOVE:
-		case ARM_ATTAQ|ARM_MOVE:
-		case ARM_UNION:
-			return MoveEffect(entities);
 		case ARM_DEPLOY:
 		{
 			if(Deployed())
@@ -300,26 +293,25 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			}
 			break;
 		}
-		default: break;
+		default:
+			if(event_type & ARM_MOVE || event_type & ARM_ATTAQ)
+				return MoveEffect(entities);
+			break;
+		
 	}
 	return true;
 }
 
 bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
-	switch(event_type)
+	if(event_type & ARM_ATTAQ)
 	{
-		case ARM_ATTAQ:
-		case ARM_ATTAQ|ARM_MOVE:
-			SDL_Delay(500);
-			SetImage(images[I_Down]);
-			if(c->Flags() & (C_TERRE))
-				c->Image()->SetFrame(1);
-			// pas de break ici
-		case ARM_MOVE:
-			SetAnim(false);
-			break;
-		default: break;
+		SDL_Delay(500);
+		SetImage(images[I_Down]);
+		if(c->Flags() & (C_TERRE))
+			c->Image()->SetFrame(1);
 	}
+	if(event_type & ARM_MOVE)
+			SetAnim(false);
 	return true;
 }

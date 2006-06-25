@@ -24,6 +24,107 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                               EContainer                                                 *
+ ********************************************************************************************/
+
+void EContainer::Union(ECEntity* entity)
+{
+	ECEntity::Union(entity);
+
+	EContainer* container = dynamic_cast<EContainer*>(entity);
+
+	if(!container) return;
+
+	if(!Containing())
+		Contain(container->Containing());
+	else if(container->Containing())
+	{
+		dynamic_cast<ECEntity*>(Containing())->Union(dynamic_cast<ECEntity*>(container->Containing()));
+		dynamic_cast<ECEntity*>(container->Containing())->SetShadowed();
+	}
+}
+
+bool EContainer::WantContain(ECEntity* entity)
+{
+	if(Containing() || entity->Locked() || entity->Shadowed() || !CanContain(entity))
+		return false;
+
+	ECMove::E_Move move;
+
+	if(entity->Case()->X() == Case()->X())
+	{
+		if(entity->Case()->Y() == Case()->Y()-1)
+			move = ECMove::Down;
+		else if(entity->Case()->Y() == Case()->Y()+1)
+			move = ECMove::Up;
+		else
+			return false;
+	}
+	else if(entity->Case()->Y() == Case()->Y())
+	{
+		if(entity->Case()->X() == Case()->X()-1)
+			move = ECMove::Right;
+		else if(entity->Case()->X() == Case()->X()+1)
+			move = ECMove::Left;
+		else
+			return false;
+	}
+	else
+		return false;
+
+	if(!entity->WantMove(move, true))
+		return false;
+
+	entity->CreateLast();
+	Contain(entity);
+
+	return true;
+}
+
+bool EContainer::WantUnContain(uint x, uint y)
+{
+	return false;
+}
+
+void EContainer::ReleaseShoot()
+{
+	if(Containing())
+	{
+		ECEntity* contained = dynamic_cast<ECEntity*>(Containing());
+		contained->Shooted(shooted);
+		contained->ReleaseShoot();
+
+		if(!contained->Nb())
+		{
+			Channel()->SendArm(NULL, contained, ARM_REMOVE);
+			Case()->Map()->RemoveAnEntity(contained, USE_DELETE);
+			SetContaining(0);
+		}
+		shooted = 0;
+	}
+	else
+		ECEntity::ReleaseShoot();
+}
+
+void EContainer::ChangeCase(ECBCase* new_case)
+{
+	ECEntity::ChangeCase(new_case);
+	if(Containing())
+		Containing()->SetCase(Case());
+}
+
+bool EContainer::Attaq(std::vector<ECEntity*> entities)
+{
+	if(Containing())
+	{
+		Containing()->SetCase(Case());
+		return dynamic_cast<ECEntity*>(Containing())->Attaq(entities);
+	}
+	else
+		return ECEntity::Attaq(entities);
+}
+
+/********************************************************************************************
  *                               ECMissiLauncher                                            *
  ********************************************************************************************/
 
@@ -130,9 +231,13 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
 			uint killed = 0;
 			switch((*it)->Type())
 			{
-				case E_ARMY: killed = uint(Nb() * coef); break;
-				case E_CHAR: killed = uint(Nb() * 4 * coef); break;
-				case E_MISSILAUNCHER: killed = uint(Nb() * 2 * coef); break;
+				case E_ARMY:
+					killed = uint(Nb() * coef); break;
+				case E_BOAT:
+				case E_CHAR:
+					killed = uint(Nb() * 4 * coef); break;
+				case E_MISSILAUNCHER:
+					killed = uint(Nb() * 2 * coef); break;
 				default:
 					if((*it)->IsBuilding())
 						killed = uint(Nb() * 7 * coef);
@@ -182,7 +287,7 @@ bool ECUnit::WantAttaq(uint mx, uint my)
 	std::vector<ECBEntity*> ents = Case()->Entities()->List();
 	std::vector<ECBEntity*>::iterator enti;
 	for(enti = ents.begin(); enti != ents.end() &&
-		((*enti)->Locked() || !CanAttaq(*enti) || Like(*enti));
+		(dynamic_cast<ECEntity*>(*enti)->Shadowed() || !CanAttaq(*enti) || Like(*enti));
 		++enti);
 
 	if(enti == ents.end())
@@ -191,7 +296,7 @@ bool ECUnit::WantAttaq(uint mx, uint my)
 	return true;
 }
 
-bool ECUnit::WantMove(ECBMove::E_Move move)
+bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
@@ -208,19 +313,24 @@ bool ECUnit::WantMove(ECBMove::E_Move move)
 	}
 	if(!c || c == Case() || last && last->Case() == c) return false;
 
-	if(!(c->Flags() & case_flags)) return false;
+	if(!force && !(c->Flags() & case_flags)) return false;
 
 	restStep--;
+
+	Move()->AddMove(move);
 
 	/* Si sur la case actuelle il y a une attaque, on ne bouge pas meme si on dit
 	 * que si au client.
 	 */
-	std::vector<ECBEntity*> ents = Case()->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		if(((!(*enti)->Locked() && !(*enti)->Last()) ||
-		    (*enti)->MyStep() - (*enti)->RestStep() == this->MyStep() - this->RestStep())
-		   && ThereIsAttaq(*enti, this))
-			return true;
+	if(!force)
+	{
+		std::vector<ECBEntity*> ents = Case()->Entities()->List();
+		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+			if(((!dynamic_cast<ECEntity*>(*enti)->Shadowed() && !(*enti)->Last()) ||
+				(*enti)->MyStep() - (*enti)->RestStep() == this->MyStep() - this->RestStep())
+			&& ThereIsAttaq(*enti, this))
+				return true;
+	}
 
 	CreateLast();
 	ChangeCase(c);

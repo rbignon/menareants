@@ -137,7 +137,7 @@ bool ECEntity::Test(int souris_x, int souris_y)
 
 void ECEntity::Draw()
 {
-	if(image && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
+	if(image && !Parent() && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
 		image->draw();
 		if(Selected())
@@ -491,7 +491,8 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 		std::vector<ECBEntity*> ents = entities.List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)->Owner() || Brouillard() && dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0) continue;
+			if(!(*enti)->Owner() || (*enti)->Parent() || Brouillard() && dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
+				continue;
 			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
 			yy = (*enti)->Case()->Y() * size_y;
 			xx = (*enti)->Case()->X() * size_x;

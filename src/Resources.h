@@ -99,6 +99,7 @@ public:
 	R_RESOURCE(ECImage,      Case,             PKGDATADIR_PICS "case.png");
 	R_RESOURCE(ECImage,      GoodHashure,      PKGDATADIR_PICS "goodhashure.png");
 	R_RESOURCE(ECImage,      BadHashure,       PKGDATADIR_PICS "badhashure.png");
+	R_RESOURCE(ECImage,      HelpScreen,       PKGDATADIR_PICS "help.png");
 	R_RESOURCE(ECImage,      FlecheVert,       PKGDATADIR_PICS "fleches/fleche_vert.png");
 	R_RESOURCE(ECImage,      FlecheHoriz,      PKGDATADIR_PICS "fleches/fleche_horiz.png");
 	R_RESOURCE(ECImage,      FlecheDroiteHaut, PKGDATADIR_PICS "fleches/fleche_droitehaut.png");
