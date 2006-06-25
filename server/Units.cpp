@@ -317,8 +317,6 @@ bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
 
 	restStep--;
 
-	Move()->AddMove(move);
-
 	/* Si sur la case actuelle il y a une attaque, on ne bouge pas meme si on dit
 	 * que si au client.
 	 */
@@ -329,10 +327,15 @@ bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
 			if(((!dynamic_cast<ECEntity*>(*enti)->Shadowed() && !(*enti)->Last()) ||
 				(*enti)->MyStep() - (*enti)->RestStep() == this->MyStep() - this->RestStep())
 			&& ThereIsAttaq(*enti, this))
+			{
+				Move()->AddMove(move);
 				return true;
+			}
 	}
 
+	/* On ajout le move bien après le CreateLast() */
 	CreateLast();
+	Move()->AddMove(move);
 	ChangeCase(c);
 
 	return true;
