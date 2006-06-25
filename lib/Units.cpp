@@ -31,12 +31,11 @@ bool ECBContainer::Contain(ECBEntity* entity)
 	if(!entity || Containing())
 		return false;
 
+	entity->ChangeCase(0);
+	entity->SetCase(Case());
+
 	SetContaining(entity);
-
 	entity->Lock();
-	if(entity->Case())
-		entity->Case()->Entities()->Remove(entity);
-
 	entity->SetParent(this);
 
 	return true;
@@ -50,7 +49,8 @@ bool ECBContainer::UnContain()
 	Containing()->Unlock();
 	Case()->Entities()->Add(Containing());
 	Containing()->SetParent(0);
-	Containing()->SetCase(Case());
+	Containing()->SetCase(0);
+	Containing()->ChangeCase(Case());
 
 	SetContaining(0);
 

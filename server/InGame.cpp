@@ -215,18 +215,19 @@ void EChannel::NextAnim()
 			                                         event->Case()->Y(), event->Nb(), event->Type());
 			break;
 		case ARM_CONTAIN:
+		case ARM_UNCONTAIN:
 		case ARM_MOVE:
 		{
-			/*std::vector<ECEvent*> ev;
-			ev.push_back(event);*/
-			SendArm(NULL, event->Entities()->List(), event->Flags(), event->Case()->X(), event->Case()->Y()/*, 0, 0, ev*/);
+			std::vector<ECEvent*> ev;
+			ev.push_back(event);
+			SendArm(NULL, event->Entities()->List(), event->Flags(), event->Case()->X(), event->Case()->Y(), 0, 0, ev);
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
 				(*it)->Case()->CheckChangingOwner(*it);
 			break;
 		}
-		default: break;
+		default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
 	}
 	dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
 }
@@ -363,7 +364,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case ')':
 			{
 				EContainer* container = dynamic_cast<EContainer*>(cl->Player()->Entities()->Find(parv[i].substr(1).c_str()));
-				if(entity && container && container->WantContain(entity))
+				if(entity && container && container->WantContain(entity, moves))
 					flags |= ARM_CONTAIN;
 				break;
 			}
@@ -373,8 +374,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				uint _x = StrToTyp<uint>(stringtok(s, ","));
 				uint _y = StrToTyp<uint>(s);
 				EContainer* container = entity ? dynamic_cast<EContainer*>(entity) : 0;
-				if(container && container->Containing() && container->WantUnContain(_x,_y))
+				ECEntity* contened = dynamic_cast<ECEntity*>(container->Containing());
+				if(container && container->Containing() && container->WantUnContain(_x,_y, moves))
+				{
 					flags |= ARM_UNCONTAIN;
+					entity = contened;
+					last_case = container->Case();
+				}
 				break;
 			}
 			case '/':

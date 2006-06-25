@@ -44,7 +44,7 @@ void EContainer::Union(ECEntity* entity)
 	}
 }
 
-bool EContainer::WantContain(ECEntity* entity)
+bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 {
 	if(Containing() || entity->Locked() || entity->Shadowed() || !CanContain(entity))
 		return false;
@@ -76,14 +76,52 @@ bool EContainer::WantContain(ECEntity* entity)
 		return false;
 
 	entity->CreateLast();
+	CreateLast();
 	Contain(entity);
+	moves.push_back(move);
 
 	return true;
 }
 
-bool EContainer::WantUnContain(uint x, uint y)
+bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 {
-	return false;
+	if(!Containing() || !restStep)
+		return false;
+
+	ECMove::E_Move move;
+
+	if(x == Case()->X())
+	{
+		if(y == Case()->Y()-1)
+			move = ECMove::Up;
+		else if(y == Case()->Y()+1)
+			move = ECMove::Down;
+		else
+			return false;
+	}
+	else if(y == Case()->Y())
+	{
+		if(x == Case()->X()-1)
+			move = ECMove::Left;
+		else if(x == Case()->X()+1)
+			move = ECMove::Right;
+		else
+			return false;
+	}
+	else
+		return false;
+
+	CreateLast();
+
+	ECBEntity* entity = Containing();
+	UnContain();
+
+	if(!entity->WantMove(move, true))
+		throw ECExcept(VIName(move) VIName(x) VIName(y) VIName(Case()->X()) VIName(Case()->Y()), "Gros problème là");
+
+	moves.push_back(move);
+
+	return true;
 }
 
 void EContainer::ReleaseShoot()
@@ -335,6 +373,8 @@ bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
 
 	/* On ajout le move bien après le CreateLast() */
 	CreateLast();
+	if(Move()->Empty())
+		Move()->SetFirstCase(Case());
 	Move()->AddMove(move);
 	ChangeCase(c);
 

@@ -1,3 +1,16 @@
+2005-06-25  Romain Bignon <progs@headfucking.net>
+
+	* src/Units.cpp (WantMove): Correction d'un bug.
+
+	* server/InGame.cpp, src/InGame.cpp: Gestion des uncontenings (out).
+
+	* lib/Map.cpp, src/Map.cpp: Correction de plusieurs problèmes.
+
+	* lib/Map.h, server/Channels.cpp: Utilisation d'un flags (&) qui dit qu'un evenement n'est pas le principal.
+
+	* server/Channels.cpp (SendArm): Dans les évenements liés, dans le cas d'une attaque (en particulier) envoyer une ligne
+	avant si jamais ce n'est pas un ARM_MOVE (pour faire ARM_MOVE|ARM_CONTAINING) en enlevant le ARM_MOVE.
+
 2005-06-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.cpp (ECMissiLauncher): Lors d'une attaque composée d'un mouvement, le lance-missile réagissait anormalement

@@ -24,6 +24,7 @@
 #include "Debug.h"
 #include "Channels.h"
 #include "Main.h"
+#include "Units.h"
 #include <fstream>
 #include <algorithm>
 
@@ -184,34 +185,66 @@ bool ECEvent::RemoveLinked(ECEvent* p, bool use_delete)
 
 bool ECEvent::operator<(const ECEvent& e) const
 {
-	const char NUMBER = 13;
-	const char CREATE = 11;
-	const char REPLOY = 9;
+	const char CREATE = 12;
+	const char REPLOY = 10;
+	const char CONTAIN= 9;
 	const char MOVE   = 8;
-	const char UNION  = 7;
-	const char DEPLOY = 6;
-	const char ATTAQ  = 5;
+	const char UNCONTAIN= 7;
+	const char UNION  = 5;
+	const char DEPLOY = 3;
+	const char ATTAQ  = 1;
 	char me = 0, him = 0;
 	switch(flags)
 	{
-		case ARM_NUMBER: me = NUMBER; break;
 		case ARM_CREATE: me = CREATE; break;
 		case ARM_UNION: me = UNION; break;
 		case ARM_DEPLOY: me = Entity()->Deployed() ? DEPLOY : REPLOY; break;
+		case ARM_CONTAIN: me = CONTAIN;
+		case ARM_UNCONTAIN: me = UNCONTAIN;
 		case ARM_ATTAQ: me = ATTAQ; break;
 		case ARM_MOVE: me = MOVE; break;
 		default: me = 0; break;
 	}
 	switch(e.Flags())
 	{
-		case ARM_NUMBER: him = NUMBER; break;
 		case ARM_CREATE: him = CREATE; break;
 		case ARM_UNION: him = UNION; break;
 		case ARM_ATTAQ: him = ATTAQ; break;
 		case ARM_DEPLOY: him = e.Entity()->Deployed() ? DEPLOY : REPLOY; break;
+		case ARM_CONTAIN: him = CONTAIN;
+		case ARM_UNCONTAIN: him = UNCONTAIN;
 		case ARM_MOVE: him = MOVE; break;
 		default: him = 0; break;
 	}
+	if(me == CONTAIN && him == MOVE && Entity()->Parent() && Entity()->Parent() == dynamic_cast<EContainer*>(e.Entity()))
+	{
+		if(dynamic_cast<EContainer*>(e.Entity())->Containing())
+			return false;
+		else
+			return true;
+	}
+	if(me == UNCONTAIN && him == MOVE && dynamic_cast<EContainer*>(e.Entity()))
+	{
+		if(dynamic_cast<EContainer*>(e.Entity())->Containing())
+			return true;
+		else
+			return false;
+	}
+	if(him == CONTAIN && me == MOVE && e.Entity()->Parent() && e.Entity()->Parent() == dynamic_cast<EContainer*>(Entity()))
+	{
+		if(dynamic_cast<EContainer*>(Entity())->Containing())
+			return true;
+		else
+			return false;
+	}
+	if(him == UNCONTAIN && me == MOVE && dynamic_cast<EContainer*>(Entity()))
+	{
+		if(dynamic_cast<EContainer*>(Entity())->Containing())
+			return false;
+		else
+			return true;
+	}
+	
 	return (me < him);
 }
 

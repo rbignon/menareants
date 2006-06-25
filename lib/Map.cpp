@@ -297,11 +297,13 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 
 void ECBEntity::ChangeCase(ECBCase* new_case)
 {
-	assert(new_case);
-
-	if(acase)
-		acase->Entities()->Remove(this);
-	new_case->Entities()->Add(this);
+	if(!Parent())
+	{
+		if(acase)
+			acase->Entities()->Remove(this);
+		if(new_case)
+			new_case->Entities()->Add(this);
+	}
 	acase = new_case;
 }
 

@@ -24,6 +24,7 @@
 #include "Component.h"
 #include "tools/Images.h"
 #include <vector>
+#include <bitset>
 
 /** @page TForm_usage Usage of TForm
  *
@@ -138,6 +139,8 @@ public:
 	void LockScreen() const;
 	void UnlockScreen() const;
 
+	bool IsPressed(SDLKey i) const { return keys[i]; }
+
 /* Variables protégées */
 protected:
 
@@ -153,7 +156,7 @@ protected:
 	}
 
 	void SetFocusOrder(bool s = true) { focus_order = s; }
-	bool FocusOrder() { return focus_order; }
+	bool FocusOrder() const { return focus_order; }
 
 /* Variables privées */
 private:
@@ -162,6 +165,7 @@ private:
 	bool focus_order;
 	TMemo* Hint;
 	SDL_mutex* mutex;
+	std::bitset<SDLK_LAST> keys;
 };
 
 #endif /* EC_FORM_H */

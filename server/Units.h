@@ -71,9 +71,9 @@ public:
 
 	virtual bool Attaq(std::vector<ECEntity*> entities);
 
-	virtual bool WantContain(ECEntity*);
+	virtual bool WantContain(ECEntity*, ECMove::Vector&);
 
-	virtual bool WantUnContain(uint x, uint y);
+	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
 
 	virtual void Union(ECEntity*);
 

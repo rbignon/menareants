@@ -165,6 +165,8 @@ bool TComponent::Test (int souris_x, int souris_y) const
 	  && (y <= souris_y) && (souris_y < int(y+h))) && enabled);
 }
 
+void TComponent::SetX(int _x) { SetXY(_x, Y()); }
+void TComponent::SetY(int _y) { SetXY(X(), _y); }
 void TComponent::SetXY (int px, int py) { x = px; y = py; }
 
 void TComponent::SetHeight (uint ph)

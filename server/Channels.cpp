@@ -968,6 +968,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 			for(std::vector<ECEvent*>::const_iterator it = events.begin(); it != events.end(); ++it)
 			{
 				if(!(*it)) continue; // Possible
+				if((*it)->Flags() != ARM_MOVE && (*it)->Flags() != flag)
+					SendArm(cl, (*it)->Entities()->List(), ((*it)->Flags()|ARM_NOPRINCIPAL) & ~ARM_MOVE);
 				if(!(*it)->Move()->FirstCase())
 				{
 					FDebug(W_WARNING, "Il n'y a pas de FirstCase !?");
@@ -1008,6 +1010,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		to_send += " .";
 	if(flag & ARM_REMOVE)
 		to_send += " -";
+	if(flag & ARM_NOPRINCIPAL)
+		to_send += " &";
 	if(flag & ARM_DEPLOY)
 	{
 		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
@@ -1020,6 +1024,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		else
 			to_send += " )" + et.front()->Parent()->LongName();
 	}
+	if(flag & ARM_UNCONTENER)
+		to_send += " (";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
 	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)

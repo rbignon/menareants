@@ -195,19 +195,21 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 
 void ECEntity::ChangeCase(ECBCase* newcase)
 {
+	if(newcase == Case()) return;
+
 	SetShowedCases(false);
 	ECBEntity::ChangeCase(newcase);
 	SetShowedCases(true);
 
-	if(dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
 		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
 void ECEntity::SetShowedCases(bool show, bool forced)
 {
-	if(!Case() || !Owner() || !forced &&
-	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe()))
+	if(!Case() || !Owner() || !forced && (Parent() ||
+	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe())))
 		return;
 
 	ECBCase* c = Case()->MoveLeft(Visibility());

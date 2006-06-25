@@ -75,12 +75,16 @@ void TForm::Actions(SDL_Event event, uint a)
 		SDL_LockMutex(mutex);
 	switch(event.type)
 	{
+		case SDL_KEYUP:
+			keys[event.key.keysym.sym] = false;
+			break;
 		case SDL_KEYDOWN:
 			if(!(a & ACTION_NOKEY))
 			{
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 					(*it)->PressKey(event.key.keysym);
 			}
+			keys[event.key.keysym.sym] = true;
 			break;
 		case SDL_MOUSEMOTION:
 		{
