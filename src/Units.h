@@ -90,9 +90,11 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(0) {}
+	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP),
+	               missile(this, MISSILAUNCHER_MISSILE_STEP) {}
 
-	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(0)
+	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP),
+	       missile(this, MISSILAUNCHER_MISSILE_STEP)
 	{
 		PutImage(I_Up, Resources::MissiLauncher_Dos());
 		PutImage(I_Down, Resources::MissiLauncher_Face());
@@ -101,6 +103,8 @@ public:
 		PutImage(I_Attaq, Resources::MissiLauncher_Right());
 		PutImage(I_Deployed, Resources::MissiLauncher_Deployed());
 		PutImage(I_Reployed, Resources::MissiLauncher_Reployed());
+		missile.SetMissileUp(Resources::MissiLauncher_Missile_Up());
+		missile.SetMissileDown(Resources::MissiLauncher_Missile_Down());
 	}
 
 /* Infos */
@@ -126,9 +130,7 @@ public:
 
 /* Variables privées */
 private:
-	ECSprite* missile;
-
-	void SetMissile(ECSpriteBase* c);
+	ECMissile missile;
 };
 
 /********************************************************************************************

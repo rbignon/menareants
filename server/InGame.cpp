@@ -100,7 +100,7 @@ void EChannel::NextAnim()
 			uint flags = ARM_ATTAQ;
 			if(!event->Linked().empty())
 				flags |= ARM_MOVE;
-			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, 0, event->Linked());
+			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
 
 			std::vector<ECEntity*>::size_type nb_entities = entv.size();
 			std::vector<ECEntity*> entities_save = entv;
@@ -170,11 +170,10 @@ void EChannel::NextAnim()
 					}
 					else
 					{
-						SendArm(NULL, *it, ARM_NUMBER, 0, 0, (*it)->Nb());
+						SendArm(NULL, *it, ARM_NUMBER);
 						EContainer* contain = dynamic_cast<EContainer*>(*it);
 						if(contain && contain->Containing())
-							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER, 0, 0,
-							                                                              contain->Containing()->Nb());
+							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
 						(*it)->Case()->CheckChangingOwner(*it);
 						(*it)->SetShadowed(false);
 					}
@@ -184,7 +183,7 @@ void EChannel::NextAnim()
 		}
 		case ARM_UNION:
 		{
-			SendArm(NULL, event->Entity(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0, 0,
+			SendArm(NULL, event->Entity(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0,
 			        event->Linked());
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
@@ -192,15 +191,14 @@ void EChannel::NextAnim()
 				Debug(W_ERR, "Il faudrait qu'il y ait deux entités dans la liste de UNION et il y en a %d", entv.size());
 			else
 			{
-				SendArm(NULL, entv[1], ARM_NUMBER|ARM_HIDE, 0, 0, entv[1]->Nb());
+				SendArm(NULL, entv[1], ARM_NUMBER|ARM_HIDE);
 				EContainer* contain_r = dynamic_cast<EContainer*>(event->Entity());
 				EContainer* contain = dynamic_cast<EContainer*>(entv[1]);
 				if(contain_r && contain_r->Containing() && contain && contain_r->Containing() != contain->Containing())
 					SendArm(NULL, dynamic_cast<ECEntity*>(contain_r->Containing()), ARM_REMOVE);
 				if(contain && contain->Containing())
 				{
-					SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER|ARM_HIDE, 0, 0,
-					                                                              contain->Containing()->Nb());
+					SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER|ARM_HIDE);
 					if(contain_r && contain_r->Containing() == contain->Containing())
 						SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_CONTENER);
 				}
@@ -212,7 +210,7 @@ void EChannel::NextAnim()
 			break;
 		case ARM_CREATE:
 			SendArm(NULL, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
-			                                         event->Case()->Y(), event->Nb(), event->Type());
+			                                         event->Case()->Y());
 			break;
 		case ARM_CONTAIN:
 		case ARM_UNCONTAIN:
@@ -220,7 +218,7 @@ void EChannel::NextAnim()
 		{
 			std::vector<ECEvent*> ev;
 			ev.push_back(event);
-			SendArm(NULL, event->Entities()->List(), event->Flags(), event->Case()->X(), event->Case()->Y(), 0, 0, ev);
+			SendArm(NULL, event->Entities()->List(), event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ev);
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
@@ -235,7 +233,9 @@ void EChannel::NextAnim()
 template<typename T>
 static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
 {
-	return new T(_name, _owner, _case);
+	T* entity = new T(_name, _owner, _case);
+	entity->Init();
+	return entity;
 }
 
 static struct
@@ -758,7 +758,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 		}
 		recvers.push_back(cl);
-		chan->SendArm(recvers, entity, flags, x, y, nb, type, events_sended);
+		chan->SendArm(recvers, entity, flags, x, y, 0, events_sended);
 
 	}
 #ifdef DEBUG

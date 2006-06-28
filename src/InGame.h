@@ -85,6 +85,7 @@ public:
 	TLabel*         Nb;
 	TLabel*         Owner;
 	TLabel*         Infos;
+	TLabel*         SpecialInfo;
 	TButtonText*    ExtractButton;
 	TButtonText*    DeployButton;
 	TButtonText*    AttaqButton;

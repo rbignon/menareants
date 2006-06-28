@@ -20,3 +20,57 @@
  */
 
 #include "Batiments.h"
+#include "Channels.h"
+
+/********************************************************************************************
+ *                               ECBNuclearSearch                                           *
+ ********************************************************************************************/
+
+ECBNuclearSearch::~ECBNuclearSearch()
+{
+	if(!Owner()) return;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+	{
+		ECBSilo* silo;
+		if((silo = dynamic_cast<ECBSilo*>(*it)))
+			silo->ClearNuclearSearch();
+	}
+}
+
+bool ECBNuclearSearch::CanBeCreated(ECBPlayer* pl) const
+{
+	assert(pl);
+	std::vector<ECBEntity*> ents = pl->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if(dynamic_cast<ECBNuclearSearch*>(*it))
+			return false;
+
+	return true;
+}
+
+/********************************************************************************************
+ *                                    ECBSilo                                               *
+ ********************************************************************************************/
+
+void ECBSilo::Init()
+{
+	if(!Owner()) return;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if((nuclear_search = dynamic_cast<ECBNuclearSearch*>(*it)))
+			break;
+}
+
+bool ECBSilo::CanBeCreated(ECBPlayer* pl) const
+{
+	assert(pl);
+	std::vector<ECBEntity*> ents = pl->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if(dynamic_cast<ECBNuclearSearch*>(*it))
+			return true;
+
+	return false;
+}

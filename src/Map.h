@@ -28,6 +28,7 @@
 
 class ECase;
 class TMap;
+class EChannel;
 class ECEntity;
 class EC_Client;
 
@@ -42,6 +43,44 @@ extern struct case_img_t case_img[];
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
+
+class ECMissile
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECMissile(ECEntity* et, int _step)
+		: missile(0), missile_up(0), missile_down(0), entity(et), step(_step)
+	{}
+
+/* Methodes */
+public:
+
+	bool ECMissile::AttaqFirst(ECase* c, EC_Client* me);
+	bool ECMissile::AttaqSecond(ECase* c, EC_Client* me);
+
+	void Draw();
+
+/* Attributs */
+public:
+
+	ECEntity* Entity() const { return entity; }
+
+	void SetMissileUp(ECSpriteBase* spr) { missile_up = spr; }
+	void SetMissileDown(ECSpriteBase* spr) { missile_down = spr; }
+
+	ECSprite* Missile() const { return missile; }
+
+/* Variables privées */
+private:
+	ECSprite* missile;
+	ECSpriteBase* missile_up;
+	ECSpriteBase* missile_down;
+	ECEntity* entity;
+	int step;
+
+	void SetMissile(ECSpriteBase* c);
+};
 
 /********************************************************************************************
  *                                   ECMove                                                 *
@@ -111,6 +150,10 @@ public:
 
 	virtual void Played();
 
+	virtual void RecvData(ECData) { return; }
+
+	virtual std::string SpecialInfo() { return ""; }
+
 /* Attributs */
 public:
 
@@ -137,6 +180,8 @@ public:
 
 	ECase* AttaquedCase() const { return attaqued_case; }
 	void SetAttaquedCase(ECase* c);
+
+	EChannel* Channel() const;
 
 /* Variables privées */
 private:

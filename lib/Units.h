@@ -49,6 +49,8 @@ public:
 	ECBEntity* Containing() const { return unit; }
 	void SetContaining(ECBEntity* e) { unit = e; }
 
+	virtual uint RealNb() const { return unit ? (unit->Nb() + Nb()) : Nb(); }
+
 /* Variables privées */
 private:
 	ECBEntity* unit;
@@ -60,11 +62,13 @@ private:
 #define BOAT_STEP                  4
 #define BOAT_NB                    10
 #define BOAT_COST                  2000
+#define BOAT_VISIBILITY            4
 #define BOAT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_BOAT, BOAT_COST)
 #define BOAT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = BOAT_NB) \
-                                     :  ECBEntity(_name, _owner, _case, E_BOAT, BOAT_STEP, BOAT_COST, _nb)
+                                     :  ECBEntity(_name, _owner, _case, E_BOAT, BOAT_STEP, BOAT_COST, _nb, \
+                                                  BOAT_VISIBILITY)
 /** This is a boat. */
-class ECBBoat : public ECBContainer
+class ECBBoat : public virtual ECBContainer
 {
 /* Constructeur/Destructeur */
 public:
@@ -80,6 +84,7 @@ public:
 
 	virtual bool CanContain(const ECBEntity* et)
 	{
+		if(et->Nb() > 50*Nb()) return false;
 		switch(et->Type())
 		{
 			case E_ARMY:
@@ -153,6 +158,8 @@ public:
 			case E_MISSILAUNCHER:
 			case E_SHIPYARD:
 			case E_BOAT:
+			case E_NUCLEARSEARCH:
+			case E_SILO:
 				return true;
 			default:
 				return false;
@@ -207,6 +214,8 @@ public:
 			case E_CASERNE:
 			case E_MISSILAUNCHER:
 			case E_CHARFACT:
+			case E_NUCLEARSEARCH:
+			case E_SILO:
 				return true;
 			default:
 				return false;
@@ -259,8 +268,8 @@ public:
 			case E_CHARFACT:
 			case E_CHAR:
 			case E_MISSILAUNCHER:
-			case E_BOAT:
-			case E_SHIPYARD:
+			case E_NUCLEARSEARCH:
+			case E_SILO:
 				return true;
 			default:
 				return false;

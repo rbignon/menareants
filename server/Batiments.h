@@ -26,6 +26,60 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                               ECNuclearSearch                                            *
+ ********************************************************************************************/
+class ECNuclearSearch : public ECEntity, public ECBNuclearSearch
+{
+/* Constructeur/Destructeur */
+public:
+
+	NUCLEARSEARCH_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
+
+	NUCLEARSEARCH_CONSTRUCTOR(ECNuclearSearch) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+
+	virtual void Played();
+
+	void RemoveOneMissile();
+};
+
+/********************************************************************************************
+ *                                 ECSilo                                                   *
+ ********************************************************************************************/
+class ECSilo : public ECEntity, public ECBSilo
+{
+/* Constructeur/Destructeur */
+public:
+
+	SILO_EMPTY_CONSTRUCTOR(ECSilo) {}
+
+	SILO_CONSTRUCTOR(ECSilo) {}
+
+	ENTITY_CREATE_LAST(ECSilo);
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void Union(ECEntity*) { return; }
+
+	virtual bool Attaq(std::vector<ECEntity*> entities);
+
+	virtual bool WantAttaq(uint x, uint y);
+};
+
+/********************************************************************************************
  *                               ECapitale                                                  *
  ********************************************************************************************/
 class ECapitale : public ECEntity, public ECBCapitale
@@ -46,13 +100,6 @@ public:
 	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 /********************************************************************************************
@@ -76,13 +123,6 @@ public:
 	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 /********************************************************************************************
@@ -106,13 +146,6 @@ public:
 	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 /********************************************************************************************
@@ -136,13 +169,6 @@ public:
 	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 /********************************************************************************************
@@ -166,13 +192,6 @@ public:
 	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
-
-/* Attributs */
-public:
-
-/* Variables protégées */
-protected:
-
 };
 
 #endif /* ECD_BATIMENTS_H */

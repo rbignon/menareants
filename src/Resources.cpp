@@ -115,6 +115,12 @@
 	R_RESOURCE(ECSpriteBase, Boat_Left);
 	R_RESOURCE(ECSpriteBase, Boat_Right);
 	R_RESOURCE(ECSpriteBase, Boat_Dos);
+	R_RESOURCE(ECImage,      NuclearSearch_Icon);
+	R_RESOURCE(ECSpriteBase, NuclearSearch_Face);
+	R_RESOURCE(ECImage,      Silo_Icon);
+	R_RESOURCE(ECSpriteBase, Silo_Face);
+	R_RESOURCE(ECSpriteBase, Silo_Missile_Up);
+	R_RESOURCE(ECSpriteBase, Silo_Missile_Down);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

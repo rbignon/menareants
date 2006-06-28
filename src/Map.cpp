@@ -53,6 +53,72 @@ ECEntityList::~ECEntityList()
 }
 
 /********************************************************************************************
+ *                                   ECMissile                                              *
+ ********************************************************************************************/
+void ECMissile::SetMissile(ECSpriteBase* c)
+{
+	if(missile)
+		MyFree(missile);
+	if(!Entity()->Case()) return;
+
+	missile = new ECSprite(c, Entity()->Image()->Window());
+	missile->SetAnim(true);
+}
+
+void ECMissile::Draw()
+{
+	if(missile)
+		missile->draw();
+}
+
+bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
+{
+	if(c == Entity()->Case()) return true;
+
+	if(!missile)
+	{
+		me->LockScreen();
+		SetMissile(missile_up);
+		me->UnlockScreen();
+		if(Entity()->Case()->Showed() > 0)
+		{
+			dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(Entity());
+			missile->set(Entity()->Image()->X(), Entity()->Image()->Y());
+			SDL_Delay(200);
+		}
+		return false;
+	}
+	missile->set(Entity()->Image()->X(), missile->Y() - step);
+	if(missile->Y() + missile->GetHeight() <= 0 || Entity()->Case()->Showed() <= 0)
+	{
+		me->LockScreen();
+		dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
+		SetMissile(missile_down);
+		missile->set(c->Image()->X(), 0 - missile->GetHeight());
+		me->UnlockScreen();
+		return true;
+	}
+	SDL_Delay(20);
+	return false;
+}
+
+bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
+{
+	if(c == Entity()->Case() || !missile) return true;
+
+	missile->set(missile->X(), missile->Y() + step);
+	if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
+	{
+		me->LockScreen();
+		MyFree(missile);
+		me->UnlockScreen();
+		return true;
+	}
+	SDL_Delay(20);
+	return false;
+}
+
+/********************************************************************************************
  *                                   ECMove                                                 *
  ********************************************************************************************/
 
@@ -154,6 +220,14 @@ void ECEntity::Draw()
 ECase* ECEntity::Case() const
 {
 	return dynamic_cast<ECase*>(acase);
+}
+
+EChannel* ECEntity::Channel() const
+{
+	assert(Case());
+	assert(Case()->Map());
+	assert(Case()->Map()->Channel());
+	return dynamic_cast<EChannel*>(Case()->Map()->Channel());
 }
 
 void ECEntity::ImageSetXY(int x, int y)
@@ -493,7 +567,8 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 		std::vector<ECBEntity*> ents = entities.List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)->Owner() || (*enti)->Parent() || Brouillard() && dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
+			if(!(*enti)->Owner() || !(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
+			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
 				continue;
 			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
 			yy = (*enti)->Case()->Y() * size_y;

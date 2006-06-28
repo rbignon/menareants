@@ -95,6 +95,8 @@ public:
 /* Methodes */
 public:
 
+	void Print(std::string, int = 0x001); /* Par défault = I_Info */
+
 /* Attributs */
 public:
 

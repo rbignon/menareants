@@ -1,4 +1,37 @@
+2005-06-28  Romain Bignon <progs@headfucking.net>
+
+	* server/Batiments.cpp: Le silo peut attaquer tout ça c'est operationnel.
+
+	* lib/Batiments.cpp: Le silo ne peut être créé que si il y a un centre de recherches, et le centre de recherches ne peut
+	être créé qu'une fois.
+
+	* src/JoinGame.cpp: Recréation de la liste latérale lors d'un nouveau tour.
+
+	* src/Resources.h, data/*, src/Batiments.h: Mise en place graphiquement de l'utilisation du silo.
+
+	* src/Map.h, src/Batiments.h, src/Units.h (ECMissile): Création d'une classe auxiliaire ECMissile à utiliser pour les
+	unités qui lancent un missile de manière verticale (première étape avec le missile qui va vers le haut à partir de
+	la zone de lancement, seconde étape où il va vers le bas jusqu'à sa cible).
+
+2005-06-27  Romain Bignon <progs@headfucking.net>
+
+	* src/Units.cpp (ECMissiLauncher): Correction d'un bug quand on fait une attaque SUR MOI (donc je ne lance pas de missile).
+
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECNuclearSearch): Création du centre de recherches nucléaire.
+
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECSilo): Création du silo de missile nucléaire.
+
+	* server/Channels.cpp, server/Batiments.cpp (SendArm): Support du flag '~' pour l'envoie de données (voir API).
+
+	* src/Batiments.h, src/InGame.cpp, src/Map.h: Utilisation d'une information spécifique à une unité (fonction virtuelle)
+	pour s'afficher dans la BarreAct.
+
 2005-06-25  Romain Bignon <progs@headfucking.net>
+
+	* lib/Units.h (ECBBoat): Limiter à 50*Nb() le nombre d'hommes maximum qu'une armée puisse contenir pour pouvoir entrer.
+
+	* src/InGame.cpp: Rajout de messages lorsqu'on ne peut pas envoyer dans un conteneur, on qu'on ne peut pas créer une
+	unité/batiment.
 
 	* src/Units.cpp (WantMove): Correction d'un bug.
 

@@ -6,13 +6,14 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
 
 * Urgent
--client: gestion des accents dans TEdit
 -server: Lors d'un combat, n'afficher les nombres restants qu'à ceux qui ont fait partit du combat.
+-gestion des nations (juste le système, pas encore les unités).
+-limiter le nombre d'unités à construire sur les villes et les batiments
 
 * Après
+-client: gestion des accents dans TEdit
 -server: enrichissement de l'IA
 -configuration des boutons de la souris
--système des bonus
 
 * Bof
 -voir si on fait les splits
@@ -39,7 +40,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 -introduction de la ressource petrolière pour les vehicules
 -avancement des niveaux techniques des batiments, qui peuvent construire plus d'unités à chaque fois
--limiter le nombre d'unités à construire sur les villes et les batiments
 -système de guerilla de Spouize
 -mode de jeu qui permet d'utiliser que certaines unités (genre le mode que vehicules, que naval (plus tard), etc)
 

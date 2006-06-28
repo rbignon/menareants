@@ -33,8 +33,7 @@
 void ECMissiLauncher::Draw()
 {
 	ECEntity::Draw();
-	if(missile)
-		missile->draw();
+	missile.Draw();
 #if 0
 	if(Selected())
 		circleColor(Image()->Window(), Image()->X() + Image()->GetWidth()/2, Image()->Y() + Image()->GetHeight()/2,
@@ -43,54 +42,17 @@ void ECMissiLauncher::Draw()
 #endif
 }
 
-void ECMissiLauncher::SetMissile(ECSpriteBase* c)
-{
-	if(missile)
-		MyFree(missile);
-	if(!c) return;
-
-	missile = new ECSprite(c, Image()->Window());
-	missile->SetAnim(true);
-}
-
 bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		case ARM_ATTAQ|ARM_MOVE:
-		{
-			if(c == Case()) return true;
-
-			if(!missile)
+			if(!missile.Missile())
 			{
-				me->LockScreen();
 				SetImage(GetSprite(I_Reployed));
 				Image()->SetAnim(false);
-				SetMissile(Resources::MissiLauncher_Missile_Up());
-				me->UnlockScreen();
-				if(Case()->Showed() > 0)
-				{
-					dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
-					missile->set(Image()->X(), Image()->Y());
-					SDL_Delay(200);
-				}
-				return false;
 			}
-			missile->set(Image()->X(), missile->Y() - MISSILAUNCHER_MISSILE_STEP);
-			if(missile->Y() + missile->GetHeight() <= 0 || Case()->Showed() <= 0)
-			{
-				me->LockScreen();
-				dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(c);
-				SetMissile(Resources::MissiLauncher_Missile_Down());
-				missile->set(c->Image()->X(), 0 - missile->GetHeight());
-				me->UnlockScreen();
-				return true;
-			}
-			SDL_Delay(20);
-			return false;
-			break;
-		}
+			return missile.AttaqFirst(c, me);
 		default:
 			return ECUnit::BeforeEvent(entities,c, me);
 	}
@@ -101,23 +63,7 @@ bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		case ARM_ATTAQ|ARM_MOVE:
-		{
-			if(c == Case() || !missile) return true;
-
-			missile->set(missile->X(), missile->Y() + MISSILAUNCHER_MISSILE_STEP);
-			if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
-			{
-				me->LockScreen();
-				MyFree(missile);
-				me->UnlockScreen();
-				return true;
-			}
-			SDL_Delay(20);
-			return false;
-
-			break;
-		}
+			return missile.AttaqSecond(c, me);
 		default:
 			return ECUnit::MakeEvent(entities,c, me);
 	}
@@ -129,7 +75,6 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		case ARM_ATTAQ|ARM_MOVE:
 		{
 			if(c == Case()) return true;
 

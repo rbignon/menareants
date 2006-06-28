@@ -59,6 +59,20 @@ typedef char MapPlayer_ID;
  *                                   ECBMove                                                *
  ********************************************************************************************/
 
+struct ECData
+{
+	ECData(int = 0) : type(0) {}
+
+	ECData(int _t, std::string _d) : type(_t), data(_d) {}
+
+	int type;
+	std::string data;
+};
+
+/********************************************************************************************
+ *                                   ECBMove                                                *
+ ********************************************************************************************/
+
 class ECBMove
 {
 /* Constructeur/Destructeur */
@@ -126,6 +140,7 @@ protected:
 #define ARM_CONTENER    0x2000
 #define ARM_UNCONTENER  0x4000
 #define ARM_NOPRINCIPAL 0x8000
+#define ARM_DATA        0x10000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -151,6 +166,8 @@ public:
 		E_CAPITALE,
 		E_SHIPYARD,
 		E_BOAT,
+		E_NUCLEARSEARCH,
+		E_SILO,
 		E_END
 	};
 
@@ -219,6 +236,8 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
+	virtual void Init() { return; }
+
 	/** Does this entity like an other entity ? */
 	bool Like(ECBEntity* e);
 
@@ -254,6 +273,7 @@ public:
 
 	/** Return the number of soldats in the army */
 	uint Nb() const { return nb; }
+	virtual uint RealNb() const { return Nb(); }
 	void SetNb(uint n) { nb = n; }
 
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */

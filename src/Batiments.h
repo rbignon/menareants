@@ -56,6 +56,76 @@ private:
 };
 
 /********************************************************************************************
+ *                                ECNuclearSearch                                           *
+ ********************************************************************************************/
+
+class ECNuclearSearch : public ECBatiment, public ECBNuclearSearch
+{
+/* Constructeur/Destructeur */
+public:
+
+	NUCLEARSEARCH_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
+
+	NUCLEARSEARCH_CONSTRUCTOR(ECNuclearSearch), ECBatiment(Resources::NuclearSearch_Face()) {}
+
+	virtual void Init();
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Centre de recherches nucléaire"; }
+	virtual const char* Infos() const { return "Fabrication de missiles nucléaires"; }
+	virtual ECImage* Icon() const { return Resources::NuclearSearch_Icon(); }
+
+/* Methodes */
+public:
+
+	virtual void RecvData(ECData);
+
+	virtual std::string SpecialInfo();
+};
+
+/********************************************************************************************
+ *                                         ECSilo                                           *
+ ********************************************************************************************/
+#define SILO_MISSILE_STEP 3
+class ECSilo : public ECBatiment, public ECBSilo
+{
+/* Constructeur/Destructeur */
+public:
+
+	SILO_EMPTY_CONSTRUCTOR(ECSilo), missile(this, SILO_MISSILE_STEP) {}
+
+	SILO_CONSTRUCTOR(ECSilo), ECBatiment(Resources::Silo_Face()), missile(this, SILO_MISSILE_STEP)
+	{
+		missile.SetMissileUp(Resources::Silo_Missile_Up());
+		missile.SetMissileDown(Resources::Silo_Missile_Down());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Silo de lancement"; }
+	virtual const char* Infos() const { return "Silo de lancement de missile nucléaire"; }
+	virtual ECImage* Icon() const { return Resources::Silo_Icon(); }
+
+/* Méthodes */
+public:
+
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual void Draw();
+
+/* Variables privées */
+private:
+	ECMissile missile;
+};
+
+/********************************************************************************************
  *                                ECapitale                                                 *
  ********************************************************************************************/
 

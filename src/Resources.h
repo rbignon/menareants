@@ -179,6 +179,12 @@ public:
 	R_RESOURCE(ECSpriteBase, Boat_Left,        "units/boat/left");
 	R_RESOURCE(ECSpriteBase, Boat_Right,       "units/boat/right");
 	R_RESOURCE(ECSpriteBase, Boat_Dos,         "units/boat/dos");
+	R_RESOURCE(ECImage,      NuclearSearch_Icon,PKGDATADIR_PICS "units/nuclearsearch_icon.png");
+	R_RESOURCE(ECSpriteBase, NuclearSearch_Face,"units/nuclearsearch");
+	R_RESOURCE(ECImage,      Silo_Icon,         PKGDATADIR_PICS "units/silo_icon.png");
+	R_RESOURCE(ECSpriteBase, Silo_Face,         "units/silo");
+	R_RESOURCE(ECSpriteBase, Silo_Missile_Up,   "units/silo/missile_up");
+	R_RESOURCE(ECSpriteBase, Silo_Missile_Down, "units/silo/missile_down");
 };
 
 #undef R_RESOURCE

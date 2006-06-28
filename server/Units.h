@@ -53,7 +53,7 @@ private:
 /********************************************************************************************
  *                               EContainer                                                 *
  ********************************************************************************************/
-class EContainer : public ECBContainer, public ECUnit
+class EContainer : public virtual ECBContainer, public ECUnit
 {
 /* Constructeur/Destructeur */
 public:

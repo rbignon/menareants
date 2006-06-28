@@ -38,6 +38,7 @@ typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
 class EChannel;
+class ECPlayer;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -114,6 +115,8 @@ public:
 	ECMove* Move() { return &move; }
 
 	EChannel* Channel() const;
+
+	ECPlayer* Owner() const;
 
 	void SetShadowed(bool b = true) { shadow = b; }
 	bool Shadowed() const { return shadow; }

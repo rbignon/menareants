@@ -18,4 +18,6 @@ U_DECL(ECity)
 U_DECL(ECapitale)
 U_DECL(ECShipyard)
 U_DECL(ECBoat)
+U_DECL(ECNuclearSearch)
+U_DECL(ECSilo)
 U_END

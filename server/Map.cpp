@@ -141,8 +141,7 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 					else
 						c->Map()->Neutres()->Add(et);
 					et->SetID(c->FindEntityName(owner ? dynamic_cast<ECPlayer*>(owner->Player()) : 0));
-					c->SendArm(NULL, et, ARM_CREATE|ARM_HIDE, (et)->Case()->X(), (et)->Case()->Y(),
-					                                          (et)->Nb(), (et)->Type());
+					c->SendArm(NULL, et, ARM_CREATE|ARM_HIDE, (et)->Case()->X(), (et)->Case()->Y());
 				}
 		}
 		if(owner && owner->Player())
@@ -402,6 +401,7 @@ void ECEntity::Shoot(ECEntity* e, uint k)
 	if(Owner())
 		dynamic_cast<ECPlayer*>(Owner())->Stats()->shooted += k;
 
+	Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), e->LongName().c_str(), k);
 	e->Shooted(k);
 }
 
@@ -409,8 +409,13 @@ void ECEntity::ReleaseShoot()
 {
 	nb -= (shooted > nb ? nb : shooted);
 	if(Owner())
-		dynamic_cast<ECPlayer*>(Owner())->Stats()->killed += shooted;
+		Owner()->Stats()->killed += shooted;
 	shooted = 0;
+}
+
+ECPlayer* ECEntity::Owner() const
+{
+	return dynamic_cast<ECPlayer*>(ECBEntity::Owner());
 }
 
 EChannel* ECEntity::Channel() const
@@ -513,7 +518,8 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 {
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(this != *it && (*it)->Case() == Case() && !Like(*it) && (*it)->Nb() && CanAttaq(*it))
+		if(this != *it && (*it)->Case() == Case() && !Like(*it) && (*it)->Nb() &&
+		   (CanAttaq(*it) || Parent() && Parent()->CanAttaq(*it)))
 			enemies++;
 
 	if(!enemies) return false;
@@ -524,7 +530,6 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
 			Shoot(*it, killed);
-			Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), (*it)->LongName().c_str(), killed);
 		}
 
 	return true;

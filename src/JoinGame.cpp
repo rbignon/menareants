@@ -328,6 +328,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						std::vector<ECBEntity*> ents = chan->Map()->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 							(*enti)->Played();
+						if(InGameForm)
+							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()));
 						me->UnlockScreen();
 					}
 					if(InGameForm && InGameForm->BarreLat)

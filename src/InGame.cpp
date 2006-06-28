@@ -37,10 +37,19 @@ TLoadingForm *LoadingForm = NULL;
 TInGameForm  *InGameForm  = NULL;
 TOptionsForm *OptionsForm = NULL;
 
+void EChannel::Print(std::string s, int i)
+{
+	if(InGameForm)
+		InGameForm->AddInfo(i, s);
+	return;
+}
+
 template<typename T>
 static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
 {
-	return new T(_name, _owner, _case, _nb);
+	T* entity = new T(_name, _owner, _case, _nb);
+	entity->Init();
+	return entity;
 }
 
 static struct
@@ -68,6 +77,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	uint y = 0, x = 0, type = 0, nb = 0;
 	EContainer* container = 0;
 	bool deployed = false;
+	ECData data;
 	std::vector<std::string> moves_str;
 	for(uint i = 1; i<parv.size(); i++)
 	{
@@ -143,6 +153,14 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case '&':
 				flags |= ARM_NOPRINCIPAL;
 				break;
+			case '~':
+			{
+				flags |= ARM_DATA;
+				std::string dt = parv[i].substr(1);
+				std::string type = stringtok(dt, ",");
+				data = ECData(StrToTyp<int>(type), dt);
+				break;
+			}
 			case '/':
 			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -268,6 +286,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			dynamic_cast<EContainer*>((*it)->Parent())->UnContain();
 			(*it)->ChangeCase((*it)->Move()->FirstCase());
 		}
+		if(flags & ARM_DATA)
+			(*it)->RecvData(data);
 	}
 
 	/* ANIMATIONS */
@@ -356,8 +376,16 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 			me->UnlockScreen();
 		}
-	if(InGameForm)
+	if(InGameForm && chan->State() == EChannel::PLAYING)
+	{
+		if(flags & ARM_CREATE)
+		{
+			me->LockScreen();
+			InGameForm->Map->Map()->CreatePreview(120,120, true);
+			me->UnlockScreen();
+		}
 		InGameForm->BarreAct->Update();
+	}
 	return 0;
 }
 #undef L_INFO
@@ -527,7 +555,6 @@ void MenAreAntsApp::InGame()
 								client->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
 								entity->SetOwner(0);
 								InGameForm->Map->SetCreateEntity(0);
-								InGameForm->Map->Map()->CreatePreview(120,120, true);
 							}
 							break;
 						}
@@ -585,10 +612,19 @@ void MenAreAntsApp::InGame()
 										EContainer* contener = 0;
 										std::vector<ECBEntity*> ents = acase->Entities()->List();
 										for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-											if(*it && (contener = dynamic_cast<EContainer*>(*it)))
+											if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)))
 												break;
-										if(contener && contener->CanContain(selected_entity))
+										if(contener)
 										{
+											if(!contener->CanContain(selected_entity))
+											{
+												InGameForm->AddInfo(I_SHIT, "Impossible d'entrée l'unité sélectionnée dans le "
+												                            "conteneur. Soit elle est pas adaptée au "
+												                            "conteneur, soit il y a trop d'hommes dedans.\n"
+												                            "Maintenez ALT pour forcer le déplacement sur "
+												                            "la case.");
+												break;
+											}
 											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
 											                " )" + std::string(contener->ID())).c_str());
 											break;
@@ -823,8 +859,14 @@ void TBarreLatIcons::SelectUnit(TObject* o, void* e)
 	 *       `- TImage           o
 	 */
 	TInGameForm* ingame = static_cast<TInGameForm*>(o->Parent()->Parent()->Parent());
-	if(!ingame || ingame->Player()->Ready() || int(static_cast<ECEntity*>(e)->Cost()) > ingame->Player()->Money())
+	if(!ingame || ingame->Player()->Ready())
 		return;
+		 
+	if(int(static_cast<ECEntity*>(e)->Cost()) > ingame->Player()->Money())
+	{
+		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer ce batiment");
+		return;
+	}
 
 	static_cast<ECEntity*>(e)->SetOwner(ingame->Player());
 	ingame->Map->SetCreateEntity(static_cast<ECEntity*>(e));
@@ -876,6 +918,12 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	 *    `- TImage           o
 	 */
 	TBarreAct* thiss = static_cast<TBarreAct*>(o->Parent()->Parent());
+	TInGameForm* ingame = static_cast<TInGameForm*>(thiss->Parent());
+	if(int(thiss->entity->Cost()) > ingame->Player()->Money())
+	{
+		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer cette unité.");
+		return;
+	}
 	int x = thiss->entity ? thiss->entity->Case()->X() : 0;
 	int y = thiss->entity ? thiss->entity->Case()->Y() : 0;
 	std::string s = "-";
@@ -908,8 +956,9 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
 		InGameForm->BarreAct->Nb->SetCaption(
 		    e->Nb() ?
-		       ((e->Owner() != InGameForm->BarreAct->me) ? "~ " : "" + TypToStr(e->Nb()))
+		       (((e->Owner() != InGameForm->BarreAct->me) ? "~ " : "") + TypToStr(e->Nb()))
 		       : "???");
+		InGameForm->BarreAct->SpecialInfo->SetCaption(e->SpecialInfo());
 
 		if(e->Deployed())
 			InGameForm->BarreAct->Infos->SetCaption((e->IWantDeploy() ? "Va se déployer" : "Déployé"));
@@ -958,7 +1007,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->ChildNb->Show();
 			InGameForm->BarreAct->ChildIcon->SetImage(dynamic_cast<ECEntity*>(container->Containing())->Icon(), false);
 			InGameForm->BarreAct->ChildNb->SetCaption(container->Containing()->Nb() ?
-			               (container->Containing()->Owner() != InGameForm->BarreAct->me ? "~ " : "" +
+			               ((container->Containing()->Owner() != InGameForm->BarreAct->me ? "~ " : "") +
 			                 TypToStr(container->Containing()->Nb())) : "???");
 			InGameForm->BarreAct->ExtractButton->Show();
 			InGameForm->BarreAct->ExtractButton->SetX((x -= InGameForm->BarreAct->ExtractButton->Width()));
@@ -1037,6 +1086,7 @@ void TBarreAct::Init()
 
 	Icon = AddComponent(new TImage(5,5));
 	Nb = AddComponent(new TLabel(5,55, "", black_color, &app.Font()->normal));
+	SpecialInfo = AddComponent(new TLabel(5,75, "", black_color, &app.Font()->normal));
 	Infos = AddComponent(new TLabel(5, 75, "", red_color, &app.Font()->normal));
 
 	Icons = AddComponent(new TBarreActIcons(200, 49));

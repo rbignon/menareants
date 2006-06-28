@@ -778,8 +778,7 @@ void EChannel::CheckReadys()
 						                                  (*map)(x,y));
 						entity->SetNb(StrToTyp<uint>(number));
 						Map()->AddAnEntity(entity);
-						SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y(), entity->Nb(),
-						                                          entity->Type());
+						SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y());
 					}
 					if(pl == players.end())
 						break;
@@ -917,27 +916,27 @@ bool EChannel::CheckEndOfGame()
 	return false;
 }
 
-void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type,
+void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
 	std::nrvector<TClient*> clv;
 	if(cl)
 		clv.push_back(cl);
 
-	SendArm(clv, et, flag, x, y, nb, type, events);
+	SendArm(clv, et, flag, x, y, data, events);
 }
 
-void EChannel::SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type,
+void EChannel::SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
 	std::vector<ECEntity*> plv;
 	if(et)
 		plv.push_back(et);
 
-	SendArm(cl, plv, flag, x, y, nb, type, events);
+	SendArm(cl, plv, flag, x, y, data, events);
 }
 
-void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uint nb, uint type,
+void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
 	std::vector<ECEntity*> plv;
@@ -948,14 +947,15 @@ void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, uin
 	if(cl)
 		clv.push_back(cl);
 
-	SendArm(clv, plv, flag, x, y, nb, type, events);
+	SendArm(clv, plv, flag, x, y, data, events);
 }
 
-/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] */
-void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, uint nb, uint type,
+/* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] [{] [}] [(] [)] [~<type>,<data>] */
+void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
-	if(!(flag & (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY|ARM_CONTENER|ARM_UNCONTENER)))
+	if(!(flag &
+	   (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY|ARM_CONTENER|ARM_UNCONTENER|ARM_DATA)))
 		return;
 
 	std::string to_send;
@@ -998,13 +998,18 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 		to_send += " <" + TypToStr(x) + "," + TypToStr(y);
 
 	if(flag & ARM_TYPE)
-		to_send += " %" + TypToStr(type);
+	{
+		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_TYPE): Il n'y a pas d'entité");
+		else
+			to_send += " %" + TypToStr(et.front()->Type());
+	}
 	if(flag & ARM_NUMBER)
 	{
 		if(flag & ARM_HIDE)
 			to_send += " +";
+		else if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_NUMER): Il n'y a pas d'entité");
 		else
-			to_send += " +" + TypToStr(nb);
+			to_send += " +" + TypToStr(et.front()->Nb());
 	}
 	if(flag & ARM_LOCK)
 		to_send += " .";
@@ -1026,6 +1031,8 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 	}
 	if(flag & ARM_UNCONTENER)
 		to_send += " (";
+	if(flag & ARM_DATA)
+		to_send += " ~" + TypToStr(data.type) + "," + data.data;
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
 	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)
@@ -1069,7 +1076,7 @@ void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, ui
 			if(!(flag & ARM_NOCONCERNED))
 			{
 				flag &= ~ARM_HIDE;
-				SendArm(cl, et, flag|ARM_RECURSE, x, y, nb, type, events);
+				SendArm(cl, et, flag|ARM_RECURSE, x, y, data, events);
 			}
 		}
 		else
