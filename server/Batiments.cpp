@@ -107,7 +107,7 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 				std::vector<ECBEntity*> ents = c->Entities()->List();
 				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 				{
-					if((*enti)->IsCountryMaker() || (*enti)->Shadowed() || (*it)->Type() == E_NUCLEARSEARCH)
+					if((*enti)->IsCountryMaker() || (*enti)->Shadowed() || (*enti)->Type() == E_NUCLEARSEARCH)
 						continue;
 					ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 					if(entity->IsBuilding())
