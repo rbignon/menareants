@@ -926,7 +926,7 @@ void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x
 	SendArm(clv, et, flag, x, y, data, events);
 }
 
-void EChannel::SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flag, uint x, uint y, ECData data,
+void EChannel::SendArm(std::vector<TClient*> cl, ECEntity* et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
 	std::vector<ECEntity*> plv;
@@ -951,7 +951,7 @@ void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, ECD
 }
 
 /* :<nick>!<arm> ARM [+<nb>] [*<pos>] [%<type>] [><pos>] [<[pos]] [-] [.] [{] [}] [(] [)] [~<type>,<data>] */
-void EChannel::SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
+void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
 	if(!(flag &

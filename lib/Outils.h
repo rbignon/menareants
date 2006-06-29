@@ -158,7 +158,7 @@ public:
 	{
 		if(use_delete)
 			for(iterator it = list.begin(); it != list.end(); ++it)
-				delete (*it);
+				MyFree(*it);
 		list.clear();
 	}
 

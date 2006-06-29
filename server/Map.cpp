@@ -534,3 +534,12 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities)
 
 	return true;
 }
+
+std::nrvector<TClient*> ECEntity::EntitiesToClients(std::vector<ECEntity*> entities)
+{
+	std::nrvector<TClient*> players;
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if((*it)->Owner() && (*it)->Owner()->Client())
+			players.push_back((*it)->Owner()->Client());
+	return players;
+}

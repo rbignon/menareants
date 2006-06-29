@@ -39,6 +39,7 @@ typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
 class EChannel;
 class ECPlayer;
+class TClient;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -93,6 +94,8 @@ public:
 	void Shoot(ECEntity*, uint);
 	void Shooted(uint n) { shooted += n; }
 	virtual void ReleaseShoot();
+
+	static std::nrvector<TClient*> EntitiesToClients(std::vector<ECEntity*>);
 
 /* Attributs */
 public:

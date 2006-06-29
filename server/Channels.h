@@ -176,7 +176,7 @@ public:
 
 	 * </pre>
 	 */
-	void SendArm(std::nrvector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
+	void SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint flags,
 	             uint x=0, uint y=0, ECData data = 0, std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 
 	/** \see SendArm() */
@@ -184,7 +184,7 @@ public:
 	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 	void SendArm(TClient* cl, ECEntity* et, uint flags, uint x = 0, uint y = 0, ECData data = 0,
 	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
-	void SendArm(std::nrvector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, ECData data = 0,
+	void SendArm(std::vector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, ECData data = 0,
 	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 
 	void InitAnims();

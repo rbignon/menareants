@@ -1,5 +1,8 @@
 2005-06-29  Romain Bignon <progs@headfucking.net>
 
+	* server/Channels.cpp, server/Map.h, server/InGame.cpp, server/Batiments.cpp: N'envoie les informations du nombre des
+	unités encore vivantes après un combat qu'aux joueurs concernés par le combat.
+
 	* src/*: Énorme travail de réécriture, notament avec un nouveau système de gestion de l'affichage à l'écran (Video.h),
 	une imposition de ECImage en substitution de SDL_Surface* dans les composants, décentralisation de MenAreAntsApp.
 

@@ -102,6 +102,8 @@ void EChannel::NextAnim()
 				flags |= ARM_MOVE;
 			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
 
+			std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entv);
+
 			std::vector<ECEntity*>::size_type nb_entities = entv.size();
 			std::vector<ECEntity*> entities_save = entv;
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
@@ -163,14 +165,14 @@ void EChannel::NextAnim()
 						gobeur->Union(*it);
 						(*it)->Move()->Clear((*it)->Case());
 						SendArm(NULL, *it, ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
-						SendArm(NULL, gobeur, ARM_NUMBER, 0, 0, gobeur->Nb());
-						/* Pas besoin de lock, il l'est déjà.
-							* (*it)->SetLock();
+						SendArm(receivers, gobeur, ARM_NUMBER);
+						/* Pas besoin de mettre shadow, il l'est déjà.
+							* (*it)->SetShadowed();
 							*/
 					}
 					else
 					{
-						SendArm(NULL, *it, ARM_NUMBER);
+						SendArm(receivers, *it, ARM_NUMBER);
 						EContainer* contain = dynamic_cast<EContainer*>(*it);
 						if(contain && contain->Containing())
 							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);

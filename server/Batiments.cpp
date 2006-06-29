@@ -84,8 +84,8 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 	ECBCase* c = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		if(*it == this) continue;
 		c = (*it)->Case();
+		if(*it == this) continue;
 		if((*it)->IsCountryMaker())
 			Shoot(*it, 1002);
 		else if((*it)->Type() == E_NUCLEARSEARCH)
@@ -96,6 +96,8 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 
 	ECBCase* this_c = c;
 	c = c->MoveLeft(SILO_IMPACT)->MoveUp(SILO_IMPACT);
+
+	std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entities);
 
 	for(uint i=0; i <= 2*SILO_IMPACT; ++i)
 	{
@@ -119,7 +121,13 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 					if(!entity->Nb())
 					{
 						entity->SetShadowed();
-						Channel()->SendArm(NULL, entity, ARM_REMOVE);
+						Channel()->SendArm(0, entity, ARM_REMOVE);
+					}
+					else
+					{
+						if(entity->Owner()->Client())
+							receivers.push_back(entity->Owner()->Client());
+						Channel()->SendArm(receivers, entity, ARM_NUMBER);
 					}
 				}
 			}
