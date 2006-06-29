@@ -26,11 +26,12 @@
 #include <string>
 #include "Defines.h"
 
-class ECSpriteBase;
 
+class ECSpriteBase;
+class Color;
 class ECImage;
 
-void ChangePixelColor(ECImage* surf, SDL_Color last_color, SDL_Color new_color);
+void ChangePixelColor(ECImage* surf, Color last_color, Color new_color);
 Uint32 getpixel(SDL_Surface * surface, int x, int y);
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
@@ -55,23 +56,17 @@ class ECSprite
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECSprite(ECSpriteBase* _base, SDL_Surface* _screen) { init(_base, _screen); }
+	ECSprite(ECSpriteBase* _base, ECImage* _screen) { init(_base, _screen); }
 	~ECSprite();
 
 /* Methodes */
 public:
 
 	/** Initialisation */
-	int init(ECSpriteBase *base, SDL_Surface *screen);
+	int init(ECSpriteBase *base, ECImage *screen);
 
 	/** Dessine l'animation */
 	void draw();
-
-	/** Vide le background */
-	void clearBG();
-
-	/** Met à jour le background */
-	void updateBG();
 
 /* Attributs */
 public:
@@ -115,9 +110,9 @@ public:
 
 	ECImage* First() const;
 
-	void ChangeColor(SDL_Color first, SDL_Color to);
+	void ChangeColor(Color first, Color to);
 
-	SDL_Surface* Window() const { return mScreen; }
+	ECImage* Window() const { return mScreen; }
 
 /* Variables privées */
 private:
@@ -129,8 +124,7 @@ private:
 	long mLastupdate;
 	bool order, repeat;
 	ECSpriteBase *mSpriteBase;
-	SDL_Surface *mBackreplacement;
-	SDL_Surface *mScreen;
+	ECImage *mScreen;
 };
 
 class ECSpriteBase
@@ -144,7 +138,7 @@ public:
 	 */
 	int init(const char *dir);
 
-	void ChangeColor(SDL_Color from, SDL_Color to);
+	void ChangeColor(Color from, Color to);
 
 	ECSpriteBase(const char *dir);
 	~ECSpriteBase();
@@ -164,9 +158,9 @@ class ECImage
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECImage(SDL_Surface* _Img) : Img(_Img) {}
+	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true) {}
 	ECImage(char* fichier);
-	ECImage() : Img(NULL) {}
+	ECImage() : Img(NULL), pause(0), autofree(true) {}
 
 	~ECImage();
 
@@ -193,16 +187,47 @@ public:
 
 	void SetColorKey(unsigned int, unsigned int, unsigned int);
 
+	int Blit(const ECImage* src, SDL_Rect *srcRect, SDL_Rect *dstRect);
+	int Blit(const ECImage* src, SDL_Rect *dstRect);
+	int Blit(const ECImage* src);
+	int Blit(const ECImage& src, SDL_Rect *srcRect, SDL_Rect *dstRect);
+	int Blit(const ECImage& src, SDL_Rect *dstRect);
+	int Blit(const ECImage& src);
+
 	ECImage &operator=(const ECImage &src);
 
 	void Free();
 
-	void SetImage(SDL_Surface* i) { Free(); Img = i; }
+	void GetRGBA(Uint32 color, Uint8 &r, Uint8 &g, Uint8 &b, Uint8 &a);
+
+	Uint32 MapRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
+	Color GetColor(Uint32 color);
+
+	Uint32 MapColor(Color color);
+
+	void Flip();
+
+	int Fill(Uint32 color);
+	int Fill(const Color &color);
+	int FillRect(SDL_Rect &dstRect, Uint32 color);
+
+/* Attributs */
+public:
+
+	void SetImage(SDL_Surface* i, bool use_delete = true) { if(use_delete) Free(); Img = i; }
+
+	SDL_Surface* Surface() const { return Img; }
+
+	bool IsNull() const { return !Img; }
+
+	void SetAutoFree(bool b = true) { autofree = b; }
 
 /* Variables publiques */
 public:
 	SDL_Surface* Img;
 	int pause;
+	bool autofree;
 };
 
 #endif /* EC_IMAGES_H */

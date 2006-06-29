@@ -20,19 +20,15 @@
  */
 
 #include "ComboBox.h"
+#include "tools/Color.h"
 #include "Resources.h"
+#include "tools/Font.h"
 
 TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
-	: TListBox(f, _x, _y, _width, f->GetHeight()), real_y(_y), edit_bg(0), opened(false), visible_len(0),
-		  COMBOBOX_HEIGHT(f->GetHeight())
+	: TListBox(f, _x, _y, _width, f->GetHeight()), real_y(_y), opened(false), visible_len(0),
+		  chaine(_x+5, _y, "", black_color, f), COMBOBOX_HEIGHT(f->GetHeight())
 {
 	gray_disable = true;
-}
-
-TComboBox::~TComboBox()
-{
-	if(edit_bg)
-		SDL_FreeSurface(edit_bg);
 }
 
 void TComboBox::Init()
@@ -42,35 +38,29 @@ void TComboBox::Init()
   visible_len = ((w) / font->GetWidth("A"));
 
   MyComponent(&m_open);
+  MyComponent(&chaine);
 
   m_open.SetImage (new ECSprite(Resources::DownButton(), Window()));
   m_open.SetXY(x+w-12, y);
 
-  if ( edit_bg)
-    SDL_FreeSurface( edit_bg);
-
   SDL_Rect r_back = {0,0,w-13,COMBOBOX_HEIGHT};
 
-  edit_bg = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-13, COMBOBOX_HEIGHT,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( edit_bg, &r_back, SDL_MapRGBA( edit_bg->format,255, 255, 255, 255*3/10));
+  edit_bg.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-13, COMBOBOX_HEIGHT,
+				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+  edit_bg.FillRect(r_back, edit_bg.MapRGBA(255, 255, 255, 255*3/10));
 
   TListBox::Init();
 
-  SDL_FreeSurface(background);
-  background = 0;
+  background.SetImage(0);
   nb_visible_items_max = uint(-1);
 }
 
 void TComboBox::SetBackGround(uint _h)
 {
-	if(background)
-		SDL_FreeSurface(background);
-
 	SDL_Rect r_back = {0,0,w,_h};
-	background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, _h,
-					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*7/10));
+	background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, _h,
+					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
 }
 
 void TComboBox::SetOpened(bool _o)
@@ -98,7 +88,7 @@ void TComboBox::SetOpened(bool _o)
 
 uint TComboBox::AddItem (bool selected,
 		       const std::string &label,
-		       const std::string &value, SDL_Color _color, bool enabled)
+		       const std::string &value, Color _color, bool enabled)
 {
 	uint j = TListBox::AddItem(selected, label, value, _color, enabled);
 	if(opened)
@@ -114,12 +104,8 @@ void TComboBox::ClearItems()
 {
 	TListBox::ClearItems();
 	SetOpened(false);
-	if(background)
-	{
-		SDL_FreeSurface(background);
-		background = 0;
-	}
-	chaine = "";
+	background.SetImage(0);
+	chaine.SetCaption("");
 }
 
 void TComboBox::Select (uint index)
@@ -128,7 +114,9 @@ void TComboBox::Select (uint index)
 
 	m_selection = index;
 
-	chaine = ReadLabel(m_selection);
+	std::string s = ReadLabel(m_selection);
+
+	chaine.SetCaption((s.size() > visible_len) ? s.substr(0, visible_len) : s);
 }
 
 void TComboBox::Deselect (uint index)
@@ -159,16 +147,9 @@ bool TComboBox::Clic (int mouse_x, int mouse_y)
 void TComboBox::Draw (int mouse_x, int mouse_y)
 {
 	SDL_Rect r_back = {x,real_y,w-13,COMBOBOX_HEIGHT};
-	SDL_BlitSurface( edit_bg, NULL, Window(), &r_back);
+	Window()->Blit(edit_bg, &r_back);
 
-	if(!chaine.empty())
-	{
-		if(chaine.size() > visible_len)
-			font->WriteLeft(x+5, real_y,
-					chaine.substr(0, visible_len), black_color);
-		else
-			font->WriteLeft(x+5, real_y, chaine, black_color);
-	}
+	chaine.Draw(mouse_x, mouse_y);
 
 	if(enabled)
 		m_open.Draw(mouse_x,mouse_y);
@@ -181,5 +162,6 @@ void TComboBox::SetXY (int _x, int _y)
 {
 	x = _x;
 	real_y = _y;
+	chaine.SetXY(_x+5, real_y);
 	SetOpened(Opened());
 }

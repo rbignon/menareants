@@ -22,7 +22,7 @@
 #ifndef EC_OBJECT_H
 #define EC_OBJECT_H
 
-struct SDL_Surface;
+class ECImage;
 
 /********************************************************************************************
  *                                  TObject                                                 *
@@ -35,7 +35,7 @@ public:
 		: parent(0), window(0)
 	{}
 
-	TObject(SDL_Surface* w)
+	TObject(ECImage* w)
 		: parent(0), window(w)
 	{}
 
@@ -44,12 +44,12 @@ public:
 	void SetParent(TObject* o) { parent = o; }
 	TObject* Parent() const { return parent; }
 
-	void SetWindow(SDL_Surface* w) { window = w; }
-	SDL_Surface* Window() const { return window; }
+	void SetWindow(ECImage* w) { window = w; }
+	ECImage* Window() const { return window; }
 
 private:
 	TObject* parent;
-	SDL_Surface* window;
+	ECImage* window;
 };
 
 #endif /* EC_OBJECT_H */

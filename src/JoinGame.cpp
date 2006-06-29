@@ -19,21 +19,24 @@
  * $Id$
  */
 
+#include "Config.h"
+#include "Debug.h"
 #include "InGame.h"
 #include "JoinGame.h"
 #include "Main.h"
+#include "Map.h"
+#include "Outils.h"
 #include "Resources.h"
 #include "Sockets.h"
-#include "gui/ListBox.h"
+#include "Timer.h"
 #include "gui/BouttonText.h"
+#include "gui/Edit.h"
+#include "gui/ListBox.h"
 #include "gui/Memo.h"
 #include "gui/MessageBox.h"
-#include "gui/Edit.h"
 #include "tools/Font.h"
-#include "Outils.h"
-#include "Debug.h"
-#include "Timer.h"
-#include "Map.h"
+#include "tools/Video.h"
+
 
 extern TLoadingForm   *LoadingForm;
 extern TInGameForm    *InGameForm;
@@ -337,7 +340,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
-				 		for(;InGameForm->BarreLat->X() > SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
+				 		for(;InGameForm->BarreLat->X() > (int)SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
 				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y()),
 				 		     SDL_Delay(10));
 				 		InGameForm->Map->SetEnabled(true);
@@ -355,7 +358,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
-				 		for(;InGameForm->BarreLat->X() < SCREEN_WIDTH;
+				 		for(;InGameForm->BarreLat->X() < (int)SCREEN_WIDTH;
 				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y()),
 				 		     SDL_Delay(10));
 				 		InGameForm->BarreLat->Hide();
@@ -928,8 +931,8 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 {
-	if(!client)
-		throw ECExcept(VPName(client), "Non connecté");
+	if(!EC_Client::GetInstance())
+		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
 
 	std::string name; /* note: comme cpath va pointer sur la valeur de name tout au long du truc, il est préferable
 	                   *       de le laisser en global de la fonction et pas uniquement dans le bloc if(!cname)
@@ -951,12 +954,14 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	}
 
 	/* Déclaration membres fixes */
-	GameInfosForm = new TGameInfosForm(sdlwindow);
+	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window());
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(cname), green_color);
 
+	EC_Client* client = EC_Client::GetInstance();
+
 	JOINED = false;
-	client->sendrpl(create ? client->rpl(EC_Client::CREATE) : client->rpl(EC_Client::JOIN), FormatStr(cname).c_str());
+	client->sendrpl(create ? EC_Client::rpl(EC_Client::CREATE) : EC_Client::rpl(EC_Client::JOIN), FormatStr(cname).c_str());
 
 	WAIT_EVENT_T(JOINED, i, 0.5);
 	if(!JOINED)
@@ -964,7 +969,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 		if(client->Player())
 		{
 			client->Player()->Channel()->SetWantLeave();
-			client->sendrpl(client->rpl(EC_Client::LEAVE));
+			client->sendrpl(EC_Client::rpl(EC_Client::LEAVE));
 		}
 		else
 			MyFree(GameInfosForm);
@@ -982,13 +987,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			throw ECExcept(VPName(client->Player()), "Dans aucun chan");
 		chan = client->Player()->Channel();
 
-		if(app.conf)
-		{
-			if(app.conf->color)
-				client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(app.conf->color)).c_str());
-			if(app.conf->nation)
-				client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " + TypToStr(app.conf->nation)).c_str());
-		}
+		if(Config::GetInstance()->color)
+			client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(Config::GetInstance()->color)).c_str());
+		if(Config::GetInstance()->nation)
+			client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " +TypToStr(Config::GetInstance()->nation)).c_str());
 
 		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
 		if(client->Player()->IsOwner())
@@ -1137,13 +1139,15 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 
 void MenAreAntsApp::ListGames()
 {
-	if(!client)
-		throw ECExcept(VPName(client), "Non connecté");
+	if(!EC_Client::GetInstance())
+		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
 
 	SDL_Event event;
 
-	ListGameForm = new TListGameForm(sdlwindow);
+	ListGameForm = new TListGameForm(Video::GetInstance()->Window());
 	ListGameForm->SetMutex(mutex);
+
+	EC_Client* client = EC_Client::GetInstance();
 
 	bool eob = false, refresh = true;
 	Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
@@ -1245,37 +1249,37 @@ void TGameInfosForm::ChangeStatus(bool add)
 	BeginMoney->SetEnabled(add);
 }
 
-TGameInfosForm::TGameInfosForm(SDL_Surface* w)
+TGameInfosForm::TGameInfosForm(ECImage* w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(350,6,"Jeu", white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(350,6,"Jeu", white_color, Font::GetInstance(Font::Big)));
 
 	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
 
-	Chat = AddComponent(new TMemo(&app.Font()->sm, 50,325,315,495,30));
-	SendMessage = AddComponent(new TEdit(&app.Font()->sm, 50,555,315, MAXBUFFER-20));
+	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,325,315,495,30));
+	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,555,315, MAXBUFFER-20));
 
-	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, &app.Font()->big));
+	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, Font::GetInstance(Font::Big)));
 	Preview = AddComponent(new TImage(390, 380));
 
-	MapList = AddComponent(new TListBox(&app.Font()->sm, 625, 270, 150, 80));
-	SpeedGame = AddComponent(new TCheckBox(&app.Font()->normal, 625, 360, "Partie rapide", white_color));
+	MapList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 625, 270, 150, 80));
+	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 625, 360, "Partie rapide", white_color));
 	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
 	SpeedGame->Check();
 
 	                                                          /*  label        x    y    w  min   max  step   defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(&app.Font()->normal, "Argent: ",  625, 385, 150, 0, 50000, 5000,    15000));
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  625, 385, 150, 0, 50000, 5000,    15000));
 	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
 
-	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", &app.Font()->normal));
+	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", Font::GetInstance(Font::Normal)));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", &app.Font()->normal));
-	CreateIAButton = AddComponent(new TButtonText(625,210,150,50, "Ajouter IA", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
+	CreateIAButton = AddComponent(new TButtonText(625,210,150,50, "Ajouter IA", Font::GetInstance(Font::Normal)));
 	CreateIAButton->Hide();
 	CreateIAButton->SetHint("Ajouter un joueur artificiel (une IA) à la partie");
 
-	Hints = AddComponent(new TMemo(&app.Font()->sm, 625, 505, 150, 60));
+	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 625, 505, 150, 60));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
@@ -1284,23 +1288,6 @@ TGameInfosForm::TGameInfosForm(SDL_Surface* w)
 	MyColor = 0;
 	MyNation = 0;
 	RecvMapList = false;
-}
-
-TGameInfosForm::~TGameInfosForm()
-{
-	delete Hints;
-	delete CreateIAButton;
-	delete RetourButton;
-	delete PretButton;
-	delete BeginMoney;
-	delete SpeedGame;
-	delete MapList;
-	delete Preview;
-	delete MapTitle;
-	delete SendMessage;
-	delete Chat;
-	delete Players;
-	delete Title;
 }
 
 void TGameInfosForm::RecalcMemo()
@@ -1313,29 +1300,19 @@ void TGameInfosForm::RecalcMemo()
  *                               TListGameForm                                              *
  ********************************************************************************************/
 
-TListGameForm::TListGameForm(SDL_Surface* w)
+TListGameForm::TListGameForm(ECImage* w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(300,150,"Liste des parties", white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(300,150,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
 
-	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Rejoindre", &app.Font()->normal));
-	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", &app.Font()->normal));
-	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Créer", &app.Font()->normal));
-	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", &app.Font()->normal));
+	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Rejoindre", Font::GetInstance(Font::Normal)));
+	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", Font::GetInstance(Font::Normal)));
+	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Créer", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", Font::GetInstance(Font::Normal)));
 
-	GList = AddComponent(new TListBox(&app.Font()->sm, 300,200,200,300));
+	GList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,200,200,300));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TListGameForm::~TListGameForm()
-{
-	delete GList;
-	delete RetourButton;
-	delete CreerButton;
-	delete RefreshButton;
-	delete JoinButton;
-	delete Title;
 }
 
 /********************************************************************************************
@@ -1389,13 +1366,13 @@ void TPlayerLine::Init()
 	assert(pl);
 	if(position) delete position;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit(&app.Font()->sm, "",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
+	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
 	MyComponent(position);
 	position->SetHint("Votre position sur la carte");
-	couleur = new TColorEdit(&app.Font()->sm, "",  x+320, y, 50);
+	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  x+320, y, 50);
 	MyComponent(couleur);
 	couleur->SetHint("La couleur de votre camp");
-	nation = new TComboBox(&app.Font()->sm, x+430, y, 120);
+	nation = new TComboBox(Font::GetInstance(Font::Small), x+430, y, 120);
 	MyComponent(nation);
 
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
@@ -1413,12 +1390,12 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 	if((int)pl->Color() != couleur->Value()) couleur->SetValue(pl->Color());
 	if((int)pl->Nation() != nation->GetSelectedItem()) nation->Select(pl->Nation());
 
-	app.Font()->big.WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
+	Font::GetInstance(Font::Big)->WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
 	if(pl->IsOwner())
-		app.Font()->big.WriteLeft(x+55, y, "*", red_color);
+		Font::GetInstance(Font::Big)->WriteLeft(x+55, y, "*", red_color);
 	else if(pl->IsOp())
-		app.Font()->big.WriteLeft(x+45, y, "@", red_color);
-	app.Font()->big.WriteLeft(x+70, y, pl->GetNick(), white_color);
+		Font::GetInstance(Font::Big)->WriteLeft(x+45, y, "@", red_color);
+	Font::GetInstance(Font::Big)->WriteLeft(x+70, y, pl->GetNick(), white_color);
 
 	position->Draw(souris_x, souris_y);
 	couleur->Draw(souris_x, souris_y);
@@ -1450,7 +1427,7 @@ void TPlayerLineHeader::Init()
 		delete label;
 
 	std::string s = "Pret   Pseudo           Pos.    Couleur     Nation";
-	label = new TLabel(x, y, s, white_color, &app.Font()->big);
+	label = new TLabel(x, y, s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
 }
 

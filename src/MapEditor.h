@@ -231,8 +231,7 @@ class TMapEditor : public TForm
 {
 /* Constructeurs */
 public:
-	TMapEditor(SDL_Surface* w, ECMap* m);
-	~TMapEditor();
+	TMapEditor(ECImage* w, ECMap* m);
 
 /* Methodes */
 public:
@@ -256,8 +255,7 @@ class TOptionsMap : public TForm
 {
 /* Constructeur */
 public:
-	TOptionsMap(SDL_Surface* w, EMap* map);
-	~TOptionsMap();
+	TOptionsMap(ECImage* w, EMap* map);
 
 /* Composants */
 public:
@@ -307,8 +305,7 @@ class TLoadMapFile : public TForm
 {
 /* Constructeur/Destructeur */
 public:
-	TLoadMapFile(SDL_Surface* w);
-	~TLoadMapFile();
+	TLoadMapFile(ECImage* w);
 
 	void Refresh();
 

@@ -27,21 +27,23 @@
 #include <list>
 
 #include "Boutton.h"
+#include "Label.h"
 #include "Component.h"
-#include "tools/Font.h"
+//#include "tools/Font.h"
 
 struct SDL_Surface;
-struct SDL_Color;
+struct Color;
 class Font;
 
 /** An item of TListBox */
-typedef struct s_list_box_item_t{
-    std::string label;
-    std::string value;
-    std::string hint;
-    SDL_Color color;
-    bool enabled;
-  } list_box_item_t;
+typedef struct s_list_box_item_t
+{
+	s_list_box_item_t(Font* f) { label.SetFont(f); }
+	TLabel label;
+	std::string value;
+	Color color;
+	bool enabled;
+} list_box_item_t;
 
 /** This is a component based on TComponent and whose show a list of items */
 class TListBox : public TComponent
@@ -49,7 +51,7 @@ class TListBox : public TComponent
 /* Constructeur/Destructeur */
 public:
 	TListBox (Font *font, int _x, int _y, uint _width, uint _height);
-	virtual ~TListBox();
+	virtual ~TListBox() {}
 
 /* Methodes */
 public:
@@ -59,22 +61,24 @@ public:
 	virtual void Draw (int mouse_x, int mouse_y);
 	virtual bool Clic (int mouse_x, int mouse_y);
 
+	virtual void SetEnabled(bool _en = true);
+
 /* Attributs */
 public:
 
 	uint AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
-	              SDL_Color _color = black_color, bool _enabled = true);
+	              Color _color = black_color, bool _enabled = true);
 	void RemoveItem (uint index);
-	void SetItemHint(uint index, const char* Hint);
+	void SetItemHint(uint index, std::string Hint);
 	void ClearItems();
 	int MouseIsOnWitchItem (int mouse_x, int mouse_y);
 	virtual void Select (uint index);
 	virtual void Deselect (uint index);
 	bool IsSelected (uint index);
 	int GetSelectedItem (); /**< retourne -1 si non sélectionné */
-	const std::string& ReadLabel (uint index) const;
+	const std::string ReadLabel (uint index) const;
 	const std::string& ReadValue (uint index) const;
 	bool EnabledItem(uint index);
 	void SetEnabledItem(uint index, bool e = true);
@@ -102,9 +106,7 @@ protected:
 	// Buttons
 	TButton m_up, m_down;
 
-	SDL_Surface *cursorover_box;
-	SDL_Surface *selected_box;
-	SDL_Surface *background;
+	ECImage cursorover_box, selected_box, background;
 
 	Font* font;
 };

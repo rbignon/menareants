@@ -24,14 +24,16 @@
 
 #include "Component.h"
 #include "gui/Label.h"
-#include "tools/Font.h"
+#include "tools/Color.h"
+
+class Font;
 
 class TCheckBox : public TComponent
 {
 /* Constructeur/Destructeurs */
 public:
 
-	TCheckBox(Font* f, int x, int y, std::string txt, SDL_Color = black_color);
+	TCheckBox(Font* f, int x, int y, std::string txt, Color = black_color);
 	~TCheckBox();
 
 /* Methodes */

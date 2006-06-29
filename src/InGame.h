@@ -172,8 +172,7 @@ class TInGameForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TInGameForm(SDL_Surface*, ECPlayer*);
-	~TInGameForm();
+	TInGameForm(ECImage*, ECPlayer*);
 
 /* Composants */
 public:
@@ -224,8 +223,7 @@ class TOptionsForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TOptionsForm(SDL_Surface*, ECPlayer*, EChannel*);
-	~TOptionsForm();
+	TOptionsForm(ECImage*, ECPlayer*, EChannel*);
 
 /* Composants */
 public:
@@ -291,8 +289,7 @@ class TLoadingForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TLoadingForm(SDL_Surface*, EChannel*);
-	~TLoadingForm();
+	TLoadingForm(ECImage*, EChannel*);
 
 /* Composants */
 public:
@@ -359,8 +356,7 @@ class TScoresForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TScoresForm(SDL_Surface*, EChannel*);
-	~TScoresForm();
+	TScoresForm(ECImage*, EChannel*);
 
 /* Composants */
 public:
@@ -387,7 +383,7 @@ class TScoresPlayerLine : public TComponent
 /* Constructeur/Destructeur */
 public:
 
-	TScoresPlayerLine(std::string nick, SDL_Color, std::string killed, std::string shooted, std::string created,
+	TScoresPlayerLine(std::string nick, Color, std::string killed, std::string shooted, std::string created,
 	                  std::string score);
 	virtual ~TScoresPlayerLine();
 
@@ -409,7 +405,7 @@ public:
 /* Variables privées */
 private:
 	std::string nick;
-	SDL_Color color;
+	Color color;
 	std::string killed, shooted, created, score;
 };
 

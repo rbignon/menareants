@@ -22,9 +22,10 @@
 #define EC_LABEL_H
 
 #include <string>
-#include <SDL.h>
 #include "Component.h"
 #include "tools/Font.h"
+
+class ECImage;
 
 /** This is a component who shows a text */
 class TLabel : public TComponent
@@ -32,9 +33,9 @@ class TLabel : public TComponent
 /* Constructeur/Destructeur */
 public:
 
-	TLabel(int x, int y, std::string s, SDL_Color new_color, Font* new_font, bool shadowed = false);
+	TLabel();
+	TLabel(int x, int y, std::string s, Color new_color, Font* new_font, bool shadowed = false);
 	TLabel(const TLabel&);
-	~TLabel();
 
 /* Methodes */
 public:
@@ -48,17 +49,19 @@ public:
 /* Attributs */
 public:
 
-	void SetColor(SDL_Color new_color);
+	void SetColor(Color new_color);
+	void SetFont(Font*);
+	void SetFontColor(Font*, Color);
 	void SetCaption(std::string text);
 	std::string Caption() const { return caption; }
 
 /* Variables privées */
 protected:
 	std::string caption;
-	SDL_Surface* surf;
-	SDL_Surface* background;
+	ECImage surf;
+	ECImage background;
 	Font* font;
-	SDL_Color color;
+	Color color;
 	bool shadowed;
 	uint bg_offset;
 

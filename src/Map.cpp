@@ -20,9 +20,10 @@
  */
  
 #include "Map.h"
-#include "Main.h"
+#include "Sockets.h"
 #include "Outils.h"
-#include "tools/Font.h"
+//#include "tools/Font.h"
+#include "tools/Video.h"
 #include "Debug.h"
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
@@ -155,7 +156,7 @@ void ECMove::SetMoves(Vector _moves)
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
                    uint _visibility)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), trajectoire(0), selected(false),
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false),
 		  move(this), want_deploy(false), attaqued_case(0)
 {
 
@@ -164,26 +165,23 @@ ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_t
 ECEntity::~ECEntity()
 {
 	delete image;
-	delete trajectoire;
 }
 
 void ECEntity::SetAttaquedCase(ECase* c)
 {
 	attaqued_case = c;
 
-	MyFree(trajectoire);
 	if(AttaquedCase() && AttaquedCase() != Case())
 	{
 		int dx = abs(c->Image()->X() - Image()->X() + 1);
 		int dy = abs(c->Image()->Y() - Image()->Y() + 1);
-		SDL_Surface* surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, dx, dy,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-		DrawLine(surf,        attaqued_case->X() < Case()->X() ? 0 : dx-1,
-			                   attaqued_case->Y() < Case()->Y() ? 0 : dy-1,
-			                   attaqued_case->X() < Case()->X() ? dx-1 : 0,
-			                   attaqued_case->Y() < Case()->Y() ? dy-1 : 0,
-			                   SDL_MapRGB(surf->format, red_color.r, red_color.g, red_color.b));
-		trajectoire = new ECImage(surf);
+		trajectoire.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, dx, dy,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+		DrawLine(trajectoire.Img,        attaqued_case->X() < Case()->X() ? 0 : dx-1,
+			                             attaqued_case->Y() < Case()->Y() ? 0 : dy-1,
+			                             attaqued_case->X() < Case()->X() ? dx-1 : 0,
+			                             attaqued_case->Y() < Case()->Y() ? dy-1 : 0,
+			                             trajectoire.MapColor(red_color));
 	}
 }
 
@@ -209,10 +207,10 @@ void ECEntity::Draw()
 		if(Selected())
 		{
 			Resources::Cadre()->Draw(image->X(),image->Y());
-			if(trajectoire)
-				trajectoire->Draw(
-				    AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
-			        AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2);
+			if(AttaquedCase())
+				trajectoire.Draw(
+				  AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
+				  AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2);
 		}
 	}
 }
@@ -260,7 +258,7 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 		dynamic_cast<ECase*>(Case())->SetMustRedraw();
 	
 	if(!spr) return;
-	image = new ECSprite(spr, app.sdlwindow);
+	image = new ECSprite(spr, Video::GetInstance()->Window());
 	image->SetAnim(anim);
 	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
 		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
@@ -347,7 +345,7 @@ void ECase::SetImage(ECSpriteBase* spr)
 	if(image) delete image;
 	SetMustRedraw();
 	if(!spr) return;
-	image = new ECSprite(spr, app.sdlwindow);
+	image = new ECSprite(spr, Video::GetInstance()->Window());
 	if(dynamic_cast<ECMap*>(map)->ShowMap())
 		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH  * x),
 		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * x));
@@ -360,18 +358,13 @@ void ECase::SetImage(ECSpriteBase* spr)
 ECMap::ECMap(std::vector<std::string> _map_file)
 	: ECBMap(_map_file), showmap(0), brouillard(false)
 {
-	preview = 0;
+
 }
 
 ECMap::ECMap(std::string filename)
 	: ECBMap(filename), showmap(0), brouillard(false)
 {
-	preview = 0;
-}
 
-ECMap::~ECMap()
-{
-	if(preview) delete preview;
 }
 
 struct case_img_t case_img[] = {
@@ -502,31 +495,29 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			ECBCase* cc = map[ _y * x + _x ];
 			ECase *c = dynamic_cast<ECase*>(cc);
 			if(!c || Brouillard() && c->Showed() < 0) continue;
-			SDL_Color *color = 0;
+			Color color;
 			switch(c->TypeID())
 			{
 				case 'v':
 				case 'V':
-					color = &red_color;
+					color = red_color;
 					break;
 				case 't':
 					color = (c->Country() && c->Country()->Owner()) ?
 					          c->Country()->Owner()->Player() ?
 					            color_eq[c->Country()->Owner()->Player()->Color()]
 					          : color_eq[c->Country()->Owner()->ID()%COLOR_MAX]
-					        : &brown_color;
+					        : brown_color;
 					break;
 				case 'p':
-					color = &gray_color;
+					color = gray_color;
 					break;
 				case 'm':
-					color = &blue_color;
+					color = blue_color;
 					break;
 			}
-			if(!color)
-				throw ECExcept(VPName(c->TypeID()) VIName(_x) VIName(_y), "Terrain inconnu");
 
-			SDL_Color *marge_color =  &white_color;
+			Color marge_color =  white_color;
 			const short MARGE_LEFT = 0x01;
 			const short MARGE_RIGHT = 0x02;
 			const short MARGE_TOP = 0x04;
@@ -551,14 +542,14 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
 				for(uint _xx = xx; _xx < xx+size_x; _xx++)
 				{
-					SDL_Color *col = (marge & MARGE_TOP && _yy == yy ||
-					                  marge & MARGE_LEFT && _xx == xx ||
-					                  marge & MARGE_BOTTOM && _yy == yy+size_y-1 ||
-					                  marge & MARGE_RIGHT && _xx == xx+size_x-1) ? marge_color : color;
+					Color col = (marge & MARGE_TOP && _yy == yy ||
+					             marge & MARGE_LEFT && _xx == xx ||
+					             marge & MARGE_BOTTOM && _yy == yy+size_y-1 ||
+					             marge & MARGE_RIGHT && _xx == xx+size_x-1) ? marge_color : color;
 					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
-					              (Brouillard() && c->Showed()<=0) ? (col->r>60) ? col->r - 60 : 0 : col->r,
-					              (Brouillard() && c->Showed()<=0) ? (col->g>60) ? col->g - 60 : 0 : col->g,
-					              (Brouillard() && c->Showed()<=0) ? (col->b>60) ? col->b - 60 : 0 : col->b));
+					         (Brouillard() && c->Showed()<=0) ? (col.GetRed()>60) ? col.GetRed() - 60 : 0 : col.GetRed(),
+					         (Brouillard() && c->Showed()<=0) ? (col.GetGreen()>60) ? col.GetGreen() - 60 : 0 : col.GetGreen(),
+					         (Brouillard() && c->Showed()<=0) ? (col.GetBlue()>60) ? col.GetBlue() - 60 : 0 : col.GetBlue()));
 				}
 		}
 	/* Position des unités */
@@ -570,14 +561,15 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			if(!(*enti)->Owner() || !(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
 			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
 				continue;
-			SDL_Color *col = color_eq[(*enti)->Owner()->Color()];
+			Color col = color_eq[(*enti)->Owner()->Color()];
 			yy = (*enti)->Case()->Y() * size_y;
 			xx = (*enti)->Case()->X() * size_x;
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
 				for(uint _xx = xx; _xx < xx+size_x; _xx++)
-					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format, col->r > 100 ? col->r - 30 : col->r + 30,
-					                                                  col->g > 100 ? col->g - 30 : col->g + 30,
-					                                                  col->b > 100 ? col->b - 30 : col->b + 30));
+					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
+					                                          (col.GetRed()>  100) ? col.GetRed() - 30 : col.GetRed() + 30,
+					                                          (col.GetGreen()>100) ? col.GetGreen() - 30 : col.GetGreen() + 30,
+					                                          (col.GetBlue()> 100) ? col.GetBlue() - 30 : col.GetBlue() + 30));
 		}
 	}
 
@@ -602,8 +594,8 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 					}
 				}
 			}
-			SDL_Surface *txtsurf = TTF_RenderText_Blended(&(app.Font()->sm.GetTTF()),
-			                                  TypToStr((*it)->Num()).c_str(), white_color);
+			SDL_Surface *txtsurf = TTF_RenderText_Blended(&(Font::GetInstance(Font::Small)->GetTTF()),
+			                                  TypToStr((*it)->Num()).c_str(), white_color.GetSDLColor());
 			SDL_Rect dst_rect;
 			dst_rect.x = (begin_x+max_x)/2 * size_x;
 			dst_rect.y = (begin_y+max_y)/2 * size_y;
@@ -617,8 +609,5 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 
 	SUNLOCK(surf);
 
-	if(preview)
-		preview->SetImage(surf);
-	else
-		preview = new ECImage(surf);
+	preview.SetImage(surf);
 }

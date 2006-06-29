@@ -27,12 +27,14 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #else
-#include <getopt.h>
 #include <winsock2.h>
 #endif
 
 #include "Main.h"
+#include "Defines.h"
 #include "tools/Font.h"
+#include "Config.h"
+#include "tools/Video.h"
 #include "tools/Images.h"
 #include "Resources.h"
 #include "Debug.h"
@@ -49,8 +51,7 @@ class TMainForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TMainForm(SDL_Surface*);
-	~TMainForm();
+	TMainForm(ECImage*);
 
 /* Composants */
 public:
@@ -61,13 +62,16 @@ public:
 	TButton*    QuitterButton;
 	TButtonText* MapEditorButton;
 	TLabel*     Version;
-
-/* Evenements */
-public:
-
 };
 
-MenAreAntsApp app;
+MenAreAntsApp* MenAreAntsApp::singleton = NULL;
+MenAreAntsApp* MenAreAntsApp::GetInstance()
+{
+	if (singleton == NULL)
+		singleton = new MenAreAntsApp();
+	
+	return singleton;
+}
 
 char* MenAreAntsApp::get_title()
 {
@@ -76,29 +80,22 @@ char* MenAreAntsApp::get_title()
 
 void MenAreAntsApp::WantQuit(TObject*, void*)
 {
-	app.want_quit = true;
+	MenAreAntsApp::GetInstance()->want_quit = true;
 }
 
 void MenAreAntsApp::WantPlay(TObject*, void*)
 {
-	app.request_game();
+	MenAreAntsApp::GetInstance()->request_game();
 }
 
 void MenAreAntsApp::WantMapEditor(TObject*, void*)
 {
-	app.MapEditor();
+	MenAreAntsApp::GetInstance()->MapEditor();
 }
 
 void MenAreAntsApp::WantConfig(TObject*, void* b)
 {
-	if(app.conf)
-		app.conf->Configuration((bool)b);
-}
-
-void MenAreAntsApp::setclient(EC_Client* c)
-{
-	client = c;
-	c->lapp = this;
+	Config::GetInstance()->Configuration((bool)b);
 }
 
 void MenAreAntsApp::quit_app(int value)
@@ -106,11 +103,8 @@ void MenAreAntsApp::quit_app(int value)
 #ifdef WIN32
 		WSACleanup();
 #endif
-		if(conf) delete conf;
-		if(fonts) delete fonts;
 		Resources::Unload();
 		TTF_Quit();
-		SDL_Quit();
         exit(value);
 }
 
@@ -121,42 +115,10 @@ int MenAreAntsApp::main(int argc, char **argv)
 #ifndef WIN32
 		signal(SIGPIPE, SIG_IGN);
 #endif
-		if(SDL_Init(SDL_INIT_VIDEO) < 0)
-		{
-			std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
-			return 0;
-		}
-		SDL_EnableUNICODE(1);
-		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
-		int sdlflags = SDL_SWSURFACE|SDL_HWPALETTE;
-#ifdef WIN32
-		sdlflags |= SDL_FULLSCREEN;
-#endif
-
-		for(int tmp = 0; (tmp = getopt(argc, argv, "hwf")) != EOF;)
-			switch(tmp)
-			{
-				case 'f':
-					sdlflags |= SDL_FULLSCREEN;
-					break;
-				case 'w':
-					sdlflags &= ~SDL_FULLSCREEN;
-					break;
-				case 'h':
-				default:
-					std::cout << "Usage: " << argv[0] << " [-wf]" << std::endl;
-					quit_app(EXIT_FAILURE);
-			}
 
 		srand( (long)time(NULL) );
 
-  		app.sdlwindow = SDL_SetVideoMode(SCREEN_WIDTH,SCREEN_HEIGHT,32, sdlflags);
-  		SDL_WM_SetCaption(get_title(), NULL);
-
-		ECImage *loading_image = Resources::Loadscreen();
-
-		loading_image->Draw();
-
+		Config* conf = Config::GetInstance();
 #ifndef WIN32
 		path = GetHome();
 		path += "/.menareants/";
@@ -165,17 +127,23 @@ int MenAreAntsApp::main(int argc, char **argv)
 			mkdir( path.c_str(), 0755 );
 		else closedir(d);
 
-		conf = new Config( path + CONFIG_FILE );
+		conf->SetFileName( path + CONFIG_FILE );
 #else
-		conf = new Config(CONFIG_FILE);
+		conf->SetFileName(CONFIG_FILE);
 #endif
+		conf->load();
+
+		Video* video = Video::GetInstance();
+		video->InitWindow();
+
+		ECImage *loading_image = Resources::Loadscreen();
+
+		loading_image->Draw();
 
 		if (TTF_Init()==-1) {
 			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;
 			return false;
 		}
-
-		fonts = new Fonts;
 
 #ifdef WIN32
 		WSADATA WSAData;
@@ -183,15 +151,13 @@ int MenAreAntsApp::main(int argc, char **argv)
 			throw ECExcept(VIName(WSAGetLastError()), "Impossible d'initialiser les sockets windows");
 #endif
 
-		SDL_UpdateRect(app.sdlwindow, 0, 0, 0, 0);
-		SDL_Flip(app.sdlwindow);
-
-		conf->load();
+		SDL_UpdateRect(video->Window()->Img, 0, 0, 0, 0);
+		video->Flip();
 
 		if(first_run)
 			MenAreAntsApp::WantConfig(0,(void*)true);
 
-		TMainForm* MainForm = new TMainForm(sdlwindow);
+		TMainForm* MainForm = new TMainForm(video->Window());
 		MainForm->PlayButton->SetOnClick(MenAreAntsApp::WantPlay, this);
 		MainForm->QuitterButton->SetOnClick(MenAreAntsApp::WantQuit, this);
 		MainForm->CreditsButton->SetOnClick(MenAreAntsApp::WantCredits, this);
@@ -204,7 +170,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 			MainForm->Update();
 		} while(!want_quit);
 
-		delete MainForm;
+		MyFree(MainForm);
 
 		quit_app(1);
 	}
@@ -232,48 +198,40 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 int main (int argc, char **argv)
 {
-  return app.main(argc,argv);
+  MenAreAntsApp::GetInstance()->main(argc,argv);
+  delete MenAreAntsApp::GetInstance();
+  exit (EXIT_SUCCESS);
 }
 
 /********************************************************************************************
  *                                    TMainForm                                             *
  ********************************************************************************************/
 
-TMainForm::TMainForm(SDL_Surface* w)
+TMainForm::TMainForm(ECImage* w)
 	: TForm(w)
 {
 	PlayButton = AddComponent(new TButton(300,150, 150,50));
-	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), app.sdlwindow));
+	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), Video::GetInstance()->Window()));
 
 	OptionsButton = AddComponent(new TButton(300,230, 150,50));
-	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), app.sdlwindow));
+	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), Video::GetInstance()->Window()));
 
-	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, "Editeur de maps", &app.Font()->normal));
+	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, "Editeur de maps", Font::GetInstance(Font::Normal)));
 	/** \todo utiliser une image bouton comme pour les autres
 	 MapEditorButton = AddComponent(new TButton(300,310, 150,50));
 	 MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), app.sdlwindow));
 	 */
 
 	CreditsButton = AddComponent(new TButton(300,390, 150,50));
-	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), app.sdlwindow));
+	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), Video::GetInstance()->Window()));
 
 	QuitterButton = AddComponent(new TButton(300,470, 150,50));
-	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), app.sdlwindow));
+	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), Video::GetInstance()->Window()));
 
-	Version = AddComponent(new TLabel(750,105,APP_VERSION, white_color, &app.Font()->big));
+	Version = AddComponent(new TLabel(750,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
 	Version->SetXY(Version->X() - Version->Width(), Version->Y());
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TMainForm::~TMainForm()
-{
-	delete Version;
-	delete QuitterButton;
-	delete CreditsButton;
-	delete MapEditorButton;
-	delete OptionsButton;
-	delete PlayButton;
 }
 
 /********************************************************************************************
@@ -285,8 +243,7 @@ class TCredits : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TCredits(SDL_Surface*);
-	~TCredits();
+	TCredits(ECImage*);
 
 /* Composants */
 public:
@@ -318,7 +275,7 @@ void TCredits::WantGoBack(TObject* o, void*)
 
 void MenAreAntsApp::WantCredits(TObject*, void*)
 {
-	TCredits*     Credits = new TCredits(app.sdlwindow);
+	TCredits*     Credits = new TCredits(Video::GetInstance()->Window());
 
 	Credits->OkButton->SetOnClick(TCredits::WantGoBack, 0);
 
@@ -331,20 +288,20 @@ void MenAreAntsApp::WantCredits(TObject*, void*)
 	delete Credits;
 }
 
-TCredits::TCredits(SDL_Surface* w)
+TCredits::TCredits(ECImage* w)
 	: TForm(w), want_goback(false)
 {
-	Label1 = AddComponent(new TLabel(300,105,"Romain Bignon", red_color, &app.Font()->big));
-	Label2 = AddComponent(new TLabel(300,135,"* Programmeur", red_color, &app.Font()->big));
+	Label1 = AddComponent(new TLabel(300,105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
+	Label2 = AddComponent(new TLabel(300,135,"* Programmeur", red_color, Font::GetInstance(Font::Big)));
 
-	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", blue_color, &app.Font()->big));
-	Label4 = AddComponent(new TLabel(50,235,"* Graphiste", blue_color, &app.Font()->big));
+	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", blue_color, Font::GetInstance(Font::Big)));
+	Label4 = AddComponent(new TLabel(50,235,"* Graphiste", blue_color, Font::GetInstance(Font::Big)));
 
-	Label5 = AddComponent(new TLabel(500,205,"Mathieu Nicolas", fwhite_color, &app.Font()->big));
-	Label6 = AddComponent(new TLabel(500,235,"* Idée originale", fwhite_color, &app.Font()->big));
-	Label7 = AddComponent(new TLabel(500,265,"* Musique", fwhite_color, &app.Font()->big));
+	Label5 = AddComponent(new TLabel(500,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
+	Label6 = AddComponent(new TLabel(500,235,"* Idée originale", fwhite_color, Font::GetInstance(Font::Big)));
+	Label7 = AddComponent(new TLabel(500,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
 
-	Memo = AddComponent(new TMemo(&app.Font()->normal, 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
+	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->AddItem("Merci au lycée Corneilles pour nous avoir mis dans le contexte emmerdant qui "
 	              "nous a permit de trouver des idées \"amusantes\" pour passer le temps et qui "
 	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "
@@ -354,20 +311,7 @@ TCredits::TCredits(SDL_Surface* w)
                   "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();
 
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,530, 150,50, "Retour", &app.Font()->normal));
+	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,530, 150,50, "Retour", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TCredits::~TCredits()
-{
-	delete OkButton;
-	delete Memo;
-	delete Label7;
-	delete Label6;
-	delete Label5;
-	delete Label4;
-	delete Label3;
-	delete Label2;
-	delete Label1;
 }

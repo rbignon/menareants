@@ -43,7 +43,7 @@ class TComponent : public TObject
 public:
 
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
-	TComponent(SDL_Surface* w = 0)
+	TComponent(ECImage* w = 0)
 		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  dynamic_hint(0)
@@ -54,7 +54,7 @@ public:
 	 * @param _y y position
 	 * @param w Window
 	 */
-	TComponent(int _x, int _y, SDL_Surface* w = 0)
+	TComponent(int _x, int _y, ECImage* w = 0)
 		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  dynamic_hint(0)
@@ -67,7 +67,7 @@ public:
 	 * @param _h heigh of component
 	 * @param w Window
 	 */
-	TComponent(int _x, int _y, uint _w, uint _h, SDL_Surface* w = 0)
+	TComponent(int _x, int _y, uint _w, uint _h, ECImage* w = 0)
 		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  dynamic_hint(0)
@@ -133,8 +133,9 @@ public:
 	void SetForceFocus(bool b = true) { force_focus = b; }
 	bool ForceFocus() const { return force_focus; }
 
-	void SetHint(const char* h) { hint = h; }
-	const char* Hint() { return hint.empty() ? "" : hint.c_str(); }
+	template<typename T>
+	void SetHint(T h) { hint = h; }
+	std::string& Hint() { return hint; }
 	bool DynamicHint() const { return dynamic_hint; }
 
 	int Tag;

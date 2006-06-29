@@ -28,22 +28,35 @@ class TObject;
 
 class Config
 {
+/* Constructeur/Destructeur */
 public:
-	Config(std::string _filename);
+	Config();
 
+	static Config* singleton;
+	static Config* GetInstance();
+
+/* Methodes */
 public:
 	bool load();
 	bool save() const;
 	void Configuration(bool);
 
+	void SetFileName(std::string f) { filename = f; }
+
+/* Variables publiques */
 public:
 	std::string hostname;
 	int port;
 	std::string nick;
 	unsigned int color;
 	unsigned int nation;
+	unsigned int screen_width;
+	unsigned int screen_height;
 	std::vector<std::string> server_list;
+	std::string ttf_file;
+	bool fullscreen;
 
+/* Variable privées */
 private:
 	std::string filename;
 	bool set_defaults(bool want_save = true);

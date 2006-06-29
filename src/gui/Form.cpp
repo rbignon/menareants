@@ -22,10 +22,22 @@
 #include "Memo.h"
 #include <SDL.h>
 
-TForm::TForm(SDL_Surface* w)
+TForm::TForm(ECImage* w)
 	: background(0), focus_order(true), Hint(0), mutex(0)
 {
 	SetWindow(w);
+}
+
+TForm::~TForm()
+{
+	Clear();
+}
+
+void TForm::Clear()
+{
+	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		delete *it;
+	composants.clear();
 }
 
 void TForm::LockScreen() const
@@ -43,6 +55,17 @@ void TForm::UnlockScreen() const
 void TForm::SetBackground(ECImage *image)
 {
 	background = image;
+}
+
+void TForm::Run(bool *(func)())
+{
+	if(!func) return;
+
+	while((*func)())
+	{
+		Actions();
+		Update();
+	}
 }
 
 void TForm::Update()
@@ -94,7 +117,7 @@ void TForm::Actions(SDL_Event event, uint a)
 				bool put_hint = false;
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 				{
-					if(!put_hint && Hint && (*it)->Visible() && (*it)->Hint() &&
+					if(!put_hint && Hint && (*it)->Visible() && !(*it)->Hint().empty() &&
 					   ((*it)->DynamicHint() || (*it)->Test(event.button.x,event.button.y)))
 					{
 						Hint->AddItem((*it)->Hint());
@@ -138,7 +161,7 @@ void TForm::Update(int _x, int _y, bool flip)
 		SDL_LockMutex(mutex);
 
 	if(background)
-		SDL_BlitSurface(background->Img,NULL,Window(),NULL);
+		Window()->Blit(background);
 
 	if(_x < 0 || _y < 0)
 		SDL_GetMouseState( &_x, &_y);
@@ -159,7 +182,7 @@ void TForm::Update(int _x, int _y, bool flip)
 	}
 
 	if(flip)
-		SDL_Flip(Window());
+		Window()->Flip();
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);

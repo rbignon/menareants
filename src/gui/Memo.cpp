@@ -20,6 +20,7 @@
  */
 
 #include "tools/Font.h"
+#include "tools/Color.h"
 #include "Memo.h"
 #include "Resources.h"
 #include "tools/Maths.h"
@@ -34,14 +35,10 @@ TMemo::TMemo (Font* f, int _x, int _y, uint _width, uint _height, uint max_items
   nb_visible_items = 0;
   visible_height = 0;
   maxitems = max_items;
-
-  background = NULL;
 }
 
 TMemo::~TMemo()
 {
-	if ( background)
-		SDL_FreeSurface( background);
 	for(std::vector<TLabel*>::iterator it = m_items.begin(); it != m_items.end(); ++it)
 		delete *it;
 }
@@ -56,16 +53,13 @@ void TMemo::Init()
 
   nb_visible_items_max = h/height_item;
 
-  if ( background)
-    SDL_FreeSurface( background);
-
   if(!show_background) return;
 
   SDL_Rect r_back = {0,0,w,h};
 
-  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
+  background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+  background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
 
 }
 
@@ -94,10 +88,10 @@ bool TMemo::Clic (int mouse_x, int mouse_y)
 
 void TMemo::Draw (int mouse_x, int mouse_y)
 {
-	if(background)
+	if(!background.IsNull())
 	{
 		SDL_Rect r_back = {x,y,w,h};
-		SDL_BlitSurface( background, NULL, Window(), &r_back);
+		Window()->Blit(background, &r_back);
 	}
 
 	uint i=0;
@@ -119,7 +113,7 @@ void TMemo::Draw (int mouse_x, int mouse_y)
 	}
 }
 
-void TMemo::AddItem (const std::string &label, SDL_Color _color)
+void TMemo::AddItem (const std::string &label, Color _color)
 {
 	const char *_s = label.c_str();
 	/* On parse le message pour le découper en différentes lignes */

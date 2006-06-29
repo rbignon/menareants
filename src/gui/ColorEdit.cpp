@@ -21,29 +21,23 @@
 #include "ColorEdit.h"
 #include "tools/Maths.h"
 #include "Resources.h"
+#include "tools/Color.h"
 
-SDL_Color *color_eq[] = {
-	/* {COLOR_NONE  */          &white_color,
-	/* COLOR_GRAY   */          &gray_color,
-	/* COLOR_BLUE   */          &fblue_color,
-	/* COLOR_RED    */          &fred_color,
-	/* COLOR_GREEN  */          &green_color,
-	/* COLOR_WHITE  */          &fwhite_color,
-	/* COLOR_BROWN  */          &fbrown_color,
-	/* COLOR_ORANGE */          &orange_color,
-	/* COLOR_MAX    */          NULL
+Color color_eq[] = {
+	/* {COLOR_NONE  */          white_color,
+	/* COLOR_GRAY   */          gray_color,
+	/* COLOR_BLUE   */          fblue_color,
+	/* COLOR_RED    */          fred_color,
+	/* COLOR_GREEN  */          green_color,
+	/* COLOR_WHITE  */          fwhite_color,
+	/* COLOR_BROWN  */          fbrown_color,
+	/* COLOR_ORANGE */          orange_color
 };
 
 TColorEdit::TColorEdit(Font* f, std::string _label, int _x, int _y, uint _width, int _defvalue)
 	: TSpinEdit(f, _label, _x, _y, _width, COLOR_NONE, COLOR_MAX-1, 1, _defvalue)
 {
 	imgx = 0;
-	img = 0;
-}
-
-TColorEdit::~TColorEdit()
-{
-	if(img) delete img;
 }
 
 void TColorEdit::Init()
@@ -51,30 +45,20 @@ void TColorEdit::Init()
   uint max_value_w = 20;
   uint margin = 10;
 
-  /* Boutons */
-  if(m_plus) delete m_plus;
-  if(m_minus) delete m_minus;
+  m_plus.SetXY(x+w-10,y);
+  m_minus.SetXY(x+w-max_value_w-10-2*margin,y);
+  MyComponent(&m_plus);
+  MyComponent(&m_minus);
+  m_plus.SetImage (new ECSprite(Resources::UpButton(), Window()));
+  m_minus.SetImage (new ECSprite(Resources::DownButton(), Window()));
 
-  m_plus = new TButton (x+w-10,y,10,10);
-  m_minus = new TButton (x+w-max_value_w-10-2*margin,y,10,10);
+  MyComponent(&txt_label);
 
-  MyComponent(m_plus);
-  MyComponent(m_minus);
+  txt_label.SetFontColor(font, color);
 
-  /* Images */
-  /* Pas besoin de delete, ECImage le fait */
-  m_plus->SetImage (new ECSprite(Resources::UpButton(), Window()));
-  m_minus->SetImage (new ECSprite(Resources::DownButton(), Window()));
+  imgx = m_minus.X() + m_minus.Width() + 5;
 
-  /* Label */
-  if(txt_label) delete txt_label;
-
-  imgx = m_minus->X() + m_minus->Width() + 5;
-
-  txt_label = new TLabel(x, y, label, color, font);
-  MyComponent(txt_label);
-
-  img = new ECImage(SDL_CreateRGBSurface( SDL_SWSURFACE, 20, h,
+  img.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE, 20, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 
   SetValue(value, true);
@@ -87,34 +71,31 @@ bool TColorEdit::SetValue(int _value, bool first)
   if(_value == value && !first) return false;
   value = _value;
 
-  SDL_Color *color = color_eq[value];
+  Color color = color_eq[value];
 
-  SDL_Rect r_back = {0,0,img->Img->w,img->Img->h};
+  SDL_Rect r_back = {0,0,img.GetWidth(),img.GetHeight()};
 
   if(value)
-    SDL_FillRect( img->Img, &r_back, SDL_MapRGB( img->Img->format,color->r, color->g, color->b));
+    img.Fill(img.MapColor(color));
   else
-    SDL_FillRect( img->Img, &r_back, SDL_MapRGBA( img->Img->format, 255,255,255, 0));
+    img.FillRect(r_back, img.MapRGBA(255,255,255, 0));
 
   return true;
 }
 
 void TColorEdit::Draw (int mouse_x, int mouse_y)
 {
-	if(txt_label)
-		txt_label->Draw(mouse_x, mouse_y);
+	txt_label.Draw(mouse_x, mouse_y);
 	
-	if(img)
+	if(!img.IsNull())
 	{
-		SDL_Rect r_back = {imgx,y,img->Img->w,img->Img->h};
-		SDL_BlitSurface( img->Img, NULL, Window(), &r_back);
+		SDL_Rect r_back = {imgx,y,img.GetWidth(),img.GetHeight()};
+		Window()->Blit(img, &r_back);
 	}
 
 	if(enabled)
 	{
-		if(m_minus)
-			m_minus->Draw (mouse_x, mouse_y);
-		if(m_plus)
-			m_plus->Draw (mouse_x, mouse_y);
+		m_minus.Draw (mouse_x, mouse_y);
+		m_plus.Draw (mouse_x, mouse_y);
 	}
 }

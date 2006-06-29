@@ -31,6 +31,7 @@ class TMap;
 class EChannel;
 class ECEntity;
 class EC_Client;
+class Color;
 
 struct case_img_t
 {
@@ -118,7 +119,7 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), trajectoire(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
+		: Tag(0), image(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
 	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
@@ -144,7 +145,7 @@ public:
 
 	virtual void ChangeCase(ECBCase* new_case);
 
-	virtual void RefreshColor(SDL_Color) = 0;
+	virtual void RefreshColor(Color) = 0;
 
 	virtual void SetShowedCases(bool show, bool forced = false);
 
@@ -186,7 +187,7 @@ public:
 /* Variables privées */
 private:
 	ECSprite* image;
-	ECImage* trajectoire;
+	ECImage trajectoire;
 
 protected:
 	bool selected;
@@ -327,8 +328,6 @@ public:
 	 */
 	ECMap(std::vector<std::string> _map_file);
 
-	virtual ~ECMap();
-
 /* Methodes */
 public:
 
@@ -339,7 +338,7 @@ public:
 /* Attributs */
 public:
 
-	ECImage* Preview() { return preview; }            /**< Creation of map preview */
+	ECImage* Preview() { return &preview; }            /**< Creation of map preview */
 
 	TMap* ShowMap() { return showmap; }
 	void SetShowMap(TMap* sm) { showmap = sm; }
@@ -353,7 +352,7 @@ public:
 
 /* Variables privées */
 protected:
-	ECImage *preview;
+	ECImage preview;
 	TMap *showmap;
 	bool brouillard;
 	uint pixel_size;

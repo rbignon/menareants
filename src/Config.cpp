@@ -37,10 +37,20 @@
 #include "gui/MessageBox.h"
 #include "gui/Memo.h"
 #include "Main.h"
+#include "tools/Video.h"
 
-Config::Config(std::string _filename)
+Config* Config::singleton = NULL;
+
+Config* Config::GetInstance()
 {
-	filename = _filename;
+	if (singleton == NULL)
+		singleton = new Config();
+	
+	return singleton;
+}
+
+Config::Config()
+{
 	want_quit_config = false;
 	set_defaults(false);
 }
@@ -52,6 +62,14 @@ bool Config::set_defaults(bool want_save)
 	nick = "";
 	color = 0;
 	nation = 0;
+	screen_width = 800;
+	screen_height = 600;
+	ttf_file = PKGDATADIR_FONTS "Vera.ttf";
+#ifdef WIN32
+	fullscreen = true;
+#else
+	fullscreen = false;
+#endif
 	server_list.clear();
 	server_list.push_back("game.coderz.info:5461");
 	server_list.push_back("127.0.0.1:5461");
@@ -66,7 +84,7 @@ bool Config::load()
 
 	if(!fp)
 	{
-		app.FirstRun();
+		MenAreAntsApp::GetInstance()->FirstRun();
 		return set_defaults();
 	}
 
@@ -79,22 +97,26 @@ bool Config::load()
 		std::string key = stringtok(ligne, " ");
 
 		if(key == "SERVER") hostname = ligne;
-		else if(key == "PORT" && is_num(ligne.c_str())) port = atoi(ligne.c_str());
-		else if(key == "COLOR" && is_num(ligne.c_str())) color = atoi(ligne.c_str());
-		else if(key == "NATION" && is_num(ligne.c_str())) nation = atoi(ligne.c_str());
+		else if(key == "PORT" && is_num(ligne.c_str())) port = StrToTyp<int>(ligne);
+		else if(key == "COLOR" && is_num(ligne.c_str())) color = StrToTyp<uint>(ligne);
+		else if(key == "NATION" && is_num(ligne.c_str())) nation = StrToTyp<uint>(ligne);
 		else if(key == "NICK") nick = ligne;
+		else if(key == "SWITDH") screen_width = StrToTyp<uint>(ligne);
+		else if(key == "SHEIGHT") screen_height = StrToTyp<uint>(ligne);
 		else if(key == "SERVERLIST") server_list.push_back(ligne);
+		else if(key == "TTF") ttf_file = ligne;
+		else if(key == "FULLSCREEN") fullscreen = (ligne == "true");
 		else
 		{
 			std::cerr << "Fichier incorrect" << std::endl;
-			app.FirstRun();
+			MenAreAntsApp::GetInstance()->FirstRun();
 			return set_defaults();
 		}
 	}
 	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX || nation >= ECPlayer::N_MAX || nick.empty())
 	{
 		std::cerr << "Lecture de la configuration invalide." << std::endl;
-		app.FirstRun();
+		MenAreAntsApp::GetInstance()->FirstRun();
 		return set_defaults();
 	}
 
@@ -115,6 +137,10 @@ bool Config::save() const
     fp << "NICK " << nick << std::endl;
     fp << "COLOR " << color << std::endl;
     fp << "NATION " << nation << std::endl;
+    fp << "SWIDTH " << screen_width << std::endl;
+    fp << "SHEIGHT " << screen_height << std::endl;
+    fp << "TTF " << ttf_file << std::endl;
+    fp << "FULLSCREEN " << fullscreen << std::endl;
     for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
     	fp << "SERVERLIST " << *it << std::endl;
 
@@ -130,8 +156,7 @@ class TConfigForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TConfigForm(SDL_Surface*);
-	~TConfigForm();
+	TConfigForm(ECImage*);
 
 /* Composants */
 public:
@@ -243,7 +268,7 @@ void Config::WantCancel(TObject*, void* configinst)
 
 void Config::Configuration(bool first)
 {
-	TConfigForm*     ConfigForm = new TConfigForm(app.sdlwindow);
+	TConfigForm*     ConfigForm = new TConfigForm(Video::GetInstance()->Window());
 
 	ConfigForm->CancelButton->SetOnClick(Config::WantCancel, this);
 	ConfigForm->OkButton->SetOnClick(Config::WantOk, this);
@@ -280,66 +305,48 @@ void Config::Configuration(bool first)
 	delete ConfigForm;
 }
 
-TConfigForm::TConfigForm(SDL_Surface *w)
+TConfigForm::TConfigForm(ECImage *w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(300,120,"Configuration", white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(300,120,"Configuration", white_color, Font::GetInstance(Font::Big)));
 
 	Info = AddComponent(new TLabel(160, 160,"C'est votre premier lancement, veuillez configurer votre jeu.",
-	                                        white_color, &app.Font()->normal));
+	                                        white_color, Font::GetInstance(Font::Normal)));
 	Info->Hide();
 
-	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK", &app.Font()->normal));
-	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", &app.Font()->normal));
+	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK", Font::GetInstance(Font::Normal)));
+	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", Font::GetInstance(Font::Normal)));
 
-	ServerList = AddComponent(new TListBox(&app.Font()->sm, 50, 200, 220, 300));
+	ServerList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 50, 200, 220, 300));
 	ServerList->SetHint("Sélectionnez le serveur auquel vous souhaitez vous connecter.");
 
-	NewServer = AddComponent(new TEdit(&app.Font()->sm, 50,510,220));
+	NewServer = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,510,220));
 	NewServer->SetHint("Serveur à ajouter sous la forme \"host[:port]\"");
 
-	DelServerButton = AddComponent(new TButtonText(280,460,100,30, "Supprimer", &app.Font()->sm));
+	DelServerButton = AddComponent(new TButtonText(280,460,100,30, "Supprimer", Font::GetInstance(Font::Small)));
 	DelServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	DelServerButton->SetHint("Supprimer le serveur sélectionné dans la liste.");
-	AddServerButton = AddComponent(new TButtonText(280,500,100,30, "Ajouter", &app.Font()->sm));
+	AddServerButton = AddComponent(new TButtonText(280,500,100,30, "Ajouter", Font::GetInstance(Font::Small)));
 	AddServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	AddServerButton->SetHint("Ajouter un serveur à la liste.");
 
-	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, &app.Font()->normal));
-	Nick = AddComponent(new TEdit(&app.Font()->sm, 300,225,200, NICKLEN, NICK_CHARS));
+	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, Font::GetInstance(Font::Normal)));
+	Nick = AddComponent(new TEdit(Font::GetInstance(Font::Small), 300,225,200, NICKLEN, NICK_CHARS));
 	Nick->SetHint("Votre pseudo permettra de vous distinguer des autres joueurs");
 
-	Color = AddComponent(new TColorEdit(&app.Font()->sm, "Couleur par défaut", 300, 250, 200));
+	Color = AddComponent(new TColorEdit(Font::GetInstance(Font::Small), "Couleur par défaut", 300, 250, 200));
 	Color->SetHint("Couleur par default dans chaques parties");
 
-	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, &app.Font()->normal));
-	Nation = AddComponent(new TComboBox(&app.Font()->sm, 300, 300, 200));
+	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, Font::GetInstance(Font::Normal)));
+	Nation = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 	{
 		uint j = Nation->AddItem(false, std::string(nations_str[i].name), "");
 		Nation->SetItemHint(j, nations_str[i].infos);
 	}
 
-	Hints = AddComponent(new TMemo(&app.Font()->sm, 550, 200, 200, 100));
+	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 200, 100));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TConfigForm::~TConfigForm()
-{
-	delete Hints;
-	delete NationInfo;
-	delete Nation;
-	delete Color;
-	delete Nick;
-	delete NickInfo;
-	delete AddServerButton;
-	delete DelServerButton;
-	delete NewServer;
-	delete ServerList;
-	delete CancelButton;
-	delete OkButton;
-	delete Info;
-	delete Title;
 }

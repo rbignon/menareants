@@ -73,7 +73,7 @@ void TChildForm::Draw(int _x, int _y)
 	if(background)
 	{
 		SDL_Rect r_back = {x,y,w,h};
-		SDL_BlitSurface(background->Img,NULL,Window(),&r_back);
+		Window()->Blit(background, &r_back);
 	}
 
 	bool first = focus_order ? true : false, put_hint = false;
@@ -86,7 +86,7 @@ void TChildForm::Draw(int _x, int _y)
 				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
 				(*it)->Draw(_x, _y);
-				if(!put_hint && (*it)->Visible() && (*it)->Hint() && (*it)->Test(_x,_y))
+				if(!put_hint && (*it)->Visible() && !(*it)->Hint().empty() && (*it)->Test(_x,_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

@@ -6,8 +6,10 @@ INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 bin_PROGRAMS = menareants
 menareants_SOURCES = \
 		tools/Font.cpp \
+		tools/Color.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
+		tools/Video.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \

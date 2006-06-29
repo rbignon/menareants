@@ -90,9 +90,9 @@ protected:
 	uint w, h;
 	uint b;
 	uint height_string;
-	std::vector<std::string> message;
+	std::vector<TLabel> message;
 	std::vector<TButtonText*> boutons;
-	SDL_Surface *background;
+	ECImage background;
 	ECImage *realbg;
 	TForm *Form;
 	TEdit *edit;

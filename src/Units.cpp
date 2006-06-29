@@ -99,15 +99,15 @@ void ECUnit::PutImage(imgs_t i, ECSpriteBase* b)
 	images.insert(ImgList::value_type(i, new ECSpriteBase(b->path.c_str())));
 
 	if(Owner() && Owner()->Color())
-		images[i]->ChangeColor(white_color, *color_eq[Owner()->Color()]);
+		images[i]->ChangeColor(white_color, color_eq[Owner()->Color()]);
 
 	if(i == I_Down) SetImage(images[i]);
 }
 
-void ECUnit::RefreshColor(SDL_Color last)
+void ECUnit::RefreshColor(Color last)
 {
 	for(ImgList::iterator it = images.begin(); it != images.end(); ++it)
-		it->second->ChangeColor(last, Owner() ? *color_eq[Owner()->Color()] : white_color);
+		it->second->ChangeColor(last, Owner() ? color_eq[Owner()->Color()] : white_color);
 }
 
 ECUnit::~ECUnit()

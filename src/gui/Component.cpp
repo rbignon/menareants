@@ -93,7 +93,7 @@ void TList::Draw(int souris_x, int souris_y)
 				(*it)->Draw(souris_x, souris_y);
 				if((*it)->OnMouseOn() && (*it)->Test(souris_x, souris_y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if((*it)->Visible() && (*it)->Hint() && (*it)->Test(souris_x, souris_y))
+				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Test(souris_x, souris_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

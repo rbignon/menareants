@@ -63,7 +63,7 @@ void TImage::SetImage(ECImage* _img, bool _wd)
 
 void TImage::Draw(int _x, int _y)
 {
-	if(!image || !Window()) return;
+	if(!image || image->IsNull() || !Window()) return;
 	SDL_Rect r_back = {x,y,w,h};
-	SDL_BlitSurface( image->Img, NULL, Window(), &r_back);
+	Window()->Blit(image, &r_back);
 }

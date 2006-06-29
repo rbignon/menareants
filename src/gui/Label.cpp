@@ -20,18 +20,22 @@
 
 #include "Label.h"
 
+TLabel::TLabel()
+	: font(0), shadowed(0), bg_offset(0)
+{
+
+}
+
 TLabel::TLabel(const TLabel& label)
-	: TComponent(label.x, label.y), surf(0), background(0), font(label.font), color(label.color),
+	: TComponent(label), font(label.font), color(label.color),
 	  shadowed(label.shadowed), bg_offset(label.bg_offset)
 {
-	SetParent(label.Parent());
-	SetWindow(label.Window());
 	caption = "";
 	SetCaption(label.caption);
 }
 
-TLabel::TLabel(int x, int y, std::string new_txt, SDL_Color new_color, Font* new_font, bool _shadowed)
-	: TComponent(x, y), surf(0), background(0), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0)
+TLabel::TLabel(int x, int y, std::string new_txt, Color new_color, Font* new_font, bool _shadowed)
+	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0)
 {
 	assert(new_font!=NULL);
 	caption = "";
@@ -45,14 +49,6 @@ TLabel::TLabel(int x, int y, std::string new_txt, SDL_Color new_color, Font* new
 	SetCaption(new_txt);
 }
 
-TLabel::~TLabel()
-{
-	if(surf)
-		SDL_FreeSurface(surf);
-	if(background)
-		SDL_FreeSurface(background);
-}
-
 void TLabel::SetCaption (std::string new_txt)
 {
 	if(caption == new_txt)
@@ -62,53 +58,61 @@ void TLabel::SetCaption (std::string new_txt)
 	Reinit();
 }
 
-void TLabel::SetColor(SDL_Color new_color)
+void TLabel::SetFontColor(Font* f, Color c)
+{
+	color = c;
+	font = f;
+	Reinit();
+}
+
+void TLabel::SetColor(Color new_color)
 {
 	color = new_color;
 	Reinit();
 }
 
+void TLabel::SetFont(Font* f)
+{
+	font = f;
+	Reinit();
+}
+
 void TLabel::Reinit()
 {
-	if (surf != NULL)
+	if(caption.empty())
 	{
-		SDL_FreeSurface(surf);
-		surf = 0;
-	}
-	if(background)
-	{
-		SDL_FreeSurface(background);
-		background = 0;
+		surf.SetImage(0);
+		background.SetImage(0);
+		return;
 	}
 
-	if(caption.empty()) return;
-
-	surf = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color);
+	surf = font->CreateSurface(caption,color);
+	//surf.SetImage(TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color.GetSDLColor()));
 
 	if(shadowed)
-		background = TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(), white_color);
+		background.SetImage(TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(), white_color.GetSDLColor()));
 
-	SetHeight(surf->h);
-	SetWidth(surf->w);
+	SetHeight(surf.GetHeight());
+	SetWidth(surf.GetWidth());
 }
 
 void TLabel::Draw(int m_x, int m_y)
 {
-	if(!surf || caption.empty()) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
+	if(surf.IsNull() || caption.empty()) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
 
 	assert(Window());
 
 	SDL_Rect dst_rect;
 	dst_rect.x = x;
 	dst_rect.y = y;
-	dst_rect.w = surf->w;
-	dst_rect.h = surf->h;
+	dst_rect.w = surf.GetWidth();
+	dst_rect.h = surf.GetHeight();
 
-	if(shadowed && background)
+	if(shadowed && !background.IsNull())
 	{
-		SDL_Rect shad_rect = {x+bg_offset, y+bg_offset, background->w, background->h};
+		SDL_Rect shad_rect = {x+bg_offset, y+bg_offset, background.GetWidth(), background.GetHeight()};
 
-		SDL_BlitSurface(background,NULL, Window(), &shad_rect);
+		Window()->Blit(background, &shad_rect);
 	}
-	SDL_BlitSurface(surf,NULL,Window(), &dst_rect);
+	Window()->Blit(surf, &dst_rect);
 }

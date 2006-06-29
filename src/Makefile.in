@@ -50,18 +50,19 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_menareants_OBJECTS = Font.$(OBJEXT) Images.$(OBJEXT) \
-	Maths.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
-	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
-	CheckBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
-	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
-	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
-	Image.$(OBJEXT) ShowMap.$(OBJEXT) Main.$(OBJEXT) \
-	Timer.$(OBJEXT) Resources.$(OBJEXT) AltThread.$(OBJEXT) \
-	Sockets.$(OBJEXT) Config.$(OBJEXT) Debug.$(OBJEXT) \
-	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
-	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
-	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
+	Images.$(OBJEXT) Maths.$(OBJEXT) Video.$(OBJEXT) \
+	Component.$(OBJEXT) Form.$(OBJEXT) ChildForm.$(OBJEXT) \
+	ListBox.$(OBJEXT) ComboBox.$(OBJEXT) CheckBox.$(OBJEXT) \
+	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
+	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
+	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
+	ShowMap.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
+	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
+	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
+	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
+	Units.$(OBJEXT) MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) \
+	InGame.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -186,8 +187,10 @@ SUBDIRS = data
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 menareants_SOURCES = \
 		tools/Font.cpp \
+		tools/Color.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
+		tools/Video.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \
@@ -294,6 +297,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Channels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChildForm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Color.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ColorEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ComboBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Component.Po@am__quote@
@@ -321,6 +325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpinEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Units.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Video.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -350,6 +355,20 @@ Font.obj: tools/Font.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Font.obj `if test -f 'tools/Font.cpp'; then $(CYGPATH_W) 'tools/Font.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Font.cpp'; fi`
 
+Color.o: tools/Color.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Color.o -MD -MP -MF "$(DEPDIR)/Color.Tpo" -c -o Color.o `test -f 'tools/Color.cpp' || echo '$(srcdir)/'`tools/Color.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Color.Tpo" "$(DEPDIR)/Color.Po"; else rm -f "$(DEPDIR)/Color.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Color.cpp' object='Color.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Color.o `test -f 'tools/Color.cpp' || echo '$(srcdir)/'`tools/Color.cpp
+
+Color.obj: tools/Color.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Color.obj -MD -MP -MF "$(DEPDIR)/Color.Tpo" -c -o Color.obj `if test -f 'tools/Color.cpp'; then $(CYGPATH_W) 'tools/Color.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Color.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Color.Tpo" "$(DEPDIR)/Color.Po"; else rm -f "$(DEPDIR)/Color.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Color.cpp' object='Color.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Color.obj `if test -f 'tools/Color.cpp'; then $(CYGPATH_W) 'tools/Color.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Color.cpp'; fi`
+
 Images.o: tools/Images.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Images.o -MD -MP -MF "$(DEPDIR)/Images.Tpo" -c -o Images.o `test -f 'tools/Images.cpp' || echo '$(srcdir)/'`tools/Images.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Images.Tpo" "$(DEPDIR)/Images.Po"; else rm -f "$(DEPDIR)/Images.Tpo"; exit 1; fi
@@ -377,6 +396,20 @@ Maths.obj: tools/Maths.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Maths.cpp' object='Maths.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Maths.obj `if test -f 'tools/Maths.cpp'; then $(CYGPATH_W) 'tools/Maths.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Maths.cpp'; fi`
+
+Video.o: tools/Video.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Video.o -MD -MP -MF "$(DEPDIR)/Video.Tpo" -c -o Video.o `test -f 'tools/Video.cpp' || echo '$(srcdir)/'`tools/Video.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Video.Tpo" "$(DEPDIR)/Video.Po"; else rm -f "$(DEPDIR)/Video.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Video.cpp' object='Video.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Video.o `test -f 'tools/Video.cpp' || echo '$(srcdir)/'`tools/Video.cpp
+
+Video.obj: tools/Video.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Video.obj -MD -MP -MF "$(DEPDIR)/Video.Tpo" -c -o Video.obj `if test -f 'tools/Video.cpp'; then $(CYGPATH_W) 'tools/Video.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Video.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Video.Tpo" "$(DEPDIR)/Video.Po"; else rm -f "$(DEPDIR)/Video.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Video.cpp' object='Video.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Video.obj `if test -f 'tools/Video.cpp'; then $(CYGPATH_W) 'tools/Video.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Video.cpp'; fi`
 
 Component.o: gui/Component.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Component.o -MD -MP -MF "$(DEPDIR)/Component.Tpo" -c -o Component.o `test -f 'gui/Component.cpp' || echo '$(srcdir)/'`gui/Component.cpp; \

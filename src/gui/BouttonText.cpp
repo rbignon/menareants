@@ -21,49 +21,48 @@
 
 #include "BouttonText.h"
 
-TButtonText::TButtonText() : TButton(), surf(0), font(0)
+TButtonText::TButtonText() : TButton(), font(0)
 {
 }
 
 //-----------------------------------------------------------------------------
 
 TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, const std::string &text, Font *f)
-  : TButton(_x, _y, _w, _h), surf(0)
+  : TButton(_x, _y, _w, _h), label(_x, _y, text, white_color, f), font(f)
 {
-  font = f;
-  SetText(text);
-}
 
-TButtonText::~TButtonText()
-{
-	if (surf)
-		SDL_FreeSurface(surf);
 }
-
 //-----------------------------------------------------------------------------
 
-void TButtonText::SetFont (Font *font)
+void TButtonText::Init()
 {
-  this->font = font;
+	TButton::Init();
+	MyComponent(&label);
 }
-
-//-----------------------------------------------------------------------------
 
 void TButtonText::SetText(const std::string &text)
 {
-  if (surf != NULL)
-  {
-    SDL_FreeSurface(surf);
-  }
-  assert (font != NULL);
-  m_text = text;
-  surf = TTF_RenderText_Blended(&(font->GetTTF()), text.c_str(), Enabled() ? white_color : gray_color);
+  label.SetCaption(text);
+  label.SetXY(X()+Width()/2-label.Width()/2, Y()+Height()/2-label.Height()/2);
 }
 
 void TButtonText::SetEnabled(bool b)
 {
 	TComponent::SetEnabled(b);
-	SetText(m_text);
+	label.SetColor(Enabled() ? white_color : gray_color);
+}
+
+void TButtonText::SetXY(int _x, int _y)
+{
+	TButton::SetXY(_x, _y);
+	label.SetXY(X()+Width()/2-label.Width()/2, Y()+Height()/2-label.Height()/2);
+}
+
+void TButtonText::SetImage (ECSprite *_image)
+{
+	TButton::SetImage(_image);
+
+	label.SetXY(X()+Width()/2-label.Width()/2, Y()+Height()/2-label.Height()/2);
 }
 
 //-----------------------------------------------------------------------------
@@ -73,20 +72,12 @@ void TButtonText::Draw (int souris_x, int souris_y)
 	if(image)
 		DrawImage (souris_x, souris_y);
 
-	if(!surf) return;
-
-	SDL_Rect dst_rect;
-	dst_rect.x = X()+Width()/2-surf->w/2;
-	dst_rect.y = Y()+Height()/2-surf->h/2;
-	dst_rect.w = surf->w;
-	dst_rect.h = surf->h;
-
-	SDL_BlitSurface(surf,NULL,Window(), &dst_rect);
+	label.Draw(souris_x, souris_y);
 }
 
 //-----------------------------------------------------------------------------
 
 std::string TButtonText::GetText() const
 {
-  return m_text;
+  return label.Caption();
 }

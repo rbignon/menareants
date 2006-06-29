@@ -19,11 +19,11 @@
  */
 
 #include "Debug.h"
-#include "Main.h"
 #include "Outils.h"
 #include "Sockets.h"
 #include <string>
 #include <cstdarg>
+#include <iostream>
 
 int Debug(unsigned int flags, const char* format, ...)
 {
@@ -60,18 +60,19 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	else if(flags & W_DEBUG)   s ="[DEBUG]   ";
 	s += msg;
 
-	if(flags & W_SEND && app.getclient())
+	if(flags & W_SEND && EC_Client::GetInstance())
 	{
 		if(vars.empty())
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORN), FormatStr(s).c_str());
+			EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ERRORN), FormatStr(s).c_str());
 		else
-			app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ERRORV), FormatStr(s).c_str(), FormatStr(vars).c_str());
+			EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ERRORV), FormatStr(s).c_str(),
+			                                                                     FormatStr(vars).c_str());
 	}
 
 	std::cout << s << std::endl;
 #ifdef DEBUG
 	if(!vars.empty())
-	std::cout << vars << std::endl;
+		std::cout << vars << std::endl;
 #endif
 
 	return 0;

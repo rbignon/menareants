@@ -36,35 +36,20 @@ TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool
   focus = false;
   chaine = "";
 
-  background = NULL;
-  edit = 0;
   avail_chars = av;
-}
-
-TEdit::~TEdit()
-{
-	if ( background)
-		SDL_FreeSurface( background);
-	if(edit)
-		SDL_FreeSurface(edit);
 }
 
 void TEdit::Init()
 {
-	if ( background)
-		SDL_FreeSurface( background);
-	if(edit)
-		SDL_FreeSurface(edit);
-
 	visible_len = ((w) / font->GetWidth("A"));
 	
 	if(!show_background) return;
 	
 	SDL_Rect r_back = {0,0,w,h};
 	
-	background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
-						32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
+	background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+						32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
 }
 
 void TEdit::SetFocus()
@@ -84,21 +69,21 @@ void TEdit::Draw (int m_x, int m_y)
 	if(have_redraw)
 		Redraw();
 
-	if(background)
+	if(!background.IsNull())
 	{
-		SDL_Rect r_back = {x,y,background->w,background->h};
-		SDL_BlitSurface( background, NULL, Window(), &r_back);
+		SDL_Rect r_back = {x,y,background.GetWidth(),background.GetHeight()};
+		Window()->Blit(background, &r_back);
 	}
 
-	if(!edit) return;
+	if(edit.IsNull()) return;
 
 	SDL_Rect dst_rect;
 	dst_rect.x = x;
 	dst_rect.y = y;
-	dst_rect.w = edit->w;
-	dst_rect.h = edit->h;
+	dst_rect.w = edit.GetWidth();
+	dst_rect.h = edit.GetHeight();
 
-	SDL_BlitSurface(edit,NULL,Window(), &dst_rect);
+	Window()->Blit(edit, &dst_rect);
 }
 
 void TEdit::SetString(std::string s)
@@ -112,9 +97,7 @@ void TEdit::Redraw()
 {
 	if(!focus && chaine.empty())
 	{
-		if(edit)
-			SDL_FreeSurface(edit);
-		edit = 0;
+		edit.SetImage(0);
 		return;
 	}
 
@@ -125,19 +108,15 @@ void TEdit::Redraw()
 	else
 		substring = chaine;
 
-	if(edit)
-		SDL_FreeSurface(edit);
-
 	/* Le " " est nécessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
-	edit = TTF_RenderText_Blended(&(font->GetTTF()), std::string(substring + " ").c_str(), color);
+	edit = font->CreateSurface(substring + " ", color);
 
 	if(Focused())
 	{
 		uint caret_x = font->GetWidth(substring.substr(0, caret-first_char));
-		SLOCK(edit);
-		DrawLine(edit, caret_x, 1, caret_x, h-2,
-		        SDL_MapRGB(edit->format, color.r, color.g, color.b));
-		SUNLOCK(edit);
+		SLOCK(edit.Img);
+		DrawLine(edit.Img, caret_x, 1, caret_x, h-2, edit.MapColor(color));
+		SUNLOCK(edit.Img);
 	}
 	have_redraw = false;
 }

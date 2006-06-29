@@ -21,8 +21,9 @@
 #include "MessageBox.h"
 #include "Defines.h"
 #include "Debug.h"
-#include "Main.h"
+#include "tools/Video.h"
 #include "Resources.h"
+#include "tools/Font.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -41,7 +42,7 @@ static struct ButtonList_t
 };
 
 TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form)
-	: TObject(app.sdlwindow), x(-1), y(-1), b(_b)
+	: TObject(Video::GetInstance()->Window()), x(-1), y(-1), b(_b)
 {
 	edit = 0;
 	Form = form;
@@ -50,7 +51,7 @@ TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form)
 }
 
 TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form)
-	: TObject(app.sdlwindow), x(_x), y(_y), b(_b)
+	: TObject(Video::GetInstance()->Window()), x(_x), y(_y), b(_b)
 {
 	edit = 0;
 	Form = form;
@@ -62,9 +63,6 @@ TMessageBox::~TMessageBox()
 {
 	for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 		delete *it;
-
-	if ( background)
-		SDL_FreeSurface( background);
 
 	delete edit;
 }
@@ -109,11 +107,12 @@ uint TMessageBox::Show()
 			}
 			SDL_GetMouseState( &x, &y);
 			if(realbg)
-				SDL_BlitSurface(realbg->Img, NULL, app.sdlwindow, NULL);
+				Window()->Blit(realbg);
+
 			if(Form)
 				Form->Update(x,y,false);
 			Draw(x,y);
-			SDL_Flip(app.sdlwindow);
+			Window()->Flip();
 		} while(1);
 	}
 	catch(...)
@@ -129,22 +128,26 @@ void TMessageBox::Draw()
 	int x,y;
 	SDL_GetMouseState( &x, &y);
 	if(realbg)
-		SDL_BlitSurface(realbg->Img, NULL, app.sdlwindow, NULL);
+		Window()->Blit(realbg);
 	if(Form)
 		Form->Update(x,y,false);
 	Draw(x,y);
-	SDL_Flip(app.sdlwindow);
+	Window()->Flip();
 }
 
 void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 {
 	SDL_Rect r_back = {x,y,w,h};
-	SDL_BlitSurface( background, NULL, app.sdlwindow, &r_back);
+	Window()->Blit(background, &r_back);
 
 	uint vert = y;
 
-	for (uint i=0; i < message.size(); i++, vert += height_string)
-		app.Font()->normal.WriteLeft(x+25, vert, message[i], black_color);
+	for (std::vector<TLabel>::iterator it = message.begin(); it != message.end(); ++it, vert += height_string)
+	{
+		it->SetXY(x+25, vert);
+		it->Draw(mouse_x, mouse_y);
+		//Font::GetInstance(Font::Normal)->WriteLeft(x+25, vert, *it, black_color);
+	}
 
 	if(edit)
 	{
@@ -163,7 +166,7 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 
 void TMessageBox::SetText(const char* _s)
 {
-	height_string = app.Font()->normal.GetHeight();
+	height_string = Font::GetInstance(Font::Normal)->GetHeight();
 
 	/* On parse le message pour le découper en différentes lignes */
 	char s[MSGBOX_MAXWIDTH + 20 + 2];
@@ -175,11 +178,12 @@ void TMessageBox::SetText(const char* _s)
 		   * MSGBOX_MAXWIDTH + 20 on coupe net.
 		   */
 		    s[i] = '\0';
-			message.push_back(std::string(s));
+			message.push_back(TLabel(x,y,s,black_color,Font::GetInstance(Font::Normal)));
+			MyComponent(&(*(message.end()-1)));
 			i=0;
 
 			h += height_string;
-			uint yw = app.Font()->normal.GetWidth(s) + 50;
+			uint yw = Font::GetInstance(Font::Normal)->GetWidth(s) + 50;
 			if(w < yw) w = yw;
 
 			if(*_s == '\n')
@@ -196,7 +200,7 @@ void TMessageBox::SetEdit()
 {
 	if(edit) delete edit;
 	h += 10;
-	edit = new TEdit(&app.Font()->normal, x+15,y+h,w-15-20);
+	edit = new TEdit(Font::GetInstance(Font::Normal), x+15,y+h,w-15-20);
 	MyComponent(edit);
 	edit->SetFocus();
 	h += edit->Height();
@@ -213,14 +217,14 @@ void TMessageBox::Init(const char* s)
 
 	SDL_Rect r_back = {0,0,w,h};
 
-	background = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, w, h,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*7/10));
+	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, w, h,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
 
 	if(x == -1 && y == -1)
 	{
-		x = SCREEN_WIDTH/2 - w / 2;
-		y = SCREEN_HEIGHT/2 - h / 2;
+		x = Video::GetInstance()->Width()/2 - w / 2;
+		y = Video::GetInstance()->Height()/2 - h / 2;
 		for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 			(*it)->SetXY((*it)->X() + x + 1, (*it)->Y() + y + 1);
 		if(edit)
@@ -244,10 +248,10 @@ void TMessageBox::SetButtons()
 		if(b & ButtonList[i].flag)
 		{
 			TButtonText *bt = new TButtonText(tmpw, y+h, ButtonList[i].w, ButtonList[i].h,
-			                                  ButtonList[i].label, &app.Font()->normal);
+			                                  ButtonList[i].label, Font::GetInstance(Font::Normal));
 			MyComponent(bt);
 			bt->Tag = ButtonList[i].flag;
-			bt->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+			bt->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 			boutons.push_back(bt);
 			tmpw += ButtonList[i].w + 1;
 			if(tmph < ButtonList[i].h) tmph = ButtonList[i].h;

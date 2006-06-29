@@ -32,7 +32,6 @@
  * It is necessary to initialize all variables in the constructor as this :
  * <pre>VarComp = AddComponent(new TComponent());</pre>
  * AddComponent function add the component in list and call his Init() function.
- * You have to destroy components too in the destructor with \a delete.c delete.
  *
  * After, when you use this Form, you have to create the object.
  * You must use a no-end-loop where you call TForm::Update() function.
@@ -53,7 +52,8 @@
  * public:
  *
  *    // Note: you have to implemente this two functions outside of class definition.
- *    TForm1()
+ *    TForm1(ECImage* screen)
+ *      : TForm(screen)
  *    {
  *      // Add components
  *      Button1 =   AddComponent(new TButton(500,350,100,49));
@@ -62,12 +62,6 @@
  *      // Défine the events
  *      Button1->SetOnClick(&ButtonClick, 0);
  *      MyListBox->SetOnSelect(&MyListBoxOnSelect, 0);
- *    }
- *    ~TForm1()
- *    {
- *      delete Button1;
- *      delete MyListBox;
- *      delete Blah;
  *    }
  *
  * // Components
@@ -84,6 +78,15 @@
  * };
  * </pre>
  *
+ * To use a TForm, use a function like this :
+ *
+ * <pre>
+ * void MyForm()
+ * {
+ *   TForm1* Form1 = new TForm1(Window());
+ *   Form1->Run(!want_quit());
+ *   return;
+ * }
  * --Progs
  */
 
@@ -96,8 +99,8 @@ class TForm : public TObject
 /* Constructeur/Destructeur */
 public:
 
-	TForm(SDL_Surface* window);
-	virtual ~TForm() {}
+	TForm(ECImage* window);
+	virtual ~TForm();
 
 /* Methodes */
 public:
@@ -126,6 +129,8 @@ public:
 	 * This function will set any components to Focused.
 	 */
 	void Actions(SDL_Event event, uint a = 0);
+
+	void Run(bool *(func)() = 0);
 
 /* Attributs */
 public:
@@ -157,6 +162,8 @@ protected:
 
 	void SetFocusOrder(bool s = true) { focus_order = s; }
 	bool FocusOrder() const { return focus_order; }
+
+	void Clear();
 
 /* Variables privées */
 private:

@@ -44,8 +44,7 @@ class TGameInfosForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TGameInfosForm(SDL_Surface*);
-	~TGameInfosForm();
+	TGameInfosForm(ECImage*);
 
 /* Composants */
 public:
@@ -96,8 +95,7 @@ class TListGameForm : public TForm
 /* Constructeur/Deconstructeur */
 public:
 
-	TListGameForm(SDL_Surface*);
-	~TListGameForm();
+	TListGameForm(ECImage*);
 
 /* Composants */
 public:

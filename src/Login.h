@@ -32,8 +32,7 @@ class TConnectedForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TConnectedForm(SDL_Surface*);
-	~TConnectedForm();
+	TConnectedForm(ECImage*);
 
 /* Composants */
 public:

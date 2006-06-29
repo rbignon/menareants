@@ -48,7 +48,7 @@ public:
 
 	unsigned int Tag;
 
-	void SetImage (ECSprite *image);
+	virtual void SetImage (ECSprite *image);
 
 /* Variables protégées */
 protected:

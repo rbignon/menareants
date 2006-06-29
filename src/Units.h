@@ -64,7 +64,7 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	void RefreshColor(SDL_Color last);
+	void RefreshColor(Color last);
 
 /* Mathodes protégées */
 protected:

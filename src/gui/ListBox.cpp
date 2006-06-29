@@ -20,6 +20,7 @@
  */
 
 #include "tools/Font.h"
+#include "tools/Color.h"
 #include "ListBox.h"
 #include "Resources.h"
 #include "tools/Maths.h"
@@ -36,20 +37,6 @@ TListBox::TListBox (Font* f, int _x, int _y, uint _width, uint _height)
   visible_height = 0;
   m_selection = -1;
   gray_disable = false;
-
-  cursorover_box = NULL;
-  selected_box = NULL;
-  background = NULL;
-}
-
-TListBox::~TListBox()
-{
-   if ( cursorover_box)
-     SDL_FreeSurface( cursorover_box);
-   if ( selected_box)
-     SDL_FreeSurface( selected_box);
-   if ( background)
-     SDL_FreeSurface( background);
 }
 
 void TListBox::Init()
@@ -62,27 +49,20 @@ void TListBox::Init()
 
   nb_visible_items_max = h/height_item;
 
-  if ( cursorover_box)
-    SDL_FreeSurface( cursorover_box);
-  if ( selected_box)
-    SDL_FreeSurface( selected_box);
-  if ( background)
-    SDL_FreeSurface( background);
-
   SDL_Rect r_item = {0,0,w,height_item};
   SDL_Rect r_back = {0,0,w,h};
 
-  cursorover_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
-					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( cursorover_box, &r_item, SDL_MapRGBA( cursorover_box->format,0,0,255*6/10,255*4/10));
+  cursorover_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
+					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+  cursorover_box.FillRect(r_item, cursorover_box.MapRGBA(0,0,255*6/10,255*4/10));
 
-  selected_box = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
-					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( selected_box, &r_item, SDL_MapRGBA( selected_box->format,0,0,255*6/10,255*8/10));
+  selected_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
+					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+  selected_box.FillRect(r_item, selected_box.MapRGBA(0,0,255*6/10,255*8/10));
 
-  background = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-  SDL_FillRect( background, &r_back, SDL_MapRGBA( background->format,255, 255, 255, 255*3/10));
+  background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+  background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
 
 }
 
@@ -146,36 +126,32 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 	
 	// blit a surface as SDL_FillRect don't alpha blit a rectangle
 	SDL_Rect r_back = {x,y,w,h};
-	SDL_BlitSurface( background, NULL, Window(), &r_back);
+	Window()->Blit(background, &r_back);
 
 	if(!NoItemHint())
 		SetHint("");
 
-	for (uint i=0; i < nb_visible_items; i++)
+	uint i=0;
+	for(std::vector<list_box_item_t>::iterator it = m_items.begin()+first_visible_item;
+	    i < nb_visible_items && it != m_items.end(); i++, ++it)
 	{
-		// blit surfaces as SDL_FillRect don't alpha blit a rectangle
-		if(i+first_visible_item >= m_items.size()) continue;
-		if(enabled && m_items[i+first_visible_item].enabled)
+		it->label.SetXY(x+5, y+i*height_item);
+		if(Enabled() && it->enabled)
 		{
 			if ( i+first_visible_item == uint(item))
 			{
 				SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-				SDL_BlitSurface( cursorover_box, NULL, Window(), &r);
+				Window()->Blit(cursorover_box, &r);
 				if(!NoItemHint())
-					SetHint(m_items[i+first_visible_item].hint.c_str());
+					SetHint(it->label.Hint());
 			}
 			else if ( IsSelected(i+first_visible_item))
 			{
 				SDL_Rect r = {x+1, y+i*height_item+1, w-2, height_item-2};
-				SDL_BlitSurface( selected_box, NULL, Window(), &r);
+				Window()->Blit(selected_box, &r);
 			}
 		}
-		if(!m_items[i+first_visible_item].label.empty())
-			font->WriteLeft(x+5,
-				y+i*height_item,
-				m_items[i+first_visible_item].label,
-				(!enabled || !m_items[i+first_visible_item].enabled && gray_disable) ? gray_color :
-				IsSelected(i+first_visible_item) && enabled ? white_color : m_items[i+first_visible_item].color) ;
+		it->label.Draw(mouse_x, mouse_y);
 	}
 
 	// buttons for listbox with more items than visible
@@ -191,16 +167,19 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 
 uint TListBox::AddItem (bool selected,
 		       const std::string &label,
-		       const std::string &value, SDL_Color _color, bool enabled)
+		       const std::string &value, Color _color, bool enabled)
 {
   uint pos = m_items.size();
 
   // Push item
-  list_box_item_t item;
-  item.label = label;
+  list_box_item_t item(font);
+  item.label.SetXY(x,y);
+  item.label.SetCaption(label);
+  item.enabled = enabled;
+  item.label.SetColor((!Enabled() || !enabled && gray_disable) ? gray_color : _color);
+  MyComponent(&item.label);
   item.value = value;
   item.color = _color;
-  item.enabled = enabled;
   m_items.push_back (item);
 
   // Select it if selected
@@ -232,11 +211,11 @@ void TListBox::RemoveItem (uint index)
 	if (h < visible_height)  visible_height = h;
 }
 
-void TListBox::SetItemHint(uint index, const char* Hint)
+void TListBox::SetItemHint(uint index, std::string Hint)
 {
   assert(index < m_items.size());
-  
-  m_items[index].hint = Hint;
+
+  m_items[index].label.SetHint(Hint);
 }
 
 void TListBox::ClearItems()
@@ -252,7 +231,12 @@ void TListBox::Select (uint index)
 {
 	if(!m_items[index].enabled) return;
 
+	if(m_selection != -1)
+		m_items[m_selection].label.SetColor(
+		                         (!Enabled() || !m_items[m_selection].enabled && gray_disable) ? gray_color :  white_color);
+
 	m_selection = index;
+	m_items[index].label.SetColor(white_color);
 }
 
 //-----------------------------------------------------------------------------
@@ -260,7 +244,11 @@ void TListBox::Select (uint index)
 void TListBox::Deselect (uint index)
 {
 	if (m_selection == (int)index)
+	{
+		m_items[index].label.SetColor((!Enabled() || !m_items[index].enabled && gray_disable) ? gray_color :
+		                                                                                        m_items[index].color);
 		m_selection = -1;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -277,12 +265,21 @@ int TListBox::GetSelectedItem ()
   return m_selection;
 }
 
+void TListBox::SetEnabled(bool _en)
+{
+	TComponent::SetEnabled(_en);
+	int i = 0;
+	for(std::vector<list_box_item_t>::iterator it = m_items.begin(); it != m_items.end(); ++it, ++i)
+		it->label.SetColor((!Enabled() || !it->enabled && gray_disable) ? gray_color : (m_selection == i) ? white_color :
+		                                                                               it->color);
+}
+
 //-----------------------------------------------------------------------------
 
-const std::string& TListBox::ReadLabel (uint index) const
+const std::string TListBox::ReadLabel (uint index) const
 {
   assert (index < m_items.size());
-  return m_items[index].label;
+  return m_items[index].label.Caption();
 }
 const std::string& TListBox::ReadValue (uint index) const
 {

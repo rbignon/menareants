@@ -1,3 +1,8 @@
+2005-06-29  Romain Bignon <progs@headfucking.net>
+
+	* src/*: Énorme travail de réécriture, notament avec un nouveau système de gestion de l'affichage à l'écran (Video.h),
+	une imposition de ECImage en substitution de SDL_Surface* dans les composants, décentralisation de MenAreAntsApp.
+
 2005-06-28  Romain Bignon <progs@headfucking.net>
 
 	* server/Batiments.cpp: Le silo peut attaquer tout ça c'est operationnel.

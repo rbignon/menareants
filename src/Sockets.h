@@ -36,18 +36,23 @@ const int MAXBUFFER=1024;
 #include "Commands.h"
 
 class EC_ACommand;
-class MenAreAntsApp;
 class ECPlayer;
 struct SDL_mutex;
 
 class EC_Client
 {
+/* Constructeur/Destructeur */
 public:
+
+	static EC_Client* singleton;
+	static EC_Client* GetInstance(bool create = false);
+
 	EC_Client(const char *hostname, unsigned short port);
 	EC_Client();
 
 	~EC_Client();
 
+/* Fonctions publiques */
 public:
 
 	/** Messages à utiliser dans les reply
@@ -81,7 +86,7 @@ public:
 	bool Connect(const char *hostname, unsigned short port);
 
 	int sendrpl(const char *pattern, ...);
-	char *rpl(msg t);
+	static char *rpl(msg t);
 
 	bool IsConnected() const { return connected; }
 	void SetConnected() { connected = true; }
@@ -89,8 +94,6 @@ public:
 	bool WantDisconnect() const { return want_disconnect; }
 	std::string GetNick() const { return nick; }
 	void set_nick(std::string _nick) { nick = _nick; }
-
-	MenAreAntsApp *lapp;
 
 	/* Obtient la sturcture player si il fait partit d'un jeu */
 	ECPlayer *Player() { return pl; }
@@ -108,6 +111,7 @@ public:
 	void LockScreen() const;
 	void UnlockScreen() const;
 
+/* Variables protégées */
 protected:
 	SOCKET sock;
 
@@ -130,6 +134,7 @@ protected:
 	ECPlayer *pl;
 	SDL_mutex* mutex;
 
+/* Variables privées */
 private:
 	void Init();
 };

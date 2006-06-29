@@ -32,14 +32,14 @@ ECBatiment::ECBatiment(ECSpriteBase* b)
 	img = new ECSpriteBase(b->path.c_str());
 
 	if(Owner() && Owner()->Color())
-		img->ChangeColor(white_color, *color_eq[Owner()->Color()]);
+		img->ChangeColor(white_color, color_eq[Owner()->Color()]);
 
 	SetImage(img);
 }
 
-void ECBatiment::RefreshColor(SDL_Color last)
+void ECBatiment::RefreshColor(Color last)
 {
-	img->ChangeColor(last, Owner() ? *color_eq[Owner()->Color()] : white_color);
+	img->ChangeColor(last, Owner() ? color_eq[Owner()->Color()] : white_color);
 }
 
 ECBatiment::~ECBatiment()
@@ -90,6 +90,16 @@ std::string ECNuclearSearch::SpecialInfo()
 /********************************************************************************************
  *                                         ECSilo                                           *
  ********************************************************************************************/
+
+std::string ECSilo::SpecialInfo()
+{
+	if(!NuclearSearch())
+		return "";
+	else if(!NuclearSearch()->Missiles())
+		return "Aucun missile disponible";
+	else
+		return "Il y a " + TypToStr(NuclearSearch()->Missiles()) + " missiles disponibles";
+}
 
 void ECSilo::Draw()
 {

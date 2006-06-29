@@ -23,7 +23,10 @@
 #define EC_COMBOBOX_H
 
 #include "ListBox.h"
-#include "tools/Font.h"
+#include "tools/Color.h"
+
+class ECImage;
+class Font;
 
 class TComboBox : public TListBox
 {
@@ -31,7 +34,7 @@ class TComboBox : public TListBox
 public:
 	TComboBox(Font* f, int _x, int _y, uint _width);
 
-	virtual ~TComboBox();
+	virtual ~TComboBox() {}
 
 /* Methodes */
 public:
@@ -48,7 +51,7 @@ public:
 	uint AddItem (bool selected,
 	              const std::string &label,
 	              const std::string &value,
-	              SDL_Color _color = black_color, bool _enabled = true);
+	              Color _color = black_color, bool _enabled = true);
 	void ClearItems();
 	virtual void Deselect (uint index);
 	virtual void Select(uint index);
@@ -61,12 +64,12 @@ public:
 protected:
 	TButton m_open;
 	int real_y;
-	SDL_Surface *edit_bg;
+	ECImage edit_bg;
 	bool opened;
 	uint visible_len;
 	void SetOpened(bool _o);
 	void SetBackGround(uint _h);
-	std::string chaine;
+	TLabel chaine;
 	uint COMBOBOX_HEIGHT;
 };
 

@@ -19,6 +19,7 @@
  */
 
 #include "ShowMap.h"
+#include "tools/Video.h"
 #include "Defines.h"
 #include "Resources.h"
 #include "Channels.h"
@@ -32,21 +33,12 @@ void TMap::Init()
 	h = CASE_HEIGHT * map->Height();
 	w = CASE_WIDTH  * map->Width();
 
-	if(brouillard)
-		SDL_FreeSurface(brouillard);
-
 	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
-	brouillard = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, CASE_WIDTH, CASE_HEIGHT,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	SDL_FillRect( brouillard, &r_back, SDL_MapRGBA( brouillard->format,0, 0, 0, 255*5/10));
+	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, CASE_WIDTH, CASE_HEIGHT,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
 
 	SetMustRedraw();
-}
-
-TMap::~TMap()
-{
-	if(brouillard)
-		SDL_FreeSurface(brouillard);
 }
 
 void TMap::SetXY(int _x, int _y)
@@ -172,7 +164,7 @@ void TMap::Draw(int _x, int _y)
 			if(HaveBrouillard() && c->Showed() < 0)
 			{
 				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
-				SDL_FillRect(Window(), &r_back, 0);
+				Window()->FillRect(r_back, 0);
 				continue;
 			}
 			c->Draw();
@@ -182,8 +174,8 @@ void TMap::Draw(int _x, int _y)
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
 			if(HaveBrouillard() && c->Showed() == 0)
 			{
-				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),brouillard->w,brouillard->h};
-				SDL_BlitSurface(brouillard, NULL, Window(), &r_back);
+				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),brouillard.GetWidth(),brouillard.GetHeight()};
+				Window()->Blit(brouillard, &r_back);
 				//SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
 				//SDL_FillRect( Window(), &r_back, SDL_MapRGBA( Window()->format,0, 0, 0, 255*5/10));
 			}

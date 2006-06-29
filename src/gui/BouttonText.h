@@ -23,27 +23,31 @@
 #define EC_BOUTTONTEXT_H
 
 #include "Boutton.h"
-#include "tools/Font.h"
+#include "Label.h"
 #include <string>
 #include <SDL.h>
+
+class Font;
 
 class TButtonText : public TButton
 {
 private:
-  std::string m_text;
-  SDL_Surface* surf;
+  TLabel label;
 
   Font *font;
 
 public:
   TButtonText();
   TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text, Font* font);
-  ~TButtonText();
+
+  void Init();
+
+  virtual void SetImage (ECSprite *image);
 
   virtual void Draw (int souris_x, int souris_y);
   void SetText (const std::string &text);
-  void SetFont (Font *font);
   void SetEnabled(bool b = true);
+  virtual void SetXY(int, int);
 
   std::string GetText() const;
 };

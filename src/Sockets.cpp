@@ -19,6 +19,7 @@
  */
 
 #include <errno.h>
+#include <iostream>
 #include <cstdarg>
 #ifdef WIN32
 #include <winsock2.h>
@@ -28,11 +29,11 @@
 #endif
 
 #include "Sockets.h"
-#include "Main.h"
 #include "Commands.h"
 #include "Outils.h"
 #include "Channels.h"
 #include "Debug.h"
+#include "Config.h"
 
 /* Messages à envoyer */
 const char* msgTab[] = {
@@ -55,6 +56,15 @@ const char* msgTab[] = {
 	"ARM %s",                                 /* ARM - Envoie des infos sur une armée */
      0
 };
+
+EC_Client* EC_Client::singleton = NULL;
+EC_Client* EC_Client::GetInstance(bool create)
+{
+	if (singleton == NULL && create)
+		singleton = new EC_Client();
+	
+	return singleton;
+}
 
 char *EC_Client::rpl(EC_Client::msg t)
 {
@@ -143,12 +153,10 @@ void EC_Client::parse_message(std::string buf)
 
 int EC_Client::read_sock(void *data)
 {
-	EC_Client *cl = new EC_Client;
-	app.setclient(cl);
-	cl->lapp = &app;
+	EC_Client *cl = EC_Client::GetInstance(true);
 	cl->mutex = reinterpret_cast<SDL_mutex*>(data);
 
-	if(!cl->Connect(app.getconf()->hostname.c_str(), app.getconf()->port))
+	if(!cl->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port))
 		return 0;
 
 	//EC_Client* cl = app.getclient();
@@ -227,7 +235,6 @@ void EC_Client::Init()
 	readQi = 0;
 	sock = 0;
 	want_disconnect = false;
-	lapp = NULL;
 	pl = NULL;
 	error = false;
 	logging = true;

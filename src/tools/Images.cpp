@@ -19,9 +19,9 @@
  */
 
 #include "Images.h"
-#include "Main.h"
-#include "Defines.h"
+#include "Video.h"
 #include "Debug.h"
+#include "tools/Color.h"
 
 void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
 {
@@ -139,17 +139,17 @@ SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
   return surface;
 }
 
-void ChangePixelColor(ECImage* surf, SDL_Color last_color, SDL_Color new_color)
+void ChangePixelColor(ECImage* surf, Color last_color, Color new_color)
 {
 	SLOCK(surf->Img);
 	for(uint x = 0; x < surf->GetWidth(); x++)
 		for(uint y = 0; y < surf->GetHeight(); y++)
 		{
 			Uint32 col = getpixel(surf->Img, x, y);
-			Uint8 r, g, b;
-			SDL_GetRGB(col, surf->Img->format, &r, &g, &b);
-			if(last_color.r == r && last_color.g == g && last_color.b == b)
-				putpixel(surf->Img, x, y, SDL_MapRGB(surf->Img->format, new_color.r, new_color.g, new_color.b));
+			/*Uint8 r, g, b;
+			SDL_GetRGB(col, surf->Img->format, &r, &g, &b);*/
+			if(last_color == surf->GetColor(col))
+				putpixel(surf->Img, x, y, surf->MapColor(new_color));
 		}
 	SUNLOCK(surf->Img);
 }
@@ -220,7 +220,7 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
  *                                      ECSprite                                        *
  ****************************************************************************************/
 
-int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
+int ECSprite::init(ECSpriteBase *base, ECImage *screen)
 {
   assert(base);
   assert(screen);
@@ -229,7 +229,6 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   mDrawn = 0;
   mSpeed = 1;
   mLastupdate = 0;
-  mBackreplacement = 0;
   order = true;
   repeat = true;
   mX = 0; mY = 0; mOldX = 0; mOldY = 0;
@@ -237,45 +236,15 @@ int ECSprite::init(ECSpriteBase *base, SDL_Surface *screen)
   //mSpriteBase = new ECSpriteBase(base->path.c_str());
   mSpriteBase = base;
 
-  if(mSpriteBase->mBuilt)
-  {
-    if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=true;
-    mBackreplacement = SDL_DisplayFormat(mSpriteBase->mAnim[0].Img);
-  }
+  if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=true;
+
   mScreen = screen;
   return 0;
 }
 
 ECSprite::~ECSprite()
 {
-	if(mBackreplacement)
-		SDL_FreeSurface(mBackreplacement);
-/*	if(mSpriteBase)
-		delete mSpriteBase;*/
-}
 
-void ECSprite::clearBG()
-{
-  if(mDrawn==1)
-  {
-    SDL_Rect dest;
-    dest.x = mOldX;
-    dest.y = mOldY;
-    dest.w = mSpriteBase->mW;
-    dest.h = mSpriteBase->mH;
-    SDL_BlitSurface(mBackreplacement, NULL, mScreen, &dest);
-  }
-}
-
-void ECSprite::updateBG()
-{
-  SDL_Rect srcrect;
-  srcrect.w = mSpriteBase->mW;
-  srcrect.h = mSpriteBase->mH;
-  srcrect.x = mX;
-  srcrect.y = mY;
-  mOldX=mX;mOldY=mY;
-  SDL_BlitSurface(mScreen, &srcrect, mBackreplacement, NULL);
 }
 
 bool ECSprite::Anim() const { return (mSpriteBase->animation && mAnimating); }
@@ -337,7 +306,7 @@ void ECSprite::draw()
 	dest.y = mY;
 	dest.w = GetWidth();
 	dest.h = GetHeight();
-	SDL_BlitSurface(mSpriteBase->mAnim[mFrame].Img, NULL, mScreen, &dest);
+	mScreen->Blit(&mSpriteBase->mAnim[mFrame], &dest);
 }
 
 int ECSprite::GetWidth()
@@ -349,7 +318,7 @@ int ECSprite::GetHeight()
 	return (mSpriteBase ? mSpriteBase->mH : 0);
 }
 
-void ECSprite::ChangeColor(SDL_Color first, SDL_Color to)
+void ECSprite::ChangeColor(Color first, Color to)
 {
 	mSpriteBase->ChangeColor(first, to);
 }
@@ -422,7 +391,7 @@ int ECSpriteBase::init(const char *dir)
   return 0;
 }
 
-void ECSpriteBase::ChangeColor(SDL_Color from, SDL_Color to)
+void ECSpriteBase::ChangeColor(Color from, Color to)
 {
 	for(uint i=0; i < mNumframes; ++i)
 		ChangePixelColor(&mAnim[i], from, to);
@@ -440,13 +409,14 @@ ECImage* ECSpriteBase::First() const
  ****************************************************************************************/
 
 ECImage::ECImage(char* fichier)
+	: pause(0), autofree(true)
 {
 	Load(fichier);
 }
 
 void ECImage::Free()
 {
-	if(Img)
+	if(Img && autofree)
 	{
 		SDL_FreeSurface(Img);
 		Img = 0;
@@ -468,6 +438,36 @@ ECImage &ECImage::operator=(const ECImage & src){
         return *this;
 }
 
+int ECImage::Blit(const ECImage& src, SDL_Rect *srcRect, SDL_Rect *dstRect)
+{
+	return SDL_BlitSurface( src.Img, srcRect, Img, dstRect );
+}
+
+int ECImage::Blit(const ECImage& src, SDL_Rect *dstRect)
+{
+	return SDL_BlitSurface( src.Img, 0, Img, dstRect );
+}
+
+int ECImage::Blit(const ECImage& src)
+{
+	return SDL_BlitSurface( src.Img, 0, Img, 0);
+}
+
+int ECImage::Blit(const ECImage* src, SDL_Rect *srcRect, SDL_Rect *dstRect)
+{
+	return SDL_BlitSurface( src->Img, srcRect, Img, dstRect );
+}
+
+int ECImage::Blit(const ECImage* src, SDL_Rect *dstRect)
+{
+	return SDL_BlitSurface( src->Img, 0, Img, dstRect );
+}
+
+int ECImage::Blit(const ECImage* src)
+{
+	return SDL_BlitSurface( src->Img, 0, Img, 0);
+}
+
 void ECImage::Load(char *fichier)
 {
 	SDL_Surface *tmp = 0;
@@ -484,7 +484,7 @@ void ECImage::Draw(int x, int y)
   SDL_Rect dest;
   dest.x = x;
   dest.y = y;
-  SDL_BlitSurface(Img, NULL, app.sdlwindow, &dest);
+  Video::GetInstance()->Window()->Blit(this, &dest);
 }
 
 void ECImage::Draw(int x, int y, int w, int h, int x2, int y2)
@@ -498,7 +498,7 @@ void ECImage::Draw(int x, int y, int w, int h, int x2, int y2)
   dest2.y = y2;
   dest2.w = w;
   dest2.h = h;
-  SDL_BlitSurface(Img, &dest2, app.sdlwindow, &dest);
+  Video::GetInstance()->Window()->Blit(this, &dest2, &dest);
 }
 
 void ECImage::Draw()
@@ -512,3 +512,51 @@ void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)
 	SDL_SetColorKey(Img, SDL_SRCCOLORKEY, SDL_MapRGB(Img->format, r, g, b));
 }
 
+void ECImage::GetRGBA(Uint32 color, Uint8 &r, Uint8 &g, Uint8 &b, Uint8 &a)
+{
+	if(!Img) return;
+	SDL_GetRGBA(color, Img->format, &r, &g, &b, &a);
+}
+
+Uint32 ECImage::MapRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+	if(!Img) return 0;
+    return SDL_MapRGBA(Img->format, r, g, b, a);
+}
+
+Color ECImage::GetColor(Uint32 color)
+{
+	Uint8 r, g, b, a;
+	GetRGBA(color, r, g, b, a);
+	return Color(r, g, b, a);
+}
+
+Uint32 ECImage::MapColor(Color color)
+{
+	if(!Img) return 0;
+	return MapRGBA(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+}
+
+void ECImage::Flip()
+{
+	if(!Img) return;
+	SDL_Flip( Img );
+}
+
+int ECImage::Fill(Uint32 color)
+{
+	if(!Img) return 0;
+	return SDL_FillRect( Img, NULL, color);
+}
+
+int ECImage::Fill(const Color &color)
+{
+	if(!Img) return 0;
+	return Fill( MapColor(color) );
+}
+
+int ECImage::FillRect(SDL_Rect &dstRect, Uint32 color)
+{
+	if(!Img) return 0;
+	return SDL_FillRect( Img, &dstRect, color);
+}

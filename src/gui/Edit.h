@@ -24,14 +24,14 @@
 
 #include <vector>
 #include <string>
-#include <SDL.h>
 
 #include "Component.h"
 
 #define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN123456789 .+-*/,;:!?()[]={}'\"&<>"
 
-struct SDL_Surface;
+struct ECImage;
 class Font;
+class Color;
 
 /** This is a component whose show a box where user can type text */
 class TEdit : public TComponent
@@ -41,7 +41,6 @@ public:
 
 	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, char* av = EDIT_CHARS,
 	      bool show_background = true);
-	~TEdit();
 
 /* Methodes */
 public:
@@ -72,15 +71,15 @@ public:
 
 	void SetMaxLen(uint m) { maxlen = m; }
 
-	void SetColor(SDL_Color c) { color = c; }
+	void SetColor(Color c) { color = c; }
 
 	void SetFocus();
 	void DelFocus();
 
 /* Variables privées */
 private:
-	SDL_Surface *background;
-	SDL_Surface *edit;
+	ECImage background;
+	ECImage edit;
 	uint maxlen;
 	uint visible_len;
 	uint first_char;
@@ -91,7 +90,7 @@ private:
 	bool have_redraw;
 	uint EDIT_HEIGHT;
 	Font* font;
-	SDL_Color color;
+	Color color;
 };
 
 #endif /* EC_EDIT_H */

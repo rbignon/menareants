@@ -25,15 +25,15 @@
 #include "SpinEdit.h"
 #include "Colors.h"
 
-extern SDL_Color *color_eq[];
+class Color;
+
+extern Color color_eq[];
 
 class TColorEdit : public TSpinEdit
 {
 /* Constructor/Destructor */
 public:
 	TColorEdit(Font* font, std::string label, int _x, int _y, uint _width, int _defvalue = 0);
-
-	~TColorEdit();
 
 /* Methodes */
 public:
@@ -49,7 +49,7 @@ public:
 
 /* Variables privées */
 protected:
-	ECImage *img;
+	ECImage img;
 	uint imgx;
 };
 

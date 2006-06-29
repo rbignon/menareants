@@ -21,17 +21,15 @@
 #ifndef EC_Main_h
 #define EC_Main_h
 
-#include "Defines.h"
-#include "Config.h"
-#include "Sockets.h"
-#include "tools/Font.h"
-#include "gui/Object.h"
+//#include "Defines.h"
+//#include "gui/Object.h"
 
 #include <iostream>
 #include <SDL_thread.h>
 
 struct SDL_Surface;
 class TForm;
+class TObject;
 class EChannel;
 class EC_Client;
 
@@ -39,10 +37,7 @@ class MenAreAntsApp
 {
 protected:
 	
-	EC_Client* client;
-	Config *conf;
 	SDL_Thread* Thread;
-	Fonts *fonts;
 	SDL_mutex* mutex;
 	std::string path;
 	bool want_quit;
@@ -73,10 +68,6 @@ public:
 	void quit_app(int value);
 #endif
 
-	Config* getconf() const { return conf; }
-	EC_Client* getclient() const { return client; }
-	Fonts* Font() const { return fonts; }
-	void setclient(EC_Client* c);
 	std::string GetPath() const { return path; }
 
 	void FirstRun() { first_run = true; }
@@ -84,12 +75,11 @@ public:
 	SDL_mutex* Mutex() const { return mutex; }
 
 	MenAreAntsApp()
-		: client(0), conf(0), Thread(0), fonts(0), mutex(0), want_quit(false), first_run(false), sdlwindow(0)
+		: Thread(0), mutex(0), want_quit(false), first_run(false)
 	{}
 
-	SDL_Surface* sdlwindow;
+	static MenAreAntsApp* singleton;
+	static MenAreAntsApp* GetInstance();
 };
-
-extern MenAreAntsApp app;
 
 #endif

@@ -22,8 +22,9 @@
 #include "CheckBox.h"
 #include "Resources.h"
 #include "gui/Label.h"
+#include "tools/Font.h"
 
-TCheckBox::TCheckBox(Font* f, int _x, int _y, std::string txt, SDL_Color color)
+TCheckBox::TCheckBox(Font* f, int _x, int _y, std::string txt, Color color)
 	: TComponent(_x, _y), text(_x+20, _y, txt, color, f), image(0), checked(false)
 {
 

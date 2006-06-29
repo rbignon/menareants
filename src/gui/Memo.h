@@ -29,8 +29,8 @@
 #include "Boutton.h"
 #include "gui/Label.h"
 
-struct SDL_Surface;
-struct SDL_Color;
+struct ECImage;
+struct Color;
 class Font;
 
 /** This is a component derived of TComponent whose show a box with text lines */
@@ -52,7 +52,7 @@ private:
 
   bool show_background;
 
-  SDL_Surface *background;
+  ECImage background;
 
   Font* font;
 
@@ -64,7 +64,7 @@ public:
   void Init ();
   void Draw (int mouse_x, int mouse_y);
   bool Clic (int mouse_x, int mouse_y);
-  void AddItem (const std::string &label, SDL_Color _color = black_color);
+  void AddItem (const std::string &label, Color _color = black_color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);
   uint NbItems() const { return m_items.size(); }

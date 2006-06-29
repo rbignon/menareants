@@ -22,11 +22,13 @@
 #include "Sockets.h"
 #include "Debug.h"
 #include "tools/Font.h"
+#include "tools/Video.h"
 #include "gui/MessageBox.h"
-#include "Main.h"
 #include "Login.h"
 #include "Resources.h"
 #include "Outils.h"
+#include "Main.h"
+#include "Config.h"
 
 TConnectedForm  *ConnectedForm = NULL;
 static bool RC_MOTD = false;
@@ -37,7 +39,7 @@ static bool RC_MOTD = false;
  */
 int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->sendrpl(me->rpl(EC_Client::IAM), me->lapp->getconf()->nick.c_str());
+	me->sendrpl(me->rpl(EC_Client::IAM), Config::GetInstance()->nick.c_str());
 	return 0;
 }
 
@@ -70,7 +72,7 @@ int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int USEDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->SetCantConnect("Le pseudo " + me->lapp->getconf()->nick + " est pris");
+	me->SetCantConnect("Le pseudo " + Config::GetInstance()->nick + " est pris");
 	return 0;
 }
 
@@ -150,7 +152,7 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 void MenAreAntsApp::request_game()
 {
-	if(client)
+	if(EC_Client::GetInstance())
 	{
 		FDebug(W_SEND|W_ERR, "Appel en étant déjà connecté !");
 		return;
@@ -158,13 +160,16 @@ void MenAreAntsApp::request_game()
 
 	try
 	{
-		ConnectedForm = new TConnectedForm(sdlwindow);
+		ConnectedForm = new TConnectedForm(Video::GetInstance()->Window());
 
 		//SDL_mutex* Mutex = SDL_CreateMutex();
 		mutex = SDL_CreateMutex();
 		Thread = SDL_CreateThread(EC_Client::read_sock, mutex);
 
-		WAIT_EVENT_T((client && (client->IsConnected() || client->Error())), i, 5);
+		WAIT_EVENT_T((EC_Client::GetInstance() && (EC_Client::GetInstance()->IsConnected() ||
+		             EC_Client::GetInstance()->Error())), i, 5);
+
+		EC_Client* client = EC_Client::GetInstance();
 
 		if(!client || !client->IsConnected())
 		{
@@ -262,7 +267,7 @@ void MenAreAntsApp::request_game()
 	catch(const TECExcept &e)
 	{
 		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
-		client->SetWantDisconnect();
+		EC_Client::GetInstance()->SetWantDisconnect();
 		TMessageBox mb("Une erreur s'est produite dans le jeu !!\n\n"
 		               "Elle a été envoyée aux programmeurs du jeu qui feront leur "
 		               "possible pour le corriger.\n\n"
@@ -270,15 +275,14 @@ void MenAreAntsApp::request_game()
 				mb.SetBackGround(Resources::Titlescreen());
 				mb.Show();
 	}
-	if(client)
+	if(EC_Client::GetInstance())
 	{
-		delete client;
-		client = NULL;
+		delete EC_Client::GetInstance();
+		EC_Client::singleton = NULL;
 	}
 	SDL_WaitThread(Thread, 0);
 
-	delete ConnectedForm;
-	ConnectedForm = NULL;
+	MyFree(ConnectedForm);
 
 	if(mutex)
 	{
@@ -293,33 +297,20 @@ void MenAreAntsApp::request_game()
  *                               TConnectedForm                                             *
  ********************************************************************************************/
 
-TConnectedForm::TConnectedForm(SDL_Surface* w)
+TConnectedForm::TConnectedForm(ECImage* w)
 	: TForm(w)
 {
-	Welcome = AddComponent(new TLabel(100,110,"Vous êtes bien connecté", white_color, &app.Font()->big));
+	Welcome = AddComponent(new TLabel(100,110,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
 
-	Motd = AddComponent(new TMemo(&app.Font()->sm, 75,150,500,350, 0));
+	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 75,150,500,350, 0));
 
-	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie", &app.Font()->normal));
-	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties", &app.Font()->normal));
-	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter", &app.Font()->normal));
+	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie", Font::GetInstance(Font::Normal)));
+	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties", Font::GetInstance(Font::Normal)));
+	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter", Font::GetInstance(Font::Normal)));
 
-	Uptime =    AddComponent(new TLabel(75,510,"", white_color, &app.Font()->normal));
-	UserStats = AddComponent(new TLabel(75,530,"", white_color, &app.Font()->normal));
-	ChanStats = AddComponent(new TLabel(75,550,"", white_color, &app.Font()->normal));
+	Uptime =    AddComponent(new TLabel(75,510,"", white_color, Font::GetInstance(Font::Normal)));
+	UserStats = AddComponent(new TLabel(75,530,"", white_color, Font::GetInstance(Font::Normal)));
+	ChanStats = AddComponent(new TLabel(75,550,"", white_color, Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TConnectedForm::~TConnectedForm()
-{
-	delete ChanStats;
-	delete UserStats;
-	delete Uptime;
-	delete DisconnectButton;
-	delete ListButton;
-	delete CreateButton;
-	delete Motd;
-	delete Welcome;
-	
 }

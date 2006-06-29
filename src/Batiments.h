@@ -26,6 +26,8 @@
 #include "lib/Batiments.h"
 #include "Resources.h"
 
+class Color;
+
 /********************************************************************************************
  *                                ECBatiment                                                *
  ********************************************************************************************/
@@ -49,7 +51,7 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
 
-	virtual void RefreshColor(SDL_Color last);
+	virtual void RefreshColor(Color last);
 
 private:
 	ECSpriteBase *img;
@@ -119,6 +121,8 @@ public:
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
 	virtual void Draw();
+
+	virtual std::string SpecialInfo();
 
 /* Variables privées */
 private:

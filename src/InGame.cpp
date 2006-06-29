@@ -18,20 +18,23 @@
  * $Id$
  */
 
+#include "AltThread.h"
+#include "Batiments.h"
+#include "Channels.h"
+#include "Debug.h"
 #include "InGame.h"
-#include "tools/Maths.h"
+#include "Main.h"
+#include "Map.h"
+#include "Outils.h"
 #include "Resources.h"
+#include "Sockets.h"
+#include "Timer.h"
+#include "Units.h"
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
-#include "Outils.h"
-#include "Main.h"
-#include "Debug.h"
-#include "Channels.h"
-#include "Map.h"
-#include "Units.h"
-#include "Batiments.h"
-#include "Timer.h"
-#include "AltThread.h"
+#include "tools/Font.h"
+#include "tools/Maths.h"
+#include "tools/Video.h"
 
 TLoadingForm *LoadingForm = NULL;
 TInGameForm  *InGameForm  = NULL;
@@ -300,7 +303,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
-		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0)
+		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 && !(flags & (ARM_REMOVE|ARM_DATA)))
 			InGameForm->Map->CenterTo(entities[0]);
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
@@ -400,7 +403,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 class THelpForm : public TForm
 {
 public:
-	THelpForm(SDL_Surface* window)
+	THelpForm(ECImage* window)
 		: TForm(window)
 	{
 		SetBackground(Resources::HelpScreen());
@@ -409,6 +412,7 @@ public:
 
 void MenAreAntsApp::InGame()
 {
+	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player() || !client->Player()->Channel()->Map())
 		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
 
@@ -418,7 +422,8 @@ void MenAreAntsApp::InGame()
 	{
 		SDL_Event event;
 		bool eob = false;
-		InGameForm = new TInGameForm(sdlwindow, client->Player());
+
+		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client->Player());
 		InGameForm->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
@@ -460,7 +465,7 @@ void MenAreAntsApp::InGame()
 							{
 								if(client->Player()->Channel()->State() != EChannel::PLAYING)
 									break;
-								THelpForm* HelpForm = new THelpForm(sdlwindow);
+								THelpForm* HelpForm = new THelpForm(Video::GetInstance()->Window());
 								SDL_Event ev;
 								bool eobb = false;
 								do
@@ -552,7 +557,7 @@ void MenAreAntsApp::InGame()
 								s += " %" + TypToStr(entity->Type());
 								s += " =" + TypToStr(acase->X()) + "," + TypToStr(acase->Y());
 								s += " +";
-								client->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
+								client->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
 								entity->SetOwner(0);
 								InGameForm->Map->SetCreateEntity(0);
 							}
@@ -691,7 +696,7 @@ void MenAreAntsApp::InGame()
 			            InGameForm->BarreLat->Radar->Y() -
 			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
 			              InGameForm->Map->Y()/CASE_HEIGHT));
-			//SDL_FillRect(app.sdlwindow, NULL, 0);
+			//SDL_FillRect(Video::GetInstance()->Window(), NULL, 0);
 			InGameForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() != EChannel::SCORING);
@@ -723,7 +728,7 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 {
 	if(!Chat) return;
 
-	SDL_Color c = white_color;
+	Color c = white_color;
 	if(flags & I_WARNING) c = orange_color;
 	else if(flags & I_INFO) c = fblue_color;
 	else if(flags & I_ECHO) c = white_color;
@@ -732,7 +737,7 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 	else if(flags & I_CHAT)
 	{
 		if(pl)
-			c = *color_eq[pl->Color()];
+			c = color_eq[pl->Color()];
 		else
 			c = red_color; // On n'envoit pas de pl quand on veut highlight
 	}
@@ -760,7 +765,7 @@ void TInGameForm::ShowBarreAct(bool show)
 	ECEntity* e = BarreAct->Entity();
 
 	Map->SetXY(Map->X(),
-	           (e && (e->Image()->Y() + e->Image()->GetHeight()) >= (SCREEN_HEIGHT - int(BarreAct->Height()))) ?
+	           (e && (e->Image()->Y() + e->Image()->GetHeight()) >= int(SCREEN_HEIGHT - BarreAct->Height())) ?
 	               Map->Y() - e->Image()->GetHeight()
 	             : Map->Y());
 		
@@ -778,7 +783,7 @@ void TInGameForm::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
+TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
 	: TForm(w)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
@@ -795,10 +800,11 @@ TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
 	BarreLat = AddComponent(new TBarreLat(pl));
 	BarreAct = AddComponent(new TBarreAct(pl));
 
-	SendMessage = AddComponent(new TEdit(&app.Font()->sm, 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
+	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
 	SendMessage->SetColor(white_color);
-	Chat = AddComponent(new TMemo(&app.Font()->sm, 30, 20 + SendMessage->Height() + 20,
-	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30, 10 * app.Font()->sm.GetHeight(), 9, false));
+	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 30, 20 + SendMessage->Height() + 20,
+	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30,
+	                              10 * Font::GetInstance(Font::Small)->GetHeight(), 9, false));
 	Chat->SetShadowed();
 
 	ShowBarreLat();
@@ -807,15 +813,6 @@ TInGameForm::TInGameForm(SDL_Surface* w, ECPlayer* pl)
 	SetHint(BarreLat->UnitsInfos);
 
 	Thread = 0;
-}
-
-TInGameForm::~TInGameForm()
-{
-	delete Chat;
-	delete SendMessage;
-	delete BarreAct;
-	delete BarreLat;
-	delete Map;
 }
 
 /********************************************************************************************
@@ -919,7 +916,8 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	 */
 	TBarreAct* thiss = static_cast<TBarreAct*>(o->Parent()->Parent());
 	TInGameForm* ingame = static_cast<TInGameForm*>(thiss->Parent());
-	if(int(thiss->entity->Cost()) > ingame->Player()->Money())
+	ECEntity* entity = static_cast<ECEntity*>(e);
+	if(int(entity->Cost()) > ingame->Player()->Money())
 	{
 		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer cette unité.");
 		return;
@@ -927,10 +925,10 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	int x = thiss->entity ? thiss->entity->Case()->X() : 0;
 	int y = thiss->entity ? thiss->entity->Case()->Y() : 0;
 	std::string s = "-";
-	s += " %" + TypToStr(static_cast<ECEntity*>(e)->Type());
+	s += " %" + TypToStr(entity->Type());
 	s += " =" + TypToStr(x) + "," + TypToStr(y);
 	s += " +";
-	app.getclient()->sendrpl(app.getclient()->rpl(EC_Client::ARM), s.c_str());
+	EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
 }
 
 void TBarreAct::UnSelect()
@@ -1022,7 +1020,7 @@ void TBarreAct::vSetEntity(void* _e)
 		if(e->Owner())
 		{
 			InGameForm->BarreAct->Owner->Show();
-			InGameForm->BarreAct->Owner->SetColor(*color_eq[e->Owner()->Color()]);
+			InGameForm->BarreAct->Owner->SetColor(color_eq[e->Owner()->Color()]);
 			InGameForm->BarreAct->Owner->SetCaption(e->Owner()->GetNick());
 		}
 		else
@@ -1035,7 +1033,7 @@ void TBarreAct::vSetEntity(void* _e)
 		if(!InGameForm->BarreAct->entity)
 		{
 			InGameForm->BarreAct->Show();
-			while(InGameForm->BarreAct->Y() > SCREEN_HEIGHT- int(InGameForm->BarreAct->Height()))
+			while(InGameForm->BarreAct->Y() > int(SCREEN_HEIGHT - InGameForm->BarreAct->Height()))
 				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()-4), SDL_Delay(10);
 			InGameForm->ShowBarreAct(true);
 		}
@@ -1049,7 +1047,7 @@ void TBarreAct::vSetEntity(void* _e)
 		if(InGameForm->BarreAct->entity)
 		{
 			InGameForm->ShowBarreAct(false);
-			while(InGameForm->BarreAct->Y() < SCREEN_HEIGHT)
+			while(InGameForm->BarreAct->Y() < int(SCREEN_HEIGHT))
 				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+4), SDL_Delay(10);
 			InGameForm->BarreAct->Hide();
 			
@@ -1068,32 +1066,32 @@ TBarreAct::TBarreAct(ECPlayer* pl)
 
 void TBarreAct::Init()
 {
-	Name = AddComponent(new TLabel(60,5, "", black_color, &app.Font()->big));
+	Name = AddComponent(new TLabel(60,5, "", black_color, Font::GetInstance(Font::Big)));
 
-	DeployButton = AddComponent(new TButtonText(300,5,100,30, "Déployer", &app.Font()->sm));
+	DeployButton = AddComponent(new TButtonText(300,5,100,30, "Déployer", Font::GetInstance(Font::Small)));
 	DeployButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	DeployButton->SetHint("Déployer l'unité pour lui permettre d'avoir des capacités en plus.");
-	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", &app.Font()->sm));
+	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", Font::GetInstance(Font::Small)));
 	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	AttaqButton->SetHint("Attaquer une autre unité sur une case choisie (cliquez dessus).\n$ Maj + clic");
-	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", &app.Font()->sm));
+	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", Font::GetInstance(Font::Small)));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	ExtractButton = AddComponent(new TButtonText(500,5,100,30, "Extraire", &app.Font()->sm));
+	ExtractButton = AddComponent(new TButtonText(500,5,100,30, "Extraire", Font::GetInstance(Font::Small)));
 	ExtractButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	ExtractButton->SetHint("Cliquez ensuite sur la case où vous voulez que l'unité contenue aille.\n$ Espace + clic");
 
-	Owner = AddComponent(new TLabel(60,30, "", black_color, &app.Font()->normal));
+	Owner = AddComponent(new TLabel(60,30, "", black_color, Font::GetInstance(Font::Normal)));
 
 	Icon = AddComponent(new TImage(5,5));
-	Nb = AddComponent(new TLabel(5,55, "", black_color, &app.Font()->normal));
-	SpecialInfo = AddComponent(new TLabel(5,75, "", black_color, &app.Font()->normal));
-	Infos = AddComponent(new TLabel(5, 75, "", red_color, &app.Font()->normal));
+	Nb = AddComponent(new TLabel(5,55, "", black_color, Font::GetInstance(Font::Normal)));
+	SpecialInfo = AddComponent(new TLabel(5,75, "", black_color, Font::GetInstance(Font::Normal)));
+	Infos = AddComponent(new TLabel(5, 75, "", red_color, Font::GetInstance(Font::Normal)));
 
 	Icons = AddComponent(new TBarreActIcons(200, 49));
 
 	ChildIcon = AddComponent(new TImage(200,50));
 	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
-	ChildNb = AddComponent(new TLabel(260,70, "", black_color, &app.Font()->normal));
+	ChildNb = AddComponent(new TLabel(260,70, "", black_color, Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::BarreAct());
 }
@@ -1130,17 +1128,17 @@ TBarreLat::TBarreLat(ECPlayer* pl)
 
 void TBarreLat::Init()
 {
-	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", &app.Font()->sm));
-	PretButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
+	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	PretButton->SetHint("Cliquez ici lorsque vous avez fini vos déplacements");
-	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", &app.Font()->sm));
-	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", Font::GetInstance(Font::Small)));
+	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	SchemaButton->SetHint("Voir la délimitation des territoires sur la carte");
-	OptionsButton = AddComponent(new TButtonText(30,280,100,30, "Options", &app.Font()->sm));
-	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	OptionsButton = AddComponent(new TButtonText(30,280,100,30, "Options", Font::GetInstance(Font::Small)));
+	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	OptionsButton->SetHint("Voir les options (notament les alliances)");
-	QuitButton = AddComponent(new TButtonText(30,310,100,30, "Quitter", &app.Font()->sm));
-	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	QuitButton = AddComponent(new TButtonText(30,310,100,30, "Quitter", Font::GetInstance(Font::Small)));
+	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	QuitButton->SetHint("Quitter la partie");
 
 	Icons = AddComponent(new TBarreLatIcons(20, 360));
@@ -1153,11 +1151,11 @@ void TBarreLat::Init()
 	Radar->SetImage(chan->Map()->Preview(), false);
 	Radar->SetOnClickPos(TBarreLat::RadarClick);
 
-	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, &app.Font()->sm));
-	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, &app.Font()->sm));
-	TurnMoney = AddComponent(new TLabel(80, 20, "", white_color, &app.Font()->sm));
+	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, Font::GetInstance(Font::Small)));
+	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
+	TurnMoney = AddComponent(new TLabel(80, 20, "", white_color, Font::GetInstance(Font::Small)));
 
-	UnitsInfos = AddComponent(new TMemo(&app.Font()->sm, 15, Height() - 100 - 10, Width() - 15 - 10, 100));
+	UnitsInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 15, Height() - 100 - 10, Width() - 15 - 10, 100));
 
 	ScreenPos = AddComponent(new TImage(0,0));
 	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
@@ -1177,6 +1175,7 @@ void TBarreLat::Init()
 
 void MenAreAntsApp::Options(EChannel* chan)
 {
+	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
 		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
 
@@ -1184,7 +1183,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 	{
 		SDL_Event event;
 		bool eob = false;
-		OptionsForm = new TOptionsForm(sdlwindow, client->Player(), chan);
+		OptionsForm = new TOptionsForm(Video::GetInstance()->Window(), client->Player(), chan);
 		OptionsForm->SetMutex(mutex);
 		do
 		{
@@ -1219,7 +1218,8 @@ void MenAreAntsApp::Options(EChannel* chan)
 				}
 			}
 			OptionsForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() && client->Player()->Channel()->State() == EChannel::PLAYING);
+		} while(!eob && client->IsConnected() && client->Player() &&
+		        client->Player()->Channel()->State() == EChannel::PLAYING);
 	
 	}
 	catch(TECExcept &e)
@@ -1231,7 +1231,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 	return;
 }
 
-TOptionsForm::TOptionsForm(SDL_Surface* w, ECPlayer* _me, EChannel* ch)
+TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
 	: TForm(w)
 {
 	Players = AddComponent(new TList(60, 200));
@@ -1239,15 +1239,9 @@ TOptionsForm::TOptionsForm(SDL_Surface* w, ECPlayer* _me, EChannel* ch)
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TOptionsPlayerLine(_me, dynamic_cast<ECPlayer*>(*it)));
 
-	OkButton = AddComponent(new TButtonText(550,350,150,50, "OK", &app.Font()->normal));
+	OkButton = AddComponent(new TButtonText(550,350,150,50, "OK", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TOptionsForm::~TOptionsForm()
-{
-	delete OkButton;
-	delete Players;
 }
 
 /********************************************************************************************
@@ -1281,12 +1275,12 @@ void TOptionsPlayerLine::Init()
 	                                              pl->GetNick(),
 	                                              nations_str[pl->Nation()].name);
 
-	label = new TLabel(x, y, s, *color_eq[pl->Color()], &app.Font()->normal);
+	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal));
 	MyComponent(label);
 
-	allie = new TLabel(x+20, y, me->IsAllie(pl) ? ">" : " ", red_color, &app.Font()->normal);
+	allie = new TLabel(x+20, y, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Normal));
 
-	recipr = new TLabel(x+10, y, pl->IsAllie(me) ? "<" : " ", red_color, &app.Font()->normal);
+	recipr = new TLabel(x+10, y, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Normal));
 
 	MyComponent(allie);
 	MyComponent(recipr);
@@ -1325,6 +1319,7 @@ void LoadingGame(EC_Client* me)
 
 void MenAreAntsApp::LoadGame(EChannel* chan)
 {
+	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
 		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
 
@@ -1332,7 +1327,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 	{
 		bool eob = false;
 		chan->Map()->CreatePreview(300,300);
-		LoadingForm = new TLoadingForm(sdlwindow, chan);
+		LoadingForm = new TLoadingForm(Video::GetInstance()->Window(), chan);
 		LoadingForm->SetMutex(mutex);
 		do
 		{
@@ -1354,12 +1349,13 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 	return;
 }
 
-TLoadingForm::TLoadingForm(SDL_Surface* w, EChannel* ch)
+TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), white_color, &app.Font()->big));
+	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), white_color,
+	                                        Font::GetInstance(Font::Big)));
 
-	MapInformations = AddComponent(new TMemo(&app.Font()->sm, 60,150,315,200,30));
+	MapInformations = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60,150,315,200,30));
 	std::vector<std::string> map_infos = ch->Map()->MapInfos();
 	if(map_infos.empty())
 		MapInformations->Hide();
@@ -1375,27 +1371,16 @@ TLoadingForm::TLoadingForm(SDL_Surface* w, EChannel* ch)
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TLoadPlayerLine(dynamic_cast<ECPlayer*>(*it)));
 
-	MapTitle = AddComponent(new TLabel(400, 100, ch->Map()->Name(), white_color, &app.Font()->big));
+	MapTitle = AddComponent(new TLabel(400, 100, ch->Map()->Name(), white_color, Font::GetInstance(Font::Big)));
 
 	Preview = AddComponent(new TImage(450, 150));
 	Preview->SetImage(ch->Map()->Preview(), false);
 
-	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), white_color, &app.Font()->normal));
+	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), white_color, Font::GetInstance(Font::Normal)));
 
-	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, &app.Font()->large));
+	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, Font::GetInstance(Font::Large)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TLoadingForm::~TLoadingForm()
-{
-	delete Loading;
-	delete Date;
-	delete Preview;
-	delete MapTitle;
-	delete Players;
-	delete MapInformations;
-	delete Title;
 }
 
 /********************************************************************************************
@@ -1421,7 +1406,7 @@ void TLoadPlayerLine::Init()
 	                                              pl->GetNick(),
 	                                              nations_str[pl->Nation()].name);
 
-	label = new TLabel(x, y, s, *color_eq[pl->Color()], &app.Font()->normal);
+	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal));
 	MyComponent(label);
 }
 
@@ -1443,9 +1428,9 @@ TScoresForm* ScoresForm = 0;
 int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!ScoresForm)
-		ScoresForm = new TScoresForm(app.sdlwindow, me->Player()->Channel());
+		ScoresForm = new TScoresForm(Video::GetInstance()->Window(), me->Player()->Channel());
 
-	ScoresForm->Players->AddLine(new TScoresPlayerLine(players[0]->GetNick(), *color_eq[players[0]->Color()],
+	ScoresForm->Players->AddLine(new TScoresPlayerLine(players[0]->GetNick(), color_eq[players[0]->Color()],
 	                                                   parv[1], parv[2], parv[3], parv[4]));
 	return 0;
 }
@@ -1460,6 +1445,7 @@ void TScoresForm::WantLeave(TObject* o, void* cl)
 
 void MenAreAntsApp::Scores(EChannel* chan)
 {
+	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
 		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
 
@@ -1490,38 +1476,28 @@ void MenAreAntsApp::Scores(EChannel* chan)
 	return;
 }
 
-TScoresForm::TScoresForm(SDL_Surface* w, EChannel* ch)
+TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
 	Title = AddComponent(new TLabel(250,100,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
-	                      &app.Font()->large));
+	                      Font::GetInstance(Font::Large)));
 
 	Players = AddComponent(new TList(70, 250));
 	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meutres", "Créations", "Score"));
 
 	Date = AddComponent(new TLabel(200, 150, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
-	                               &app.Font()->big));
+	                               Font::GetInstance(Font::Big)));
 
-//	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, &app.Font()->large));
-
-	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TScoresForm::~TScoresForm()
-{
-	delete RetourButton;
-	delete Date;
-	delete Players;
-	delete Title;
 }
 
 /********************************************************************************************
  *                               TScoresPlayerLine                                          *
  ********************************************************************************************/
 
-TScoresPlayerLine::TScoresPlayerLine(std::string n, SDL_Color col, std::string _k, std::string _s, std::string _c,
+TScoresPlayerLine::TScoresPlayerLine(std::string n, Color col, std::string _k, std::string _s, std::string _c,
                                      std::string _sc)
 	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
 {
@@ -1539,12 +1515,12 @@ TScoresPlayerLine::~TScoresPlayerLine()
 
 void TScoresPlayerLine::Init()
 {
-	Nick = new TLabel(x, y, nick, color, &app.Font()->big);
+	Nick = new TLabel(x, y, nick, color, Font::GetInstance(Font::Big));
 
-	Killed = new TLabel(x+170, y, killed, color, &app.Font()->big);
-	Shooted = new TLabel(x+300, y, shooted, color, &app.Font()->big);
-	Created = new TLabel(x+420, y, created, color, &app.Font()->big);
-	Score = new TLabel(x+580, y, score, color, &app.Font()->big);
+	Killed = new TLabel(x+170, y, killed, color, Font::GetInstance(Font::Big));
+	Shooted = new TLabel(x+300, y, shooted, color, Font::GetInstance(Font::Big));
+	Created = new TLabel(x+420, y, created, color, Font::GetInstance(Font::Big));
+	Score = new TLabel(x+580, y, score, color, Font::GetInstance(Font::Big));
 	MyComponent(Nick);
 	MyComponent(Killed);
 	MyComponent(Shooted);

@@ -25,9 +25,10 @@
 #include "Component.h"
 #include "Boutton.h"
 #include "Label.h"
-#include "tools/Font.h"
 #include <string>
-#include <SDL.h>
+
+class Color;
+class Font;
 
 /** This component show an edit who you can choose an integer in an interval */
 class TSpinEdit : public TComponent
@@ -48,7 +49,6 @@ public:
 	 */
 	TSpinEdit(Font *font, std::string label, int _x, int _y, uint _width, int _min, int _max, uint _step = 1,
 	          int _defvalue = 0);
-	virtual ~TSpinEdit();
 
 /* Methodes */
 public:
@@ -59,7 +59,7 @@ public:
 
 	bool Clic (int mouse_x, int mouse_y);
 
-	void SetColorFont(SDL_Color new_color, Font* new_font);
+	void SetColorFont(Color new_color, Font* new_font);
 
 /* Attributs */
 public:
@@ -81,8 +81,8 @@ public:
 
 /* Variables privées */
 protected:
-	TButton *m_plus, *m_minus;
-	TLabel *txt_label, *txt_value;
+	TButton m_plus, m_minus;
+	TLabel txt_label, txt_value;
 	int value, min, max;
 	uint step;
 	uint visible_len;
@@ -93,7 +93,7 @@ protected:
 	/** This function is used by Clic() to check in bad_values */
 	bool ChangeValueByClick(bool up);
 
-	SDL_Color color;
+	Color color;
 	Font *font;
 };
 

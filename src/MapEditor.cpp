@@ -23,6 +23,7 @@
 #include <windows.h>
 #endif
 #include "Main.h"
+#include "Config.h"
 #include "Resources.h"
 #include "Map.h"
 #include "Outils.h"
@@ -31,6 +32,8 @@
 #include "gui/ColorEdit.h" // Pour color_eq[]
 #include "Debug.h"
 #include "tools/Maths.h"
+#include "tools/Video.h"
+#include "tools/Font.h"
 #include "MapEditor.h"
 #include "Units.h"
 #include "Batiments.h"
@@ -202,7 +205,7 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 			map.push_back(c);
 		}
 
-	map_infos.push_back("Map créée par " + app.getconf()->nick);
+	map_infos.push_back("Map créée par " + Config::GetInstance()->nick);
 	initialised = true;
 }
 
@@ -290,7 +293,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 
 		uint x = 0, y = 0;
 		std::string date;
-		name = app.GetPath() + name + ".map";
+		name = MenAreAntsApp::GetInstance()->GetPath() + name + ".map";
 
 		{
 			TMessageBox mb("Combien de cases en abscisse\n(horizontales) ?", HAVE_EDIT|BT_OK, form);
@@ -357,7 +360,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 	{
 		bool eob = false;
 		bool ctrl = false;
-		MapEditor = new TMapEditor(app.sdlwindow, map);
+		MapEditor = new TMapEditor(Video::GetInstance()->Window(), map);
 
 		SDL_Event event;
 		do
@@ -510,7 +513,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 			            MapEditor->BarreLat->Radar->Y() -
 			              ((int)MapEditor->BarreLat->Radar->Height()/(int)map->Height() *
 			              MapEditor->Map->Y()/CASE_HEIGHT));
-			SDL_FillRect(app.sdlwindow, NULL, 0);
+			Video::GetInstance()->Window()->Fill(0);
 			MapEditor->Update();
 		} while(!eob);
 	}
@@ -539,7 +542,7 @@ void TMapEditor::ShowBarreAct(bool show, ECase* c)
 		Map->SetContraintes(Map->Xmin(), SCREEN_HEIGHT - int(Map->Height()));
 
 	Map->SetXY(Map->X(),
-	           (c && (c->Image()->Y() + c->Image()->GetHeight()) >= (SCREEN_HEIGHT - h)) ?
+	           (c && (c->Image()->Y() + c->Image()->GetHeight()) >= (int(SCREEN_HEIGHT) - h)) ?
 	               Map->Y() - c->Image()->GetHeight()
 	             : Map->Y());
 }
@@ -555,7 +558,7 @@ void TMapEditor::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TMapEditor::TMapEditor(SDL_Surface* w, ECMap *m)
+TMapEditor::TMapEditor(ECImage* w, ECMap *m)
 	: TForm(w)
 {
 	Map = AddComponent(new TMap(m));
@@ -571,14 +574,6 @@ TMapEditor::TMapEditor(SDL_Surface* w, ECMap *m)
 
 	ShowBarreLat();
 	SetFocusOrder(false);
-}
-
-TMapEditor::~TMapEditor()
-{
-	delete BarreCase;
-	delete BarreEntity;
-	delete BarreLat;
-	delete Map;
 }
 
 /********************************************************************************************
@@ -750,7 +745,7 @@ void TBarreCase::Init()
 	Icons = AddComponent(new TBarreCaseIcons(100,5));
 	Icons->SetList();
 
-	Country = AddComponent(new TListBox(&app.Font()->sm, 2, 5, 100, Height()-25));
+	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 5, 100, Height()-25));
 	Country->SetOnClick(TBarreCase::ChangeOwner, 0);
 
 	SetBackground(Resources::BarreAct());
@@ -786,7 +781,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		entity->SetNb(StrToTyp<uint>(Nb->Text()));
 
 		bool dont_check = false;
-		SDL_Color last_color = white_color;
+		Color last_color = white_color;
 		if(entity->Owner())
 		{
 			if(dynamic_cast<EMapPlayer*>(entity->Owner())->ID() == Owner->ReadValue(Owner->GetSelectedItem())[0])
@@ -794,7 +789,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 			else
 			{
 				entity->Owner()->Entities()->Remove(entity);
-				last_color = *color_eq[entity->Owner()->Color()];
+				last_color = color_eq[entity->Owner()->Color()];
 			}
 		}
 		else
@@ -876,16 +871,16 @@ TBarreEntity::TBarreEntity()
 
 void TBarreEntity::Init()
 {
-	Name = AddComponent(new TLabel(60,5, "", black_color, &app.Font()->big));
+	Name = AddComponent(new TLabel(60,5, "", black_color, Font::GetInstance(Font::Big)));
 
-	RemoveButton = AddComponent(new TButtonText(Width()-150,5,100,30, "Supprimer", &app.Font()->sm));
+	RemoveButton = AddComponent(new TButtonText(Width()-150,5,100,30, "Supprimer", Font::GetInstance(Font::Small)));
 	RemoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
-	Owner = AddComponent(new TListBox(&app.Font()->sm, RemoveButton->X()-105, 5, 100, Height()-15));
+	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 5, 100, Height()-15));
 
 	Icon = AddComponent(new TImage(5,5));
 
-	Nb = AddComponent(new TEdit(&app.Font()->sm, 5,55,100));
+	Nb = AddComponent(new TEdit(Font::GetInstance(Font::Small), 5,55,100));
 	Nb->SetAvailChars("0123456789");
 
 	SetBackground(Resources::BarreAct());
@@ -974,12 +969,12 @@ TEditBarreLat::TEditBarreLat()
 
 void TEditBarreLat::Init()
 {
-	QuitButton = AddComponent(new TButtonText(30,200,100,30, "Fermer", &app.Font()->sm));
-	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	OptionsButton = AddComponent(new TButtonText(30,230,100,30, "Configuration", &app.Font()->sm));
-	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
-	SaveButton = AddComponent(new TButtonText(30,260,100,30, "Sauvegarder", &app.Font()->sm));
-	SaveButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	QuitButton = AddComponent(new TButtonText(30,200,100,30, "Fermer", Font::GetInstance(Font::Small)));
+	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+	OptionsButton = AddComponent(new TButtonText(30,230,100,30, "Configuration", Font::GetInstance(Font::Small)));
+	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+	SaveButton = AddComponent(new TButtonText(30,260,100,30, "Sauvegarder", Font::GetInstance(Font::Small)));
+	SaveButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
 	TMapEditor* editor = dynamic_cast<TMapEditor*>(Parent());
 
@@ -998,9 +993,10 @@ void TEditBarreLat::Init()
 	ScreenPos = AddComponent(new TImage(0,0));
 	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	DrawRect(surf, 0, 0, editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
-	                     editor->Map->Map()->Preview()->GetHeight()/editor->Map->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
-	                     SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
+	DrawRect(surf, 0, 0,
+	          editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
+	          editor->Map->Map()->Preview()->GetHeight()/editor->Map->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	         SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
 	ScreenPos->SetImage(new ECImage(surf));
 	ScreenPos->SetEnabled(false);
 
@@ -1019,7 +1015,7 @@ void TOptionsMap::Options(TObject*, void* m)
 	{
 		SDL_Event event;
 		bool eob = false;
-		OptionsMap = new TOptionsMap(app.sdlwindow, map);
+		OptionsMap = new TOptionsMap(Video::GetInstance()->Window(), map);
 		OptionsMap->Refresh();
 
 		/* Mettre les valeurs qui ne seront enregistrées qu'à la fermeture */
@@ -1190,83 +1186,63 @@ void TOptionsMap::Refresh()
 	MaxPlayers->SetMax(map->MapPlayers().size());
 }
 
-TOptionsMap::TOptionsMap(SDL_Surface* w, EMap* m)
+TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 	: TForm(w)
 {
 	map = m;
 
-	OkButton = AddComponent(new TButtonText(600,500,150,50, "OK", &app.Font()->normal));
+	OkButton = AddComponent(new TButtonText(600,500,150,50, "OK", Font::GetInstance(Font::Normal)));
 
-	PlayersLabel = AddComponent(new TLabel(100, 130, "Joueurs :", white_color, &app.Font()->normal));
-	Players = AddComponent(new TListBox(&app.Font()->sm, 100,150,150,200));
+	PlayersLabel = AddComponent(new TLabel(100, 130, "Joueurs :", white_color, Font::GetInstance(Font::Normal)));
+	Players = AddComponent(new TListBox(Font::GetInstance(Font::Small), 100,150,150,200));
 	Players->SetNoItemHint();
 	Players->SetHint("Ce sont les différents joueurs susceptibles d'être joués.\nChaque territoire et unité peut être lié à "
 	                 " un joueur.");
 
-	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, "Ajouter", &app.Font()->normal));
-	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, "Ajouter", Font::GetInstance(Font::Normal)));
+	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, "Supprimer", &app.Font()->normal));
-	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, "Supprimer", Font::GetInstance(Font::Normal)));
+	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	CountriesLabel = AddComponent(new TLabel(400, 130, "Territoires :", white_color, &app.Font()->normal));
-	Countries = AddComponent(new TListBox(&app.Font()->sm, 400,150,150,200));
+	CountriesLabel = AddComponent(new TLabel(400, 130, "Territoires :", white_color, Font::GetInstance(Font::Normal)));
+	Countries = AddComponent(new TListBox(Font::GetInstance(Font::Small), 400,150,150,200));
 	Countries->SetNoItemHint();
 	Countries->SetHint("Liste des différents territoires. Vous pouvez assigner chaque case à un territoire.\n"
 	                   "Vous ne pouvez supprimer que les territoires en vert, qui ne sont assignés à aucune case.");
 
-	AddCountryEdit = AddComponent(new TEdit(&app.Font()->sm, 400,360,150, 2, COUNTRY_CHARS));
+	AddCountryEdit = AddComponent(new TEdit(Font::GetInstance(Font::Small), 400,360,150, 2, COUNTRY_CHARS));
 
-	AddCountryButton = AddComponent(new TButtonText(555, 350, 100, 30, "Ajouter", &app.Font()->normal));
-	AddCountryButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	AddCountryButton = AddComponent(new TButtonText(555, 350, 100, 30, "Ajouter", Font::GetInstance(Font::Normal)));
+	AddCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, "Supprimer", &app.Font()->normal));
-	DelCountryButton->SetImage(new ECSprite(Resources::LitleButton(), app.sdlwindow));
+	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, "Supprimer", Font::GetInstance(Font::Normal)));
+	DelCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	CountryPlayerLabel = AddComponent(new TLabel(560, 150, "Appartient à :", white_color, &app.Font()->sm));
-	CountryPlayer = AddComponent(new TComboBox(&app.Font()->sm, 560 + CountryPlayerLabel->Width(), 150, 70));
+	CountryPlayerLabel = AddComponent(new TLabel(560, 150, "Appartient à :", white_color, Font::GetInstance(Font::Small)));
+	CountryPlayer = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 560 + CountryPlayerLabel->Width(), 150, 70));
 	CountryPlayer->SetEnabled(false);
 	CountryPlayer->SetNoItemHint();
 	CountryPlayer->SetHint("Propriétaire du territoire sélectionné.\n"
 	                       "Un territoire neutre n'appartiendra à personne au début de la partie.");
 
-	NameLabel = AddComponent(new TLabel(50,380, "Nom de la carte", white_color, &app.Font()->normal));
-	Name = AddComponent(new TEdit(&app.Font()->sm, 50, 400, 150, 50, EDIT_CHARS));
+	NameLabel = AddComponent(new TLabel(50,380, "Nom de la carte", white_color, Font::GetInstance(Font::Normal)));
+	Name = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 400, 150, 50, EDIT_CHARS));
 
-	                                                            // label    x    y    w  min   max                 step  def
-	MinPlayers = AddComponent(new TSpinEdit(&app.Font()->sm, "Min players", 50, 420, 150, 1, map->MapPlayers().size(), 1, 1));
-	MaxPlayers = AddComponent(new TSpinEdit(&app.Font()->sm, "Max players", 50, 440, 150, 1, map->MapPlayers().size(), 1, 1));
+	                                                                           // label    x  y  width min
+	                                                                                        // max                step def
+	MinPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),"Min players", 50,420,150,1,
+	                                                                                      map->MapPlayers().size(),1,1));
+	MaxPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),"Max players", 50, 440, 150, 1,
+	                                                                                      map->MapPlayers().size(), 1, 1));
 
-	CityLabel = AddComponent(new TLabel(50,460, "Argent par villes", white_color, &app.Font()->normal));
-	City = AddComponent(new TEdit(&app.Font()->sm, 50, 480, 150, 5, "0123456789"));
+	CityLabel = AddComponent(new TLabel(50,460, "Argent par villes", white_color, Font::GetInstance(Font::Normal)));
+	City = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 480, 150, 5, "0123456789"));
 
-	Hints = AddComponent(new TMemo(&app.Font()->sm, 300, 480, 290, 100));
+	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 300, 480, 290, 100));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TOptionsMap::~TOptionsMap()
-{
-	delete Hints;
-	delete City;
-	delete CityLabel;
-	delete MaxPlayers;
-	delete MinPlayers;
-	delete Name;
-	delete NameLabel;
-	delete CountryPlayer;
-	delete CountryPlayerLabel;
-	delete DelCountryButton;
-	delete AddCountryButton;
-	delete AddCountryEdit;
-	delete Countries;
-	delete CountriesLabel;
-	delete DelPlayerButton;
-	delete AddPlayerButton;
-	delete Players;
-	delete PlayersLabel;
-	delete OkButton;
 }
 
 /********************************************************************************************
@@ -1280,7 +1256,7 @@ void MenAreAntsApp::MapEditor()
 	{
 		SDL_Event event;
 		bool eob = false;
-		LoadMapFile = new TLoadMapFile(sdlwindow);
+		LoadMapFile = new TLoadMapFile(Video::GetInstance()->Window());
 		LoadMapFile->SetMutex(mutex);
 		do
 		{
@@ -1364,38 +1340,30 @@ void TLoadMapFile::Refresh()
 #else
 	struct dirent *lecture;
 	DIR *rep;
-	rep = opendir(app.GetPath().c_str());
+	rep = opendir(MenAreAntsApp::GetInstance()->GetPath().c_str());
 	while ((lecture = readdir(rep)))
 	{
 		std::string s = lecture->d_name;
 		if(s.rfind(".map") != s.size() - 4) continue;
 		if(!s.empty())
-			MapsList->AddItem(false, s.substr(0, s.size() - 4), app.GetPath() + s,
+			MapsList->AddItem(false, s.substr(0, s.size() - 4), MenAreAntsApp::GetInstance()->GetPath() + s,
 			                             black_color, true);
 	}
 	closedir(rep);
 #endif
 }
 
-TLoadMapFile::TLoadMapFile(SDL_Surface* w)
+TLoadMapFile::TLoadMapFile(ECImage* w)
 	: TForm(w)
 {
 
-	MapsList = AddComponent(new TListBox(&app.Font()->sm, 300,200,200,300));
+	MapsList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,200,200,300));
 	Refresh();
 
-	NewButton = AddComponent(new TButtonText(550,250,150,50, "Nouveau", &app.Font()->normal));
-	LoadButton = AddComponent(new TButtonText(550,300,150,50, "Charger", &app.Font()->normal));
+	NewButton = AddComponent(new TButtonText(550,250,150,50, "Nouveau", Font::GetInstance(Font::Normal)));
+	LoadButton = AddComponent(new TButtonText(550,300,150,50, "Charger", Font::GetInstance(Font::Normal)));
 	LoadButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", &app.Font()->normal));
+	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
-}
-
-TLoadMapFile::~TLoadMapFile()
-{
-	delete RetourButton;
-	delete LoadButton;
-	delete NewButton;
-	delete MapsList;
 }

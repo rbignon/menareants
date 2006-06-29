@@ -33,8 +33,10 @@
 #define APP_SITE "http://menareants.coderz.info/"
 
 /* Résolution de l'écran */
-const int SCREEN_HEIGHT = 600;
-const int SCREEN_WIDTH  = 800;
+//const int SCREEN_HEIGHT = 600;
+//const int SCREEN_WIDTH  = 800;
+#define SCREEN_HEIGHT (Video::GetInstance()->Height())
+#define SCREEN_WIDTH (Video::GetInstance()->Width())
 
 /* Taille des cases */
 const int CASE_HEIGHT = 80;

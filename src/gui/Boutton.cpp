@@ -24,8 +24,9 @@
 #include "Resources.h"
 
 TButton::TButton ()
+	: image(0)
 {
-   image = NULL;
+
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +76,7 @@ void TButton::SetImage (ECSprite *_image)
 		delete image;
 
 	image = _image;
- 
+
 	if(!_image) return;
 
 	SetWidth(image->GetWidth());

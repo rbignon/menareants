@@ -27,8 +27,9 @@
 
 TSpinEdit::TSpinEdit(Font* f, std::string _label, int _x, int _y, uint _width, int _min, int _max, uint _step,
                      int _defvalue)
-	: TComponent(_x, _y, _width, SPINEDIT_HEIGHT), min(_min), max(_max), step(_step),
-	  label(_label)
+	: TComponent(_x, _y, _width, SPINEDIT_HEIGHT), m_plus(_x,_y,10,10), m_minus(_x,_y,10,10),
+	  txt_label(_x, _y, _label, white_color, f), txt_value(_x,_y,"", white_color, f),
+	  min(_min), max(_max), step(_step), color(white_color), font(f)
 {
 	/* Sécurités */
 	if(max < min) max = min;
@@ -36,21 +37,6 @@ TSpinEdit::TSpinEdit(Font* f, std::string _label, int _x, int _y, uint _width, i
 	else if(_defvalue > max) _defvalue = max;
 
 	value = _defvalue;
-
-	txt_label = NULL;
-	txt_value = NULL;
-	m_plus = NULL;
-	m_minus = NULL;
-	font = f;
-	color = white_color;
-}
-
-TSpinEdit::~TSpinEdit()
-{
-  if(txt_label) delete txt_label;
-  if(txt_value) delete txt_value;
-  if(m_plus) delete m_plus;
-  if(m_minus) delete m_minus;
 }
 
 void TSpinEdit::Init()
@@ -61,30 +47,18 @@ void TSpinEdit::Init()
   uint max_value_w = font->GetWidth(max_value_s.str());
   uint margin = 5;
 
-  /* Boutons */
-  if(m_plus) delete m_plus;
-  if(m_minus) delete m_minus;
+  m_plus.SetXY(x+w-10,y);
+  m_minus.SetXY(x+w-max_value_w-10-2*margin,y);
+  MyComponent(&m_plus);
+  MyComponent(&m_minus);
+  m_plus.SetImage (new ECSprite(Resources::UpButton(), Window()));
+  m_minus.SetImage (new ECSprite(Resources::DownButton(), Window()));
 
-  m_plus = new TButton (x+w-10,y,10,10);
-  m_minus = new TButton (x+w-max_value_w-10-2*margin,y,10,10);
+  MyComponent(&txt_label);
+  MyComponent(&txt_value);
 
-  MyComponent(m_plus);
-  MyComponent(m_minus);
-
-  /* Images */
-  /* Pas besoin de delete, ECImage le fait */
-  m_plus->SetImage (new ECSprite(Resources::UpButton(), Window()));
-  m_minus->SetImage (new ECSprite(Resources::DownButton(), Window()));
-
-  /* Label */
-  if(txt_label) delete txt_label;
-  if(txt_value) delete txt_value;
-
-  txt_label = new TLabel(x, y, label, color, font);
-  txt_value = new TLabel(x, y, "", color, font);
-
-  MyComponent(txt_label);
-  MyComponent(txt_value);
+  txt_label.SetFontColor(font, color);
+  txt_value.SetFontColor(font, color);
 
   SetValue(value, true);
 }
@@ -100,10 +74,10 @@ bool TSpinEdit::SetValue(int _value, bool first)
   value_s << value ;
 
   std::string s(value_s.str());
-  txt_value->SetCaption(s);
+  txt_value.SetCaption(s);
 
-  uint center = (m_plus->X() +10 + m_minus->X() )/2 - font->GetWidth(s)/2;
-  txt_value->SetXY(center, txt_value->Y());
+  uint center = (m_plus.X() +10 + m_minus.X() )/2 - font->GetWidth(s)/2;
+  txt_value.SetX(center);
 
   return true;
 }
@@ -132,36 +106,32 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 
 void TSpinEdit::Draw (int mouse_x, int mouse_y)
 {
-	if(txt_label)
-		txt_label->Draw(mouse_x, mouse_y);
+	txt_label.Draw(mouse_x, mouse_y);
 
 	if(enabled)
 	{
-		if(m_minus)
-			m_minus->Draw (mouse_x, mouse_y);
-		if(m_plus)
-			m_plus->Draw (mouse_x, mouse_y);
+		m_minus.Draw (mouse_x, mouse_y);
+		m_plus.Draw (mouse_x, mouse_y);
 	}
 
-	if(txt_value)
-		txt_value->Draw(mouse_x, mouse_y);
+	txt_value.Draw(mouse_x, mouse_y);
 }
 
 //-----------------------------------------------------------------------------
 
 bool TSpinEdit::Clic (int mouse_x, int mouse_y)
 {
-  if(!m_minus || !m_plus || !enabled) return false;
+  if(!enabled) return false;
 
-  if (m_minus->Test(mouse_x, mouse_y))
+  if (m_minus.Test(mouse_x, mouse_y))
     return ChangeValueByClick(false);
-  else if (m_plus->Test(mouse_x, mouse_y))
+  else if (m_plus.Test(mouse_x, mouse_y))
     return ChangeValueByClick(true);
 
   return false;
 }
 
-void TSpinEdit::SetColorFont(SDL_Color new_color, Font* new_font)
+void TSpinEdit::SetColorFont(Color new_color, Font* new_font)
 {
 	color = new_color;
 	font = new_font;

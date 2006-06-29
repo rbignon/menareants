@@ -24,17 +24,17 @@
 #include "Component.h"
 #include "Map.h"
 
+class ECImage;
+
 class TMap : public TComponent
 {
 /* Constructeur/Destructeur */
 public:
 
 	TMap(ECMap* _map)
-		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0), brouillard(0), have_brouillard(true),
-		  must_redraw(true)
+		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0),
+		  have_brouillard(true), must_redraw(true)
 	{}
-
-	~TMap();
 
 /* Methodes */
 public:
@@ -91,7 +91,7 @@ private:
 	bool schema;
 	int x_min, y_min;
 	ECEntity* create_entity;
-	SDL_Surface* brouillard;
+	ECImage brouillard;
 	bool have_brouillard;
 	bool must_redraw;
 };
