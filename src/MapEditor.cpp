@@ -188,7 +188,6 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 	x = _x;
 	y = _y;
 	max = 0;
-	date = new ECDate(d);
 	city_money = 0;
 	filename = _filename;
 
@@ -283,7 +282,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		create = true;
 		{
 			TMessageBox mb("Entrez le nom du fichier de la carte",
-							HAVE_EDIT|BT_OK, form);
+							HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars(MAPFILE_CHARS);
 			mb.Edit()->SetMaxLen(20);
 			if(mb.Show() == BT_OK)
@@ -296,25 +295,29 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		name = MenAreAntsApp::GetInstance()->GetPath() + name + ".map";
 
 		{
-			TMessageBox mb("Combien de cases en abscisse\n(horizontales) ?", HAVE_EDIT|BT_OK, form);
+			TMessageBox mb("Combien de cases en abscisse\n(horizontales) ?", HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
 			if(mb.Show() == BT_OK)
 				x = StrToTyp<uint>(mb.EditText());
+			else return true;
 		}
 		{
-			TMessageBox mb("Combien de cases en ordonnée\n(vertical) ?", HAVE_EDIT|BT_OK, form);
+			TMessageBox mb("Combien de cases en ordonnée\n(vertical) ?", HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
 			if(mb.Show() == BT_OK)
 				y = StrToTyp<uint>(mb.EditText());
+			else return true;
 		}
 		{
-			TMessageBox mb("Quelle est la date en début de partie ?\n('xx xx xxxx' ou 'xx/xx/xxxx')", HAVE_EDIT|BT_OK, form);
+			TMessageBox mb("Quelle est la date en début de partie ?\n('xx xx xxxx' ou 'xx/xx/xxxx')",
+			               HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789/ ");
 			mb.Edit()->SetMaxLen(10);
 			if(mb.Show() == BT_OK)
 				date = mb.EditText();
+			else return true;
 		}
 		try
 		{

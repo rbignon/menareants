@@ -151,15 +151,15 @@ void EContainer::ChangeCase(ECBCase* new_case)
 		Containing()->SetCase(Case());
 }
 
-bool EContainer::Attaq(std::vector<ECEntity*> entities)
+bool EContainer::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	if(Containing())
 	{
 		Containing()->SetCase(Case());
-		return dynamic_cast<ECEntity*>(Containing())->Attaq(entities);
+		return dynamic_cast<ECEntity*>(Containing())->Attaq(entities, event);
 	}
 	else
-		return ECEntity::Attaq(entities);
+		return ECEntity::Attaq(entities, event);
 }
 
 /********************************************************************************************
@@ -185,14 +185,14 @@ bool ECMissiLauncher::WantDeploy()
 	return true;
 }
 
-bool ECMissiLauncher::WantAttaq(uint mx, uint my)
+bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 {
 	/* Il faut:
 	 * - être déployé
 	 * - que ça soit notre première action
 	 * - qu'on n'ait pas déjà prévu une attaque
 	 */
-	if(!Deployed() || Last())
+	if(!Deployed() || !force && Last())
 		return false;
 
 	/* On n'attaque pas sur notre case */
@@ -238,7 +238,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my)
 	return true;
 }
 
-bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
+bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case).
 	 * Effectivement, cette unité ne tire QUE quand on lui en donne l'ordre
@@ -312,7 +312,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities)
  *                               ECUnit                                                     *
  ********************************************************************************************/
 
-bool ECUnit::WantAttaq(uint mx, uint my)
+bool ECUnit::WantAttaq(uint mx, uint my, bool force)
 {
 	/* On ne peut attaquer que si on est sur la case */
 	if(Case()->X() != mx || Case()->Y() != my)

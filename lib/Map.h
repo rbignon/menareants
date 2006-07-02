@@ -201,7 +201,7 @@ public:
 	virtual bool CanAttaq(const ECBEntity* e) = 0;
 
 	/** Use this function when this entity wants to attaq someone */
-	virtual bool WantAttaq(uint x, uint y) { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool force = false) { return true; }
 
 	/** Use this function when this entity wants to move somewhere */
 	virtual bool WantMove(ECBMove::E_Move, bool force = false) { return true; }
@@ -336,6 +336,7 @@ class ECBDate
 {
 /* Constructeur/Destructeur */
 public:
+	ECBDate();
 	ECBDate(uint d, uint m, int y);
 	ECBDate(std::string date);
 
@@ -359,6 +360,8 @@ public:
 	void SetYear(int _y) { y = _y; }
 
 	void SetDate(std::string date);
+
+	void SetDate(uint days);
 
 	ECBDate& operator++ ();    ///< prefix ++
 	ECBDate  operator++ (int); ///< postfix ++
@@ -671,8 +674,8 @@ public:
 
 	std::vector<std::string> MapFile() { return map_file; }         /**< Return map_file vector */
 
-	ECBDate* Date() { return date; }                                ///< Date of day
-	ECBDate* NextDay() { return &(++(*date)); }                     /**< Increment date to next day */
+	ECBDate* Date() { return &date; }                               ///< Date of day
+	ECBDate* NextDay() { return &(++date); }                        /**< Increment date to next day */
 
 	std::vector<std::string> MapInfos() { return map_infos; }       /**< Map informations */
 	
@@ -705,7 +708,7 @@ protected:
 
 	std::vector<std::string> neutres_units;
 
-	ECBDate* date;
+	ECBDate date;
 
 	ECBChannel *chan;
 	std::string name;

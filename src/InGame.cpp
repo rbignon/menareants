@@ -303,7 +303,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
-		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 && !(flags & (ARM_REMOVE|ARM_DATA)))
+		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 &&
+		   !(flags & (ARM_REMOVE|ARM_DATA|ARM_NUMBER)))
 			InGameForm->Map->CenterTo(entities[0]);
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
@@ -1352,7 +1353,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(400,50,("Jeu : " + std::string(ch->GetName())), white_color,
+	Title = AddComponent(new TLabel(50,("Jeu : " + std::string(ch->GetName())), white_color,
 	                                        Font::GetInstance(Font::Big)));
 
 	MapInformations = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60,150,315,200,30));
@@ -1479,13 +1480,23 @@ void MenAreAntsApp::Scores(EChannel* chan)
 TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(250,100,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
+	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
 	                      Font::GetInstance(Font::Large)));
 
 	Players = AddComponent(new TList(70, 250));
 	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meutres", "Créations", "Score"));
 
-	Date = AddComponent(new TLabel(200, 150, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
+	InitDate = AddComponent(new TLabel(200, 150, "Début des combats :  " + ch->Map()->InitDate()->String(), white_color,
+	                               Font::GetInstance(Font::Big)));
+	Date = AddComponent(new TLabel(200, 180, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
+	                               Font::GetInstance(Font::Big)));
+	ECDate delta;
+	delta.SetDate(ch->Map()->NbDays());
+	std::string s;
+	if(delta.Year()) s += " " + TypToStr(delta.Year()) + " ans";
+	if(delta.Month()) s += " " + TypToStr(delta.Month()) + " mois";
+	if(delta.Day()) s += " " + TypToStr(delta.Month()) + " jours";
+	Duree = AddComponent(new TLabel(200, 211, "Durée :" + s, white_color,
 	                               Font::GetInstance(Font::Big)));
 
 	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", Font::GetInstance(Font::Normal)));

@@ -19,13 +19,17 @@
  */
 
 #include "ShowMap.h"
-#include "tools/Video.h"
 #include "Defines.h"
 #include "Resources.h"
 #include "Channels.h"
 #include "Debug.h"
 #include "tools/Font.h"
 #include <SDL_gfxPrimitives.h>
+
+#undef SCREEN_HEIGHT
+#define SCREEN_HEIGHT (Window()->GetHeight())
+#undef SCREEN_WIDTH
+#define SCREEN_WIDTH (Window()->GetWidth())
 
 void TMap::Init()
 {

@@ -88,6 +88,10 @@ void ECBMove::Return(ECBCase* end)
  *                               ECBDate                                                    *
  ********************************************************************************************/
 
+ECBDate::ECBDate()
+	: d(0), m(0), y(0)
+{}
+
 ECBDate::ECBDate(uint _d, uint _m, int _y)
 	: d(_d), m(_m), y(_y)
 {
@@ -95,11 +99,15 @@ ECBDate::ECBDate(uint _d, uint _m, int _y)
 }
 
 ECBDate::ECBDate(std::string date)
+	: d(0), m(0), y(0)
 {
-	d = 0;
-	m = 0;
-	y = 0;
 	SetDate(date);
+}
+
+void ECBDate::SetDate(uint days)
+{
+	for(uint i = 0; i < days; ++i)
+		++(*this);
 }
 
 ECBDate& ECBDate::operator++ ()
@@ -548,7 +556,6 @@ void ECBMap::Init()
 	y = 0;
 	min = 0;
 	max = 0;
-	date = 0;
 	city_money = 0;
 	
 	std::string ligne;
@@ -590,7 +597,7 @@ void ECBMap::Init()
 			else if(key == "CITY") city_money = atoi(ligne.c_str());
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());
-			else if(key == "DATE") date = new ECBDate(ligne);
+			else if(key == "DATE") date.SetDate(ligne);
 			else if(key == "INFO") map_infos.push_back(ligne);
 			else if(key == "UNIT")
 			{
@@ -727,9 +734,9 @@ void ECBMap::Init()
 	}
 	/* Vérification finale des données */
 	if(!city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
-	   !min || !max || map_players.size() != max || min > max || !date)
+	   !min || !max || map_players.size() != max || min > max)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
-		               VIName(max) VIName(map_countries.size()) VPName(date),
+		               VIName(max) VIName(map_countries.size()),
 		               "Fichier incorrect !");
 
 #if 0 /** \todo les villes sont des unités, il faut voir si on ne fait pas une vérification auprès des UNIT */
@@ -798,8 +805,6 @@ void ECBMap::Destruct()
 		delete *it;
 	map_countries.clear();
 
-	if(initialised)
-		delete date;
 	initialised = false;
 }
 

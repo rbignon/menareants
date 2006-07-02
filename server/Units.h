@@ -42,7 +42,7 @@ public:
 
 	virtual bool WantMove(ECBMove::E_Move, bool force = false);
 
-	virtual bool WantAttaq(uint x, uint y);
+	virtual bool WantAttaq(uint x, uint y, bool force = false);
 
 /* Variables protégées */
 private:
@@ -69,7 +69,7 @@ public:
 
 	virtual void ChangeCase(ECBCase* new_case);
 
-	virtual bool Attaq(std::vector<ECEntity*> entities);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent*);
 
 	virtual bool WantContain(ECEntity*, ECMove::Vector&);
 
@@ -112,9 +112,9 @@ public:
 /* Methodes */
 public:
 
-	virtual bool Attaq(std::vector<ECEntity*> entities);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent*);
 
-	virtual bool WantAttaq(uint x, uint y);
+	virtual bool WantAttaq(uint x, uint y, bool);
 
 	virtual bool WantDeploy();
 };

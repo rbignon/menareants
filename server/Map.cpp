@@ -514,7 +514,7 @@ bool ECEntity::Return(ECBCase* c)
 	return true;
 }
 
-bool ECEntity::Attaq(std::vector<ECEntity*> entities)
+bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 {
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)

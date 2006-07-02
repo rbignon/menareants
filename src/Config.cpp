@@ -308,7 +308,7 @@ void Config::Configuration(bool first)
 TConfigForm::TConfigForm(ECImage *w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(300,120,"Configuration", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(120,"Configuration", white_color, Font::GetInstance(Font::Big)));
 
 	Info = AddComponent(new TLabel(160, 160,"C'est votre premier lancement, veuillez configurer votre jeu.",
 	                                        white_color, Font::GetInstance(Font::Normal)));

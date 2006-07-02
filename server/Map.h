@@ -40,6 +40,7 @@ typedef ECBMove        ECMove;
 class EChannel;
 class ECPlayer;
 class TClient;
+class ECEvent;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -81,8 +82,11 @@ public:
 
 	/** This function is a default method used by entities to attaq someone.
 	 * An entity can redefine this method to shoot others entities as it wants
+	 * @param entities this is a vector of all entities who are included in the attaq
+	 * @param event this is the event's pointer
+	 * @return true if this function must be called an other time after that
 	 */
-	virtual bool Attaq(std::vector<ECEntity*> entities);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 
 	/** This \a static method will check if the entities in list are friends */
 	static bool AreFriends(std::vector<ECEntity*> list);

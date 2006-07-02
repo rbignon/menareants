@@ -21,21 +21,21 @@
 #include "Label.h"
 
 TLabel::TLabel()
-	: font(0), shadowed(0), bg_offset(0)
+	: font(0), shadowed(0), bg_offset(0), auto_set(false)
 {
 
 }
 
 TLabel::TLabel(const TLabel& label)
 	: TComponent(label), font(label.font), color(label.color),
-	  shadowed(label.shadowed), bg_offset(label.bg_offset)
+	  shadowed(label.shadowed), bg_offset(label.bg_offset), auto_set(label.auto_set)
 {
 	caption = "";
 	SetCaption(label.caption);
 }
 
 TLabel::TLabel(int x, int y, std::string new_txt, Color new_color, Font* new_font, bool _shadowed)
-	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0)
+	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(false)
 {
 	assert(new_font!=NULL);
 	caption = "";
@@ -49,11 +49,32 @@ TLabel::TLabel(int x, int y, std::string new_txt, Color new_color, Font* new_fon
 	SetCaption(new_txt);
 }
 
+TLabel::TLabel(int y, std::string new_txt, Color new_color, Font* new_font, bool _shadowed)
+	: TComponent(0, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(true)
+{
+	assert(new_font!=NULL);
+	caption = "";
+	if(shadowed)
+	{
+		int width = font->GetWidth("x");
+		bg_offset = (unsigned int)width/8; // shadow offset = 0.125ex
+		if (bg_offset < 1) bg_offset = 1;
+	}
+
+	SetCaption(new_txt);
+}
+
+void TLabel::Init()
+{
+	if(auto_set && Window())
+		SetX(Window()->GetWidth()/2 - font->GetWidth(caption)/2);
+}
+
 void TLabel::SetCaption (std::string new_txt)
 {
 	if(caption == new_txt)
 		return;
-	
+
 	caption = new_txt;
 	Reinit();
 }
@@ -87,13 +108,14 @@ void TLabel::Reinit()
 	}
 
 	surf = font->CreateSurface(caption,color);
-	//surf.SetImage(TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(),color.GetSDLColor()));
 
 	if(shadowed)
-		background.SetImage(TTF_RenderText_Blended(&(font->GetTTF()), caption.c_str(), white_color.GetSDLColor()));
+		background = font->CreateSurface(caption, white_color);
 
 	SetHeight(surf.GetHeight());
 	SetWidth(surf.GetWidth());
+	if(auto_set && Window())
+		SetX(Window()->GetWidth()/2 - font->GetWidth(caption)/2);
 }
 
 void TLabel::Draw(int m_x, int m_y)

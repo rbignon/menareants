@@ -187,7 +187,7 @@ void MenAreAntsApp::request_game()
 			if(client)
 			{
 				delete client;
-				client = 0;
+				EC_Client::singleton = NULL;
 			}
 			delete ConnectedForm;
 			ConnectedForm = 0;
@@ -300,7 +300,7 @@ void MenAreAntsApp::request_game()
 TConnectedForm::TConnectedForm(ECImage* w)
 	: TForm(w)
 {
-	Welcome = AddComponent(new TLabel(100,110,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
+	Welcome = AddComponent(new TLabel(110,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
 
 	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 75,150,500,350, 0));
 

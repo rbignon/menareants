@@ -823,7 +823,6 @@ void EChannel::CheckReadys()
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 					{
-						(*enti)->Played(); /* On marque bien qu'il a été joué */
 						if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
 						{
 							ECList<ECBEntity*>::iterator it = enti;
@@ -832,7 +831,10 @@ void EChannel::CheckReadys()
 							enti = it;
 						}
 						else
+						{
+							(*enti)->Played(); /* On marque bien qu'il a été joué */
 							++enti;
+						}
 					}
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)

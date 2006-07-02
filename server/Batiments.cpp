@@ -53,9 +53,9 @@ void ECNuclearSearch::RemoveOneMissile()
  *                                        ECSilo                                            *
  ********************************************************************************************/
 
-bool ECSilo::WantAttaq(uint mx, uint my)
+bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 {
-	if(!NuclearSearch() || !NuclearSearch()->Missiles())
+	if(!force && (!NuclearSearch() || !NuclearSearch()->Missiles()))
 		return false;
 
 	/* On n'attaque pas sur notre case */
@@ -70,21 +70,21 @@ bool ECSilo::WantAttaq(uint mx, uint my)
 	if(d > SILO_PORTY)
 		return false;
 
-	dynamic_cast<ECNuclearSearch*>(NuclearSearch())->RemoveOneMissile();
+	if(!force)
+		dynamic_cast<ECNuclearSearch*>(NuclearSearch())->RemoveOneMissile();
 
 	return true;
 }
 
-bool ECSilo::Attaq(std::vector<ECEntity*> entities)
+bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case). */
 	if(!(EventType() & ARM_ATTAQ))
-		return ECEntity::Attaq(entities);
+		return ECEntity::Attaq(entities, event);
 
-	ECBCase* c = 0;
+	ECBCase* c = event->Case();
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		c = (*it)->Case();
 		if(*it == this) continue;
 		if((*it)->IsCountryMaker())
 			Shoot(*it, 1002);
@@ -113,7 +113,7 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 						continue;
 					ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 					if(entity->IsBuilding())
-						Shoot(entity, entity->InitNb()/2);
+						Shoot(entity, entity->InitNb()/2+21);
 					else
 						Shoot(entity, entity->RealNb());
 
@@ -125,7 +125,7 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities)
 					}
 					else
 					{
-						if(entity->Owner()->Client())
+						if(entity->Owner() && entity->Owner()->Client())
 							receivers.push_back(entity->Owner()->Client());
 						Channel()->SendArm(receivers, entity, ARM_NUMBER);
 					}

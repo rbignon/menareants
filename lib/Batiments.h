@@ -64,7 +64,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
 
@@ -114,7 +114,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
 
 	virtual bool CanCreate(const ECBEntity* e) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
@@ -163,7 +163,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() { return true; }
 	virtual int TurnMoney() { return 2 * Case()->Map()->CityMoney(); }
@@ -211,7 +211,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() { return true; }
 	virtual int TurnMoney() { return Case()->Map()->CityMoney(); }
@@ -260,7 +260,7 @@ public:
 	virtual bool IsNaval() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
 	{
@@ -305,7 +305,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
 	{
@@ -351,7 +351,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
-	virtual bool WantAttaq(uint x, uint y) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
 	{

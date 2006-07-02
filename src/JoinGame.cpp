@@ -326,6 +326,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(chan->State() != EChannel::SENDING)
 					{
 						chan->Map()->NextDay();
+						++chan->Map()->NbDays();
 						me->LockScreen();
 						chan->Map()->CreatePreview(120,120, true);
 						std::vector<ECBEntity*> ents = chan->Map()->Entities()->List();
@@ -335,6 +336,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()));
 						me->UnlockScreen();
 					}
+					else
+						*(chan->Map()->InitDate()) = ECDate(*chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
@@ -943,7 +946,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	{
 		create = true;
 		TMessageBox mb("Entrez le nom de la partie à créer",
-						HAVE_EDIT|BT_OK, form);
+						HAVE_EDIT|BT_OK|BT_CANCEL, form);
 		mb.Edit()->SetAvailChars(CHAN_CHARS);
 		mb.Edit()->SetMaxLen(GAMELEN);
 		if(mb.Show() == BT_OK)
@@ -1015,7 +1018,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 								eob = true;
 								break;
 							case SDLK_RETURN:
-								if(GameInfosForm->SendMessage->Focused())
+								if(GameInfosForm->SendMessage->Focused() && !GameInfosForm->SendMessage->Empty())
 								{
 									client->sendrpl(client->rpl(EC_Client::MSG),
 												FormatStr(GameInfosForm->SendMessage->GetString()).c_str());
@@ -1252,7 +1255,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 TGameInfosForm::TGameInfosForm(ECImage* w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(350,6,"Jeu", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(6,"Jeu", white_color, Font::GetInstance(Font::Big)));
 
 	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
@@ -1303,7 +1306,7 @@ void TGameInfosForm::RecalcMemo()
 TListGameForm::TListGameForm(ECImage* w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(300,150,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(150,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
 
 	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Rejoindre", Font::GetInstance(Font::Normal)));
 	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", Font::GetInstance(Font::Normal)));

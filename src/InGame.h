@@ -363,6 +363,8 @@ public:
 
 	TLabel*      Title;
 	TLabel*      Date;
+	TLabel*      InitDate;
+	TLabel*      Duree;
 
 	TButtonText* RetourButton;
 

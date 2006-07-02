@@ -350,12 +350,17 @@ public:
 
 	uint PixelSize() const { return pixel_size; }
 
+	uint& NbDays() { return nb_days; }
+	ECDate* InitDate() { return &init_date; }
+
 /* Variables privées */
 protected:
 	ECImage preview;
 	TMap *showmap;
+	ECDate init_date;
 	bool brouillard;
 	uint pixel_size;
+	uint nb_days;
 };
 
 /********************************************************************************************

@@ -1,3 +1,18 @@
+2005-07-02  Romain Bignon <progs@headfucking.net>
+
+	* server/Map.h, server/Units.cpp, server/Batiments.cpp, server/InGame.cpp (ECEntity/Attaq()): Passage en argument
+	de l'event, comme ça ECSilo::Attaq() connait la case plutot que de chercher chez les attaqués.
+
+2005-06-30  Romain Bignon <progs@headfucking.net>
+
+	* server/Batiments.cpp, server/InGame.cpp: Corrections...
+
+	* lib/Map.h, src/Map.h, src/InGame.cpp: Passage du ECDate en temps que variable et non de pointeur, et utilisation d'une
+	mémorisation de la date initiale ainsi que du nombre de tours écoulés pour les stats de fin de partie.
+
+	* src/gui/Label.cpp, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp (TLabel): Ne pas donner de position X place le
+	composant automatiquement centré (horizontalement) à l'écran.
+
 2005-06-29  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp, server/Map.h, server/InGame.cpp, server/Batiments.cpp: N'envoie les informations du nombre des

@@ -119,7 +119,7 @@ void EChannel::NextAnim()
 				if(state == S_ATTAQ)
 				{
 					if((*it)->Tag == T_CONTINUE)
-						(*it)->Tag = (*it)->Attaq(entv) ? T_CONTINUE : T_STOP;
+						(*it)->Tag = (*it)->Attaq(entv, event) ? T_CONTINUE : T_STOP;
 					++it;
 				}
 				else if(state == S_REMOVE)
@@ -590,9 +590,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					{
 						if(*enti == entity) continue;
 
-						if((entity->CanAttaq(*enti) && !entity->Like(*enti) ||
-						    (*enti)->CanAttaq(entity) && !(*enti)->Like(entity))
-						  &&
+						if(ThereIsAttaq(entity, *enti) &&
 						   (!dynamic_cast<ECEntity*>(*enti)->Shadowed() ||
 						    (*enti)->MyStep() - (*enti)->RestStep() == entity->MyStep() - entity->RestStep()))
 						{
@@ -722,7 +720,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						{
 							Debug(W_DEBUG, "On a trouvé une unité qui a bougé");
 							ECEntity* e = dynamic_cast<ECEntity*>(*enti)->FindNext();
-							if(entity->WantAttaq(e->Case()->X(), e->Case()->Y()))
+							if(entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
 								next_entity = e;
 						}
 	

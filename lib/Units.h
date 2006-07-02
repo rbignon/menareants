@@ -169,7 +169,7 @@ public:
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return MISSILAUNCHER_NB; }
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
-	virtual bool WantAttaq(uint, uint) { return Deployed(); }
+	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
 
 /* Methodes */
 public:

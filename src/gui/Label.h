@@ -35,16 +35,17 @@ public:
 
 	TLabel();
 	TLabel(int x, int y, std::string s, Color new_color, Font* new_font, bool shadowed = false);
+	TLabel(int y, std::string s, Color new_color, Font* new_font, bool shadowed = false);
 	TLabel(const TLabel&);
 
 /* Methodes */
 public:
 
+	/** Init */
+	virtual void Init();
+
 	/** Draw */
 	void Draw(int m_x, int m_y);
-
-	/** Initialization. It is requiered to be defined by TComponent but it isn't necessary for TLabel */
-	void Init() {}
 
 /* Attributs */
 public:
@@ -64,6 +65,7 @@ protected:
 	Color color;
 	bool shadowed;
 	uint bg_offset;
+	bool auto_set;
 
 	void Reinit();
 };

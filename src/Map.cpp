@@ -222,10 +222,10 @@ ECase* ECEntity::Case() const
 
 EChannel* ECEntity::Channel() const
 {
-	assert(Case());
-	assert(Case()->Map());
-	assert(Case()->Map()->Channel());
-	return dynamic_cast<EChannel*>(Case()->Map()->Channel());
+	assert(acase);
+	assert(acase->Map());
+	assert(acase->Map()->Channel());
+	return dynamic_cast<EChannel*>(acase->Map()->Channel());
 }
 
 void ECEntity::ImageSetXY(int x, int y)
@@ -356,13 +356,13 @@ void ECase::SetImage(ECSpriteBase* spr)
  ********************************************************************************************/
 
 ECMap::ECMap(std::vector<std::string> _map_file)
-	: ECBMap(_map_file), showmap(0), brouillard(false)
+	: ECBMap(_map_file), showmap(0), brouillard(false), nb_days(0)
 {
 
 }
 
 ECMap::ECMap(std::string filename)
-	: ECBMap(filename), showmap(0), brouillard(false)
+	: ECBMap(filename), showmap(0), brouillard(false), nb_days(0)
 {
 
 }
