@@ -1341,9 +1341,14 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 				else
 					++evti;
 			}
-			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
-			entity->Case()->Entities()->Remove(entity);
-			Map()->Entities()->Remove(entity);
+			Map()->RemoveAnEntity(entity);
+			/** Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer *
+			 *  entity->Case()->Entities()->Remove(entity);
+			 *  Map()->Entities()->Remove(entity);
+			 * \note finalement on l'appel quand meme parce que dans le destructeur de ECBNuclearSearch par exemple il fait
+			 * une boucle sur les unités de l'owner, et ça plante, car il n'est pas supprimé de la liste mais la mémoire
+			 * est libérée
+			 */
 			MyFree(entity);
 		}
 		if(pl->MapPlayer())

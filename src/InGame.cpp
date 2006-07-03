@@ -1495,7 +1495,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	std::string s;
 	if(delta.Year()) s += " " + TypToStr(delta.Year()) + " ans";
 	if(delta.Month()) s += " " + TypToStr(delta.Month()) + " mois";
-	if(delta.Day()) s += " " + TypToStr(delta.Month()) + " jours";
+	if(delta.Day()) s += " " + TypToStr(delta.Day()) + " jours";
 	Duree = AddComponent(new TLabel(200, 211, "Durée :" + s, white_color,
 	                               Font::GetInstance(Font::Big)));
 

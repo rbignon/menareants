@@ -3,9 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--faire une versino de WantAttaq() avec une variable "force" pour etre appelé lors d'un changement de case dans
- InGame/ARMCommand. En effet, avec le lance missile, si on fait un tir qui "suit" une unité, il y a un premier WantAttaq()
- qui va supprimer un missile au début, puis un second appel lors du changement de case dans ARMCommand.
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
 
 * Urgent
