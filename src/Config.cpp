@@ -101,19 +101,21 @@ bool Config::load()
 		else if(key == "COLOR" && is_num(ligne.c_str())) color = StrToTyp<uint>(ligne);
 		else if(key == "NATION" && is_num(ligne.c_str())) nation = StrToTyp<uint>(ligne);
 		else if(key == "NICK") nick = ligne;
-		else if(key == "SWITDH") screen_width = StrToTyp<uint>(ligne);
+		else if(key == "SWIDTH") screen_width = StrToTyp<uint>(ligne);
 		else if(key == "SHEIGHT") screen_height = StrToTyp<uint>(ligne);
 		else if(key == "SERVERLIST") server_list.push_back(ligne);
 		else if(key == "TTF") ttf_file = ligne;
-		else if(key == "FULLSCREEN") fullscreen = (ligne == "true");
+		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else
 		{
-			std::cerr << "Fichier incorrect" << std::endl;
+			std::cerr << "Fichier incorrect: " << std::endl;
+			std::cerr << ": " << key << " " << ligne << std::endl;
 			MenAreAntsApp::GetInstance()->FirstRun();
 			return set_defaults();
 		}
 	}
-	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX || nation >= ECPlayer::N_MAX || nick.empty())
+	if(hostname.empty() || ttf_file.empty() || port < 1 || port > 65535 || color >= COLOR_MAX ||
+	   nation >= ECPlayer::N_MAX || nick.empty())
 	{
 		std::cerr << "Lecture de la configuration invalide." << std::endl;
 		MenAreAntsApp::GetInstance()->FirstRun();
