@@ -96,6 +96,8 @@ bool Config::load()
 
 	while(std::getline(fp, ligne))
 	{
+		if(ligne[0] == '#') continue;
+
 		std::string key = stringtok(ligne, " ");
 
 		if(key == "SERVER") hostname = ligne;

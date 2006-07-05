@@ -125,7 +125,7 @@ bool ECBPlayer::SetNation(unsigned int n)
  ********************************************************************************************/
 
 ECBChannel::ECBChannel(std::string _name)
-	: name(_name), state(WAITING), limite(0), map(0), turn_time(0)
+	: name(_name), state(WAITING), limite(0), map(0), turn_time(60)
 {
 
 }

@@ -453,12 +453,13 @@ void MenAreAntsApp::InGame()
 				timer->reset();
 			}
 			if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
-				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
-			if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
 			{
-				client->sendrpl(client->rpl(EC_Client::SET), "+!");
-				InGameForm->BarreLat->ProgressBar->SetValue(0);
-				timer->reset();
+				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
+				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
+				{
+					client->sendrpl(client->rpl(EC_Client::SET), "+!");
+					timer->reset();
+				}
 			}
 			if(chan->State() == EChannel::ANIMING && InGameForm->BarreAct->Select())
 			{

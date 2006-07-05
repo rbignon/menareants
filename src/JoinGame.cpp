@@ -368,6 +368,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y()),
 				 		     SDL_Delay(10));
 				 		InGameForm->BarreLat->Hide();
+				 		InGameForm->BarreLat->ProgressBar->SetValue(0);
 				 	}
 				 }
 				 break;
