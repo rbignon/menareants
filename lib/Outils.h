@@ -123,7 +123,7 @@ template <class T>
 class ECList
 {
 /* Variables privées */
-protected:
+private:
 	std::vector<T> list;
 
 /* Constructeur/Destructeur */

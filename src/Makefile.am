@@ -26,6 +26,7 @@ menareants_SOURCES = \
 		gui/ColorEdit.cpp \
 		gui/Image.cpp \
 		gui/ShowMap.cpp \
+		gui/ProgressBar.cpp \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \

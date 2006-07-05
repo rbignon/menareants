@@ -36,11 +36,6 @@ ECPlayer::ECPlayer(const char* _nick, EChannel *_chan, bool _owner, bool _op, bo
  *                               EChannel                                                   *
  ********************************************************************************************/
 
-EChannel::~EChannel()
-{
-	if(map) MyFree(map);
-}
-
 ECPlayer *EChannel::GetMe()
 {
 	BPlayerVector::iterator it;

@@ -26,14 +26,14 @@ public:
 	Timer();
 	~Timer();
 
-	static void reset();
-	static float time_elapsed(bool update=false);
-	static long get_time();
+	void reset();
+	float time_elapsed(bool update=false);
+	long get_time();
 
 protected:
 
-	static long begin_time;
-	static float elapsed;
+	long begin_time;
+	float elapsed;
 };
 
 #endif

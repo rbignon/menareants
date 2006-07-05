@@ -32,6 +32,7 @@ class EChannel;
 class ECEntity;
 class EC_Client;
 class Color;
+class ECPlayer;
 
 struct case_img_t
 {
@@ -173,6 +174,7 @@ public:
 	void ImageSetXY(int x, int y);
 
 	ECase* Case() const;
+	ECPlayer* Owner() const;
 
 	ECMove* Move() { return &move; }
 

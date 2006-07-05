@@ -30,6 +30,7 @@
 #include "gui/ChildForm.h"
 #include "gui/Edit.h"
 #include "gui/BouttonText.h"
+#include "gui/ProgressBar.h"
 #include "Timer.h"
 
 struct SDL_Thread;
@@ -148,6 +149,7 @@ public:
 	TButtonText*    QuitButton;
 	TButtonText*    SchemaButton;
 	TButtonText*    OptionsButton;
+	TProgressBar*   ProgressBar;
 	TLabel*         Date;
 	TLabel*         Money;
 	TLabel*         TurnMoney;
@@ -203,6 +205,7 @@ public:
 /* Attributs */
 public:
 	Timer* GetTimer() { return &timer; }
+	Timer* GetElapsedTime() { return &elapsed_time; }
 
 	ECPlayer* Player() const { return player; }
 
@@ -211,6 +214,7 @@ public:
 
 private:
 	Timer timer;
+	Timer elapsed_time;
 	ECPlayer* player;
 };
 

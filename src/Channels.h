@@ -90,8 +90,6 @@ public:
 		: ECBChannel(_name), want_leave(false), current_event(0)
 	{}
 
-	virtual ~EChannel();
-
 /* Methodes */
 public:
 

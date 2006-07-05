@@ -72,7 +72,9 @@ bool Config::set_defaults(bool want_save)
 #endif
 	server_list.clear();
 	server_list.push_back("game.coderz.info:5461");
+#ifndef WIN32
 	server_list.push_back("127.0.0.1:5461");
+#endif
 	if(want_save)
 		save();
 	return true;

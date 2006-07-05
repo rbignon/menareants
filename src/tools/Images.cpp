@@ -560,3 +560,41 @@ int ECImage::FillRect(SDL_Rect &dstRect, Uint32 color)
 	if(!Img) return 0;
 	return SDL_FillRect( Img, &dstRect, color);
 }
+
+int ECImage::FillRect(SDL_Rect &dstRect, const Color color)
+{
+	if(!Img) return 0;
+	return SDL_FillRect( Img, &dstRect, MapColor(color));
+}
+
+void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
+{
+	Uint32 alphaMask;
+	Uint32 redMask;
+	Uint32 greenMask;
+	Uint32 blueMask;
+
+	if( autofree )
+		Free();
+
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	redMask = 0xff000000;
+	greenMask = 0x00ff0000;
+	blueMask = 0x0000ff00;
+	alphaMask =	0x000000ff;
+#else
+	redMask = 0x000000ff;
+	greenMask = 0x0000ff00;
+	blueMask = 0x00ff0000;
+	alphaMask = 0xff000000;
+#endif
+
+	if( !useAlpha )
+		alphaMask = 0;
+
+	Img = SDL_CreateRGBSurface(flags, width, height, 32,
+			redMask, greenMask, blueMask, alphaMask );
+
+	if( Img == NULL )
+		throw ECExcept("", std::string("Can't create SDL RGBA surface: ") + SDL_GetError() );
+}

@@ -6,13 +6,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
 
 * Urgent
--server: Lors d'un combat, n'afficher les nombres restants qu'à ceux qui ont fait partit du combat.
 -gestion des nations (juste le système, pas encore les unités).
 -limiter le nombre d'unités à construire sur les villes et les batiments
 
 * Après
 -client: gestion des accents dans TEdit
--server: enrichissement de l'IA
 -configuration des boutons de la souris
 
 * Bof
@@ -32,6 +30,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 ** En parallèle (on s'en fou un peu de quand on les fait)
 -mot de passe éventuel pour accéder à un serveur
+-server: enrichissement de l'IA
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -Unités des nations

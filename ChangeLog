@@ -1,3 +1,29 @@
+2005-07-04  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ProgressBar.h (TProgressBar): Récupération du composant TProgressBar de wormux.
+
+	* lib/Channels.h, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Programmation du temps maximum de reflexion
+	par tours.
+
+	* server/Batiments.cpp (ECNuclearSearch): Envoie à tout le monde du nombre de missile d'un batiment.
+
+	* src/Batiments.cpp (ECNuclearSearch): Affichage d'un message d'avertissement lors de la creation d'un centre de recherches
+	nucléaire.
+
+	* server/Channels.cpp, lib/Channels.cpp: Supprime bien la map dans le destructeur du channel, après avoir détruit les
+	players. En outre, dans le destructeur de ECBPlayer, paramètre l'owner à 0 de chacunes de ses entités.
+
+2005-07-03  Romain Bignon <progs@headfucking.net>
+
+	* Obtention du bac.
+
+	* server/Channels.cpp (RemovePlayer): Suppression des entités de la liste des players, pour satisfaire au destructeur
+	de ECBNuclearSearch qui regarde la liste des players.
+
+	* src/Config.cpp: Correction d'un bug de lecture de la configuration.
+
+	* src/ListBox.cpp: Décolorie bien les lignes déselectionnées.
+
 2005-07-02  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.h, server/Units.cpp, server/Batiments.cpp, server/InGame.cpp (ECEntity/Attaq()): Passage en argument

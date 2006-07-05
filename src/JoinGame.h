@@ -59,6 +59,7 @@ public:
 	TListBox*    MapList;
 	TCheckBox*   SpeedGame;
 	TSpinEdit*   BeginMoney;
+	TSpinEdit*   TurnTime;
 	TLabel*      MapTitle;
 	TImage*      Preview;
 

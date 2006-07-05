@@ -32,6 +32,7 @@
 #include "Units.h"
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
+#include "gui/ProgressBar.h"
 #include "tools/Font.h"
 #include "tools/Maths.h"
 #include "tools/Video.h"
@@ -441,12 +442,22 @@ void MenAreAntsApp::InGame()
 		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
 		InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
+		Timer* elapsed_time = InGameForm->GetElapsedTime();
+		elapsed_time->reset();
 		do
 		{
 			if(timer->time_elapsed(true) > 10)
 			{
 				if(InGameForm->Chat->NbItems())
 					InGameForm->Chat->RemoveItem(0);
+				timer->reset();
+			}
+			if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
+				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
+			if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
+			{
+				client->sendrpl(client->rpl(EC_Client::SET), "+!");
+				InGameForm->BarreLat->ProgressBar->SetValue(0);
 				timer->reset();
 			}
 			if(chan->State() == EChannel::ANIMING && InGameForm->BarreAct->Select())
@@ -522,10 +533,7 @@ void MenAreAntsApp::InGame()
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
-						{
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
-							InGameForm->Map->SetCreateEntity(0);
-						}
 						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
@@ -1129,6 +1137,9 @@ TBarreLat::TBarreLat(ECPlayer* pl)
 
 void TBarreLat::Init()
 {
+	ProgressBar = AddComponent(new TProgressBar(15, 190, Width()-30, 15));
+	ProgressBar->InitVal(0, 0, chan->TurnTime());
+
 	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	PretButton->SetHint("Cliquez ici lorsque vous avez fini vos déplacements");

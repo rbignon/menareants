@@ -55,7 +55,9 @@ ECBatiment::~ECBatiment()
 void ECNuclearSearch::Init()
 {
 	ECBNuclearSearch::Init();
-	SDL_Delay(1000);
+	if(Owner() && Channel() && !Owner()->IsMe())
+		Channel()->Print("ATTENTION!! " + std::string(Owner()->GetNick()) + " possède maintenant la technologie nucléaire "
+		                 "avec son centre de recherches nucléaire", 0x008);
 }
 
 void ECNuclearSearch::RecvData(ECData data)
@@ -68,7 +70,7 @@ void ECNuclearSearch::RecvData(ECData data)
 			if(Owner() && missiles < new_missile_nb)
 			{
 				// 0x008 = I_Shit
-				if(Owner() == Channel()->GetMe())
+				if(Owner()->IsMe())
 					Channel()->Print("Vous avez un nouveau missile en stock !", 0x008);
 				else
 					Channel()->Print(std::string(Owner()->GetNick()) + " a un nouveau missile en stock !", 0x008);
@@ -84,7 +86,8 @@ void ECNuclearSearch::RecvData(ECData data)
 
 std::string ECNuclearSearch::SpecialInfo()
 {
-	return TypToStr(missiles) + " missile(s) - Nouveau missile dans " + TypToStr(restBuild) + " jour(s)";
+	return Owner()->IsMe() ? (TypToStr(missiles) + " missile(s) - Nouveau missile dans " + TypToStr(restBuild) + " jour(s)")
+	                       : "";
 }
 
 /********************************************************************************************

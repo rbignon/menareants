@@ -215,6 +215,11 @@ void ECEntity::Draw()
 	}
 }
 
+ECPlayer* ECEntity::Owner() const
+{
+	return dynamic_cast<ECPlayer*>(owner);
+}
+
 ECase* ECEntity::Case() const
 {
 	return dynamic_cast<ECase*>(acase);

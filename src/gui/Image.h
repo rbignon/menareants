@@ -54,8 +54,8 @@ protected:
 	ECImage* image;
 
 	/* Interdits*/
-	void SetHeight (uint _h);                             /**< Set \a height */
-	void SetWidth (uint _w);                              /**< Set \a width */
+	void SetHeight (uint _h) {}                           /**< Set \a height */
+	void SetWidth (uint _w) {}                            /**< Set \a width */
 	bool wana_delete;
 };
 

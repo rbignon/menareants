@@ -97,8 +97,8 @@ public:
 	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 	void SetX(int _x);
 	void SetY(int _y);
-	void SetHeight (uint _h);                             /**< Set \a height */
-	void SetWidth (uint _w);                              /**< Set \a width */
+	virtual void SetHeight (uint _h);                     /**< Set \a height */
+	virtual void SetWidth (uint _w);                      /**< Set \a width */
 
 	/* Visibilité */
 	bool Visible() const { return visible; }              /**< Is this object visible ? */

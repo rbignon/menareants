@@ -122,6 +122,30 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 't':
+			{
+				if(!sender->Channel()->Joinable())
+				{
+					Debug(W_DESYNCH, "SET %ct: interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->IsPriv())
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
+
+				if(add)
+				{
+					if(j<parv.size())
+					{
+						sender->Channel()->SetTurnTime(StrToTyp<uint>(parv[j++]));
+						changed = YES_WITHPARAM;
+					}
+					else
+						Debug(W_DESYNCH, "SET +t: sans argument");
+				}
+				else
+					Debug(W_DESYNCH, "SET -t: interdit.");
+				break;
+			}
 			case 'b':
 			{
 				if(!sender->Channel()->Joinable())
@@ -634,7 +658,6 @@ EChannel::EChannel(std::string _name)
 EChannel::~EChannel()
 {
 	app.NBchan--;
-	if(map) delete map;
 	if(state == EChannel::WAITING) app.NBwchan--;
 	else app.NBachan--;
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
@@ -661,7 +684,7 @@ void EChannel::CheckReadys()
 		{
 			case EChannel::WAITING:
 			{
-				if(c < Map()->MinPlayers() || !Owner()->Ready())
+				if(!Map() || c < Map()->MinPlayers() || !Owner()->Ready())
 					break; /* Si c == nbplayers, c'est ok que si nbplayers >= minplayers */
 
 				/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
@@ -1341,14 +1364,10 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 				else
 					++evti;
 			}
-			Map()->RemoveAnEntity(entity);
-			/** Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer *
-			 *  entity->Case()->Entities()->Remove(entity);
-			 *  Map()->Entities()->Remove(entity);
-			 * \note finalement on l'appel quand meme parce que dans le destructeur de ECBNuclearSearch par exemple il fait
-			 * une boucle sur les unités de l'owner, et ça plante, car il n'est pas supprimé de la liste mais la mémoire
-			 * est libérée
-			 */
+			entity->SetOwner(0);
+			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
+			entity->Case()->Entities()->Remove(entity);
+			Map()->Entities()->Remove(entity);
 			MyFree(entity);
 		}
 		if(pl->MapPlayer())
@@ -1362,6 +1381,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 			}
 		}
 	}
+	pl->Entities()->Clear();
 	if(pl->Client())
 		sendto_players(0, app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
 	else
@@ -1383,6 +1403,7 @@ std::string EChannel::ModesStr() const
 	if(map)         modes += "m", params += " " + TypToStr(Map()->Num());
 	                modes += "b", params += " " + TypToStr(begin_money);
 	if(fast_game)   modes += "r";
+	if(turn_time)   modes += "t", params += " " + TypToStr(turn_time);
 
 	switch(state)
 	{

@@ -34,8 +34,7 @@ void ECNuclearSearch::Played()
 	{
 		restBuild = NUCLEARSEARCH_BUILDTIME;
 		missiles++;
-		if(Owner()->Client())
-			Channel()->SendArm(Owner()->Client(), this, ARM_DATA, 0,0, ECData(DATA_NBMISSILES, TypToStr(missiles)));
+		Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_NBMISSILES, TypToStr(missiles)));
 	}
 	if(Owner()->Client())
 		Channel()->SendArm(Owner()->Client(), this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));

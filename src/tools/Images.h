@@ -211,6 +211,9 @@ public:
 	int Fill(Uint32 color);
 	int Fill(const Color &color);
 	int FillRect(SDL_Rect &dstRect, Uint32 color);
+	int FillRect(SDL_Rect &dstRect, const Color color);
+
+	void NewSurface(uint width, uint height, Uint32 flags, bool useAlpha);
 
 /* Attributs */
 public:

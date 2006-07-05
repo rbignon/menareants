@@ -333,7 +333,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 							(*enti)->Played();
 						if(InGameForm)
+						{
 							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()));
+							InGameForm->GetElapsedTime()->reset();
+						}
 						me->UnlockScreen();
 					}
 					else
@@ -436,7 +439,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(!add && (chan->State() == EChannel::SENDING || chan->State() == EChannel::ANIMING))
 							me->sendrpl(me->rpl(EC_Client::SET), "+!");
 						if(InGameForm)
+						{
 							InGameForm->BarreLat->PretButton->SetEnabled(!add);
+							if(add && chan->State() == EChannel::PLAYING)
+								InGameForm->Map->SetCreateEntity(0);
+						}
 
 						/* En mode ANIMING, la confirmation de chaque evenement est manifesté par le +!
 						 * et marque la fin d'un evenement, donc on a plus besoin de s'en rappeler.
@@ -502,6 +509,15 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(GameInfosForm && j<parv.size())
 					GameInfosForm->BeginMoney->SetValue(StrToTyp<int>(parv[j++]));
 				break;
+			case 't':
+			{
+				if(j>=parv.size()) { Debug(W_DESYNCH, "SET +t: sans temps"); break; }
+				uint time = StrToTyp<uint>(parv[j++]);
+				chan->SetTurnTime(time);
+				if(GameInfosForm)
+					GameInfosForm->TurnTime->SetValue(time);
+				break;
+			}
 			case 'r':
 			{
 				if(GameInfosForm)
@@ -1087,6 +1103,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 						else if(GameInfosForm->BeginMoney->Test(event.button.x, event.button.y))
 							client->sendrpl(client->rpl(EC_Client::SET),
 							   ("+b " + TypToStr(GameInfosForm->BeginMoney->Value())).c_str());
+						else if(GameInfosForm->TurnTime->Test(event.button.x, event.button.y))
+							client->sendrpl(client->rpl(EC_Client::SET),
+							   ("+t " + TypToStr(GameInfosForm->TurnTime->Value())).c_str());
 						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
 						{
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
@@ -1250,6 +1269,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 	CreateIAButton->SetVisible(add);
 	SpeedGame->SetEnabled(add);
 	BeginMoney->SetEnabled(add);
+	TurnTime->SetEnabled(add);
 }
 
 TGameInfosForm::TGameInfosForm(ECImage* w)
@@ -1271,9 +1291,15 @@ TGameInfosForm::TGameInfosForm(ECImage* w)
 	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
 	SpeedGame->Check();
 
-	                                                          /*  label        x    y    w  min   max  step   defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  625, 385, 150, 0, 50000, 5000,    15000));
+	                                                                     /*  label        x    y    w  min   max  step */
+	/* defvalue */
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  625, 385, 150, 0, 50000, 5000,
+	15000));
 	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
+
+	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  625, 405, 150, 15, 360, 15,
+	60));
+	TurnTime->SetHint("Temps en secondes maximal de reflexion chaques tours");
 
 	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", Font::GetInstance(Font::Normal)));
 	PretButton->SetEnabled(false);

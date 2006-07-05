@@ -54,7 +54,7 @@ void TIA::FirstMovements()
 						ia_send("ARM " + std::string((*enti)->ID()) + " +");
 				}
 			}
-			for(int k = 0; k < 2; k++)
+			for(uint k = 0; k < (*enti)->MyStep(); k++)
 			{
 				int i = rand()%4;
 				switch(i)

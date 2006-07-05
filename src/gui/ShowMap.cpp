@@ -110,20 +110,6 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 	c->Entities()->Add(e);
 
 	return dynamic_cast<ECEntity*>(e);
-#if 0
-	std::vector<ECBEntity*> entities = map->Entities()->List();
-
-	/* On porte la priorité sur la selection des entités plutot que des batiments */
-	ECEntity* et = 0;
-	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-		if(dynamic_cast<ECEntity*>(*enti)->Test(mouse_x, mouse_y))
-		{
-			et = dynamic_cast<ECEntity*>(*enti);
-			if(!(*enti)->IsBuilding())
-				return et;
-		}
-	return et;
-#endif
 }
 
 ECase* TMap::TestCase(int mouse_x, int mouse_y)

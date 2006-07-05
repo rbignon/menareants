@@ -233,7 +233,8 @@ void TListBox::Select (uint index)
 
 	if(m_selection != -1)
 		m_items[m_selection].label.SetColor(
-		                         (!Enabled() || !m_items[m_selection].enabled && gray_disable) ? gray_color :  white_color);
+		                         (!Enabled() || !m_items[m_selection].enabled && gray_disable) ? gray_color
+		                                                                                       : m_items[index].color);
 
 	m_selection = index;
 	m_items[index].label.SetColor(white_color);

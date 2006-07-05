@@ -119,6 +119,7 @@ Sommaire:
          +P                  :jeu (PLAYING)
          +A                  :animation (ANIMING)
          +E                  :fin du jeu (SCORING)
+         +t <temps>          :temps par tours maximum pour jouer
         Mode pour un user:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position

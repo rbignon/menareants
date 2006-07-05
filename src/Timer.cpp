@@ -35,9 +35,6 @@ struct timeval {
 #  include <sys/time.h>
 #endif
 
-long Timer::begin_time = 0;
-float Timer::elapsed = 0;
-
 #ifdef WIN32
 int gettimeofday(struct timeval* tp, void* tzp) {
     DWORD t;

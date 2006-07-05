@@ -56,7 +56,7 @@ class ECBPlayer
 /* Constructeurs/Deconstructeurs */
 public:
 	ECBPlayer(ECBChannel *_chan, bool _owner, bool _op);
-	virtual ~ECBPlayer() {}
+	virtual ~ECBPlayer();
 
 	/** List of nations */
 	enum e_nations
@@ -220,6 +220,9 @@ public:
 	 */
 	std::string PlayerList();
 
+	uint TurnTime() const { return turn_time; }
+	void SetTurnTime(uint t) { turn_time = t; }
+
 /* Variables privées */
 protected:
 	BPlayerVector players;
@@ -227,6 +230,7 @@ protected:
 	e_state state;
 	unsigned int limite;
 	ECBMap *map;
+	uint turn_time;
 };
 
 #endif /* ECLIB_CHANNELS_H */

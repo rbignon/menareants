@@ -54,6 +54,13 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 	nation = N_NONE;
 }
 
+ECBPlayer::~ECBPlayer()
+{
+	std::vector<ECBEntity*> entities = Entities()->List();
+	for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		(*it)->SetOwner(0);
+}
+
 void ECBPlayer::AddAllie(ECBPlayer* pl)
 {
 	allies.push_back(pl);
@@ -118,7 +125,7 @@ bool ECBPlayer::SetNation(unsigned int n)
  ********************************************************************************************/
 
 ECBChannel::ECBChannel(std::string _name)
-	: name(_name), state(WAITING), limite(0), map(0)
+	: name(_name), state(WAITING), limite(0), map(0), turn_time(0)
 {
 
 }
@@ -128,6 +135,10 @@ ECBChannel::~ECBChannel()
 	/* Libération des players */
 	for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 		delete *it;
+
+	players.clear();
+
+	delete map;
 }
 
 bool ECBChannel::AddPlayer(ECBPlayer* pl)

@@ -1,3 +1,23 @@
+/* src/tools/Color.h - Header of Color.cpp
+ *
+ * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id: Color.h 766 2006-06-17 11:41:58Z progs $
+ */
 /******************************************************************************
  *  Wormux, a free clone of the game Worms from Team17.
  *  Copyright (C) 2001-2004 Lawrence Azzoug.
@@ -19,8 +39,8 @@
  * Handle a SDL_Surface.
  *****************************************************************************/
 
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef EC_COLOR_H
+#define EC_COLOR_H
 
 #include <SDL.h>
 
@@ -62,4 +82,4 @@ const Color fwhite_color(0xcb, 0xcb, 0xcb, 0xff);
 const Color fbrown_color(0x3b, 0x2b, 0x1e, 0xff);
 const Color fblue_color(0x0e, 0x0e, 0x55, 0xff);
 
-#endif
+#endif /* EC_COLOR_H */
