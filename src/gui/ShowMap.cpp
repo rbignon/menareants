@@ -38,10 +38,108 @@ void TMap::Init()
 	w = CASE_WIDTH  * map->Width();
 
 	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
-	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, CASE_WIDTH, CASE_HEIGHT,
+	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
 
+	SetMustRedraw();
+}
+
+void TMap::LockScreen() const
+{
+	if(mutex)
+		SDL_LockMutex(mutex);
+}
+
+void TMap::UnlockScreen() const
+{
+	if(mutex)
+		SDL_UnlockMutex(mutex);
+}
+
+ECase* TMap::Pixel2Case(int x, int y)
+{
+	int x_ = (x - X()) / CASE_WIDTH;
+	int y_ = (y - Y()) / CASE_HEIGHT;
+	return dynamic_cast<ECase*>((*Map())(x_, y_));
+}
+
+std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
+{
+	std::vector<ECase*> cases;
+
+	ECBCase* c = Pixel2Case(x, y);
+	uint nb_x = w / CASE_WIDTH;
+	uint nb_y = h / CASE_HEIGHT;
+	//printf("%d,%d\n", nb_x, nb_y);
+
+	for(uint i=0; i <= nb_y; ++i)
+	{
+		uint j=0;
+		for(; j <= nb_x; ++j)
+		{
+			ECase* cc = dynamic_cast<ECase*>(c);
+
+			cases.push_back(cc);
+
+			if(c->X() == c->Map()->Width()-1)
+				break;
+			c = c->MoveRight();
+		}
+		if(c->Y() == c->Map()->Height()-1)
+			break;
+		c = c->MoveDown();
+		c = c->MoveLeft(j);
+	}
+	return cases;
+}
+
+void TMap::ToRedraw(ECSprite* img)
+{
+	ToRedraw(img->X(), img->Y());
+}
+
+void TMap::ToRedraw(int x, int y)
+{
+	ToRedraw(Pixel2Case(x, y));
+}
+
+void TMap::ToRedraw(int x, int y, int w, int h)
+{
+	LockScreen();
+	std::vector<ECase*> cases = Rect2Case(x, y, w, h);
+	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
+		(*it)->SetMustRedraw();
+	UnlockScreen();
+}
+
+void TMap::ToRedraw(TComponent* c)
+{
+	ToRedraw(c->X(), c->Y(), c->Width(), c->Height());
+}
+
+void TMap::ToRedraw(ECEntity* e)
+{
+	ToRedraw(e->Image()->X(), e->Image()->Y(), e->Image()->GetWidth(), e->Image()->GetHeight());
+}
+
+void TMap::ToRedraw(ECase* c)
+{
+	LockScreen();
+	c->SetMustRedraw();
+	UnlockScreen();
+}
+
+void TMap::SetMustRedraw(bool b)
+{
+	LockScreen();
+	must_redraw = b;
+	UnlockScreen();
+}
+
+void TMap::SetSchema(bool s)
+{
+	schema = s;
 	SetMustRedraw();
 }
 
@@ -116,11 +214,14 @@ ECase* TMap::TestCase(int mouse_x, int mouse_y)
 {
 	if(!Focused()) return 0;
 
+#if 0
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 		if(*casi && dynamic_cast<ECase*>(*casi)->Test(mouse_x, mouse_y))
 			return dynamic_cast<ECase*>(*casi);
 	return 0;
+#endif
+	return Pixel2Case(mouse_x, mouse_y);
 }
 
 void TMap::Draw(int _x, int _y)
@@ -149,7 +250,7 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c && (MustRedraw() || c->MustRedraw()))
+		if(c && (MustRedraw() || c->MustRedraw() || CreateEntity()))
 		{
 			if(HaveBrouillard() && c->Showed() < 0)
 			{
@@ -171,6 +272,7 @@ void TMap::Draw(int _x, int _y)
 			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
+			c->SetMustRedraw(false);
 		}
 	}
 

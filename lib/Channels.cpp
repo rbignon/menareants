@@ -24,6 +24,7 @@
 #include "Map.h"
 #include "Debug.h"
 #include "Colors.h"
+#include "Defines.h"
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *
@@ -57,8 +58,8 @@ ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
 ECBPlayer::~ECBPlayer()
 {
 	std::vector<ECBEntity*> entities = Entities()->List();
-	for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		(*it)->SetOwner(0);
+	FOR(ECBEntity*, entities, enti)
+		enti->SetOwner(0);
 }
 
 void ECBPlayer::AddAllie(ECBPlayer* pl)
@@ -133,8 +134,8 @@ ECBChannel::ECBChannel(std::string _name)
 ECBChannel::~ECBChannel()
 {
 	/* Libération des players */
-	for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
-		delete *it;
+	FOR(ECBPlayer*, players, pl)
+		delete pl;
 
 	players.clear();
 

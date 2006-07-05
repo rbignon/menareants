@@ -346,9 +346,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
-				 		for(;InGameForm->BarreLat->X() > (int)SCREEN_WIDTH - int(InGameForm->BarreLat->Width());
-				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y()),
-				 		     SDL_Delay(10));
+				 		for(;InGameForm->BarreLat->X() > (int)SCREEN_WIDTH - int(InGameForm->BarreLat->Width());SDL_Delay(10))
+				 		{
+				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y());
+				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+				 		}
 				 		InGameForm->Map->SetEnabled(true);
 				 		InGameForm->ShowBarreLat(true);
 				 	}
@@ -364,9 +366,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
-				 		for(;InGameForm->BarreLat->X() < (int)SCREEN_WIDTH;
-				 		     InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y()),
-				 		     SDL_Delay(10));
+				 		for(;InGameForm->BarreLat->X() < (int)SCREEN_WIDTH; SDL_Delay(10))
+				 		{
+				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y());
+				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+				 		}
 				 		InGameForm->BarreLat->Hide();
 				 		InGameForm->BarreLat->ProgressBar->SetValue(0);
 				 	}

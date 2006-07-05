@@ -64,12 +64,20 @@ void ECMissile::SetMissile(ECSpriteBase* c)
 
 	missile = new ECSprite(c, Entity()->Image()->Window());
 	missile->SetAnim(true);
+	if(Entity()->Map())
+		Entity()->Map()->ShowMap()->ToRedraw(missile);
 }
 
 void ECMissile::Draw()
 {
 	if(missile)
 		missile->draw();
+}
+
+void ECMissile::SetXY(int x, int y)
+{
+	missile->set(x, y);
+	Entity()->Map()->ShowMap()->ToRedraw(missile);
 }
 
 bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
@@ -84,7 +92,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		if(Entity()->Case()->Showed() > 0)
 		{
 			dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(Entity());
-			missile->set(Entity()->Image()->X(), Entity()->Image()->Y());
+			SetXY(Entity()->Image()->X(), Entity()->Image()->Y());
 			SDL_Delay(200);
 		}
 		return false;
@@ -95,7 +103,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		me->LockScreen();
 		dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
 		SetMissile(missile_down);
-		missile->set(c->Image()->X(), 0 - missile->GetHeight());
+		SetXY(c->Image()->X(), 0 - missile->GetHeight());
 		me->UnlockScreen();
 		return true;
 	}
@@ -167,6 +175,12 @@ ECEntity::~ECEntity()
 	delete image;
 }
 
+void ECEntity::Select(bool s)
+{
+	selected = s;
+	Map()->ShowMap()->ToRedraw(this);
+}
+
 void ECEntity::SetAttaquedCase(ECase* c)
 {
 	attaqued_case = c;
@@ -175,7 +189,7 @@ void ECEntity::SetAttaquedCase(ECase* c)
 	{
 		int dx = abs(c->Image()->X() - Image()->X() + 1);
 		int dy = abs(c->Image()->Y() - Image()->Y() + 1);
-		trajectoire.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_OPENGL, dx, dy,
+		trajectoire.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, dx, dy,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 		DrawLine(trajectoire.Img,        attaqued_case->X() < Case()->X() ? 0 : dx-1,
 			                             attaqued_case->Y() < Case()->Y() ? 0 : dy-1,
@@ -225,12 +239,16 @@ ECase* ECEntity::Case() const
 	return dynamic_cast<ECase*>(acase);
 }
 
+ECMap* ECEntity::Map() const
+{
+	return dynamic_cast<ECMap*>(map);
+}
+
 EChannel* ECEntity::Channel() const
 {
-	assert(acase);
-	assert(acase->Map());
-	assert(acase->Map()->Channel());
-	return dynamic_cast<EChannel*>(acase->Map()->Channel());
+	assert(Map());
+	assert(Map()->Channel());
+	return dynamic_cast<EChannel*>(Map()->Channel());
 }
 
 void ECEntity::ImageSetXY(int x, int y)
@@ -239,16 +257,9 @@ void ECEntity::ImageSetXY(int x, int y)
 		return;
 
 	image->set(x,y);
-	ECase* c = dynamic_cast<ECase*>(Case());
-	c->SetMustRedraw();
-	if(x > c->Image()->X())
-		dynamic_cast<ECase*>(c->MoveRight())->SetMustRedraw();
-	if(x < c->Image()->X())
-		dynamic_cast<ECase*>(c->MoveLeft())->SetMustRedraw();
-	if(y > c->Image()->Y())
-		dynamic_cast<ECase*>(c->MoveDown())->SetMustRedraw();
-	if(y < c->Image()->Y())
-		dynamic_cast<ECase*>(c->MoveUp())->SetMustRedraw();
+
+	if(Map()->ShowMap())
+		Map()->ShowMap()->ToRedraw(this);
 }
 
 void ECEntity::SetImage(ECSpriteBase* spr)
@@ -266,7 +277,7 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	image = new ECSprite(spr, Video::GetInstance()->Window());
 	image->SetAnim(anim);
 	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
-		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		ImageSetXY(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
@@ -279,7 +290,7 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 	SetShowedCases(true);
 
 	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
-		image->set(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		ImageSetXY(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
 		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
@@ -302,6 +313,7 @@ void ECEntity::SetShowedCases(bool show, bool forced)
 				cc->SetShowed(cc->Showed() < 0 ? 1 : cc->Showed() + 1);
 			else if(cc->Showed() > 0)
 				cc->SetShowed(cc->Showed()-1);
+			cc->SetMustRedraw();
 
 			if(c->X() == c->Map()->Width()-1)
 				break;

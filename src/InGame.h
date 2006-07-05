@@ -29,6 +29,7 @@
 #include "gui/ShowMap.h"
 #include "gui/ChildForm.h"
 #include "gui/Edit.h"
+#include "gui/Fps.h"
 #include "gui/BouttonText.h"
 #include "gui/ProgressBar.h"
 #include "Timer.h"
@@ -185,6 +186,7 @@ public:
 
 	TMemo*     Chat;
 	TEdit*     SendMessage;
+	TFPS*      FPS;
 
 	SDL_Thread* Thread;
 

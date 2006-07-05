@@ -38,7 +38,7 @@ std::string GetHome()
   char *txt = getenv("HOME");
 
   if (txt == NULL)
-    ECExcept(0,"HOME directory (environment variable $HOME) could not be found!");
+    throw ECExcept(0,"HOME directory (environment variable $HOME) could not be found!");
 
   return txt;
 }

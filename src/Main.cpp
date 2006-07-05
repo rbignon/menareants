@@ -44,6 +44,7 @@
 #include "gui/Memo.h"
 #include "gui/ComboBox.h"
 #include "gui/Label.h"
+#include "gui/Fps.h"
 #include <functional>
 
 class TMainForm : public TForm
@@ -62,6 +63,7 @@ public:
 	TButton*    QuitterButton;
 	TButtonText* MapEditorButton;
 	TLabel*     Version;
+	TFPS*       FPS;
 };
 
 MenAreAntsApp* MenAreAntsApp::singleton = NULL;
@@ -230,6 +232,8 @@ TMainForm::TMainForm(ECImage* w)
 
 	Version = AddComponent(new TLabel(750,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
 	Version->SetXY(Version->X() - Version->Width(), Version->Y());
+
+	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
 
 	SetBackground(Resources::Titlescreen());
 }

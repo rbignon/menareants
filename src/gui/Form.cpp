@@ -94,8 +94,8 @@ void TForm::Actions(uint a)
 
 void TForm::Actions(SDL_Event event, uint a)
 {
-	if(mutex)
-		SDL_LockMutex(mutex);
+	/*if(mutex)
+		SDL_LockMutex(mutex);*/
 	switch(event.type)
 	{
 		case SDL_KEYUP:
@@ -151,20 +151,20 @@ void TForm::Actions(SDL_Event event, uint a)
 		default:
 			break;
 	}
-	if(mutex)
-		SDL_UnlockMutex(mutex);
+/*	if(mutex)
+		SDL_UnlockMutex(mutex);*/
 }
 
 void TForm::Update(int _x, int _y, bool flip)
 {
-	if(mutex)
-		SDL_LockMutex(mutex);
-
 	if(background)
 		Window()->Blit(background);
 
 	if(_x < 0 || _y < 0)
 		SDL_GetMouseState( &_x, &_y);
+
+	if(mutex)
+		SDL_LockMutex(mutex);
 
 	bool first = focus_order ? true : false;
 	while(1)
@@ -181,11 +181,11 @@ void TForm::Update(int _x, int _y, bool flip)
 		else break;
 	}
 
-	if(flip)
-		Window()->Flip();
-
 	if(mutex)
 		SDL_UnlockMutex(mutex);
 
-	SDL_Delay(15);
+	if(flip)
+		Window()->Flip();
+
+	//SDL_Delay(15);
 }

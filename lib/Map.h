@@ -172,7 +172,8 @@ public:
 	};
 
 	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3), parent(0)
+		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3),
+		  parent(0), map(0)
 	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0,
@@ -311,6 +312,9 @@ public:
 	ECBEntity* Parent() const { return parent; }
 	void SetParent(ECBEntity* e) { parent = e; }
 
+	ECBMap* Map() const { return map; }
+	void SetMap(ECBMap* m) { map = m; }
+
 /* Variables protégées */
 protected:
 	ECBPlayer* owner;
@@ -326,6 +330,7 @@ protected:
 	uint event_type;
 	uint visibility;
 	ECBEntity* parent;
+	ECBMap* map;
 };
 
 /********************************************************************************************

@@ -33,6 +33,7 @@ class ECEntity;
 class EC_Client;
 class Color;
 class ECPlayer;
+class ECMap;
 
 struct case_img_t
 {
@@ -58,8 +59,8 @@ public:
 /* Methodes */
 public:
 
-	bool ECMissile::AttaqFirst(ECase* c, EC_Client* me);
-	bool ECMissile::AttaqSecond(ECase* c, EC_Client* me);
+	bool AttaqFirst(ECase* c, EC_Client* me);
+	bool AttaqSecond(ECase* c, EC_Client* me);
 
 	void Draw();
 
@@ -70,6 +71,8 @@ public:
 
 	void SetMissileUp(ECSpriteBase* spr) { missile_up = spr; }
 	void SetMissileDown(ECSpriteBase* spr) { missile_down = spr; }
+
+	void SetXY(int x, int y);
 
 	ECSprite* Missile() const { return missile; }
 
@@ -166,7 +169,7 @@ public:
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
 
-	void Select(bool s = true) { selected = s; }
+	void Select(bool s = true);
 	bool Selected() { return selected; }
 
 	int Tag;
@@ -185,6 +188,7 @@ public:
 	void SetAttaquedCase(ECase* c);
 
 	EChannel* Channel() const;
+	ECMap* Map() const;
 
 /* Variables privées */
 private:

@@ -1,3 +1,14 @@
+2005-07-05  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h (ECBEntity): Sauvegarde de la map associée.
+
+	* src/gui/ShowMap.cpp, src/InGame.cpp, src/Map.cpp: Utilisation de MustRedraw() pour ne réafficher les cases que si
+	nécessaire.
+
+	* src/gui/Fps.cpp (TFPS): Création de la classe qui calcule les frames par secondes.
+
+	* src/InGame.cpp: Utilisation d'un TFPS.
+
 2005-07-04  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ProgressBar.h (TProgressBar): Récupération du composant TProgressBar de wormux.

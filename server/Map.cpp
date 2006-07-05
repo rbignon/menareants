@@ -420,10 +420,9 @@ ECPlayer* ECEntity::Owner() const
 
 EChannel* ECEntity::Channel() const
 {
-	assert(Case());
-	assert(Case()->Map());
-	assert(Case()->Map()->Channel());
-	return dynamic_cast<EChannel*>(Case()->Map()->Channel());
+	assert(Map());
+	assert(Map()->Channel());
+	return dynamic_cast<EChannel*>(Map()->Channel());
 }
 
 void ECEntity::RemoveLast()

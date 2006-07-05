@@ -33,7 +33,7 @@ public:
 
 	TMap(ECMap* _map)
 		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0),
-		  have_brouillard(true), must_redraw(true)
+		  have_brouillard(true), must_redraw(true), mutex(0)
 	{}
 
 /* Methodes */
@@ -45,6 +45,16 @@ public:
 
 	ECEntity* TestEntity(int mouse_x, int mouse_y);
 	ECase* TestCase(int mouse_x, int mouse_y);
+
+	ECase* Pixel2Case(int x, int y);
+	std::vector<ECase*> Rect2Case(int x, int y, uint w, uint h);
+
+	void ToRedraw(ECSprite*);
+	void ToRedraw(int x, int y);
+	void ToRedraw(int x, int y, int w, int h);
+	void ToRedraw(ECEntity*);
+	void ToRedraw(ECase*);
+	void ToRedraw(TComponent*);
 
 	virtual void SetXY(int x, int y);
 
@@ -71,8 +81,8 @@ public:
 	void SetContraintes(int _x, int _y) { x_min = _x; y_min = _y; }
 
 	bool Schema() const { return schema; }
-	void SetSchema(bool s = true) { schema = s; }
-	void ToggleSchema() { schema = !schema; }
+	void SetSchema(bool s = true);
+	void ToggleSchema() { SetSchema(!schema); }
 
 	ECMap* Map() const { return map; }
 
@@ -83,7 +93,12 @@ public:
 	void SetBrouillard(bool b = true) { have_brouillard = b; }
 
 	bool MustRedraw() const { return must_redraw; }
-	void SetMustRedraw(bool b = true) { must_redraw = b; }
+	void SetMustRedraw(bool b = true);
+
+	SDL_mutex* Mutex() const { return mutex; }
+	void SetMutex(SDL_mutex* m) { mutex = m; }
+	void LockScreen() const;
+	void UnlockScreen() const;
 
 /* Variables privées */
 private:
@@ -94,6 +109,7 @@ private:
 	ECImage brouillard;
 	bool have_brouillard;
 	bool must_redraw;
+	SDL_mutex* mutex;
 };
 
 #endif /* EC_SHOWMAP_H */

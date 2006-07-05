@@ -49,4 +49,8 @@
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
 
+#define FOR(T, v, x) \
+                       T (x); \
+                       for(std::vector<T>::iterator sdfsdfit = (v).begin(); (x = *sdfsdfit) && sdfsdfit != (v).end(); ++sdfsdfit)
+
 #endif /* ECLIB_Defines_h */

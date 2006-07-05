@@ -49,16 +49,17 @@ void EChannel::Print(std::string s, int i)
 }
 
 template<typename T>
-static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
+static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map)
 {
 	T* entity = new T(_name, _owner, _case, _nb);
+	entity->SetMap(map);
 	entity->Init();
 	return entity;
 }
 
 static struct
 {
-	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb);
+	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
@@ -209,7 +210,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
 				continue;
 			}
-			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb);
+			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb, map);
 			map->AddAnEntity(entity);
 		}
 		if(!moves_str.empty())
@@ -427,6 +428,7 @@ void MenAreAntsApp::InGame()
 
 		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client->Player());
 		InGameForm->SetMutex(mutex);
+		InGameForm->Map->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
 		const char W_EXTRACT = 3;
@@ -449,7 +451,10 @@ void MenAreAntsApp::InGame()
 			if(timer->time_elapsed(true) > 10)
 			{
 				if(InGameForm->Chat->NbItems())
+				{
 					InGameForm->Chat->RemoveItem(0);
+					InGameForm->Map->ToRedraw(InGameForm->Chat);
+				}
 				timer->reset();
 			}
 			if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
@@ -760,6 +765,7 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 		timer.reset();
 
 	Chat->AddItem(line, c);
+	Map->ToRedraw(Chat);
 	UnlockScreen();
 }
 
@@ -816,6 +822,8 @@ TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
 	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30,
 	                              10 * Font::GetInstance(Font::Small)->GetHeight(), 9, false));
 	Chat->SetShadowed();
+
+	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
 
 	ShowBarreLat();
 
@@ -1044,7 +1052,10 @@ void TBarreAct::vSetEntity(void* _e)
 		{
 			InGameForm->BarreAct->Show();
 			while(InGameForm->BarreAct->Y() > int(SCREEN_HEIGHT - InGameForm->BarreAct->Height()))
+			{
 				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()-4), SDL_Delay(10);
+				InGameForm->Map->ToRedraw(InGameForm->BarreAct);
+			}
 			InGameForm->ShowBarreAct(true);
 		}
 		InGameForm->BarreAct->entity = e;
@@ -1058,7 +1069,10 @@ void TBarreAct::vSetEntity(void* _e)
 		{
 			InGameForm->ShowBarreAct(false);
 			while(InGameForm->BarreAct->Y() < int(SCREEN_HEIGHT))
+			{
 				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+4), SDL_Delay(10);
+				InGameForm->Map->ToRedraw(InGameForm->BarreAct);
+			}
 			InGameForm->BarreAct->Hide();
 			
 		}
