@@ -206,23 +206,6 @@ public:
 		return l;
 	}
 
-	uint Moved()
-	{
-		uint i = 0;
-		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Shadowed() && (*it)->Last() && (*it)->Last()->Case() != (*it)->Case())
-				++i;
-		return i;
-	}
-
-	uint Available()
-	{
-		uint i = 0;
-		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Shadowed()) ++i;
-		return i;
-	}
-
 	T First() const { return list.front(); }
 
 	std::vector<T> List() { return list; }

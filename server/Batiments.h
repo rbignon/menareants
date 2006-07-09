@@ -74,7 +74,7 @@ public:
 
 	virtual void Union(ECEntity*) { return; }
 
-	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent*);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 
 	virtual bool WantAttaq(uint x, uint y, bool);
 };

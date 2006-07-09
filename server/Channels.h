@@ -144,8 +144,7 @@ public:
 	 * @param flags there is a lot of flags. You can show them at the end of comment.
 	 * @param x an horizontal position. (optional)
 	 * @param y a vertical position. (optional)
-	 * @param nb number of units in entity. (optional)
-	 * @param type type of entity. (optional)
+	 * @param data a data structure for ~ flag.
 	 * @param events this is a vector of events (in exemple for an attaq)
 	 *
 	 * Note that params \a x \a y \a nb and \a type aren't necessary and you have to put
@@ -168,6 +167,8 @@ public:
 	 * ARM_FORCEATTAQ  0x1000  (!, to force an attaq to a specific case)
 	 * ARM_CONTENER    0x2000  ( ) )
 	 * ARM_UNCONTENER  0x4000  ( ( )
+	 * ARM_NOPRINCIPAL 0x8000  (&)
+	 * ARM_DATA        0x10000 (~id,data)
 	 * ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 	 * ARM_UNION       (ARM_MOVE|ARM_NUMBER)
 	 * ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)

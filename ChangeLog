@@ -1,4 +1,17 @@
-2005-07-05  Romain Bignon <progs@headfucking.net>
+2006-07-08  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.h (ECList): Suppression des fonctions inutiles Moved() et Available().
+
+	* lib/Defines.h (FOR): Macro sous la forme "FOR(type, vecteur, pointé par iterateur)",
+	genre "FOR(ECEntity*, entities, entity)". Voir la documentation dans lib/Defines.h.
+
+	* server/Server.h, server/IA.cpp: Utilisation de std::string...
+
+	* src/Main.h, src/InGame.cpp: Affiche un message lors de la première partie.
+
+	* src/gui/ShowMap.cpp: Quelques corrections..
+
+2006-07-05  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h (ECBEntity): Sauvegarde de la map associée.
 
@@ -9,7 +22,7 @@
 
 	* src/InGame.cpp: Utilisation d'un TFPS.
 
-2005-07-04  Romain Bignon <progs@headfucking.net>
+2006-07-04  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ProgressBar.h (TProgressBar): Récupération du composant TProgressBar de wormux.
 
@@ -24,7 +37,7 @@
 	* server/Channels.cpp, lib/Channels.cpp: Supprime bien la map dans le destructeur du channel, après avoir détruit les
 	players. En outre, dans le destructeur de ECBPlayer, paramètre l'owner à 0 de chacunes de ses entités.
 
-2005-07-03  Romain Bignon <progs@headfucking.net>
+2006-07-03  Romain Bignon <progs@headfucking.net>
 
 	* Obtention du bac.
 
@@ -35,12 +48,12 @@
 
 	* src/ListBox.cpp: Décolorie bien les lignes déselectionnées.
 
-2005-07-02  Romain Bignon <progs@headfucking.net>
+2006-07-02  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.h, server/Units.cpp, server/Batiments.cpp, server/InGame.cpp (ECEntity/Attaq()): Passage en argument
 	de l'event, comme ça ECSilo::Attaq() connait la case plutot que de chercher chez les attaqués.
 
-2005-06-30  Romain Bignon <progs@headfucking.net>
+2006-06-30  Romain Bignon <progs@headfucking.net>
 
 	* server/Batiments.cpp, server/InGame.cpp: Corrections...
 
@@ -50,7 +63,7 @@
 	* src/gui/Label.cpp, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp (TLabel): Ne pas donner de position X place le
 	composant automatiquement centré (horizontalement) à l'écran.
 
-2005-06-29  Romain Bignon <progs@headfucking.net>
+2006-06-29  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp, server/Map.h, server/InGame.cpp, server/Batiments.cpp: N'envoie les informations du nombre des
 	unités encore vivantes après un combat qu'aux joueurs concernés par le combat.
@@ -58,7 +71,7 @@
 	* src/*: Énorme travail de réécriture, notament avec un nouveau système de gestion de l'affichage à l'écran (Video.h),
 	une imposition de ECImage en substitution de SDL_Surface* dans les composants, décentralisation de MenAreAntsApp.
 
-2005-06-28  Romain Bignon <progs@headfucking.net>
+2006-06-28  Romain Bignon <progs@headfucking.net>
 
 	* server/Batiments.cpp: Le silo peut attaquer tout ça c'est operationnel.
 
@@ -73,7 +86,7 @@
 	unités qui lancent un missile de manière verticale (première étape avec le missile qui va vers le haut à partir de
 	la zone de lancement, seconde étape où il va vers le bas jusqu'à sa cible).
 
-2005-06-27  Romain Bignon <progs@headfucking.net>
+2006-06-27  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.cpp (ECMissiLauncher): Correction d'un bug quand on fait une attaque SUR MOI (donc je ne lance pas de missile).
 
@@ -86,7 +99,7 @@
 	* src/Batiments.h, src/InGame.cpp, src/Map.h: Utilisation d'une information spécifique à une unité (fonction virtuelle)
 	pour s'afficher dans la BarreAct.
 
-2005-06-25  Romain Bignon <progs@headfucking.net>
+2006-06-25  Romain Bignon <progs@headfucking.net>
 
 	* lib/Units.h (ECBBoat): Limiter à 50*Nb() le nombre d'hommes maximum qu'une armée puisse contenir pour pouvoir entrer.
 
@@ -104,7 +117,7 @@
 	* server/Channels.cpp (SendArm): Dans les évenements liés, dans le cas d'une attaque (en particulier) envoyer une ligne
 	avant si jamais ce n'est pas un ARM_MOVE (pour faire ARM_MOVE|ARM_CONTAINING) en enlevant le ARM_MOVE.
 
-2005-06-24  Romain Bignon <progs@headfucking.net>
+2006-06-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.cpp (ECMissiLauncher): Lors d'une attaque composée d'un mouvement, le lance-missile réagissait anormalement
 	en se reployant...
@@ -117,13 +130,13 @@
 
 	* server/InGame.cpp (NextAnim): Gestion des contenings, des unions par conteneurs, etc.
 
-2005-06-22  Romain Bignon <progs@headfucking.net>
+2006-06-22  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (Options): Si jamais le jeu se met brusquement à passer en ANIMING ou autre, fermer cet écran.
 
 	* src/data/pics/help.png: Image d'aide lorsqu'on appuie sur F1.
 
-2005-06-21  Romain Bignon <progs@headfucking.net>
+2006-06-21  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp, server/Channels.cpp, API: Programmation du ')' (contenir).
 
@@ -132,7 +145,7 @@
 	* lib/Map.h, server/Map.h, server/InGame.cpp: Remplacement de l'utilisation dans le serveur des Locked() par des Shadowed()
 	pour pouvoir se servir de Locked() dans le cas d'une unité verouillée MAIS NON A SUPPRIMER.
 
-2005-06-20  Romain Bignon <progs@headfucking.net>
+2006-06-20  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp:
 	- Support des attaques sur la case de départ d'une unité qui a bougé.
@@ -164,7 +177,7 @@
 	l'attaque n'a plus de mouvement dans la commande, parce que l'attaque l'en empeche, mais qu'elle avait un mouvement
 	anticipé, le client le faisait bouger car il ne supprimait pas le contenu de ECEntity::Move().
 
-2005-06-19  Romain Bignon <progs@headfucking.net>
+2006-06-19  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Affichage d'un panneau de scores.
 
@@ -179,7 +192,7 @@
 
 	* API, src/JoinGame.cpp, server/Channels.cpp: Mode +£ pour indiquer qu'un joueur a perdu, et +E pour les scores.
 
-2005-06-17  Romain Bignon <progs@headfucking.net>
+2006-06-17  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp (ECEvent/operator<): Le "reploiement" se fait maintenant avant un déplacement.
 
@@ -190,24 +203,24 @@
 
 	* API, src/JoinGame.cpp, server/Channels.cpp: Nouveau mode +r (Partie rapide).
 
-2005-06-13  Romain Bignon <progs@headfucking.net>
+2006-06-13  Romain Bignon <progs@headfucking.net>
 
 	* Projet sur svn gna
 
-2005-06-02  Romain Bignon <progs@headfucking.net>
+2006-06-02  Romain Bignon <progs@headfucking.net>
 
 	* servers/maps/three.map: Map pour trois joueurs
 
 	* src/gui/*: Petites modifs rapides à faire et longues à retrouver.
 
-2005-06-01  Romain Bignon <progs@headfucking.net>
+2006-06-01  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Label.cpp: Utilisation d'une variable "shadowed" pour afficher un petit fond qui permet de bien voir.
 
 	* src/gui/Memo.cpp: Utilisations de TLabels plutot que de la classe exotique propre à TMemo. Ceci permet d'utiliser
 	le shadowed du Label, et surtout d'éviter les nombreux TFont::WriteLeft() qui bouffent à mort.
 
-2005-05-31  Romain Bignon <progs@headfucking.net>
+2006-05-31  Romain Bignon <progs@headfucking.net>
 
 	* server/Units.cpp, server/Units.cpp: Délégation de la détection d'unité sur la case cible à ARMCommand::Exec.
 
@@ -220,7 +233,7 @@
 	* src/InGame.cpp: Ctrl + clic: attaque maintenue, shift + clic: attaque volatile. (note: sans avoir besoin de cliquer
 	sur "Attaquer")
 
-2005-05-28  Romain Bignon <progs@headfucking.net>
+2006-05-28  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Correction d'un bug, si jamais un evenement d'une attaque contient des locked, surtout ne pas
 	envoyer le ARM* et surtout supprimer l'evenement, sinon boucle infinie !
@@ -228,7 +241,7 @@
 	* src/InGame.cpp: Correction d'un bug qui faisait apparaitre un mouvement non réel si jamais le serveur envoyait un
 	ARM*= pour une unité qui finalement ne bougeait pas (mais qui avait quand meme un évenement lié, cf attaque en chemin).
 
-2005-05-27  Romain Bignon <progs@headfucking.net>
+2006-05-27  Romain Bignon <progs@headfucking.net>
 
 	* API, server/Map.cpp, server/InGame.cpp, src/InGame.cpp: Possibilité d'attaques "maintenues" ou "volatiles". Dans le
 	premier cas, il faut maintenir ctrl enfoncé lors du clic pour l'attaque. L'attaque volatile permet que si une unité de
@@ -237,7 +250,7 @@
 	* src/Map.cpp, src/InGame.cpp, src/MapEditor.cpp: Modification de la preview pour que chaque pixel soit uniformisé,
 	ça fait plus beau.
 
-2005-05-25  Romain Bignon <progs@headfucking.net>
+2006-05-25  Romain Bignon <progs@headfucking.net>
 
 	* src/Map.cpp, src/data/ShowMap.cpp, src/Units.cpp: Corrections pour les attaques du lance missile ou déploiement hors
 	champ de vision.
@@ -248,7 +261,7 @@
 
 	* src/Doxyfile, server/Doxyfile: Affiche la doc de lib/ dans les deux, ce qui devient plus interressant.
 
-2005-05-24  Romain Bignon <progs@headfucking.net>
+2006-05-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Resources.h, src/data/anims/cases/terre/2.png, src/Units.cpp: Affichage d'un "cratère" quand y a eu un combat.
 
@@ -270,14 +283,14 @@
 
 	* src/Map.cpp: Affiche un rayon.
 
-2005-05-23  Romain Bignon <progs@headfucking.net>
+2006-05-23  Romain Bignon <progs@headfucking.net>
 
 	* src/MapEditor.cpp: Ne permet pas la sauvegarde tant qu'on n'a pas configuré la map. En outre, faire toutes les
 	vérifications minimum.
 
 	* src/Map.cpp, src/gui/ShowMap.cpp: Actualisation des images des cases uniquement quand c'est nécessaire.
 
-2005-05-22  Romain Bignon <progs@headfucking.net>
+2006-05-22  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp: Visibilité.
 
@@ -286,7 +299,7 @@
 	* server/InGame.cpp: Correction d'un bug qui ne faisait pas d'attaques lorsqu'on créait une unité sur une ville et
 	que quelqu'un avait commencé à bouger dessus (le pire c'est que je l'avais déjà corrigé, et je l'ai recréé).
 
-2005-05-21  Romain Bignon <progs@headfucking.net>
+2006-05-21  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Correction d'un bug de ScrollTo().
 
@@ -298,7 +311,7 @@
 
 	* server/maps: Utilisations des ponts.
 
-2005-05-20  Romain Bignon <progs@headfucking.net>
+2006-05-20  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp (SetMap): N'envoie plus les lignes UNIT qui sont inutiles au client.
 
@@ -312,23 +325,23 @@
 
 	* src/MapEditor.cpp: L'éditeur de maps est fini.
 
-2005-05-18  Romain Bignon <progø@headfucking.net>
+2006-05-18  Romain Bignon <progø@headfucking.net>
 
 	* server/IA.cpp (SETCommand): En PLAYING, ne se +! que quand tous les humains sont +!.
 
-2005-05-17  Romain Bignon <progs@headfucking.net>
+2006-05-17  Romain Bignon <progs@headfucking.net>
 
 	* src/Map.h, src/Units.h, src/Batiments.h (RefreshColor): Permet de modifier la couleur attribuée à une unité.
 
 	* src/Map.cpp: Correction pour l'affichage des unités sur la preview.
 
-2005-05-14  Romain Bignon <progs@headfucking.net>
+2006-05-14  Romain Bignon <progs@headfucking.net>
 
 	* lib/Batiments.h, server/Batiments.h, src/Batiments.h: Passage des villes en unités à part entières.
 
 	* lib/Map.h, server/Map.h, server/InGame.cpp, src/InGame.cpp, src/Map.h: Suppression des cases ville et capitale.
 
-2005-05-13  Romain Bignon <progs@headfucking.net>
+2006-05-13  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp, server/Channels.cpp: Programmation du support d'UNIT dans les fichiers maps pour décider à l'avance
 	des unités présentent sur la carte au lancement. Suppression de SOLDATS.
@@ -337,7 +350,7 @@
 
 	* server/InGame.cpp: Correction d'un bug lors des animations des unions.
 
-2005-05-12  Romain Bignon <progs@headfucking.net>
+2006-05-12  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp (Return), server/InGame.cpp: Correction d'un bug qui, lors d'un combat en cours de chemin, faisait buguer.
 
@@ -350,7 +363,7 @@
 
 	* src/Map.h: Vérification si un batiment peut etre construit par le player.
 
-2005-05-09  Romain Bignon <progs@headfucking.net>
+2006-05-09  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h, lib/Units.h, lib/Batiments.h: Utilisation d'une fonction Qual() qui retourne un qualificatif pour
 	une entité ("l'armée", "la caserne", etc) utilisé dans un message au joueur.
@@ -360,7 +373,7 @@
 
 	* src/InGame.cpp: Modification des messages en réponse à ARM.
 
-2005-05-08  Romain Bignon <progs@headfucking.net>
+2006-05-08  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.h: Opérateur << sur EChannel& qui envoie un message INFO à ses users.
 
@@ -371,13 +384,13 @@
 	* API, server/Channels.cpp, src/InGame.cpp: Changement du protocole sur les déploiements, utilisation de '{' et '}'
 	pour que ça soit plus explicite niveau client.
 
-2005-05-07  Romain Bignon <progs@headfucking.net>
+2006-05-07  Romain Bignon <progs@headfucking.net>
 
 	* lib/Units.h, server/Units.cpp, src/Units.cpp (EC[B]MissiLauncher): Support des attaques uniquement en déployé.
 
 	* API, server/InGame.cpp, server/Channels.cpp, src/InGame.cpp: Support du deploiement ('#').
 
-2005-05-06  Romain Bignon <progs@headfucking.net>
+2006-05-06  Romain Bignon <progs@headfucking.net>
 
 	* data/case.png, src/gui/ShowMap.cpp: En mode "schema" affichage du quadrillage.
 
@@ -389,7 +402,7 @@
 
 	* server/IA.cpp: Remplace les ' ' par des '_' dans le pseudo de l'IA.
 
-2005-05-03  Romain Bignon <progs@headfucking.net>
+2006-05-03  Romain Bignon <progs@headfucking.net>
 
 	* src/Config.cpp: Possibilité d'ajouter ou de supprimer un serveur à la liste.
 
@@ -406,7 +419,7 @@
 
 	* lib/Outils.h: Correction de ECList::Clear().
 
-2005-05-02  Romain Bignon <progs@headfucking.net>
+2006-05-02  Romain Bignon <progs@headfucking.net>
 
 	* src/Main.cpp: Affichage du numero de version.
 
@@ -414,7 +427,7 @@
 
 	* server/InGame.cpp: Correction du bug des attaques tuaient des entités qui devaient vivre.
 
-2005-05-01  Romain Bignon <progs@headfucking.net>
+2006-05-01  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.h, server/Units.h: Création indépendament coté serveur et coté client de ECUnit qui réunit le code
 	utilisé par EChar et ECArmy.
@@ -426,7 +439,7 @@
 	* src/Units.cpp: Utilisation dans ECUnit d'une liste d'images suivant la position et coloriage de la couleur
 	du propriétaire.
 
-2005-04-30  Romain Bignon <progs@headfucking.net>
+2006-04-30  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp: Pas deux batiments, ou pas deux unités sur la meme case.
 
@@ -439,7 +452,7 @@
 
 	* src/tools/Images.cpp (DrawRect): Fonction pour dessiner un rectangle.
 
-2005-04-29  Romain Bignon <progs@headfucking.net>
+2006-04-29  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp: Vérification des +! lors du quit.
 
@@ -461,14 +474,14 @@
 
 	* API, server/InGame.cpp: Envoie d'un '.' pour LOCK une armée quand elle union.
 
-2005-04-27  Romain Bignon <progs@headfucking.net>
+2006-04-27  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Correction d'un bug qui ne vérifiait pas les attaques dans un create, et qui envoie *tous* les
 	déplacements d'un joueur
 
 	* server/Map.h (ECEntity): Il stock maintenant tous ses déplacements.
 
-2005-04-26  Romain Bignon <progs@headfucking.net>
+2006-04-26  Romain Bignon <progs@headfucking.net>
 
 	* API: Paragraphe concernant l'IA.
 
@@ -488,12 +501,12 @@
 	* lib/Outils.h: - Fonction MyFree() (plutot que macro) avec une sécurité
 	- Portage si la std est trop vieille.
 
-2005-04-25  Romain Bignon <progs@headfucking.net>
+2006-04-25  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Component.cpp, src/gui/Form.cpp: Rajout d'un paramètre "dynamic_hint" qui donne la priorité et qui fait
 	fonctionner les hints du GameInfosForm sur la combobox des nations.
 
-2005-04-23  Romain Bignon <progs@headfucking.net>
+2006-04-23  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp: Utilisation d'un système de Lock pour ne pas traiter les messages tout de suite.
 
@@ -505,7 +518,7 @@
 
 	* src/gui/Components.cpp, src/gui/ChildForm.cpp: Modifs concernant les Hints.
 
-2005-04-20  Romain Bignon <progs@headfucking.net>
+2006-04-20  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp (JIACommand): Commande pour créer une IA dans un chan.
 	(TIA): Classe de l'Intelligence Artificielle
@@ -515,7 +528,7 @@
 
 	* lib/Outils.cpp, src/Sockets.cpp, server/Server.cpp: Utilisation d'une fonction SplitBuf().
 
-2005-04-19  Romain Bignon <progs@headfucking.net>
+2006-04-19  Romain Bignon <progs@headfucking.net>
 
 	* server/Server.cpp: Système des clients revisités pour accueillir l'intelligence artificielle...
 
@@ -525,7 +538,7 @@
 
 	* */Units.h: Macros pour les constructeurs.
 
-2005-04-13  Romain Bignon <progs@headfucking.net>
+2006-04-13  Romain Bignon <progs@headfucking.net>
 
 	* server/Makefile.am: Installation de la configuration dans $prefix/etc/.
 
@@ -541,7 +554,7 @@
 
 	* src/Map.cpp: N'affiche plus les contours sur la mer (preview).
 
-2005-04-12  Romain Bignon <progs@headfucking.net>
+2006-04-12  Romain Bignon <progs@headfucking.net>
 
 	* src/Main.cpp, src/Config.cpp: Affiche la ConfigForm au lancement lors du premier lancement.
 
@@ -566,13 +579,13 @@
 
 	* configure.ac: Paramètre --enable-full-warnings
 
-2005-04-11  Romain Bignon <progs@headfucking.net>
+2006-04-11  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp (RemovePlayer): Gestion du départ d'un joueur pendant une partie.
 
 	* server/Map.cpp (CheckRemoveBecauseOfPartOfAttaqEntity): Fonction dont le nom est explicite :p.
 
-2005-04-10  Romain Bignon <progs@headfucking.net>
+2006-04-10  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp (CheckChaningOwner): Fonction de ECBCase pour vérifier si sa prise créé un changement d'owner.
 
@@ -601,7 +614,7 @@
 
 	* src/data/barrelat.png: Nouvelle version un peu plus belle.
 
-2005-04-09  Romain Bignon <progs@headfucking.net>
+2006-04-09  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Gestion de l'ajout d'unités, des messages d'information, et quelques corrections.
 
@@ -611,7 +624,7 @@
 
 	* src/, WIN32: Portabilité du code du jeu pour windows.
 
-2005-04-08  Romain Bignon <progs@headfucking.net>
+2006-04-08  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Component.cpp (TList), src/gui/ChildForm.cpp: Gestion des focus et clics
 
@@ -621,7 +634,7 @@
 
 	* src/AltThread.cpp: Thread alternatif qui peut recevoir des instructions à executer.
 
-2005-04-05  Romain Bignon <progs@headfucking.net>
+2006-04-05  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Suppression de l'ancien code.
 
@@ -635,7 +648,7 @@
 
 	* lib/Outils.cpp (GetHome): Fonction pour récupérer le $HOME.
 
-2005-04-01  Romain Bignon <progs@headfucking.net>
+2006-04-01  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp, src/gui/ShowMap.cpp: Gestion des déplacements anticipés.
 
@@ -651,7 +664,7 @@
 
 	* Changement du nom du jeu (Europa Conquest -> Men Are Ants).
 
-2005-03-31  Romain Bignon <progs@headfucking.net>
+2006-03-31  Romain Bignon <progs@headfucking.net>
 
 	* lib/Channels.h: Gestion des nations (enumérateur, tableau d'équivalence de chaine, etc)
 
@@ -669,11 +682,11 @@
 
 	* server/InGame.cpp: Gestion des unions.
 
-2005-03-30  Romain Bignon <progs@headfucking.net>
+2006-03-30  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ComboBox.cpp: Programmation d'un composant TComboBox.
 
-2005-03-29  Romain Bignon <progs@headfucking.net>
+2006-03-29  Romain Bignon <progs@headfucking.net>
 
 	* lib/Outils.h (nrvector): Vecteur dérivé de std::vector sans répétitions.
 	Retour de std::string plutot que de chaines dans FormatStr().
@@ -707,7 +720,7 @@
 	* server/Channels.cpp: Application au principe de déplacement pas-à-pas à SendArm(), support de la couleur et de la
 	position aléatoire.
 
-2005-03-25  Romain Bignon <progs@headfucking.net>
+2006-03-25  Romain Bignon <progs@headfucking.net>
 
 	* src/Sockets.cpp: Support des hosts et correction de bugs.
 
@@ -721,7 +734,7 @@
 
 	* lib/Outils.cpp: Rajout de is_ip().
 
-2005-03-19  Romain Bignon <progs@headfucking.net>
+2006-03-19  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h, server/Map.h (EC*Entity): Passage du system de last de lib à server, et passage de event_type de server à
 	lib.
@@ -748,7 +761,7 @@
 
 	* src/Timer.cpp, src/gui/Menu.cpp: Correction d'un bug.
 
-2005-03-18  Romain Bignon <progs@headfucking.net>
+2006-03-18  Romain Bignon <progs@headfucking.net>
 
 	* lib/Outils.h (is_num): Fonction pour vérifier si une chaine est un entier.
 
@@ -778,11 +791,11 @@
 
 	* src/tools/Font.cpp: Correction du bug qui n'affichait pas le texte bien au centre verticalement avec WriteCenter().
 
-2005-03-17  Romain Bignon <progs@headfucking.net>
+2006-03-17  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/: Réorganisation en utilisant int plutot que uint pour X et Y.
 
-2005-03-17  Romain Bignon <progs@headfucking.net>
+2006-03-17  Romain Bignon <progs@headfucking.net>
 
 	* lib/Channels.h: Petites améliorations.
 
@@ -802,7 +815,7 @@
 
 	* src/gui/Components.h (TLine): Rajout de l'argument use_delete dans RemoveComponent.
 
-2005-03-15  Romain Bignon <progs@headfucking.net>
+2006-03-15  Romain Bignon <progs@headfucking.net>
 
 	* src/Map.cpp: Dérivation des cases avec chargement des sprites des cases.
 
@@ -825,7 +838,7 @@
 	* src/Resources.h: Rajout de normalbutton et de toutes les images des cases, mise en place d'un nouveau système
 	avec les macros qui déchire.
 
-2005-03-12  Romain Bignon <progs@headfucking.net>
+2006-03-12  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Gestion des créations et amélioration des animations.
 
@@ -835,7 +848,7 @@
 
 	* lib/Outils.h (ECList): Rajout des fonctions membres ECList::Enemies() et ECList::Sames()
 
-2005-03-11  Romain Bignon <progs@headfucking.net>
+2006-03-11  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h: RemoveLast().
 
@@ -847,7 +860,7 @@
 
 	* server/Server.cpp: Ne s'arrete plus sur les messages vides.
 
-2005-03-11  Romain Bignon <progs@headfucking.net>
+2006-03-11  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp (SendArm): Fonction pour envoyer un message ARM.
 	- Envoie de l'argent, des unités crées au début de la partie.
@@ -870,11 +883,11 @@
 
 	* lib/Units.cpp (ECArmy): Implémentation de fonctions élémentaires (mouvement, attaque, retour, etc).
 
-2005-03-04  Romain Bignon <progs@headfucking.net>
+2006-03-04  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/MessageBox: Correction du bug de dimentionnement horizontale.
 
-2005-03-01  Romain Bignon <progs@headfucking.net>
+2006-03-01  Romain Bignon <progs@headfucking.net>
 
 	* API: Commande ARM
 
@@ -899,7 +912,7 @@
 
 	* src/InGame.cpp: Affichage de la date dans le Loading.
 
-2005-02-24  Romain Bignon <progs@headfucking.net>
+2006-02-24  Romain Bignon <progs@headfucking.net>
 
 	* src/Outils.cpp (duration): Fonction pour avoir le temps d'une heure unix.
 
@@ -927,20 +940,20 @@
 	veut *créer* un chan. Evite, quand on veut créer un chan, d'en rejoindre un existant ou d'essayer de joindre
 	une partie déjà lancée (et que le serveur s'étonne).
 
-2005-02-22  Romain Bignon <progs@headfucking.net>
+2006-02-22  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ColorEdit.cpp: Création du composant ColorEdit.
 
 	* src/JoinGame.cpp: Rajout de la couleur.
 
-2005-02-20  Romain Bignon <progs@headfucking.net>
+2006-02-20  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp server/Server.cpp, server/Login.cpp, server/Map.coo: Petit formatage des messages des Debug
 	pour plus de compréhension.
 
 	* server/Channels.cpp: Support du passage de SENDING à PLAYING.
 
-2005-02-19  Romain Bignon <progs@headfucking.net>
+2006-02-19  Romain Bignon <progs@headfucking.net>
 
 	* src/Channels.cpp: Supprime la map lors de la suppression du channel (uniquement dans le client car le serveur elle
 	GARDE la map dans sa liste).
@@ -964,7 +977,7 @@
 
 	* server/Debug.cpp: Le fichier errors.log devient plus clair car mieux structuré.
 
-2005-02-18  Romain Bignon <progs@headfucking.net>
+2006-02-18  Romain Bignon <progs@headfucking.net>
 
 	* test/map.cpp: Petite mise à jour avec prise en compte de la date et test du ++ dessus.
 
@@ -989,7 +1002,7 @@
 
 	* src/Main.cpp, ...: Mise du membre EuroConqApp::fonts et application partout.
 
-2005-02-17  Romain Bignon <progs@headfucking.net>
+2006-02-17  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Reception de la liste des maps et de la map paramétrée.
 
@@ -999,7 +1012,7 @@
 
 	* server/Map.cpp: Fonction d'ouverture de toutes les maps.
 
-2005-02-16  Romain Bignon <progs@headfucking.net>
+2006-02-16  Romain Bignon <progs@headfucking.net>
 
 	* test/map.cpp: Outil permettant d'ouvrir une map (genre gna.map) et d'avoir des infos sur elle une fois qu'on a
 	vérifié qu'elle ne comportait pas d'erreurs.

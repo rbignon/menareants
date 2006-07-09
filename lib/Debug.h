@@ -50,40 +50,18 @@ public:
 	TECExcept(std::string msg);
 };
 
-/*
-#define CATCHBUGS(x) \
-	} \
-	catch(TECExcept &e) \
-	{ \
-		throw; \
-	} \
-	catch(...) \
-	{ \
-		cout	<< "  RAPPORT DE BUG !!!" << std::endl \
-			<< "  ------------------" << std::endl \
-			<< "Il y a un bug dans le programme. Nous " \
-			<< "vous demandons d'envoyer le rapport de bug " \
-			<< "à " PACKAGE_BUGREPORT "." << std::endl \
-			<< "  ------------------" << std::endl \
-			<< __func__ "(" + std::string(x) + ":"__FILE__":"__LINE__";"; \ 
-	}
-*/
-
 #ifndef DEBUG
-/* let's try not to clash with the system assert()... */
-#undef assert
-
-#ifndef assert
-# ifdef NDEBUG
-#  define assert(expr)  ((void)0)
-# else
-#  define assert(expr)                                                        \
-  ((void)(__builtin_expect(!!(expr), 1) ? 0 :                                 \
+# undef assert
+# ifndef assert
+#  ifdef NDEBUG
+#   define assert(expr)  ((void)0)
+#  else
+#   define assert(expr)                                                        \
+   ((void)(__builtin_expect(!!(expr), 1) ? 0 :                                 \
           (throw TECExcept(__PRETTY_FUNCTION__, __FILE__, __LINE__, "", "assert failed: " #expr), 0)))
+#  endif
 # endif
-#endif
-
-#endif
+# endif
 
 
 #endif /* ECLIB_DEBUG_H */

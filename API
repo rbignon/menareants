@@ -89,6 +89,7 @@ Sommaire:
          }           :reploiement
          )<entité>   :s'envoyer dans une unité de conteneur (voir 8. Entités Conteneurs)
          (<entité>   :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
+         &           :la ligne n'est pas l'action principale (bien qu'elle soit la première envoyée)
          ~<type>,    :envoie une donnée particulière à l'entité, et qui doit donc etre interprétée par elle (fonction RecvData).
           <data>
       Et client -> server :

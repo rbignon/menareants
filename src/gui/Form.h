@@ -87,6 +87,8 @@
  *   Form1->Run(!want_quit());
  *   return;
  * }
+ * </pre>
+ *
  * --Progs
  */
 

@@ -58,6 +58,7 @@ protected:
 	static void WantMapEditor(TObject*, void*);
 
 	bool first_run;
+	bool first_game;
 
 public:
 	int main(int argc, char** argv);
@@ -70,12 +71,14 @@ public:
 
 	std::string GetPath() const { return path; }
 
-	void FirstRun() { first_run = true; }
+	void FirstRun() { first_run = true; first_game = true; }
+	bool IsFirstGame() const { return first_game; }
+	void FirstGameDone() { first_game = false; }
 
 	SDL_mutex* Mutex() const { return mutex; }
 
 	MenAreAntsApp()
-		: Thread(0), mutex(0), want_quit(false), first_run(false)
+		: Thread(0), mutex(0), want_quit(false), first_run(false), first_game(false)
 	{}
 
 	static MenAreAntsApp* singleton;

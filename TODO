@@ -31,6 +31,9 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 ** En parallèle (on s'en fou un peu de quand on les fait)
 -mot de passe éventuel pour accéder à un serveur
 -server: enrichissement de l'IA
+-essayer d'utiliser au maximum std::string plutot que char*. Voir pour une fonction Format() qui prendrait %s comme une
+ string et non un char*.
+-utilisation de gettext.
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -Unités des nations

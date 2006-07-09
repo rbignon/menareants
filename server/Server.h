@@ -74,7 +74,7 @@ public:
 	std::string Nick() const { return nick; }
 
 	/** Set client's nickname. */
-	void SetNick(const char* _nick) { nick = _nick; }
+	void SetNick(std::string _nick) { nick = _nick; }
 
 	/** Get IP. */
 	const char* GetIp() const { return ip.c_str(); }

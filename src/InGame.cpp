@@ -443,7 +443,13 @@ void MenAreAntsApp::InGame()
 		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
 		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
-		InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
+		if(MenAreAntsApp::GetInstance()->IsFirstGame())
+		{
+			TMessageBox("Ceci est votre première partie.\nAppuyez sur F1 pour avoir de l'aide", BT_OK, InGameForm).Show();
+			MenAreAntsApp::GetInstance()->FirstGameDone();
+		}
+		else
+			InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
 		do

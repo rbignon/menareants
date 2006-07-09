@@ -69,7 +69,7 @@ public:
 
 	virtual void ChangeCase(ECBCase* new_case);
 
-	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent*);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 
 	virtual bool WantContain(ECEntity*, ECMove::Vector&);
 
@@ -112,7 +112,7 @@ public:
 /* Methodes */
 public:
 
-	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent*);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 
 	virtual bool WantAttaq(uint x, uint y, bool);
 

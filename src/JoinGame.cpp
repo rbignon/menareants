@@ -1113,7 +1113,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 							   ("+t " + TypToStr(GameInfosForm->TurnTime->Value())).c_str());
 						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
 						{
-							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK, GameInfosForm);
+							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
 							mb.Edit()->SetAvailChars(NICK_CHARS);
 							mb.Edit()->SetMaxLen(NICKLEN);
 							std::string name;

@@ -281,13 +281,13 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
 		
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
-	IA->SetNick((IA_CHAR + parv[1]).c_str());
+	IA->SetNick(IA_CHAR + parv[1]);
 	SetAuth(IA);
 
 	/* A partir de là le serveur le gere comme un client normal */
 	IA->ia_send("JOI " + FormatStr(chan->GetName()));
 	if(chan->Map())
-	    IA->ia_send("SET +!");
+		IA->ia_send("SET +!");
 
 	return 0;
 }

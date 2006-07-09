@@ -97,7 +97,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		}
 		return false;
 	}
-	missile->set(Entity()->Image()->X(), missile->Y() - step);
+	SetXY(Entity()->Image()->X(), missile->Y() - step);
 	if(missile->Y() + missile->GetHeight() <= 0 || Entity()->Case()->Showed() <= 0)
 	{
 		me->LockScreen();
@@ -115,7 +115,7 @@ bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
 {
 	if(c == Entity()->Case() || !missile) return true;
 
-	missile->set(missile->X(), missile->Y() + step);
+	SetXY(missile->X(), missile->Y() + step);
 	if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
 	{
 		me->LockScreen();

@@ -49,6 +49,21 @@
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
 
+/** This is a macro to simplify a loop on a vector
+ * @param T this is the vector's type
+ * @param v this is the vector
+ * @param x this is the iterator's pointer
+ *
+ * Use this like this:
+ * <pre>
+ *  std::vector<ECBEntity*> entities;
+ *  FOR(ECBEntity*, entities, entity)
+ *  {
+ *    entity->DoSomething();
+ *    FuckSomeone(entity);
+ *  }
+ * </pre>
+ */
 #define FOR(T, v, x) \
                        T (x); \
                        for(std::vector<T>::iterator sdfsdfit = (v).begin(); (x = *sdfsdfit) && sdfsdfit != (v).end(); ++sdfsdfit)

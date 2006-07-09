@@ -59,8 +59,10 @@ void TMap::UnlockScreen() const
 
 ECase* TMap::Pixel2Case(int x, int y)
 {
-	int x_ = (x - X()) / CASE_WIDTH;
-	int y_ = (y - Y()) / CASE_HEIGHT;
+	uint x_ = (x - X()) / CASE_WIDTH;
+	uint y_ = (y - Y()) / CASE_HEIGHT;
+	if(x_ >= Map()->Width())  x_ = Map()->Width()  - 1;
+	if(y_ >= Map()->Height()) y_ = Map()->Height() - 1;
 	return dynamic_cast<ECase*>((*Map())(x_, y_));
 }
 
@@ -71,7 +73,6 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 	ECBCase* c = Pixel2Case(x, y);
 	uint nb_x = w / CASE_WIDTH;
 	uint nb_y = h / CASE_HEIGHT;
-	//printf("%d,%d\n", nb_x, nb_y);
 
 	for(uint i=0; i <= nb_y; ++i)
 	{
@@ -96,7 +97,7 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 
 void TMap::ToRedraw(ECSprite* img)
 {
-	ToRedraw(img->X(), img->Y());
+	ToRedraw(img->X(), img->Y(), img->GetWidth(), img->GetHeight());
 }
 
 void TMap::ToRedraw(int x, int y)
