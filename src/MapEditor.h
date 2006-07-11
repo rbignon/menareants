@@ -44,7 +44,7 @@ class EMapPlayer : public ECMapPlayer, public ECPlayer
 /* Constructeurs */
 public:
 	EMapPlayer(char _id, uint _num)
-		: ECMapPlayer(_id, _num), ECPlayer(0,0,false,false,false,false)
+		: ECMapPlayer(_id, _num), ECPlayer("",0,false,false,false,false)
 	{}
 
 	virtual bool IsIA() const { return true; }

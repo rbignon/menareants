@@ -105,12 +105,15 @@ public:
 
 	int X() { return mX; }
 	int Y() { return mY; }
-	int GetWidth();                             /**< Fonction pour la largeur */
-	int GetHeight();                            /**< Fonction pour la hauteur */
+	uint GetWidth();                             /**< Fonction pour la largeur */
+	uint GetHeight();                            /**< Fonction pour la hauteur */
 
 	ECImage* First() const;
 
 	void ChangeColor(Color first, Color to);
+
+	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
+	void Zoom(double zoomx, double zoomy, bool smooth);
 
 	ECImage* Window() const { return mScreen; }
 
@@ -140,6 +143,9 @@ public:
 
 	void ChangeColor(Color from, Color to);
 
+	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
+	void Zoom(double zoomx, double zoomy, bool smooth);
+
 	ECSpriteBase(const char *dir);
 	~ECSpriteBase();
 
@@ -148,7 +154,8 @@ public:
 /* Variables publiques */
 public:
 	ECImage *mAnim;
-	int mBuilt, mW, mH;
+	int mBuilt;
+	uint mW, mH;
 	uint mNumframes;
 	bool animation;
 	std::string path;
@@ -214,6 +221,9 @@ public:
 	int FillRect(SDL_Rect &dstRect, const Color color);
 
 	void NewSurface(uint width, uint height, Uint32 flags, bool useAlpha);
+
+	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
+	void Zoom(double zoomx, double zoomy, bool smooth);
 
 /* Attributs */
 public:

@@ -3,11 +3,15 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
+-finir la gestion de la non réimpression des cases quand ce n'est pas necessaire.
+-assurer un passage en 1280x1024 (notament par rapport à la vitesse)
+-assurer que les composants aient une position relative à la resolution
 
 * Urgent
 -gestion des nations (juste le système, pas encore les unités).
 -limiter le nombre d'unités à construire sur les villes et les batiments
+-ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
+-unité ingénieur
 
 * Après
 -client: gestion des accents dans TEdit

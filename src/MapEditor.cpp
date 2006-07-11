@@ -45,14 +45,17 @@
  ********************************************************************************************/
 
 template<typename T>
-static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb)
+static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map)
 {
-	return new T(_name, _owner, _case, _nb);
+	T* t = new T(_name, _owner, _case, _nb);
+	t->SetMap(map);
+	t->Init();
+	return t;
 }
 
 static struct
 {
-	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb);
+	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
@@ -86,7 +89,8 @@ void EMap::VirtualAddUnit(std::string line)
 		}
 	}
 
-	ECEntity* entity = entities_type[StrToTyp<uint>(type)].create ("**", pl, map[ y * Width() + x ], StrToTyp<uint>(number));
+	ECEntity* entity = entities_type[StrToTyp<uint>(type)].create ("**", pl, map[ y * Width() + x ], StrToTyp<uint>(number),
+	                                                               this);
 	
 
 	AddAnEntity(entity);
@@ -405,7 +409,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						            !MapEditor->BarreCase->Test(event.button.x, event.button.y) &&
 						            (acase = MapEditor->Map->TestCase(event.button.x, event.button.y)))
 							{
-								ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb());
+								ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb(), map);
 								map->AddAnEntity(et);
 
 								MapEditor->BarreCase->UnSelect();
@@ -545,7 +549,7 @@ void TMapEditor::ShowBarreAct(bool show, ECase* c)
 		Map->SetContraintes(Map->Xmin(), SCREEN_HEIGHT - int(Map->Height()));
 
 	Map->SetXY(Map->X(),
-	           (c && (c->Image()->Y() + c->Image()->GetHeight()) >= (int(SCREEN_HEIGHT) - h)) ?
+	           (c && (c->Image()->Y() + c->Image()->GetHeight()) >= (SCREEN_HEIGHT - h)) ?
 	               Map->Y() - c->Image()->GetHeight()
 	             : Map->Y());
 }

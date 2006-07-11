@@ -25,6 +25,7 @@
 #include "Server.h"
 #include <string>
 #include <vector>
+#include <map>
 
 class ECPlayer;
 
@@ -62,8 +63,11 @@ public:
 private:
 	static int SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	static int LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
+	static int ARMCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	bool lock;
 	std::vector<std::string> msgs;
+
+	std::map<int, uint> units;
 };
 
 #endif /* ECD_IA_H */

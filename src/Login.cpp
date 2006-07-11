@@ -300,17 +300,24 @@ void MenAreAntsApp::request_game()
 TConnectedForm::TConnectedForm(ECImage* w)
 	: TForm(w)
 {
-	Welcome = AddComponent(new TLabel(110,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
+	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 0, 0, 500,350, 0));
+	Motd->SetXY(Window()->GetWidth()/2 - Motd->Width()/2, Window()->GetHeight()/2 - Motd->Height()/2);
 
-	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 75,150,500,350, 0));
+	Welcome = AddComponent(new TLabel(Motd->Y()-40,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
 
-	CreateButton = AddComponent(new TButtonText(600,150, 150,50, "Créer une partie", Font::GetInstance(Font::Normal)));
-	ListButton = AddComponent(new TButtonText(600,200,150,50, "Lister les parties", Font::GetInstance(Font::Normal)));
-	DisconnectButton = AddComponent(new TButtonText(600,250,150,50, "Se déconnecter", Font::GetInstance(Font::Normal)));
+	int button_x = Motd->X() + Motd->Width() + 15;
 
-	Uptime =    AddComponent(new TLabel(75,510,"", white_color, Font::GetInstance(Font::Normal)));
-	UserStats = AddComponent(new TLabel(75,530,"", white_color, Font::GetInstance(Font::Normal)));
-	ChanStats = AddComponent(new TLabel(75,550,"", white_color, Font::GetInstance(Font::Normal)));
+	CreateButton = AddComponent(new TButtonText(button_x, Motd->Y(), 150,50, "Créer une partie",
+	                                            Font::GetInstance(Font::Normal)));
+	ListButton = AddComponent(new TButtonText(button_x,CreateButton->Y()+CreateButton->Height(),150,50, "Lister les parties",
+	                                          Font::GetInstance(Font::Normal)));
+	DisconnectButton = AddComponent(new TButtonText(button_x,ListButton->Y()+ListButton->Height(),150,50, "Se déconnecter",
+	                                                Font::GetInstance(Font::Normal)));
+
+	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90,"x", white_color, Font::GetInstance(Font::Normal)));
+	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height(),"y", white_color, Font::GetInstance(Font::Normal)));
+	ChanStats = AddComponent(new TLabel(75,UserStats->Y()+UserStats->Height(),"z", white_color,
+	                                    Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

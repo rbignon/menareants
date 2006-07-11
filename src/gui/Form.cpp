@@ -55,6 +55,11 @@ void TForm::UnlockScreen() const
 void TForm::SetBackground(ECImage *image)
 {
 	background = image;
+	if(background->GetWidth() != Window()->GetWidth() ||
+	   background->GetHeight() != Window()->GetHeight())
+		background->Zoom(double(Window()->GetWidth()) / (double)background->GetWidth(),
+	                     double(Window()->GetHeight()) / (double)background->GetHeight(),
+	                     true);
 }
 
 void TForm::Run(bool *(func)())

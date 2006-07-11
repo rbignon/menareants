@@ -84,6 +84,11 @@ public:
 	/** Set real back ground. */
 	void SetBackGround(ECImage* _ebg) { realbg = _ebg; }
 
+	int X() const { return x; }
+	int Y() const { return y; }
+	uint Width() const { return w; }
+	uint Height() const { return h; }
+
 /* Variables privées */
 protected:
 	int x, y;

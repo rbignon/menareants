@@ -163,5 +163,6 @@ void TComboBox::SetXY (int _x, int _y)
 	x = _x;
 	real_y = _y;
 	chaine.SetXY(_x+5, real_y);
+	m_open.SetXY(x+w-12, real_y);
 	SetOpened(Opened());
 }

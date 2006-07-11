@@ -25,6 +25,7 @@
 #include <vector>
 
 class TObject;
+class TListBox;
 
 class Config
 {
@@ -66,6 +67,8 @@ private:
 	static void WantOk(TObject*, void*);
 	static void WantAddServer(TObject*, void*);
 	static void WantDelServer(TObject*, void*);
+	static void SetFullScreen(TObject*, void*);
+	static void ChangeResolution(TListBox*);
 };
 
 #endif

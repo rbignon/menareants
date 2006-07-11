@@ -34,6 +34,9 @@
 struct SDL_Surface;
 struct Color;
 class Font;
+class TListBox;
+
+typedef void (*OnChangeFunc) (TListBox*);
 
 /** An item of TListBox */
 typedef struct s_list_box_item_t
@@ -89,6 +92,8 @@ public:
 	bool NoItemHint() const { return no_item_hint; }
 	void SetNoItemHint(bool b = true) { no_item_hint = b; }
 
+	void SetOnChange(OnChangeFunc on) { on_change = on; }
+
 /* Variables protégées */
 protected:
 
@@ -109,6 +114,8 @@ protected:
 	ECImage cursorover_box, selected_box, background;
 
 	Font* font;
+
+	OnChangeFunc on_change;
 };
 
 #endif /* EC_LISTBOX_H */

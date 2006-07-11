@@ -28,7 +28,7 @@
 #include <SDL.h>
 
 TListBox::TListBox (Font* f, int _x, int _y, uint _width, uint _height)
-  : TComponent(_x, _y, _width, _height), no_item_hint(false), font(f)
+  : TComponent(_x, _y, _width, _height), no_item_hint(false), font(f), on_change(0)
 {
   assert(font);
   height_item = f->GetHeight();
@@ -52,11 +52,11 @@ void TListBox::Init()
   SDL_Rect r_item = {0,0,w,height_item};
   SDL_Rect r_back = {0,0,w,h};
 
-  cursorover_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
+  cursorover_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-2, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   cursorover_box.FillRect(r_item, cursorover_box.MapRGBA(0,0,255*6/10,255*4/10));
 
-  selected_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, height_item,
+  selected_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-2, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   selected_box.FillRect(r_item, selected_box.MapRGBA(0,0,255*6/10,255*8/10));
 
@@ -117,6 +117,8 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
   else
 #endif
   Select (item);
+  if(on_change)
+    (*on_change) (this);
   return true;
 }
 

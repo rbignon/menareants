@@ -95,7 +95,8 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				map = new ECMap(GameInfosForm->RecvMap);
 				map->Init();
-				map->CreatePreview();
+				map->CreatePreview(GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
+				                   GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85);
 			}
 			catch(TECExcept &e)
 			{
@@ -112,8 +113,10 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
-			GameInfosForm->Preview->SetXY(GameInfosForm->Preview->X(), 565-GameInfosForm->Preview->Height());
-			GameInfosForm->MapTitle->SetXY(GameInfosForm->MapTitle->X(),
+			GameInfosForm->Preview->SetXY(GameInfosForm->Preview->X(),
+			                              GameInfosForm->Window()->GetHeight() - 50 - GameInfosForm->Preview->Height());
+			GameInfosForm->MapTitle->SetXY(GameInfosForm->Preview->X() + GameInfosForm->Preview->Width()/2 -
+			                                   GameInfosForm->MapTitle->Width()/2,
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
 			GameInfosForm->Hints->ClearItems();
 			me->UnlockScreen();
@@ -1285,35 +1288,39 @@ TGameInfosForm::TGameInfosForm(ECImage* w)
 	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
 
-	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,325,315,495,30));
-	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,555,315, MAXBUFFER-20));
+	int chat_width = 325 * Window()->GetWidth() / 800;
+	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,325,chat_width,495,30));
+	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,Window()->GetHeight()-45,chat_width,
+	                                     MAXBUFFER-20));
 
-	MapTitle = AddComponent(new TLabel(390, 345, "", white_color, Font::GetInstance(Font::Big)));
-	Preview = AddComponent(new TImage(390, 380));
+	MapTitle = AddComponent(new TLabel(50 + chat_width + 40, 345, "", white_color, Font::GetInstance(Font::Big)));
+	Preview = AddComponent(new TImage(50 + chat_width + 40, 380));
 
-	MapList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 625, 270, 150, 80));
-	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 625, 360, "Partie rapide", white_color));
+	int right_x = Window()->GetWidth() - 175;
+
+	MapList = AddComponent(new TListBox(Font::GetInstance(Font::Small), right_x, 270, 150, 80));
+	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, "Partie rapide", white_color));
 	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
 	SpeedGame->Check();
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  625, 385, 150, 0, 50000, 5000,
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  right_x, 385, 150, 0, 50000, 5000,
 	15000));
 	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
 
-	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  625, 405, 150, 15, 360, 15,
+	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  right_x, 405, 150, 15, 360, 15,
 	60));
 	TurnTime->SetHint("Temps en secondes maximal de reflexion chaques tours");
 
-	PretButton = AddComponent(new TButtonText(625,110, 150,50, "Pret", Font::GetInstance(Font::Normal)));
+	PretButton = AddComponent(new TButtonText(right_x,110, 150,50, "Pret", Font::GetInstance(Font::Normal)));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
-	CreateIAButton = AddComponent(new TButtonText(625,210,150,50, "Ajouter IA", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(right_x,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
+	CreateIAButton = AddComponent(new TButtonText(right_x,210,150,50, "Ajouter IA", Font::GetInstance(Font::Normal)));
 	CreateIAButton->Hide();
 	CreateIAButton->SetHint("Ajouter un joueur artificiel (une IA) à la partie");
 
-	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 625, 505, 150, 60));
+	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), right_x, Window()->GetHeight()-95, 150, 60));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
@@ -1327,7 +1334,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w)
 void TGameInfosForm::RecalcMemo()
 {
 	Chat->SetXY(50, Players->Y() + Players->Height());
-	Chat->SetHeight(545-Players->Height()-Players->Y()); /* On définit une jolie taille */
+	Chat->SetHeight(Window()->GetHeight() - 65 - Players->Height()-Players->Y()); /* On définit une jolie taille */
 }
 
 /********************************************************************************************
@@ -1337,14 +1344,17 @@ void TGameInfosForm::RecalcMemo()
 TListGameForm::TListGameForm(ECImage* w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(150,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
-
-	JoinButton = AddComponent(new TButtonText(550,200,150,50, "Rejoindre", Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(550,250,150,50, "Actualiser", Font::GetInstance(Font::Normal)));
-	CreerButton = AddComponent(new TButtonText(550,300,150,50, "Créer", Font::GetInstance(Font::Normal)));
-	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", Font::GetInstance(Font::Normal)));
-
 	GList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,200,200,300));
+	GList->SetXY(Window()->GetWidth()/2 - GList->Width()/2, Window()->GetHeight()/2 - GList->Height()/2);
+
+	Title = AddComponent(new TLabel(GList->Y()-50,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
+
+	int button_x = GList->X()+GList->Width()+50;
+	int button_y = GList->Y();
+	JoinButton = AddComponent(new TButtonText(button_x,button_y,150,50, "Rejoindre", Font::GetInstance(Font::Normal)));
+	RefreshButton = AddComponent(new TButtonText(button_x,button_y+50,150,50, "Actualiser", Font::GetInstance(Font::Normal)));
+	CreerButton = AddComponent(new TButtonText(button_x,button_y+100,150,50, "Créer", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(button_x,button_y+150,150,50, "Retour", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

@@ -29,10 +29,30 @@
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
  ********************************************************************************************/
 
-
 void TIA::FirstMovements()
 {
+	units.clear();
+
 	std::vector<ECBEntity*> ents = Player()->Entities()->List();
+
+	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		units[(*enti)->Type()]++;
+
+	BCountriesVector countries = Player()->MapPlayer()->Countries();
+	for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
+	{
+		std::vector<ECBCase*> cases = (*cty)->Cases();
+		for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
+		{
+			int i = rand()%ECBEntity::E_END;
+			if(i && units[i] <= 1)
+			{
+				ia_send("ARM - =" + TypToStr((*c)->X()) + "," + TypToStr((*c)->Y()) + " + %" + TypToStr(i));
+				break;
+			}
+		}
+	}
+
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		std::string msg;

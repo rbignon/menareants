@@ -42,7 +42,7 @@ void TCheckBox::Init()
 	delete image;
 
 	image = new ECSprite(Resources::CheckBox(), Window());
-	SetHeight(image->GetHeight() > int(text.Height()) ? image->GetHeight() : text.Height());
+	SetHeight(image->GetHeight() > text.Height() ? image->GetHeight() : text.Height());
 	image->set(X(), Y() + (text.Height() - image->GetHeight())/2);
 
 	MyComponent(&text);

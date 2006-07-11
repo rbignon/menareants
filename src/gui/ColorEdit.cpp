@@ -55,6 +55,7 @@ void TColorEdit::Init()
   MyComponent(&txt_label);
 
   txt_label.SetFontColor(font, color);
+  txt_label.SetXY(X(), Y());
 
   imgx = m_minus.X() + m_minus.Width() + 5;
 
@@ -82,6 +83,8 @@ bool TColorEdit::SetValue(int _value, bool first)
 
   return true;
 }
+
+void TColorEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
 
 void TColorEdit::Draw (int mouse_x, int mouse_y)
 {

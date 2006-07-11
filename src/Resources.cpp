@@ -27,6 +27,7 @@
                           	delete *it; \
                           type##_objects.clear()
 #define R_RESOURCE(type, name) type* Resources::spr_##name = NULL
+	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);
 	R_RESOURCE(ECImage,      Loadscreen);
 	R_RESOURCE(ECImage,      BarreLat);

@@ -36,8 +36,20 @@
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
 #include "gui/Memo.h"
+#include "gui/CheckBox.h"
 #include "Main.h"
 #include "tools/Video.h"
+
+struct resolutions_t
+{
+	uint w;
+	uint h;
+} resolutions[] = {
+	{ 800, 600 },
+	{ 1024, 768 },
+	{ 1152, 864 },
+	{ 1280, 1024 }
+};
 
 Config* Config::singleton = NULL;
 
@@ -62,8 +74,8 @@ bool Config::set_defaults(bool want_save)
 	nick = "";
 	color = 0;
 	nation = 0;
-	screen_width = 800;
-	screen_height = 600;
+	screen_width = 1280;
+	screen_height = 1024;
 	ttf_file = PKGDATADIR_FONTS "Vera.ttf";
 #ifdef WIN32
 	fullscreen = true;
@@ -181,9 +193,14 @@ public:
 	TEdit*          NewServer;
 	TButtonText*    AddServerButton;
 	TButtonText*    DelServerButton;
+	TLabel*         ResolutionInfo;
+	TComboBox*      Resolution;
+	TCheckBox*      FullScreen;
 
 /* Evenements */
 public:
+
+	void SetRelativePositions();
 
 };
 
@@ -262,6 +279,8 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 	conf->color = form->Color->Value();
 	conf->nation = form->Nation->GetSelectedItem();
 
+	conf->fullscreen = form->FullScreen->Checked();
+
 	conf->save();
 	conf->want_quit_config = true;
 }
@@ -270,6 +289,30 @@ void Config::WantCancel(TObject*, void* configinst)
 {
 	Config* conf = static_cast<Config*>(configinst);
 	conf->want_quit_config = true;
+}
+
+void Config::SetFullScreen(TObject* obj, void* configinst)
+{
+	TCheckBox* CheckBox = dynamic_cast<TCheckBox*>(obj);
+	Config* conf = static_cast<Config*>(configinst);
+	if(!CheckBox) return;
+
+	Video::GetInstance()->SetConfig(conf->screen_width, conf->screen_height, CheckBox->Checked());
+	conf->fullscreen = CheckBox->Checked();
+}
+
+void Config::ChangeResolution(TListBox* listbox)
+{
+	int i = listbox->GetSelectedItem ();
+	Config* conf = Config::GetInstance();
+	conf->screen_width = resolutions[i].w;
+	conf->screen_height = resolutions[i].h;
+	Video::GetInstance()->SetConfig(conf->screen_width, conf->screen_height, conf->fullscreen);
+	TConfigForm* cform = dynamic_cast<TConfigForm*>(listbox->Parent());
+	if(!cform) return;
+
+	cform->SetBackground(Resources::Titlescreen());
+	cform->SetRelativePositions();
 }
 
 void Config::Configuration(bool first)
@@ -283,6 +326,15 @@ void Config::Configuration(bool first)
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
 	ConfigForm->Nation->Select(nation);
+	ConfigForm->FullScreen->Check(fullscreen);
+	ConfigForm->FullScreen->SetOnClick(Config::SetFullScreen, this);
+	ConfigForm->Resolution->SetOnChange(Config::ChangeResolution);
+	for(uint i = 0; i < ASIZE(resolutions); ++i)
+		if(screen_width == resolutions[i].w && screen_height == resolutions[i].h)
+		{
+			ConfigForm->Resolution->Select(i);
+			break;
+		}
 	if(first)
 	{
 		ConfigForm->Info->Show();
@@ -311,12 +363,35 @@ void Config::Configuration(bool first)
 	delete ConfigForm;
 }
 
+void TConfigForm::SetRelativePositions()
+{
+	// Va remettre le label automatiquement au milieu
+	Title->Init();
+	Info->Init();
+
+	Hints->SetX(Window()->GetWidth() - Hints->Width() - 50);
+	OkButton->SetXY(Hints->X() + Hints->Width()/2 - OkButton->Width()/2,
+	                Hints->Y() + Hints->Height() + 50);
+	CancelButton->SetXY(Hints->X() + Hints->Width()/2 - CancelButton->Width()/2,
+	                    OkButton->Y() + OkButton->Height());
+
+	int x = Window()->GetWidth()/2 - 100;
+	NickInfo->SetX(x);
+	Nick->SetX(x);
+	Color->SetX(x);
+	NationInfo->SetX(x);
+	Nation->SetXY(x, Nation->RealY());
+	ResolutionInfo->SetX(x);
+	Resolution->SetXY(x, Resolution->RealY());
+	FullScreen->SetX(x);
+}
+
 TConfigForm::TConfigForm(ECImage *w)
 	: TForm(w)
 {
 	Title = AddComponent(new TLabel(120,"Configuration", white_color, Font::GetInstance(Font::Big)));
 
-	Info = AddComponent(new TLabel(160, 160,"C'est votre premier lancement, veuillez configurer votre jeu.",
+	Info = AddComponent(new TLabel(160,"C'est votre premier lancement, veuillez configurer votre jeu.",
 	                                        white_color, Font::GetInstance(Font::Normal)));
 	Info->Hide();
 
@@ -347,12 +422,21 @@ TConfigForm::TConfigForm(ECImage *w)
 	Nation = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 	{
-		uint j = Nation->AddItem(false, std::string(nations_str[i].name), "");
+		uint j = Nation->AddItem(false, std::string(nations_str[i].name), TypToStr(i));
 		Nation->SetItemHint(j, nations_str[i].infos);
 	}
+
+	ResolutionInfo = AddComponent(new TLabel(300, 320, "Résolution :", white_color, Font::GetInstance(Font::Normal)));
+	Resolution = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 345, 200));
+	for(uint i = 0; i < ASIZE(resolutions); ++i)
+		Resolution->AddItem(false, TypToStr(resolutions[i].w) + "x" + TypToStr(resolutions[i].h), "");
+
+	FullScreen = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 365, "Plein écran", white_color));
 
 	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 200, 100));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
+
+	SetRelativePositions();
 }

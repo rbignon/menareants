@@ -58,7 +58,9 @@ void TSpinEdit::Init()
   MyComponent(&txt_value);
 
   txt_label.SetFontColor(font, color);
+  txt_label.SetXY(X(), Y());
   txt_value.SetFontColor(font, color);
+  txt_value.SetY(Y());
 
   SetValue(value, true);
 }

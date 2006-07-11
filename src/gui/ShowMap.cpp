@@ -71,8 +71,10 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 	std::vector<ECase*> cases;
 
 	ECBCase* c = Pixel2Case(x, y);
-	uint nb_x = w / CASE_WIDTH;
-	uint nb_y = h / CASE_HEIGHT;
+	uint nb_x = (x % CASE_WIDTH  + w) / CASE_WIDTH;
+	uint nb_y = (y % CASE_HEIGHT + h) / CASE_HEIGHT;
+
+	//printf("%d,%d,%d,%d\n", c->X(), c->Y(), nb_x, nb_y);
 
 	for(uint i=0; i <= nb_y; ++i)
 	{
@@ -83,11 +85,11 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 
 			cases.push_back(cc);
 
-			if(c->X() == c->Map()->Width()-1)
+			if(c->X() == Map()->Width()-1)
 				break;
 			c = c->MoveRight();
 		}
-		if(c->Y() == c->Map()->Height()-1)
+		if(c->Y() == Map()->Height()-1)
 			break;
 		c = c->MoveDown();
 		c = c->MoveLeft(j);
@@ -116,16 +118,19 @@ void TMap::ToRedraw(int x, int y, int w, int h)
 
 void TMap::ToRedraw(TComponent* c)
 {
+	assert(c);
 	ToRedraw(c->X(), c->Y(), c->Width(), c->Height());
 }
 
 void TMap::ToRedraw(ECEntity* e)
 {
+	assert(e);
 	ToRedraw(e->Image()->X(), e->Image()->Y(), e->Image()->GetWidth(), e->Image()->GetHeight());
 }
 
 void TMap::ToRedraw(ECase* c)
 {
+	assert(c);
 	LockScreen();
 	c->SetMustRedraw();
 	UnlockScreen();
@@ -234,14 +239,14 @@ void TMap::Draw(int _x, int _y)
 		int xx = x, yy = y;
 
 		/* Changement de position automatique */
-		if(_x >=0 && _x < 15)
-			xx += 15;
-		if(_y >= 0 && _y < 15)
-			yy += 15;
-		if(_x > int(SCREEN_WIDTH-15) && _x <= int(SCREEN_WIDTH))
-			xx -= 15;
-		if(_y > int(SCREEN_HEIGHT-15) && _y <= int(SCREEN_HEIGHT))
-			yy -= 15;
+		if(_x >=0 && _x < 20)
+			xx += 30 - _x;
+		if(_y >= 0 && _y < 20)
+			yy += 30 - _y;
+		if(_x > int(SCREEN_WIDTH-20) && _x <= int(SCREEN_WIDTH))
+			xx -= 30 - (SCREEN_WIDTH - _x);
+		if(_y > int(SCREEN_HEIGHT-20) && _y <= int(SCREEN_HEIGHT))
+			yy -= 30 - (SCREEN_HEIGHT - _y);
 	
 		if(xx != x || yy != y)
 			SetXY(xx, yy);
@@ -273,7 +278,8 @@ void TMap::Draw(int _x, int _y)
 			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
-			c->SetMustRedraw(false);
+			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
+				c->SetMustRedraw(false);
 		}
 	}
 
@@ -286,7 +292,10 @@ void TMap::Draw(int _x, int _y)
 		}
 		else
 		{
-			dynamic_cast<ECEntity*>(*enti)->Draw();
+			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+			entity->Draw();
+			if(entity->Image() && entity->Image()->Anim())
+				entity->Case()->SetMustRedraw();
 			++enti;
 		}
 #if 0
@@ -370,6 +379,7 @@ void TMap::Draw(int _x, int _y)
 								break;
 						}
 					}
+					next_c->SetMustRedraw();
 					last_move = *move;
 					c = next_c;
 				}
@@ -392,6 +402,7 @@ void TMap::Draw(int _x, int _y)
 						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
 						break;
 				}
+				c->SetMustRedraw();
 
 			}
 		}

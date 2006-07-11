@@ -64,7 +64,12 @@ public:
 	TButtonText* MapEditorButton;
 	TLabel*     Version;
 	TFPS*       FPS;
+
+	static bool enter_in_main;
+	void SetRelativePositions();
 };
+
+bool TMainForm::enter_in_main = true;
 
 MenAreAntsApp* MenAreAntsApp::singleton = NULL;
 MenAreAntsApp* MenAreAntsApp::GetInstance()
@@ -88,16 +93,19 @@ void MenAreAntsApp::WantQuit(TObject*, void*)
 void MenAreAntsApp::WantPlay(TObject*, void*)
 {
 	MenAreAntsApp::GetInstance()->request_game();
+	TMainForm::enter_in_main = true;
 }
 
 void MenAreAntsApp::WantMapEditor(TObject*, void*)
 {
 	MenAreAntsApp::GetInstance()->MapEditor();
+	TMainForm::enter_in_main = true;
 }
 
 void MenAreAntsApp::WantConfig(TObject*, void* b)
 {
 	Config::GetInstance()->Configuration((bool)b);
+	TMainForm::enter_in_main = true;
 }
 
 void MenAreAntsApp::quit_app(int value)
@@ -140,6 +148,12 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		ECImage *loading_image = Resources::Loadscreen();
 
+		if(loading_image->GetWidth() != video->Width() ||
+		   loading_image->GetHeight() != video->Height())
+			loading_image->Zoom(double(video->Width()) / (double)loading_image->GetWidth(),
+	                            double(video->Height()) / (double)loading_image->GetHeight(),
+	                            true);
+
 		loading_image->Draw();
 
 		if (TTF_Init()==-1) {
@@ -169,6 +183,24 @@ int MenAreAntsApp::main(int argc, char **argv)
 		do
 		{
 			MainForm->Actions();
+			if(TMainForm::enter_in_main)
+			{
+				TMainForm::enter_in_main = false;
+				ECSprite sprite(Resources::Intro(), video->Window());
+				if(sprite.GetWidth() != video->Width() ||
+				   sprite.GetHeight() != video->Height())
+					sprite.Zoom(double(video->Width()) / (double)sprite.GetWidth(),
+	                             double(video->Height()) / (double)sprite.GetHeight(),
+	                             true);
+				sprite.SetRepeat(false);
+				sprite.set(0,0);
+				while(sprite.Anim())
+				{
+					sprite.draw();
+					video->Window()->Flip();
+				}
+				MainForm->SetRelativePositions();
+			}
 			MainForm->Update();
 		} while(!want_quit);
 
@@ -209,6 +241,16 @@ int main (int argc, char **argv)
  *                                    TMainForm                                             *
  ********************************************************************************************/
 
+void TMainForm::SetRelativePositions()
+{
+	PlayButton->SetXY(Window()->GetWidth()/2 - PlayButton->Width()/2, 150 * Window()->GetHeight() / 600);
+	OptionsButton->SetXY(Window()->GetWidth()/2 - OptionsButton->Width()/2, 230 * Window()->GetHeight() / 600);
+	MapEditorButton->SetXY(Window()->GetWidth()/2 - MapEditorButton->Width()/2, 310 * Window()->GetHeight() / 600);
+	CreditsButton->SetXY(Window()->GetWidth()/2 - CreditsButton->Width()/2, 390 * Window()->GetHeight() / 600);
+	QuitterButton->SetXY(Window()->GetWidth()/2 - QuitterButton->Width()/2, 470 * Window()->GetHeight() / 600);
+	Version->SetXY(Window()->GetWidth()-50 - Version->Width(), Version->Y());
+}
+
 TMainForm::TMainForm(ECImage* w)
 	: TForm(w)
 {
@@ -230,10 +272,11 @@ TMainForm::TMainForm(ECImage* w)
 	QuitterButton = AddComponent(new TButton(300,470, 150,50));
 	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), Video::GetInstance()->Window()));
 
-	Version = AddComponent(new TLabel(750,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
-	Version->SetXY(Version->X() - Version->Width(), Version->Y());
+	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
 
 	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
+
+	SetRelativePositions();
 
 	SetBackground(Resources::Titlescreen());
 }
@@ -290,20 +333,21 @@ void MenAreAntsApp::WantCredits(TObject*, void*)
 	} while(!Credits->want_goback);
 
 	delete Credits;
+	TMainForm::enter_in_main = true;
 }
 
 TCredits::TCredits(ECImage* w)
 	: TForm(w), want_goback(false)
 {
-	Label1 = AddComponent(new TLabel(300,105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
-	Label2 = AddComponent(new TLabel(300,135,"* Programmeur", red_color, Font::GetInstance(Font::Big)));
+	Label1 = AddComponent(new TLabel(105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
+	Label2 = AddComponent(new TLabel(135,"* Programmeur", red_color, Font::GetInstance(Font::Big)));
 
 	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", blue_color, Font::GetInstance(Font::Big)));
 	Label4 = AddComponent(new TLabel(50,235,"* Graphiste", blue_color, Font::GetInstance(Font::Big)));
 
-	Label5 = AddComponent(new TLabel(500,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
-	Label6 = AddComponent(new TLabel(500,235,"* Idée originale", fwhite_color, Font::GetInstance(Font::Big)));
-	Label7 = AddComponent(new TLabel(500,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
+	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
+	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,"* Idée originale", fwhite_color, Font::GetInstance(Font::Big)));
+	Label7 = AddComponent(new TLabel(SCREEN_WIDTH-300,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->AddItem("Merci au lycée Corneilles pour nous avoir mis dans le contexte emmerdant qui "
@@ -315,7 +359,7 @@ TCredits::TCredits(ECImage* w)
                   "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();
 
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,530, 150,50, "Retour", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, "Retour", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

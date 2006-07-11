@@ -72,7 +72,7 @@ void TChildForm::Draw(int _x, int _y)
 {
 	if(background)
 	{
-		SDL_Rect r_back = {x,y,w,h};
+		SDL_Rect r_back = {X(),Y(),Width(),Height()};
 		Window()->Blit(background, &r_back);
 	}
 

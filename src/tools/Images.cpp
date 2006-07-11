@@ -18,6 +18,7 @@
  * $Id$
  */
 
+#include <SDL_rotozoom.h>
 #include "Images.h"
 #include "Video.h"
 #include "Debug.h"
@@ -309,11 +310,11 @@ void ECSprite::draw()
 	mScreen->Blit(&mSpriteBase->mAnim[mFrame], &dest);
 }
 
-int ECSprite::GetWidth()
+uint ECSprite::GetWidth()
 {
 	return (mSpriteBase ? mSpriteBase->mW : 0);
 }
-int ECSprite::GetHeight()
+uint ECSprite::GetHeight()
 {
 	return (mSpriteBase ? mSpriteBase->mH : 0);
 }
@@ -322,6 +323,17 @@ void ECSprite::ChangeColor(Color first, Color to)
 {
 	mSpriteBase->ChangeColor(first, to);
 }
+
+void ECSprite::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
+{
+	mSpriteBase->RotoZoom(angle, zoomx, zoomy, smooth);
+}
+
+void ECSprite::Zoom(double zoomx, double zoomy, bool smooth)
+{
+	mSpriteBase->Zoom(zoomx, zoomy, smooth);
+}
+
 
 /****************************************************************************************
  *                                      ECSpriteBase                                    *
@@ -395,6 +407,26 @@ void ECSpriteBase::ChangeColor(Color from, Color to)
 {
 	for(uint i=0; i < mNumframes; ++i)
 		ChangePixelColor(&mAnim[i], from, to);
+}
+
+void ECSpriteBase::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
+{
+	for(uint i=0; i < mNumframes; ++i)
+	{
+		mAnim[i].RotoZoom(angle, zoomx, zoomy, smooth);
+		mW = mAnim[i].Img->w;
+		mH = mAnim[i].Img->h;
+ }
+}
+
+void ECSpriteBase::Zoom(double zoomx, double zoomy, bool smooth)
+{
+	for(uint i=0; i < mNumframes; ++i)
+	{
+		mAnim[i].Zoom(zoomx, zoomy, smooth);
+		mW = mAnim[i].Img->w;
+		mH = mAnim[i].Img->h;
+	}
 }
 
 ECImage* ECSpriteBase::First() const
@@ -597,4 +629,24 @@ void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
 
 	if( Img == NULL )
 		throw ECExcept("", std::string("Can't create SDL RGBA surface: ") + SDL_GetError() );
+}
+
+void ECImage::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
+{
+#ifndef WIN32
+	SetImage( rotozoomSurfaceXY(Img, angle, zoomx, zoomy, smooth) );
+
+	if( IsNull() )
+		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
+#endif
+}
+
+void ECImage::Zoom(double zoomx, double zoomy, bool smooth)
+{
+#ifndef WIN32
+	SetImage( zoomSurface(Img, zoomx, zoomy, smooth) );
+
+	if(IsNull() )
+		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
+#endif
 }

@@ -91,7 +91,8 @@ public:
 	static void Unload();
 
 	/* Ne pas oublier de rajouter dans Resources.cpp */
-	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_PICS "menu.png");
+	R_RESOURCE(ECSpriteBase, Intro,            "intro");
+	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_ANIMS "intro/17.png");
 	R_RESOURCE(ECImage,      Loadscreen,       PKGDATADIR_PICS "loading.png");
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");

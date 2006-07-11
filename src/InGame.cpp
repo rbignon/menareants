@@ -325,6 +325,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							case AFTER_EVENT: (*it)->Tag = (*it)->AfterEvent(entities, event_case,me) ? 1 : 0; break;
 						}
 						if(!(*it)->Tag) ok = false;
+						if(InGameForm)
+							InGameForm->Map->ToRedraw(*it);
 					}
 			}
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
@@ -377,6 +379,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			me->LockScreen();
 
 			(*it)->SetShowedCases(false);
+			if(InGameForm)
+				InGameForm->Map->ToRedraw(*it);
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
 
@@ -482,6 +486,9 @@ void MenAreAntsApp::InGame()
 				InGameForm->Actions(event);
 				switch(event.type)
 				{
+					case SDL_KEYDOWN:
+						if(InGameForm->SendMessage->Focused())
+							InGameForm->Map->ToRedraw(InGameForm->SendMessage);
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
 						{
@@ -532,11 +539,13 @@ void MenAreAntsApp::InGame()
 									InGameForm->SendMessage->ClearString();
 									InGameForm->SendMessage->Hide();
 									InGameForm->SendMessage->DelFocus();
+									InGameForm->Map->ToRedraw(InGameForm->SendMessage);
 								}
 								else
 								{
 									InGameForm->SendMessage->SetFocus();
 									InGameForm->SendMessage->Show();
+									InGameForm->Map->ToRedraw(InGameForm->SendMessage);
 								}
 								break;
 							default: break;
@@ -551,6 +560,7 @@ void MenAreAntsApp::InGame()
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
 						{
 							Options(chan);
+							InGameForm->Map->SetMustRedraw();
 							InGameForm->Map->Map()->CreatePreview(120,120, true);
 						}
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
@@ -558,6 +568,7 @@ void MenAreAntsApp::InGame()
 							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
 							if(mb.Show() == BT_YES)
 								eob = true;
+							InGameForm->Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
 						}
 
 						ECEntity* entity = 0;
@@ -568,7 +579,10 @@ void MenAreAntsApp::InGame()
 							entity = InGameForm->Map->CreateEntity();
 
 							if(event.button.button == MBUTTON_RIGHT)
+							{
 								InGameForm->Map->SetCreateEntity(0);
+								InGameForm->Map->ToRedraw(event.button.x, event.button.y);
+							}
 							else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y) &&
 						            !InGameForm->BarreAct->Test(event.button.x, event.button.y) &&
 						            (acase = InGameForm->Map->TestCase(event.button.x, event.button.y)) &&
@@ -787,7 +801,7 @@ void TInGameForm::ShowBarreAct(bool show)
 	ECEntity* e = BarreAct->Entity();
 
 	Map->SetXY(Map->X(),
-	           (e && (e->Image()->Y() + e->Image()->GetHeight()) >= int(SCREEN_HEIGHT - BarreAct->Height())) ?
+	           (e && (e->Image()->Y() + e->Image()->GetHeight()) >= (SCREEN_HEIGHT - BarreAct->Height())) ?
 	               Map->Y() - e->Image()->GetHeight()
 	             : Map->Y());
 		
@@ -819,8 +833,8 @@ TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
 
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
 
-	BarreLat = AddComponent(new TBarreLat(pl));
 	BarreAct = AddComponent(new TBarreAct(pl));
+	BarreLat = AddComponent(new TBarreLat(pl));
 
 	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
 	SendMessage->SetColor(white_color);
@@ -1160,22 +1174,28 @@ void TBarreLat::Init()
 {
 	ProgressBar = AddComponent(new TProgressBar(15, 190, Width()-30, 15));
 	ProgressBar->InitVal(0, 0, chan->TurnTime());
+	ProgressBar->SetX(X() + Width()/2 - ProgressBar->Width()/2);
 
 	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	PretButton->SetHint("Cliquez ici lorsque vous avez fini vos déplacements");
+	PretButton->SetX(X() + Width()/2 - PretButton->Width()/2);
 	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", Font::GetInstance(Font::Small)));
 	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	SchemaButton->SetHint("Voir la délimitation des territoires sur la carte");
+	SchemaButton->SetX(X() + Width()/2 - SchemaButton->Width()/2);
 	OptionsButton = AddComponent(new TButtonText(30,280,100,30, "Options", Font::GetInstance(Font::Small)));
 	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	OptionsButton->SetHint("Voir les options (notament les alliances)");
+	OptionsButton->SetX(X() + Width()/2 - OptionsButton->Width()/2);
 	QuitButton = AddComponent(new TButtonText(30,310,100,30, "Quitter", Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	QuitButton->SetHint("Quitter la partie");
+	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
 
-	Icons = AddComponent(new TBarreLatIcons(20, 360));
+	Icons = AddComponent(new TBarreLatIcons(0, 360));
 	Icons->SetList(EntityList.Buildings(player));
+	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 
 	chan->Map()->CreatePreview(120,120, true);
 	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
@@ -1185,10 +1205,13 @@ void TBarreLat::Init()
 	Radar->SetOnClickPos(TBarreLat::RadarClick);
 
 	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, Font::GetInstance(Font::Small)));
+	Money->SetX(X() + Width()/2 - Money->Width()/2);
+
 	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
 	TurnMoney = AddComponent(new TLabel(80, 20, "", white_color, Font::GetInstance(Font::Small)));
 
 	UnitsInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 15, Height() - 100 - 10, Width() - 15 - 10, 100));
+	UnitsInfos->SetX(X() + Width()/2 - UnitsInfos->Width()/2);
 
 	ScreenPos = AddComponent(new TImage(0,0));
 	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
@@ -1512,15 +1535,15 @@ void MenAreAntsApp::Scores(EChannel* chan)
 TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
+	Title = AddComponent(new TLabel(110,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
 	                      Font::GetInstance(Font::Large)));
 
 	Players = AddComponent(new TList(70, 250));
-	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meutres", "Créations", "Score"));
+	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meurtres", "Créations", "Score"));
 
-	InitDate = AddComponent(new TLabel(200, 150, "Début des combats :  " + ch->Map()->InitDate()->String(), white_color,
+	InitDate = AddComponent(new TLabel(150, "Début des combats :  " + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
-	Date = AddComponent(new TLabel(200, 180, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
+	Date = AddComponent(new TLabel(180, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
 	ECDate delta;
 	delta.SetDate(ch->Map()->NbDays());
@@ -1528,10 +1551,11 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	if(delta.Year()) s += " " + TypToStr(delta.Year()) + " ans";
 	if(delta.Month()) s += " " + TypToStr(delta.Month()) + " mois";
 	if(delta.Day()) s += " " + TypToStr(delta.Day()) + " jours";
-	Duree = AddComponent(new TLabel(200, 211, "Durée :" + s, white_color,
+	Duree = AddComponent(new TLabel(211, "Durée :" + s, white_color,
 	                               Font::GetInstance(Font::Big)));
 
-	RetourButton = AddComponent(new TButtonText(625,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 250,150,50, "Retour",
+	                                            Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

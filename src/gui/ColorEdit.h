@@ -47,6 +47,8 @@ public:
 
 	bool SetValue(int _value, bool first = false);
 
+	virtual void SetXY (int _x, int _y);
+
 /* Variables privées */
 protected:
 	ECImage img;
