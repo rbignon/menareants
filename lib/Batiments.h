@@ -165,7 +165,7 @@ public:
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
-	virtual bool IsCountryMaker() { return true; }
+	virtual bool IsCountryMaker() const { return true; }
 	virtual int TurnMoney() { return 2 * Case()->Map()->CityMoney(); }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -213,7 +213,7 @@ public:
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
-	virtual bool IsCountryMaker() { return true; }
+	virtual bool IsCountryMaker() const { return true; }
 	virtual int TurnMoney() { return Case()->Map()->CityMoney(); }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -252,7 +252,7 @@ public:
 /* Constantes */
 public:
 
-	virtual bool CanAttaq(const ECBEntity* e) { return true; }
+	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "le port"; }
 	virtual uint InitNb() const { return SHIPYARD_NB; }
@@ -298,7 +298,7 @@ public:
 /* Constantes */
 public:
 
-	virtual bool CanAttaq(const ECBEntity* e) { return true; }
+	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "l'usine de chars"; }
 	virtual uint InitNb() const { return CHARFACT_NB; }
@@ -344,7 +344,7 @@ public:
 /* Constantes */
 public:
 
-	virtual bool CanAttaq(const ECBEntity* e) { return true; }
+	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "la caserne"; }
 	virtual uint InitNb() const { return CASERNE_NB; }
@@ -358,6 +358,7 @@ public:
 		switch(e->Type())
 		{
 			case ECBEntity::E_ARMY:
+			case E_ENGINER:
 				return true;
 			default:
 				return false;

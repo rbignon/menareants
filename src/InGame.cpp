@@ -391,7 +391,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(flags & ARM_CREATE)
 		{
 			me->LockScreen();
-			InGameForm->Map->Map()->CreatePreview(120,120, true);
+			InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
 			me->UnlockScreen();
 		}
 		InGameForm->BarreAct->Update();
@@ -473,7 +473,7 @@ void MenAreAntsApp::InGame()
 				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
 				{
 					client->sendrpl(client->rpl(EC_Client::SET), "+!");
-					timer->reset();
+					elapsed_time->reset();
 				}
 			}
 			if(chan->State() == EChannel::ANIMING && InGameForm->BarreAct->Select())
@@ -489,6 +489,7 @@ void MenAreAntsApp::InGame()
 					case SDL_KEYDOWN:
 						if(InGameForm->SendMessage->Focused())
 							InGameForm->Map->ToRedraw(InGameForm->SendMessage);
+						break;
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
 						{
@@ -561,7 +562,7 @@ void MenAreAntsApp::InGame()
 						{
 							Options(chan);
 							InGameForm->Map->SetMustRedraw();
-							InGameForm->Map->Map()->CreatePreview(120,120, true);
+							InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
 						}
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
 						{
@@ -658,7 +659,7 @@ void MenAreAntsApp::InGame()
 										{
 											if(!contener->CanContain(selected_entity))
 											{
-												InGameForm->AddInfo(I_SHIT, "Impossible d'entrée l'unité sélectionnée dans le "
+												InGameForm->AddInfo(I_SHIT, "Impossible d'entrer l'unité sélectionnée dans le "
 												                            "conteneur. Soit elle est pas adaptée au "
 												                            "conteneur, soit il y a trop d'hommes dedans.\n"
 												                            "Maintenez ALT pour forcer le déplacement sur "
@@ -691,8 +692,12 @@ void MenAreAntsApp::InGame()
 													move += " v";
 										if(!move.empty())
 										{
-											client->sendrpl(client->rpl(EC_Client::ARM),
-															std::string(std::string(selected_entity->ID()) + move).c_str());
+											if(selected_entity->Move()->Size() >= selected_entity->MyStep())
+												InGameForm->AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une "
+												                            "journée !");
+											else
+												client->sendrpl(client->rpl(EC_Client::ARM),
+											                std::string(std::string(selected_entity->ID()) + move).c_str());
 										}
 									}
 								}
@@ -869,7 +874,8 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list)
 		_x += i->Width();
 		if(i->Height() > _h) _h = i->Height();
 		i->SetOnClick(TBarreAct::CreateUnit, (void*)*it);
-		i->SetHint(std::string(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos()).c_str());
+		i->SetHint(TypToStr((*it)->Cost()) + " $\n" +
+		           (*it)->Infos());
 	}
 	TComponent* parent = dynamic_cast<TComponent*>(Parent());
 	SetWidth(_x);
@@ -929,7 +935,7 @@ void TBarreLatIcons::SetList(std::vector<ECEntity*> list)
 			_y += _h;
 		}
 		i->SetOnClick(TBarreLatIcons::SelectUnit, (void*)*it);
-		i->SetHint(std::string(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos()).c_str());
+		i->SetHint(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos());
 
 	}
 	if(!left) // c'est à dire on était à droite
@@ -1197,7 +1203,7 @@ void TBarreLat::Init()
 	Icons->SetList(EntityList.Buildings(player));
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 
-	chan->Map()->CreatePreview(120,120, true);
+	chan->Map()->CreatePreview(120,120, P_ENTITIES);
 	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - chan->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y));
@@ -1214,7 +1220,7 @@ void TBarreLat::Init()
 	UnitsInfos->SetX(X() + Width()/2 - UnitsInfos->Width()/2);
 
 	ScreenPos = AddComponent(new TImage(0,0));
-	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
 	DrawRect(surf, 0, 0, chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
 	                     chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
@@ -1382,7 +1388,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 	try
 	{
 		bool eob = false;
-		chan->Map()->CreatePreview(300,300);
+		chan->Map()->CreatePreview(300,300, P_POSITIONS);
 		LoadingForm = new TLoadingForm(Video::GetInstance()->Window(), chan);
 		LoadingForm->SetMutex(mutex);
 		do
@@ -1554,7 +1560,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	Duree = AddComponent(new TLabel(211, "Durée :" + s, white_color,
 	                               Font::GetInstance(Font::Big)));
 
-	RetourButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 250,150,50, "Retour",
+	RetourButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, "Retour",
 	                                            Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());

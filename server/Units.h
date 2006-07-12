@@ -135,6 +135,27 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECEnginer                                                  *
+ ********************************************************************************************/
+class ECEnginer : public ECUnit, public ECBEnginer
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENGINER_EMPTY_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
+
+	ENGINER_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
+
+	ENTITY_CREATE_LAST(ECEnginer);
+
+/* Methodes */
+public:
+
+	/** Invest a building */
+	virtual void Invest(ECBEntity* e);
+};
+
+/********************************************************************************************
  *                               ECArmy                                                     *
  ********************************************************************************************/
 class ECArmy : public ECUnit, public ECBArmy

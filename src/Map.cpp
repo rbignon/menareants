@@ -167,7 +167,7 @@ void ECMove::SetMoves(Vector _moves)
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
                    uint _visibility)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), selected(false),
+		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), attaq(0), selected(false),
 		  move(this), want_deploy(false), attaqued_case(0)
 {
 
@@ -176,6 +176,7 @@ ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_t
 ECEntity::~ECEntity()
 {
 	delete image;
+	delete attaq;
 }
 
 void ECEntity::Select(bool s)
@@ -229,6 +230,8 @@ void ECEntity::Draw()
 				  AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
 				  AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2);
 		}
+		if(attaq)
+			attaq->draw();
 	}
 }
 
@@ -261,8 +264,29 @@ void ECEntity::ImageSetXY(int x, int y)
 
 	image->set(x,y);
 
-	if(Map()->ShowMap())
+	if(Map() && Map()->ShowMap())
 		Map()->ShowMap()->ToRedraw(this);
+}
+
+void ECEntity::SetAttaqImg(ECSpriteBase* spr, int x, int y)
+{
+	bool anim = false;
+	if(attaq)
+	{
+		anim = attaq->Anim();
+		MyFree(attaq);
+	}
+
+	if(!spr) return;
+
+	attaq = new ECSprite(spr, Video::GetInstance()->Window());
+	attaq->SetAnim(anim);
+
+	if(Map() && Map()->ShowMap())
+	{
+		attaq->set(x,y);
+		Map()->ShowMap()->ToRedraw(attaq);
+	}
 }
 
 void ECEntity::SetImage(ECSpriteBase* spr)
@@ -279,9 +303,9 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	if(!spr) return;
 	image = new ECSprite(spr, Video::GetInstance()->Window());
 	image->SetAnim(anim);
-	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
-		ImageSetXY(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
-		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+	if(Case() && Map() && Map()->ShowMap())
+		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		           Map()->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
 void ECEntity::ChangeCase(ECBCase* newcase)
@@ -292,9 +316,9 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 	ECBEntity::ChangeCase(newcase);
 	SetShowedCases(true);
 
-	if(Case() && dynamic_cast<ECMap*>(acase->Map())->ShowMap())
-		ImageSetXY(dynamic_cast<ECMap*>(acase->Map())->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
-		           dynamic_cast<ECMap*>(acase->Map())->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+	if(Case() && Map() && Map()->ShowMap())
+		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
+		           Map()->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
 }
 
 void ECEntity::SetShowedCases(bool show, bool forced)
@@ -495,7 +519,7 @@ ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
 }
 
 /** \note Preview use two screen pixels for one pixel in map */
-void ECMap::CreatePreview(uint width, uint height, bool ingame)
+void ECMap::CreatePreview(uint width, uint height, int flags)
 {
 	if(!initialised) return;
 
@@ -504,7 +528,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 	else size_y = size_x;
 	pixel_size = size_y;
 
-	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_SWSURFACE|SDL_SRCALPHA);
+	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_HWSURFACE|SDL_SRCALPHA);
 
 	SLOCK(surf);
 	/* Dessine la preview */
@@ -544,17 +568,21 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 			const short MARGE_BOTTOM = 0x08;
 			unsigned short marge = 0;
 
-			if(!(c->Flags() & C_MER))
+			if(!(c->Flags() & C_MER) || (flags & P_FRONTMER))
 			{
-				if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country() && !(map[(_y-1) * x + _x]->Flags() & C_MER))
+				if(_y > 0 && map[(_y-1) * x + _x]->Country() != c->Country() &&
+				   ((flags & P_FRONTMER) || !(map[(_y-1) * x + _x]->Flags() & C_MER)))
 					marge |= MARGE_TOP;
-				if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country() && !(map[_y * x + _x-1]->Flags() & C_MER))
+				if(_x > 0 && map[_y * x + _x-1]->Country() != c->Country() &&
+				   ((flags & P_FRONTMER) || !(map[_y * x + _x-1]->Flags() & C_MER)))
 					marge |= MARGE_LEFT;
 				if(size_x > 5 && size_y > 5)
 				{
-					if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country() && !(map[(_y+1) * x+_x]->Flags() & C_MER))
+					if(_y < (y-1) && map[(_y+1) * x + _x]->Country() != c->Country() &&
+					   ((flags & P_FRONTMER) || !(map[(_y+1) * x+_x]->Flags() & C_MER)))
 						marge |= MARGE_BOTTOM;
-					if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country() && !(map[_y * x + _x+1]->Flags() & C_MER))
+					if(_x < (x-1) && map[_y * x + _x+1]->Country() != c->Country() &&
+					   ((flags & P_FRONTMER) || !(map[_y * x + _x+1]->Flags() & C_MER)))
 						marge |= MARGE_RIGHT;
 				}
 			}
@@ -573,15 +601,15 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 				}
 		}
 	/* Position des unités */
-	if(ingame)
+	if(flags & P_ENTITIES)
 	{
 		std::vector<ECBEntity*> ents = entities.List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)->Owner() || !(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
+			if(!(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
 			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
 				continue;
-			Color col = color_eq[(*enti)->Owner()->Color()];
+			Color col = (*enti)->Owner() ? color_eq[(*enti)->Owner()->Color()] : white_color;
 			yy = (*enti)->Case()->Y() * size_y;
 			xx = (*enti)->Case()->X() * size_x;
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
@@ -594,7 +622,7 @@ void ECMap::CreatePreview(uint width, uint height, bool ingame)
 	}
 
 	/* Numero du player */
-	if(!ingame)
+	if(flags & P_POSITIONS)
 	{
 		for(std::vector<ECMapPlayer*>::iterator it = map_players.begin(); it != map_players.end(); ++it)
 		{

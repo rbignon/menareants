@@ -20,4 +20,5 @@ U_DECL(ECShipyard)
 U_DECL(ECBoat)
 U_DECL(ECNuclearSearch)
 U_DECL(ECSilo)
+U_DECL(ECEnginer)
 U_END

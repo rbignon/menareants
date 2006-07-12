@@ -123,7 +123,7 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
+		: Tag(0), image(0), attaq(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
 	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
@@ -169,6 +169,9 @@ public:
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
 
+	ECSprite* AttaqImg() const { return attaq; }
+	void SetAttaqImg(ECSpriteBase* spr, int x, int y);
+
 	void Select(bool s = true);
 	bool Selected() { return selected; }
 
@@ -193,6 +196,7 @@ public:
 /* Variables privées */
 private:
 	ECSprite* image;
+	ECSprite* attaq;
 	ECImage trajectoire;
 
 protected:
@@ -337,7 +341,10 @@ public:
 /* Methodes */
 public:
 
-	void CreatePreview(uint width = 150, uint height = 150, bool ingame = false);
+	#define P_FRONTMER  0x001
+	#define P_ENTITIES  0x002
+	#define P_POSITIONS 0x004
+	void CreatePreview(uint width, uint height, int flags);
 
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
 

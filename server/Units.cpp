@@ -24,6 +24,22 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                               ECEnginer                                                  *
+ ********************************************************************************************/
+
+void ECEnginer::Invest(ECBEntity* entity)
+{
+	ECEntity::Invest(entity);
+
+	if(entity->IsCountryMaker())
+		return;
+
+	Channel()->SendArm(0, this, ARM_REMOVE);
+	SetShadowed();
+	/* On attend de se faire purger */
+}
+
+/********************************************************************************************
  *                               EContainer                                                 *
  ********************************************************************************************/
 
@@ -267,23 +283,14 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 				case 8: coef = 0.3f; break;
 			}
 			uint killed = 0;
-			switch((*it)->Type())
+			if((*it)->IsBuilding())                          killed = uint(Nb() * 7 * coef);
+			else if((*it)->IsInfantry())                     killed = uint(Nb() * coef);
+			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(Nb() * 4 * coef);
+			else if((*it)->Type() == E_MISSILAUNCHER)        killed = uint(Nb() * 2 * coef);
+			else
 			{
-				case E_ARMY:
-					killed = uint(Nb() * coef); break;
-				case E_BOAT:
-				case E_CHAR:
-					killed = uint(Nb() * 4 * coef); break;
-				case E_MISSILAUNCHER:
-					killed = uint(Nb() * 2 * coef); break;
-				default:
-					if((*it)->IsBuilding())
-						killed = uint(Nb() * 7 * coef);
-					else
-					{
-						FDebug(W_WARNING, "Shoot d'un type non supporté");
-						continue;
-					}
+				FDebug(W_WARNING, "Shoot d'un type non supporté");
+				continue;
 			}
 			if(!killed) continue;
 

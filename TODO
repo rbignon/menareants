@@ -3,15 +3,13 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--finir la gestion de la non réimpression des cases quand ce n'est pas necessaire.
--assurer un passage en 1280x1024 (notament par rapport à la vitesse)
--assurer que les composants aient une position relative à la resolution
+-villes sur 4 cases, intégration de l'usine d'armement et de la caserne dedans, suppression de ces derniers batiments
+-systèmes d'upgrades, notament pour permettre à la caserne et à l'usine d'armement de construire de plus en plus d'unités.
 
 * Urgent
 -gestion des nations (juste le système, pas encore les unités).
 -limiter le nombre d'unités à construire sur les villes et les batiments
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
--unité ingénieur
 
 * Après
 -client: gestion des accents dans TEdit
@@ -33,6 +31,9 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -Unités de base
 
 ** En parallèle (on s'en fou un peu de quand on les fait)
+-finir la gestion de la non réimpression des cases quand ce n'est pas necessaire.
+-assurer un passage en 1280x1024 (notament par rapport à la vitesse)
+-assurer que les composants aient une position relative à la resolution
 -mot de passe éventuel pour accéder à un serveur
 -server: enrichissement de l'IA
 -essayer d'utiliser au maximum std::string plutot que char*. Voir pour une fonction Format() qui prendrait %s comme une
@@ -45,7 +46,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 ** Idées
 -client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
 -introduction de la ressource petrolière pour les vehicules
--avancement des niveaux techniques des batiments, qui peuvent construire plus d'unités à chaque fois
 -système de guerilla de Spouize
 -mode de jeu qui permet d'utiliser que certaines unités (genre le mode que vehicules, que naval (plus tard), etc)
 

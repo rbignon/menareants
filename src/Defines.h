@@ -32,6 +32,12 @@
 
 #define APP_SITE "http://menareants.coderz.info/"
 
+/* Defines */
+#undef BUGUED_INTRO
+#ifdef WIN32
+# define DISABLE_BUGUS_ZOOM
+#endif
+
 /* Résolution de l'écran */
 //const int SCREEN_HEIGHT = 600;
 //const int SCREEN_WIDTH  = 800;
@@ -39,8 +45,8 @@
 #define SCREEN_WIDTH (Video::GetInstance()->Width())
 
 /* Taille des cases */
-const int CASE_HEIGHT = 80;
-const int CASE_WIDTH = 80;
+const int CASE_HEIGHT = 100;
+const int CASE_WIDTH = 100;
 
 /* Définitions des boutons de la souris */
 const int MBUTTON_LEFT = 1;
@@ -50,12 +56,6 @@ const int MBUTTON_RIGHT = 3;
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
-#ifdef APP_VERSION_PATCH
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_PVERSION "-" APP_VERSION_PATCH
-#else
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_PVERSION
-#endif
-
 #if defined(WIN32) || defined(__MINGW32__)
 #define PATH_SEPARATOR "\\"
 #else

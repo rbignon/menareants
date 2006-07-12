@@ -1,3 +1,27 @@
+2006-07-12  Romain Bignon <progs@headfucking.net>
+
+	* src/data/anims/brouillard, src/Units.cpp, src/Map.h:
+	- Support des animations lors des attaques.
+	- Première animation: brouillard.
+
+2006-07-11  Romain Bignon <progs@headfucking.net>
+
+	* src/v.sh, src/Version.cpp, src/Main.cpp: Affichage de la version svn.
+
+	* src/data/, src/Resources.h, lib/Units.h, server/Units.h, src/Units.h (ECEnginer): Création de l'ingénieur.
+
+	* lib/Map.cpp, lib/Batiments.h, lib/Units.h, server/Map.cpp, server/Units.cpp: Principe de l'investissement, étendue
+	à la capture des villes.
+
+	* src/Defines.h, src/data/anims/cases/*: Intégration de nouvelles images pour les cases, format 100x100
+
+	* src/v.sh, src/Version.cpp, src/Main.cpp, src/Makefile.am: Affichage de la révision svn.
+
+	* src/Map.cpp, src/InGame.cpp, src/JoinGame.cpp, src/MapEditor.cpp (CreatePreview):
+	- Utilisation de flags plutot que d'un booléen "ingame" arbitraire.
+	- Affichage des limites des countries meme sur la meme dans l'editeur de map.
+	- Affichage des unités neutres en blanc.
+
 2006-07-10  Romain Bignon <progs@headfucking.net>
 
 	* src/Main.cpp, src/Login.cpp, src/Config.cpp, src/JoinGame.cpp, src/InGame.cpp, src/MapEditor.cpp: Optimisation du jeu

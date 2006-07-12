@@ -386,7 +386,7 @@ int ECSpriteBase::init(const char *dir)
       SDL_Surface *temp;
       if((temp = IMG_Load(filename)) == NULL)
          throw ECExcept(filename, "Impossible de charger une image.");
-      if(r >= 0) SDL_SetColorKey(temp, SDL_SRCCOLORKEY, SDL_MapRGB(temp->format, r, g, b));
+      if(r >= 0) SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
       mAnim[count].Img = SDL_DisplayFormat(temp);
       SDL_FreeSurface(temp);
 
@@ -541,7 +541,7 @@ void ECImage::Draw()
 void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)
 {
 	if(!Img) return;
-	SDL_SetColorKey(Img, SDL_SRCCOLORKEY, SDL_MapRGB(Img->format, r, g, b));
+	SDL_SetColorKey(Img, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(Img->format, r, g, b));
 }
 
 void ECImage::GetRGBA(Uint32 color, Uint8 &r, Uint8 &g, Uint8 &b, Uint8 &a)
@@ -633,7 +633,7 @@ void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
 
 void ECImage::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
 {
-#ifndef WIN32
+#ifndef DISABLE_BUGUS_ZOOM
 	SetImage( rotozoomSurfaceXY(Img, angle, zoomx, zoomy, smooth) );
 
 	if( IsNull() )
@@ -643,7 +643,7 @@ void ECImage::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
 
 void ECImage::Zoom(double zoomx, double zoomy, bool smooth)
 {
-#ifndef WIN32
+#ifndef DISABLE_BUGUS_ZOOM
 	SetImage( zoomSurface(Img, zoomx, zoomy, smooth) );
 
 	if(IsNull() )

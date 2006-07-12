@@ -96,7 +96,8 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				map = new ECMap(GameInfosForm->RecvMap);
 				map->Init();
 				map->CreatePreview(GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
-				                   GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85);
+				                   GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
+				                   P_POSITIONS);
 			}
 			catch(TECExcept &e)
 			{
@@ -331,7 +332,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->Map()->NextDay();
 						++chan->Map()->NbDays();
 						me->LockScreen();
-						chan->Map()->CreatePreview(120,120, true);
+						chan->Map()->CreatePreview(120,120, P_ENTITIES);
 						std::vector<ECBEntity*> ents = chan->Map()->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 							(*enti)->Played();
@@ -941,7 +942,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(InGameForm)
 			{
 				InGameForm->AddInfo(I_INFO, "*** " + std::string((*playersi)->GetNick()) + " quitte la partie");
-				me->Player()->Channel()->Map()->CreatePreview(120,120, true);
+				me->Player()->Channel()->Map()->CreatePreview(120,120, P_ENTITIES);
 			}
 			if(me->Player()->Channel()->RemovePlayer((*playersi), USE_DELETE))
 				playersi = players.erase(playersi);

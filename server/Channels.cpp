@@ -980,7 +980,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
                        std::vector<ECEvent*> events)
 {
 	if(!(flag &
-	   (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY|ARM_CONTENER|ARM_UNCONTENER|ARM_DATA)))
+	   (ARM_ATTAQ|ARM_MOVE|ARM_RETURN|ARM_TYPE|ARM_NUMBER|ARM_LOCK|ARM_REMOVE|ARM_DEPLOY|
+	    ARM_CONTENER|ARM_UNCONTENER|ARM_DATA)))
 		return;
 
 	std::string to_send;

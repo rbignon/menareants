@@ -80,6 +80,11 @@ public:
 	/** Use this function to make an union with an other entity */
 	virtual void Union(ECEntity*);
 
+	/** Par default, si c'est un CountryMake change l'owner de la country, et ensuite l'owner de l'unité investie */
+	virtual void Invest(ECBEntity* e);
+
+	virtual void ChangeOwner(ECBPlayer*);
+
 	/** This function is a default method used by entities to attaq someone.
 	 * An entity can redefine this method to shoot others entities as it wants
 	 * @param entities this is a vector of all entities who are included in the attaq

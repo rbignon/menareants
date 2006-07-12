@@ -84,14 +84,10 @@ public:
 
 	virtual bool CanContain(const ECBEntity* et)
 	{
-		if(et->Nb() > 50*Nb()) return false;
-		switch(et->Type())
-		{
-			case E_ARMY:
-				return true;
-			default:
-				return false;
-		}
+		if(et->Nb() > 50*Nb() || !et->IsInfantry())
+			return false;
+		else
+			return true;
 	}
 
 	bool CanAttaq(const ECBEntity* e)
@@ -149,27 +145,18 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		switch(e->Type())
-		{
-			case E_ARMY:
-			case E_CHAR:
-			case E_CASERNE:
-			case E_CHARFACT:
-			case E_MISSILAUNCHER:
-			case E_SHIPYARD:
-			case E_BOAT:
-			case E_NUCLEARSEARCH:
-			case E_SILO:
-				return true;
-			default:
-				return false;
-		}
+		if(e->Case() == Case() ||  e->IsCountryMaker() ||
+		   !e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval())
+			return false;
+		else
+			return true;
 	}
 	virtual const char* Qual() const { return "le lance-missiles"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return MISSILAUNCHER_NB; }
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
 	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
+	bool IsVehicule() const { return true; }
 
 /* Methodes */
 public:
@@ -207,23 +194,15 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		switch(e->Type())
-		{
-			case E_ARMY:
-			case E_CHAR:
-			case E_CASERNE:
-			case E_MISSILAUNCHER:
-			case E_CHARFACT:
-			case E_NUCLEARSEARCH:
-			case E_SILO:
-				return true;
-			default:
-				return false;
-		}
+		if(e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker())
+			return true;
+		else
+			return false;
 	}
 	virtual const char* Qual() const { return "le char"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return CHAR_NB; }
+	bool IsVehicule() const { return true; }
 
 /* Methodes */
 public:
@@ -234,6 +213,55 @@ public:
 /* Variables privées */
 protected:
 };
+
+/********************************************************************************************
+ *                               ECBEnginer                                                 *
+ ********************************************************************************************/
+#define ENGINER_STEP                  1
+#define ENGINER_NB                    1
+#define ENGINER_COST                  5000
+#define ENGINER_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_ENGINER, ENGINER_COST)
+#define ENGINER_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ENGINER_NB) \
+                                     :  ECBEntity(_name, _owner, _case, E_ENGINER, ENGINER_STEP, ENGINER_COST, _nb)
+/** This is a simple army */
+class ECBEnginer : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENGINER_EMPTY_CONSTRUCTOR(ECBEnginer) {}
+
+	ENGINER_CONSTRUCTOR(ECBEnginer) {}
+
+	virtual ~ECBEnginer() {}
+
+/* Constantes */
+public:
+
+	virtual bool CanInvest(const ECBEntity* e) const
+	{
+		if(!Like(e) && e->IsBuilding())
+			return true;
+		else
+			return false;
+	}
+
+	bool CanAttaq(const ECBEntity* e) { return false; }
+	virtual const char* Qual() const { return "l'ingénieur"; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	uint InitNb() const { return ENGINER_NB; }
+	bool IsInfantry() const { return true; }
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
 
 /********************************************************************************************
  *                               ECBArmy                                                   *
@@ -261,23 +289,15 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		switch(e->Type())
-		{
-			case E_ARMY:
-			case E_CASERNE:
-			case E_CHARFACT:
-			case E_CHAR:
-			case E_MISSILAUNCHER:
-			case E_NUCLEARSEARCH:
-			case E_SILO:
-				return true;
-			default:
-				return false;
-		}
+		if(e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker())
+			return true;
+		else
+			return false;
 	}
 	virtual const char* Qual() const { return "l'armée"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	uint InitNb() const { return ARMY_NB; }
+	bool IsInfantry() const { return true; }
 
 /* Methodes */
 public:

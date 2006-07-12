@@ -146,6 +146,7 @@ public:
 	R_RESOURCE(ECSpriteBase, CasePontBas,      "cases/pontbas");
 	R_RESOURCE(ECSpriteBase, CasePontGauche,   "cases/pontgauche");
 	R_RESOURCE(ECSpriteBase, CasePontDroite,   "cases/pontdroite");
+	R_RESOURCE(ECSpriteBase, Brouillard,       "brouillard");
 	R_RESOURCE(ECImage,      Army_Icon,        PKGDATADIR_PICS "units/army_icon.png");
 	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
 	R_RESOURCE(ECSpriteBase, Army_Left,        "units/army/left");
@@ -186,6 +187,11 @@ public:
 	R_RESOURCE(ECSpriteBase, Silo_Face,         "units/silo");
 	R_RESOURCE(ECSpriteBase, Silo_Missile_Up,   "units/silo/missile_up");
 	R_RESOURCE(ECSpriteBase, Silo_Missile_Down, "units/silo/missile_down");
+	R_RESOURCE(ECImage,      Enginer_Icon,      PKGDATADIR_PICS "units/enginer_icon.png");
+	R_RESOURCE(ECSpriteBase, Enginer_Face,      "units/enginer/face");
+	R_RESOURCE(ECSpriteBase, Enginer_Left,      "units/enginer/left");
+	R_RESOURCE(ECSpriteBase, Enginer_Right,     "units/enginer/right");
+	R_RESOURCE(ECSpriteBase, Enginer_Dos,       "units/enginer/dos");
 };
 
 #undef R_RESOURCE

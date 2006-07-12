@@ -45,7 +45,7 @@ void TIA::FirstMovements()
 		for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
 		{
 			int i = rand()%ECBEntity::E_END;
-			if(i && units[i] <= 1)
+			if(i && units[i] < 2)
 			{
 				ia_send("ARM - =" + TypToStr((*c)->X()) + "," + TypToStr((*c)->Y()) + " + %" + TypToStr(i));
 				break;

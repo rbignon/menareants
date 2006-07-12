@@ -131,11 +131,7 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 {
 	ECMap* map = dynamic_cast<ECMap*>(Case()->Map());
 	if(move.Empty())
-	{
-		if(event_type & ARM_ATTAQ)
-			SetImage(images[I_Attaq]);
 		return true;
-	}
 
 	ECMove::E_Move m = move.First();
 	switch(m)
@@ -173,6 +169,7 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 
 	if(!move.Empty() && m != move.First())
 		SetImage(images[(imgs_t)move.First()]);
+
 	return false;
 }
 
@@ -251,8 +248,21 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
 	if(event_type & ARM_ATTAQ)
 	{
-		SDL_Delay(500);
-		SetImage(images[I_Down]);
+		if(!AttaqImg())
+		{
+			SetAttaqImg(images[I_Attaq], Image()->X(), Image()->Y());
+			AttaqImg()->SetRepeat(false);
+			AttaqImg()->SetAnim(true);
+			return false;
+		}
+		if(AttaqImg()->Anim())
+		{
+			SDL_Delay(20);
+			return false;
+		}
+
+		SetAttaqImg(0,0,0);
+
 		if(c->Flags() & (C_TERRE))
 			c->Image()->SetFrame(1);
 	}

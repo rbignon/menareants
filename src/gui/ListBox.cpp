@@ -52,15 +52,15 @@ void TListBox::Init()
   SDL_Rect r_item = {0,0,w,height_item};
   SDL_Rect r_back = {0,0,w,h};
 
-  cursorover_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-2, height_item,
+  cursorover_box.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w-2, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   cursorover_box.FillRect(r_item, cursorover_box.MapRGBA(0,0,255*6/10,255*4/10));
 
-  selected_box.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-2, height_item,
+  selected_box.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w-2, height_item,
 					 32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   selected_box.FillRect(r_item, selected_box.MapRGBA(0,0,255*6/10,255*8/10));
 
-  background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
 

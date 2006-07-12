@@ -47,6 +47,14 @@
 #include "gui/Fps.h"
 #include <functional>
 
+extern const char* SVNVERSION;
+#ifdef APP_VERSION_PATCH
+std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
+                          std::string("-") + APP_VERSION_PATCH;
+#else
+std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA;
+#endif
+
 class TMainForm : public TForm
 {
 /* Constructeur/Destructeur */
@@ -185,6 +193,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 			MainForm->Actions();
 			if(TMainForm::enter_in_main)
 			{
+#ifdef BUGUED_INTRO
 				TMainForm::enter_in_main = false;
 				ECSprite sprite(Resources::Intro(), video->Window());
 				if(sprite.GetWidth() != video->Width() ||
@@ -199,6 +208,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 					sprite.draw();
 					video->Window()->Flip();
 				}
+#endif
 				MainForm->SetRelativePositions();
 			}
 			MainForm->Update();

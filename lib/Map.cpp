@@ -210,13 +210,14 @@ void ECBCase::SetCountry(ECBCountry *mc)
 
 void ECBCase::CheckChangingOwner(ECBEntity* e)
 {
+	if(!e->Owner()) return;
 	std::vector<ECBEntity*> ents = entities.List();
 	for(std::vector<ECBEntity*>::const_iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		if((*enti)->IsCountryMaker())
+		if(e->CanInvest(*enti) &&
+		        (!(*enti)->Owner() ||
+			     (*enti)->Owner() != e->Owner() && !e->Owner()->IsAllie((*enti)->Owner())))
 		{
-			if(e->Owner() && (!Country()->Owner() ||
-			    (Country()->Owner()->Player() != e->Owner() && !e->Owner()->IsAllie(Country()->Owner()->Player()))))
-				Country()->ChangeOwner(e->Owner()->MapPlayer());
+			e->Invest(*enti);
 			break;
 		}
 }
@@ -244,7 +245,7 @@ void ECBEntity::SetID(const char* _name)
 	strcpy(name, _name);
 }
 
-bool ECBEntity::Like(ECBEntity* e)
+bool ECBEntity::Like(const ECBEntity* e) const
 {
 	return (owner == e->Owner() || owner && owner->IsAllie(e->Owner()));
 }
@@ -259,6 +260,11 @@ bool ECBEntity::AddUnits(uint u)
 {
 	nb += u;
 	return true;
+}
+
+void ECBEntity::Invest(ECBEntity* e)
+{
+	throw ECExcept("", "On ne devrait pas passer ici");
 }
 
 bool ECBEntity::CanBeCreated(ECBPlayer* pl) const

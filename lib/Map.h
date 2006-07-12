@@ -168,6 +168,7 @@ public:
 		E_BOAT,
 		E_NUCLEARSEARCH,
 		E_SILO,
+		E_ENGINER,
 		E_END
 	};
 
@@ -187,13 +188,29 @@ public:
 	/** Use this function to know how people there are when you create this entity */
 	virtual uint InitNb() const = 0;
 
+	virtual bool IsCountryMaker() const { return false; }    /**< Is it an entity who sets the country's owner ? */
 	virtual bool IsBuilding() const { return false; }
 	virtual bool IsNaval() const { return false; }
+	virtual bool IsInfantry() const { return false; }
+	virtual bool IsVehicule() const { return false; }
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
 
 	virtual bool CanContain(const ECBEntity*) { return false; }
+
+	virtual bool CanInvest(const ECBEntity* e) const
+	{
+		if(Like(e)) return false;
+		switch(e->Type())
+		{
+			case E_CITY:
+			case E_CAPITALE:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	/** Qualitatif */
 	virtual const char* Qual() const = 0;
@@ -210,14 +227,17 @@ public:
 	/** Use this function to deploy your entity */
 	virtual bool WantDeploy() { return false; }
 
-	/** Is it an entity who sets the country's owner ? */
-	virtual bool IsCountryMaker() { return false; }
-
 	/** If this entity add money, use this function to return how many money it will add or remove */
 	virtual int TurnMoney() { return 0; }
 
 /* Methodes */
 public:
+
+	/** Must be called ONLY in server ! */
+	virtual void Invest(ECBEntity* e);
+
+	/** This virtual function must be redefined in server to change owner, but it called by ECBCase::CheckChaningOwner() */
+	virtual void ChangeOwner(ECBPlayer*) { return; }
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;
@@ -240,7 +260,7 @@ public:
 	virtual void Init() { return; }
 
 	/** Does this entity like an other entity ? */
-	bool Like(ECBEntity* e);
+	bool Like(const ECBEntity* e) const;
 
 /* Attributs */
 public:

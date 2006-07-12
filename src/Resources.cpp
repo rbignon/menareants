@@ -82,6 +82,7 @@
 	R_RESOURCE(ECSpriteBase, CasePontBas);
 	R_RESOURCE(ECSpriteBase, CasePontGauche);
 	R_RESOURCE(ECSpriteBase, CasePontDroite);
+	R_RESOURCE(ECSpriteBase, Brouillard);
 	R_RESOURCE(ECImage,      Army_Icon);
 	R_RESOURCE(ECSpriteBase, Army_Face);
 	R_RESOURCE(ECSpriteBase, Army_Left);
@@ -122,6 +123,11 @@
 	R_RESOURCE(ECSpriteBase, Silo_Face);
 	R_RESOURCE(ECSpriteBase, Silo_Missile_Up);
 	R_RESOURCE(ECSpriteBase, Silo_Missile_Down);
+	R_RESOURCE(ECImage,      Enginer_Icon);
+	R_RESOURCE(ECSpriteBase, Enginer_Face);
+	R_RESOURCE(ECSpriteBase, Enginer_Left);
+	R_RESOURCE(ECSpriteBase, Enginer_Right);
+	R_RESOURCE(ECSpriteBase, Enginer_Dos);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

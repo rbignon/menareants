@@ -114,54 +114,6 @@ void ECMap::SortEvents()
 }
 
 /********************************************************************************************
- *                                 ECountry                                                 *
- ********************************************************************************************/
-
-bool ECountry::ChangeOwner(ECBMapPlayer* mp)
-{
-	ECBMapPlayer* last_owner = owner;
-	if(ECBCountry::ChangeOwner(mp))
-	{
-		for(BCaseVector::iterator c = cases.begin(); c != cases.end(); ++c)
-		{
-			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
-			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-				if((*it)->IsCountryMaker())
-				{
-					EChannel* c = dynamic_cast<EChannel*>(Map()->Channel());
-					ECEntity* et = dynamic_cast<ECEntity*>(*it);
-					c->SendArm(NULL, et, ARM_REMOVE);
-					et->SetOwner(owner ? owner->Player() : 0);
-					if(last_owner && last_owner->Player())
-						last_owner->Player()->Entities()->Remove(et);
-					else
-						c->Map()->Neutres()->Remove(et);
-					if(owner && owner->Player())
-						owner->Player()->Entities()->Add(et);
-					else
-						c->Map()->Neutres()->Add(et);
-					et->SetID(c->FindEntityName(owner ? dynamic_cast<ECPlayer*>(owner->Player()) : 0));
-					c->SendArm(NULL, et, ARM_CREATE|ARM_HIDE, (et)->Case()->X(), (et)->Case()->Y());
-				}
-		}
-		if(owner && owner->Player())
-		{
-			EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
-			chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
-									std::string(std::string("+@ ") + ident).c_str());
-		}
-		else if(last_owner && last_owner->Player())
-		{
-			EChannel* chan = dynamic_cast<EChannel*>(last_owner->Player()->Channel());
-			chan->sendto_players(0, app.rpl(ECServer::SET), last_owner->Player()->GetNick(),
-									std::string(std::string("-@ ") + ident).c_str());
-		}
-		return true;
-	}
-	return false;
-}
-
-/********************************************************************************************
  *                                 ECEvent                                                  *
  ********************************************************************************************/
 
@@ -372,8 +324,70 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 }
 
 /********************************************************************************************
+ *                                 ECountry                                                 *
+ ********************************************************************************************/
+
+bool ECountry::ChangeOwner(ECBMapPlayer* mp)
+{
+	ECBMapPlayer* last_owner = owner;
+	if(ECBCountry::ChangeOwner(mp))
+	{
+		for(BCaseVector::iterator c = cases.begin(); c != cases.end(); ++c)
+		{
+			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
+			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+				if((*it)->IsCountryMaker())
+					(*it)->ChangeOwner(owner ? owner->Player() : 0);
+		}
+		if(owner && owner->Player())
+		{
+			EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
+			chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
+									std::string(std::string("+@ ") + ident).c_str());
+		}
+		else if(last_owner && last_owner->Player())
+		{
+			EChannel* chan = dynamic_cast<EChannel*>(last_owner->Player()->Channel());
+			chan->sendto_players(0, app.rpl(ECServer::SET), last_owner->Player()->GetNick(),
+									std::string(std::string("-@ ") + ident).c_str());
+		}
+		return true;
+	}
+	return false;
+}
+
+
+/********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
+
+void ECEntity::Invest(ECBEntity* e)
+{
+	if(e->IsCountryMaker())
+		Case()->Country()->ChangeOwner(Owner()->MapPlayer());
+	e->ChangeOwner(Owner());
+}
+
+void ECEntity::ChangeOwner(ECBPlayer* pl)
+{
+	if(Owner() == pl) return;
+	ECPlayer* last_owner = Owner();
+	EChannel* c = Channel();
+	c->SendArm(NULL, this, ARM_REMOVE);
+	SetOwner(pl);
+
+	if(last_owner)
+		last_owner->Entities()->Remove(this);
+	else
+		c->Map()->Neutres()->Remove(this);
+	if(Owner())
+		Owner()->Entities()->Add(this);
+	else
+		c->Map()->Neutres()->Add(this);
+
+	SetID(c->FindEntityName(Owner()));
+	c->SendArm(NULL, this, ARM_CREATE|ARM_HIDE, Case()->X(), Case()->Y());
+}
 
 bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 {

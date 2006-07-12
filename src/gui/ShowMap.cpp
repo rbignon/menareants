@@ -256,7 +256,7 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c && (MustRedraw() || c->MustRedraw() || CreateEntity()))
+		if(c && (MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity()))
 		{
 			if(HaveBrouillard() && c->Showed() < 0)
 			{

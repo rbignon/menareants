@@ -476,7 +476,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						{
 							MapEditor->BarreEntity->UnSelect();
 							map->RemoveAnEntity(entity);
-							map->CreatePreview(120,120,true);
+							map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 							break;
 						}
 
@@ -636,7 +636,7 @@ void TBarreCaseIcons::SelectCase(TObject* o, void* e)
 		(*it)->Select();
 	}
 
-	me->Map->Map()->CreatePreview(120,120,true);
+	me->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 }
 
 
@@ -701,7 +701,7 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 	for(std::vector<ECase*>::iterator it = bc->cases.begin(); it != bc->cases.end(); ++it)
 		(*it)->SetCountry(country);
 
-	dynamic_cast<TMapEditor*>(bc->Parent())->Map->Map()->CreatePreview(120,120,true);
+	dynamic_cast<TMapEditor*>(bc->Parent())->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 }
 
 void TBarreCase::Update(ECase* c)
@@ -749,7 +749,7 @@ TBarreCase::TBarreCase()
 
 void TBarreCase::Init()
 {
-	Icons = AddComponent(new TBarreCaseIcons(100,5));
+	Icons = AddComponent(new TBarreCaseIcons(100,1));
 	Icons->SetList();
 
 	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 5, 100, Height()-25));
@@ -826,7 +826,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 					}
 			}
 			entity->RefreshColor(last_color);
-			dynamic_cast<EMap*>(entity->Case()->Map())->CreatePreview(120,120,true);
+			dynamic_cast<EMap*>(entity->Case()->Map())->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 		}
 	}
 
@@ -990,7 +990,7 @@ void TEditBarreLat::Init()
 	Icons = AddComponent(new TEditBarreLatIcons(20, 300));
 	Icons->SetList(EntityList.List());
 
-	editor->Map->Map()->CreatePreview(120,120, true);
+	editor->Map->Map()->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
 	int _x = 15 + 60 - editor->Map->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - editor->Map->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y, false));
@@ -998,7 +998,7 @@ void TEditBarreLat::Init()
 	Radar->SetOnClickPos(TEditBarreLat::RadarClick);
 
 	ScreenPos = AddComponent(new TImage(0,0));
-	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, h,
+	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
 	DrawRect(surf, 0, 0,
 	          editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
@@ -1166,7 +1166,7 @@ void TOptionsMap::Options(TObject*, void* m)
 	map->CityMoney()  = StrToTyp<int>(OptionsMap->City->Text());
 	
 	MyFree(OptionsMap);
-	map->CreatePreview(120,120, true);
+	map->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
 	map->SetCanSave();
 }
 

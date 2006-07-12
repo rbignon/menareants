@@ -116,6 +116,7 @@ public:
 	void Zoom(double zoomx, double zoomy, bool smooth);
 
 	ECImage* Window() const { return mScreen; }
+	ECSpriteBase* SpriteBase() const { return mSpriteBase; }
 
 /* Variables privées */
 private:

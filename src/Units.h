@@ -150,7 +150,7 @@ public:
 		PutImage(I_Down, Resources::Boat_Face());
 		PutImage(I_Right, Resources::Boat_Right());
 		PutImage(I_Left, Resources::Boat_Left());
-		PutImage(I_Attaq, Resources::Boat_Face());
+		PutImage(I_Attaq, Resources::Brouillard());
 	}
 
 /* Infos */
@@ -179,7 +179,7 @@ public:
 		PutImage(I_Down, Resources::Char_Face());
 		PutImage(I_Right, Resources::Char_Right());
 		PutImage(I_Left, Resources::Char_Left());
-		PutImage(I_Attaq, Resources::Char_Face());
+		PutImage(I_Attaq, Resources::Brouillard());
 	}
 
 /* Infos */
@@ -188,6 +188,34 @@ public:
 	virtual const char* Name() const { return "Char"; }
 	virtual const char* Infos() const { return "Char d'assaut"; }
 	virtual ECImage* Icon() const { return Resources::Char_Icon(); }
+};
+
+/********************************************************************************************
+ *                                ECEnginer                                                 *
+ ********************************************************************************************/
+#define ENGINER_VISUAL_STEP 2
+class ECEnginer : public ECUnit, public ECBEnginer
+{
+/* Constructeur/Destructeur */
+public:
+
+  ENGINER_EMPTY_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP) {}
+
+	ENGINER_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::Enginer_Dos());
+		PutImage(I_Down, Resources::Enginer_Face());
+		PutImage(I_Right, Resources::Enginer_Right());
+		PutImage(I_Left, Resources::Enginer_Left());
+		PutImage(I_Attaq, Resources::Brouillard());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Ingénieur"; }
+	virtual const char* Infos() const { return "Il peut capturer les batiments enemies."; }
+	virtual ECImage* Icon() const { return Resources::Enginer_Icon(); }
 };
 
 /********************************************************************************************
@@ -207,7 +235,7 @@ public:
 		PutImage(I_Down, Resources::Army_Face());
 		PutImage(I_Right, Resources::Army_Right());
 		PutImage(I_Left, Resources::Army_Left());
-		PutImage(I_Attaq, Resources::Army_Face());
+		PutImage(I_Attaq, Resources::Brouillard());
 	}
 
 /* Infos */

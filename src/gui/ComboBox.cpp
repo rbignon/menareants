@@ -45,7 +45,7 @@ void TComboBox::Init()
 
   SDL_Rect r_back = {0,0,w-13,COMBOBOX_HEIGHT};
 
-  edit_bg.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w-13, COMBOBOX_HEIGHT,
+  edit_bg.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w-13, COMBOBOX_HEIGHT,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   edit_bg.FillRect(r_back, edit_bg.MapRGBA(255, 255, 255, 255*3/10));
 
@@ -58,7 +58,7 @@ void TComboBox::Init()
 void TComboBox::SetBackGround(uint _h)
 {
 	SDL_Rect r_back = {0,0,w,_h};
-	background.SetImage(SDL_CreateRGBSurface( SDL_SWSURFACE|SDL_SRCALPHA, w, _h,
+	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, _h,
 					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
 }
