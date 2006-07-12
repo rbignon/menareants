@@ -27,30 +27,26 @@
 /********************************************************************************************
  *                               ECBNuclearSearch                                           *
  ********************************************************************************************/
-#define NUCLEARSEARCH_STEP                  0
-#define NUCLEARSEARCH_NB                    3000
-#define NUCLEARSEARCH_COST                  50000
 #define NUCLEARSEARCH_BUILDTIME             10
 #define NUCLEARSEARCH_INITBUILDTIME         5
-#define NUCLEARSEARCH_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_NUCLEARSEARCH, NUCLEARSEARCH_COST)
-#define NUCLEARSEARCH_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, \
-                                              uint _nb = NUCLEARSEARCH_NB) \
-                                            :  ECBEntity(_name, _owner, _case, E_NUCLEARSEARCH, NUCLEARSEARCH_STEP, \
-                                                         NUCLEARSEARCH_COST, _nb)
 /** This is a char factory */
 class ECBNuclearSearch : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	NUCLEARSEARCH_EMPTY_CONSTRUCTOR(ECBNuclearSearch), missiles(0), restBuild(NUCLEARSEARCH_INITBUILDTIME) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBNuclearSearch) : missiles(0), restBuild(NUCLEARSEARCH_INITBUILDTIME) {}
 
-	NUCLEARSEARCH_CONSTRUCTOR(ECBNuclearSearch), missiles(0), restBuild(NUCLEARSEARCH_INITBUILDTIME) {}
+	ENTITY_CONSTRUCTOR(ECBNuclearSearch), missiles(0), restBuild(NUCLEARSEARCH_INITBUILDTIME) {}
 
 	virtual ~ECBNuclearSearch();
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_NUCLEARSEARCH; }
+	virtual uint Cost() const { return 50000; }
+	virtual uint InitNb() const { return 3000;}
 
 	enum data_t {
 		DATA_NBMISSILES,
@@ -60,7 +56,7 @@ public:
 	virtual bool CanAttaq(const ECBEntity* e) { return true; }
 
 	virtual const char* Qual() const { return "le centre de recherches nucléaire"; }
-	virtual uint InitNb() const { return NUCLEARSEARCH_NB; }
+
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
@@ -82,35 +78,32 @@ protected:
 /********************************************************************************************
  *                               ECBSilo                                                    *
  ********************************************************************************************/
-#define SILO_STEP                  0
-#define SILO_NB                    500
-#define SILO_COST                  10000
 #define SILO_PORTY                 10
 #define SILO_IMPACT                1
-#define SILO_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_SILO, SILO_COST)
-#define SILO_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = SILO_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_SILO, SILO_STEP, SILO_COST, _nb)
 /** This is a char factory */
 class ECBSilo : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	SILO_EMPTY_CONSTRUCTOR(ECBSilo), nuclear_search(0) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBSilo) : nuclear_search(0) {}
 
-	SILO_CONSTRUCTOR(ECBSilo), nuclear_search(0) {}
+	ENTITY_CONSTRUCTOR(ECBSilo), nuclear_search(0) {}
 
 	virtual ~ECBSilo() {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_SILO; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 500;}
+
 	virtual bool CanAttaq(const ECBEntity* e) { return true; }
 
 	virtual void Init();
 
 	virtual const char* Qual() const { return "le silo de lancement"; }
-	virtual uint InitNb() const { return SILO_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
@@ -133,33 +126,29 @@ private:
 /********************************************************************************************
  *                               ECBCapitale                                                *
  ********************************************************************************************/
-#define CAPITALE_STEP                  0
-#define CAPITALE_NB                    2000
-#define CAPITALE_COST                  0
-#define CAPITALE_VISIBILITY            4
-#define CAPITALE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CAPITALE, CAPITALE_COST)
-#define CAPITALE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CAPITALE_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CAPITALE, CAPITALE_STEP, CAPITALE_COST, _nb, \
-                                       CAPITALE_VISIBILITY)
 /** This is a city */
 class ECBCapitale : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CAPITALE_EMPTY_CONSTRUCTOR(ECBCapitale) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCapitale) {}
 
-	CAPITALE_CONSTRUCTOR(ECBCapitale) {}
+	ENTITY_CONSTRUCTOR(ECBCapitale) {}
 
 	virtual ~ECBCapitale() {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_CAPITALE; }
+	virtual uint Cost() const { return 0; }
+	virtual uint InitNb() const { return 2000; }
+	virtual uint Visibility() const { return 4; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
 	virtual const char* Qual() const { return "la capitale"; }
-	virtual uint InitNb() const { return CAPITALE_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
@@ -183,31 +172,26 @@ public:
 /********************************************************************************************
  *                               ECBCity                                                    *
  ********************************************************************************************/
-#define CITY_STEP                  0
-#define CITY_NB                    1000
-#define CITY_COST                  0
-#define CITY_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CITY, CITY_COST)
-#define CITY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CITY_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CITY, CITY_STEP, CITY_COST, _nb)
 /** This is a city */
 class ECBCity : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CITY_EMPTY_CONSTRUCTOR(ECBCity) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCity) {}
 
-	CITY_CONSTRUCTOR(ECBCity) {}
-
-	virtual ~ECBCity() {}
+	ENTITY_CONSTRUCTOR(ECBCity) {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_CITY; }
+	virtual uint Cost() const { return 0; }
+	virtual uint InitNb() const { return 1000; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
 	virtual const char* Qual() const { return "la ville"; }
-	virtual uint InitNb() const { return CITY_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
@@ -231,31 +215,26 @@ public:
 /********************************************************************************************
  *                               ECBShipyard                                                *
  ********************************************************************************************/
-#define SHIPYARD_STEP                  0
-#define SHIPYARD_NB                    200
-#define SHIPYARD_COST                  4000
-#define SHIPYARD_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_SHIPYARD, SHIPYARD_COST)
-#define SHIPYARD_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = SHIPYARD_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_SHIPYARD, SHIPYARD_STEP, SHIPYARD_COST, _nb)
 /** This is a char factory */
 class ECBShipyard : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	SHIPYARD_EMPTY_CONSTRUCTOR(ECBShipyard) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBShipyard) {}
 
-	SHIPYARD_CONSTRUCTOR(ECBShipyard) {}
-
-	virtual ~ECBShipyard() {}
+	ENTITY_CONSTRUCTOR(ECBShipyard) {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_SHIPYARD; }
+	virtual uint Cost() const { return 4000; }
+	virtual uint InitNb() const { return 200; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "le port"; }
-	virtual uint InitNb() const { return SHIPYARD_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsNaval() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
@@ -277,31 +256,26 @@ public:
 /********************************************************************************************
  *                               ECBCharFact                                                *
  ********************************************************************************************/
-#define CHARFACT_STEP                  0
-#define CHARFACT_NB                    1000
-#define CHARFACT_COST                  20000
-#define CHARFACT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHARFACT, CHARFACT_COST)
-#define CHARFACT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHARFACT_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CHARFACT, CHARFACT_STEP, CHARFACT_COST, _nb)
 /** This is a char factory */
 class ECBCharFact : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CHARFACT_EMPTY_CONSTRUCTOR(ECBCharFact) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCharFact) {}
 
-	CHARFACT_CONSTRUCTOR(ECBCharFact) {}
-
-	virtual ~ECBCharFact() {}
+	ENTITY_CONSTRUCTOR(ECBCharFact) {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_CHARFACT; }
+	virtual uint Cost() const { return 20000; }
+	virtual uint InitNb() const { return 1000; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "l'usine de chars"; }
-	virtual uint InitNb() const { return CHARFACT_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
@@ -323,31 +297,26 @@ public:
 /********************************************************************************************
  *                               ECBCaserne                                                 *
  ********************************************************************************************/
-#define CASERNE_STEP                  0
-#define CASERNE_NB                    500
-#define CASERNE_COST                  9000
-#define CASERNE_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CASERNE, CASERNE_COST)
-#define CASERNE_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CASERNE_NB) \
-                                       :  ECBEntity(_name, _owner, _case, E_CASERNE, CASERNE_STEP, CASERNE_COST, _nb)
 /** This is a caserne */
 class ECBCaserne : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CASERNE_EMPTY_CONSTRUCTOR(ECBCaserne) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCaserne) {}
 
-	CASERNE_CONSTRUCTOR(ECBCaserne) {}
-
-	virtual ~ECBCaserne() {}
+	ENTITY_CONSTRUCTOR(ECBCaserne) {}
 
 /* Constantes */
 public:
 
+	virtual e_type Type() const { return E_CASERNE; }
+	virtual uint Cost() const { return 9000; }
+	virtual uint InitNb() const { return 500; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
 
 	virtual const char* Qual() const { return "la caserne"; }
-	virtual uint InitNb() const { return CASERNE_NB; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }

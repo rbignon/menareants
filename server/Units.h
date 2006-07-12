@@ -88,9 +88,7 @@ class ECBoat : public EContainer, public ECBBoat
 /* Constructeur/Destructeur */
 public:
 
-	BOAT_EMPTY_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
-
-	BOAT_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
+	ENTITY_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
 
 	ENTITY_CREATE_LAST(ECBoat);
 };
@@ -103,9 +101,7 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
-
-	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
+	ENTITY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
 
 	ENTITY_CREATE_LAST(ECMissiLauncher);
 
@@ -127,9 +123,7 @@ class EChar : public ECUnit, public ECBChar
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
-
-	CHAR_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
+	ENTITY_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
 
 	ENTITY_CREATE_LAST(EChar);
 };
@@ -142,9 +136,7 @@ class ECEnginer : public ECUnit, public ECBEnginer
 /* Constructeur/Destructeur */
 public:
 
-	ENGINER_EMPTY_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
-
-	ENGINER_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
 
 	ENTITY_CREATE_LAST(ECEnginer);
 
@@ -163,9 +155,7 @@ class ECArmy : public ECUnit, public ECBArmy
 /* Constructeur/Destructeur */
 public:
 
-	ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
-
-	ARMY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
 
 	ENTITY_CREATE_LAST(ECArmy);
 };

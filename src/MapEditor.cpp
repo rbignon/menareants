@@ -47,7 +47,8 @@
 template<typename T>
 static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map)
 {
-	T* t = new T(_name, _owner, _case, _nb);
+	T* t = new T(_name, _owner, _case);
+	t->SetNb(_nb);
 	t->SetMap(map);
 	t->Init();
 	return t;

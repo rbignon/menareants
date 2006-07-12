@@ -59,28 +59,24 @@ private:
 /********************************************************************************************
  *                               ECBBoat                                                    *
  ********************************************************************************************/
-#define BOAT_STEP                  4
-#define BOAT_NB                    10
-#define BOAT_COST                  2000
-#define BOAT_VISIBILITY            4
-#define BOAT_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_BOAT, BOAT_COST)
-#define BOAT_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = BOAT_NB) \
-                                     :  ECBEntity(_name, _owner, _case, E_BOAT, BOAT_STEP, BOAT_COST, _nb, \
-                                                  BOAT_VISIBILITY)
 /** This is a boat. */
 class ECBBoat : public virtual ECBContainer
 {
 /* Constructeur/Destructeur */
 public:
 
-	BOAT_EMPTY_CONSTRUCTOR(ECBBoat) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBBoat) {}
 
-	BOAT_CONSTRUCTOR(ECBBoat) {}
-
-	virtual ~ECBBoat() {}
+	ENTITY_CONSTRUCTOR(ECBBoat) {}
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_BOAT; }
+	virtual uint Cost() const { return 2000; }
+	virtual uint InitNb() const { return 10; }
+	virtual uint Step() const { return 4; }
+	virtual uint Visibility() const { return 4; }
 
 	virtual bool CanContain(const ECBEntity* et)
 	{
@@ -103,7 +99,6 @@ public:
 	}
 	virtual const char* Qual() const { return "le bateau"; }
 	bool CanCreate(const ECBEntity*) { return false; }
-	uint InitNb() const { return BOAT_NB; }
 	virtual bool IsNaval() const { return true; }
 
 /* Methodes */
@@ -119,29 +114,24 @@ protected:
 /********************************************************************************************
  *                               ECBMissiLauncher                                           *
  ********************************************************************************************/
-#define MISSILAUNCHER_STEP                  1
-#define MISSILAUNCHER_NB                    100
-#define MISSILAUNCHER_COST                  6000
 #define MISSILAUNCHER_PORTY                 8
-#define MISSILAUNCHER_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_MISSILAUNCHER, MISSILAUNCHER_COST)
-#define MISSILAUNCHER_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, \
-                                                uint _nb = MISSILAUNCHER_NB) \
-                                            :  ECBEntity(_name, _owner, _case, E_MISSILAUNCHER, MISSILAUNCHER_STEP, \
-                                                       MISSILAUNCHER_COST, _nb)
 /** This is a simple army */
 class ECBMissiLauncher : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECBMissiLauncher) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBMissiLauncher) {}
 
-	MISSILAUNCHER_CONSTRUCTOR(ECBMissiLauncher) {}
-
-	virtual ~ECBMissiLauncher() {}
+	ENTITY_CONSTRUCTOR(ECBMissiLauncher) {}
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_MISSILAUNCHER; }
+	virtual uint Cost() const { return 6000; }
+	virtual uint InitNb() const { return 100; }
+	virtual uint Step() const { return 1; }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -153,7 +143,6 @@ public:
 	}
 	virtual const char* Qual() const { return "le lance-missiles"; }
 	bool CanCreate(const ECBEntity*) { return false; }
-	uint InitNb() const { return MISSILAUNCHER_NB; }
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
 	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
 	bool IsVehicule() const { return true; }
@@ -171,26 +160,23 @@ protected:
 /********************************************************************************************
  *                               ECBChar                                                    *
  ********************************************************************************************/
-#define CHAR_STEP                  3
-#define CHAR_NB                    1500
-#define CHAR_COST                  20000
-#define CHAR_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_CHAR, CHAR_COST)
-#define CHAR_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = CHAR_NB) \
-                                     :  ECBEntity(_name, _owner, _case, E_CHAR, CHAR_STEP, CHAR_COST, _nb)
 /** This is a simple army */
 class ECBChar : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(ECBChar) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBChar) {}
 
-	CHAR_CONSTRUCTOR(ECBChar) {}
-
-	virtual ~ECBChar() {}
+	ENTITY_CONSTRUCTOR(ECBChar) {}
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_CHAR; }
+	virtual uint Cost() const { return 20000; }
+	virtual uint InitNb() const { return 1500; }
+	virtual uint Step() const { return 3; }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -201,7 +187,6 @@ public:
 	}
 	virtual const char* Qual() const { return "le char"; }
 	bool CanCreate(const ECBEntity*) { return false; }
-	uint InitNb() const { return CHAR_NB; }
 	bool IsVehicule() const { return true; }
 
 /* Methodes */
@@ -217,26 +202,23 @@ protected:
 /********************************************************************************************
  *                               ECBEnginer                                                 *
  ********************************************************************************************/
-#define ENGINER_STEP                  1
-#define ENGINER_NB                    1
-#define ENGINER_COST                  5000
-#define ENGINER_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_ENGINER, ENGINER_COST)
-#define ENGINER_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ENGINER_NB) \
-                                     :  ECBEntity(_name, _owner, _case, E_ENGINER, ENGINER_STEP, ENGINER_COST, _nb)
 /** This is a simple army */
 class ECBEnginer : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ENGINER_EMPTY_CONSTRUCTOR(ECBEnginer) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBEnginer) {}
 
-	ENGINER_CONSTRUCTOR(ECBEnginer) {}
-
-	virtual ~ECBEnginer() {}
+	ENTITY_CONSTRUCTOR(ECBEnginer) {}
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_ENGINER; }
+	virtual uint Cost() const { return 5000; }
+	virtual uint InitNb() const { return 1; }
+	virtual uint Step() const { return 1; }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
@@ -249,7 +231,6 @@ public:
 	bool CanAttaq(const ECBEntity* e) { return false; }
 	virtual const char* Qual() const { return "l'ingénieur"; }
 	bool CanCreate(const ECBEntity*) { return false; }
-	uint InitNb() const { return ENGINER_NB; }
 	bool IsInfantry() const { return true; }
 
 /* Methodes */
@@ -266,26 +247,23 @@ protected:
 /********************************************************************************************
  *                               ECBArmy                                                   *
  ********************************************************************************************/
-#define ARMY_STEP                  2
-#define ARMY_NB                    100
-#define ARMY_COST                  2000
-#define ARMY_EMPTY_CONSTRUCTOR(x)  x() : ECBEntity(E_ARMY, ARMY_COST)
-#define ARMY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb = ARMY_NB) \
-                                     :  ECBEntity(_name, _owner, _case, E_ARMY, ARMY_STEP, ARMY_COST, _nb)
 /** This is a simple army */
 class ECBArmy : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ARMY_EMPTY_CONSTRUCTOR(ECBArmy) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBArmy) {}
 
-	ARMY_CONSTRUCTOR(ECBArmy) {}
-
-	virtual ~ECBArmy() {}
+	ENTITY_CONSTRUCTOR(ECBArmy) {}
 
 /* Constantes */
 public:
+
+	virtual e_type Type() const { return E_ARMY; }
+	virtual uint Cost() const { return 2000; }
+	virtual uint InitNb() const { return 100; }
+	virtual uint Step() const { return 2; }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -296,7 +274,6 @@ public:
 	}
 	virtual const char* Qual() const { return "l'armée"; }
 	bool CanCreate(const ECBEntity*) { return false; }
-	uint InitNb() const { return ARMY_NB; }
 	bool IsInfantry() const { return true; }
 
 /* Methodes */

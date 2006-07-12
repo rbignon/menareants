@@ -1,0 +1,107 @@
+Index: Resources.cpp
+===================================================================
+--- Resources.cpp	(révision 795)
++++ Resources.cpp	(copie de travail)
+@@ -34,6 +34,14 @@
+ 	R_RESOURCE(ECImage,      BarreAct);
+ 	R_RESOURCE(ECImage,      Cadre);
+ 	R_RESOURCE(ECImage,      Case);
++	R_RESOURCE(ECImage,      FogTop);
++	R_RESOURCE(ECImage,      FogBottom);
++	R_RESOURCE(ECImage,      FogRight);
++	R_RESOURCE(ECImage,      FogLeft);
++	R_RESOURCE(ECImage,      FogTopLeft);
++	R_RESOURCE(ECImage,      FogTopRight);
++	R_RESOURCE(ECImage,      FogBottomLeft);
++	R_RESOURCE(ECImage,      FogBottomRight);
+ 	R_RESOURCE(ECImage,      GoodHashure);
+ 	R_RESOURCE(ECImage,      BadHashure);
+ 	R_RESOURCE(ECImage,      HelpScreen);
+Index: gui/ShowMap.h
+===================================================================
+--- gui/ShowMap.h	(révision 795)
++++ gui/ShowMap.h	(copie de travail)
+@@ -41,6 +41,7 @@
+ 
+ 	void Init();
+ 
++	void DrawFog(ECase* c);
+ 	void Draw(int x, int y);
+ 
+ 	ECEntity* TestEntity(int mouse_x, int mouse_y);
+Index: gui/ShowMap.cpp
+===================================================================
+--- gui/ShowMap.cpp	(révision 795)
++++ gui/ShowMap.cpp	(copie de travail)
+@@ -230,6 +230,40 @@
+ 	return Pixel2Case(mouse_x, mouse_y);
+ }
+ 
++void TMap::DrawFog(ECase* c)
++{
++	// Fog borders: if adjacents cases are fogged and this one is not, then we add fog borders!
++	if(c->Showed() < 0)
++		return;
++
++	// Side borders
++	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() < 0)
++		Resources::FogTop()->Draw(c->Image()->X(), c->Image()->Y());
++	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() < 0)
++		Resources::FogBottom()->Draw(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - Resources::FogBottom()->GetHeight());
++	if((dynamic_cast<ECase*>(c->MoveRight()))->Showed() < 0)
++		Resources::FogRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogRight()->GetWidth(), c->Image()->Y());
++	if((dynamic_cast<ECase*>(c->MoveLeft()))->Showed() < 0)
++		Resources::FogLeft()->Draw(c->Image()->X(), c->Image()->Y());
++	// Corner borders
++	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveLeft()->MoveUp()))->Showed() < 0)
++		Resources::FogTopLeft()->Draw(c->Image()->X(), c->Image()->Y());
++	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveRight()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveRight()->MoveUp()))->Showed() < 0)
++		Resources::FogTopRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogTopRight()->GetWidth(), c->Image()->Y());
++	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveLeft()->MoveDown()))->Showed() < 0)
++		Resources::FogBottomLeft()->Draw(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomLeft()->GetHeight());
++	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveRight()))->Showed() > 0
++	&& (dynamic_cast<ECase*>(c->MoveRight()->MoveDown()))->Showed() < 0)
++		Resources::FogBottomRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogBottomRight()->GetWidth(), c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomRight()->GetHeight());
++}
++
+ void TMap::Draw(int _x, int _y)
+ {
+ 	if(!map) return;
+@@ -278,7 +312,10 @@
+ 			}
+ 			if(schema)
+ 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
+-			if(map->Channel()) // Si il n'y a pas de channel, c'est l'�iteur de map et on n'utilise pas � dans ce cas.
++
++			DrawFog(c);
++
++			if(map->Channel()) // Si il n'y a pas de channel, c'est l'�iteur de map et on n'utilise pas � dans ce cas.
+ 				c->SetMustRedraw(false);
+ 		}
+ 	}
+Index: Resources.h
+===================================================================
+--- Resources.h	(révision 795)
++++ Resources.h	(copie de travail)
+@@ -98,6 +98,14 @@
+ 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
+ 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
+ 	R_RESOURCE(ECImage,      Case,             PKGDATADIR_PICS "case.png");
++	R_RESOURCE(ECImage,      FogTop,           PKGDATADIR_PICS "fog-top.png");
++	R_RESOURCE(ECImage,      FogBottom,        PKGDATADIR_PICS "fog-bottom.png");
++	R_RESOURCE(ECImage,      FogRight,         PKGDATADIR_PICS "fog-right.png");
++	R_RESOURCE(ECImage,      FogLeft,          PKGDATADIR_PICS "fog-left.png");
++	R_RESOURCE(ECImage,      FogTopLeft,       PKGDATADIR_PICS "fog-topleft.png");
++	R_RESOURCE(ECImage,      FogTopRight,     PKGDATADIR_PICS "fog-topright.png");
++	R_RESOURCE(ECImage,      FogBottomLeft,    PKGDATADIR_PICS "fog-bottomleft.png");
++	R_RESOURCE(ECImage,      FogBottomRight,   PKGDATADIR_PICS "fog-bottomright.png");
+ 	R_RESOURCE(ECImage,      GoodHashure,      PKGDATADIR_PICS "goodhashure.png");
+ 	R_RESOURCE(ECImage,      BadHashure,       PKGDATADIR_PICS "badhashure.png");
+ 	R_RESOURCE(ECImage,      HelpScreen,       PKGDATADIR_PICS "help.png");

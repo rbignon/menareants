@@ -66,9 +66,9 @@ class ECNuclearSearch : public ECBatiment, public ECBNuclearSearch
 /* Constructeur/Destructeur */
 public:
 
-	NUCLEARSEARCH_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
 
-	NUCLEARSEARCH_CONSTRUCTOR(ECNuclearSearch), ECBatiment(Resources::NuclearSearch_Face()) {}
+	ENTITY_CONSTRUCTOR(ECNuclearSearch), ECBatiment(Resources::NuclearSearch_Face()) {}
 
 	virtual void Init();
 
@@ -96,9 +96,9 @@ class ECSilo : public ECBatiment, public ECBSilo
 /* Constructeur/Destructeur */
 public:
 
-	SILO_EMPTY_CONSTRUCTOR(ECSilo), missile(this, SILO_MISSILE_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECSilo) : missile(this, SILO_MISSILE_STEP) {}
 
-	SILO_CONSTRUCTOR(ECSilo), ECBatiment(Resources::Silo_Face()), missile(this, SILO_MISSILE_STEP)
+	ENTITY_CONSTRUCTOR(ECSilo), ECBatiment(Resources::Silo_Face()), missile(this, SILO_MISSILE_STEP)
 	{
 		missile.SetMissileUp(Resources::Silo_Missile_Up());
 		missile.SetMissileDown(Resources::Silo_Missile_Down());
@@ -138,9 +138,9 @@ class ECapitale : public ECBatiment, public ECBCapitale
 /* Constructeur/Destructeur */
 public:
 
-	CAPITALE_EMPTY_CONSTRUCTOR(ECapitale) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECapitale) {}
 
-	CAPITALE_CONSTRUCTOR(ECapitale), ECBatiment(Resources::Capitale_Face()) {}
+	ENTITY_CONSTRUCTOR(ECapitale), ECBatiment(Resources::Capitale_Face()) {}
 
 /* Infos */
 public:
@@ -159,9 +159,9 @@ class ECity : public ECBatiment, public ECBCity
 /* Constructeur/Destructeur */
 public:
 
-	CITY_EMPTY_CONSTRUCTOR(ECity) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECity) {}
 
-	CITY_CONSTRUCTOR(ECity), ECBatiment(Resources::City_Face()) {}
+	ENTITY_CONSTRUCTOR(ECity), ECBatiment(Resources::City_Face()) {}
 
 /* Infos */
 public:
@@ -180,9 +180,9 @@ class ECShipyard : public ECBatiment, public ECBShipyard
 /* Constructeur/Destructeur */
 public:
 
-	SHIPYARD_EMPTY_CONSTRUCTOR(ECShipyard) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECShipyard) {}
 
-	SHIPYARD_CONSTRUCTOR(ECShipyard), ECBatiment(Resources::Shipyard_Face()) {}
+	ENTITY_CONSTRUCTOR(ECShipyard), ECBatiment(Resources::Shipyard_Face()) {}
 
 /* Infos */
 public:
@@ -201,9 +201,9 @@ class ECharFact : public ECBatiment, public ECBCharFact
 /* Constructeur/Destructeur */
 public:
 
-	CHARFACT_EMPTY_CONSTRUCTOR(ECharFact) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECharFact) {}
 
-	CHARFACT_CONSTRUCTOR(ECharFact), ECBatiment(Resources::CharFact_Face()) {}
+	ENTITY_CONSTRUCTOR(ECharFact), ECBatiment(Resources::CharFact_Face()) {}
 
 /* Infos */
 public:
@@ -222,9 +222,9 @@ class ECaserne : public ECBatiment, public ECBCaserne
 /* Constructeur/Destructeur */
 public:
 
-	CASERNE_EMPTY_CONSTRUCTOR(ECaserne) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECaserne) {}
 
-	CASERNE_CONSTRUCTOR(ECaserne), ECBatiment(Resources::Caserne_Face()) {}
+	ENTITY_CONSTRUCTOR(ECaserne), ECBatiment(Resources::Caserne_Face()) {}
 
 /* Infos */
 public:

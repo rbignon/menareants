@@ -359,48 +359,51 @@ ECSpriteBase::~ECSpriteBase()
 
 int ECSpriteBase::init(const char *dir)
 {
-  char buffer[255];
-  char filename[255];
-  char name[255];
-  int pause=0, r=0, g=0, b=0;
-  FILE *fp;
+	char buffer[255];
+	char filename[255];
+	char name[255];
+	int pause=0, r=0, g=0, b=0;
+	FILE *fp;
 
-  sprintf(filename, PKGDATADIR_ANIMS "%s/info", dir);
+	sprintf(filename, PKGDATADIR_ANIMS "%s/info", dir);
 
-  if((fp=fopen(filename, "r")) == NULL)
-    throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
+	if((fp=fopen(filename, "r")) == NULL)
+		throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
 
-  fgets(buffer, 255, fp);
-  sscanf(buffer, "FILES: %d", &mNumframes);
-  mAnim = new ECImage[mNumframes];
+	fgets(buffer, 255, fp);
+	sscanf(buffer, "FILES: %d", &mNumframes);
+	mAnim = new ECImage[mNumframes];
 
-  mBuilt = 1;
+	mBuilt = 1;
 
-  for(uint count=0;!feof(fp) && count<mNumframes;)
-  {
-    fgets(buffer, 255, fp);
-    if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n')
-    {
-      sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
-      sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
-      SDL_Surface *temp;
-      if((temp = IMG_Load(filename)) == NULL)
-         throw ECExcept(filename, "Impossible de charger une image.");
-      if(r >= 0) SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
-      mAnim[count].Img = SDL_DisplayFormat(temp);
-      SDL_FreeSurface(temp);
+	for(uint count=0;!feof(fp) && count<mNumframes;)
+	{
+		fgets(buffer, 255, fp);
+		if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n')
+		{
+			sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
+			sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
+			SDL_Surface *temp;
+			if((temp = IMG_Load(filename)) == NULL)
+				throw ECExcept(filename, "Impossible de charger une image.");
 
-      mAnim[count].pause = pause;
-      if(pause) animation = true;
-      if(!mW) mW = mAnim[count].Img->w;
-      if(!mH) mH = mAnim[count].Img->h;
+			if(r >= 0)
+				SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
 
-      count++;
-    }
-  }
-  fclose(fp);
-  path = dir;
-  return 0;
+			mAnim[count].Img = SDL_DisplayFormat(temp);
+			SDL_FreeSurface(temp);
+
+			mAnim[count].pause = pause;
+			if(pause) animation = true;
+			if(!mW) mW = mAnim[count].Img->w;
+			if(!mH) mH = mAnim[count].Img->h;
+
+			count++;
+		}
+	}
+	fclose(fp);
+	path = dir;
+	return 0;
 }
 
 void ECSpriteBase::ChangeColor(Color from, Color to)

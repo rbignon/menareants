@@ -1,3 +1,5 @@
 Makefile
 menareants
+menareants.exe
 .deps
+Version.cpp

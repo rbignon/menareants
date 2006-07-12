@@ -314,9 +314,9 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	DisconnectButton = AddComponent(new TButtonText(button_x,ListButton->Y()+ListButton->Height(),150,50, "Se déconnecter",
 	                                                Font::GetInstance(Font::Normal)));
 
-	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90,"x", white_color, Font::GetInstance(Font::Normal)));
-	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height(),"y", white_color, Font::GetInstance(Font::Normal)));
-	ChanStats = AddComponent(new TLabel(75,UserStats->Y()+UserStats->Height(),"z", white_color,
+	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90," ", white_color, Font::GetInstance(Font::Normal)));
+	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height()," ", white_color, Font::GetInstance(Font::Normal)));
+	ChanStats = AddComponent(new TLabel(75,UserStats->Y()+UserStats->Height()," ", white_color,
 	                                    Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());

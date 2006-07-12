@@ -98,6 +98,14 @@ public:
 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
 	R_RESOURCE(ECImage,      Cadre,            PKGDATADIR_PICS "cadre.png");
 	R_RESOURCE(ECImage,      Case,             PKGDATADIR_PICS "case.png");
+	R_RESOURCE(ECImage,      FogTop,           PKGDATADIR_PICS "fog-top.png");
+	R_RESOURCE(ECImage,      FogBottom,        PKGDATADIR_PICS "fog-bottom.png");
+	R_RESOURCE(ECImage,      FogRight,         PKGDATADIR_PICS "fog-right.png");
+	R_RESOURCE(ECImage,      FogLeft,          PKGDATADIR_PICS "fog-left.png");
+	R_RESOURCE(ECImage,      FogTopLeft,       PKGDATADIR_PICS "fog-topleft.png");
+	R_RESOURCE(ECImage,      FogTopRight,      PKGDATADIR_PICS "fog-topright.png");
+	R_RESOURCE(ECImage,      FogBottomLeft,    PKGDATADIR_PICS "fog-bottomleft.png");
+	R_RESOURCE(ECImage,      FogBottomRight,   PKGDATADIR_PICS "fog-bottomright.png");
 	R_RESOURCE(ECImage,      GoodHashure,      PKGDATADIR_PICS "goodhashure.png");
 	R_RESOURCE(ECImage,      BadHashure,       PKGDATADIR_PICS "badhashure.png");
 	R_RESOURCE(ECImage,      HelpScreen,       PKGDATADIR_PICS "help.png");

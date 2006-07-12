@@ -165,9 +165,8 @@ void ECMove::SetMoves(Vector _moves)
  *                                 ECEntity                                                 *
  ********************************************************************************************/
 
-ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb,
-                   uint _visibility)
-		: ECBEntity(_name, _owner, _case, _type, _Step, _nb, _visibility), Tag(0), image(0), attaq(0), selected(false),
+ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
+		: ECBEntity(_name, _owner, _case), Tag(0), image(0), attaq(0), selected(false),
 		  move(this), want_deploy(false), attaqued_case(0)
 {
 

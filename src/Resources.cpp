@@ -34,6 +34,14 @@
 	R_RESOURCE(ECImage,      BarreAct);
 	R_RESOURCE(ECImage,      Cadre);
 	R_RESOURCE(ECImage,      Case);
+	R_RESOURCE(ECImage,      FogTop);
+	R_RESOURCE(ECImage,      FogBottom);
+	R_RESOURCE(ECImage,      FogRight);
+	R_RESOURCE(ECImage,      FogLeft);
+	R_RESOURCE(ECImage,      FogTopLeft);
+	R_RESOURCE(ECImage,      FogTopRight);
+	R_RESOURCE(ECImage,      FogBottomLeft);
+	R_RESOURCE(ECImage,      FogBottomRight);
 	R_RESOURCE(ECImage,      GoodHashure);
 	R_RESOURCE(ECImage,      BadHashure);
 	R_RESOURCE(ECImage,      HelpScreen);

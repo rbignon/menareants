@@ -248,20 +248,23 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
 	if(event_type & ARM_ATTAQ)
 	{
-		if(!AttaqImg())
+		if(Case()->Showed() > 0)
 		{
-			SetAttaqImg(images[I_Attaq], Image()->X(), Image()->Y());
-			AttaqImg()->SetRepeat(false);
-			AttaqImg()->SetAnim(true);
-			return false;
+			if(!AttaqImg())
+			{
+				SetAttaqImg(images[I_Attaq], Image()->X(), Image()->Y());
+				AttaqImg()->SetRepeat(false);
+				AttaqImg()->SetAnim(true);
+				return false;
+			}
+			if(AttaqImg()->Anim())
+			{
+				SDL_Delay(20);
+				return false;
+			}
+	
+			SetAttaqImg(0,0,0);
 		}
-		if(AttaqImg()->Anim())
-		{
-			SDL_Delay(20);
-			return false;
-		}
-
-		SetAttaqImg(0,0,0);
 
 		if(c->Flags() & (C_TERRE))
 			c->Image()->SetFrame(1);

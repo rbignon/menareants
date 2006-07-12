@@ -41,6 +41,7 @@ public:
 
 	void Init();
 
+	void DrawFog(ECase* c);
 	void Draw(int x, int y);
 
 	ECEntity* TestEntity(int mouse_x, int mouse_y);

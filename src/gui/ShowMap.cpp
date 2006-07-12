@@ -230,6 +230,43 @@ ECase* TMap::TestCase(int mouse_x, int mouse_y)
 	return Pixel2Case(mouse_x, mouse_y);
 }
 
+void TMap::DrawFog(ECase* c)
+{
+	// Fog borders: if adjacents cases are fogged and this one is not, then we add fog borders!
+	if(c->Showed() < 0)
+		return;
+
+	// Side borders
+	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() < 0)
+		Resources::FogTop()->Draw(c->Image()->X(), c->Image()->Y());
+	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() < 0)
+		Resources::FogBottom()->Draw(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - Resources::FogBottom()->GetHeight());
+	if((dynamic_cast<ECase*>(c->MoveRight()))->Showed() < 0)
+		Resources::FogRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogRight()->GetWidth(), c->Image()->Y());
+	if((dynamic_cast<ECase*>(c->MoveLeft()))->Showed() < 0)
+		Resources::FogLeft()->Draw(c->Image()->X(), c->Image()->Y());
+	// Corner borders
+	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveLeft()->MoveUp()))->Showed() < 0)
+		Resources::FogTopLeft()->Draw(c->Image()->X(), c->Image()->Y());
+	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveRight()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveRight()->MoveUp()))->Showed() < 0)
+		Resources::FogTopRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogTopRight()->GetWidth(), c->Image()->Y());
+	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveLeft()->MoveDown()))->Showed() < 0)
+		Resources::FogBottomLeft()->Draw(c->Image()->X(),
+		                                 c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomLeft()->GetHeight());
+	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveRight()))->Showed() >= 0
+	   && (dynamic_cast<ECase*>(c->MoveRight()->MoveDown()))->Showed() < 0)
+		Resources::FogBottomRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogBottomRight()->GetWidth(),
+		                                  c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomRight()->GetHeight());
+}
+
+
 void TMap::Draw(int _x, int _y)
 {
 	if(!map) return;
@@ -278,6 +315,9 @@ void TMap::Draw(int _x, int _y)
 			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
+
+			DrawFog(c);
+
 			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
 				c->SetMustRedraw(false);
 		}

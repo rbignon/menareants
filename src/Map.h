@@ -126,8 +126,7 @@ public:
 		: Tag(0), image(0), attaq(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
 	{}
 
-	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type _type, uint _Step, uint _nb = 0,
-	         uint _visibility = 3);
+	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
 	virtual ~ECEntity();
 

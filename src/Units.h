@@ -90,11 +90,11 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 /* Constructeur/Destructeur */
 public:
 
-	MISSILAUNCHER_EMPTY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP),
-	               missile(this, MISSILAUNCHER_MISSILE_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECMissiLauncher)
+		: ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(this, MISSILAUNCHER_MISSILE_STEP)
+	{}
 
-	MISSILAUNCHER_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP),
-	       missile(this, MISSILAUNCHER_MISSILE_STEP)
+	ENTITY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(this, MISSILAUNCHER_MISSILE_STEP)
 	{
 		PutImage(I_Up, Resources::MissiLauncher_Dos());
 		PutImage(I_Down, Resources::MissiLauncher_Face());
@@ -142,9 +142,9 @@ class ECBoat : public ECUnit, public ECBBoat
 /* Constructeur/Destructeur */
 public:
 
-	BOAT_EMPTY_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBoat) {}
 
-	BOAT_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Boat_Dos());
 		PutImage(I_Down, Resources::Boat_Face());
@@ -171,9 +171,9 @@ class EChar : public ECUnit, public ECBChar
 /* Constructeur/Destructeur */
 public:
 
-	CHAR_EMPTY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(EChar) {}
 
-	CHAR_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Char_Dos());
 		PutImage(I_Down, Resources::Char_Face());
@@ -199,9 +199,9 @@ class ECEnginer : public ECUnit, public ECBEnginer
 /* Constructeur/Destructeur */
 public:
 
-  ENGINER_EMPTY_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECEnginer) {}
 
-	ENGINER_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Enginer_Dos());
 		PutImage(I_Down, Resources::Enginer_Face());
@@ -227,9 +227,9 @@ class ECArmy : public ECUnit, public ECBArmy
 /* Constructeur/Destructeur */
 public:
 
-  ARMY_EMPTY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECArmy) {}
 
-	ARMY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Army_Dos());
 		PutImage(I_Down, Resources::Army_Face());

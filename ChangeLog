@@ -1,4 +1,11 @@
+2006-07-12  Laurent Defert <lodesi2@yahoo.fr>
+
+	* src/ShowMap.cpp, src/Resources.h: Bords au brouillard de guerre.
+
 2006-07-12  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h, lib/Units.h, lib/Batiments.h, server/Units.h, server/Batiments.h, src/Units.h, src/Batiments.h:
+	restructuration.
 
 	* src/data/anims/brouillard, src/Units.cpp, src/Map.h:
 	- Support des animations lors des attaques.

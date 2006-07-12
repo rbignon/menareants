@@ -150,6 +150,10 @@ protected:
 #define ARM_HIDE        0x0100 /* cache les infos aux users non concernés */
 #define ARM_RECURSE     0x0200 /* ne JAMAIS appeler */
 #define ARM_NOCONCERNED 0x0400 /* ne pas envoyer aux users concernés */
+
+#define ENTITY_EMPTY_CONSTRUCTOR(x)  x()
+#define ENTITY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case) \
+                                     :  ECBEntity(_name, _owner, _case)
 class ECBEntity
 {
 /* Constructor/Destructor */
@@ -172,21 +176,32 @@ public:
 		E_END
 	};
 
-	ECBEntity(e_type t = E_NONE, uint _cost = 0)
-		: owner(0), acase(0), type(t), nb(0), lock(false), deployed(false), cost(_cost), event_type(0), visibility(3),
+	ECBEntity()
+		: owner(0), acase(0), nb(0), lock(false), deployed(false), myStep(0), restStep(0), event_type(0),
 		  parent(0), map(0)
 	{}
 
-	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, e_type type, uint Step, uint cost, uint nb = 0,
-	          uint visibility = 3);
+	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
 	virtual ~ECBEntity() {}
 
 /* Constantes */
 public:
 
+	/** This is the type of entity */
+	virtual e_type Type() const = 0;
+
+	/** This is the price of this entity */
+	virtual uint Cost() const = 0;
+
 	/** Use this function to know how people there are when you create this entity */
 	virtual uint InitNb() const = 0;
+
+	/** This is the visibility of this entity (rayon) */
+	virtual uint Visibility() const { return 3; }
+
+	/** Initial step */
+	virtual uint Step() const { return 0; }
 
 	virtual bool IsCountryMaker() const { return false; }    /**< Is it an entity who sets the country's owner ? */
 	virtual bool IsBuilding() const { return false; }
@@ -257,7 +272,7 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
-	virtual void Init() { return; }
+	virtual void Init();
 
 	/** Does this entity like an other entity ? */
 	bool Like(const ECBEntity* e) const;
@@ -289,9 +304,6 @@ public:
 	void AddEvent(uint _e) { event_type |= _e; }
 	void DelEvent(uint _e) { event_type &= ~(_e); }
 
-	/** This is the type of entity */
-	e_type Type() const { return type; }
-
 	/** Return the number of soldats in the army */
 	uint Nb() const { return nb; }
 	virtual uint RealNb() const { return Nb(); }
@@ -318,12 +330,6 @@ public:
 	bool Deployed() const { return deployed; }
 	void SetDeployed(bool d = true) { deployed = d; }
 
-	/** This is the price of this entity */
-	uint Cost() const { return cost; }
-
-	/** This is the visibility of this entity (rayon) */
-	uint Visibility() const { return visibility; }
-
 	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel à Shadowed(), qui ne sera utilisé que dans le serveur.
 	 * En effet ce dernier a que des instances de ECEntity qui eux contiennent bien Shadowed().
 	 */
@@ -340,15 +346,12 @@ protected:
 	ECBPlayer* owner;
 	Entity_ID name;
 	ECBCase *acase;
-	e_type type;
 	uint nb;
 	bool lock;
 	bool deployed;
 	uint myStep;
 	uint restStep;
-	uint cost;
 	uint event_type;
-	uint visibility;
 	ECBEntity* parent;
 	ECBMap* map;
 };

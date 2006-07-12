@@ -51,7 +51,8 @@ void EChannel::Print(std::string s, int i)
 template<typename T>
 static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map)
 {
-	T* entity = new T(_name, _owner, _case, _nb);
+	T* entity = new T(_name, _owner, _case);
+	entity->SetNb(_nb);
 	entity->SetMap(map);
 	entity->Init();
 	return entity;
@@ -512,6 +513,7 @@ void MenAreAntsApp::InGame()
 								} while(!eobb && client->IsConnected() && client->Player() &&
 								        client->Player()->Channel()->State() == EChannel::PLAYING);
 								MyFree(HelpForm);
+								InGameForm->Map->SetMustRedraw();
 								break;
 							}
 							case SDLK_ESCAPE:

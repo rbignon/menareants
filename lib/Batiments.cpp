@@ -56,6 +56,7 @@ bool ECBNuclearSearch::CanBeCreated(ECBPlayer* pl) const
 
 void ECBSilo::Init()
 {
+	ECBEntity::Init();
 	if(!Owner()) return;
 
 	std::vector<ECBEntity*> ents = Owner()->Entities()->List();

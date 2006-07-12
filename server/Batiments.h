@@ -33,9 +33,7 @@ class ECNuclearSearch : public ECEntity, public ECBNuclearSearch
 /* Constructeur/Destructeur */
 public:
 
-	NUCLEARSEARCH_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
-
-	NUCLEARSEARCH_CONSTRUCTOR(ECNuclearSearch) {}
+	ENTITY_CONSTRUCTOR(ECNuclearSearch) {}
 
 /* Methodes */
 public:
@@ -60,9 +58,7 @@ class ECSilo : public ECEntity, public ECBSilo
 /* Constructeur/Destructeur */
 public:
 
-	SILO_EMPTY_CONSTRUCTOR(ECSilo) {}
-
-	SILO_CONSTRUCTOR(ECSilo) {}
+	ENTITY_CONSTRUCTOR(ECSilo) {}
 
 	ENTITY_CREATE_LAST(ECSilo);
 
@@ -87,9 +83,7 @@ class ECapitale : public ECEntity, public ECBCapitale
 /* Constructeur/Destructeur */
 public:
 
-	CAPITALE_EMPTY_CONSTRUCTOR(ECapitale) {}
-
-	CAPITALE_CONSTRUCTOR(ECapitale) {}
+	ENTITY_CONSTRUCTOR(ECapitale) {}
 
 /* Methodes */
 public:
@@ -110,9 +104,7 @@ class ECity : public ECEntity, public ECBCity
 /* Constructeur/Destructeur */
 public:
 
-	CITY_EMPTY_CONSTRUCTOR(ECity) {}
-
-	CITY_CONSTRUCTOR(ECity) {}
+	ENTITY_CONSTRUCTOR(ECity) {}
 
 /* Methodes */
 public:
@@ -133,9 +125,7 @@ class ECShipyard : public ECEntity, public ECBShipyard
 /* Constructeur/Destructeur */
 public:
 
-	SHIPYARD_EMPTY_CONSTRUCTOR(ECShipyard) {}
-
-	SHIPYARD_CONSTRUCTOR(ECShipyard) {}
+	ENTITY_CONSTRUCTOR(ECShipyard) {}
 
 /* Methodes */
 public:
@@ -156,9 +146,7 @@ class ECharFact : public ECEntity, public ECBCharFact
 /* Constructeur/Destructeur */
 public:
 
-	CHARFACT_EMPTY_CONSTRUCTOR(ECharFact) {}
-
-	CHARFACT_CONSTRUCTOR(ECharFact) {}
+	ENTITY_CONSTRUCTOR(ECharFact) {}
 
 /* Methodes */
 public:
@@ -179,9 +167,7 @@ class ECaserne : public ECEntity, public ECBCaserne
 /* Constructeur/Destructeur */
 public:
 
-	CASERNE_EMPTY_CONSTRUCTOR(ECaserne) {}
-
-	CASERNE_CONSTRUCTOR(ECaserne) {}
+	ENTITY_CONSTRUCTOR(ECaserne) {}
 
 /* Methodes */
 public:
