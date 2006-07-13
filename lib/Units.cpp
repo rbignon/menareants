@@ -47,7 +47,6 @@ bool ECBContainer::UnContain()
 		return false;
 
 	Containing()->Unlock();
-	Case()->Entities()->Add(Containing());
 	Containing()->SetParent(0);
 	Containing()->SetCase(0);
 	Containing()->ChangeCase(Case());

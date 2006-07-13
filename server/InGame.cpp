@@ -236,6 +236,7 @@ template<typename T>
 static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
 {
 	T* entity = new T(_name, _owner, _case);
+	entity->SetNb(entity->InitNb());
 	entity->Init();
 	return entity;
 }

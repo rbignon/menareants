@@ -1,3 +1,8 @@
+2006-07-13  Romain Bignon <progs@headfucking.net>
+
+	* lib/Units.cpp (UnContain): Correction d'un bug très vicieux qui a nécessité du temps de recherche et qui pouvait causer
+	une crash (juste parce qu'on a ajouté deux fois l'unité dans la liste d'une ville).
+
 2006-07-12  Laurent Defert <lodesi2@yahoo.fr>
 
 	* src/ShowMap.cpp, src/Resources.h: Bords au brouillard de guerre.
