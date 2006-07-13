@@ -92,6 +92,7 @@ public:
 	TButtonText*    DeployButton;
 	TButtonText*    AttaqButton;
 	TButtonText*    UpButton;
+	TButtonText*    UpgradeButton;
 	TBarreActIcons* Icons;
 
 	TImage*         ChildIcon;

@@ -130,6 +130,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					type = StrToTyp<uint>(parv[i].substr(1));
 				break;
 			}
+			case '°':
+				flags |= ARM_UPGRADE;
+				break;
 			case '.':
 				flags |= ARM_LOCK;
 				break;
@@ -280,11 +283,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			(*it)->SetNb(nb);
 		}
-		if(flags & ARM_DEPLOY)
-		{
-			(*it)->SetWantDeploy(chan->State() == EChannel::PLAYING && (*it)->Deployed() != deployed);
+		if(flags & ARM_DEPLOY && chan->State() == EChannel::ANIMING)
 			(*it)->SetDeployed(deployed);
-		}
 		if(flags & ARM_ATTAQ)
 			(*it)->SetAttaquedCase(dynamic_cast<ECase*>((*map)(x,y)));
 		if(flags & ARM_UNCONTENER && dynamic_cast<EContainer*>((*it)->Parent()) && chan->State() == EChannel::ANIMING)
@@ -337,23 +337,19 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	/* PLAYING */
 	else if(chan->State() == EChannel::PLAYING)
 	{
-		if(flags == ARM_MOVE || flags == ARM_ATTAQ || flags == ARM_PREUNION)
+		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		{
-			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-			{
-				(*it)->SetEvent(flags);
-				if(flags == ARM_PREUNION)
-					(*it)->Lock();
-			}
-		}
-
-		if(flags == ARM_RETURN)
-		{
-			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			if(flags == ARM_RETURN)
 			{
 				(*it)->Move()->Return((*map)(x,y));
 				if((*it)->Move()->FirstCase())
-					(*it)->SetEvent(0);
+					(*it)->DelEvent(ARM_ATTAQ|ARM_MOVE);
+			}
+			else
+			{
+				(*it)->AddEvent(flags);
+				if(flags & ARM_LOCK)
+					(*it)->Lock();
 			}
 		}
 		if(flags == ARM_CREATE && InGameForm && !entities.empty())
@@ -616,13 +612,30 @@ void MenAreAntsApp::InGame()
 							break;
 						}
 
-						if(InGameForm->BarreAct->Entity() &&
-						   InGameForm->BarreAct->DeployButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreAct->Entity())
 						{
-							client->sendrpl(client->rpl(EC_Client::ARM),
-							                 std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
-							                 " #").c_str());
-							break;
+							if(InGameForm->IsPressed(SDLK_PLUS) ||
+							   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y))
+							{
+								client->sendrpl(client->rpl(EC_Client::ARM),
+								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
+								                " +").c_str());
+								break;
+							}
+							if(InGameForm->BarreAct->DeployButton->Test(event.button.x, event.button.y))
+							{
+								client->sendrpl(client->rpl(EC_Client::ARM),
+								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
+								                " #").c_str());
+								break;
+							}
+							if(InGameForm->BarreAct->UpgradeButton->Test(event.button.x, event.button.y))
+							{
+								client->sendrpl(client->rpl(EC_Client::ARM),
+								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
+								                " °").c_str());
+								break;
+							}
 						}
 
 						if(InGameForm->BarreLat->Test(event.button.x, event.button.y) ||
@@ -1004,8 +1017,12 @@ void TBarreAct::vSetEntity(void* _e)
 		       : "???");
 		InGameForm->BarreAct->SpecialInfo->SetCaption(e->SpecialInfo());
 
-		if(e->Deployed())
-			InGameForm->BarreAct->Infos->SetCaption((e->IWantDeploy() ? "Va se déployer" : "Déployé"));
+		if(e->Deployed()) // Il est déjà deployé, donc si y a un evenement pour se déployer c'est qu'il va se replier
+			InGameForm->BarreAct->Infos->SetCaption((e->EventType() & ARM_DEPLOY) ? "Va se replier" : "Déployé");
+		else if(e->EventType() & ARM_DEPLOY) // Donc il n'est pas actuellement déployé
+			InGameForm->BarreAct->Infos->SetCaption("Va se déployer");
+		else if(e->EventType() & ARM_UPGRADE)
+			InGameForm->BarreAct->Infos->SetCaption("Va upgrader");
 		else if(e->Locked())
 			InGameForm->BarreAct->Infos->SetCaption("Vérouillée");
 		else
@@ -1024,15 +1041,29 @@ void TBarreAct::vSetEntity(void* _e)
 			{
 				InGameForm->BarreAct->UpButton->Show();
 				InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
-				InGameForm->BarreAct->UpButton->SetHint(std::string("Coût: " + TypToStr(e->Cost()) + " $").c_str());
+				InGameForm->BarreAct->UpButton->SetHint("Coût: " + TypToStr(e->Cost()) + " $");
 				InGameForm->BarreAct->UpButton->SetEnabled(
-						(e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()) ? true : false);
+				                            (e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()));
 				InGameForm->BarreAct->UpButton->SetX((x -= InGameForm->BarreAct->UpButton->Width()));
 			}
 			else
 				InGameForm->BarreAct->UpButton->Hide();
+
+			if(e->MyUpgrade() > 0)
+			{
+				ECEntity* upgrade = EntityList.Get(e->MyUpgrade());
+				InGameForm->BarreAct->UpgradeButton->Show();
+				InGameForm->BarreAct->UpgradeButton->SetHint(std::string(upgrade->Name()) + "\n" +
+				                                             "Coût: " + TypToStr(upgrade->Cost()) + " $");
+				InGameForm->BarreAct->UpgradeButton->SetEnabled((int(e->Cost()) <= e->Owner()->Money()));
+				InGameForm->BarreAct->UpgradeButton->SetX((x-=InGameForm->BarreAct->UpgradeButton->Width()));
+			}
+			else
+				InGameForm->BarreAct->UpgradeButton->Hide();
+
 			InGameForm->BarreAct->DeployButton->SetVisible(e->WantDeploy());
 			InGameForm->BarreAct->AttaqButton->SetVisible(e->WantAttaq(0,0));
+
 			if(e->WantAttaq(0,0)) InGameForm->BarreAct->AttaqButton->SetX((x -= InGameForm->BarreAct->AttaqButton->Width()));
 			if(e->WantDeploy()) InGameForm->BarreAct->DeployButton->SetX((x -= InGameForm->BarreAct->DeployButton->Width()));
 		}
@@ -1042,6 +1073,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->DeployButton->Hide();
 			InGameForm->BarreAct->AttaqButton->Hide();
 			InGameForm->BarreAct->UpButton->Hide();
+			InGameForm->BarreAct->UpgradeButton->Hide();
 		}
 
 		EContainer* container = dynamic_cast<EContainer*>(e);
@@ -1131,6 +1163,9 @@ void TBarreAct::Init()
 	ExtractButton = AddComponent(new TButtonText(500,5,100,30, "Extraire", Font::GetInstance(Font::Small)));
 	ExtractButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	ExtractButton->SetHint("Cliquez ensuite sur la case où vous voulez que l'unité contenue aille.\n$ Espace + clic");
+	UpgradeButton = AddComponent(new TButtonText(500,5,100,30, "Upgrade", Font::GetInstance(Font::Small)));
+	UpgradeButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	UpgradeButton->SetHint("Utiliser l'amélioration de ce batiment.");
 
 	Owner = AddComponent(new TLabel(60,30, "", black_color, Font::GetInstance(Font::Normal)));
 

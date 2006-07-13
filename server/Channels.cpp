@@ -1059,6 +1059,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += " (";
 	if(flag & ARM_DATA)
 		to_send += " ~" + TypToStr(data.type) + "," + data.data;
+	if(flag & ARM_UPGRADE)
+		to_send += " °";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
 	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)

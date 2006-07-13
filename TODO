@@ -4,7 +4,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 * En cours
 -villes sur 4 cases, intégration de l'usine d'armement et de la caserne dedans, suppression de ces derniers batiments
--systèmes d'upgrades, notament pour permettre à la caserne et à l'usine d'armement de construire de plus en plus d'unités.
 
 * Urgent
 -gestion des nations (juste le système, pas encore les unités).
@@ -12,6 +11,8 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
 
 * Après
+-utiliser le système d'upgrades, notament pour permettre à la caserne et à l'usine d'armement de construire de plus en plus
+ d'unités.
 -client: gestion des accents dans TEdit
 -configuration des boutons de la souris
 

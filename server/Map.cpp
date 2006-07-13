@@ -136,37 +136,36 @@ bool ECEvent::RemoveLinked(ECEvent* p, bool use_delete)
 
 bool ECEvent::operator<(const ECEvent& e) const
 {
-	const char CREATE = 12;
-	const char REPLOY = 10;
-	const char CONTAIN= 9;
-	const char MOVE   = 8;
-	const char UNCONTAIN= 7;
-	const char UNION  = 5;
-	const char DEPLOY = 3;
-	const char ATTAQ  = 1;
-	char me = 0, him = 0;
-	switch(flags)
-	{
-		case ARM_CREATE: me = CREATE; break;
-		case ARM_UNION: me = UNION; break;
-		case ARM_DEPLOY: me = Entity()->Deployed() ? DEPLOY : REPLOY; break;
-		case ARM_CONTAIN: me = CONTAIN;
-		case ARM_UNCONTAIN: me = UNCONTAIN;
-		case ARM_ATTAQ: me = ATTAQ; break;
-		case ARM_MOVE: me = MOVE; break;
-		default: me = 0; break;
-	}
-	switch(e.Flags())
-	{
-		case ARM_CREATE: him = CREATE; break;
-		case ARM_UNION: him = UNION; break;
-		case ARM_ATTAQ: him = ATTAQ; break;
-		case ARM_DEPLOY: him = e.Entity()->Deployed() ? DEPLOY : REPLOY; break;
-		case ARM_CONTAIN: him = CONTAIN;
-		case ARM_UNCONTAIN: him = UNCONTAIN;
-		case ARM_MOVE: him = MOVE; break;
-		default: him = 0; break;
-	}
+#define EV_BEGIN int i = sizeof(char); char me = 0, him = 0
+#define EV(x) do {\
+                     char x = i--; \
+                     if(flags & ARM_##x) me = x; \
+                     if(e.Flags() & ARM_##x) him = x; \
+              } while(0)
+#define EV_IF(x, y, z, a) do {\
+                                char x = i--; \
+                                if(flags & y && (z)) me = x; \
+                                if(e.Flags() & y && (a)) him = x; \
+                          } while(0)
+#define EV_END return (me < him)
+
+/* Mettre les evenements dans l'ORDRE DANS LEQUEL ON SOUHAITE QU'ILS SOIENT EXECUTÉS PENDANT LES ANIMATIONS */
+	EV_BEGIN;
+
+	EV(CREATE);
+	EV_IF(REPLOY, ARM_DEPLOY, !Entity()->Deployed(), !e.Entity()->Deployed());
+	EV(CONTAIN);
+	EV(MOVE);
+	EV(UNCONTAIN);
+	EV(UNION);
+	EV_IF(DEPLOY, ARM_DEPLOY, Entity()->Deployed(), e.Entity()->Deployed());
+	EV(DEPLOY);
+	EV(ATTAQ);
+	EV(UPGRADE);
+
+	EV_END;
+
+#if 0
 	if(me == CONTAIN && him == MOVE && Entity()->Parent() && Entity()->Parent() == dynamic_cast<EContainer*>(e.Entity()))
 	{
 		if(dynamic_cast<EContainer*>(e.Entity())->Containing())
@@ -195,8 +194,7 @@ bool ECEvent::operator<(const ECEvent& e) const
 		else
 			return true;
 	}
-	
-	return (me < him);
+#endif
 }
 
 bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)

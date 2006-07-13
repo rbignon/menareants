@@ -123,7 +123,7 @@ class ECEntity : public virtual ECBEntity
 public:
 
 	ECEntity()
-		: Tag(0), image(0), attaq(0), selected(false), move(this), want_deploy(false), attaqued_case(0)
+		: Tag(0), image(0), attaq(0), selected(false), move(this), attaqued_case(0)
 	{}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
@@ -183,9 +183,6 @@ public:
 
 	ECMove* Move() { return &move; }
 
-	bool IWantDeploy() const { return want_deploy; }
-	void SetWantDeploy(bool b = true) { want_deploy = b; }
-
 	ECase* AttaquedCase() const { return attaqued_case; }
 	void SetAttaquedCase(ECase* c);
 
@@ -201,7 +198,6 @@ private:
 protected:
 	bool selected;
 	ECMove move;
-	bool want_deploy;
 	ECase* attaqued_case;
 };
 
@@ -389,6 +385,8 @@ public:
 /* Attributs */
 public:
 	std::vector<ECEntity*> List() const { return entities; }
+
+	ECEntity* Get(ECEntity::e_type i) const { return entities[i-1]; }
 
 	template<typename T>
 	std::vector<ECEntity*> CanCreatedBy(T c, ECBPlayer* pl) const

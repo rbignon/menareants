@@ -167,7 +167,7 @@ void ECMove::SetMoves(Vector _moves)
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 		: ECBEntity(_name, _owner, _case), Tag(0), image(0), attaq(0), selected(false),
-		  move(this), want_deploy(false), attaqued_case(0)
+		  move(this), attaqued_case(0)
 {
 
 }
@@ -206,7 +206,6 @@ void ECEntity::Played()
 {
 	ECBEntity::Played();
 	SetAttaquedCase(0);
-	want_deploy = false;
 	Move()->Clear(Case());
 }
 

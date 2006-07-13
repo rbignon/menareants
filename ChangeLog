@@ -1,5 +1,7 @@
 2006-07-13  Romain Bignon <progs@headfucking.net>
 
+	* lib/Map.h, server/InGame.cpp, src/InGame.cpp: Système d'upgrade programmé, fonctionnel et disponible pour plus tard.
+
 	* lib/Units.cpp (UnContain): Correction d'un bug très vicieux qui a nécessité du temps de recherche et qui pouvait causer
 	une crash (juste parce qu'on a ajouté deux fois l'unité dans la liste d'une ville).
 

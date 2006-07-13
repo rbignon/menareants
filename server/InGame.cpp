@@ -227,6 +227,31 @@ void EChannel::NextAnim()
 				(*it)->Case()->CheckChangingOwner(*it);
 			break;
 		}
+		case ARM_UPGRADE:
+		{
+			if(event->Entities()->empty())
+			{
+				Debug(W_WARNING, "Personne dans l'evenement");
+				break;
+			}
+			ECEntity* entity = event->Entities()->First();
+			if(entity->Shadowed())
+				break; // Cette unité s'est peut etre fait battre dans un combat d'une animation précédente
+
+			SendArm(NULL, entity, ARM_REMOVE|ARM_UPGRADE);
+
+			ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
+
+			/* On attribut un nombre dans l'upgrade proportionnel au nombre dans l'entité détruite par rapport au nombre
+			 * initial. */
+			upgrade->SetNb(upgrade->InitNb() * entity->Nb() / entity->InitNb());
+
+			Map()->RemoveAnEntity(entity);
+			Map()->AddAnEntity(upgrade);
+
+			SendArm(NULL, upgrade, ARM_CREATE|ARM_HIDE, upgrade->Case()->X(), upgrade->Case()->Y());
+			break;
+		}
 		default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
 	}
 	dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
@@ -386,6 +411,12 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			}
+			case '°':
+			{
+				if(entity && entity->MyUpgrade() > 0)
+					flags |= ARM_UPGRADE;
+				break;
+			}
 			case '/':
 			default: Debug(W_DESYNCH, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -455,6 +486,29 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			else
 				flags = 0;
+		}
+		if(flags & ARM_UPGRADE)
+		{
+			/*****************************
+			 *    GESTION DES UPGRADES   *
+			 *****************************/
+			ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
+			if(int(upgrade->Cost()) > cl->Player()->Money())
+				flags = 0;
+			else
+			{
+				cl->Player()->Stats()->created += upgrade->InitNb();
+				cl->Player()->DownMoney(upgrade->Cost());
+				Debug(W_DEBUG, "Création d'un evenement d'UPGRADE");
+				ECEvent* event = new ECEvent(ARM_UPGRADE, entity->Case());
+				event->Entities()->Add(entity);
+				entity->Lock();
+				map->AddEvent(event);
+				flags |= ARM_LOCK;
+			}
+			/* On supprime l'entité qui a été générée pour vérifier le prix.
+			 * On la recréera lors de l'animation si elle est bien construite */
+			MyFree(upgrade);
 		}
 		if(flags & ARM_DEPLOY)
 		{

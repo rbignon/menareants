@@ -92,6 +92,7 @@ Sommaire:
          &           :la ligne n'est pas l'action principale (bien qu'elle soit la première envoyée)
          ~<type>,    :envoie une donnée particulière à l'entité, et qui doit donc etre interprétée par elle (fonction RecvData).
           <data>
+         °           :upgrade
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
@@ -105,6 +106,7 @@ Sommaire:
          !           :lors d'une attaque, force la case
          )<entité>   :s'envoyer dans une unité conteneur (voir 8. Entités Conteneurs)
          (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
+         °           :upgrader
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.

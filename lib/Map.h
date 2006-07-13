@@ -141,6 +141,7 @@ protected:
 #define ARM_UNCONTENER  0x4000
 #define ARM_NOPRINCIPAL 0x8000
 #define ARM_DATA        0x10000
+#define ARM_UPGRADE     0x20000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -238,6 +239,9 @@ public:
 
 	/** Use this function when this entity wants to move somewhere */
 	virtual bool WantMove(ECBMove::E_Move, bool force = false) { return true; }
+
+	/** This is my upgrade (with ARM_UPGRADE/°) */
+	virtual e_type MyUpgrade() const { return E_NONE; }
 
 	/** Use this function to deploy your entity */
 	virtual bool WantDeploy() { return false; }

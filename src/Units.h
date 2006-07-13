@@ -114,7 +114,7 @@ public:
 	virtual const char* Infos() const
 		{ return "Véhicule lanceur de missiles à portée de 8 cases une fois déployé."; }
 	virtual ECImage* Icon() const { return Resources::MissiLauncher_Icon(); }
-	virtual bool WantAttaq(uint, uint, bool) { return Deployed() && !IWantDeploy(); }
+	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
 
 	//virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
