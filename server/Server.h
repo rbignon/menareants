@@ -43,9 +43,9 @@ class TClient
 /* Constructeur/Destructeur */
 public:
     TClient(int _fd, const char* _ip)
-        : lastread(0), fd(_fd), flag(0), ip(_ip), pl(0)
+        : nick("~"), lastread(0), fd(_fd), flag(0), ip(_ip), pl(0)
     {}
-    
+
     virtual ~TClient() {}
 
 /* Méthodes */

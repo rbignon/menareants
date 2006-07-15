@@ -136,16 +136,16 @@ bool ECEvent::RemoveLinked(ECEvent* p, bool use_delete)
 
 bool ECEvent::operator<(const ECEvent& e) const
 {
-#define EV_BEGIN int i = sizeof(char); char me = 0, him = 0
+#define EV_BEGIN char i = 0; char me = 0, him = 0
 #define EV(x) do {\
-                     char x = i--; \
-                     if(flags & ARM_##x) me = x; \
-                     if(e.Flags() & ARM_##x) him = x; \
+                     char x = --i; \
+                     if(flags == ARM_##x) me = x; \
+                     if(e.Flags() == ARM_##x) him = x; \
               } while(0)
 #define EV_IF(x, y, z, a) do {\
-                                char x = i--; \
-                                if(flags & y && (z)) me = x; \
-                                if(e.Flags() & y && (a)) him = x; \
+                                char x = --i; \
+                                if(flags == y && (z)) me = x; \
+                                if(e.Flags() == y && (a)) him = x; \
                           } while(0)
 #define EV_END return (me < him)
 

@@ -63,6 +63,7 @@ public:
 		SET,          /**< SET */
 		PLIST,        /**< PLS */
 		LEAVE,        /**< LEA */
+		KICK,         /**< KICK */
 		GLIST,        /**< LSP */
 		EOGLIST,      /**< EOL */
 		MSG,          /**< MSG */

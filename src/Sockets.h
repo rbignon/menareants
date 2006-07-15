@@ -71,6 +71,7 @@ public:
 		JOIN,        /**< JOI */
 		CREATE,      /**< JOI $ */
 		LEAVE,       /**< LEA */
+		KICK,        /**< KICK */
 		MSG,         /**< MSG */
 		AMSG,        /**< AMSG */
 		SET,         /**< SET */

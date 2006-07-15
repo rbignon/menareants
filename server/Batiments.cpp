@@ -66,7 +66,7 @@ bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	/* On ne tire que dans un rayon de SILO_PORTY (10?) cases. */
-	if(d > SILO_PORTY)
+	if(d > Porty())
 		return false;
 
 	if(!force)

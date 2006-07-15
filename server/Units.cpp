@@ -88,7 +88,7 @@ bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 	else
 		return false;
 
-	if(!entity->WantMove(move, true))
+	if(!entity->WantMove(move, MOVE_FORCE))
 		return false;
 
 	entity->CreateLast();
@@ -132,7 +132,7 @@ bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 	ECBEntity* entity = Containing();
 	UnContain();
 
-	if(!entity->WantMove(move, true))
+	if(!entity->WantMove(move, MOVE_FORCE))
 		throw ECExcept(VIName(move) VIName(x) VIName(y) VIName(Case()->X()) VIName(Case()->Y()), "Gros problème là");
 
 	moves.push_back(move);
@@ -215,42 +215,14 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 	if(Case()->X() == mx && Case()->Y() == my)
 		return false;
 
-#if 0 // Ancienne méthode de détection de la portée
-	uint dx = 0, dy = 0;
-	for(uint x=Case()->X(); x != mx; dx++) x < mx ? ++x : --x;
-	for(uint y=Case()->Y(); y != my; dy++) y < my ? ++y : --y;
-
-	/* On ne tire que dans un rayon de quatre cases. */
-	if(dx > MISSILAUNCHER_PORTY || dy > MISSILAUNCHER_PORTY)
-		return false;
-#else
 	uint d = 0;
 	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
 	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	/* On ne tire que dans un rayon de quatre cases. */
-	if(d > MISSILAUNCHER_PORTY)
-		return false;
-#endif
-
-#if 0 /* Ce détail est géré dans ARMCommand::Exec(), et permet, en cas d'attaque maintenue, d'attaquer tout de
-         meme une case sans qu'il y ait d'unité */
-
-	ECBCase* c = (*Case()->Map())(mx, my);
-
-	/* Si il n'y a personne à attaquer on n'attaque pas */
-	if(c->Entities()->empty())
+	if(d > Porty())
 		return false;
 
-	std::vector<ECBEntity*> ents = c->Entities()->List();
-	std::vector<ECBEntity*>::iterator enti;
-	for(enti = ents.begin(); enti != ents.end() &&
-		((*enti)->Locked() || !CanAttaq(*enti) || Like(*enti));
-		++enti);
-
-	if(enti == ents.end())
-		return false;
-#endif
 	return true;
 }
 
@@ -341,11 +313,11 @@ bool ECUnit::WantAttaq(uint mx, uint my, bool force)
 	return true;
 }
 
-bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
+bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!restStep || Deployed()) return false;
+	if(!restStep && !(flags & MOVE_SIMULE) || Deployed()) return false;
 
 	ECBCase *c = 0;
 
@@ -358,14 +330,17 @@ bool ECUnit::WantMove(ECBMove::E_Move move, bool force)
 	}
 	if(!c || c == Case() || last && last->Case() == c) return false;
 
-	if(!force && !(c->Flags() & case_flags)) return false;
+	if(!(flags & MOVE_FORCE) && !(c->Flags() & case_flags)) return false;
+
+	if(flags & MOVE_SIMULE)
+		return true;
 
 	restStep--;
 
 	/* Si sur la case actuelle il y a une attaque, on ne bouge pas meme si on dit
 	 * que si au client.
 	 */
-	if(!force)
+	if(!(flags & MOVE_FORCE))
 	{
 		std::vector<ECBEntity*> ents = Case()->Entities()->List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)

@@ -114,7 +114,6 @@ protected:
 /********************************************************************************************
  *                               ECBMissiLauncher                                           *
  ********************************************************************************************/
-#define MISSILAUNCHER_PORTY                 8
 /** This is a simple army */
 class ECBMissiLauncher : public virtual ECBEntity
 {
@@ -132,6 +131,7 @@ public:
 	virtual uint Cost() const { return 6000; }
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 1; }
+	virtual uint Porty() const { return 8; }
 
 	bool CanAttaq(const ECBEntity* e)
 	{

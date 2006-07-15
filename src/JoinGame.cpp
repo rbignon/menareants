@@ -19,6 +19,7 @@
  * $Id$
  */
 
+#include <math.h>
 #include "Config.h"
 #include "Debug.h"
 #include "InGame.h"
@@ -47,6 +48,22 @@ TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
+
+/** Someone wants to kick me
+ *
+ * Syntax: nick KICK victime [reason]
+ */
+int KICKCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(parv[1] != me->GetNick())
+		return 0; // On s'en fou
+
+	if(GameInfosForm)
+		GameInfosForm->Kicked = "Vous avez été éjecté de la partie par " + parv[0] + "\n\n" +
+		                         ((parv.size() > 2) ? ("Raison: " + parv[2]) : "Aucune raison n'a été spécifiée");
+
+	return 0;
+}
 
 /** We receive a map !
  *
@@ -350,11 +367,22 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
-				 		for(;InGameForm->BarreLat->X() > (int)SCREEN_WIDTH - int(InGameForm->BarreLat->Width());SDL_Delay(10))
-				 		{
-				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y());
-				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
-				 		}
+						// Move the lateral bar
+						int t0 = InGameForm->GetTimer()->get_time();
+						const int time_to_show = 600; // in ms
+						while(InGameForm->GetTimer()->get_time() < t0 + time_to_show)
+						{
+							int dt = InGameForm->GetTimer()->get_time() - t0;
+							int x = (int)SCREEN_WIDTH - int(float(InGameForm->BarreLat->Width()) * sin((float)dt / (float)time_to_show * M_PI_2));
+
+							InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+				 			InGameForm->BarreLat->SetXY(x, InGameForm->BarreLat->Y());
+							SDL_Delay(10);
+						}
+			 			InGameForm->BarreLat->SetXY((int)SCREEN_WIDTH - InGameForm->BarreLat->Width(),
+			 			                            InGameForm->BarreLat->Y());
+			 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+
 				 		InGameForm->Map->SetEnabled(true);
 				 		InGameForm->ShowBarreLat(true);
 				 	}
@@ -370,11 +398,21 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
-				 		for(;InGameForm->BarreLat->X() < (int)SCREEN_WIDTH; SDL_Delay(10))
-				 		{
-				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y());
-				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
-				 		}
+
+						// Move the lateral bar
+						int t0 = InGameForm->GetTimer()->get_time();
+						const int time_to_hide = 600; // in ms
+						while(InGameForm->GetTimer()->get_time() < t0 + time_to_hide)
+						{
+							int dt = InGameForm->GetTimer()->get_time() - t0;
+							int x = (int)SCREEN_WIDTH - int(float(InGameForm->BarreLat->Width()) * sin((float)(time_to_hide - dt) / (float)time_to_hide * M_PI_2));
+
+							InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+				 			InGameForm->BarreLat->SetXY(x, InGameForm->BarreLat->Y());
+							SDL_Delay(10);
+						}
+			 			InGameForm->BarreLat->SetXY(SCREEN_WIDTH, InGameForm->BarreLat->Y());
+			 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
 				 		InGameForm->BarreLat->Hide();
 				 		InGameForm->BarreLat->ProgressBar->SetValue(0);
 				 	}
@@ -792,6 +830,8 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->position->SetEnabled(false);
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
+				if(me->Player()->IsOwner())
+					pline->Nick->SetHint("Cliquez sur le pseudo pour éjecter " + std::string(pl->GetNick()));
 			}
 		}
 	}
@@ -849,6 +889,8 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->position->SetEnabled(false);
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
+				if(me->Player()->IsOwner())
+					pline->Nick->SetHint("Cliquez sur le pseudo pour éjecter " + std::string(pl->GetNick()));
 			}
 			me->UnlockScreen();
 		}
@@ -1074,15 +1116,30 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 								for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 								{
 									TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
-									if(pll && pll->OwnZone(event.button.x, event.button.y) && !pll->Player()->IsMe() &&
-									   !pll->Player()->IsOwner())
+									if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
 									{
-										if(pll->Player()->IsOp())
-											client->sendrpl(client->rpl(EC_Client::SET),
-														("-o " + std::string(pll->Player()->GetNick())).c_str());
-										else
-											client->sendrpl(client->rpl(EC_Client::SET),
-														("+o " + std::string(pll->Player()->GetNick())).c_str());
+										if(pll->OwnZone(event.button.x, event.button.y))
+										{
+											if(pll->Player()->IsOp())
+												client->sendrpl(client->rpl(EC_Client::SET),
+															("-o " + std::string(pll->Player()->GetNick())).c_str());
+											else
+												client->sendrpl(client->rpl(EC_Client::SET),
+															("+o " + std::string(pll->Player()->GetNick())).c_str());
+										}
+										else if(pll->Nick->Test(event.button.x, event.button.y))
+										{
+											TMessageBox mb(("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
+											               "Veuillez entrer la raison :").c_str(),
+											               HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
+											std::string name;
+											if(mb.Show() == BT_OK)
+											{
+												name = mb.EditText();
+												client->sendrpl(client->rpl(EC_Client::KICK), pll->Nick->Caption().c_str(),
+												                                              FormatStr(name).c_str());
+											}
+										}
 									}
 								}
 							}
@@ -1149,6 +1206,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 			MyFree(GameInfosForm);
 		throw;
 	}
+	if(GameInfosForm && !GameInfosForm->Kicked.empty())
+		TMessageBox(GameInfosForm->Kicked.c_str(), BT_OK, GameInfosForm).Show();
+
 	if(!client || !client->Player())
 		MyFree(GameInfosForm);
 	else
@@ -1372,24 +1432,32 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 	position = 0;
 	couleur = 0;
 	nation = 0;
+	Ready = 0;
+	Nick = 0;
+	Status = 0;
 }
 
 TPlayerLine::~TPlayerLine()
 {
-	if(nation) delete nation;
-	if(couleur) delete couleur;
-	if(position) delete position;
+	delete nation;
+	delete couleur;
+	delete position;
+	delete Ready;
+	delete Nick;
+	delete Status;
 }
 
 void TPlayerLine::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
-	if(position)
-		position->SetXY(px+210, py);
-	if(couleur)
-		couleur->SetXY(px+320, py);
-	if(nation)
-		nation->SetXY(px+430, py);
+
+	if(position) position->SetXY(px+210, py);
+	if(couleur) couleur->SetXY(px+320, py);
+	if(nation) nation->SetXY(px+430, py);
+
+	if(Ready) Ready->SetXY(px, py);
+	if(Status) Status->SetXY(px+45, py);
+	if(Nick) Nick->SetXY(px+70, py);
 }
 
 bool TPlayerLine::OwnZone(int _x, int _y)
@@ -1420,6 +1488,14 @@ void TPlayerLine::Init()
 	nation = new TComboBox(Font::GetInstance(Font::Small), x+430, y, 120);
 	MyComponent(nation);
 
+	Ready = new TLabel(x, y, "OK", gray_color, Font::GetInstance(Font::Big));
+	Status = new TLabel(x+45, y, pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
+	Nick = new TLabel(x+70, y, pl->GetNick(), white_color, Font::GetInstance(Font::Big));
+
+	MyComponent(Ready);
+	MyComponent(Status);
+	MyComponent(Nick);
+
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 	{
 		uint j = nation->AddItem(false, std::string(nations_str[i].name), "");
@@ -1434,14 +1510,12 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 	if((int)pl->Position() != position->Value()) position->SetValue(pl->Position());
 	if((int)pl->Color() != couleur->Value()) couleur->SetValue(pl->Color());
 	if((int)pl->Nation() != nation->GetSelectedItem()) nation->Select(pl->Nation());
+	Status->SetCaption(pl->IsOp() ? "@" : pl->IsOwner() ? "*" : "");
+	Ready->SetColor(pl->Ready() ? red_color : gray_color);
 
-	Font::GetInstance(Font::Big)->WriteLeft(x, y, "OK", pl->Ready() ? red_color : gray_color);
-	if(pl->IsOwner())
-		Font::GetInstance(Font::Big)->WriteLeft(x+55, y, "*", red_color);
-	else if(pl->IsOp())
-		Font::GetInstance(Font::Big)->WriteLeft(x+45, y, "@", red_color);
-	Font::GetInstance(Font::Big)->WriteLeft(x+70, y, pl->GetNick(), white_color);
-
+	Ready->Draw(souris_x, souris_y);
+	Status->Draw(souris_x, souris_y);
+	Nick->Draw(souris_x, souris_y);
 	position->Draw(souris_x, souris_y);
 	couleur->Draw(souris_x, souris_y);
 	nation->Draw(souris_x, souris_y);
@@ -1452,7 +1526,10 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 		SetHint(couleur->Hint());
 	else if(nation->Test(souris_x, souris_y))
 		SetHint(nation->Hint());
-	else SetHint("");
+	else if(Nick->Test(souris_x, souris_y))
+		SetHint(Nick->Hint());
+	else
+		SetHint("");
 }
 
 /********************************************************************************************

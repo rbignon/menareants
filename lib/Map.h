@@ -192,6 +192,9 @@ public:
 	/** This is the type of entity */
 	virtual e_type Type() const = 0;
 
+	/** Porty of the entity */
+	virtual uint Porty() const { return 0; }
+
 	/** This is the price of this entity */
 	virtual uint Cost() const = 0;
 
@@ -237,8 +240,9 @@ public:
 	/** Use this function when this entity wants to attaq someone */
 	virtual bool WantAttaq(uint x, uint y, bool force = false) { return true; }
 
-	/** Use this function when this entity wants to move somewhere */
-	virtual bool WantMove(ECBMove::E_Move, bool force = false) { return true; }
+	#define MOVE_FORCE 0x001
+	#define MOVE_SIMULE 0x002
+	virtual bool WantMove(ECBMove::E_Move, int flags = 0) { return true; } ///< Does this entity wants to move somewhere ?
 
 	/** This is my upgrade (with ARM_UPGRADE/°) */
 	virtual e_type MyUpgrade() const { return E_NONE; }
@@ -431,6 +435,9 @@ public:
 	virtual bool CanCreate(const ECBEntity*) { return false; }
 
 	void CheckChangingOwner(ECBEntity* e);
+
+	/** Calculate distance */
+	uint Delta(ECBCase* c);
 
 /* Attributs */
 public:

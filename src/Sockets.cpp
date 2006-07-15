@@ -48,6 +48,7 @@ const char* msgTab[] = {
 	"JOI %s",                                 /* JOI - Joindre une partie */
 	"JOI %s $",                               /* JOI $ - Crée une partie */
 	"LEA",                                    /* LEA - Partir d'une partie */
+	"KICK %s %s",                             /* KICK - Éjecter quelqu'un du jeu */
 	"MSG %s",                                 /* MSG - Message dans une partie */
 	"AMSG %s",                                /* AMSG - Envoie un message à ses alliés */
 	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
@@ -261,6 +262,7 @@ void EC_Client::Init()
 	Commands.push_back(new SETCommand("SET",	0,	1));
 	Commands.push_back(new PLSCommand("PLS",	0,	1));
 	Commands.push_back(new LEACommand("LEA",	0,	0));
+	Commands.push_back(new KICKCommand("KICK",	0,	1));
 	Commands.push_back(new MSGCommand("MSG",	0,	1));
 	Commands.push_back(new INFOCommand("INFO",	0,	1));
 

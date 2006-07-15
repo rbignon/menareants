@@ -203,6 +203,11 @@ ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y
 ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : (*map)(0, y); }
 ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : (*map)(map->Width()-1, y); }
 
+uint ECBCase::Delta(ECBCase* c)
+{
+	return (abs(X() - c->X()) + abs(Y() - c->Y()));
+}
+
 void ECBCase::SetCountry(ECBCountry *mc)
 {
 	map_country = mc;

@@ -71,8 +71,8 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 	std::vector<ECase*> cases;
 
 	ECBCase* c = Pixel2Case(x, y);
-	uint nb_x = (x % CASE_WIDTH  + w) / CASE_WIDTH;
-	uint nb_y = (y % CASE_HEIGHT + h) / CASE_HEIGHT;
+	uint nb_x = (x % CASE_WIDTH  + w) / CASE_WIDTH + 1;
+	uint nb_y = (y % CASE_HEIGHT + h) / CASE_HEIGHT + 1;
 
 	//printf("%d,%d,%d,%d\n", c->X(), c->Y(), nb_x, nb_y);
 

@@ -38,6 +38,40 @@ ChannelVector ChanList;
  *                              Commandes                                                   *
  ********************************************************************************************/
 
+/** The owner can eject someone from channel.
+ *
+ * Syntax: KICK victime [reason]
+ */
+int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
+{
+	if(!cl || !cl->Player())
+		return Debug(W_DESYNCH, "KICK en dehors d'un salon");
+
+	if(!cl->Player()->IsOwner())
+		return Debug(W_DESYNCH, "KICK: le sender n'est pas owner");
+
+	if(!cl->Player()->Channel()->Joinable())
+		return Debug(W_DESYNCH, "KICK: on ne peut pas kicker pendant une partie.");
+
+	ECPlayer *pl = cl->Player()->Channel()->GetPlayer(parv[1].c_str());
+
+	if(!pl)
+		return Debug(W_DESYNCH, "KICK: joueur non trouvé");
+
+	if(pl == cl->Player())
+		return Debug(W_DESYNCH, "KICK: le joueur cherche à se kicker");
+
+	pl->Client()->sendrpl(app.rpl(ECServer::KICK), cl->GetNick(), pl->GetNick(),
+	                                               parv.size() > 2 ? FormatStr(parv[2]).c_str() : "");
+
+	pl->Client()->ClrPlayer();
+
+	pl->Client()->sendrpl(app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
+	pl->Channel()->RemovePlayer(pl, USE_DELETE);
+
+	return 0;
+}
+
 /** A player wants to send a message to his allies.
  *
  * Syntax: AMSG message

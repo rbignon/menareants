@@ -74,6 +74,8 @@ public:
 	bool RecvMapList;
 	std::vector<std::string> RecvMap;
 
+	std::string Kicked;
+
 /* Evenements */
 public:
 
@@ -143,6 +145,9 @@ public:
 	TSpinEdit   *position;
 	TColorEdit  *couleur;
 	TComboBox   *nation;
+	TLabel*     Ready;
+	TLabel*     Status;
+	TLabel*     Nick;
 
 /* Attributs */
 public:

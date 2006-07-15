@@ -57,6 +57,7 @@ const char* msgTab[] = {
      ":%s SET %s",                          /* SET - Définit ou informe les paramètres d'un jeu */
      "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
      ":%s LEA",                             /* LEA - Un user part du saon */
+     ":%s KICK %s %s",                      /* KICK - On éjecte quelqu'un du salon */
      "LSP %s %c %d %d %s",                  /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */

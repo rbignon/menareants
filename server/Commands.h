@@ -73,6 +73,8 @@ class JIACommand : public EC_ACommand { public: JIACommand(const std::string _Cm
 
 class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
+class KICKCommand : public EC_ACommand { public: KICKCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~KICKCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
 class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
@@ -94,8 +96,10 @@ DECLARE_CMD ( STAT );
 
 DECLARE_CMD ( JOI );
 DECLARE_CMD ( LEA );
+DECLARE_CMD ( KICK );
 DECLARE_CMD ( LSP );
 DECLARE_CMD ( MSG );
+DECLARE_CMD ( AMSG );
 DECLARE_CMD ( SET );
 DECLARE_CMD ( ARM );
 */

@@ -95,6 +95,8 @@ class PLSCommand : public EC_ACommand { public: PLSCommand(const std::string _Cm
 
 class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class KICKCommand : public EC_ACommand { public: KICKCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~KICKCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
 class INFOCommand : public EC_ACommand { public: INFOCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~INFOCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
@@ -131,6 +133,7 @@ DECLARE_CMD ( EOL );
 DECLARE_CMD ( JOI );
 DECLARE_CMD ( PLS );
 DECLARE_CMD ( LEA );
+DECLARE_CMD ( KICK );
 DECLARE_CMD ( MSG );
 DECLARE_CMD ( SET );
 

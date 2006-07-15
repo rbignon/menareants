@@ -40,7 +40,7 @@ public:
 /* Methodes */
 public:
 
-	virtual bool WantMove(ECBMove::E_Move, bool force = false);
+	virtual bool WantMove(ECBMove::E_Move, int flags = 0);
 
 	virtual bool WantAttaq(uint x, uint y, bool force = false);
 

@@ -1,3 +1,18 @@
+2006-07-15  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp (FirstMovements): Amélioration importante: l'IA cherche à aller vers l'enemie (bien que le code soit pas
+	encore très beau).
+
+2006-07-14  Laurent Defert <lodesi2@yahoo.fr>
+
+	* src/JoinGame.cpp: Animation de la translation de la barre laterale.
+
+2006-07-14  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp, src/JoinGame.cpp: Implémentation du KICK.
+
+	* server/IA.cpp (LEACommand): Il s'autosupprime bien.
+
 2006-07-13  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h, server/InGame.cpp, src/InGame.cpp: Système d'upgrade programmé, fonctionnel et disponible pour plus tard.

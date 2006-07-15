@@ -59,7 +59,7 @@ public:
 
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
@@ -78,7 +78,6 @@ protected:
 /********************************************************************************************
  *                               ECBSilo                                                    *
  ********************************************************************************************/
-#define SILO_PORTY                 10
 #define SILO_IMPACT                1
 /** This is a char factory */
 class ECBSilo : public virtual ECBEntity
@@ -98,6 +97,7 @@ public:
 	virtual e_type Type() const { return E_SILO; }
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 500;}
+	virtual uint Porty() const { return 10; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return true; }
 
@@ -106,7 +106,7 @@ public:
 	virtual const char* Qual() const { return "le silo de lancement"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
 
 	virtual bool CanCreate(const ECBEntity* e) { return false; }
@@ -151,7 +151,7 @@ public:
 	virtual const char* Qual() const { return "la capitale"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
@@ -194,7 +194,7 @@ public:
 	virtual const char* Qual() const { return "la ville"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
@@ -238,7 +238,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsNaval() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -278,7 +278,7 @@ public:
 	virtual const char* Qual() const { return "l'usine de chars"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
@@ -319,7 +319,7 @@ public:
 	virtual const char* Qual() const { return "la caserne"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)

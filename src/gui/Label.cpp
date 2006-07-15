@@ -88,6 +88,7 @@ void TLabel::SetFontColor(Font* f, Color c)
 
 void TLabel::SetColor(Color new_color)
 {
+	if(color == new_color) return;
 	color = new_color;
 	Reinit();
 }

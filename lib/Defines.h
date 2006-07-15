@@ -26,7 +26,7 @@
 #define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 '`-_@-()[]{}~"
 #define MAPFILE_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN_"
 #define COUNTRY_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
-#define IA_CHAR '~'
+#define IA_CHAR '&'
 
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole

@@ -707,7 +707,9 @@ void MenAreAntsApp::InGame()
 													move += " v";
 										if(!move.empty())
 										{
-											if(selected_entity->Move()->Size() >= selected_entity->MyStep())
+											if(selected_entity->MyStep() == 0)
+												InGameForm->AddInfo(I_SHIT, "Cette unité ne peut avancer.");
+											else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
 												InGameForm->AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une "
 												                            "journée !");
 											else

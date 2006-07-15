@@ -31,7 +31,7 @@ Sommaire:
          - Dans une pré-partie
               SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
               JIA <nom>                         :Créé une IA (par l'owner)
-              KIK <nick> [raison]               :l'owner peut kicker
+              KICK <nick> [raison]              :l'owner peut kicker
               LEA                               :partir
               GO!                               :l'owner lance le jeu
               MSG <message>                     :envoie un message à tous les joueurs
@@ -64,6 +64,7 @@ Sommaire:
               :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA                       :un user part (ou a été kické)
               :<nick> MSG <message>             :message reçue
+              :<nick> KICK <victime> [raison]   :un user est kické
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu

@@ -367,7 +367,6 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 	try
 	{
 		bool eob = false;
-		bool ctrl = false;
 		MapEditor = new TMapEditor(Video::GetInstance()->Window(), map);
 
 		SDL_Event event;
@@ -378,24 +377,6 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 				MapEditor->Actions(event);
 				switch(event.type)
 				{
-					case SDL_KEYUP:
-						switch (event.key.keysym.sym)
-						{
-							case SDLK_LCTRL:
-								ctrl = false;
-								break;
-							default: break;
-						}
-						break;
-					case SDL_KEYDOWN:
-						switch(event.key.keysym.sym)
-						{
-							case SDLK_LCTRL:
-								ctrl = true;
-								break;
-							default: break;
-						}
-						break;
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(MapEditor->Map->CreateEntity())
@@ -416,6 +397,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								MapEditor->BarreCase->UnSelect();
 								MapEditor->Map->SetCreateEntity(0);
 								MapEditor->BarreEntity->SetEntity(et);
+								MapEditor->Map->SetPosition(MapEditor->Map->X(), MapEditor->Map->Y(), true);
 							}
 							break;
 						}
@@ -489,7 +471,8 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						if(event.button.button == MBUTTON_LEFT)
 						{
 							ECase* c = 0;
-							if(!ctrl && (entity = MapEditor->Map->TestEntity(event.button.x, event.button.y)))
+							if(!MapEditor->IsPressed(SDLK_LCTRL) &&
+							   (entity = MapEditor->Map->TestEntity(event.button.x, event.button.y)))
 							{
 								MapEditor->BarreCase->UnSelect();
 								MapEditor->BarreEntity->SetEntity(entity);
@@ -499,7 +482,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								MapEditor->BarreEntity->UnSelect();
 								if(!MapEditor->BarreCase->RemoveCase(c, false))
 								{
-									if(!ctrl)
+									if(!MapEditor->IsPressed(SDLK_LCTRL))
 										MapEditor->BarreCase->UnSelect(false);
 									MapEditor->BarreCase->AddCase(c);
 								}

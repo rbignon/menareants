@@ -192,7 +192,7 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdn
 	for(i=0; i <= len; )
 	{
 		bool slash;
-		while(buf[i] == ' ') i++;
+		while(buf[i] == ' ' || buf[i] == '\0') i++;
 		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
 			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
 				slash = true;
