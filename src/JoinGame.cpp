@@ -497,7 +497,13 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						 * On peut considérer qu'on passe par là à chaques fins d'evenements
 						 */
 						if(add && chan->State() == EChannel::ANIMING)
+						{
+							me->UnlockScreen();
+							if(chan->CurrentEvent() & ARM_ATTAQ)
+								SDL_Delay(500);
+							me->LockScreen();
 							chan->SetCurrentEvent(0);
+						}
 					}
 					if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready() && GameInfosForm)
 					{

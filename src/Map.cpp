@@ -98,11 +98,10 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		return false;
 	}
 	SetXY(Entity()->Image()->X(), missile->Y() - step);
-	printf("%d (%d)\n", missile->Y(), (missile->Y() + missile->GetHeight()));
+
 	if((missile->Y() + (int)missile->GetHeight()) <= 0 || Entity()->Case()->Showed() <= 0)
 	{
 		me->LockScreen();
-		printf("on est là\n");
 		dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
 		SetMissile(missile_down);
 		SetXY(c->Image()->X(), 0 - missile->GetHeight());
@@ -118,7 +117,6 @@ bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
 	if(c == Entity()->Case() || !missile) return true;
 
 	SetXY(missile->X(), missile->Y() + step);
-	printf("- %d\n", missile->Y());
 	if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
 	{
 		me->LockScreen();

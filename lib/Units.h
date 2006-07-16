@@ -180,7 +180,7 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if(e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker())
+		if((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker()) && !e->IsNaval())
 			return true;
 		else
 			return false;
@@ -222,7 +222,7 @@ public:
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(!Like(e) && e->IsBuilding())
+		if(!Like(e) && e->IsBuilding() && !e->IsNaval())
 			return true;
 		else
 			return false;
@@ -232,6 +232,7 @@ public:
 	virtual const char* Qual() const { return "l'ingénieur"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
 
 /* Methodes */
 public:
@@ -267,7 +268,7 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if(e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker())
+		if((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker()) && !e->IsNaval())
 			return true;
 		else
 			return false;

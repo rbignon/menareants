@@ -1,3 +1,16 @@
+2006-07-06  Romain Bignon <progs@headfucking.net>
+
+	* src/Images.h (ECSpriteBase): Reprogrammation de la fonction d'ouverture pour l'adapter un peu plus au c++.
+	(ECImage): Gère maintenant le canal alpha des images.
+
+	* src/Resources.h, src/data/pics/fleches/: Recréation des fleches en utilisant le canal alpha.
+
+	* server/IA.cpp: Modifications rapides de l'IA qui n'améliorent pas encore vraiment le problème des côtes.
+
+	* src/data/anims/cases/terre/2.png: Autre image pour le cratère.
+
+	* src/JoinGame.cpp: Petit timer pour voir la fin des combats.
+
 2006-07-15  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp (FirstMovements): Amélioration importante: l'IA cherche à aller vers l'enemie (bien que le code soit pas

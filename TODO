@@ -8,7 +8,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 * Urgent
 -gestion des nations (juste le système, pas encore les unités).
 -limiter le nombre d'unités à construire sur les villes et les batiments
--ordre des animations (important pour MOVE -> CONTAINING -> MOVE)
+-ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Après
 -utiliser le système d'upgrades, notament pour permettre à la caserne et à l'usine d'armement de construire de plus en plus
@@ -32,7 +32,9 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -Unités de base
 
 ** En parallèle (on s'en fou un peu de quand on les fait)
--finir la gestion de la non réimpression des cases quand ce n'est pas necessaire.
+-voir pour d'autres paramètres dans les fichiers MAPS (genre interdire certaines unités, etc).
+-voir pour la création de fichiers de configuration des unités.
+-voir pour l'utilisation de fichiers xml plutot que des configurations pourries.
 -assurer un passage en 1280x1024 (notament par rapport à la vitesse)
 -assurer que les composants aient une position relative à la resolution
 -mot de passe éventuel pour accéder à un serveur

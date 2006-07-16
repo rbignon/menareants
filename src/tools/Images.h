@@ -166,9 +166,9 @@ class ECImage
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true) {}
-	ECImage(char* fichier);
-	ECImage() : Img(NULL), pause(0), autofree(true) {}
+	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true), alpha(false) {}
+	ECImage(char* fichier, bool alpha = false);
+	ECImage() : Img(NULL), pause(0), autofree(true), alpha(false) {}
 
 	~ECImage();
 
@@ -176,7 +176,7 @@ public:
 public:
 
 	/** Charge l'image à partir d'un fichier */
-	void Load(char *fichier);
+	void Load(char *fichier, bool alpha = false);
 
 	/** Dessin à la taille originale à la position (x,y) */
 	void Draw(int x, int y);
@@ -242,6 +242,7 @@ public:
 	SDL_Surface* Img;
 	int pause;
 	bool autofree;
+	bool alpha;
 };
 
 #endif /* EC_IMAGES_H */

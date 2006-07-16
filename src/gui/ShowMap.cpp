@@ -419,7 +419,7 @@ void TMap::Draw(int _x, int _y)
 								break;
 						}
 					}
-					next_c->SetMustRedraw();
+					c->SetMustRedraw();
 					last_move = *move;
 					c = next_c;
 				}

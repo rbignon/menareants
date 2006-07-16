@@ -307,7 +307,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char AFTER_EVENT = 3;
 		char event_moment;
 		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 &&
-		   !(flags & (ARM_REMOVE|ARM_DATA|ARM_NUMBER)))
+		   !(flags & (ARM_DATA|ARM_NUMBER)) && flags != ARM_REMOVE)
 			InGameForm->Map->CenterTo(entities[0]);
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
@@ -393,6 +393,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		InGameForm->BarreAct->Update();
 	}
+	/*else if(flags & ARM_NUMBER && chan->CurrentEvent() & ARM_ATTAQ)
+			SDL_Delay(500);*/
 	return 0;
 }
 #undef L_INFO
@@ -579,6 +581,7 @@ void MenAreAntsApp::InGame()
 
 							if(event.button.button == MBUTTON_RIGHT)
 							{
+								entity->SetOwner(0);
 								InGameForm->Map->SetCreateEntity(0);
 								InGameForm->Map->ToRedraw(event.button.x, event.button.y);
 							}

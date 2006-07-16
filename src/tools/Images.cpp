@@ -23,6 +23,7 @@
 #include "Video.h"
 #include "Debug.h"
 #include "tools/Color.h"
+#include <fstream>
 
 void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
 {
@@ -359,38 +360,56 @@ ECSpriteBase::~ECSpriteBase()
 
 int ECSpriteBase::init(const char *dir)
 {
-	char buffer[255];
-	char filename[255];
-	char name[255];
+	std::string filename;
 	int pause=0, r=0, g=0, b=0;
-	FILE *fp;
 
-	sprintf(filename, PKGDATADIR_ANIMS "%s/info", dir);
+	filename = PKGDATADIR_ANIMS + std::string(dir) + "/info";
 
-	if((fp=fopen(filename, "r")) == NULL)
+	std::ifstream fp(filename.c_str());
+
+	if(!fp)
 		throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
 
-	fgets(buffer, 255, fp);
-	sscanf(buffer, "FILES: %d", &mNumframes);
-	mAnim = new ECImage[mNumframes];
-
-	mBuilt = 1;
-
-	for(uint count=0;!feof(fp) && count<mNumframes;)
+	std::string ligne, key;
+	for(int count = -1; std::getline(fp, ligne);)
 	{
-		fgets(buffer, 255, fp);
-		if(buffer[0] != '#' && buffer[0] != '\r' && buffer[0] != '\0' && buffer[0] != '\n')
-		{
-			sscanf(buffer, "%s %d %d %d %d", name, &pause, &r, &g, &b);
-			sprintf(filename, PKGDATADIR_ANIMS "%s/%s", dir, name);
-			SDL_Surface *temp;
-			if((temp = IMG_Load(filename)) == NULL)
-				throw ECExcept(filename, "Impossible de charger une image.");
+		if(ligne[0] == '#' || ligne[0] == '\r' || ligne[0] == '\0' || ligne[0] == '\n')
+			continue;
 
-			if(r >= 0)
+		std::string key = stringtok(ligne, " ");
+
+		if(count < 0 && key == "FILES:")
+		{
+			mNumframes = StrToTyp<uint>(ligne);
+			mAnim = new ECImage[mNumframes];
+			mBuilt = 1;
+			count++;
+		}
+		else
+		{
+			filename = PKGDATADIR_ANIMS + std::string(dir) + PATH_SEPARATOR + key;
+			bool alpha = false;
+			if(ligne.find(' '))
+			{
+				pause = StrToTyp<int>(stringtok(ligne, " "));
+				r = StrToTyp<int>(stringtok(ligne, " "));
+				g = StrToTyp<int>(stringtok(ligne, " "));
+				b = StrToTyp<int>(stringtok(ligne, " "));
+			}
+			else
+			{
+				pause = StrToTyp<int>(ligne);
+				alpha = true;
+			}
+
+			SDL_Surface *temp;
+			if((temp = IMG_Load(filename.c_str())) == NULL)
+				throw ECExcept(filename, "Impossible de charger l'image: " + filename);
+
+			if(r >= 0 && !alpha)
 				SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
 
-			mAnim[count].Img = SDL_DisplayFormat(temp);
+			mAnim[count].Img = alpha ? SDL_DisplayFormatAlpha(temp) : SDL_DisplayFormat(temp);
 			SDL_FreeSurface(temp);
 
 			mAnim[count].pause = pause;
@@ -401,7 +420,7 @@ int ECSpriteBase::init(const char *dir)
 			count++;
 		}
 	}
-	fclose(fp);
+
 	path = dir;
 	return 0;
 }
@@ -443,10 +462,24 @@ ECImage* ECSpriteBase::First() const
  *                                      ECImage                                         *
  ****************************************************************************************/
 
-ECImage::ECImage(char* fichier)
-	: pause(0), autofree(true)
+ECImage::ECImage(char* fichier, bool _alpha)
+	: pause(0), autofree(true), alpha(_alpha)
 {
-	Load(fichier);
+	Load(fichier, _alpha);
+}
+
+void ECImage::Load(char *fichier, bool _alpha)
+{
+	SDL_Surface *tmp = 0;
+	if(!(tmp = IMG_Load(fichier)))
+		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
+
+	alpha = _alpha;
+	Img = alpha ? SDL_DisplayFormatAlpha(tmp) : SDL_DisplayFormat(tmp);
+	SDL_FreeSurface(tmp);
+
+	if(!alpha)
+		SetColorKey(255,0,255);
 }
 
 void ECImage::Free()
@@ -503,16 +536,6 @@ int ECImage::Blit(const ECImage* src)
 	return SDL_BlitSurface( src->Img, 0, Img, 0);
 }
 
-void ECImage::Load(char *fichier)
-{
-	SDL_Surface *tmp = 0;
-	if(!(tmp = IMG_Load(fichier)))
-		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
-	Img = SDL_DisplayFormat(tmp);
-	SDL_FreeSurface(tmp);
-	SetColorKey(255,0,255);
-}
-
 void ECImage::Draw(int x, int y)
 {
   if(!Img) return;
@@ -543,7 +566,7 @@ void ECImage::Draw()
 
 void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)
 {
-	if(!Img) return;
+	if(!Img || alpha) return;
 	SDL_SetColorKey(Img, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(Img->format, r, g, b));
 }
 
