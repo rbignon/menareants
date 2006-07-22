@@ -24,6 +24,106 @@
 #include "Debug.h"
 
 /********************************************************************************************
+ *                                        ECDefenseTower                                    *
+ ********************************************************************************************/
+
+bool ECDefenseTower::WantAttaq(uint mx, uint my, bool force)
+{
+	if(!force && (EventType() & ARM_ATTAQ))
+		return false;
+
+	/* On n'attaque pas sur notre case */
+	if(Case()->X() == mx && Case()->Y() == my)
+		return false;
+
+	uint d = 0;
+	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
+
+	/* On ne tire que dans un rayon de SILO_PORTY (10?) cases. */
+	if(d > Porty())
+		return false;
+
+	return true;
+}
+
+bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	/* C'est une attaque contre moi (probablement sur la meme case). */
+	if(!(EventType() & ARM_ATTAQ))
+		return ECEntity::Attaq(entities, event);
+
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case())
+		{
+			uint dx = 0, dy = 0;
+			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;
+			for(uint y=Case()->Y(); y != (*it)->Case()->Y(); dy++) y < (*it)->Case()->Y() ? ++y : --y;
+			uint d = dx + dy;
+			float coef = 0;
+			switch(d)
+			{
+				case 0: coef = 0.0f; break;
+				case 1: coef = 0.8f; break;
+				case 2: coef = 2.0f; break;
+				case 3: coef = 1.4f; break;
+				case 4: coef = 0.9f; break;
+				default: coef = 0;
+			}
+			uint killed = 0;
+			if((*it)->IsInfantry())                          killed = uint(300 * coef);
+			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(400 * coef);
+			else
+			{
+				FDebug(W_WARNING, "Shoot d'un type non supporté");
+				continue;
+			}
+			if(!killed) continue;
+
+			Shoot(*it, killed);
+			(*Channel()) << "La tour de défense " + LongName() + " dégomme " + (*it)->Qual() + " " +
+							(*it)->LongName() + " de " + TypToStr(killed);
+		}
+
+
+	return false;
+}
+
+
+
+/********************************************************************************************
+ *                                        ECMine                                            *
+ ********************************************************************************************/
+
+void ECMine::Played()
+{
+	if(restBuild)
+	{
+		restBuild--;
+		if(Owner()->Client())
+		{
+			std::vector<TClient*> sdrs = Owner()->ClientAllies();
+			sdrs.push_back(Owner()->Client());
+			Channel()->SendArm(sdrs, this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
+		}
+	}
+	ECEntity::Played();
+}
+
+bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	{
+		if(*it == this) continue;
+		Shoot(*it, 998);
+	}
+	/* Auto destruction */
+	Shoot(this, Nb());
+
+	return false;
+}
+
+/********************************************************************************************
  *                               ECNuclearSearch                                            *
  ********************************************************************************************/
 

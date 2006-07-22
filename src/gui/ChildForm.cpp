@@ -83,10 +83,10 @@ void TChildForm::Draw(int _x, int _y)
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
 			{
-				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
+				if((*it)->OnMouseOn() && (*it)->Mouse(_x, _y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
 				(*it)->Draw(_x, _y);
-				if(!put_hint && (*it)->Visible() && !(*it)->Hint().empty() && (*it)->Test(_x,_y))
+				if(!put_hint && (*it)->Visible() && !(*it)->Hint().empty() && (*it)->Mouse(_x,_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

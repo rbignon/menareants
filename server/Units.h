@@ -131,6 +131,24 @@ public:
 /********************************************************************************************
  *                               ECEnginer                                                  *
  ********************************************************************************************/
+class ECTourist : public ECUnit, public ECBTourist
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(C_TERRE|C_PONT) {}
+
+	ENTITY_CREATE_LAST(ECTourist);
+
+/* Methodes */
+public:
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+};
+
+/********************************************************************************************
+ *                               ECEnginer                                                  *
+ ********************************************************************************************/
 class ECEnginer : public ECUnit, public ECBEnginer
 {
 /* Constructeur/Destructeur */
@@ -145,6 +163,8 @@ public:
 
 	/** Invest a building */
 	virtual void Invest(ECBEntity* e);
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************

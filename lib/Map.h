@@ -142,6 +142,7 @@ protected:
 #define ARM_NOPRINCIPAL 0x8000
 #define ARM_DATA        0x10000
 #define ARM_UPGRADE     0x20000
+#define ARM_CHANGEOWNER 0x40000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -174,6 +175,9 @@ public:
 		E_NUCLEARSEARCH,
 		E_SILO,
 		E_ENGINER,
+		E_DEFENSETOWER,
+		E_TOURIST,
+		E_MINE,
 		E_END
 	};
 
@@ -208,13 +212,20 @@ public:
 	virtual uint Step() const { return 0; }
 
 	virtual bool IsCountryMaker() const { return false; }    /**< Is it an entity who sets the country's owner ? */
+	virtual bool IsCity() const { return false; }            /**< This building is a part of a city */
 	virtual bool IsBuilding() const { return false; }
 	virtual bool IsNaval() const { return false; }
 	virtual bool IsInfantry() const { return false; }
 	virtual bool IsVehicule() const { return false; }
+	virtual bool IsHidden() const { return false; }          /**< This unit can be views only by his owner and his allies */
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
+
+	/** This function check if this unit can be created by any nation.
+	 * Default: unit can be created by all nations
+	 */
+	virtual bool CanBeCreated(uint nation) const { return true; }
 
 	virtual bool CanContain(const ECBEntity*) { return false; }
 
@@ -260,7 +271,7 @@ public:
 	virtual void Invest(ECBEntity* e);
 
 	/** This virtual function must be redefined in server to change owner, but it called by ECBCase::CheckChaningOwner() */
-	virtual void ChangeOwner(ECBPlayer*) { return; }
+	virtual void ChangeOwner(ECBPlayer*) { assert(0); }
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;

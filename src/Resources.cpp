@@ -59,6 +59,16 @@
 	R_RESOURCE(ECImage,      FlecheAttaqGauche);
 	R_RESOURCE(ECImage,      FlecheAttaqHaut);
 	R_RESOURCE(ECImage,      FlecheAttaqBas);
+	R_RESOURCE(ECImage,      PointerSelect);
+	R_RESOURCE(ECImage,      PointerAttaq);
+	R_RESOURCE(ECImage,      PointerMaintainedAttaq);
+	R_RESOURCE(ECImage,      PointerCantAttaq);
+	R_RESOURCE(ECImage,      PointerInvest);
+	R_RESOURCE(ECImage,      PointerTop);
+	R_RESOURCE(ECImage,      PointerBottom);
+	R_RESOURCE(ECImage,      PointerLeft);
+	R_RESOURCE(ECImage,      PointerRight);
+	R_RESOURCE(ECImage,      PointerRadar);
 	R_RESOURCE(ECSpriteBase, UpButton);
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);
@@ -70,8 +80,6 @@
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);
-	R_RESOURCE(ECSpriteBase, CaseVille);
-	R_RESOURCE(ECSpriteBase, CaseCapitale);
 	R_RESOURCE(ECSpriteBase, CaseBordNord);
 	R_RESOURCE(ECSpriteBase, CaseBordSud);
 	R_RESOURCE(ECSpriteBase, CaseBordEst);
@@ -136,6 +144,16 @@
 	R_RESOURCE(ECSpriteBase, Enginer_Left);
 	R_RESOURCE(ECSpriteBase, Enginer_Right);
 	R_RESOURCE(ECSpriteBase, Enginer_Dos);
+	R_RESOURCE(ECImage,      DefenseTower_Icon);
+	R_RESOURCE(ECSpriteBase, DefenseTower_Face);
+	R_RESOURCE(ECImage,      Tourist_Icon);
+	R_RESOURCE(ECSpriteBase, Tourist_Face);
+	R_RESOURCE(ECSpriteBase, Tourist_Left);
+	R_RESOURCE(ECSpriteBase, Tourist_Right);
+	R_RESOURCE(ECSpriteBase, Tourist_Dos);
+	R_RESOURCE(ECImage,      Mine_Icon);
+	R_RESOURCE(ECSpriteBase, Mine_DesactFace);
+	R_RESOURCE(ECSpriteBase, Mine_ActFace);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

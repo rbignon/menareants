@@ -52,17 +52,18 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
 	Images.$(OBJEXT) Maths.$(OBJEXT) Video.$(OBJEXT) \
-	Component.$(OBJEXT) Form.$(OBJEXT) ChildForm.$(OBJEXT) \
-	ListBox.$(OBJEXT) ComboBox.$(OBJEXT) CheckBox.$(OBJEXT) \
-	Boutton.$(OBJEXT) BouttonText.$(OBJEXT) Memo.$(OBJEXT) \
-	Edit.$(OBJEXT) MessageBox.$(OBJEXT) Label.$(OBJEXT) \
-	SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) Image.$(OBJEXT) \
-	ShowMap.$(OBJEXT) ProgressBar.$(OBJEXT) Fps.$(OBJEXT) \
-	Main.$(OBJEXT) Timer.$(OBJEXT) Resources.$(OBJEXT) \
-	AltThread.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
-	Map.$(OBJEXT) Batiments.$(OBJEXT) Units.$(OBJEXT) \
-	MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+	Cursor.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
+	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
+	CheckBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
+	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
+	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
+	Image.$(OBJEXT) ShowMap.$(OBJEXT) ProgressBar.$(OBJEXT) \
+	Fps.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
+	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
+	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
+	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
+	Units.$(OBJEXT) MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) \
+	InGame.$(OBJEXT)
 nodist_menareants_OBJECTS = Version.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS) \
 	$(nodist_menareants_OBJECTS)
@@ -196,6 +197,7 @@ menareants_SOURCES = \
 		tools/Images.cpp \
 		tools/Maths.cpp \
 		tools/Video.cpp \
+		gui/Cursor.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \
@@ -309,6 +311,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ComboBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Component.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Config.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cursor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Edit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Font.Po@am__quote@
@@ -420,6 +423,20 @@ Video.obj: tools/Video.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tools/Video.cpp' object='Video.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Video.obj `if test -f 'tools/Video.cpp'; then $(CYGPATH_W) 'tools/Video.cpp'; else $(CYGPATH_W) '$(srcdir)/tools/Video.cpp'; fi`
+
+Cursor.o: gui/Cursor.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Cursor.o -MD -MP -MF "$(DEPDIR)/Cursor.Tpo" -c -o Cursor.o `test -f 'gui/Cursor.cpp' || echo '$(srcdir)/'`gui/Cursor.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Cursor.Tpo" "$(DEPDIR)/Cursor.Po"; else rm -f "$(DEPDIR)/Cursor.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Cursor.cpp' object='Cursor.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Cursor.o `test -f 'gui/Cursor.cpp' || echo '$(srcdir)/'`gui/Cursor.cpp
+
+Cursor.obj: gui/Cursor.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Cursor.obj -MD -MP -MF "$(DEPDIR)/Cursor.Tpo" -c -o Cursor.obj `if test -f 'gui/Cursor.cpp'; then $(CYGPATH_W) 'gui/Cursor.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Cursor.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Cursor.Tpo" "$(DEPDIR)/Cursor.Po"; else rm -f "$(DEPDIR)/Cursor.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gui/Cursor.cpp' object='Cursor.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Cursor.obj `if test -f 'gui/Cursor.cpp'; then $(CYGPATH_W) 'gui/Cursor.cpp'; else $(CYGPATH_W) '$(srcdir)/gui/Cursor.cpp'; fi`
 
 Component.o: gui/Component.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Component.o -MD -MP -MF "$(DEPDIR)/Component.Tpo" -c -o Component.o `test -f 'gui/Component.cpp' || echo '$(srcdir)/'`gui/Component.cpp; \
@@ -946,7 +963,7 @@ uninstall-info: uninstall-info-recursive
 
 
 Version.cpp: $(menareants_SOURCES)
-	$(SHELL) v.sh
+	@$(SHELL) v.sh
 
 distclean-local:
 	rm -f menareants.cfg

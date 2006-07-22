@@ -143,32 +143,6 @@ void TList::SetXY (int px, int py)
  *                                 TComponent                                               *
  ********************************************************************************************/
 
-int TComponent::X() const { return x; }
-int TComponent::Y() const { return y; }
-unsigned int TComponent::Width() const { return w; }
-unsigned int TComponent::Height() const { return h; }
-
-void TComponent::SetFocus()
-{
-	focus = true;
-}
-
-void TComponent::DelFocus()
-{
-	focus = false;
-}
-
-
-bool TComponent::Test (int souris_x, int souris_y) const
-{
-  return (visible && ((x <= souris_x) && (souris_x < int(x+w))
-	  && (y <= souris_y) && (souris_y < int(y+h))) && enabled);
-}
-
-void TComponent::SetX(int _x) { SetXY(_x, Y()); }
-void TComponent::SetY(int _y) { SetXY(X(), _y); }
-void TComponent::SetXY (int px, int py) { x = px; y = py; }
-
 void TComponent::SetHeight (uint ph)
 {
 	if(h == ph) return;

@@ -123,7 +123,7 @@ void TForm::Actions(SDL_Event event, uint a)
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 				{
 					if(!put_hint && Hint && (*it)->Visible() && !(*it)->Hint().empty() &&
-					   ((*it)->DynamicHint() || (*it)->Test(event.button.x,event.button.y)))
+					   ((*it)->DynamicHint() || (*it)->Mouse(event.button.x,event.button.y)))
 					{
 						Hint->AddItem((*it)->Hint());
 						put_hint = true;
@@ -178,7 +178,7 @@ void TForm::Update(int _x, int _y, bool flip)
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
 			{
-				if((*it)->OnMouseOn() && (*it)->Test(_x, _y))
+				if((*it)->OnMouseOn() && (*it)->Mouse(_x, _y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
 				(*it)->Draw(_x, _y);
 			}

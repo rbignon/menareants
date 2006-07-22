@@ -57,6 +57,20 @@ void TMap::UnlockScreen() const
 		SDL_UnlockMutex(mutex);
 }
 
+void TMap::RemoveAfterDraw(ECSprite* s)
+{
+	for(std::vector<ECSprite*>::iterator it = after_draw.begin(); it != after_draw.end();)
+	{
+		if(*it == s)
+		{
+			after_draw.erase(it);
+			return;
+		}
+		else
+			++it;
+	}
+}
+
 ECase* TMap::Pixel2Case(int x, int y)
 {
 	uint x_ = (x - X()) / CASE_WIDTH;
@@ -321,6 +335,13 @@ void TMap::Draw(int _x, int _y)
 			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
 				c->SetMustRedraw(false);
 		}
+		if(c && !c->Entities()->empty())
+		{
+			std::vector<ECBEntity*> ents = c->Entities()->List();
+			FOR(ECBEntity*, ents, entity)
+				if(entity && entity->IsBuilding())
+					dynamic_cast<ECEntity*>(entity)->Draw();
+		}
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
@@ -333,11 +354,23 @@ void TMap::Draw(int _x, int _y)
 		else
 		{
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-			entity->Draw();
-			if(entity->Image() && entity->Image()->Anim())
+			if(!entity->IsBuilding())
+				entity->Draw();
+			if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
 				entity->Case()->SetMustRedraw();
+			if(entity->AttaquedCase() && entity->Selected())
+				entity->Trajectoire()->Draw(
+				      entity->AttaquedCase()->X() < entity->Case()->X() ? entity->AttaquedCase()->Image()->X()+CASE_WIDTH /2
+				                                                        : entity->Image()->X()+CASE_WIDTH /2,
+				      entity->AttaquedCase()->Y() < entity->Case()->Y() ? entity->AttaquedCase()->Image()->Y()+CASE_HEIGHT/2
+				                                                        : entity->Image()->Y()+CASE_HEIGHT/2);
 			++enti;
 		}
+
+	FOR(ECSprite*, after_draw, it)
+		if(it)
+			it->draw();
+
 #if 0
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 		if(dynamic_cast<ECase*>(*casi)->Showed() == 0)

@@ -81,6 +81,9 @@ public:
 	void SetBackgroundColor(Color color);
 	void SetValueColor(Color color);
 
+	void SetBackground(bool b = true) { background = b; }
+	bool Background() const { return background; }
+
 
 /* variables privées */
 private:
@@ -94,6 +97,8 @@ private:
 	
 	uint CalculeVal (long val) const;
 	uint CalculeValBarre (long val) const;
+
+	bool background;
 	
 	std::list<marqueur_t> marqueur;
 };

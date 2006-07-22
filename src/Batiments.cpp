@@ -49,6 +49,47 @@ ECBatiment::~ECBatiment()
 }
 
 /********************************************************************************************
+ *                                         ECMine                                           *
+ ********************************************************************************************/
+
+ECMine::~ECMine()
+{
+	delete activeimg;
+}
+
+void ECMine::Init()
+{
+	ECBEntity::Init();
+
+	activeimg = new ECSpriteBase(Resources::Mine_ActFace()->path.c_str());
+
+	if(Owner() && Owner()->Color())
+		activeimg->ChangeColor(white_color, color_eq[Owner()->Color()]);
+}
+
+void ECMine::RecvData(ECData data)
+{
+	switch(data.type)
+	{
+		case DATA_RESTBUILD:
+			restBuild = StrToTyp<uint>(data.data);
+			if(!restBuild)
+			{
+				SetImage(activeimg);
+				Image()->SetAnim(true);
+			}
+			break;
+	}
+}
+
+std::string ECMine::SpecialInfo()
+{
+	if(!Owner()->IsMe()) return "";
+	else if(restBuild) return "Active dans " + TypToStr(restBuild) + " jours.";
+	else return "Mine active";
+}
+
+/********************************************************************************************
  *                                ECNuclearSearch                                           *
  ********************************************************************************************/
 
@@ -104,12 +145,6 @@ std::string ECSilo::SpecialInfo()
 		return "Il y a " + TypToStr(NuclearSearch()->Missiles()) + " missiles disponibles";
 }
 
-void ECSilo::Draw()
-{
-	ECEntity::Draw();
-	missile.Draw();
-}
-
 bool ECSilo::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
 	switch(event_type)
@@ -133,6 +168,50 @@ bool ECSilo::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Clie
 }
 
 bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+		{
+			if(c == Case()) return true;
+
+			if(c->Flags() & (C_TERRE))
+				c->Image()->SetFrame(1);
+
+			SDL_Delay(800);
+			return true;
+		}
+		default:
+			return true;
+	}
+}
+
+/********************************************************************************************
+ *                                 ECDefenseTower                                           *
+ ********************************************************************************************/
+bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+			return missile.AttaqFirst(c, me);
+		default:
+			return true;
+	}
+}
+
+bool ECDefenseTower::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+			return missile.AttaqSecond(c, me);
+		default:
+			return true;
+	}
+}
+
+bool ECDefenseTower::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
 	switch(event_type)
 	{

@@ -101,6 +101,9 @@ public:
 	void LockScreen() const;
 	void UnlockScreen() const;
 
+	void AddAfterDraw(ECSprite* s) { after_draw.push_back(s); }
+	void RemoveAfterDraw(ECSprite* s);
+
 /* Variables privées */
 private:
 	ECMap* map;
@@ -111,6 +114,7 @@ private:
 	bool have_brouillard;
 	bool must_redraw;
 	SDL_mutex* mutex;
+	std::vector<ECSprite*> after_draw;
 };
 
 #endif /* EC_SHOWMAP_H */

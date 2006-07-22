@@ -38,6 +38,7 @@ struct SDL_Thread;
 
 class EChannel;
 class ECPlayer;
+class TCursor;
 
 /********************************************************************************************
  *                               TInGameForm                                                *
@@ -189,6 +190,8 @@ public:
 	TEdit*     SendMessage;
 	TFPS*      FPS;
 
+	TCursor*   Cursor;
+
 	SDL_Thread* Thread;
 
 /* Methodes */
@@ -196,6 +199,8 @@ public:
 
 	void ShowBarreLat(bool show = true);
 	void ShowBarreAct(bool show = true);
+
+	void SetCursor(const char want);
 
 	#define I_INFO     0x001
 	#define I_WARNING  0x002

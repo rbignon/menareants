@@ -23,6 +23,7 @@
 #define ECLIB_UNITS_H
 
 #include "Map.h"
+#include "Channels.h"
 
 /********************************************************************************************
  *                               ECBContainer                                               *
@@ -135,7 +136,7 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if(e->Case() == Case() ||  e->IsCountryMaker() ||
+		if(e->Case() == Case() || e->IsCountryMaker() ||
 		   !e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval())
 			return false;
 		else
@@ -180,7 +181,8 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker()) && !e->IsNaval())
+		if((Parent() && Parent()->CanAttaq(e)) ||
+		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity()) && !e->IsNaval()))
 			return true;
 		else
 			return false;
@@ -198,6 +200,47 @@ public:
 /* Variables privées */
 protected:
 };
+
+/********************************************************************************************
+ *                               ECBTourist                                                 *
+ ********************************************************************************************/
+/** This is a simple army */
+class ECBTourist : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBTourist) {}
+
+	ENTITY_CONSTRUCTOR(ECBTourist) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_TOURIST; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 1; }
+	virtual uint Step() const { return 4; }
+	virtual uint Visibility() const { return 4; }
+	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
+
+	bool CanAttaq(const ECBEntity* e) { return false; }
+	virtual const char* Qual() const { return "le touriste japonais"; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	bool IsInfantry() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool AddUnits(uint) { return false; }
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
 
 /********************************************************************************************
  *                               ECBEnginer                                                 *
@@ -232,6 +275,7 @@ public:
 	virtual const char* Qual() const { return "l'ingénieur"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool AddUnits(uint) { return false; }
 
 /* Methodes */
@@ -268,7 +312,8 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCountryMaker()) && !e->IsNaval())
+		if((Parent() && Parent()->CanAttaq(e)) ||
+		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity()) && !e->IsNaval()))
 			return true;
 		else
 			return false;

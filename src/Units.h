@@ -126,8 +126,6 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	virtual void Draw();
-
 /* Variables privées */
 private:
 	ECMissile missile;
@@ -191,6 +189,39 @@ public:
 };
 
 /********************************************************************************************
+ *                                ECTourist                                                 *
+ ********************************************************************************************/
+#define ENGINER_VISUAL_STEP 2
+class ECTourist : public ECUnit, public ECBTourist
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECTourist) {}
+
+	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(ENGINER_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::Tourist_Dos());
+		PutImage(I_Down, Resources::Tourist_Face());
+		PutImage(I_Right, Resources::Tourist_Right());
+		PutImage(I_Left, Resources::Tourist_Left());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Touriste japonais"; }
+	virtual const char* Infos() const { return "Il a un champs de vision élevé, et le terrain où il passe reste visible "
+	                                           "en permanence."; }
+	virtual ECImage* Icon() const { return Resources::Tourist_Icon(); }
+
+/* Methodes */
+public:
+
+	virtual void ChangeCase(ECBCase* new_case);
+};
+
+/********************************************************************************************
  *                                ECEnginer                                                 *
  ********************************************************************************************/
 #define ENGINER_VISUAL_STEP 2
@@ -207,7 +238,6 @@ public:
 		PutImage(I_Down, Resources::Enginer_Face());
 		PutImage(I_Right, Resources::Enginer_Right());
 		PutImage(I_Left, Resources::Enginer_Left());
-		PutImage(I_Attaq, Resources::Brouillard());
 	}
 
 /* Infos */

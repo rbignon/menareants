@@ -46,7 +46,7 @@ void TIA::FirstMovements()
 		std::vector<ECBCase*> cases = (*cty)->Cases();
 		for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
 		{
-			int i = rand()%(2*ECBEntity::E_END/4);
+			int i = rand()%(ECBEntity::E_END);
 			if(i && i < ECBEntity::E_END && units[i] < 2)
 			{
 				ia_send("ARM - =" + TypToStr((*c)->X()) + "," + TypToStr((*c)->Y()) + " + %" + TypToStr(i));
@@ -77,154 +77,170 @@ void TIA::FirstMovements()
 					if((*e)->CanCreate(*enti) && (*e)->Owner() == Player())
 						for(int i = 0; !i ;i = rand()%3)
 							ia_send("ARM " + std::string((*enti)->ID()) + " +");
-			if((*enti)->MyStep() > 0)
+
+			std::vector<ECBEntity*> all_entities = (*enti)->Map()->Entities()->List();
+			ECBEntity* victim = 0;
+			uint d = 0;
+			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
+				if(!(*enti)->Like(*e) && ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
+				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
+				   ((*e)->Owner() != 0 || !(*e)->IsCity()))
+					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
+
+			if(!victim) continue; // étonnant !
+
+			if((*enti)->Case()->Delta(victim->Case()) <= (*enti)->Porty())
 			{
-				std::vector<ECBEntity*> all_entities = (*enti)->Map()->Entities()->List();
-				ECBEntity* victim = 0;
-				uint d = 0;
-				for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
-					if(!(*enti)->Like(*e) && ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
-					   (!victim || d > (*enti)->Case()->Delta((*e)->Case())))
-						victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
+				/* On sait pas si il peut se déployer ou non, alors on écrit ça car on sait jamais, et si il ne peut
+				 * pas se déployer c'est pas génant.
+				 */
+				if(!(*enti)->Deployed())
+					ia_send("ARM " + std::string((*enti)->ID()) + " #");
+				ia_send("ARM " + std::string((*enti)->ID()) + " *" + TypToStr(victim->Case()->X()) + "," +
+																		TypToStr(victim->Case()->Y()));
+				continue;
+			}
+			else if((*enti)->Deployed())
+				ia_send("ARM " + std::string((*enti)->ID()) + " #");
 
-				if(!victim) continue; // étonnant !
-				std::string msg;
-				ECBCase* c = (*enti)->Case();
-				ECBCase* original_case = (*enti)->Case();
-				for(uint k = 0; k < (*enti)->MyStep(); k++)
+			if(!(*enti)->MyStep()) continue; /* Il n'y a pas d'attaque, donc on continue */
+
+			std::string msg;
+			ECBCase* c = (*enti)->Case();
+			ECBCase* original_case = (*enti)->Case();
+			for(uint k = 0; k < (*enti)->MyStep(); k++)
+			{
+				int i = c->Y() != victim->Case()->Y() && c->X() != victim->Case()->X()
+									? rand()%2
+									: c->X() != victim->Case()->X()
+									? 1
+									: 0;
+
+				if(i && c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) &&
+						(c->Y() == victim->Case()->Y() ||
+							c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) ||
+							c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE)))
+					msg += " >", c = c->MoveRight();
+				else if(i && c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE) &&
+						(c->Y() == victim->Case()->Y() ||
+							c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) ||
+							c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE)))
+					msg += " <", c = c->MoveLeft();
+				else if(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) &&
+						(c->X() == victim->Case()->X() ||
+							c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) ||
+							c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE)))
+					msg += " v", c = c->MoveDown();
+				else if(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE) &&
+						(c->X() == victim->Case()->X() ||
+							c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) ||
+							c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE)))
+					msg += " ^", c = c->MoveUp();
+				else
 				{
-					int i = c->Y() != victim->Case()->Y() && c->X() != victim->Case()->X()
-					                  ? rand()%2
-					                  : c->X() != victim->Case()->X()
-					                    ? 1
-					                    : 0;
-
-					if(i && c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) &&
-					        (c->Y() == victim->Case()->Y() ||
-					         c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) ||
-					         c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE)))
-						msg += " >", c = c->MoveRight();
-					else if(i && c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE) &&
-					        (c->Y() == victim->Case()->Y() ||
-					         c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) ||
-					         c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE)))
-						msg += " <", c = c->MoveLeft();
-					else if(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE) &&
-					        (c->X() == victim->Case()->X() ||
-					         c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) ||
-					         c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE)))
-						msg += " v", c = c->MoveDown();
-					else if(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE) &&
-					        (c->X() == victim->Case()->X() ||
-					         c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE) ||
-					         c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE)))
-						msg += " ^", c = c->MoveUp();
-					else
+					if(c == victim->Case()) break;
+					if(!(*enti)->WantMove(ECMove::Right, MOVE_SIMULE) || !(*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
 					{
-						if(c == victim->Case()) break;
-						if(!(*enti)->WantMove(ECMove::Right, MOVE_SIMULE) || !(*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
-						{
-							uint desesperate = 0;
-							int dh = 0, db = 0;
-							for((*enti)->SetCase(c);
-							        !(c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) &&
-									!(c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE));
-									(*enti)->SetCase((*enti)->Case()->MoveUp()), dh++)
-								if(!(*enti)->WantMove(ECMove::Up, MOVE_SIMULE))
-								{
-									dh = -1;
-									break;
-								}
-							for((*enti)->SetCase(c);
-							        !(c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) &&
-									!(c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE));
-									(*enti)->SetCase((*enti)->Case()->MoveDown()), db++)
-								if(!(*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
-								{
-									db = -1;
-									break;
-								}
-							IA_DEBUG("^v : " + TypToStr(dh) + " and " + TypToStr(db) +
-							         " (" + TypToStr(c->Y()) + " > " + TypToStr(victim->Case()->Y()) + ")");
-							desesperate = (db < 0 && dh < 0)
-							              ? 0
-							              : (db < 0)
-							                ? 2
-							                : (dh < 0)
-							                  ? 1
-							                  : (c->Y() > victim->Case()->Y())
-							                     ? 1
-							                     : (c->Y() < victim->Case()->Y())
-							                       ? 2
-							                       : (db < dh)
-							                         ? 1
-							                         : 2;
-							(*enti)->SetCase(c);
-
-							if(desesperate == 1 && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
-								msg += " v", c = c->MoveDown();
-							else if(desesperate == 2) msg += " ^", c = c->MoveUp();
-							else if(desesperate == 0)
+						uint desesperate = 0;
+						int dh = 0, db = 0;
+						for((*enti)->SetCase(c);
+								!(c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) &&
+								!(c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE));
+								(*enti)->SetCase((*enti)->Case()->MoveUp()), dh++)
+							if(!(*enti)->WantMove(ECMove::Up, MOVE_SIMULE))
 							{
-								if((*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveUp();
-								else msg += " <", c = c->MoveRight();
+								dh = -1;
+								break;
 							}
-						}
-						else if(!(*enti)->WantMove(ECMove::Up, MOVE_SIMULE) || !(*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
-						{
-							uint desesperate = 0;
-							int dl = 0, dr = 0;
-							for((*enti)->SetCase(c);
-							        !(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE)) &&
-									!(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE));
-									(*enti)->SetCase((*enti)->Case()->MoveLeft()), dl++)
-								if(!(*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
-								{
-									dl = -1;
-									break;
-								}
-							for((*enti)->SetCase(c);
-							        !(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE)) &&
-									!(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE));
-									(*enti)->SetCase((*enti)->Case()->MoveRight()), dr++)
-								if(!(*enti)->WantMove(ECMove::Right, MOVE_SIMULE))
-								{
-									dr = -1;
-									break;
-								}
-							IA_DEBUG("<> : " + TypToStr(dl) + " and " + TypToStr(dr) +
-							         " (" + TypToStr(c->X()) + " > " + TypToStr(victim->Case()->X()) + ")");
-							desesperate = (dl < 0 && dr < 0)
-							              ? 0
-							              : (dl < 0)
-							                ? 2
-							                : (dr < 0)
-							                  ? 1
-							                  : (c->X() > victim->Case()->X())
-							                     ? 1
-							                     : (c->X() < victim->Case()->X())
-							                       ? 2
-							                       : (dl < dr)
-							                         ? 1
-							                         : 2;
-							(*enti)->SetCase(c);
-
-							if(desesperate == 1 && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
-								msg += " <", c = c->MoveLeft();
-							else if(desesperate == 2) msg += " >", c = c->MoveRight();
-							else if(desesperate == 0)
+						for((*enti)->SetCase(c);
+								!(c->X() < victim->Case()->X() && (*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) &&
+								!(c->X() > victim->Case()->X() && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE));
+								(*enti)->SetCase((*enti)->Case()->MoveDown()), db++)
+							if(!(*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
 							{
-								if((*enti)->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
-								else msg += " v", c = c->MoveRight();
+								db = -1;
+								break;
 							}
+						IA_DEBUG("^v : " + TypToStr(dh) + " and " + TypToStr(db) +
+									" (" + TypToStr(c->Y()) + " > " + TypToStr(victim->Case()->Y()) + ")");
+						desesperate = (db < 0 && dh < 0)
+										? 0
+										: (db < 0)
+										? 2
+										: (dh < 0)
+											? 1
+											: (c->Y() > victim->Case()->Y())
+												? 1
+												: (c->Y() < victim->Case()->Y())
+												? 2
+												: (db < dh)
+													? 1
+													: 2;
+						(*enti)->SetCase(c);
+
+						if(desesperate == 1 && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
+							msg += " v", c = c->MoveDown();
+						else if(desesperate == 2) msg += " ^", c = c->MoveUp();
+						else if(desesperate == 0)
+						{
+							if((*enti)->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveUp();
+							else msg += " <", c = c->MoveRight();
 						}
 					}
-					(*enti)->SetCase(c);
+					else if(!(*enti)->WantMove(ECMove::Up, MOVE_SIMULE) || !(*enti)->WantMove(ECMove::Down, MOVE_SIMULE))
+					{
+						uint desesperate = 0;
+						int dl = 0, dr = 0;
+						for((*enti)->SetCase(c);
+								!(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE)) &&
+								!(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE));
+								(*enti)->SetCase((*enti)->Case()->MoveLeft()), dl++)
+							if(!(*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
+							{
+								dl = -1;
+								break;
+							}
+						for((*enti)->SetCase(c);
+								!(c->Y() < victim->Case()->Y() && (*enti)->WantMove(ECMove::Down, MOVE_SIMULE)) &&
+								!(c->Y() > victim->Case()->Y() && (*enti)->WantMove(ECMove::Up, MOVE_SIMULE));
+								(*enti)->SetCase((*enti)->Case()->MoveRight()), dr++)
+							if(!(*enti)->WantMove(ECMove::Right, MOVE_SIMULE))
+							{
+								dr = -1;
+								break;
+							}
+						IA_DEBUG("<> : " + TypToStr(dl) + " and " + TypToStr(dr) +
+									" (" + TypToStr(c->X()) + " > " + TypToStr(victim->Case()->X()) + ")");
+						desesperate = (dl < 0 && dr < 0)
+										? 0
+										: (dl < 0)
+										? 2
+										: (dr < 0)
+											? 1
+											: (c->X() > victim->Case()->X())
+												? 1
+												: (c->X() < victim->Case()->X())
+												? 2
+												: (dl < dr)
+													? 1
+													: 2;
+						(*enti)->SetCase(c);
+
+						if(desesperate == 1 && (*enti)->WantMove(ECMove::Left, MOVE_SIMULE))
+							msg += " <", c = c->MoveLeft();
+						else if(desesperate == 2) msg += " >", c = c->MoveRight();
+						else if(desesperate == 0)
+						{
+							if((*enti)->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
+							else msg += " v", c = c->MoveRight();
+						}
+					}
 				}
-				(*enti)->SetCase(original_case);
-				if(!msg.empty())
-					ia_send("ARM " + std::string((*enti)->ID()) + msg);
+				(*enti)->SetCase(c);
 			}
+			(*enti)->SetCase(original_case);
+			if(!msg.empty())
+				ia_send("ARM " + std::string((*enti)->ID()) + msg);
 		}
 	}
 }

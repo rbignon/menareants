@@ -26,6 +26,31 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                                        ECMine                                            *
+ ********************************************************************************************/
+class ECMine : public ECEntity, public ECBMine
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECMine) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+
+	virtual void Played();
+
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
+};
+
+/********************************************************************************************
  *                               ECNuclearSearch                                            *
  ********************************************************************************************/
 class ECNuclearSearch : public ECEntity, public ECBNuclearSearch
@@ -118,14 +143,16 @@ public:
 };
 
 /********************************************************************************************
- *                               ECShipyard                                                 *
+ *                               ECDefenseTower                                             *
  ********************************************************************************************/
-class ECShipyard : public ECEntity, public ECBShipyard
+class ECDefenseTower : public ECEntity, public ECBDefenseTower
 {
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECShipyard) {}
+	ENTITY_CONSTRUCTOR(ECDefenseTower) {}
+
+	ENTITY_CREATE_LAST(ECDefenseTower);
 
 /* Methodes */
 public:
@@ -133,9 +160,11 @@ public:
 	/** @return last case */
 	virtual bool Return() { return false; }
 
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
+
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
+
+	virtual bool WantAttaq(uint x, uint y, bool);
 };
 
 /********************************************************************************************
@@ -179,5 +208,27 @@ public:
 
 	virtual void Union(ECEntity*) { return; }
 };
+
+/********************************************************************************************
+ *                               ECShipyard                                                 *
+ ********************************************************************************************/
+class ECShipyard : public ECEntity, public ECBShipyard
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECShipyard) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+};
+
 
 #endif /* ECD_BATIMENTS_H */

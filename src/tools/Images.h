@@ -152,6 +152,8 @@ public:
 
 	ECImage* First() const;
 
+	bool Alpha() const { return alpha; }
+
 /* Variables publiques */
 public:
 	ECImage *mAnim;
@@ -160,6 +162,7 @@ public:
 	uint mNumframes;
 	bool animation;
 	std::string path;
+	bool alpha;
 };
 
 class ECImage
@@ -236,6 +239,7 @@ public:
 	bool IsNull() const { return !Img; }
 
 	void SetAutoFree(bool b = true) { autofree = b; }
+	void SetAlpha(bool a = true) { alpha = a; }
 
 /* Variables publiques */
 public:

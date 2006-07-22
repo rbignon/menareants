@@ -134,6 +134,16 @@ public:
 	R_RESOURCE_P(ECImage,    FlecheAttaqGauche,PKGDATADIR_PICS "fleches/fleche_attaq_gauche.png", true);
 	R_RESOURCE_P(ECImage,    FlecheAttaqHaut,  PKGDATADIR_PICS "fleches/fleche_attaq_haut.png", true);
 	R_RESOURCE_P(ECImage,    FlecheAttaqBas,   PKGDATADIR_PICS "fleches/fleche_attaq_bas.png", true);
+	R_RESOURCE_P(ECImage,    PointerSelect,    PKGDATADIR_PICS "cursors/select.png", true);
+	R_RESOURCE_P(ECImage,    PointerAttaq,     PKGDATADIR_PICS "cursors/attaq.png", true);
+	R_RESOURCE_P(ECImage,    PointerMaintainedAttaq, PKGDATADIR_PICS "cursors/maintened_attaq.png", true);
+	R_RESOURCE_P(ECImage,    PointerCantAttaq, PKGDATADIR_PICS "cursors/cantattaq.png", true);
+	R_RESOURCE_P(ECImage,    PointerInvest,    PKGDATADIR_PICS "cursors/invest.png", true);
+	R_RESOURCE_P(ECImage,    PointerTop,       PKGDATADIR_PICS "cursors/top.png", true);
+	R_RESOURCE_P(ECImage,    PointerBottom,    PKGDATADIR_PICS "cursors/bottom.png", true);
+	R_RESOURCE_P(ECImage,    PointerLeft,      PKGDATADIR_PICS "cursors/left.png", true);
+	R_RESOURCE_P(ECImage,    PointerRight,     PKGDATADIR_PICS "cursors/right.png", true);
+	R_RESOURCE_P(ECImage,    PointerRadar,     PKGDATADIR_PICS "cursors/radar.png", true);
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
 	R_RESOURCE(ECSpriteBase, NormalButton,     "normalbutton");
@@ -145,8 +155,6 @@ public:
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");
-	R_RESOURCE(ECSpriteBase, CaseVille,        "cases/ville");
-	R_RESOURCE(ECSpriteBase, CaseCapitale,     "cases/capitale");
 	R_RESOURCE(ECSpriteBase, CaseBordNord,     "cases/bordnord");
 	R_RESOURCE(ECSpriteBase, CaseBordSud,      "cases/bordsud");
 	R_RESOURCE(ECSpriteBase, CaseBordEst,      "cases/bordest");
@@ -211,6 +219,16 @@ public:
 	R_RESOURCE(ECSpriteBase, Enginer_Left,      "units/enginer/left");
 	R_RESOURCE(ECSpriteBase, Enginer_Right,     "units/enginer/right");
 	R_RESOURCE(ECSpriteBase, Enginer_Dos,       "units/enginer/dos");
+	R_RESOURCE(ECImage,      DefenseTower_Icon, PKGDATADIR_PICS "units/defensetower_icon.png");
+	R_RESOURCE(ECSpriteBase, DefenseTower_Face, "units/defensetower");
+	R_RESOURCE(ECImage,      Tourist_Icon,      PKGDATADIR_PICS "units/tourist_icon.png");
+	R_RESOURCE(ECSpriteBase, Tourist_Face,      "units/tourist/face");
+	R_RESOURCE(ECSpriteBase, Tourist_Left,      "units/tourist/left");
+	R_RESOURCE(ECSpriteBase, Tourist_Right,     "units/tourist/right");
+	R_RESOURCE(ECSpriteBase, Tourist_Dos,       "units/tourist/dos");
+	R_RESOURCE(ECImage,      Mine_Icon, PKGDATADIR_PICS "units/mine_icon.png");
+	R_RESOURCE(ECSpriteBase, Mine_DesactFace,   "units/mine/desactived");
+	R_RESOURCE(ECSpriteBase, Mine_ActFace,      "units/mine/actived");
 };
 
 #undef R_RESOURCE

@@ -66,8 +66,9 @@ int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
 
 	pl->Client()->ClrPlayer();
 
-	pl->Client()->sendrpl(app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
 	pl->Channel()->RemovePlayer(pl, USE_DELETE);
+	TClient* victim = pl->Client();
+	victim->sendrpl(app.rpl(ECServer::LEAVE), victim->GetNick());
 
 	return 0;
 }
@@ -676,12 +677,25 @@ bool ECPlayer::IsIA() const
 	return (client && client->IsIA());
 }
 
+std::vector<TClient*> ECPlayer::ClientAllies() const
+{
+	std::nrvector<TClient*> players;
+
+	for(BPlayerVector::const_iterator it = allies.begin(); it != allies.end(); ++it)
+	{
+		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
+		if(pl->Client())
+			players.push_back(pl->Client());
+	}
+	return players;
+}
+
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name)
-	: ECBChannel(_name), owner(0), fast_game(true), begin_money(15000)
+	: ECBChannel(_name), owner(0), fast_game(true), begin_money(20000)
 {
 	limite = app.GetConf()->DefLimite(); /* Limite par default */
 	app.NBchan++;
@@ -815,7 +829,8 @@ void EChannel::CheckReadys()
 
 				for(BPlayerVector::iterator pl=players.begin();; ++pl)
 				{
-					std::vector<std::string> units = (pl==players.end() ? Map()->NeutralUnits() : (*pl)->MapPlayer()->Units());
+					std::vector<std::string> units = (pl==players.end() ? Map()->NeutralUnits() :
+					                                                      (*pl)->MapPlayer()->Units());
 					for(std::vector<std::string>::iterator it = units.begin(); it != units.end(); ++it)
 					{
 						std::string line = *it;
@@ -835,7 +850,14 @@ void EChannel::CheckReadys()
 						                                  (*map)(x,y));
 						entity->SetNb(StrToTyp<uint>(number));
 						Map()->AddAnEntity(entity);
-						SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y());
+						if(entity->IsHidden())
+						{
+							if(entity->Owner())
+								SendArm(entity->Owner()->Client(), entity, ARM_CREATE, entity->Case()->X(),
+								                                                       entity->Case()->Y());
+						}
+						else
+							SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y());
 					}
 					if(pl == players.end())
 						break;
@@ -902,7 +924,10 @@ void EChannel::CheckReadys()
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 						{
 							money += (*enti)->TurnMoney();
-							if((*enti)->IsBuilding() || !FastGame())
+							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
+							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
+							 */
+							if((*enti)->IsBuilding() && !(*enti)->IsHidden() && !(*enti)->IsNaval() || !FastGame())
 								nb_units++;
 						}
 						if(!nb_units)
@@ -978,7 +1003,7 @@ bool EChannel::CheckEndOfGame()
 void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
                        std::vector<ECEvent*> events)
 {
-	std::nrvector<TClient*> clv;
+	std::vector<TClient*> clv;
 	if(cl)
 		clv.push_back(cl);
 
@@ -1002,7 +1027,7 @@ void EChannel::SendArm(TClient* cl, ECEntity* et, uint flag, uint x, uint y, ECD
 	if(et)
 		plv.push_back(et);
 
-	std::nrvector<TClient*> clv;
+	std::vector<TClient*> clv;
 	if(cl)
 		clv.push_back(cl);
 
@@ -1095,6 +1120,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += " ~" + TypToStr(data.type) + "," + data.data;
 	if(flag & ARM_UPGRADE)
 		to_send += " °";
+	if(flag & ARM_CHANGEOWNER)
+		to_send += " @";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
 	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)

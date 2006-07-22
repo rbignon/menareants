@@ -159,7 +159,6 @@ bool ECEvent::operator<(const ECEvent& e) const
 	EV(UNCONTAIN);
 	EV(UNION);
 	EV_IF(DEPLOY, ARM_DEPLOY, Entity()->Deployed(), e.Entity()->Deployed());
-	EV(DEPLOY);
 	EV(ATTAQ);
 	EV(UPGRADE);
 
@@ -334,7 +333,7 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 		{
 			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
 			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-				if((*it)->IsCountryMaker())
+				if((*it)->IsCity())
 					(*it)->ChangeOwner(owner ? owner->Player() : 0);
 		}
 		if(owner && owner->Player())
@@ -371,7 +370,7 @@ void ECEntity::ChangeOwner(ECBPlayer* pl)
 	if(Owner() == pl) return;
 	ECPlayer* last_owner = Owner();
 	EChannel* c = Channel();
-	c->SendArm(NULL, this, ARM_REMOVE);
+	c->SendArm(NULL, this, ARM_REMOVE|ARM_CHANGEOWNER);
 	SetOwner(pl);
 
 	if(last_owner)

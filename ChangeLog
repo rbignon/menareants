@@ -1,4 +1,72 @@
-2006-07-06  Romain Bignon <progs@headfucking.net>
+2006-07-22  Romain Bignon <progs@headfucking.net>
+
+	* Passage à la version 0.3(P7)(SVN-801)-dev
+
+	* lib/Batiments.h (ECDefenseTower): Récupération de ECityBuilding pour créer la Tour de défense.
+
+	* src/gui/ShowMap.h: Utilisation d'un système de callback pour afficher des sprites après les entités.
+
+	* server/Channels.cpp: En mode "partie rapide", les batiments cachés ou d'eau ne comptent plus pour être maintenu en vie.
+
+2006-07-20  Romain Bignon <progs@headfucking.net>
+
+	* src/Batiments.h (ECMine): Création des mines.
+
+	* src/Map.h, server/InGame.cpp: Fonction constante "IsHidden" qui n'affiche l'unité concernée qu'aux alliées, et à tout
+	le monde lors d'un combat.
+
+	* src/data/pics/barrelat.png: Intégration d'une nouvelle barre laterale.
+
+	* src/gui/ProgressBar.cpp: Flag "background" qui permet de le cacher.
+
+2006-07-19  Romain Bignon <progs@headfucking.net>
+
+	* Units.h (ECTouriste): Touriste Japonais, première unité spéciale d'une nation.
+
+	* lib/Map.h, lib/Units.h: La fonction CanBeCreated(ECPlayer* pl) redirive vers CanBeCreated(pl->Nation()) qui est créée
+	et qui renvoie "true" par défaut pour toutes les unités, et les unités spéciales surchargent la fonction en renvoyant
+	"true" que pour la nation qui peut la créer.
+
+	* src/Map.cpp (SetShadowedCases): Correction du bug qui mettait un champs de vision trop gros si l'unité était trop près
+	du bord de la map.
+
+	* src/gui/Cursors.cpp, src/InGame.cpp: Curseur de selection sur le radar.
+
+2006-07-18  Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Cursor.cpp (TCursor): Création du composant qui gère les curseurs.
+
+	* src/InGame.cpp: Utilisation du TCursor dans le jeu.
+
+	* src/data/pics/cursors: Ajout de plusieurs curseurs (à titre experimentaux).
+
+	* lib/Map.h, lib/Batiments.h: ECBEntity::IsCity() pour différencier les CountryMaker des autres batiments de la ville.
+
+	* server/InGame.cpp: Même quand on a pas bougé on vérifie quand même qu'il y a pas attaque.
+
+	* server/Map.cpp: Tous les batiments de la ville sont changés d'owner.
+
+	* server/Units.cpp: Affaiblissement de la puissance des lance-missiles.
+
+2006-07-17  Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (KICKCommand): Correction d'un bug avec les IA.
+
+	* src/JoinGame.cpp (LEACommand): Met à jour le bouton "Lancer la partie".
+
+	* src/gui/Component.h (Mouse): Fonction qui détecte la présence de la souris sans inclure le fait que le composant
+	soit ou non Enabled.
+
+	* server/maps/: Remodelage des maps en utilisant les "nouvelles villes" de 4 cases (enfin trois pour le moment).
+
+	* lib/Batiments.h:
+	- La caserne et l'usine de chars ne sont plus constructibles.
+	- Le centre d'affaire (ex Capitale) est l'upgrade du centre ville (ex Ville).
+
+	* src/gui/ShowMap.cpp (Draw): Les batiments sont dessinés en même temps que les villes, ce qui fait que dans tous les cas
+	les unités sont au dessus des batiments.
+
+2006-07-16  Romain Bignon <progs@headfucking.net>
 
 	* src/Images.h (ECSpriteBase): Reprogrammation de la fonction d'ouverture pour l'adapter un peu plus au c++.
 	(ECImage): Gère maintenant le canal alpha des images.

@@ -85,6 +85,12 @@ void EChannel::NextAnim()
 					it = entv.erase(it);
 				else
 				{
+					/* Si l'unité est hidden, il faut bien montrer son existance lors d'un combat, donc on créé l'unité.
+					   Les alliés du propriétaire ont déjà vu la création de l'unité, et vont donc recevoir une nouvelle
+					   ligne, mais theoriquement ils devraient l'ignorer. */
+					if((*it)->IsHidden())
+						SendArm(0, *it, ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, (*it)->Case()->X(), (*it)->Case()->Y());
+
 					(*it)->SetShadowed();
 					(*it)->Tag = T_CONTINUE;
 					++it;
@@ -92,10 +98,7 @@ void EChannel::NextAnim()
 			}
 			/* Si l'evenement ne contenait que des unités locked, on s'en va (genre elle a été supprimée précédemment) */
 			if(entv.empty())
-			{
-				dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
-				return;
-			}
+				break;
 
 			uint flags = ARM_ATTAQ;
 			if(!event->Linked().empty())
@@ -172,6 +175,8 @@ void EChannel::NextAnim()
 					}
 					else
 					{
+						if((*it)->EventType() & ARM_DEPLOY)
+							SendArm(NULL, event->Entities()->List(), ARM_DEPLOY);
 						SendArm(receivers, *it, ARM_NUMBER);
 						EContainer* contain = dynamic_cast<EContainer*>(*it);
 						if(contain && contain->Containing())
@@ -208,11 +213,20 @@ void EChannel::NextAnim()
 			break;
 		}
 		case ARM_DEPLOY:
-			SendArm(NULL, event->Entities()->List(), ARM_DEPLOY);
+			if(!(event->Entity()->EventType() & ARM_ATTAQ))
+				SendArm(NULL, event->Entities()->List(), ARM_DEPLOY);
 			break;
 		case ARM_CREATE:
-			SendArm(NULL, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
-			                                         event->Case()->Y());
+			if(event->Entity()->IsHidden())
+			{
+				if(!event->Entity()->Owner() || event->Entity()->Owner()->NbAllies() == 0)
+					break;
+				SendArm(event->Entity()->Owner()->ClientAllies(), event->Entities()->List(),
+				        ARM_CREATE, event->Case()->X(), event->Case()->Y());
+			}
+			else
+				SendArm(0, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
+				                                                                           event->Case()->Y());
 			break;
 		case ARM_CONTAIN:
 		case ARM_UNCONTAIN:
@@ -465,7 +479,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				chan->Map()->AddAnEntity(entity);
 				map->AddEvent(event);
 				nb = event->Nb();
-				entity->SetEvent(flags);
+				entity->AddEvent(flags);
 			}
 		}
 	}
@@ -515,6 +529,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			/*****************************
 			 *  GESTION DES DÉPLOIEMENTS *
 			 *****************************/
+#if 0
 			EventVector evts = map->Events();
 			bool can_create_event = true;
 			for(EventVector::iterator evti = evts.begin(); evti != evts.end();)
@@ -534,18 +549,19 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			if(can_create_event)
 			{
+#endif
 				Debug(W_DEBUG, "Création d'un evenement de déploiement");
 				ECEvent* event = new ECEvent(ARM_DEPLOY, entity->Case());
 				event->Entities()->Add(entity);
 				map->AddEvent(event);
-			}
+			//}
 		}
 		if(flags & ARM_MOVE)
 		{
 			/*****************************
 			 *  GESTION DES DÉPLACEMENTS *
 			 *****************************/
-			entity->SetEvent(flags);
+			entity->AddEvent(flags);
 
 			EventVector evts = map->Events();
 			ECEvent* event_found = 0;
@@ -579,22 +595,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					Debug(W_DEBUG, "On a trouvé un déplacement continue au mien");
 				}
 
-				if(entity->Case() == last_case)
-				{
-					++evti;
-					continue;
-				}
-
-				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
-				 * on supprime mon entité
-				 */
-				if(last_case && (*evti)->Case() == last_case && (*evti)->Flags() == ARM_ATTAQ &&
-				   (*evti)->Entities()->Find(entity))
-				{
-					/* On sous traite à la fonction dont le nom fait rêver */
-					delete_event = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
-				}
-
 				/* On regarde si, sur la nouvelle case, il y a un evenement d'attaque.
 				 * Note: il n'y a pas besoin de vérifier tout le parcourt, en effet, c'est à chaque
 				 *       appel de ECEntity::WantMove() qu'il est censé le faire
@@ -614,6 +614,23 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						Debug(W_DEBUG, "On a trouvé un evenement d'attaque");
 					}
 				}
+
+				if(entity->Case() == last_case)
+				{
+					++evti;
+					continue;
+				}
+
+				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
+				 * on supprime mon entité
+				 */
+				if(last_case && (*evti)->Case() == last_case && (*evti)->Flags() == ARM_ATTAQ &&
+				   (*evti)->Entities()->Find(entity))
+				{
+					/* On sous traite à la fonction dont le nom fait rêver */
+					delete_event = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
+				}
+
 				if(delete_event)
 				{
 					map->RemoveEvent(*evti, USE_DELETE);
@@ -752,7 +769,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						attaq_event = new ECEvent(ARM_ATTAQ, c);
 						map->AddEvent(attaq_event);
 						attaq_event->Entities()->Add(entity);
-						entity->SetEvent(flags);
+						entity->AddEvent(flags);
 					}
 					std::vector<ECBEntity*> entities = c->Entities()->List();
 					ECEntity* next_entity = 0;
@@ -787,7 +804,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 								attaq_event = new ECEvent(ARM_ATTAQ, c);
 								map->AddEvent(attaq_event);
 								attaq_event->Entities()->Add(entity);
-								entity->SetEvent(flags);
+								entity->AddEvent(flags);
 							}
 							attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
 						}
@@ -808,7 +825,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				else
 				{
 					Debug(W_DEBUG, "Il y a déjà une attaque, on ne prévient PAS les attaqués");
-					entity->SetEvent(flags);
+					entity->AddEvent(flags);
 				}
 			}
 		}

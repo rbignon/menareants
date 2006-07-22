@@ -31,11 +31,11 @@
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"6"
+#define APP_PVERSION	"7"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"2.5"
+#define APP_VERSION_BETA	"3.0"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
@@ -65,7 +65,7 @@ const unsigned int GAMELEN=20;
  * </pre>
  */
 #define FOR(T, v, x) \
-                       T (x); \
-                       for(std::vector<T>::iterator sdfsdfit = (v).begin(); (x = *sdfsdfit) && sdfsdfit != (v).end(); ++sdfsdfit)
+                          T (x); \
+                          for(std::vector<T>::iterator sdfsdfit = (v).begin(); sdfsdfit != (v).end() && (x = *sdfsdfit); ++sdfsdfit)
 
 #endif /* ECLIB_Defines_h */

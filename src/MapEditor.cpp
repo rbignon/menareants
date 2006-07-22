@@ -377,6 +377,25 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 				MapEditor->Actions(event);
 				switch(event.type)
 				{
+					case SDL_KEYUP:
+					{
+						switch(event.key.keysym.sym)
+						{
+							case SDLK_DELETE:
+							{
+								ECEntity* entity = 0;
+								if((entity = MapEditor->BarreEntity->Entity()))
+								{
+									MapEditor->BarreEntity->UnSelect();
+									map->RemoveAnEntity(entity);
+									map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+									break;
+								}
+								break;
+							}
+							default: break;
+						}
+					}
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(MapEditor->Map->CreateEntity())
@@ -398,6 +417,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								MapEditor->Map->SetCreateEntity(0);
 								MapEditor->BarreEntity->SetEntity(et);
 								MapEditor->Map->SetPosition(MapEditor->Map->X(), MapEditor->Map->Y(), true);
+								map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 							}
 							break;
 						}
@@ -432,7 +452,8 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							else
 							{
 								TMessageBox mb("Vous n'avez pas configuré la carte, vous ne pouvez donc pas la sauvegarder.\n"
-								               "Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL, MapEditor);
+								               "Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL,
+								                MapEditor);
 								result = mb.Show();
 							}
 							if(result != BT_CANCEL)
@@ -557,11 +578,11 @@ TMapEditor::TMapEditor(ECImage* w, ECMap *m)
 	Map->SetBrouillard(false);
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
 
-	BarreLat = AddComponent(new TEditBarreLat);
 	BarreEntity = AddComponent(new TBarreEntity);
 	BarreEntity->Hide();
 	BarreCase = AddComponent(new TBarreCase);
 	BarreCase->Hide();
+	BarreLat = AddComponent(new TEditBarreLat);
 
 	ShowBarreLat();
 	SetFocusOrder(false);
@@ -726,17 +747,17 @@ void TBarreCase::Update(ECase* c)
 }
 
 TBarreCase::TBarreCase()
-	: TChildForm(0, SCREEN_HEIGHT-100, SCREEN_WIDTH-150, 100)
+	: TChildForm(0, SCREEN_HEIGHT-110, SCREEN_WIDTH-200, 110)
 {
 
 }
 
 void TBarreCase::Init()
 {
-	Icons = AddComponent(new TBarreCaseIcons(100,1));
+	Icons = AddComponent(new TBarreCaseIcons(100,10));
 	Icons->SetList();
 
-	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 5, 100, Height()-25));
+	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 15, 100, Height()-25));
 	Country->SetOnClick(TBarreCase::ChangeOwner, 0);
 
 	SetBackground(Resources::BarreAct());
@@ -855,23 +876,23 @@ void TBarreEntity::SetEntity(ECEntity* e)
 }
 
 TBarreEntity::TBarreEntity()
-	: TChildForm(0, SCREEN_HEIGHT-100, SCREEN_WIDTH-150, 100), entity(0)
+	: TChildForm(0, SCREEN_HEIGHT-110, SCREEN_WIDTH-200, 110), entity(0)
 {
 
 }
 
 void TBarreEntity::Init()
 {
-	Name = AddComponent(new TLabel(60,5, "", black_color, Font::GetInstance(Font::Big)));
+	Name = AddComponent(new TLabel(60,15, "", black_color, Font::GetInstance(Font::Big)));
 
-	RemoveButton = AddComponent(new TButtonText(Width()-150,5,100,30, "Supprimer", Font::GetInstance(Font::Small)));
+	RemoveButton = AddComponent(new TButtonText(Width()-150,15,100,30, "Supprimer", Font::GetInstance(Font::Small)));
 	RemoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
-	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 5, 100, Height()-15));
+	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 15, 100, Height()-15));
 
-	Icon = AddComponent(new TImage(5,5));
+	Icon = AddComponent(new TImage(5,15));
 
-	Nb = AddComponent(new TEdit(Font::GetInstance(Font::Small), 5,55,100));
+	Nb = AddComponent(new TEdit(Font::GetInstance(Font::Small), 5,65,100));
 	Nb->SetAvailChars("0123456789");
 
 	SetBackground(Resources::BarreAct());
@@ -953,29 +974,33 @@ void TEditBarreLat::RadarClick(TObject* m, int x, int y)
 }
 
 TEditBarreLat::TEditBarreLat()
-	: TChildForm(SCREEN_WIDTH-150, 0, 150, SCREEN_HEIGHT)
+	: TChildForm(SCREEN_WIDTH-200, 0, 200, SCREEN_HEIGHT)
 {
 
 }
 
 void TEditBarreLat::Init()
 {
-	QuitButton = AddComponent(new TButtonText(30,200,100,30, "Fermer", Font::GetInstance(Font::Small)));
+	QuitButton = AddComponent(new TButtonText(30,240,100,30, "Fermer", Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-	OptionsButton = AddComponent(new TButtonText(30,230,100,30, "Configuration", Font::GetInstance(Font::Small)));
+	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
+	OptionsButton = AddComponent(new TButtonText(30,270,100,30, "Configuration", Font::GetInstance(Font::Small)));
 	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-	SaveButton = AddComponent(new TButtonText(30,260,100,30, "Sauvegarder", Font::GetInstance(Font::Small)));
+	OptionsButton->SetX(X() + Width()/2 - OptionsButton->Width()/2);
+	SaveButton = AddComponent(new TButtonText(30,300,100,30, "Sauvegarder", Font::GetInstance(Font::Small)));
 	SaveButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+	SaveButton->SetX(X() + Width()/2 - SaveButton->Width()/2);
 
 	TMapEditor* editor = dynamic_cast<TMapEditor*>(Parent());
 
 	OptionsButton->SetOnClick(TOptionsMap::Options, (void*)editor->Map->Map());
 
-	Icons = AddComponent(new TEditBarreLatIcons(20, 300));
+	Icons = AddComponent(new TEditBarreLatIcons(20, 340));
 	Icons->SetList(EntityList.List());
+	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 
 	editor->Map->Map()->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
-	int _x = 15 + 60 - editor->Map->Map()->Preview()->GetWidth() / 2 ;
+	int _x = 40 + 60 - editor->Map->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - editor->Map->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y, false));
 	Radar->SetImage(editor->Map->Map()->Preview(), false);
@@ -1279,7 +1304,8 @@ void MenAreAntsApp::MapEditor()
 						}
 						else if(LoadMapFile->LoadButton->Test(event.button.x, event.button.y))
 						{
-							if(!TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
+							if(LoadMapFile->MapsList->GetSelectedItem() &&
+							   !TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
 										LoadMapFile->MapsList->GetSelectedItem()).c_str()))
 							{
 								TMessageBox mb(std::string("Impossible d'ouvrir la map " +
@@ -1289,6 +1315,7 @@ void MenAreAntsApp::MapEditor()
 								mb.Show();
 							}
 							LoadMapFile->Refresh();
+							LoadMapFile->LoadButton->SetEnabled(false);
 						}
 						else if(LoadMapFile->RetourButton->Test(event.button.x, event.button.y))
 							eob = true;

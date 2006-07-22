@@ -97,13 +97,21 @@ uint TProgressBar::CalculeValBarre (long val) const
 void TProgressBar::Draw(int souris_x, int souris_y)
 {
 	int left, right;
-	
-	// Bordure
-	image.Fill(border_color);
-	
-	// Fond
-	SDL_Rect r_back = {1, 1, Width() - 2, Height() - 2};
-	image.FillRect(r_back, background_color);
+
+	if(background)
+	{
+		// Bordure
+		image.Fill(border_color);
+		
+		// Fond
+		SDL_Rect r_back = {1, 1, Width() - 2, Height() - 2};
+		image.FillRect(r_back, background_color);
+	}
+	else
+	{
+		SDL_Rect r_back = {0, 0, Width(), Height()};
+		image.FillRect(r_back, image.MapRGBA(0,0,0,0));
+	}
 	
 	// Valeur
 	if (m_use_ref_val)

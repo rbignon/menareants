@@ -27,20 +27,22 @@
 #include <SDL_gfxPrimitives.h>
 
 /********************************************************************************************
- *                                ECMissiLauncher                                           *
+ *                                ECTourist                                                 *
  ********************************************************************************************/
 
-void ECMissiLauncher::Draw()
+void ECTourist::ChangeCase(ECBCase* newcase)
 {
-	ECEntity::Draw();
-	missile.Draw();
-#if 0
-	if(Selected())
-		circleColor(Image()->Window(), Image()->X() + Image()->GetWidth()/2, Image()->Y() + Image()->GetHeight()/2,
-		            MISSILAUNCHER_PORTY * CASE_WIDTH,
-		            SDL_MapRGB(Image()->Window()->format, blue_color.r, blue_color.g, blue_color.b));
-#endif
+	/* Le touriste ne permet pas aux cases par lesquelles il est passé de se remettre en Showed == 0.
+	 * Elles sont donc visibles en permanence. Pour cela, il va incrémenter deux fois Showed quand il arrive,
+	 * comme ça meme quand il partira ça décrémentera qu'une fois et la valeur sera au minimum de 1.
+	 */
+	ECEntity::ChangeCase(newcase);
+	SetShowedCases(true);
 }
+
+/********************************************************************************************
+ *                                ECMissiLauncher                                           *
+ ********************************************************************************************/
 
 bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
@@ -248,7 +250,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
 	if(event_type & ARM_ATTAQ)
 	{
-		if(Case()->Showed() > 0)
+		if(Case()->Showed() > 0 && images[I_Attaq])
 		{
 			if(!AttaqImg())
 			{

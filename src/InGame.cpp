@@ -31,6 +31,7 @@
 #include "Timer.h"
 #include "Units.h"
 #include "gui/ColorEdit.h"
+#include "gui/Cursor.h"
 #include "gui/MessageBox.h"
 #include "gui/ProgressBar.h"
 #include "tools/Font.h"
@@ -170,6 +171,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				data = ECData(StrToTyp<int>(type), dt);
 				break;
 			}
+			case '@':
+				flags |= ARM_CHANGEOWNER;
+				break;
 			case '/':
 			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -367,13 +371,18 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				case ARM_ATTAQ|ARM_MOVE:
 				case ARM_ATTAQ:
-					L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
+					if(!(flags & ARM_CHANGEOWNER))
+						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
 					break;
 			}
 			if((*it)->Selected() && InGameForm)
 				InGameForm->BarreAct->SetEntity(0);
 
 			me->LockScreen();
+
+			EContainer* contain;
+			if((contain = dynamic_cast<EContainer*>((*it)->Parent())))
+				contain->SetContaining(0);
 
 			(*it)->SetShowedCases(false);
 			if(InGameForm)
@@ -392,9 +401,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			me->UnlockScreen();
 		}
 		InGameForm->BarreAct->Update();
+		InGameForm->SetCursor(0);
 	}
-	/*else if(flags & ARM_NUMBER && chan->CurrentEvent() & ARM_ATTAQ)
-			SDL_Delay(500);*/
 	return 0;
 }
 #undef L_INFO
@@ -416,6 +424,97 @@ public:
 	}
 };
 
+const char W_EXTRACT = 3;
+const char W_ATTAQ = 2;
+const char W_MOVE = 1;
+const char W_NONE = 0;
+
+void TInGameForm::SetCursor(const char want)
+{
+	if(BarreLat->Test(Cursor->X(), Cursor->Y()) ||
+	   BarreAct->Test(Cursor->X(), Cursor->Y()) ||
+	   Player()->Channel()->State() != EChannel::PLAYING)
+	{
+		if(BarreLat->Radar->Test(Cursor->X(), Cursor->Y()))
+			Cursor->SetCursor(TCursor::Radar);
+		else
+			Cursor->SetCursor(TCursor::Standard);
+		return;
+	}
+
+	ECase* acase = Map->TestCase(Cursor->X(), Cursor->Y());
+	ECEntity* entity = BarreAct->Entity();
+
+	if(!acase || acase->Showed() <= 0)
+	{
+		Cursor->SetCursor(TCursor::Standard);
+		return;
+	}
+
+	std::vector<ECBEntity*> ents = acase->Entities()->List();
+	ECBCase* e_case = !entity ? 0 : entity->Move()->Empty() ? entity->Case() : entity->Move()->Dest();
+
+	if(want == W_ATTAQ && entity)
+	{
+		if(!(entity->EventType() & ARM_ATTAQ) && acase->Delta(e_case) <= entity->Porty())
+		{
+			if(IsPressed(SDLK_LCTRL))
+			{
+				Cursor->SetCursor(TCursor::MaintainedAttaq);
+				return;
+			}
+			FOR(ECBEntity*, ents, enti)
+				if(entity->CanAttaq(enti) && !entity->Like(enti))
+				{
+					Cursor->SetCursor(TCursor::Attaq);
+					return;
+				}
+		}
+		Cursor->SetCursor(TCursor::CantAttaq);
+	}
+	else
+	{
+		if(IsPressed(SDLK_LALT) && entity && !Player()->Ready() && entity->Move()->Size() < entity->MyStep() &&
+		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
+		   entity->MyStep() - entity->Move()->Size() >= acase->Delta(e_case) &&
+		   !entity->Deployed() && !(entity->EventType() & ARM_DEPLOY))
+		{
+			int can_invest = 0;
+			FOR(ECBEntity*, ents, enti)
+			{
+				if(entity->CanInvest(enti) && !entity->Like(enti)) can_invest = 1;
+				if(!enti->Like(entity) && enti->CanAttaq(entity))
+				{
+					can_invest = -1;
+					break;
+				}
+			}
+
+			if(can_invest > 0)
+			{
+				Cursor->SetCursor(TCursor::Invest);
+				return;
+			}
+			else
+			{
+				Cursor->SetCursor(e_case->X() < acase->X() ? TCursor::Right
+				                : e_case->X() > acase->X() ? TCursor::Left
+				                : e_case->Y() < acase->Y() ? TCursor::Bottom
+				                : e_case->Y() > acase->Y() ? TCursor::Top
+				                : TCursor::Standard);
+				return;
+			}
+		}
+
+		if(!IsPressed(SDLK_LALT) && !ents.empty())
+		{
+			Cursor->SetCursor(TCursor::Select);
+			return;
+		}
+		Cursor->SetCursor(TCursor::Standard);
+	}
+}
+
 void MenAreAntsApp::InGame()
 {
 	EC_Client* client = EC_Client::GetInstance();
@@ -434,10 +533,6 @@ void MenAreAntsApp::InGame()
 		InGameForm->Map->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
-		const char W_EXTRACT = 3;
-		const char W_ATTAQ = 2;
-		const char W_MOVE = 1;
-		const char W_NONE = 0;
 		char want = 0;
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
@@ -488,6 +583,20 @@ void MenAreAntsApp::InGame()
 					case SDL_KEYDOWN:
 						if(InGameForm->SendMessage->Focused())
 							InGameForm->Map->ToRedraw(InGameForm->SendMessage);
+
+						if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
+						{
+							switch(event.key.keysym.sym)
+							{
+								case SDLK_LCTRL:
+								case SDLK_LSHIFT:
+									if(InGameForm->BarreAct->Entity() && InGameForm->BarreAct->Entity()->WantAttaq(0,0))
+										want = W_ATTAQ;
+									break;
+								default: break;
+							}
+							InGameForm->SetCursor(want);
+						}
 						break;
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
@@ -549,9 +658,19 @@ void MenAreAntsApp::InGame()
 									InGameForm->Map->ToRedraw(InGameForm->SendMessage);
 								}
 								break;
+							case SDLK_LCTRL:
+							case SDLK_LSHIFT:
+								want = 0;
+								break;
 							default: break;
 						}
+						InGameForm->SetCursor(want);
 						break;
+					case SDL_MOUSEMOTION:
+					{
+						InGameForm->SetCursor(want);
+						break;
+					}
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
@@ -648,7 +767,7 @@ void MenAreAntsApp::InGame()
 						int mywant = want;
 						if(InGameForm->IsPressed(SDLK_SPACE) || want == W_EXTRACT)
 							mywant = W_EXTRACT;
-						else if(event.button.button == MBUTTON_RIGHT)
+						else if(event.button.button == MBUTTON_RIGHT || InGameForm->IsPressed(SDLK_LALT))
 							mywant = W_MOVE;
 						else if(event.button.button != MBUTTON_LEFT)
 							mywant = W_NONE;
@@ -742,6 +861,7 @@ void MenAreAntsApp::InGame()
 							else if(!mywant && event.button.button == MBUTTON_LEFT)
 									InGameForm->BarreAct->UnSelect();
 						}
+						InGameForm->SetCursor(want);
 						break;
 					}
 					default:
@@ -874,6 +994,9 @@ TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
 
 	SetFocusOrder(false);
 	SetHint(BarreLat->UnitsInfos);
+
+	Cursor = AddComponent(new TCursor);
+	Cursor->SetMap(Map);
 
 	Thread = 0;
 }
@@ -1033,6 +1156,7 @@ void TBarreAct::vSetEntity(void* _e)
 		else
 			InGameForm->BarreAct->Infos->SetCaption("");
 		InGameForm->BarreAct->Icon->SetImage(e->Icon(), false);
+		InGameForm->BarreAct->Icon->SetHint(e->Infos());
 
 		int x = InGameForm->BarreAct->Width() - 5;
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
@@ -1060,17 +1184,25 @@ void TBarreAct::vSetEntity(void* _e)
 				InGameForm->BarreAct->UpgradeButton->Show();
 				InGameForm->BarreAct->UpgradeButton->SetHint(std::string(upgrade->Name()) + "\n" +
 				                                             "Coût: " + TypToStr(upgrade->Cost()) + " $");
-				InGameForm->BarreAct->UpgradeButton->SetEnabled((int(e->Cost()) <= e->Owner()->Money()));
+				InGameForm->BarreAct->UpgradeButton->SetEnabled((int(upgrade->Cost()) <= e->Owner()->Money()));
 				InGameForm->BarreAct->UpgradeButton->SetX((x-=InGameForm->BarreAct->UpgradeButton->Width()));
 			}
 			else
 				InGameForm->BarreAct->UpgradeButton->Hide();
 
-			InGameForm->BarreAct->DeployButton->SetVisible(e->WantDeploy());
+			if(e->WantDeploy())
+			{
+				InGameForm->BarreAct->DeployButton->Show();
+				InGameForm->BarreAct->DeployButton->SetX((x -= InGameForm->BarreAct->DeployButton->Width()));
+				InGameForm->BarreAct->DeployButton->SetEnabled(!(e->EventType() & ARM_DEPLOY));
+				InGameForm->BarreAct->DeployButton->SetText(e->Deployed() ? "Replier" : "Déployer");
+			}
+			else
+				InGameForm->BarreAct->DeployButton->Hide();
+
 			InGameForm->BarreAct->AttaqButton->SetVisible(e->WantAttaq(0,0));
 
 			if(e->WantAttaq(0,0)) InGameForm->BarreAct->AttaqButton->SetX((x -= InGameForm->BarreAct->AttaqButton->Width()));
-			if(e->WantDeploy()) InGameForm->BarreAct->DeployButton->SetX((x -= InGameForm->BarreAct->DeployButton->Width()));
 		}
 		else
 		{
@@ -1118,9 +1250,10 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->Show();
 			while(InGameForm->BarreAct->Y() > int(SCREEN_HEIGHT - InGameForm->BarreAct->Height()))
 			{
-				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()-4), SDL_Delay(10);
+				InGameForm->BarreAct->SetY(InGameForm->BarreAct->Y()-4), SDL_Delay(10);
 				InGameForm->Map->ToRedraw(InGameForm->BarreAct);
 			}
+			InGameForm->BarreAct->SetY(SCREEN_HEIGHT - InGameForm->BarreAct->Height());
 			InGameForm->ShowBarreAct(true);
 		}
 		InGameForm->BarreAct->entity = e;
@@ -1146,7 +1279,7 @@ void TBarreAct::vSetEntity(void* _e)
 }
 
 TBarreAct::TBarreAct(ECPlayer* pl)
-	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-150, 100), entity(0)
+	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-200, 110), entity(0)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
@@ -1155,35 +1288,35 @@ TBarreAct::TBarreAct(ECPlayer* pl)
 
 void TBarreAct::Init()
 {
-	Name = AddComponent(new TLabel(60,5, "", black_color, Font::GetInstance(Font::Big)));
+	Name = AddComponent(new TLabel(60,15, "", black_color, Font::GetInstance(Font::Big)));
 
-	DeployButton = AddComponent(new TButtonText(300,5,100,30, "Déployer", Font::GetInstance(Font::Small)));
+	DeployButton = AddComponent(new TButtonText(300,15,100,30, "Déployer", Font::GetInstance(Font::Small)));
 	DeployButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	DeployButton->SetHint("Déployer l'unité pour lui permettre d'avoir des capacités en plus.");
-	AttaqButton = AddComponent(new TButtonText(400,5,100,30, "Attaquer", Font::GetInstance(Font::Small)));
+	AttaqButton = AddComponent(new TButtonText(400,15,100,30, "Attaquer", Font::GetInstance(Font::Small)));
 	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	AttaqButton->SetHint("Attaquer une autre unité sur une case choisie (cliquez dessus).\n$ Maj + clic");
-	UpButton = AddComponent(new TButtonText(500,5,100,30, "Ajouter", Font::GetInstance(Font::Small)));
+	UpButton = AddComponent(new TButtonText(500,15,100,30, "Ajouter", Font::GetInstance(Font::Small)));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	ExtractButton = AddComponent(new TButtonText(500,5,100,30, "Extraire", Font::GetInstance(Font::Small)));
+	ExtractButton = AddComponent(new TButtonText(500,15,100,30, "Extraire", Font::GetInstance(Font::Small)));
 	ExtractButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	ExtractButton->SetHint("Cliquez ensuite sur la case où vous voulez que l'unité contenue aille.\n$ Espace + clic");
-	UpgradeButton = AddComponent(new TButtonText(500,5,100,30, "Upgrade", Font::GetInstance(Font::Small)));
+	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, "Upgrade", Font::GetInstance(Font::Small)));
 	UpgradeButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	UpgradeButton->SetHint("Utiliser l'amélioration de ce batiment.");
 
-	Owner = AddComponent(new TLabel(60,30, "", black_color, Font::GetInstance(Font::Normal)));
+	Owner = AddComponent(new TLabel(60,40, "", black_color, Font::GetInstance(Font::Normal)));
 
-	Icon = AddComponent(new TImage(5,5));
-	Nb = AddComponent(new TLabel(5,55, "", black_color, Font::GetInstance(Font::Normal)));
-	SpecialInfo = AddComponent(new TLabel(5,75, "", black_color, Font::GetInstance(Font::Normal)));
-	Infos = AddComponent(new TLabel(5, 75, "", red_color, Font::GetInstance(Font::Normal)));
+	Icon = AddComponent(new TImage(5,15));
+	Nb = AddComponent(new TLabel(5,65, "", black_color, Font::GetInstance(Font::Normal)));
+	SpecialInfo = AddComponent(new TLabel(5,85, "", black_color, Font::GetInstance(Font::Normal)));
+	Infos = AddComponent(new TLabel(5, 85, "", red_color, Font::GetInstance(Font::Normal)));
 
-	Icons = AddComponent(new TBarreActIcons(200, 49));
+	Icons = AddComponent(new TBarreActIcons(200, 59));
 
-	ChildIcon = AddComponent(new TImage(200,50));
+	ChildIcon = AddComponent(new TImage(200,60));
 	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
-	ChildNb = AddComponent(new TLabel(260,70, "", black_color, Font::GetInstance(Font::Normal)));
+	ChildNb = AddComponent(new TLabel(260,80, "", black_color, Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::BarreAct());
 }
@@ -1211,7 +1344,7 @@ void TBarreLat::RadarClick(TObject* m, int x, int y)
 }
 
 TBarreLat::TBarreLat(ECPlayer* pl)
-	: TChildForm(SCREEN_WIDTH-150, 0, 150, SCREEN_HEIGHT)
+	: TChildForm(SCREEN_WIDTH-200, 0, 200, SCREEN_HEIGHT)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
@@ -1220,9 +1353,12 @@ TBarreLat::TBarreLat(ECPlayer* pl)
 
 void TBarreLat::Init()
 {
-	ProgressBar = AddComponent(new TProgressBar(15, 190, Width()-30, 15));
+	ProgressBar = AddComponent(new TProgressBar(39, 202, 117, 12));
 	ProgressBar->InitVal(0, 0, chan->TurnTime());
-	ProgressBar->SetX(X() + Width()/2 - ProgressBar->Width()/2);
+	ProgressBar->SetBackground(false);
+	/* Position absolue due au dessin
+	 * ProgressBar->SetX(X() + Width()/2 - ProgressBar->Width()/2);
+	 */
 
 	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
@@ -1246,7 +1382,7 @@ void TBarreLat::Init()
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 
 	chan->Map()->CreatePreview(120,120, P_ENTITIES);
-	int _x = 15 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
+	int _x = 40 + 60 - chan->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - chan->Map()->Preview()->GetHeight() / 2 ;
 	Radar = AddComponent(new TImage(_x, _y));
 	Radar->SetImage(chan->Map()->Preview(), false);
@@ -1255,10 +1391,10 @@ void TBarreLat::Init()
 	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, Font::GetInstance(Font::Small)));
 	Money->SetX(X() + Width()/2 - Money->Width()/2);
 
-	Date = AddComponent(new TLabel(5, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
-	TurnMoney = AddComponent(new TLabel(80, 20, "", white_color, Font::GetInstance(Font::Small)));
+	Date = AddComponent(new TLabel(15, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
+	TurnMoney = AddComponent(new TLabel(110, 20, "", white_color, Font::GetInstance(Font::Small)));
 
-	UnitsInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 15, Height() - 100 - 10, Width() - 15 - 10, 100));
+	UnitsInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 15, Height() - 100 - 10, Width() - 60, 100));
 	UnitsInfos->SetX(X() + Width()/2 - UnitsInfos->Width()/2);
 
 	ScreenPos = AddComponent(new TImage(0,0));

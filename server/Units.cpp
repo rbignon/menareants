@@ -184,6 +184,9 @@ bool EContainer::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 
 bool ECMissiLauncher::WantDeploy()
 {
+	if(EventType() & ARM_DEPLOY)
+		return false;
+
 	/** \note On switch sur ce qu'on VEUT mettre */
 	switch(!Deployed())
 	{
@@ -255,10 +258,10 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 				case 8: coef = 0.3f; break;
 			}
 			uint killed = 0;
-			if((*it)->IsBuilding())                          killed = uint(Nb() * 7 * coef);
+			if((*it)->IsBuilding())                          killed = uint(Nb() * 3 * coef);
 			else if((*it)->IsInfantry())                     killed = uint(Nb() * coef);
-			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(Nb() * 4 * coef);
-			else if((*it)->Type() == E_MISSILAUNCHER)        killed = uint(Nb() * 2 * coef);
+			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(Nb() * 2 * coef);
+			else if((*it)->Type() == E_MISSILAUNCHER)        killed = uint(Nb() * coef);
 			else
 			{
 				FDebug(W_WARNING, "Shoot d'un type non supporté");

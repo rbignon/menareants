@@ -16,6 +16,7 @@ menareants_SOURCES = \
 		tools/Images.cpp \
 		tools/Maths.cpp \
 		tools/Video.cpp \
+		gui/Cursor.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
 		gui/ChildForm.cpp \
@@ -53,7 +54,7 @@ menareants_SOURCES = \
 menareants_LDADD =${top_builddir}/lib/libmenareants.a
 
 Version.cpp: $(menareants_SOURCES)
-	$(SHELL) v.sh
+	@$(SHELL) v.sh
 
 distclean-local:
 	rm -f menareants.cfg

@@ -86,6 +86,8 @@ public:
 	stats_t Stats() const { return stats; }
 	stats_t* Stats() { return &stats; }
 
+	std::vector<TClient*> ClientAllies() const;
+
 /* Variables privées */
 protected:
 	TClient *client;

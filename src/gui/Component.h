@@ -88,15 +88,15 @@ public:
 public:
 
 	/* Obtient la position, la hauteur ou la largeur */
-	int X() const;                                        /**< Get \a x position. */
-	int Y() const;                                        /**< Get \a y position. */
-	unsigned int Width() const;                           /**< Get \a width position. */
-	unsigned int Height() const;                          /**< Get \a height position. */
+	int X() const { return x; }                           /**< Get \a x position. */
+	int Y() const { return y; }                           /**< Get \a y position. */
+	unsigned int Width() const { return w; }              /**< Get \a width position. */
+	unsigned int Height() const { return h; }             /**< Get \a height position. */
 
 	/* Définie la position, la hauteur ou la largeur */
-	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
-	void SetX(int _x);
-	void SetY(int _y);
+	virtual void SetXY (int _x, int _y) { x = _x; y = _y; } /**< Set \a x and \a y positions */
+	void SetX(int _x) { SetXY(_x, y); }
+	void SetY(int _y) { SetXY(x, _y); }
 	virtual void SetHeight (uint _h);                     /**< Set \a height */
 	virtual void SetWidth (uint _w);                      /**< Set \a width */
 
@@ -112,10 +112,11 @@ public:
 
 	/* Le composant a le focus ? */
 	bool Focused() const { return focus; }
-	virtual void SetFocus();
-	virtual void DelFocus();
+	virtual void SetFocus() { focus = true; }
+	virtual void DelFocus() { focus = false; }
 
-	virtual bool Test (int souris_x, int souris_y) const;
+	virtual inline bool Mouse (int souris_x, int souris_y) const;
+	virtual bool Test (int souris_x, int souris_y) const { return (Mouse(souris_x, souris_y) && Enabled()); }
 	virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
 	virtual void PressKey(SDL_keysym) { return; }
 
@@ -157,6 +158,12 @@ protected:
 	bool dynamic_hint;
 };
 typedef std::vector<TComponent*> ComponentVector;
+
+bool TComponent::Mouse (int souris_x, int souris_y) const
+{
+	return (visible && ((x <= souris_x) && (souris_x < int(x+w))
+	        && (y <= souris_y) && (souris_y < int(y+h))));
+}
 
 /********************************************************************************************
  *                                 TList                                                    *

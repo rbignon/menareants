@@ -21,4 +21,7 @@ U_DECL(ECBoat)
 U_DECL(ECNuclearSearch)
 U_DECL(ECSilo)
 U_DECL(ECEnginer)
+U_DECL(ECDefenseTower)
+U_DECL(ECTourist)
+U_DECL(ECMine)
 U_END

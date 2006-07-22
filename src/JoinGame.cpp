@@ -533,6 +533,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(money > players[0]->Money())
 						{
 							InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(money - players[0]->Money()) + "$.t-1");
+							InGameForm->BarreLat->TurnMoney->SetX(InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
+							                                      InGameForm->BarreLat->TurnMoney->Width() - 15);
 							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
 						}
 						SDL_Delay(50);
@@ -967,6 +969,20 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				}
 				GameInfosForm->Players->Show();
+				EChannel *chan = me->Player()->Channel();
+				if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready())
+				{
+					BPlayerVector::iterator it;
+					BPlayerVector plv = chan->Players();
+					uint ok = 0;
+					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
+					if((ok+1) >= chan->Map()->MinPlayers()) /* +1 for me */
+						GameInfosForm->PretButton->SetEnabled(true);
+					else
+						GameInfosForm->PretButton->SetEnabled(false);
+				}
+				else
+					GameInfosForm->PretButton->SetEnabled(false);
 			}
 			if(LoadingForm)
 			{

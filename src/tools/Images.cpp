@@ -347,6 +347,7 @@ ECSpriteBase::ECSpriteBase(const char *dir)
 	mNumframes = 0;
 	mW = 0;
 	mH = 0;
+	alpha = false;
 	animation = false;
 
 	init(dir);
@@ -388,17 +389,18 @@ int ECSpriteBase::init(const char *dir)
 		else
 		{
 			filename = PKGDATADIR_ANIMS + std::string(dir) + PATH_SEPARATOR + key;
-			bool alpha = false;
-			if(ligne.find(' '))
+			bool a = false;
+			pause = StrToTyp<int>(stringtok(ligne, " "));
+
+			if(!ligne.empty())
 			{
-				pause = StrToTyp<int>(stringtok(ligne, " "));
 				r = StrToTyp<int>(stringtok(ligne, " "));
 				g = StrToTyp<int>(stringtok(ligne, " "));
 				b = StrToTyp<int>(stringtok(ligne, " "));
 			}
 			else
 			{
-				pause = StrToTyp<int>(ligne);
+				a = true;
 				alpha = true;
 			}
 
@@ -406,10 +408,11 @@ int ECSpriteBase::init(const char *dir)
 			if((temp = IMG_Load(filename.c_str())) == NULL)
 				throw ECExcept(filename, "Impossible de charger l'image: " + filename);
 
-			if(r >= 0 && !alpha)
+			if(!a)
 				SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
 
-			mAnim[count].Img = alpha ? SDL_DisplayFormatAlpha(temp) : SDL_DisplayFormat(temp);
+			mAnim[count].Img = a ? SDL_DisplayFormatAlpha(temp) : SDL_DisplayFormat(temp);
+			mAnim[count].SetAlpha(a);
 			SDL_FreeSurface(temp);
 
 			mAnim[count].pause = pause;

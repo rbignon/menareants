@@ -25,11 +25,58 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                                        ECBMine                                           *
+ ********************************************************************************************/
+#define MINE_CHARGETIME             2
+/** This is a char factory */
+class ECBMine : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBMine) : restBuild(MINE_CHARGETIME) {}
+
+	ENTITY_CONSTRUCTOR(ECBMine), restBuild(MINE_CHARGETIME) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_MINE; }
+	virtual uint Cost() const { return 15000; }
+	virtual uint InitNb() const { return 1;}
+
+	enum data_t {
+		DATA_RESTBUILD
+	};
+
+	virtual bool CanAttaq(const ECBEntity* e) { return (!restBuild); }
+
+	virtual const char* Qual() const { return "la mine"; }
+
+	/** Mine is a building to prevent from constructing buildings here, and to be drawed at background. */
+	virtual bool IsBuilding() const { return true; }
+	virtual bool IsHidden() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+
+/* Attributs */
+public:
+
+	uint RestBuild() const { return restBuild; }
+
+/* Variables privées */
+protected:
+	uint restBuild;
+};
+
+/********************************************************************************************
  *                               ECBNuclearSearch                                           *
  ********************************************************************************************/
 #define NUCLEARSEARCH_BUILDTIME             10
 #define NUCLEARSEARCH_INITBUILDTIME         5
-/** This is a char factory */
+/** This is a nuclear search center */
 class ECBNuclearSearch : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -142,31 +189,23 @@ public:
 public:
 
 	virtual e_type Type() const { return E_CAPITALE; }
-	virtual uint Cost() const { return 0; }
+	virtual uint Cost() const { return 50000; }
 	virtual uint InitNb() const { return 2000; }
 	virtual uint Visibility() const { return 4; }
 
+	bool CanCreate(const ECBEntity*) { return false; }
+
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "la capitale"; }
+	virtual const char* Qual() const { return "le centre d'affaire"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
-	virtual int TurnMoney() { return 2 * Case()->Map()->CityMoney(); }
-
-	virtual bool CanCreate(const ECBEntity* e)
-	{
-		switch(e->Type())
-		{
-			case ECBEntity::E_ARMY:
-				return true;
-			default:
-				return false;
-		}
-	}
+	virtual bool IsCity() const { return true; }
+	virtual int TurnMoney() { return Case() ? (2 * Case()->Map()->CityMoney()) : 0; }
 };
 
 /********************************************************************************************
@@ -188,23 +227,146 @@ public:
 	virtual e_type Type() const { return E_CITY; }
 	virtual uint Cost() const { return 0; }
 	virtual uint InitNb() const { return 1000; }
+	virtual e_type MyUpgrade() const { return E_CAPITALE; }
+
+	bool CanCreate(const ECBEntity*) { return false; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "la ville"; }
+	virtual const char* Qual() const { return "le centre ville"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
-	virtual int TurnMoney() { return Case()->Map()->CityMoney(); }
+	virtual bool IsCity() const { return true; }
+	virtual int TurnMoney() { return Case() ? Case()->Map()->CityMoney() : 0; }
+};
+
+/********************************************************************************************
+ *                               ECBDefenseTower                                            *
+ ********************************************************************************************/
+/** This is a defense tower */
+class ECBDefenseTower : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBDefenseTower) {}
+
+	ENTITY_CONSTRUCTOR(ECBDefenseTower) {}
+
+	virtual ~ECBDefenseTower() {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_DEFENSETOWER; }
+	virtual uint Cost() const { return 0; }
+	virtual uint InitNb() const { return 1000; }
+	virtual uint Visibility() const { return 4; }
+	virtual uint Porty() const { return 4; }
+
+	virtual bool CanAttaq(const ECBEntity* e)
+	{
+		if(!e->IsBuilding() && e->Case() != Case()) return true;
+		else return false;
+	}
+
+	bool CanCreate(const ECBEntity*) { return false; }
+
+	virtual const char* Qual() const { return "la tour de défense"; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool IsCity() const { return true; }
+};
+
+/********************************************************************************************
+ *                               ECBCharFact                                                *
+ ********************************************************************************************/
+/** This is a char factory */
+class ECBCharFact : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCharFact) {}
+
+	ENTITY_CONSTRUCTOR(ECBCharFact) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_CHARFACT; }
+	virtual uint Cost() const { return 20000; }
+	virtual uint InitNb() const { return 1000; }
+	virtual bool IsCity() const { return true; }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "l'usine de chars"; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 	virtual bool CanCreate(const ECBEntity* e)
 	{
 		switch(e->Type())
 		{
-			case ECBEntity::E_ARMY:
+			case ECBEntity::E_CHAR:
+			case ECBEntity::E_MISSILAUNCHER:
+				return true;
+			default:
+				return false;
+		}
+	}
+};
+
+/********************************************************************************************
+ *                               ECBCaserne                                                 *
+ ********************************************************************************************/
+/** This is a caserne */
+class ECBCaserne : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCaserne) {}
+
+	ENTITY_CONSTRUCTOR(ECBCaserne) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_CASERNE; }
+	virtual uint Cost() const { return 9000; }
+	virtual uint InitNb() const { return 500; }
+	virtual bool IsCity() const { return true; }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "la caserne"; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_ARMY:
+			case E_ENGINER:
+			case E_TOURIST:
 				return true;
 			default:
 				return false;
@@ -253,86 +415,5 @@ public:
 	}
 };
 
-/********************************************************************************************
- *                               ECBCharFact                                                *
- ********************************************************************************************/
-/** This is a char factory */
-class ECBCharFact : public virtual ECBEntity
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_EMPTY_CONSTRUCTOR(ECBCharFact) {}
-
-	ENTITY_CONSTRUCTOR(ECBCharFact) {}
-
-/* Constantes */
-public:
-
-	virtual e_type Type() const { return E_CHARFACT; }
-	virtual uint Cost() const { return 20000; }
-	virtual uint InitNb() const { return 1000; }
-
-	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
-
-	virtual const char* Qual() const { return "l'usine de chars"; }
-	virtual bool IsBuilding() const { return true; }
-	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
-	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
-
-	virtual bool CanCreate(const ECBEntity* e)
-	{
-		switch(e->Type())
-		{
-			case ECBEntity::E_CHAR:
-			case ECBEntity::E_MISSILAUNCHER:
-				return true;
-			default:
-				return false;
-		}
-	}
-};
-
-/********************************************************************************************
- *                               ECBCaserne                                                 *
- ********************************************************************************************/
-/** This is a caserne */
-class ECBCaserne : public virtual ECBEntity
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_EMPTY_CONSTRUCTOR(ECBCaserne) {}
-
-	ENTITY_CONSTRUCTOR(ECBCaserne) {}
-
-/* Constantes */
-public:
-
-	virtual e_type Type() const { return E_CASERNE; }
-	virtual uint Cost() const { return 9000; }
-	virtual uint InitNb() const { return 500; }
-
-	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
-
-	virtual const char* Qual() const { return "la caserne"; }
-	virtual bool IsBuilding() const { return true; }
-	virtual bool AddUnits(uint) { return false; }
-	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
-	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
-
-	virtual bool CanCreate(const ECBEntity* e)
-	{
-		switch(e->Type())
-		{
-			case ECBEntity::E_ARMY:
-			case E_ENGINER:
-				return true;
-			default:
-				return false;
-		}
-	}
-};
 
 #endif /* ECLIB_BATIMENTS_H */

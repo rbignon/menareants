@@ -90,36 +90,38 @@ void TListBox::ScrollTo(uint id)
 
 bool TListBox::Clic (int mouse_x, int mouse_y)
 {
-  // buttons for listbox with more items than visible
-  if (m_items.size() > nb_visible_items_max)
-  {
-    if ( m_down.Test(mouse_x, mouse_y) )
-    {
-      // bottom button
-      if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
-      return true;
-    }
-
-
-    if ( m_up.Test(mouse_x,mouse_y) )
-    {
-      // top button
-      if (first_visible_item > 0) first_visible_item-- ;
-      return true;
-    }
-  }
-
-  int item = MouseIsOnWitchItem(mouse_x,mouse_y);
-  if (item == -1 || !m_items[item].enabled) return false;
+	if(!Enabled()) return false;
+	
+	// buttons for listbox with more items than visible
+	if (m_items.size() > nb_visible_items_max)
+	{
+		if ( m_down.Test(mouse_x, mouse_y) )
+		{
+		// bottom button
+		if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
+		return true;
+		}
+	
+	
+		if ( m_up.Test(mouse_x,mouse_y) )
+		{
+		// top button
+		if (first_visible_item > 0) first_visible_item-- ;
+		return true;
+		}
+	}
+	
+	int item = MouseIsOnWitchItem(mouse_x,mouse_y);
+	if (item == -1 || !m_items[item].enabled) return false;
 #if 0
-  if (IsSelected(item))
-    Deselect (item);
-  else
+	if (IsSelected(item))
+		Deselect (item);
+	else
 #endif
-  Select (item);
-  if(on_change)
-    (*on_change) (this);
-  return true;
+		Select (item);
+	if(on_change)
+		(*on_change) (this);
+	return true;
 }
 
 void TListBox::Draw (int mouse_x, int mouse_y)

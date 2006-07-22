@@ -68,12 +68,6 @@ void ECMissile::SetMissile(ECSpriteBase* c)
 		Entity()->Map()->ShowMap()->ToRedraw(missile);
 }
 
-void ECMissile::Draw()
-{
-	if(missile)
-		missile->draw();
-}
-
 void ECMissile::SetXY(int x, int y)
 {
 	missile->set(x, y);
@@ -88,6 +82,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 	{
 		me->LockScreen();
 		SetMissile(missile_up);
+		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		me->UnlockScreen();
 		if(Entity()->Case()->Showed() > 0)
 		{
@@ -102,8 +97,11 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 	if((missile->Y() + (int)missile->GetHeight()) <= 0 || Entity()->Case()->Showed() <= 0)
 	{
 		me->LockScreen();
-		dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
+		if(c->Showed() > 0)
+			dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
+		Entity()->Map()->ShowMap()->RemoveAfterDraw(Missile());
 		SetMissile(missile_down);
+		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		SetXY(c->Image()->X(), 0 - missile->GetHeight());
 		me->UnlockScreen();
 		return true;
@@ -120,6 +118,7 @@ bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
 	if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
 	{
 		me->LockScreen();
+		Entity()->Map()->ShowMap()->RemoveAfterDraw(Missile());
 		MyFree(missile);
 		me->UnlockScreen();
 		return true;
@@ -180,6 +179,11 @@ void ECEntity::Select(bool s)
 {
 	selected = s;
 	Map()->ShowMap()->ToRedraw(this);
+	if(AttaquedCase())
+		Map()->ShowMap()->ToRedraw(
+		          AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
+				  AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
+				  trajectoire.GetWidth(), trajectoire.GetHeight());
 }
 
 void ECEntity::SetAttaquedCase(ECase* c)
@@ -219,13 +223,8 @@ void ECEntity::Draw()
 	{
 		image->draw();
 		if(Selected())
-		{
 			Resources::Cadre()->Draw(image->X(),image->Y());
-			if(AttaquedCase())
-				trajectoire.Draw(
-				  AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
-				  AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2);
-		}
+
 		if(attaq)
 			attaq->draw();
 	}
@@ -337,11 +336,16 @@ void ECEntity::SetShowedCases(bool show, bool forced)
 			else if(cc->Showed() > 0)
 				cc->SetShowed(cc->Showed()-1);
 			cc->SetMustRedraw();
+			if(c->X() == Case()->X())
+				j = Visibility();
 
 			if(c->X() == c->Map()->Width()-1)
 				break;
 			c = c->MoveRight();
 		}
+		if(c->Y() == Case()->Y())
+			i = Visibility();
+
 		if(c->Y() == c->Map()->Height()-1)
 			break;
 		c = c->MoveDown();

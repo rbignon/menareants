@@ -62,8 +62,6 @@ public:
 	bool AttaqFirst(ECase* c, EC_Client* me);
 	bool AttaqSecond(ECase* c, EC_Client* me);
 
-	void Draw();
-
 /* Attributs */
 public:
 
@@ -188,6 +186,8 @@ public:
 
 	EChannel* Channel() const;
 	ECMap* Map() const;
+
+	ECImage* Trajectoire() { return &trajectoire; }
 
 /* Variables privées */
 private:

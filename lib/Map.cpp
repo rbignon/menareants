@@ -277,10 +277,11 @@ void ECBEntity::Invest(ECBEntity* e)
 
 bool ECBEntity::CanBeCreated(ECBPlayer* pl) const
 {
-	/** \todo avec les nations, vérifier ici si ma nation peut créer cette unité, car si
-	 * ce n'est pas le cas autant se barrer de suite.
+	/* Oui ça ne sert à rien de passer par cette fonction, mais comme elle était déjà utilisée
+	 * en prevention de la gestion des nations (et donc de la fonction CanBeCreated(pl->Nation) qui
+	 * était pas prévue)
 	 */
-	return true;
+	return pl ? CanBeCreated(pl->Nation()) : false;
 }
 
 bool ECBEntity::CanBeCreated(ECBCase* c) const
