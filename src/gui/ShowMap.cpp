@@ -354,18 +354,17 @@ void TMap::Draw(int _x, int _y)
 		else
 		{
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+			if(!entity) continue;
+
 			if(!entity->IsBuilding())
 				entity->Draw();
 			if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
 				entity->Case()->SetMustRedraw();
-			if(entity->AttaquedCase() && entity->Selected())
-				entity->Trajectoire()->Draw(
-				      entity->AttaquedCase()->X() < entity->Case()->X() ? entity->AttaquedCase()->Image()->X()+CASE_WIDTH /2
-				                                                        : entity->Image()->X()+CASE_WIDTH /2,
-				      entity->AttaquedCase()->Y() < entity->Case()->Y() ? entity->AttaquedCase()->Image()->Y()+CASE_HEIGHT/2
-				                                                        : entity->Image()->Y()+CASE_HEIGHT/2);
 			++enti;
 		}
+
+	FOR(ECBEntity*, entities, enti)
+		dynamic_cast<ECEntity*>(enti)->AfterDraw();
 
 	FOR(ECSprite*, after_draw, it)
 		if(it)

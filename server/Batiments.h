@@ -168,6 +168,32 @@ public:
 };
 
 /********************************************************************************************
+ *                                    ECObelisk                                             *
+ ********************************************************************************************/
+class ECObelisk : public ECEntity, public ECBObelisk
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECObelisk) {}
+
+	ENTITY_CREATE_LAST(ECObelisk);
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void Union(ECEntity*) { return; }
+
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
+
+	virtual bool WantAttaq(uint x, uint y, bool);
+};
+
+
+/********************************************************************************************
  *                               ECharFact                                                  *
  ********************************************************************************************/
 class ECharFact : public ECEntity, public ECBCharFact

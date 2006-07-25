@@ -35,7 +35,7 @@
 /* Defines */
 #undef BUGUED_INTRO
 #ifdef WIN32
-# define DISABLE_BUGUS_ZOOM
+//# define DISABLE_BUGUS_ZOOM
 #endif
 
 /* Résolution de l'écran */

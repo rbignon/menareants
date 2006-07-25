@@ -24,6 +24,7 @@
 
 #include "lib/Map.h"
 #include "tools/Images.h"
+#include "gui/ProgressBar.h"
 #include <vector>
 
 class ECase;
@@ -120,10 +121,7 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity()
-		: Tag(0), image(0), attaq(0), selected(false), move(this), attaqued_case(0)
-	{}
-
+	ECEntity();
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
 	virtual ~ECEntity();
@@ -134,6 +132,7 @@ public:
 	virtual const char* Name() const = 0;
 	virtual const char* Infos() const = 0;
 	virtual ECImage* Icon() const = 0;
+	virtual ECSpriteBase* DeadCase() const;
 
 /* Methodes */
 public:
@@ -156,12 +155,15 @@ public:
 
 	virtual std::string SpecialInfo() { return ""; }
 
+	virtual void Draw();
+
+	virtual void AfterDraw();
+
 /* Attributs */
 public:
 
 	bool Test(int x, int y);
 
-	virtual void Draw();
 	ECSprite* Image() const { return image; }
 	void SetImage(ECSpriteBase* spr);
 	void SetAnim(bool anim = true) { if(image) image->SetAnim(anim); }
@@ -189,16 +191,21 @@ public:
 
 	ECImage* Trajectoire() { return &trajectoire; }
 
+	virtual void SetNb(uint n);
+	void SetMaxNb(uint n) { max_nb = n; }
+
 /* Variables privées */
 private:
 	ECSprite* image;
 	ECSprite* attaq;
 	ECImage trajectoire;
+	TProgressBar life;
 
 protected:
 	bool selected;
 	ECMove move;
 	ECase* attaqued_case;
+	uint max_nb;
 };
 
 /********************************************************************************************

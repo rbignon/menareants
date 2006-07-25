@@ -540,8 +540,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						SDL_Delay(50);
 						InGameForm->BarreLat->Money->SetCaption(TypToStr(money) + " $");
 						InGameForm->BarreLat->Money->SetColor(red_color);
+						me->LockScreen();
 				 		SDL_Delay(200);
 				 		InGameForm->BarreLat->Money->SetColor(white_color);
+				 		me->UnlockScreen();
 					}
 					players[0]->SetMoney(money);
 				}

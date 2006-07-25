@@ -32,7 +32,7 @@ void EChannel::InitAnims()
 	dynamic_cast<ECMap*>(map)->SortEvents();
 }
 
-#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : "no")
+#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
 void EChannel::NextAnim()
 {
 	if(!map) throw ECExcept(VPName(map), "Pas de map");
@@ -258,7 +258,7 @@ void EChannel::NextAnim()
 
 			/* On attribut un nombre dans l'upgrade proportionnel au nombre dans l'entité détruite par rapport au nombre
 			 * initial. */
-			upgrade->SetNb(upgrade->InitNb() * entity->Nb() / entity->InitNb());
+			upgrade->SetNb((upgrade->InitNb() * entity->Nb()) / entity->InitNb());
 
 			Map()->RemoveAnEntity(entity);
 			Map()->AddAnEntity(upgrade);

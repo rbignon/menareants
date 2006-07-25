@@ -137,12 +137,3 @@ int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	return 0;
 
 }
-
-/** Client wants to disconnect.
- *
- * Syntax: BYE
- */
-int BYECommand::Exec(TClient *cl, std::vector<std::string> parv)
-{
-	return cl->exit(app.rpl(ECServer::BYE));
-}

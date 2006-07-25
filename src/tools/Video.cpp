@@ -97,20 +97,22 @@ bool Video::SetConfig(uint width, uint height, bool _fullscreen)
 	// initialize the main window
 	if( window.IsNull() || 
 			(width != window.GetWidth() || 
-			 height != window.GetHeight() ) ){
+			 height != window.GetHeight() ) )
+	{
 
-		window.SetImage( SDL_SetVideoMode(width, height, 32,
-				SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF ), false );
+		int flags = SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
+		if(_fullscreen) flags |= SDL_FULLSCREEN;
+
+		window.SetImage( SDL_SetVideoMode(width, height, 32, flags), false );
 
 		if(window.IsNull())
 			window.SetImage( SDL_SetVideoMode(width, height, 32, SDL_SWSURFACE) );
 
 		if(window.IsNull())
 			return false;
-		fullscreen = false;
+		fullscreen = _fullscreen;
 	}
-
-	if(fullscreen != _fullscreen ){
+	else if(fullscreen != _fullscreen ){
 		SDL_WM_ToggleFullScreen( window.Surface() );
 		fullscreen = _fullscreen;
 	}

@@ -507,6 +507,8 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 										MapEditor->BarreCase->UnSelect(false);
 									MapEditor->BarreCase->AddCase(c);
 								}
+								else if(MapEditor->BarreCase->Cases().empty())
+									MapEditor->BarreCase->UnSelect(false);
 							}
 						}
 						else if(event.button.button == MBUTTON_RIGHT)

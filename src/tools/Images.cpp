@@ -18,12 +18,21 @@
  * $Id$
  */
 
-#include <SDL_rotozoom.h>
+#include "tools/SDL_rotozoom.h"
 #include "Images.h"
 #include "Video.h"
 #include "Debug.h"
 #include "tools/Color.h"
 #include <fstream>
+
+void DrawLargeLine(SDL_Surface* screen, int x1, int y1, int x2, int y2, Uint32 color)
+{
+	int _x1, _y1, _x2, _y2;
+
+	for(_x1 = x1-1, _x2 = x2-1; _x1 != x1+1; _x1++, _x2++)
+		for(_y1 = y1-1, _y2 = y2-1; _y1 != y1+1; _y1++, _y2++)
+			DrawLine(screen, _x1, _y1, _x2, _y2, color);
+}
 
 void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color)
 {
@@ -372,7 +381,7 @@ int ECSpriteBase::init(const char *dir)
 		throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
 
 	std::string ligne, key;
-	for(int count = -1; std::getline(fp, ligne);)
+	for(int count = -1; std::getline(fp, ligne) && count < (int)mNumframes;)
 	{
 		if(ligne[0] == '#' || ligne[0] == '\r' || ligne[0] == '\0' || ligne[0] == '\n')
 			continue;
@@ -466,7 +475,7 @@ ECImage* ECSpriteBase::First() const
  ****************************************************************************************/
 
 ECImage::ECImage(char* fichier, bool _alpha)
-	: pause(0), autofree(true), alpha(_alpha)
+	: pause(0), autofree(true), alpha(_alpha), x(0), y(0)
 {
 	Load(fichier, _alpha);
 }
@@ -564,7 +573,7 @@ void ECImage::Draw(int x, int y, int w, int h, int x2, int y2)
 
 void ECImage::Draw()
 {
-  Draw(0, 0);
+  Draw(x, y);
 }
 
 void ECImage::SetColorKey(unsigned int r, unsigned int g, unsigned int b)

@@ -218,7 +218,6 @@ void MenAreAntsApp::request_game()
 						{
 							case SDLK_ESCAPE:
 								client->SetWantDisconnect();
-								client->sendrpl(client->rpl(EC_Client::BYE));
 								eob = true;
 								break;
 							default: break;
@@ -228,7 +227,6 @@ void MenAreAntsApp::request_game()
 						if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y))
 						{
 							client->SetWantDisconnect();
-							client->sendrpl(client->rpl(EC_Client::BYE));
 							eob = true;
 						}
 						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y))

@@ -98,6 +98,11 @@
 	R_RESOURCE(ECSpriteBase, CasePontBas);
 	R_RESOURCE(ECSpriteBase, CasePontGauche);
 	R_RESOURCE(ECSpriteBase, CasePontDroite);
+	R_RESOURCE(ECSpriteBase, CaseTerreDead);
+	R_RESOURCE(ECSpriteBase, CaseCityNODead);
+	R_RESOURCE(ECSpriteBase, CaseCityNEDead);
+	R_RESOURCE(ECSpriteBase, CaseCitySODead);
+	R_RESOURCE(ECSpriteBase, CaseCitySEDead);
 	R_RESOURCE(ECSpriteBase, Brouillard);
 	R_RESOURCE(ECImage,      Army_Icon);
 	R_RESOURCE(ECSpriteBase, Army_Face);
@@ -154,6 +159,8 @@
 	R_RESOURCE(ECImage,      Mine_Icon);
 	R_RESOURCE(ECSpriteBase, Mine_DesactFace);
 	R_RESOURCE(ECSpriteBase, Mine_ActFace);
+	R_RESOURCE(ECImage,      Obelisk_Icon);
+	R_RESOURCE(ECSpriteBase, Obelisk_Face);
 #undef R_RESOURCE
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
 	R_TYPE(ECImage);

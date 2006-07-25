@@ -39,7 +39,6 @@
 const char* msgTab[] = {
 	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
 	"POG",                                    /* POG - PONG */
-	"BYE",                                    /* BYE - Quit le serveur */
 	"ERR %s",                                 /* ERR - Message d'erreur */
 	"ERR %s %s",                              /* ERR - Message d'erreur avec vars */
 	"STAT",                                   /* STAT - Infos sur l'etat du serveur */

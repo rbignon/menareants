@@ -52,18 +52,18 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
 	Images.$(OBJEXT) Maths.$(OBJEXT) Video.$(OBJEXT) \
-	Cursor.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
-	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
-	CheckBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
-	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
-	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
-	Image.$(OBJEXT) ShowMap.$(OBJEXT) ProgressBar.$(OBJEXT) \
-	Fps.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
-	Resources.$(OBJEXT) AltThread.$(OBJEXT) Sockets.$(OBJEXT) \
-	Config.$(OBJEXT) Debug.$(OBJEXT) Login.$(OBJEXT) \
-	Channels.$(OBJEXT) Map.$(OBJEXT) Batiments.$(OBJEXT) \
-	Units.$(OBJEXT) MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) \
-	InGame.$(OBJEXT)
+	SDL_rotozoom.$(OBJEXT) Cursor.$(OBJEXT) Component.$(OBJEXT) \
+	Form.$(OBJEXT) ChildForm.$(OBJEXT) ListBox.$(OBJEXT) \
+	ComboBox.$(OBJEXT) CheckBox.$(OBJEXT) Boutton.$(OBJEXT) \
+	BouttonText.$(OBJEXT) Memo.$(OBJEXT) Edit.$(OBJEXT) \
+	MessageBox.$(OBJEXT) Label.$(OBJEXT) SpinEdit.$(OBJEXT) \
+	ColorEdit.$(OBJEXT) Image.$(OBJEXT) ShowMap.$(OBJEXT) \
+	ProgressBar.$(OBJEXT) Fps.$(OBJEXT) Main.$(OBJEXT) \
+	Timer.$(OBJEXT) Resources.$(OBJEXT) AltThread.$(OBJEXT) \
+	Sockets.$(OBJEXT) Config.$(OBJEXT) Debug.$(OBJEXT) \
+	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
+	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
+	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 nodist_menareants_OBJECTS = Version.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS) \
 	$(nodist_menareants_OBJECTS)
@@ -71,6 +71,10 @@ menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
@@ -197,6 +201,7 @@ menareants_SOURCES = \
 		tools/Images.cpp \
 		tools/Maths.cpp \
 		tools/Video.cpp \
+		tools/SDL_rotozoom.c \
 		gui/Cursor.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
@@ -236,7 +241,7 @@ menareants_LDADD = ${top_builddir}/lib/libmenareants.a
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .cpp .o .obj
+.SUFFIXES: .c .cpp .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -332,6 +337,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProgressBar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Resources.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_rotozoom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sockets.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpinEdit.Po@am__quote@
@@ -339,6 +345,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Units.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Version.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Video.Po@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+SDL_rotozoom.o: tools/SDL_rotozoom.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT SDL_rotozoom.o -MD -MP -MF "$(DEPDIR)/SDL_rotozoom.Tpo" -c -o SDL_rotozoom.o `test -f 'tools/SDL_rotozoom.c' || echo '$(srcdir)/'`tools/SDL_rotozoom.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/SDL_rotozoom.Tpo" "$(DEPDIR)/SDL_rotozoom.Po"; else rm -f "$(DEPDIR)/SDL_rotozoom.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tools/SDL_rotozoom.c' object='SDL_rotozoom.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o SDL_rotozoom.o `test -f 'tools/SDL_rotozoom.c' || echo '$(srcdir)/'`tools/SDL_rotozoom.c
+
+SDL_rotozoom.obj: tools/SDL_rotozoom.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT SDL_rotozoom.obj -MD -MP -MF "$(DEPDIR)/SDL_rotozoom.Tpo" -c -o SDL_rotozoom.obj `if test -f 'tools/SDL_rotozoom.c'; then $(CYGPATH_W) 'tools/SDL_rotozoom.c'; else $(CYGPATH_W) '$(srcdir)/tools/SDL_rotozoom.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/SDL_rotozoom.Tpo" "$(DEPDIR)/SDL_rotozoom.Po"; else rm -f "$(DEPDIR)/SDL_rotozoom.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tools/SDL_rotozoom.c' object='SDL_rotozoom.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o SDL_rotozoom.obj `if test -f 'tools/SDL_rotozoom.c'; then $(CYGPATH_W) 'tools/SDL_rotozoom.c'; else $(CYGPATH_W) '$(srcdir)/tools/SDL_rotozoom.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

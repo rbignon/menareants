@@ -22,6 +22,7 @@
 #include "Channels.h"
 #include "Batiments.h"
 #include "gui/ColorEdit.h"
+#include "gui/ShowMap.h"
 
 /********************************************************************************************
  *                                ECBatiment                                                *
@@ -173,12 +174,6 @@ bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cli
 	{
 		case ARM_ATTAQ:
 		{
-			if(c == Case()) return true;
-
-			if(c->Flags() & (C_TERRE))
-				c->Image()->SetFrame(1);
-
-			SDL_Delay(800);
 			return true;
 		}
 		default:
@@ -216,15 +211,86 @@ bool ECDefenseTower::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
+			return true;
+		default:
+			return true;
+	}
+}
+
+/********************************************************************************************
+ *                                 ECObelisk                                                *
+ ********************************************************************************************/
+void ECObelisk::AfterDraw()
+{
+	ECEntity::AfterDraw();
+	if(victim)
+		img.Draw(victim->X() < Case()->X() ? victim->Image()->X()+53
+				                           : Image()->X()+53,
+				 victim->Y() < Case()->Y() ? victim->Image()->Y()+2
+				                           : Image()->Y()+2);
+}
+
+bool ECObelisk::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+			if(Case()->Showed() <= 0 || c == Case()) return true;
+
+			Image()->SetRepeat(false);
+			Image()->SetAnim(true);
+			while(Image()->Anim()) SDL_Delay(20);
+
+			return true;
+
+		default:
+			return true;
+	}
+}
+
+bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
 		{
 			if(c == Case()) return true;
 
-			if(c->Flags() & (C_TERRE))
-				c->Image()->SetFrame(1);
-
-			SDL_Delay(800);
+			int dx = abs(c->Image()->X() - Image()->X() + 3);
+			int dy = abs(c->Image()->Y() - Image()->Y() + 3);
+			img.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, dx, dy,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+			DrawLargeLine(img.Img,       c->X() < Case()->X() ? 0 : dx-1,
+			                             c->Y() < Case()->Y() ? 0 : dy-1,
+			                             c->X() < Case()->X() ? dx-1 : 0,
+			                             c->Y() < Case()->Y() ? dy-1 : 0,
+			                             img.MapColor(red_color));
+			victim = c;
+			SDL_Delay(1500);
+			victim = 0;
+			Map()->ShowMap()->ToRedraw(c->X() < Case()->X() ? c->Image()->X()+CASE_WIDTH /2
+				                                            : Image()->X()+CASE_WIDTH /2,
+				                       c->Y() < Case()->Y() ? c->Image()->Y()+CASE_HEIGHT/2
+				                                            : Image()->Y()+CASE_HEIGHT/2,
+				                       img.GetWidth(), img.GetHeight());
+			img.SetImage(0);
 			return true;
 		}
+		default:
+			return true;
+	}
+}
+
+bool ECObelisk::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+			if(c == Case()) return true;
+
+			Image()->SetAnim(false);
+			Image()->SetFrame(0);
+			return true;
 		default:
 			return true;
 	}

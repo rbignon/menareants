@@ -18,21 +18,20 @@
  *
  * $Id$
  */
- 
-#include "Map.h"
-#include "Sockets.h"
-#include "Outils.h"
-//#include "tools/Font.h"
-#include "tools/Video.h"
-#include "Debug.h"
-#include "gui/ColorEdit.h"
-#include "gui/ShowMap.h"
-#include "Map.h"
-#include "Resources.h"
-#include "Channels.h"
-#include "Units.h"
+
 #include "Batiments.h"
+#include "Channels.h"
+#include "Debug.h"
+#include "Map.h"
 #include "MapEditor.h"
+#include "Outils.h"
+#include "Resources.h"
+#include "Sockets.h"
+#include "Units.h"
+#include "gui/ColorEdit.h"
+#include "gui/ProgressBar.h"
+#include "gui/ShowMap.h"
+#include "tools/Video.h"
 
 /********************************************************************************************
  *                               ECEntityList                                               *
@@ -162,11 +161,17 @@ void ECMove::SetMoves(Vector _moves)
  *                                 ECEntity                                                 *
  ********************************************************************************************/
 
-ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
-		: ECBEntity(_name, _owner, _case), Tag(0), image(0), attaq(0), selected(false),
-		  move(this), attaqued_case(0)
+ECEntity::ECEntity()
+	: Tag(0), image(0), attaq(0), life(0,0,CASE_WIDTH-4,10), selected(false), move(this), attaqued_case(0), max_nb(0)
 {
+	life.SetBackground(false);
+}
 
+ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
+	: ECBEntity(_name, _owner, _case), Tag(0), image(0), attaq(0), life(0,0,CASE_WIDTH-4,10), selected(false),
+	  move(this), attaqued_case(0), max_nb(0)
+{
+	life.SetBackground(false);
 }
 
 ECEntity::~ECEntity()
@@ -175,14 +180,19 @@ ECEntity::~ECEntity()
 	delete attaq;
 }
 
+ECSpriteBase* ECEntity::DeadCase() const
+{
+	return 0;
+}
+
 void ECEntity::Select(bool s)
 {
 	selected = s;
 	Map()->ShowMap()->ToRedraw(this);
 	if(AttaquedCase())
 		Map()->ShowMap()->ToRedraw(
-		          AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
-				  AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
+		         AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
+				 AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
 				  trajectoire.GetWidth(), trajectoire.GetHeight());
 }
 
@@ -222,12 +232,44 @@ void ECEntity::Draw()
 	if(image && !Parent() && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
 		image->draw();
-		if(Selected())
-			Resources::Cadre()->Draw(image->X(),image->Y());
 
 		if(attaq)
 			attaq->draw();
 	}
+}
+
+void ECEntity::AfterDraw()
+{
+	if(!image || dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() && Case()->Showed() <= 0)
+		return;
+
+	if(Selected())
+	{
+		Resources::Cadre()->Draw(image->X(),image->Y());
+		if(Nb())
+		{
+			life.SetWindow(image->Window());
+			life.SetXY(image->X()+2, image->Y()+2);
+			life.InitVal(Nb(), 0, max_nb ? max_nb : InitNb());
+			float f = float(Nb()) / float(max_nb ? max_nb : InitNb());
+			if(f >= 0.5) life.SetValueColor(green_color);
+			else if(f >= 0.3) life.SetValueColor(orange_color);
+			else life.SetValueColor(red_color);
+			life.Draw(0,0);
+		}
+		if(AttaquedCase())
+			trajectoire.Draw(
+		         AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2
+		                                           : Image()->X()+CASE_WIDTH /2,
+		         AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2
+		                                           : Image()->Y()+CASE_HEIGHT/2);
+	}
+}
+
+void ECEntity::SetNb(uint n)
+{
+	ECBEntity::SetNb(n);
+	if(max_nb < n) max_nb = n;
 }
 
 ECPlayer* ECEntity::Owner() const
@@ -391,8 +433,9 @@ void ECase::SetImage(ECSpriteBase* spr)
 	if(!spr) return;
 	image = new ECSprite(spr, Video::GetInstance()->Window());
 	if(dynamic_cast<ECMap*>(map)->ShowMap())
-		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH  * x),
-		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * x));
+		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH   * X()),
+		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * Y()));
+	SetMustRedraw();
 }
 
 /********************************************************************************************

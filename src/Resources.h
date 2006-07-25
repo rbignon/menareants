@@ -173,6 +173,11 @@ public:
 	R_RESOURCE(ECSpriteBase, CasePontBas,      "cases/pontbas");
 	R_RESOURCE(ECSpriteBase, CasePontGauche,   "cases/pontgauche");
 	R_RESOURCE(ECSpriteBase, CasePontDroite,   "cases/pontdroite");
+	R_RESOURCE(ECSpriteBase, CaseTerreDead,    "cases/terredead");
+	R_RESOURCE(ECSpriteBase, CaseCityNODead,    "cases/citynodead");
+	R_RESOURCE(ECSpriteBase, CaseCityNEDead,    "cases/citynedead");
+	R_RESOURCE(ECSpriteBase, CaseCitySODead,    "cases/citysodead");
+	R_RESOURCE(ECSpriteBase, CaseCitySEDead,    "cases/citysedead");
 	R_RESOURCE(ECSpriteBase, Brouillard,       "brouillard");
 	R_RESOURCE(ECImage,      Army_Icon,        PKGDATADIR_PICS "units/army_icon.png");
 	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
@@ -226,9 +231,11 @@ public:
 	R_RESOURCE(ECSpriteBase, Tourist_Left,      "units/tourist/left");
 	R_RESOURCE(ECSpriteBase, Tourist_Right,     "units/tourist/right");
 	R_RESOURCE(ECSpriteBase, Tourist_Dos,       "units/tourist/dos");
-	R_RESOURCE(ECImage,      Mine_Icon, PKGDATADIR_PICS "units/mine_icon.png");
+	R_RESOURCE(ECImage,      Mine_Icon,         PKGDATADIR_PICS "units/mine_icon.png");
 	R_RESOURCE(ECSpriteBase, Mine_DesactFace,   "units/mine/desactived");
 	R_RESOURCE(ECSpriteBase, Mine_ActFace,      "units/mine/actived");
+	R_RESOURCE(ECImage,      Obelisk_Icon,      PKGDATADIR_PICS "units/obelisk_icon.png");
+	R_RESOURCE(ECSpriteBase, Obelisk_Face,      "units/obelisk");
 };
 
 #undef R_RESOURCE

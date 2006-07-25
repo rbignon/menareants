@@ -266,7 +266,8 @@ public:
 	virtual uint Cost() const { return 0; }
 	virtual uint InitNb() const { return 1000; }
 	virtual uint Visibility() const { return 4; }
-	virtual uint Porty() const { return 4; }
+	virtual uint Porty() const { return 3; }
+	virtual e_type MyUpgrade() const { return E_OBELISK; }
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
@@ -277,6 +278,47 @@ public:
 	bool CanCreate(const ECBEntity*) { return false; }
 
 	virtual const char* Qual() const { return "la tour de défense"; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool IsCity() const { return true; }
+};
+
+/********************************************************************************************
+ *                               ECBObelisk                                                 *
+ ********************************************************************************************/
+/** This is an obelisk */
+class ECBObelisk : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBObelisk) {}
+
+	ENTITY_CONSTRUCTOR(ECBObelisk) {}
+
+	virtual ~ECBObelisk() {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_OBELISK; }
+	virtual uint Cost() const { return 20000; }
+	virtual uint InitNb() const { return 2000; }
+	virtual uint Visibility() const { return 4; }
+	virtual uint Porty() const { return 5; }
+
+	virtual bool CanAttaq(const ECBEntity* e)
+	{
+		if(!e->IsCountryMaker() && e->Case() != Case()) return true;
+		else return false;
+	}
+
+	bool CanCreate(const ECBEntity*) { return false; }
+
+	virtual const char* Qual() const { return "l'obélisque"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }

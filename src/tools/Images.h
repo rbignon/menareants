@@ -39,6 +39,7 @@ void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color
 SDL_Surface* CreateRGBSurface (int width, int height, Uint32 flags);
 SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags);
 void DrawLine(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
+void DrawLargeLine(SDL_Surface* screen, int x1, int y1, int x2, int y2, Uint32 color);
 #define sgn(x) ((x<0)?-1:((x>0)?1:0))
 #define SLOCK(surface) \
     do { \
@@ -169,9 +170,9 @@ class ECImage
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true), alpha(false) {}
+	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 	ECImage(char* fichier, bool alpha = false);
-	ECImage() : Img(NULL), pause(0), autofree(true), alpha(false) {}
+	ECImage() : Img(NULL), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 
 	~ECImage();
 
@@ -247,6 +248,7 @@ public:
 	int pause;
 	bool autofree;
 	bool alpha;
+	int x, y;
 };
 
 #endif /* EC_IMAGES_H */

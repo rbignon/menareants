@@ -54,6 +54,7 @@ static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase*
 {
 	T* entity = new T(_name, _owner, _case);
 	entity->SetNb(_nb);
+	entity->SetMaxNb(entity->InitNb());
 	entity->SetMap(map);
 	entity->Init();
 	return entity;
@@ -337,6 +338,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 				(*it)->Tag = 0;
 		}
+		if(flags & ARM_ATTAQ && (event_case->Flags() & C_TERRE) &&
+		   event_case->Image()->SpriteBase() == Resources::CaseTerre())
+			event_case->SetImage(Resources::CaseTerreDead());
 	}
 	/* PLAYING */
 	else if(chan->State() == EChannel::PLAYING)
@@ -372,7 +376,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				case ARM_ATTAQ|ARM_MOVE:
 				case ARM_ATTAQ:
 					if(!(flags & ARM_CHANGEOWNER))
+					{
 						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
+						if((*it)->DeadCase())
+							(*it)->Case()->SetImage((*it)->DeadCase());
+					}
 					break;
 			}
 			if((*it)->Selected() && InGameForm)
@@ -550,8 +558,10 @@ void MenAreAntsApp::InGame()
 			InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
+		unsigned int start, delay, sleep_fps;
 		do
 		{
+			start = SDL_GetTicks();
 			if(timer->time_elapsed(true) > 10)
 			{
 				if(InGameForm->Chat->NbItems())
@@ -878,6 +888,15 @@ void MenAreAntsApp::InGame()
 			              InGameForm->Map->Y()/CASE_HEIGHT));
 			//SDL_FillRect(Video::GetInstance()->Window(), NULL, 0);
 			InGameForm->Update();
+
+			delay = SDL_GetTicks()-start;
+			if (delay < Video::GetInstance()->SleepMaxFps())
+				sleep_fps = Video::GetInstance()->SleepMaxFps() - delay;
+			else
+				sleep_fps = 0;
+			if(sleep_fps >= SDL_TIMESLICE)
+				SDL_Delay(sleep_fps);
+
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() != EChannel::SCORING);
 

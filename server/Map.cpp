@@ -418,7 +418,7 @@ void ECEntity::Shoot(ECEntity* e, uint k)
 
 void ECEntity::ReleaseShoot()
 {
-	nb -= (shooted > nb ? nb : shooted);
+	SetNb(Nb() - (shooted > nb ? nb : shooted));
 	if(Owner())
 		Owner()->Stats()->killed += shooted;
 	shooted = 0;

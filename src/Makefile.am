@@ -16,6 +16,7 @@ menareants_SOURCES = \
 		tools/Images.cpp \
 		tools/Maths.cpp \
 		tools/Video.cpp \
+		tools/SDL_rotozoom.c \
 		gui/Cursor.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \

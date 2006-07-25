@@ -189,8 +189,8 @@ int TRealClient::parse_this()
 
 	if((read = recv(GetFd(), buf, sizeof buf -1, 0)) <= 0)
 	{
-		printf("Erreur lors de recv(%s): [%s] (%d)\n",
-			GetIp(), strerror(errno), errno);
+		/*printf("Erreur lors de recv(%s): [%s] (%d)\n",
+			GetIp(), strerror(errno), errno);*/
 		app.delclient(this);
 	}
 	else

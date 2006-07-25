@@ -178,6 +178,7 @@ public:
 		E_DEFENSETOWER,
 		E_TOURIST,
 		E_MINE,
+		E_OBELISK,
 		E_END
 	};
 
@@ -326,7 +327,7 @@ public:
 	/** Return the number of soldats in the army */
 	uint Nb() const { return nb; }
 	virtual uint RealNb() const { return Nb(); }
-	void SetNb(uint n) { nb = n; }
+	virtual void SetNb(uint n) { nb = n; }
 
 	/** This unit is locked, because it is new, or deleted, or in a move, or in a transport. */
 	bool Locked() const { return lock; }

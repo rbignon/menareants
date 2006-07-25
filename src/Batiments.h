@@ -181,6 +181,7 @@ public:
 	virtual const char* Name() const { return "Centre d'affaire"; }
 	virtual const char* Infos() const { return "Rapporte deux fois plus d'argent que le centre ville"; }
 	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
 };
 
 /********************************************************************************************
@@ -202,6 +203,7 @@ public:
 	virtual const char* Name() const { return "Centre ville"; }
 	virtual const char* Infos() const { return "Rapporte une certaine somme par tours"; }
 	virtual ECImage* Icon() const { return Resources::City_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
 };
 
 /********************************************************************************************
@@ -228,6 +230,7 @@ public:
 	virtual const char* Name() const { return "Tour de défense"; }
 	virtual const char* Infos() const { return "Peut tirer pour defendre la ville."; }
 	virtual ECImage* Icon() const { return Resources::DefenseTower_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
 
 /* Methodes */
 public:
@@ -239,6 +242,39 @@ public:
 /* Variables privées */
 private:
 	ECMissile missile;
+};
+
+/********************************************************************************************
+ *                                ECDefenseTower                                            *
+ ********************************************************************************************/
+class ECObelisk : public ECBatiment, public ECBObelisk
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECObelisk) : victim(0) {}
+
+	ENTITY_CONSTRUCTOR(ECObelisk), ECBatiment(Resources::Obelisk_Face()), victim(0) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Obélisque du NOD"; }
+	virtual const char* Infos() const { return "Bien plus puissantes que la tour de défense, les fans de C&C reconnaitront."; }
+	virtual ECImage* Icon() const { return Resources::Obelisk_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
+
+/* Methodes */
+public:
+
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+	virtual void AfterDraw();
+
+private:
+	ECImage img;
+	ECase* victim;
 };
 
 /********************************************************************************************
@@ -260,6 +296,7 @@ public:
 	virtual const char* Name() const { return "Usine de chars"; }
 	virtual const char* Infos() const { return "Construit des vehicules."; }
 	virtual ECImage* Icon() const { return Resources::CharFact_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySEDead(); }
 };
 
 /********************************************************************************************
@@ -281,6 +318,7 @@ public:
 	virtual const char* Name() const { return "Caserne"; }
 	virtual const char* Infos() const { return "Caserne pour entraîner des hommes"; }
 	virtual ECImage* Icon() const { return Resources::Caserne_Icon(); }
+	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySODead(); }
 };
 
 /********************************************************************************************

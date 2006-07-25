@@ -77,15 +77,7 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		{
-			if(c == Case()) return true;
-
-			if(c->Flags() & (C_TERRE))
-				c->Image()->SetFrame(1);
-
-			SDL_Delay(800);
 			return true;
-		}
 		default:
 			return ECUnit::AfterEvent(entities,c, me);
 	}
@@ -267,9 +259,6 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 	
 			SetAttaqImg(0,0,0);
 		}
-
-		if(c->Flags() & (C_TERRE))
-			c->Image()->SetFrame(1);
 	}
 	if(event_type & ARM_MOVE)
 			SetAnim(false);

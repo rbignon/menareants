@@ -96,6 +96,8 @@ uint TProgressBar::CalculeValBarre (long val) const
 
 void TProgressBar::Draw(int souris_x, int souris_y)
 {
+	if(image.IsNull()) return;
+
 	int left, right;
 
 	if(background)

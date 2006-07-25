@@ -24,4 +24,5 @@ U_DECL(ECEnginer)
 U_DECL(ECDefenseTower)
 U_DECL(ECTourist)
 U_DECL(ECMine)
+U_DECL(ECObelisk)
 U_END

@@ -132,7 +132,6 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
 		Commands.push_back(new KICKCommand("KICK",	ECD_AUTH,	1));
 		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
-		Commands.push_back(new BYECommand("BYE",	0,			0));
 		Commands.push_back(new ERRCommand("ERR",	0,			1));
 		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
 	

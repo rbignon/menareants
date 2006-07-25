@@ -62,7 +62,6 @@ public:
 	enum msg {
 		IAM,         /**< IAM */
 		PONG,        /**< POG */
-		BYE,         /**< BYE */
 		ERRORN,      /**< ERR */
 		ERRORV,      /**< ERR */
 		STAT,        /**< STAT */
