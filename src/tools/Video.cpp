@@ -97,7 +97,11 @@ bool Video::SetConfig(uint width, uint height, bool _fullscreen)
 	// initialize the main window
 	if( window.IsNull() || 
 			(width != window.GetWidth() || 
-			 height != window.GetHeight() ) )
+			 height != window.GetHeight() )
+#ifdef WIN32
+		|| fullscreen != _fullscreen
+#endif
+		 )
 	{
 
 		int flags = SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;

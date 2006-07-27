@@ -69,7 +69,7 @@ void TIA::FirstMovements()
 				ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
 				                  TypToStr(i));
 		}
-		if((*enti)->MyUpgrade() != ECEntity::E_NONE)
+		if((*enti)->MyUpgrade() != ECEntity::E_NONE && !(rand()%2))
 			ia_send("ARM " + std::string((*enti)->ID()) + " °");
 		if((*enti)->MyStep() > 0 || (*enti)->Porty() > 0)
 		{
@@ -86,7 +86,7 @@ void TIA::FirstMovements()
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
 				if(!(*enti)->Like(*e) && ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
-				   ((*e)->Owner() != 0 || !(*e)->IsCity()) || !(*enti)->Porty())
+				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
 
 			if(!victim) continue; // étonnant !

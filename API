@@ -156,9 +156,9 @@ Sommaire:
 
 7) Intelligence Artificielle
      L'intelligence artificielle est implémentée dans le serveur de la manière suivante :
-     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '~', étant un
+     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '&', étant un
        caractère non inclus dans NICK_CHARS.
-     - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinciton
+     - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinction
      - Chaque sendrpl() vers ce client est interprété ensuite par l'IA qui parse le message et le traite.
      - Chaque message que l'IA veut envoyer est en fait redirigé vers son parsemsg().
 

@@ -1,8 +1,16 @@
+2006-07-26  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp, lib/Units.h, server/Units.cpp: Les ingénieurs peuvent réparer les batiments endomagés.
+
+	* lib/Map.cpp: On peut maintenant construire sur les territoires de ses alliés.
+
 2006-07-25  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (InGame): Utilisation du limiteur de fps.
 
 	* src/tools/SDL_rotozoom.c: Comme la compilation pour windows ne marche pas avec cette librairie, je l'ai inclus.
+
+	* src/tools/Video.cpp: On peut mettre le plein écran sous windows, mais il faut admettre que ça merde un peu.
 
 2006-07-23  Romain Bignon <progs@headfucking.net>
 

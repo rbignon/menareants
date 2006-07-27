@@ -244,7 +244,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Ingénieur"; }
-	virtual const char* Infos() const { return "Il peut capturer les batiments enemies."; }
+	virtual const char* Infos() const { return "Il peut capturer les batiments enemies ou réparer les votres."; }
 	virtual ECImage* Icon() const { return Resources::Enginer_Icon(); }
 };
 

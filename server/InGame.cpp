@@ -529,7 +529,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			/*****************************
 			 *  GESTION DES DÉPLOIEMENTS *
 			 *****************************/
-#if 0
+
 			EventVector evts = map->Events();
 			bool can_create_event = true;
 			for(EventVector::iterator evti = evts.begin(); evti != evts.end();)
@@ -549,12 +549,12 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			if(can_create_event)
 			{
-#endif
 				Debug(W_DEBUG, "Création d'un evenement de déploiement");
 				ECEvent* event = new ECEvent(ARM_DEPLOY, entity->Case());
 				event->Entities()->Add(entity);
 				map->AddEvent(event);
-			//}
+				entity->AddEvent(flags);
+			}
 		}
 		if(flags & ARM_MOVE)
 		{

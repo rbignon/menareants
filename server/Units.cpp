@@ -29,10 +29,19 @@
 
 void ECEnginer::Invest(ECBEntity* entity)
 {
-	ECEntity::Invest(entity);
-
-	if(entity->IsCountryMaker())
-		return;
+	if(entity->Owner() == Owner())
+	{
+		if(entity->Nb() >= entity->InitNb()) return;
+		entity->SetNb(entity->InitNb());
+		Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(entity), ARM_NUMBER);
+	}
+	else
+	{
+		ECEntity::Invest(entity);
+	
+		if(entity->IsCountryMaker())
+			return;
+	}
 
 	Channel()->SendArm(0, this, ARM_REMOVE);
 	SetShadowed();

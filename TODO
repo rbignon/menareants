@@ -3,12 +3,10 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent
--permettre aux ingenieurs de réparer nos propres batiments.
 -limiter le nombre d'unités à construire sur batiments
--corriger le bug qui empeche de compiler sous windows avec les fonctions de glxprimite.h
--corriger le bug qui empeche de mettre en plein écran sous windows
 
 * Après
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
@@ -26,7 +24,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
  ARMCommand::Exec pour ne pas avoir à réécrire tout le code.
 
 ** Objectif actuel
--Unités de base
+-Multiplier les unités
 
 ** Unités
 - Tout le monde
@@ -55,8 +53,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -voir pour d'autres paramètres dans les fichiers MAPS (genre interdire certaines unités, etc).
 -voir pour la création de fichiers de configuration des unités.
 -voir pour l'utilisation de fichiers xml plutot que des configurations pourries.
--assurer un passage en 1280x1024 (notament par rapport à la vitesse)
--assurer que les composants aient une position relative à la resolution
 -mot de passe éventuel pour accéder à un serveur
 -server: enrichissement de l'IA
 -essayer d'utiliser au maximum std::string plutot que char*. Voir pour une fonction Format() qui prendrait %s comme une
@@ -64,7 +60,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -utilisation de gettext.
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
--Unités des nations
+-??
 
 ** Idées
 -client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)

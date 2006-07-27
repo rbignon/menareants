@@ -218,9 +218,7 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
 	if(!e->Owner()) return;
 	std::vector<ECBEntity*> ents = entities.List();
 	for(std::vector<ECBEntity*>::const_iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		if(e->CanInvest(*enti) &&
-		        (!(*enti)->Owner() ||
-			     (*enti)->Owner() != e->Owner() && !e->Owner()->IsAllie((*enti)->Owner())))
+		if(e->CanInvest(*enti))
 		{
 			e->Invest(*enti);
 			break;
@@ -312,7 +310,8 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
 	 */
-	if(!ret && c->Country()->Owner() && c->Country()->Owner()->Player() == owner && c->CanCreate(this))
+	if(!ret && c->Country()->Owner() && c->CanCreate(this) && c->Country()->Owner() &&
+	   (c->Country()->Owner()->Player() == owner || c->Country()->Owner()->Player()->IsAllie(owner)))
 		return true;
 
 	return ret;

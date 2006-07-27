@@ -224,6 +224,7 @@ public:
 	virtual uint Visibility() const { return 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
 
+	bool CanInvest(const ECBEntity* e) const { return false; }
 	bool CanAttaq(const ECBEntity* e) { return false; }
 	virtual const char* Qual() const { return "le touriste japonais"; }
 	bool CanCreate(const ECBEntity*) { return false; }
@@ -265,7 +266,7 @@ public:
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(!Like(e) && e->IsBuilding() && !e->IsNaval())
+		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || e->Owner() == Owner() && e->Nb() < e->InitNb()))
 			return true;
 		else
 			return false;
