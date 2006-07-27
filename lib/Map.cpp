@@ -801,23 +801,23 @@ void ECBMap::Reload()
 
 void ECBMap::Destruct()
 {
-	/* Libération des entitées */
-	entities.Clear(USE_DELETE);
+	/* Libération des MapPlayers */
+	for(std::vector<ECBMapPlayer*>::iterator it=map_players.begin(); it != map_players.end(); ++it)
+		delete *it;
+	map_players.clear();
 
 	/* Libération des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;
 	map.clear();
 
-	/* Libération des MapPlayers */
-	for(std::vector<ECBMapPlayer*>::iterator it=map_players.begin(); it != map_players.end(); ++it)
-		delete *it;
-	map_players.clear();
-		
 	/* Libération des Countries */
 	for(std::vector<ECBCountry*>::iterator it=map_countries.begin(); it != map_countries.end(); ++it)
 		delete *it;
 	map_countries.clear();
+
+	/* Libération des entitées */
+	entities.Clear(USE_DELETE);
 
 	initialised = false;
 }

@@ -95,6 +95,8 @@
 class TMemo; /* Besoin pour les Hints */
 class SDL_mutex;
 
+#define FORM_RUN(form, condition) do { (form)->Actions(); (form)->Update(); } while((condition))
+
 /** This is a class who show a form on the screen and contain some components */
 class TForm : public TObject
 {
@@ -148,6 +150,9 @@ public:
 
 	bool IsPressed(SDLKey i) const { return keys[i]; }
 
+	void SetMaxFPS(int mps) { max_fps = mps; }
+	int MaxFPS() const { return max_fps; }
+
 /* Variables protégées */
 protected:
 
@@ -175,6 +180,7 @@ private:
 	TMemo* Hint;
 	SDL_mutex* mutex;
 	std::bitset<SDLK_LAST> keys;
+	uint max_fps;
 };
 
 #endif /* EC_FORM_H */

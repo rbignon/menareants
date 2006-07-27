@@ -74,6 +74,14 @@ AC_CHECK_LIB(SDL_image, IMG_Load,,
 				fi
 			)
 
+# SDL_mixer
+
+AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio,,
+				if test "x{INSTALL_GAME_Q}" = "x1"; then
+					AC_MSG_ERROR([SDL_mixer library required])
+				fi
+			)
+
 # SDL_ttf
 
 AC_CHECK_LIB([SDL_ttf], [TTF_OpenFont],,
@@ -96,7 +104,8 @@ fi
 
 # WIN32
 if test "${WIN32}" = "yes"; then
-	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image /usr/local/cross-tools/i586-mingw32msvc//lib/libSDL_mixer.a -lwinmm"
+#	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
 fi
 
 #  FULL-WARNINGS

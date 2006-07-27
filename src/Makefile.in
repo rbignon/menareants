@@ -41,7 +41,8 @@ bin_PROGRAMS = menareants$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -59,11 +60,11 @@ am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
 	MessageBox.$(OBJEXT) Label.$(OBJEXT) SpinEdit.$(OBJEXT) \
 	ColorEdit.$(OBJEXT) Image.$(OBJEXT) ShowMap.$(OBJEXT) \
 	ProgressBar.$(OBJEXT) Fps.$(OBJEXT) Main.$(OBJEXT) \
-	Timer.$(OBJEXT) Resources.$(OBJEXT) AltThread.$(OBJEXT) \
-	Sockets.$(OBJEXT) Config.$(OBJEXT) Debug.$(OBJEXT) \
-	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
-	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
-	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+	Timer.$(OBJEXT) Resources.$(OBJEXT) Sound.$(OBJEXT) \
+	AltThread.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
+	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
+	Map.$(OBJEXT) Batiments.$(OBJEXT) Units.$(OBJEXT) \
+	MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 nodist_menareants_OBJECTS = Version.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS) \
 	$(nodist_menareants_OBJECTS)
@@ -224,6 +225,7 @@ menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
+		Sound.cpp \
 		AltThread.cpp \
 		Sockets.cpp \
 		Config.cpp \
@@ -340,6 +342,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_rotozoom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sockets.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sound.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpinEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Units.Po@am__quote@

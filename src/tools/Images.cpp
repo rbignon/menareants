@@ -671,20 +671,16 @@ void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
 
 void ECImage::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
 {
-#ifndef DISABLE_BUGUS_ZOOM
 	SetImage( rotozoomSurfaceXY(Img, angle, zoomx, zoomy, smooth) );
 
 	if( IsNull() )
 		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
-#endif
 }
 
 void ECImage::Zoom(double zoomx, double zoomy, bool smooth)
 {
-#ifndef DISABLE_BUGUS_ZOOM
 	SetImage( zoomSurface(Img, zoomx, zoomy, smooth) );
 
 	if(IsNull() )
 		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
-#endif
 }

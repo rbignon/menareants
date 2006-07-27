@@ -52,7 +52,8 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	if(!(EventType() & ARM_ATTAQ))
 		return ECEntity::Attaq(entities, event);
 
-	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
 		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case())
 		{
 			uint dx = 0, dy = 0;
@@ -63,8 +64,8 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			switch(d)
 			{
 				case 0: coef = 0.0f; break;
-				case 1: coef = 0.8f; break;
-				case 2: coef = 2.0f; break;
+				case 1: coef = 2.0f; break;
+				case 2: coef = 1.8f; break;
 				case 3: coef = 1.4f; break;
 				case 4: coef = 0.9f; break;
 				case 5: coef = 0.9f; break;
@@ -82,7 +83,7 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Shoot(*it, killed);
+			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 			(*Channel()) << "L'obélisque du NOD " + LongName() + " dégomme " + (*it)->Qual() + " " +
 							(*it)->LongName() + " de " + TypToStr(killed);
 		}
@@ -119,7 +120,8 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	if(!(EventType() & ARM_ATTAQ))
 		return ECEntity::Attaq(entities, event);
 
-	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
 		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case())
 		{
 			uint dx = 0, dy = 0;
@@ -147,7 +149,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Shoot(*it, killed);
+			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 			(*Channel()) << "La tour de défense " + LongName() + " dégomme " + (*it)->Qual() + " " +
 							(*it)->LongName() + " de " + TypToStr(killed);
 		}
@@ -247,15 +249,16 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 		return ECEntity::Attaq(entities, event);
 
 	ECBCase* c = event->Case();
-	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	std::vector<ECBEntity*> ents = c->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
 	{
 		if(*it == this) continue;
 		if((*it)->IsCountryMaker())
-			Shoot(*it, 1002);
+			Shoot(dynamic_cast<ECEntity*>(*it), 1002);
 		else if((*it)->Type() == E_NUCLEARSEARCH)
-			Shoot(*it, 30);
+			Shoot(dynamic_cast<ECEntity*>(*it), 30);
 		else
-			Shoot(*it, (*it)->RealNb());
+			Shoot(dynamic_cast<ECEntity*>(*it), (*it)->RealNb());
 	}
 
 	ECBCase* this_c = c;

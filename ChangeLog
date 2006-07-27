@@ -1,3 +1,42 @@
+2006-07-27  Romain Bignon <progs@headfucking.net>
+
+	* src/Sound.cpp (Sound): Système de gestion sonore, d'un coté il y a les fonctions statiques pour l'initialisation
+	et la gestion globale, de l'autre coté il y a l'instanciation unique pour chaque fichier sonore.
+
+	* src/Resources.h: L'implémentation de la fonction d'instanciation d'une ressource passe dans le .cpp, comme ça on
+	évite d'inclure Images.h, Sound.h et Defines.h dans les en-tetes, et donc de devoir recompiler tous les fichiers
+	utilisant des images pour la modification de Sound.h !
+
+	* src/data/sound/dingdong.wav: "Hoo, you touch my tralala... Hmm, my ding ding dong", écran des scores.
+	* src/data/sound/start.wav: "Controle de la bataille activée", début d'une partie.
+	* src/data/sound/begin.wav: "Nouveau tour", nouveau tour.
+	* src/data/sound/end.wav: "Fin du tour", fin d'un tour.
+	* src/data/sound/resources.wav: "Ressources insuffisantes", pas assez d'argent pour construire.
+
+	* src/JoinGame.cpp, src/InGame.cpp: Utilisation des sons.
+
+	* src/gui/Form.cpp (TForm::Update): Mise de la limite FPS là pour que ça soit effectif partout.
+
+	* src/MapEditor.cpp (MenAreAntsApp::MapEditor): Correction d'un bug qui ne permettait pas d'ouvrir la première
+	map de la liste.
+	(TLoadMapFile::Refresh): Marche maintenant sous windows.
+
+	* src/Config.cpp: Permet de ne pas avoir la musique.
+
+	* lib/Map.cpp (ECBMap::Destruct): Correction d'un plantage quand on ferme une map à partir de l'éditeur de maps.
+
+	* configure.ac: Utilisation de SDL_mixer pour linux et en dur d'un lien direct vers la lib de mon pc (et oui) pour
+	pouvoir compiler.
+
+	* server/maps/ia.map: Nouvelle map où on est censé se battre contre une IA forte dès le début.
+
+	* server/IA.cpp: Maintenant, les IA s'allient entre elles au début de la partie, et quand un des joueurs humain
+	s'allie avec une IA, celle ci se des-allie avec ses alliées IA, puis s'allie avec l'humain. Ensuite donc un nombre
+	variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est allié avec l'IA, celle ci s'allie
+	avec toutes les IA qui n'ont pas d'alliés humains.
+
+	* src/gui/Cursor.cpp (TCursor::~TCursor): Réaffiche le curseur.
+
 2006-07-26  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp, lib/Units.h, server/Units.cpp: Les ingénieurs peuvent réparer les batiments endomagés.

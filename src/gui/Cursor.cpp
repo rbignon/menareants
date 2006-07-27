@@ -38,6 +38,11 @@ TCursor::TCursor()
 	SetCursorImage(Radar, Resources::PointerRadar());
 }
 
+TCursor::~TCursor()
+{
+	SDL_ShowCursor(true);
+}
+
 void TCursor::Init()
 {
 

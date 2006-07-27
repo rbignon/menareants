@@ -260,7 +260,8 @@ public:
 public:
 
 	virtual const char* Name() const { return "Obélisque du NOD"; }
-	virtual const char* Infos() const { return "Bien plus puissantes que la tour de défense, les fans de C&C reconnaitront."; }
+	virtual const char* Infos() const { return "Bien plus puissantes que la tour de défense, les fans de C&C "
+	                                           "reconnaitront."; }
 	virtual ECImage* Icon() const { return Resources::Obelisk_Icon(); }
 	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
 

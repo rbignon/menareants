@@ -19,7 +19,7 @@
  * $Id$
  */
 
-#if 0
+#ifdef WIN32
 #include <windows.h>
 #endif
 #include "Main.h"
@@ -195,6 +195,8 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 	max = 0;
 	city_money = 0;
 	filename = _filename;
+
+	date.SetDate(d);
 
 	ECBCountry* country = CreateCountry(this, "AA");
 	map_countries.push_back(country);
@@ -1066,8 +1068,11 @@ void TOptionsMap::Options(TObject*, void* m)
 								TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
 								            OptionsMap).Show();
 							else if(OptionsMap->MaxPlayers->Value() < OptionsMap->MinPlayers->Value())
-								TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de joueurs "
-								            "minimal", BT_OK, OptionsMap).Show();
+								TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de "
+								            "joueurs minimal", BT_OK, OptionsMap).Show();
+							else if(StrToTyp<int>(OptionsMap->City->Text()) < 1)
+								TMessageBox("Il faut qu'il y ait de l'argent pour chaque ville par tour",
+								            BT_OK, OptionsMap).Show();
 							else
 								eob = true;
 						}
@@ -1306,7 +1311,7 @@ void MenAreAntsApp::MapEditor()
 						}
 						else if(LoadMapFile->LoadButton->Test(event.button.x, event.button.y))
 						{
-							if(LoadMapFile->MapsList->GetSelectedItem() &&
+							if(LoadMapFile->MapsList->GetSelectedItem() >= 0 &&
 							   !TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
 										LoadMapFile->MapsList->GetSelectedItem()).c_str()))
 							{
@@ -1340,7 +1345,7 @@ void MenAreAntsApp::MapEditor()
 void TLoadMapFile::Refresh()
 {
 	MapsList->ClearItems();
-#if 0
+#ifdef WIN32
 	WIN32_FIND_DATA File;
 	HANDLE hSearch;
 	BOOL re;
@@ -1353,6 +1358,9 @@ void TLoadMapFile::Refresh()
 	do
 	{
 		/* Traitement */
+		std::string s = File.cFileName;
+		MapsList->AddItem(false, s.substr(0, s.size() - 4), MenAreAntsApp::GetInstance()->GetPath() + s,
+			                             black_color, true);
 		re = FindNextFile(hSearch, &File);
 	} while(re);
 	

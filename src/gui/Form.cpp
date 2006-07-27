@@ -23,7 +23,7 @@
 #include <SDL.h>
 
 TForm::TForm(ECImage* w)
-	: background(0), focus_order(true), Hint(0), mutex(0)
+	: background(0), focus_order(true), Hint(0), mutex(0), max_fps(50)
 {
 	SetWindow(w);
 }
@@ -172,6 +172,8 @@ void TForm::Update(int _x, int _y, bool flip)
 		SDL_LockMutex(mutex);
 
 	bool first = focus_order ? true : false;
+	unsigned int start, delay, sleep_fps;
+	start = SDL_GetTicks();
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
@@ -191,6 +193,14 @@ void TForm::Update(int _x, int _y, bool flip)
 
 	if(flip)
 		Window()->Flip();
+
+	delay = SDL_GetTicks()-start;
+	if (delay < max_fps)
+		sleep_fps = max_fps - delay;
+	else
+		sleep_fps = 0;
+	if(sleep_fps >= SDL_TIMESLICE)
+		SDL_Delay(sleep_fps);
 
 	//SDL_Delay(15);
 }

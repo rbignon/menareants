@@ -39,6 +39,7 @@ menareants_SOURCES = \
 		Main.cpp \
 		Timer.cpp \
 		Resources.cpp \
+		Sound.cpp \
 		AltThread.cpp \
 		Sockets.cpp \
 		Config.cpp \

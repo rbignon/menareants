@@ -1,4 +1,4 @@
-/* src/gui/Cursor.h - Header of Cursor.cpp
+/* src/Sound.h - Header of Sound.cpp
  *
  * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
  *
@@ -15,66 +15,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: ShowMap.h 796 2006-07-12 18:02:55Z progs $
+ *
+ * $Id: $
  */
 
-#ifndef EC_CURSOR_H
-#define EC_CURSOR_H
+#ifndef EC_SOUND_H
+#define EC_SOUND_H
 
+#include <string>
+#include <SDL_mixer.h>
 #include <map>
-#include "gui/Component.h"
 
-class TMap;
-
-class TCursor : public TComponent
+class Sound
 {
+/* Static */
+private:
+	static bool init;
+	static int frequency;
+	static int channels;
+	static std::map<int, Sound*> chunks;
+
+public:
+	static void Init();
+	static void End();
+	static void StopAll();
+	static int StopEffects();
+	static int StopMusic();
+	static void EndChunk(int channel);
+
 /* Constructeur/Destructeur */
 public:
 
-	TCursor();
-	~TCursor();
-
-	enum cursors_t {
-		TOPLEFT_POINTERS,
-		Standard,
-		MIDDLE_POINTERS,
-		Select,
-		Attaq,
-		MaintainedAttaq,
-		CantAttaq,
-		Invest,
-		Top,
-		Bottom,
-		Left,
-		Right,
-		Radar
-	};
-	typedef std::map<cursors_t, ECImage*> ImgList;
+	Sound(std::string path, bool music = false);
+	~Sound();
 
 /* Methodes */
 public:
 
-	void Init();
-
-	void Draw(int, int);
+	void Play();
+	int Stop();
+	void Free();
 
 /* Attributs */
 public:
 
-	cursors_t Pointer() const { return pointer; }
-
-	void SetCursor(cursors_t);
-
-	void SetCursorImage(cursors_t i, ECImage* b);
-
-	TMap* Map() const { return map; }
-	void SetMap(TMap* m) { map = m; }
+	bool IsMusic() const { return is_music; }
+	bool Playing() const { return playing; }
 
 /* Variables privées */
 private:
-	TMap* map;
-	cursors_t pointer;
-	ImgList cursors;
+	bool is_music;
+	std::string path;
+	bool playing;
+	int channel;
+	Mix_Music* music;
+	Mix_Chunk* chunk;
 };
 
-#endif /* EC_CURSOR_H */
+#endif /* EC_SOUND_H */

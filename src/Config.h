@@ -56,6 +56,7 @@ public:
 	std::vector<std::string> server_list;
 	std::string ttf_file;
 	bool fullscreen;
+	bool music;
 
 /* Variable privées */
 private:

@@ -263,28 +263,83 @@ int TIA::LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 	return 0;
 }
 
+void TIA::MakeAllies()
+{
+	//std::vector<std::string> to_send;
+
+	std::vector<ECBPlayer*> pls = Player()->Channel()->Players();
+	for(std::vector<ECBPlayer*>::iterator it = pls.begin(); it != pls.end(); ++it)
+	{
+		if(*it == Player() || !(*it)->IsIA()) continue;
+		bool have_ia = true;
+		BPlayerVector allies = (*it)->Allies();
+		for(BPlayerVector::iterator pl = allies.begin(); pl != allies.end(); ++pl)
+			if(!(*pl)->IsIA())
+			{
+				have_ia = false;
+				break;
+			}
+		if(have_ia && !Player()->IsAllie(*it))
+			ia_send("SET +a " + std::string((*it)->GetNick()));
+	}
+
+	/*for(std::vector<std::string>::iterator it = to_send.begin(); it != to_send.end(); ++it)
+		ia_send(*it);*/
+}
+
 /** :nicks SET modes [params] */
 int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv)
 {
 	ECPlayer *sender = 0;
 	if(players.size()) sender = players[0];
 
-	bool add = true;
+	bool add = true, want_make_allies = false;
+
+	std::vector<std::string> to_send;
 
 	for(uint i=0, j=2; i<parv[1].size(); i++)
 		switch(parv[1][i])
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 'S':
+				if(!add) /* On vient pour la première fois en Playing */
+				{
+					/* On s'allie avec toutes les IA */
+					want_make_allies = true;
+				}
+				break;
 			case 'P':
 				if(add)
 					me->FirstMovements();
 				break;
 			case 'a':
 			{
-				if(strcasecmp(me->Player()->GetNick(), parv[j++].c_str())) break;
+				if(sender == me->Player() || strcasecmp(me->Player()->GetNick(), parv[j++].c_str()))
+					break;
 
-				me->ia_send("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
+				if(sender->IsIA())
+				{
+					bool is_allie = me->Player()->IsAllie(sender);
+					if(!add && is_allie)
+						to_send.push_back("SET -a " + std::string(sender->GetNick()));
+					else if(add && !is_allie)
+						to_send.push_back("SET +a " + std::string(sender->GetNick()));
+					break;
+				}
+
+				BPlayerVector pls = me->Player()->Allies();
+				bool ia_allies = true;
+				for(BPlayerVector::iterator pl = pls.begin(); pl != pls.end(); ++pl)
+				{
+					if(add && (*pl)->IsIA())
+						to_send.push_back("SET -a " + std::string((*pl)->GetNick()));
+					else if(!add && !(*pl)->IsIA() && *pl != sender) ia_allies = false;
+				}
+				if(!add && ia_allies)
+					want_make_allies = true;
+
+				to_send.push_back("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
 				break;
 			}
 			case 'm':
@@ -319,6 +374,12 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 
 				break;
 		}
+
+	for(std::vector<std::string>::iterator it = to_send.begin(); it != to_send.end(); ++it)
+		me->ia_send(*it);
+
+	if(want_make_allies)
+		me->MakeAllies();
 	return 0;
 }
 

@@ -87,6 +87,7 @@ bool Config::set_defaults(bool want_save)
 #ifndef WIN32
 	server_list.push_back("127.0.0.1:5461");
 #endif
+	music = true;
 	if(want_save)
 		save();
 	return true;
@@ -122,6 +123,7 @@ bool Config::load()
 		else if(key == "SERVERLIST") server_list.push_back(ligne);
 		else if(key == "TTF") ttf_file = ligne;
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
+		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
 		else
 		{
 			std::cerr << "Fichier incorrect: " << std::endl;
@@ -159,6 +161,7 @@ bool Config::save() const
     fp << "SHEIGHT " << screen_height << std::endl;
     fp << "TTF " << ttf_file << std::endl;
     fp << "FULLSCREEN " << fullscreen << std::endl;
+    fp << "MUSIC " << music << std::endl;
     for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
     	fp << "SERVERLIST " << *it << std::endl;
 

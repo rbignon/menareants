@@ -191,9 +191,9 @@ void ECEntity::Select(bool s)
 	Map()->ShowMap()->ToRedraw(this);
 	if(AttaquedCase())
 		Map()->ShowMap()->ToRedraw(
-		         AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
-				 AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
-				  trajectoire.GetWidth(), trajectoire.GetHeight());
+		        AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
+		        AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
+		        trajectoire.GetWidth(), trajectoire.GetHeight());
 }
 
 void ECEntity::SetAttaquedCase(ECase* c)
@@ -229,7 +229,7 @@ bool ECEntity::Test(int souris_x, int souris_y)
 
 void ECEntity::Draw()
 {
-	if(image && !Parent() && (!dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
+	if(image && !Parent() && (!Map()->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
 		image->draw();
 
@@ -240,13 +240,13 @@ void ECEntity::Draw()
 
 void ECEntity::AfterDraw()
 {
-	if(!image || dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->HaveBrouillard() && Case()->Showed() <= 0)
+	if(!image || Map()->ShowMap()->HaveBrouillard() && Case()->Showed() <= 0)
 		return;
 
 	if(Selected())
 	{
 		Resources::Cadre()->Draw(image->X(),image->Y());
-		if(Nb())
+		if(Nb() && Map()->Channel()) /* Uniquement si sélectionnée et en jeu (non map editor) */
 		{
 			life.SetWindow(image->Window());
 			life.SetXY(image->X()+2, image->Y()+2);
@@ -289,8 +289,9 @@ ECMap* ECEntity::Map() const
 
 EChannel* ECEntity::Channel() const
 {
-	assert(Map());
-	assert(Map()->Channel());
+	if(!Map()) return 0;
+	if(!Map()->Channel()) return 0;
+
 	return dynamic_cast<EChannel*>(Map()->Channel());
 }
 

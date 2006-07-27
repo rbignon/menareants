@@ -51,6 +51,7 @@ public:
 	int ia_send(std::string msg) { return parsemsg(msg); }
 
 	void FirstMovements();
+	void MakeAllies();
 
 /* Attributs */
 public:

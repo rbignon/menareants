@@ -161,6 +161,10 @@ Sommaire:
      - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinction
      - Chaque sendrpl() vers ce client est interprété ensuite par l'IA qui parse le message et le traite.
      - Chaque message que l'IA veut envoyer est en fait redirigé vers son parsemsg().
+     - Maintenant, les IA s'allient entre elles au début de la partie, et quand un des joueurs humain
+       s'allie avec une IA, celle ci se des-allie avec ses alliées IA, puis s'allie avec l'humain. Ensuite donc un nombre
+       variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est allié avec l'IA, celle ci s'allie
+       avec toutes les IA qui n'ont pas d'alliés humains.
 
      La problematique est la suivante:
      * Dans plusieurs fonctions ???Command::Exec() executées par une commande d'un client, il y a des messages envoyés aux

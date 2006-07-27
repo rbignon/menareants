@@ -138,12 +138,14 @@ std::string ECNuclearSearch::SpecialInfo()
 
 std::string ECSilo::SpecialInfo()
 {
-	if(!NuclearSearch())
+	if(!Owner()->IsMe())
 		return "";
+	else if(!NuclearSearch())
+		return "Relié à aucun Centre de recherches nucléaire.";
 	else if(!NuclearSearch()->Missiles())
-		return "Aucun missile disponible";
+		return "Aucun missile disponible.";
 	else
-		return "Il y a " + TypToStr(NuclearSearch()->Missiles()) + " missiles disponibles";
+		return "Il y a " + TypToStr(NuclearSearch()->Missiles()) + " missiles disponibles.";
 }
 
 bool ECSilo::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)

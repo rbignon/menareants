@@ -31,20 +31,21 @@
 #endif
 
 #include "Main.h"
-#include "Defines.h"
-#include "tools/Font.h"
 #include "Config.h"
-#include "tools/Video.h"
-#include "tools/Images.h"
-#include "Resources.h"
 #include "Debug.h"
-#include "gui/Form.h"
+#include "Defines.h"
+#include "Resources.h"
+#include "Sound.h"
 #include "gui/Boutton.h"
 #include "gui/BouttonText.h"
-#include "gui/Memo.h"
 #include "gui/ComboBox.h"
-#include "gui/Label.h"
+#include "gui/Form.h"
 #include "gui/Fps.h"
+#include "gui/Label.h"
+#include "gui/Memo.h"
+#include "tools/Font.h"
+#include "tools/Images.h"
+#include "tools/Video.h"
 #include <functional>
 
 extern const char* SVNVERSION;
@@ -123,6 +124,7 @@ void MenAreAntsApp::quit_app(int value)
 #endif
 		Resources::Unload();
 		TTF_Quit();
+		Sound::End();
         exit(value);
 }
 
@@ -168,6 +170,9 @@ int MenAreAntsApp::main(int argc, char **argv)
 			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;
 			return false;
 		}
+
+		if(conf->music)
+			Sound::Init();
 
 #ifdef WIN32
 		WSADATA WSAData;
@@ -336,11 +341,9 @@ void MenAreAntsApp::WantCredits(TObject*, void*)
 
 	Credits->OkButton->SetOnClick(TCredits::WantGoBack, 0);
 
-	do
-	{
-		Credits->Actions();
-		Credits->Update();
-	} while(!Credits->want_goback);
+	Resources::DingDong()->Play();
+
+	FORM_RUN(Credits, !Credits->want_goback);
 
 	delete Credits;
 	TMainForm::enter_in_main = true;
@@ -366,10 +369,13 @@ TCredits::TCredits(ECImage* w)
 	              "cours d'histoire et d'espagnol. Je tiens d'ailleurs à remercier le manque "
 	              "d'autorité de Mme Gay (histoire) et Mme Goetz (espagnol).\n"
 	              "\n"
+	              "Merci à lodesi pour ses patchs."
+	              "\n"
                   "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();
 
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, "Retour", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, "Retour",
+	                                        Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

@@ -3641,10 +3641,8 @@ echo $ECHO_N "checking for SDL - version >= $min_sdl_version... $ECHO_C" >&6
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
     if test "x$enable_sdltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
-      ac_save_CXXFLAGS="$CXXFLAGS"
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $SDL_CFLAGS"
-      CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
       LIBS="$LIBS $SDL_LIBS"
       rm -f conf.sdltest
       if test "$cross_compiling" = yes; then
@@ -3759,7 +3757,6 @@ echo "${ECHO_T}no" >&6
        else
           echo "*** Could not run SDL test program, checking why..."
           CFLAGS="$CFLAGS $SDL_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
           LIBS="$LIBS $SDL_LIBS"
           cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -3826,12 +3823,10 @@ fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
           CFLAGS="$ac_save_CFLAGS"
-          CXXFLAGS="$ac_save_CXXFLAGS"
           LIBS="$ac_save_LIBS"
        fi
      fi
      SDL_CFLAGS=""
-     SDL_CXXFLAGS=""
      SDL_LIBS=""
      if test "x{INSTALL_GAME_Q}" = "x1"; then
 				{ { echo "$as_me:$LINENO: error: *** SDL version $SDL_VERSION not found!" >&5
@@ -3922,6 +3917,89 @@ else
   if test "x{INSTALL_GAME_Q}" = "x1"; then
 					{ { echo "$as_me:$LINENO: error: SDL_image library required" >&5
 echo "$as_me: error: SDL_image library required" >&2;}
+   { (exit 1); exit 1; }; }
+				fi
+
+fi
+
+
+# SDL_mixer
+
+
+echo "$as_me:$LINENO: checking for Mix_OpenAudio in -lSDL_mixer" >&5
+echo $ECHO_N "checking for Mix_OpenAudio in -lSDL_mixer... $ECHO_C" >&6
+if test "${ac_cv_lib_SDL_mixer_Mix_OpenAudio+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lSDL_mixer  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char Mix_OpenAudio ();
+int
+main ()
+{
+Mix_OpenAudio ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_SDL_mixer_Mix_OpenAudio=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_SDL_mixer_Mix_OpenAudio=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_SDL_mixer_Mix_OpenAudio" >&5
+echo "${ECHO_T}$ac_cv_lib_SDL_mixer_Mix_OpenAudio" >&6
+if test $ac_cv_lib_SDL_mixer_Mix_OpenAudio = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSDL_MIXER 1
+_ACEOF
+
+  LIBS="-lSDL_mixer $LIBS"
+
+else
+  if test "x{INSTALL_GAME_Q}" = "x1"; then
+					{ { echo "$as_me:$LINENO: error: SDL_mixer library required" >&5
+echo "$as_me: error: SDL_mixer library required" >&2;}
    { (exit 1); exit 1; }; }
 				fi
 
@@ -4100,7 +4178,8 @@ fi
 
 # WIN32
 if test "${WIN32}" = "yes"; then
-	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lwinmm"
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image /usr/local/cross-tools/i586-mingw32msvc//lib/libSDL_mixer.a -lwinmm"
+#	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
 fi
 
 #  FULL-WARNINGS

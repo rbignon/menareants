@@ -121,6 +121,8 @@ bool Video::SetConfig(uint width, uint height, bool _fullscreen)
 		fullscreen = _fullscreen;
 	}
 
+	SDL_ShowCursor(true);
+
 	return true;
 }
 

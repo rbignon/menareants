@@ -28,6 +28,7 @@
 #include "Outils.h"
 #include "Resources.h"
 #include "Sockets.h"
+#include "Sound.h"
 #include "Timer.h"
 #include "Units.h"
 #include "gui/ColorEdit.h"
@@ -546,6 +547,7 @@ void MenAreAntsApp::InGame()
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
 		timer->reset();
+		Resources::SoundStart()->Play();
 		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
 		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
@@ -558,10 +560,8 @@ void MenAreAntsApp::InGame()
 			InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
-		unsigned int start, delay, sleep_fps;
 		do
 		{
-			start = SDL_GetTicks();
 			if(timer->time_elapsed(true) > 10)
 			{
 				if(InGameForm->Chat->NbItems())
@@ -806,11 +806,12 @@ void MenAreAntsApp::InGame()
 										{
 											if(!contener->CanContain(selected_entity))
 											{
-												InGameForm->AddInfo(I_SHIT, "Impossible d'entrer l'unité sélectionnée dans le "
-												                            "conteneur. Soit elle est pas adaptée au "
-												                            "conteneur, soit il y a trop d'hommes dedans.\n"
-												                            "Maintenez ALT pour forcer le déplacement sur "
-												                            "la case.");
+												InGameForm->AddInfo(I_SHIT,
+												         "Impossible d'entrer l'unité sélectionnée dans le "
+												         "conteneur. Soit elle est pas adaptée au "
+												         "conteneur, soit il y a trop d'hommes dedans.\n"
+												         "Maintenez ALT pour forcer le déplacement sur "
+												         "la case.");
 												break;
 											}
 											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
@@ -846,7 +847,7 @@ void MenAreAntsApp::InGame()
 												                            "journée !");
 											else
 												client->sendrpl(client->rpl(EC_Client::ARM),
-											                std::string(std::string(selected_entity->ID()) + move).c_str());
+											               std::string(std::string(selected_entity->ID()) + move).c_str());
 										}
 									}
 								}
@@ -888,15 +889,6 @@ void MenAreAntsApp::InGame()
 			              InGameForm->Map->Y()/CASE_HEIGHT));
 			//SDL_FillRect(Video::GetInstance()->Window(), NULL, 0);
 			InGameForm->Update();
-
-			delay = SDL_GetTicks()-start;
-			if (delay < Video::GetInstance()->SleepMaxFps())
-				sleep_fps = Video::GetInstance()->SleepMaxFps() - delay;
-			else
-				sleep_fps = 0;
-			if(sleep_fps >= SDL_TIMESLICE)
-				SDL_Delay(sleep_fps);
-
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() != EChannel::SCORING);
 
@@ -1068,6 +1060,7 @@ void TBarreLatIcons::SelectUnit(TObject* o, void* e)
 	if(int(static_cast<ECEntity*>(e)->Cost()) > ingame->Player()->Money())
 	{
 		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer ce batiment");
+		Resources::SoundResources()->Play();
 		return;
 	}
 
@@ -1126,6 +1119,7 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	if(int(entity->Cost()) > ingame->Player()->Money())
 	{
 		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer cette unité.");
+		Resources::SoundResources()->Play();
 		return;
 	}
 	int x = thiss->entity ? thiss->entity->Case()->X() : 0;
@@ -1707,6 +1701,8 @@ void MenAreAntsApp::Scores(EChannel* chan)
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
 		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+
+	Resources::DingDong()->Play();
 
 	try
 	{

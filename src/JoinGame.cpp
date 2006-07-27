@@ -29,6 +29,7 @@
 #include "Outils.h"
 #include "Resources.h"
 #include "Sockets.h"
+#include "Sound.h"
 #include "Timer.h"
 #include "gui/BouttonText.h"
 #include "gui/Edit.h"
@@ -364,6 +365,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						*(chan->Map()->InitDate()) = ECDate(*chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
+						Resources::SoundBegin()->Play();
 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
@@ -395,6 +397,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	chan->SetState(EChannel::ANIMING);
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
+				 		Resources::SoundEnd()->Play();
 				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
@@ -533,8 +536,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(money > players[0]->Money())
 						{
 							InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(money - players[0]->Money()) + "$.t-1");
-							InGameForm->BarreLat->TurnMoney->SetX(InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
-							                                      InGameForm->BarreLat->TurnMoney->Width() - 15);
+							InGameForm->BarreLat->TurnMoney->SetX(
+							                                   InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
+							                                   InGameForm->BarreLat->TurnMoney->Width() - 15);
 							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
 						}
 						SDL_Delay(50);
@@ -583,7 +587,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			case '£':
 			{
-				if(!add) { Debug(W_DESYNCH|W_SEND, "SET -£: theoriquement impossible, on ne peut pas \"déperdre\""); break; }
+				if(!add)
+					{ Debug(W_DESYNCH|W_SEND, "SET -£: theoriquement impossible, on ne peut pas \"déperdre\""); break; }
 				if(InGameForm)
 				{
 					if(sender->IsMe())
@@ -649,8 +654,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						else if(pl->IsMe())
 						{
 							if(pl->IsAllie(sender))
-								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " vous a trahis et a "
-								                            "brisé votre alliance !");
+								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " vous a trahis "
+								                            "et a brisé votre alliance !");
 							else
 								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " n'est plus allié "
 								                            "avec vous");
