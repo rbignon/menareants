@@ -96,6 +96,7 @@ void Sound::EndChunk(int channel)
 
 	if(!chk) return;
 
+	chk->Free();
 	chk->playing = false;
 	chunks[channel] = 0;
 }
@@ -154,9 +155,8 @@ void Sound::Play()
 		channel = Mix_PlayChannel(-1, chunk, 0);
 	}
 
-	if (channel == -1) {
+	if (channel == -1)
 		Debug(W_WARNING, "Error: Sound::Play(): %s", Mix_GetError());
-	}
 	else
 	{
 		playing = true;

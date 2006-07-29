@@ -34,6 +34,7 @@ private:
 	static int frequency;
 	static int channels;
 	static std::map<int, Sound*> chunks;
+	static void EndChunk(int channel);
 
 public:
 	static void Init();
@@ -41,7 +42,6 @@ public:
 	static void StopAll();
 	static int StopEffects();
 	static int StopMusic();
-	static void EndChunk(int channel);
 
 /* Constructeur/Destructeur */
 public:

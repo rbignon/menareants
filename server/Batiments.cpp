@@ -49,7 +49,7 @@ bool ECObelisk::WantAttaq(uint mx, uint my, bool force)
 bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case). */
-	if(!(EventType() & ARM_ATTAQ))
+	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return ECEntity::Attaq(entities, event);
 
 	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
@@ -117,7 +117,7 @@ bool ECDefenseTower::WantAttaq(uint mx, uint my, bool force)
 bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case). */
-	if(!(EventType() & ARM_ATTAQ))
+	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return ECEntity::Attaq(entities, event);
 
 	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
@@ -132,7 +132,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			switch(d)
 			{
 				case 0: coef = 0.0f; break;
-				case 1: coef = 0.8f; break;
+				case 1: coef = 1.5f; break;
 				case 2: coef = 2.0f; break;
 				case 3: coef = 1.4f; break;
 				case 4: coef = 0.9f; break;
@@ -245,7 +245,7 @@ bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case). */
-	if(!(EventType() & ARM_ATTAQ))
+	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return ECEntity::Attaq(entities, event);
 
 	ECBCase* c = event->Case();

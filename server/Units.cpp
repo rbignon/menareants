@@ -238,12 +238,12 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 	return true;
 }
 
-bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent*)
+bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case).
 	 * Effectivement, cette unité ne tire QUE quand on lui en donne l'ordre
 	 */
-	if(!(EventType() & ARM_ATTAQ))
+	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)

@@ -84,7 +84,8 @@ void TIA::FirstMovements()
 			ECBEntity* victim = 0;
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
-				if(!(*enti)->Like(*e) && ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
+				if(!(*enti)->IsHidden() && !(*enti)->Like(*e) &&
+				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
