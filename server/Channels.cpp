@@ -565,10 +565,12 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), FormatStr(chan->GetName()).c_str(), "");
 
+
 	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
 		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name()).c_str(),
 		                                        (*it)->MinPlayers(), (*it)->MaxPlayers(),
-		                                      ((*it)->MapInfos().empty() ? "" : FormatStr((*it)->MapInfos().front()).c_str()));
+		                                      ((*it)->MapInfos().empty() ? "" :
+		                                          FormatStr((*it)->MapInfos().front()).c_str()));
 	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
 
 	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
@@ -577,7 +579,12 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{ /* Si la map existe on l'envoie */
 		std::vector<std::string> map_file = chan->Map()->MapFile();
 		for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
-			cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr((*it)).c_str());
+		{
+			const char* c = (*it).c_str();
+			if(!strncmp(c, "UNIT", 4)) continue;
+			cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+		}
+
 		cl->sendrpl(app.rpl(ECServer::ENDOFSMAP));
 	}
 	
