@@ -19,9 +19,6 @@
  * $Id$
  */
 
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include "Main.h"
 #include "Config.h"
 #include "Resources.h"
@@ -37,7 +34,6 @@
 #include "MapEditor.h"
 #include "Units.h"
 #include "Batiments.h"
-#include <dirent.h>
 #include <fstream>
 
 /********************************************************************************************
@@ -1345,40 +1341,12 @@ void MenAreAntsApp::MapEditor()
 void TLoadMapFile::Refresh()
 {
 	MapsList->ClearItems();
-#ifdef WIN32
-	WIN32_FIND_DATA File;
-	HANDLE hSearch;
-	BOOL re;
-	
-	hSearch=FindFirstFile("*.map", &File);
-	if(hSearch ==  INVALID_HANDLE_VALUE)
-		return;
-	
-	re=TRUE;
-	do
-	{
-		/* Traitement */
-		std::string s = File.cFileName;
-		MapsList->AddItem(false, s.substr(0, s.size() - 4), MenAreAntsApp::GetInstance()->GetPath() + s,
+
+	std::vector<std::string> file_list = GetFileList(MenAreAntsApp::GetInstance()->GetPath(), "map");
+
+	for(std::vector<std::string>::const_iterator it = file_list.begin(); it != file_list.end(); ++it)
+		MapsList->AddItem(false, it->substr(0, it->size() - 4), MenAreAntsApp::GetInstance()->GetPath() + *it,
 			                             black_color, true);
-		re = FindNextFile(hSearch, &File);
-	} while(re);
-	
-	FindClose(hSearch);
-#else
-	struct dirent *lecture;
-	DIR *rep;
-	rep = opendir(MenAreAntsApp::GetInstance()->GetPath().c_str());
-	while ((lecture = readdir(rep)))
-	{
-		std::string s = lecture->d_name;
-		if(s.rfind(".map") != s.size() - 4) continue;
-		if(!s.empty())
-			MapsList->AddItem(false, s.substr(0, s.size() - 4), MenAreAntsApp::GetInstance()->GetPath() + s,
-			                             black_color, true);
-	}
-	closedir(rep);
-#endif
 }
 
 TLoadMapFile::TLoadMapFile(ECImage* w)

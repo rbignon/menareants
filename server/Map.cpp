@@ -159,7 +159,10 @@ bool ECEvent::operator<(const ECEvent& e) const
 	EV(UNCONTAIN);
 	EV(UNION);
 	EV_IF(DEPLOY, ARM_DEPLOY, Entity()->Deployed(), e.Entity()->Deployed());
-	EV(ATTAQ);
+	/* On fait d'abord passer les evenements avec evenets linkés, histoire que les mouvements linkés se fassent bien
+	   en premiers */
+	EV_IF(ATTAQ, ARM_ATTAQ, !linked.empty(), !e.linked.empty());
+	EV_IF(ATTAQ, ARM_ATTAQ, linked.empty(), e.linked.empty());
 	EV(UPGRADE);
 
 	EV_END;
@@ -214,7 +217,8 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 	 * de leur attaque et de passer l'attaque sur une autre case.
 	 * Par la suite, on recherche les déplacements faits vers la case de l'attaque et qui ne cherchent aucunement
 	 * à se faire sodomiser l'anus par un bétail. Si jamais après le retrait de cette entité il n'y a plus d'attaque entre
-	 * lui et les autres, on le retire de la liste des attaquants et on met son mouvement, s'il existe, dans la liste globale.
+	 * lui et les autres, on le retire de la liste des attaquants et on met son mouvement, s'il existe, dans la liste
+	 * globale.
 	 */
 	const char T_ATTAQ_STEP = 0;
 	const char T_MOVE_STEP = 1;
@@ -232,8 +236,13 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 			   entity->Case() != Case() && (*enti)->WantAttaq(entity->Case()->X(), entity->Case()->Y()))
 			{
 				Debug(W_DEBUG, "On déokace notre évenement");
+#if 0 /** FIXME: voir si ça marche bien :) */
+				/** On ne souhaite pas que l'attaque en rejoigne une autre existante */
 				ECEvent* attaq_event = dynamic_cast<ECMap*>(Case()->Map())->FindEvent(entity->Case(), ARM_ATTAQ);
 				if(!attaq_event)
+#else
+				ECEvent* attaq_event = 0;
+#endif
 				{
 					Debug(W_DEBUG, "Création d'un evenement ATTAQ issue d'un déplacement de cible");
 					attaq_event = new ECEvent(ARM_ATTAQ, entity->Case());

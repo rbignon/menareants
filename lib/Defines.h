@@ -66,6 +66,9 @@ const unsigned int GAMELEN=20;
  */
 #define FOR(T, v, x) \
                           T (x); \
-                          for(std::vector<T>::iterator sdfsdfit = (v).begin(); sdfsdfit != (v).end() && (x = *sdfsdfit); ++sdfsdfit)
+                          for(std::vector<T>::iterator x##it = (v).begin(); x##it != (v).end() && (x = *x##it); ++x##it)
+
+#define FORit(T, v, x) \
+                          for(std::vector<T>::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
 
 #endif /* ECLIB_Defines_h */

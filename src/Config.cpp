@@ -22,10 +22,12 @@
 #include <fstream>
 #include <iostream>
 
-#include "Outils.h"
-#include "Config.h"
-#include "Resources.h"
 #include "Channels.h"
+#include "Config.h"
+#include "Outils.h"
+#include "Main.h"
+#include "Resources.h"
+#include "Sound.h"
 #include "lib/Colors.h"
 #include "gui/Form.h"
 #include "gui/ListBox.h"
@@ -37,7 +39,6 @@
 #include "gui/MessageBox.h"
 #include "gui/Memo.h"
 #include "gui/CheckBox.h"
-#include "Main.h"
 #include "tools/Video.h"
 
 struct resolutions_t
@@ -88,6 +89,7 @@ bool Config::set_defaults(bool want_save)
 	server_list.push_back("127.0.0.1:5461");
 #endif
 	music = true;
+	effect = true;
 	if(want_save)
 		save();
 	return true;
@@ -124,6 +126,7 @@ bool Config::load()
 		else if(key == "TTF") ttf_file = ligne;
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
+		else if(key == "EFFECT") effect = (ligne == "1" || ligne == "true");
 		else
 		{
 			std::cerr << "Fichier incorrect: " << std::endl;
@@ -162,6 +165,7 @@ bool Config::save() const
     fp << "TTF " << ttf_file << std::endl;
     fp << "FULLSCREEN " << fullscreen << std::endl;
     fp << "MUSIC " << music << std::endl;
+    fp << "EFFECT " << effect << std::endl;
     for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
     	fp << "SERVERLIST " << *it << std::endl;
 
@@ -199,6 +203,8 @@ public:
 	TLabel*         ResolutionInfo;
 	TComboBox*      Resolution;
 	TCheckBox*      FullScreen;
+	TCheckBox*      Music;
+	TCheckBox*      Effect;
 
 /* Evenements */
 public:
@@ -283,6 +289,8 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 	conf->nation = form->Nation->GetSelectedItem();
 
 	conf->fullscreen = form->FullScreen->Checked();
+	conf->music = form->Music->Checked();
+	conf->effect = form->Effect->Checked();
 
 	conf->save();
 	conf->want_quit_config = true;
@@ -302,6 +310,19 @@ void Config::SetFullScreen(TObject* obj, void* configinst)
 
 	Video::GetInstance()->SetConfig(conf->screen_width, conf->screen_height, CheckBox->Checked());
 	conf->fullscreen = CheckBox->Checked();
+}
+
+void Config::SetMusic(TObject* obj, void* configinst)
+{
+	TCheckBox* CheckBox = dynamic_cast<TCheckBox*>(obj);
+	Config* conf = static_cast<Config*>(configinst);
+	if(!CheckBox) return;
+
+	conf->music = CheckBox->Checked();
+	if(CheckBox->Checked())
+		Sound::PlayMusic();
+	else
+		Sound::StopMusic();
 }
 
 void Config::ChangeResolution(TListBox* listbox)
@@ -329,6 +350,9 @@ void Config::Configuration(bool first)
 	ConfigForm->Nick->SetString(nick);
 	ConfigForm->Color->SetValue(color);
 	ConfigForm->Nation->Select(nation);
+	ConfigForm->Music->Check(music);
+	ConfigForm->Music->SetOnClick(Config::SetMusic, this);
+	ConfigForm->Effect->Check(effect);
 	ConfigForm->FullScreen->Check(fullscreen);
 	ConfigForm->FullScreen->SetOnClick(Config::SetFullScreen, this);
 	ConfigForm->Resolution->SetOnChange(Config::ChangeResolution);
@@ -372,7 +396,7 @@ void TConfigForm::SetRelativePositions()
 	Title->Init();
 	Info->Init();
 
-	Hints->SetX(Window()->GetWidth() - Hints->Width() - 50);
+	Hints->SetX(Window()->GetWidth() - Hints->Width() - 20);
 	OkButton->SetXY(Hints->X() + Hints->Width()/2 - OkButton->Width()/2,
 	                Hints->Y() + Hints->Height() + 50);
 	CancelButton->SetXY(Hints->X() + Hints->Width()/2 - CancelButton->Width()/2,
@@ -387,6 +411,8 @@ void TConfigForm::SetRelativePositions()
 	ResolutionInfo->SetX(x);
 	Resolution->SetXY(x, Resolution->RealY());
 	FullScreen->SetX(x);
+	Music->SetX(x);
+	Effect->SetX(x);
 }
 
 TConfigForm::TConfigForm(ECImage *w)
@@ -435,8 +461,12 @@ TConfigForm::TConfigForm(ECImage *w)
 		Resolution->AddItem(false, TypToStr(resolutions[i].w) + "x" + TypToStr(resolutions[i].h), "");
 
 	FullScreen = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 365, "Plein écran", white_color));
+	Music = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 385, "Musique", white_color));
+	Music->SetHint("Si active, les fichiers audio contenus dans le repertoire suivant seront lus pendant le jeu:\n\n"
+	                PKGDATADIR_SOUND INGAME_MUSIC);
+	Effect = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 405, "Effets", white_color));
 
-	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 200, 100));
+	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 250, 150));
 	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());

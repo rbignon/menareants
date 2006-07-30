@@ -21,12 +21,14 @@
 #include <string>
 #include <cstdarg>
 #include <fstream>
-#ifdef _WIN32
+#ifdef WIN32
    // To get SHGetSpecialFolderPath
 #  define _WIN32_IE   0x400
 #  include <shlobj.h>
+#  include <windows.h>
 #else
 #  include <stdlib.h> // getenv
+#  include <dirent.h>
 #endif
 
 #include "Outils.h"
@@ -56,6 +58,52 @@ std::string GetHome (){
 }
 #endif
 
+std::vector<std::string> GetFileList(std::string path, std::string ext)
+{
+	std::vector<std::string> file_list;
+#ifdef WIN32
+	WIN32_FIND_DATA File;
+	HANDLE hSearch;
+	BOOL re;
+	std::string dir = GetCurrentDirectory();
+
+	SetCurrentDirectory (path);
+
+	if(!ext.empty())
+		hSearch=FindFirstFile("*." + ext, &File);
+	else
+		hSearch=FindFirstFile("*.*", &File);
+
+	if(hSearch ==  INVALID_HANDLE_VALUE)
+		return;
+	
+	re=TRUE;
+	do
+	{
+		file_list.push_back(File.cFileName);
+		re = FindNextFile(hSearch, &File);
+	} while(re);
+	
+	FindClose(hSearch);
+	SetCurrentDirectory(dir);
+#else
+	struct dirent *lecture;
+	DIR *rep;
+	rep = opendir(path.c_str());
+	while ((lecture = readdir(rep)))
+	{
+		std::string s = lecture->d_name;
+		if(s == "." || s == "..") continue;
+		if(!ext.empty() && s.rfind("." + ext) != s.size() - 4) continue;
+
+		file_list.push_back(s);
+	}
+
+	closedir(rep);
+#endif
+
+	return file_list;
+}
 
 bool is_num(const char *num)
 {

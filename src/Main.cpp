@@ -171,8 +171,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 			return false;
 		}
 
-		if(conf->music)
-			Sound::Init();
+		Sound::Init();
 
 #ifdef WIN32
 		WSADATA WSAData;
@@ -193,6 +192,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 		MainForm->MapEditorButton->SetOnClick(MenAreAntsApp::WantMapEditor, this);
 		MainForm->OptionsButton->SetOnClick(MenAreAntsApp::WantConfig, (void*)false);
 
+		Sound::SetMusicList(MENU_MUSIC);
 		do
 		{
 			MainForm->Actions();

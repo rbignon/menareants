@@ -1,3 +1,30 @@
+2006-07-30  Romain Bignon <progs@headfucking.net>
+
+	* AVERTISSEMENT AVEC LE SON: Je me suis apperçu qu'avec gdb il y avait quelques problèmes avec la musique ou le son.
+	Si jamais ça vous arrive, coupez la musique voir les effets dans les options, ou alors lancez sans gdb pour en
+	profiter même si ça empeche de trouver les crashs.
+	Ça m'a l'air d'être un problème avec gdb par rapport aux threads, je sais pas trop pourquoi, gdb merde un peu.
+
+	* lib/Outils.h (GetFileList): Création d'une fonction qui permet d'obtenir la liste des fichiers à partir d'un
+	nom de repertoire.
+
+	* src/Sound.cpp: Gestion d'une liste de musique, pour lire tous les fichiers audio inclus dans un répertoire.
+
+	* server/Map.cpp (ECEvent::operator<): Afficher en premier les evenements qui ont d'autres evenements liés, pour les
+	attaques, histoire d'éviter par exemple un tir de lance missile sur la case où va aller l'unité toucher mais qui n'y
+	est pas encore car son evenement de mouvement est lié à une evenement d'attaque qu'on va avoir plus tard.
+	(CheckRemoveBecauseOfPartOfAttaqEntity): On ne rejoint pas une attaque existante quand notre attaque bouge, on en
+	créer forcément une.
+
+	* server/Channels.cpp (CheckReadys): Même dans les parties longues, ne pas avoir à trouver les mines pour gagner.
+
+	* src/Batiments.h: Variable explosion pour gérer les sprites à afficher lors de l'explosion d'un batiment. Application
+	sur la mine.
+
+2006-07-29  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp (JIACommand): N'envoie plus le +! inutile car il réagit au SET +m lors du join.
+
 2006-07-27  Romain Bignon <progs@headfucking.net>
 
 	* src/Sound.cpp (Sound): Système de gestion sonore, d'un coté il y a les fonctions statiques pour l'initialisation

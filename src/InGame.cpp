@@ -537,6 +537,7 @@ void MenAreAntsApp::InGame()
 		SDL_Event event;
 		bool eob = false;
 
+		Sound::SetMusicList(INGAME_MUSIC);
 		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client->Player());
 		InGameForm->SetMutex(mutex);
 		InGameForm->Map->SetMutex(mutex);
@@ -611,6 +612,11 @@ void MenAreAntsApp::InGame()
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
 						{
+							case SDLK_n:
+							{
+								Sound::NextMusic();
+								break;
+							}
 							case SDLK_F1:
 							{
 								if(client->Player()->Channel()->State() != EChannel::PLAYING)
@@ -906,11 +912,14 @@ void MenAreAntsApp::InGame()
 		throw;
 	}
 	MyFree(InGameForm);
+	Sound::EraseMusicList();
 
 	if(client->Player() && client->Player()->Channel()->State() == EChannel::SCORING)
 	{
 		Scores(client->Player()->Channel());
 	}
+
+	Sound::SetMusicList(MENU_MUSIC);
 
 	return;
 }

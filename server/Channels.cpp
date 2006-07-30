@@ -934,7 +934,7 @@ void EChannel::CheckReadys()
 							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
 							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
 							 */
-							if((*enti)->IsBuilding() && !(*enti)->IsHidden() && !(*enti)->IsNaval() || !FastGame())
+							if(!(*enti)->IsHidden() && ((*enti)->IsBuilding() && !(*enti)->IsNaval() || !FastGame()))
 								nb_units++;
 						}
 						if(!nb_units)

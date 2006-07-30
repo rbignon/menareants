@@ -28,7 +28,8 @@
  *                                ECBatiment                                                *
  ********************************************************************************************/
 
-ECBatiment::ECBatiment(ECSpriteBase* b)
+ECBatiment::ECBatiment(ECSpriteBase* b, ECSpriteBase* explos)
+	: explosion(explos)
 {
 	img = new ECSpriteBase(b->path.c_str());
 
@@ -41,6 +42,31 @@ ECBatiment::ECBatiment(ECSpriteBase* b)
 void ECBatiment::RefreshColor(Color last)
 {
 	img->ChangeColor(last, Owner() ? color_eq[Owner()->Color()] : white_color);
+}
+
+bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
+{
+	if(event_type & ARM_ATTAQ)
+	{
+		if(Case()->Showed() > 0 && explosion)
+		{
+			if(!AttaqImg())
+			{
+				SetAttaqImg(explosion, Image()->X(), Image()->Y());
+				AttaqImg()->SetRepeat(false);
+				AttaqImg()->SetAnim(true);
+				return false;
+			}
+			if(AttaqImg()->Anim())
+			{
+				SDL_Delay(20);
+				return false;
+			}
+	
+			SetAttaqImg(0,0,0);
+		}
+	}
+	return true;
 }
 
 ECBatiment::~ECBatiment()

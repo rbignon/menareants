@@ -37,9 +37,9 @@ class ECBatiment : public ECEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECBatiment() : img(0) {}
+	ECBatiment() : img(0), explosion(0) {}
 
-	ECBatiment(ECSpriteBase* b);
+	ECBatiment(ECSpriteBase* b, ECSpriteBase* explosion = 0);
 	virtual ~ECBatiment();
 
 /* Methodes */
@@ -49,12 +49,13 @@ public:
 
 	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
 
-	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*) { return true; }
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
 	virtual void RefreshColor(Color last);
 
 private:
 	ECSpriteBase *img;
+	ECSpriteBase *explosion;
 };
 
 /********************************************************************************************
@@ -68,7 +69,7 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECMine) : activeimg(0) {}
 
-	ENTITY_CONSTRUCTOR(ECMine), ECBatiment(Resources::Mine_DesactFace()), activeimg(0) {}
+	ENTITY_CONSTRUCTOR(ECMine), ECBatiment(Resources::Mine_DesactFace(), Resources::Brouillard()), activeimg(0) {}
 
 	~ECMine();
 

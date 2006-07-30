@@ -788,7 +788,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						if(!dynamic_cast<ECEntity*>(*enti)->Shadowed() && *enti != entity && entity->CanAttaq(*enti) &&
 						   !entity->Like(*enti) && (turn || dynamic_cast<ECEntity*>(*enti)->Move()->Empty()))
 							can_attaq = true;
-						else if(dynamic_cast<ECEntity*>(*enti)->Shadowed() && dynamic_cast<ECEntity*>(*enti)->Move()->Empty())
+						else if(dynamic_cast<ECEntity*>(*enti)->Shadowed() &&
+						        dynamic_cast<ECEntity*>(*enti)->Move()->Empty())
 						{
 							Debug(W_DEBUG, "On a trouvé une unité qui a bougé");
 							ECEntity* e = dynamic_cast<ECEntity*>(*enti)->FindNext();

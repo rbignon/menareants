@@ -28,6 +28,9 @@ typedef unsigned int   uint;
 /** Récupère le path du home */
 std::string GetHome();
 
+/** Récupère la liste des fichiers contenus dans le path */
+std::vector<std::string> GetFileList(std::string path, std::string ext = "");
+
 /** Récupère le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
 

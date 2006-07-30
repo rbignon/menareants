@@ -25,23 +25,33 @@
 #include <string>
 #include <SDL_mixer.h>
 #include <map>
+#include <vector>
 
+/** \warning With gdb there is some problems... */
 class Sound
 {
 /* Static */
 private:
 	static bool init;
+	static bool playing_music;
 	static int frequency;
 	static int channels;
 	static std::map<int, Sound*> chunks;
 	static void EndChunk(int channel);
+	static void EndMusic();
+	static void NextMusic(std::vector<Sound*>::iterator);
+	static std::vector<Sound*> musics;
 
 public:
 	static void Init();
 	static void End();
 	static void StopAll();
 	static int StopEffects();
-	static int StopMusic();
+	static void StopMusic();
+	static void PlayMusic();
+	static void NextMusic();
+	static void SetMusicList(std::string path);
+	static void EraseMusicList();
 
 /* Constructeur/Destructeur */
 public:

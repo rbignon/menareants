@@ -21,6 +21,7 @@
 
 #include <SDL.h>
 #include <iostream>
+#include "Config.h"
 #include "Debug.h"
 #include "Defines.h"
 #include "Sound.h"
@@ -32,6 +33,8 @@ bool Sound::init = false;
 int Sound::frequency = 44100; //MIX_DEFAULT_FREQUENCY;
 int Sound::channels = 2; // stereo
 std::map<int, Sound*> Sound::chunks;
+std::vector<Sound*> Sound::musics;
+bool Sound::playing_music = false;
 
 void Sound::Init()
 {
@@ -46,7 +49,7 @@ void Sound::Init()
 		return;
 	}
 
-	int audio_buffer = 1024;
+	int audio_buffer = 512;
 
 	/* Open the audio device */
 	if (Mix_OpenAudio(frequency, audio_format, channels, audio_buffer) < 0)
@@ -57,9 +60,11 @@ void Sound::Init()
 	else
 	{
 		Mix_QuerySpec(&frequency, &audio_format, &channels);
-		Debug(W_DEBUG, "Opened audio at %d Hz %d bit", frequency, (audio_format&0xFF));
+		Debug(W_DEBUG, "Opened audio at %d Hz %d bit %s, %d bytes audio buffer\n", frequency,
+		               (audio_format&0xFF), channels>1?"stereo":"mono", audio_buffer);
 	}
 	Mix_ChannelFinished(Sound::EndChunk);
+	Mix_HookMusicFinished(Sound::EndMusic);
 
 	init = true;
 }
@@ -79,11 +84,6 @@ int Sound::StopEffects()
 	return Mix_HaltChannel(-1);
 }
 
-int Sound::StopMusic()
-{
-	return Mix_HaltMusic();
-}
-
 void Sound::StopAll()
 {
 	StopEffects();
@@ -99,6 +99,88 @@ void Sound::EndChunk(int channel)
 	chk->Free();
 	chk->playing = false;
 	chunks[channel] = 0;
+}
+
+void Sound::StopMusic()
+{
+	playing_music = false;
+	Mix_HaltMusic();
+	EndMusic(); /* En effet, le callback n'est appelé que si la musique s'arrete naturellement */
+}
+
+void Sound::EndMusic()
+{
+	FORit(Sound*, musics, s)
+		if((*s)->Playing())
+		{
+			(*s)->Free();
+			(*s)->playing = false;
+
+			/* On choisis la prochaine */
+			if(Config::GetInstance()->music && playing_music)
+				NextMusic(s);
+			return;
+		}
+}
+
+void Sound::NextMusic(std::vector<Sound*>::iterator s)
+{
+	if(!Config::GetInstance()->music || !playing_music) return;
+
+	Sound* next;
+	if((s+1) == musics.end())
+		s = musics.begin();
+	else
+		++s;
+
+	next = *s;
+
+	next->Play();
+	if(!next->Playing())
+		NextMusic(s);
+}
+
+void Sound::NextMusic()
+{
+	if(!playing_music)
+		PlayMusic();
+	else
+		EndMusic();
+}
+
+void Sound::PlayMusic()
+{
+	StopMusic();
+
+	if(musics.empty() || !Config::GetInstance()->music) return;
+
+	int r = rand()%musics.size();
+	musics[r]->Play();
+	if(!musics[r]->Playing())
+		PlayMusic(); // Si on arrive pas à lire on réexecute la fonction en reprenant un autre nombre aléatoire.
+}
+
+void Sound::EraseMusicList()
+{
+	SetMusicList("");
+}
+
+void Sound::SetMusicList(std::string path)
+{
+	StopMusic();
+
+	FOR(Sound*, musics, s)
+		delete s;
+	musics.clear();
+
+	if(path.empty()) return;
+
+	std::vector<std::string> file_list = GetFileList(PKGDATADIR_SOUND + path);
+
+	for(std::vector<std::string>::const_iterator it = file_list.begin(); it != file_list.end(); ++it)
+		musics.push_back(new Sound(path + *it, true));
+
+	PlayMusic();
 }
 
 /*************************************************************************************************
@@ -140,26 +222,43 @@ int Sound::Stop()
 
 void Sound::Play()
 {
-	if(Playing() || !Sound::init) return;
+	if(Playing() || !Sound::init) { printf("shit ici\n"); return; }
 
 	if(IsMusic())
 	{
+		if(!Config::GetInstance()->music) return;
+
 		if(!music)
 			music = Mix_LoadMUS(path.c_str());
-		channel = Mix_PlayMusic(music, 0);
+		if(!music)
+		{
+			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
+			return;
+		}
+		channel = Mix_PlayMusic(music,0);
 	}
 	else
 	{
+		if(!Config::GetInstance()->effect) return;
+
 		if(!chunk)
 			chunk = Mix_LoadWAV(path.c_str());
+		if(!chunk)
+		{
+			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
+			return;
+		}
 		channel = Mix_PlayChannel(-1, chunk, 0);
 	}
 
 	if (channel == -1)
-		Debug(W_WARNING, "Error: Sound::Play(): %s", Mix_GetError());
+		Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
 	else
 	{
 		playing = true;
-		Sound::chunks[channel] = this;
+		if(!IsMusic()) /* La musique n'a pas de channel */
+			Sound::chunks[channel] = this;
+		else
+			playing_music = true;
 	}
 }

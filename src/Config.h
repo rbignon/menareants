@@ -57,6 +57,7 @@ public:
 	std::string ttf_file;
 	bool fullscreen;
 	bool music;
+	bool effect;
 
 /* Variable privées */
 private:
@@ -69,6 +70,7 @@ private:
 	static void WantAddServer(TObject*, void*);
 	static void WantDelServer(TObject*, void*);
 	static void SetFullScreen(TObject*, void*);
+	static void SetMusic(TObject*, void*);
 	static void ChangeResolution(TListBox*);
 };
 
