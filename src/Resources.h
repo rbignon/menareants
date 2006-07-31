@@ -217,6 +217,7 @@ public:
 	R_RESOURCE(ECSpriteBase, Enginer_Dos);
 	R_RESOURCE(ECImage,      DefenseTower_Icon);
 	R_RESOURCE(ECSpriteBase, DefenseTower_Face);
+	R_RESOURCE(ECImage,      DefenseTower_Missile);
 	R_RESOURCE(ECImage,      Tourist_Icon);
 	R_RESOURCE(ECSpriteBase, Tourist_Face);
 	R_RESOURCE(ECSpriteBase, Tourist_Left);

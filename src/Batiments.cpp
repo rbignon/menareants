@@ -212,12 +212,71 @@ bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cli
 /********************************************************************************************
  *                                 ECDefenseTower                                           *
  ********************************************************************************************/
+void ECDefenseTower::AfterDraw()
+{
+	ECEntity::AfterDraw();
+	if(!cible) return;
+
+	// Trajectoire d'un missile
+	int ax = Case()->Image()->X() + 36;
+	int ay = Case()->Image()->Y() + 2; // Coordonnées du point de départ
+	int bx = cible->Image()->X() + CASE_WIDTH/2;
+	int by = cible->Image()->Y() + CASE_HEIGHT/3; // Coordonnées du point d'arrivé
+	int tx; // Point de passage le plus haut du missile
+	int ty; // (là où il commence à retomber)
+
+	tx = (ax + bx) / 2;
+	ty = 0;
+
+	if( ax == bx ) bx++; // Evite une division par 0
+
+	// Calcule des coeffs de l'équation
+	float A, B, C;
+	A = (ay - by) / float(ax*ax - bx*bx - 2*tx*ax + 2*tx*bx);
+	B = - 2 * A * tx;
+	C = ax - A*ax*ax + B*ax;
+
+	if(!miss)
+	{
+		miss = SDL_GetTicks();
+		printf("begin, %d,%d -> %d,%d\n", ax, ay, bx, by);
+	}
+
+	// Position du missile :
+	const unsigned int duration = 2000; // Durée du mouvement du missile
+	unsigned int t = SDL_GetTicks(); // Temps actuel en millisecondes
+	unsigned int t0 = miss; // Temps au moement du lancement du missile
+
+	if( t - t0 < duration)
+	{
+		float x = ((bx - ax) * (t - t0) / (float)duration) + (float)ax;
+		float y = A*x*x + B*x + C;
+
+		Map()->ShowMap()->ToRedraw((int)x, (int)y);
+		printf("draw %d, %d\n", (int)x, (int)y);
+		Resources::DefenseTower_Missile()->Draw((int)x, (int)y);
+	}
+	else
+	{
+		printf("end\n");
+		// Explosion
+		miss = 0;
+		cible = 0;
+	}
+}
+
 bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-			return missile.AttaqFirst(c, me);
+		{
+			if(c != Case())
+			{
+				Map()->ShowMap()->CenterTo(this);
+				cible = c;
+			}
+		}
 		default:
 			return true;
 	}
@@ -228,7 +287,13 @@ bool ECDefenseTower::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c,
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-			return missile.AttaqSecond(c, me);
+			if(cible)
+			{
+				SDL_Delay(20);
+				return false;
+			}
+			return true;
+		//	return missile.AttaqSecond(c, me);
 		default:
 			return true;
 	}

@@ -182,6 +182,7 @@
 	R_RESOURCE(ECSpriteBase, Enginer_Dos,       "units/enginer/dos");
 	R_RESOURCE(ECImage,      DefenseTower_Icon, PKGDATADIR_PICS "units/defensetower_icon.png");
 	R_RESOURCE(ECSpriteBase, DefenseTower_Face, "units/defensetower");
+	R_RESOURCE_P(ECImage,    DefenseTower_Missile, PKGDATADIR_ANIMS "units/defensetower/missile.png", true);
 	R_RESOURCE(ECImage,      Tourist_Icon,      PKGDATADIR_PICS "units/tourist_icon.png");
 	R_RESOURCE(ECSpriteBase, Tourist_Face,      "units/tourist/face");
 	R_RESOURCE(ECSpriteBase, Tourist_Left,      "units/tourist/left");

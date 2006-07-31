@@ -93,7 +93,7 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 	while ((lecture = readdir(rep)))
 	{
 		std::string s = lecture->d_name;
-		if(s == "." || s == "..") continue;
+		if(s[0] == '.') continue; // On ne prend pas les fichiers cachés
 		if(!ext.empty() && s.rfind("." + ext) != s.size() - 4) continue;
 
 		file_list.push_back(s);

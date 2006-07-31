@@ -49,7 +49,7 @@ void Sound::Init()
 		return;
 	}
 
-	int audio_buffer = 512;
+	const int audio_buffer = 1024;
 
 	/* Open the audio device */
 	if (Mix_OpenAudio(frequency, audio_format, channels, audio_buffer) < 0)

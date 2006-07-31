@@ -28,7 +28,7 @@ public:
 
 	void reset();
 	float time_elapsed(bool update=false);
-	long get_time();
+	static long get_time();
 
 protected:
 

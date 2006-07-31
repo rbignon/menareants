@@ -216,10 +216,10 @@ class ECDefenseTower : public ECBatiment, public ECBDefenseTower
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_EMPTY_CONSTRUCTOR(ECDefenseTower) : missile(this, DEFENSETOWER_MISSILE_STEP) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECDefenseTower) : missile(this, DEFENSETOWER_MISSILE_STEP), miss(0), cible(0) {}
 
 	ENTITY_CONSTRUCTOR(ECDefenseTower), ECBatiment(Resources::DefenseTower_Face()),
-	                                    missile(this, DEFENSETOWER_MISSILE_STEP)
+	                                    missile(this, DEFENSETOWER_MISSILE_STEP), miss(0), cible(0)
 	{
 		missile.SetMissileUp(Resources::MissiLauncher_Missile_Up());
 		missile.SetMissileDown(Resources::MissiLauncher_Missile_Down());
@@ -236,6 +236,7 @@ public:
 /* Methodes */
 public:
 
+	virtual void AfterDraw();
 	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
@@ -243,6 +244,8 @@ public:
 /* Variables privées */
 private:
 	ECMissile missile;
+	unsigned int miss;
+	ECase* cible;
 };
 
 /********************************************************************************************

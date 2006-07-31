@@ -49,7 +49,7 @@ bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase*
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-			if(!missile.Missile())
+			if(!missile.Missile() && c != Case()) // c'est pas une attaque sur moi donc je tire
 			{
 				SetImage(GetSprite(I_Reployed));
 				Image()->SetAnim(false);
