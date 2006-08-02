@@ -24,11 +24,36 @@
 #include "Channels.h"
 
 /********************************************************************************************
+ *                               ECMcDo                                                     *
+ ********************************************************************************************/
+
+void ECMcDo::Invest(ECBEntity* entity)
+{
+/*
+	if(Shadowed()) return;
+
+	ECEntity::Invest(entity);
+
+	if(entity->IsCountryMaker())
+		return;
+
+	Channel()->SendArm(0, this, ARM_REMOVE);
+	SetShadowed();
+	* On attend de se faire purger */
+}
+
+/********************************************************************************************
  *                               ECEnginer                                                  *
  ********************************************************************************************/
 
 void ECEnginer::Invest(ECBEntity* entity)
 {
+	/* On a été tué mais bon faudrait quand même que le test ne se fasse pas ici, le problème est que la fonction
+	 * qui nous appelle ici est dans la lib (ECBCase::CheckInvests()). Elle n'est appelée que par le serveur,
+	 * et est dans la lib parce que la classe ECBCase n'est pas dérivée dans le serveur. Il faudrait trouver
+	 * une alternative
+	 */
+	if(Shadowed()) return;
 	if(entity->Owner() == Owner())
 	{
 		if(entity->Nb() >= entity->InitNb()) return;

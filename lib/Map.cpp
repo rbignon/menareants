@@ -213,7 +213,10 @@ void ECBCase::SetCountry(ECBCountry *mc)
 	map_country = mc;
 }
 
-void ECBCase::CheckChangingOwner(ECBEntity* e)
+/** \todo La fonction est [pour le moment] ici car il n'y a pas de dérivée de ECBCase sur le serveur
+ * Ça serait quand même bien de trouver une alternative
+ */
+void ECBCase::CheckInvests(ECBEntity* e)
 {
 	if(!e->Owner()) return;
 	std::vector<ECBEntity*> ents = entities.List();
@@ -221,6 +224,14 @@ void ECBCase::CheckChangingOwner(ECBEntity* e)
 		if(e->CanInvest(*enti))
 		{
 			e->Invest(*enti);
+			break;
+		}
+		else if((*enti)->CanInvest(e))
+		{ /* On sait jamais, si par exemple une unité peut en investir une autre, mais que c'est cette autre qui se deplace
+		   * vers la mienne, ou si les deux se déplacent dans le même tour sur la meme case, ça serait con que juste
+		   * parce que l'unité investisseuse s'est déplacée *avant* l'unité à investir, il n'y ait pas d'investiture
+		   */
+			(*enti)->Invest(e);
 			break;
 		}
 }

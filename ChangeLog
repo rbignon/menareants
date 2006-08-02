@@ -1,3 +1,20 @@
+2006-08-01  Romain Bignon <progs@headfucking.net>
+
+	* Units.h (ECMcDo): Unité Donald De McGerbale qui ne fazit pour le moment.. rien.
+
+	* lib/Map.cpp (CheckChangingOwner): Fonction renomée en CheckInvests().
+	(CheckInvests): Maintenant vérifie aussi si une quelconque unité de la case peut investir l'unité en question.
+
+	* server/InGame.cpp (EChannel::NextAnim): On envoie plus le ARM_ATTAQ si il y a que des amis.
+
+2006-08-01  Laurent Defert <lodesi2@yahoo.fr>
+
+	* src/Batiments.cpp (ECDefenseTower::AfterDraw): Envoie d'un boulet de manière parabolique.
+
+2006-07-31  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.cpp (GetFileList): Ne pas noter les dossiers.
+
 2006-07-30  Romain Bignon <progs@headfucking.net>
 
 	* AVERTISSEMENT AVEC LE SON: Je me suis apperçu qu'avec gdb il y avait quelques problèmes avec la musique ou le son.

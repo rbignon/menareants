@@ -129,6 +129,25 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECMcDo                                                     *
+ ********************************************************************************************/
+class ECMcDo : public ECUnit, public ECBMcDo
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(C_TERRE|C_PONT) {}
+
+	ENTITY_CREATE_LAST(ECMcDo);
+
+/* Methodes */
+public:
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual void Invest(ECBEntity* e);
+};
+
+/********************************************************************************************
  *                               ECEnginer                                                  *
  ********************************************************************************************/
 class ECTourist : public ECUnit, public ECBTourist

@@ -94,7 +94,7 @@ Sommaire:
          ~<type>,    :envoie une donnée particulière à l'entité, et qui doit donc etre interprétée par elle (RecvData).
           <data>
          °           :upgrade
-         @           :change d'owner
+         @           :investit
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas

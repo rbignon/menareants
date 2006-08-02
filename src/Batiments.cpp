@@ -23,6 +23,7 @@
 #include "Batiments.h"
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
+#include "tools/Video.h" // Pour obtenir SCREEN_WIDTH
 
 /********************************************************************************************
  *                                ECBatiment                                                *
@@ -215,50 +216,67 @@ bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cli
 void ECDefenseTower::AfterDraw()
 {
 	ECEntity::AfterDraw();
+
 	if(!cible) return;
 
-	// Trajectoire d'un missile
-	int ax = Case()->Image()->X() + 36;
-	int ay = Case()->Image()->Y() + 2; // Coordonnées du point de départ
-	int bx = cible->Image()->X() + CASE_WIDTH/2;
-	int by = cible->Image()->Y() + CASE_HEIGHT/3; // Coordonnées du point d'arrivé
-	int tx; // Point de passage le plus haut du missile
-	int ty; // (là où il commence à retomber)
+	// Coordonnées du point de départ
+	float ax = Case()->Image()->X() + 36;
+	float ay = Case()->Image()->Y() + 2;
+	// Coordonnées du point d'arrivé
+	float bx = cible->Image()->X() + CASE_WIDTH/2 - Resources::DefenseTower_Missile()->GetWidth()/2;
+	float by = cible->Image()->Y() + CASE_HEIGHT/2 - Resources::DefenseTower_Missile()->GetHeight()/2;
+	// Point de passage le plus haut du missile (là où il commence à retomber)
+	float ty;
+	float tx = ((ax + bx) / 2);
 
-	tx = (ax + bx) / 2;
 	ty = 0;
 
-	if( ax == bx ) bx++; // Evite une division par 0
-
-	// Calcule des coeffs de l'équation
-	float A, B, C;
-	A = (ay - by) / float(ax*ax - bx*bx - 2*tx*ax + 2*tx*bx);
-	B = - 2 * A * tx;
-	C = ax - A*ax*ax + B*ax;
-
 	if(!miss)
-	{
 		miss = SDL_GetTicks();
-		printf("begin, %d,%d -> %d,%d\n", ax, ay, bx, by);
-	}
 
 	// Position du missile :
 	const unsigned int duration = 2000; // Durée du mouvement du missile
 	unsigned int t = SDL_GetTicks(); // Temps actuel en millisecondes
 	unsigned int t0 = miss; // Temps au moement du lancement du missile
 
-	if( t - t0 < duration)
-	{
-		float x = ((bx - ax) * (t - t0) / (float)duration) + (float)ax;
-		float y = A*x*x + B*x + C;
+	if( ax == tx ) tx++; // Evite une division par 0
+	if( tx == bx ) bx++; // Evite une division par 0
 
-		Map()->ShowMap()->ToRedraw((int)x, (int)y);
-		printf("draw %d, %d\n", (int)x, (int)y);
-		Resources::DefenseTower_Missile()->Draw((int)x, (int)y);
+	float x = ((bx - ax) * float(t - t0) / (float)duration) + ax;
+
+	// Calcule des coeffs de l'ï¿½uation
+	float A, B, C;
+
+	if( t - t0 < duration / 2)
+	{
+		A = (ay - ty) / ((ax - tx)*(ax - tx));
+		B = - 2 * A * tx;
+		C = ay - A*ax*ax - B*ax;
 	}
 	else
 	{
-		printf("end\n");
+		A = (by - ty) / ((bx - tx)*(bx - tx));
+		B = - 2 * A * tx;
+		C = by - A*bx*bx - B*bx;
+	}
+
+	// Position du missile :
+	if( t - t0 < duration)
+	{
+		//float x = ((bx - ax) * (t - t0) / (float)duration) + (float)ax;
+		float y = A*x*x + B*x + C;
+
+		Resources::DefenseTower_Missile()->Draw((int)x, (int)y);
+
+		if(cible->Showed() > 0 && t - t0 < duration/2 &&
+		   (cible->Image()->X() < 0 || cible->Image()->X()+CASE_WIDTH > (int)SCREEN_WIDTH))
+			Map()->ShowMap()->CenterTo(cible);
+
+		// On fait assez large
+		Map()->ShowMap()->ToRedraw((int)x-CASE_WIDTH, (int)y-CASE_HEIGHT, 3*CASE_WIDTH, 3*CASE_HEIGHT);
+	}
+	else
+	{
 		// Explosion
 		miss = 0;
 		cible = 0;
@@ -270,13 +288,11 @@ bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-		{
 			if(c != Case())
 			{
 				Map()->ShowMap()->CenterTo(this);
 				cible = c;
 			}
-		}
 		default:
 			return true;
 	}
@@ -293,7 +309,6 @@ bool ECDefenseTower::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c,
 				return false;
 			}
 			return true;
-		//	return missile.AttaqSecond(c, me);
 		default:
 			return true;
 	}

@@ -189,9 +189,36 @@ public:
 };
 
 /********************************************************************************************
+ *                                ECMcDo                                                    *
+ ********************************************************************************************/
+#define MCDO_VISUAL_STEP 2
+class ECMcDo : public ECUnit, public ECBMcDo
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECMcDo) {}
+
+	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(MCDO_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::McDo_Dos());
+		PutImage(I_Down, Resources::McDo_Face());
+		PutImage(I_Right, Resources::McDo_Right());
+		PutImage(I_Left, Resources::McDo_Left());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Donald de McGerbale"; }
+	virtual const char* Infos() const { return "Emmenez-le sur une caserne pour qu'il y installe un McGerbale."; }
+	virtual ECImage* Icon() const { return Resources::McDo_Icon(); }
+};
+
+/********************************************************************************************
  *                                ECTourist                                                 *
  ********************************************************************************************/
-#define ENGINER_VISUAL_STEP 2
+#define TOURIST_VISUAL_STEP 4
 class ECTourist : public ECUnit, public ECBTourist
 {
 /* Constructeur/Destructeur */
@@ -199,7 +226,7 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECTourist) {}
 
-	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(ENGINER_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(TOURIST_VISUAL_STEP)
 	{
 		PutImage(I_Up, Resources::Tourist_Dos());
 		PutImage(I_Down, Resources::Tourist_Face());

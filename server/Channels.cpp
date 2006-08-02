@@ -1127,7 +1127,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += " ~" + TypToStr(data.type) + "," + data.data;
 	if(flag & ARM_UPGRADE)
 		to_send += " °";
-	if(flag & ARM_CHANGEOWNER)
+	if(flag & ARM_INVEST)
 		to_send += " @";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */

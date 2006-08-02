@@ -79,6 +79,7 @@ void EChannel::NextAnim()
 
 			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
 			std::vector<ECEntity*> entv = event->Entities()->List();
+			bool someone_want_attaq = false;
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end();)
 			{
 				if((*it)->Shadowed())
@@ -93,6 +94,8 @@ void EChannel::NextAnim()
 
 					(*it)->SetShadowed();
 					(*it)->Tag = T_CONTINUE;
+					if((*it)->EventType() & ARM_ATTAQ)
+						someone_want_attaq = true;
 					++it;
 				}
 			}
@@ -103,7 +106,15 @@ void EChannel::NextAnim()
 			uint flags = ARM_ATTAQ;
 			if(!event->Linked().empty())
 				flags |= ARM_MOVE;
+			/* Si jamais il n'y a plus que des amis on envoie les mouvements puis on se barre, sauf si quelqu'un a
+			 * vraiment envie de se taper meme contre personne
+			 */
+			if(!someone_want_attaq && ECEntity::AreFriends(entv))
+				flags &= ~ARM_ATTAQ;
 			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
+
+			if(!(flags & ARM_ATTAQ))
+				break; // Il n'y a que des amis (voir trois lignes plus haut) donc on se barre après avoir envoyé les moves
 
 			std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entv);
 
@@ -176,12 +187,12 @@ void EChannel::NextAnim()
 					else
 					{
 						if((*it)->EventType() & ARM_DEPLOY)
-							SendArm(NULL, event->Entities()->List(), ARM_DEPLOY);
+							SendArm(NULL, *it, ARM_DEPLOY);
 						SendArm(receivers, *it, ARM_NUMBER);
 						EContainer* contain = dynamic_cast<EContainer*>(*it);
 						if(contain && contain->Containing())
 							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
-						(*it)->Case()->CheckChangingOwner(*it);
+						(*it)->Case()->CheckInvests(*it);
 						(*it)->SetShadowed(false);
 					}
 				}
@@ -238,7 +249,7 @@ void EChannel::NextAnim()
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				(*it)->Case()->CheckChangingOwner(*it);
+				(*it)->Case()->CheckInvests(*it);
 			break;
 		}
 		case ARM_UPGRADE:
@@ -256,9 +267,8 @@ void EChannel::NextAnim()
 
 			ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
 
-			/* On attribut un nombre dans l'upgrade proportionnel au nombre dans l'entité détruite par rapport au nombre
-			 * initial. */
-			upgrade->SetNb((upgrade->InitNb() * entity->Nb()) / entity->InitNb());
+			/* On remet le niveau de vie au plus haut */
+			upgrade->SetNb(upgrade->InitNb());
 
 			Map()->RemoveAnEntity(entity);
 			Map()->AddAnEntity(upgrade);

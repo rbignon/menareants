@@ -355,12 +355,14 @@ TCredits::TCredits(ECImage* w)
 	Label1 = AddComponent(new TLabel(105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
 	Label2 = AddComponent(new TLabel(135,"* Programmeur", red_color, Font::GetInstance(Font::Big)));
 
-	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", blue_color, Font::GetInstance(Font::Big)));
-	Label4 = AddComponent(new TLabel(50,235,"* Graphiste", blue_color, Font::GetInstance(Font::Big)));
+	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
+	Label4 = AddComponent(new TLabel(50,235,"* \"Graphiste\"", fgreen_color, Font::GetInstance(Font::Big)));
 
 	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
 	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,"* Idée originale", fwhite_color, Font::GetInstance(Font::Big)));
-	Label7 = AddComponent(new TLabel(SCREEN_WIDTH-300,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
+	/** \todo Mettre quand il m'aurra envoyé sa musique !
+	 * Label7 = AddComponent(new TLabel(SCREEN_WIDTH-300,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
+	 */
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->AddItem("Merci au lycée Corneilles pour nous avoir mis dans le contexte emmerdant qui "
@@ -369,7 +371,7 @@ TCredits::TCredits(ECImage* w)
 	              "cours d'histoire et d'espagnol. Je tiens d'ailleurs à remercier le manque "
 	              "d'autorité de Mme Gay (histoire) et Mme Goetz (espagnol).\n"
 	              "\n"
-	              "Merci à lodesi pour ses patchs."
+	              "Merci à lodesi pour ses patchs.\n"
 	              "\n"
                   "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();

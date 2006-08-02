@@ -142,7 +142,7 @@ protected:
 #define ARM_NOPRINCIPAL 0x8000
 #define ARM_DATA        0x10000
 #define ARM_UPGRADE     0x20000
-#define ARM_CHANGEOWNER 0x40000
+#define ARM_INVEST      0x40000
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -179,6 +179,7 @@ public:
 		E_TOURIST,
 		E_MINE,
 		E_OBELISK,
+		E_MCDO,
 		E_END
 	};
 
@@ -232,12 +233,12 @@ public:
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(Like(e)) return false;
 		switch(e->Type())
 		{
 			case E_CITY:
 			case E_CAPITALE:
-				return true;
+				if(!Like(e))
+					return true;
 			default:
 				return false;
 		}
@@ -446,7 +447,7 @@ public:
 
 	virtual bool CanCreate(const ECBEntity*) { return false; }
 
-	void CheckChangingOwner(ECBEntity* e);
+	void CheckInvests(ECBEntity* e);
 
 	/** Calculate distance */
 	uint Delta(ECBCase* c);

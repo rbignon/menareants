@@ -379,7 +379,7 @@ void ECEntity::ChangeOwner(ECBPlayer* pl)
 	if(Owner() == pl) return;
 	ECPlayer* last_owner = Owner();
 	EChannel* c = Channel();
-	c->SendArm(NULL, this, ARM_REMOVE|ARM_CHANGEOWNER);
+	c->SendArm(NULL, this, ARM_REMOVE|ARM_INVEST);
 	SetOwner(pl);
 
 	if(last_owner)

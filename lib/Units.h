@@ -115,7 +115,7 @@ protected:
 /********************************************************************************************
  *                               ECBMissiLauncher                                           *
  ********************************************************************************************/
-/** This is a simple army */
+/** This is a missile launcher */
 class ECBMissiLauncher : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -161,7 +161,7 @@ protected:
 /********************************************************************************************
  *                               ECBChar                                                    *
  ********************************************************************************************/
-/** This is a simple army */
+/** This is a vehicule */
 class ECBChar : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -182,7 +182,7 @@ public:
 	bool CanAttaq(const ECBEntity* e)
 	{
 		if((Parent() && Parent()->CanAttaq(e)) ||
-		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity()) && !e->IsNaval()))
+		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity() && !e->IsHidden()) && !e->IsNaval()))
 			return true;
 		else
 			return false;
@@ -202,9 +202,55 @@ protected:
 };
 
 /********************************************************************************************
+ *                               ECBMcDo                                                    *
+ ********************************************************************************************/
+/** This is a special Unit for USA nation */
+class ECBMcDo : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBMcDo) {}
+
+	ENTITY_CONSTRUCTOR(ECBMcDo) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_MCDO; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 1; }
+	virtual uint Step() const { return 2; }
+	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
+
+	bool CanInvest(const ECBEntity* e) const
+	{
+		if(e->Type() == E_CASERNE && !Like(e))
+			return true;
+		else
+			return false;
+	}
+	bool CanAttaq(const ECBEntity* e) { return false; }
+	virtual const char* Qual() const { return "Donald de McGerbale"; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	bool IsInfantry() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool AddUnits(uint) { return false; }
+
+/* Methodes */
+public:
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+};
+
+/********************************************************************************************
  *                               ECBTourist                                                 *
  ********************************************************************************************/
-/** This is a simple army */
+/** This is a special Unit for Japan nation */
 class ECBTourist : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -246,7 +292,7 @@ protected:
 /********************************************************************************************
  *                               ECBEnginer                                                 *
  ********************************************************************************************/
-/** This is a simple army */
+/** This is an enginer who can take enemey's buildings */
 class ECBEnginer : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -314,7 +360,10 @@ public:
 	bool CanAttaq(const ECBEntity* e)
 	{
 		if((Parent() && Parent()->CanAttaq(e)) ||
-		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity()) && !e->IsNaval()))
+		   (( e->IsInfantry() && e->Type() != E_MCDO ||
+		      e->IsVehicule() ||
+		      e->IsBuilding() && !e->IsCity() && !e->IsHidden()) &&
+		    !e->IsNaval()))
 			return true;
 		else
 			return false;

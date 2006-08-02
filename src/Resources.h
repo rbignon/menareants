@@ -228,6 +228,11 @@ public:
 	R_RESOURCE(ECSpriteBase, Mine_ActFace);
 	R_RESOURCE(ECImage,      Obelisk_Icon);
 	R_RESOURCE(ECSpriteBase, Obelisk_Face);
+	R_RESOURCE(ECImage,      McDo_Icon);
+	R_RESOURCE(ECSpriteBase, McDo_Face);
+	R_RESOURCE(ECSpriteBase, McDo_Left);
+	R_RESOURCE(ECSpriteBase, McDo_Right);
+	R_RESOURCE(ECSpriteBase, McDo_Dos);
 };
 
 #undef R_RESOURCE

@@ -80,6 +80,8 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 	re=TRUE;
 	do
 	{
+		if(File.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			continue;
 		file_list.push_back(File.cFileName);
 		re = FindNextFile(hSearch, &File);
 	} while(re);
@@ -92,6 +94,7 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 	rep = opendir(path.c_str());
 	while ((lecture = readdir(rep)))
 	{
+		if(lecture->d_type == DT_DIR) continue;
 		std::string s = lecture->d_name;
 		if(s[0] == '.') continue; // On ne prend pas les fichiers cachés
 		if(!ext.empty() && s.rfind("." + ext) != s.size() - 4) continue;

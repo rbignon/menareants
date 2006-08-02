@@ -174,7 +174,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				break;
 			}
 			case '@':
-				flags |= ARM_CHANGEOWNER;
+				flags |= ARM_INVEST;
 				break;
 			case '/':
 			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
@@ -376,7 +376,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				case ARM_ATTAQ|ARM_MOVE:
 				case ARM_ATTAQ:
-					if(!(flags & ARM_CHANGEOWNER))
+					if(!(flags & ARM_INVEST))
 					{
 						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
 						if((*it)->DeadCase())

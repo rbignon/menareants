@@ -193,6 +193,11 @@
 	R_RESOURCE(ECSpriteBase, Mine_ActFace,      "units/mine/actived");
 	R_RESOURCE(ECImage,      Obelisk_Icon,      PKGDATADIR_PICS "units/obelisk_icon.png");
 	R_RESOURCE(ECSpriteBase, Obelisk_Face,      "units/obelisk");
+	R_RESOURCE(ECImage,      McDo_Icon,         PKGDATADIR_PICS "units/mcdo_icon.png");
+	R_RESOURCE(ECSpriteBase, McDo_Face,         "units/mcdo/face");
+	R_RESOURCE(ECSpriteBase, McDo_Left,         "units/mcdo/left");
+	R_RESOURCE(ECSpriteBase, McDo_Right,        "units/mcdo/right");
+	R_RESOURCE(ECSpriteBase, McDo_Dos,          "units/mcdo/dos");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects

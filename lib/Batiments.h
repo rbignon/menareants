@@ -44,6 +44,7 @@ public:
 	virtual e_type Type() const { return E_MINE; }
 	virtual uint Cost() const { return 15000; }
 	virtual uint InitNb() const { return 1;}
+	virtual uint Visibility() const { return 1; } /**< Elle ne voit en effet pas bien loins... */
 
 	enum data_t {
 		DATA_RESTBUILD
@@ -409,6 +410,7 @@ public:
 			case E_ARMY:
 			case E_ENGINER:
 			case E_TOURIST:
+			case E_MCDO:
 				return true;
 			default:
 				return false;
