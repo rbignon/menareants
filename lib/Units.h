@@ -214,17 +214,23 @@ public:
 
 	ENTITY_CONSTRUCTOR(ECBMcDo) {}
 
+	enum data_t {
+		DATA_INVESTED,
+		DATA_EXOWNER
+	};
+
 /* Constantes */
 public:
 
 	virtual e_type Type() const { return E_MCDO; }
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1; }
-	virtual uint Step() const { return 2; }
+	virtual uint Step() const { return Deployed() ? 0 : 2; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
 
 	bool CanInvest(const ECBEntity* e) const
 	{
+		if(Deployed()) return false;
 		if(e->Type() == E_CASERNE && !Like(e))
 			return true;
 		else
@@ -232,10 +238,14 @@ public:
 	}
 	bool CanAttaq(const ECBEntity* e) { return false; }
 	virtual const char* Qual() const { return "Donald de McGerbale"; }
-	bool CanCreate(const ECBEntity*) { return false; }
-	bool IsInfantry() const { return true; }
+	virtual bool CanCreate(const ECBEntity*) { return false; }
+	virtual void Create(ECBEntity*);
+	virtual bool IsBuilding() const { return Deployed(); }
+	bool IsInfantry() const { return !Deployed(); }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return !Deployed(); }
+	virtual bool IsCity() const { return Deployed(); }
 
 /* Methodes */
 public:

@@ -3,7 +3,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--trouver le système qui permettrait au mcdo de faire ses actions.
+-bug qui créer apparament ne supprime pas une unité d'une liste et qui en recréer une autre avec le même ID.
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent

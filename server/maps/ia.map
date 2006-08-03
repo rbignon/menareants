@@ -21,7 +21,9 @@ CITY 1000
 MIN 2
 MAX 2
 DATE 27/7/2006
-INFO Map créée par Progs
+INFO Mettez vous en joueur 2 pour vous battre contre l'IA
+INFO
+INFO Progressez vers la gauche afin de l'anéantir
 UNIT 5 A 18,3 200
 UNIT 5 A 18,6 200
 UNIT 6 A 18,0 1000

@@ -206,7 +206,7 @@ public:
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
 	virtual bool IsCity() const { return true; }
-	virtual int TurnMoney() { return Case() ? (2 * Case()->Map()->CityMoney()) : 0; }
+	virtual int TurnMoney(ECBPlayer* pl) { return (pl == Owner() && Case()) ? (2 * Case()->Map()->CityMoney()) : 0; }
 };
 
 /********************************************************************************************
@@ -242,7 +242,7 @@ public:
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 	virtual bool IsCountryMaker() const { return true; }
 	virtual bool IsCity() const { return true; }
-	virtual int TurnMoney() { return Case() ? Case()->Map()->CityMoney() : 0; }
+	virtual int TurnMoney(ECBPlayer* pl) { return (pl == Owner() && Case()) ? Case()->Map()->CityMoney() : 0; }
 };
 
 /********************************************************************************************

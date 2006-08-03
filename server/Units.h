@@ -136,7 +136,7 @@ class ECMcDo : public ECUnit, public ECBMcDo
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(C_TERRE|C_PONT), caserne(0), ex_owner(0) {}
 
 	ENTITY_CREATE_LAST(ECMcDo);
 
@@ -144,7 +144,16 @@ public:
 public:
 
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool WantMove(ECBMove::E_Move m, int i) { return !Deployed() ? ECUnit::WantMove(m,i) : false; }
 	virtual void Invest(ECBEntity* e);
+	virtual bool CanCreate(const ECBEntity*);
+	virtual int TurnMoney(ECBPlayer*);
+	virtual void ChangeOwner(ECBPlayer*);
+
+/* Variables privées */
+private:
+	ECEntity* caserne;
+	ECPlayer* ex_owner;
 };
 
 /********************************************************************************************

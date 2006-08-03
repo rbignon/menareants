@@ -53,7 +53,7 @@ public:
 
 	void Init() {}
 
-	void SetList(std::vector<ECEntity*> list);
+	void SetList(std::vector<ECEntity*> list, bool click = true);
 
 private:
 	std::vector<TImage*> icons;
@@ -94,10 +94,14 @@ public:
 	TButtonText*    AttaqButton;
 	TButtonText*    UpButton;
 	TButtonText*    UpgradeButton;
+	TButtonText*    HelpButton;
 	TBarreActIcons* Icons;
 
 	TImage*         ChildIcon;
 	TLabel*         ChildNb;
+
+	TMemo*          HelpInfos;
+	TLabel*         HelpAttaqs;
 
 /* Attributs */
 public:
@@ -113,6 +117,8 @@ public:
 
 	void UnSelect();
 	bool Select() const { return select; }
+
+	void ShowInfos();
 
 	static void CreateUnit(TObject* o, void* e);
 
@@ -135,7 +141,7 @@ private:
 			Icons->Clear();
 	}
 
-	bool select;
+	bool select, infos;
 };
 
 class TBarreLat : public TChildForm

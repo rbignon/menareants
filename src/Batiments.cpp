@@ -223,8 +223,8 @@ void ECDefenseTower::AfterDraw()
 	float ax = Case()->Image()->X() + 36;
 	float ay = Case()->Image()->Y() + 2;
 	// Coordonnées du point d'arrivé
-	float bx = cible->Image()->X() + CASE_WIDTH/2 - Resources::DefenseTower_Missile()->GetWidth()/2;
-	float by = cible->Image()->Y() + CASE_HEIGHT/2 - Resources::DefenseTower_Missile()->GetHeight()/2;
+	float bx = (int)(cible->Image()->X() + CASE_WIDTH/2 - Resources::DefenseTower_Missile()->GetWidth()/2);
+	float by = (int)(cible->Image()->Y() + CASE_HEIGHT/2 - Resources::DefenseTower_Missile()->GetHeight()/2);
 	// Point de passage le plus haut du missile (là où il commence à retomber)
 	float ty;
 	float tx = ((ax + bx) / 2);
@@ -242,7 +242,7 @@ void ECDefenseTower::AfterDraw()
 	if( ax == tx ) tx++; // Evite une division par 0
 	if( tx == bx ) bx++; // Evite une division par 0
 
-	float x = ((bx - ax) * float(t - t0) / (float)duration) + ax;
+	float x = ((bx - ax) * (t - t0) / (float)duration) + ax;
 
 	// Calcule des coeffs de l'ï¿½uation
 	float A, B, C;
@@ -261,7 +261,7 @@ void ECDefenseTower::AfterDraw()
 	}
 
 	// Position du missile :
-	if( t - t0 < duration)
+	if( t - t0 <= duration)
 	{
 		//float x = ((bx - ax) * (t - t0) / (float)duration) + (float)ax;
 		float y = A*x*x + B*x + C;
@@ -288,7 +288,7 @@ bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(event_type)
 	{
 		case ARM_ATTAQ:
-			if(c != Case())
+			if(c != Case() && (c->Showed() > 0 || Case()->Showed() > 0))
 			{
 				Map()->ShowMap()->CenterTo(this);
 				cible = c;

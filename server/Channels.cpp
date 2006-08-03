@@ -31,6 +31,7 @@
 #include "InGame.h"
 #include <cstdarg>
 #include <list>
+#include <map>
 
 ChannelVector ChanList;
 
@@ -907,6 +908,7 @@ void EChannel::CheckReadys()
 				{ /* Plus d'animations */
 
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
+					std::map<ECBPlayer*, int> money;
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 					{
 						if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
@@ -919,6 +921,8 @@ void EChannel::CheckReadys()
 						else
 						{
 							(*enti)->Played(); /* On marque bien qu'il a été joué */
+							for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+								money[*it] += (*enti)->TurnMoney(*it);
 							++enti;
 						}
 					}
@@ -926,11 +930,10 @@ void EChannel::CheckReadys()
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
 						if((*it)->Lost()) continue;
-						int money = 0, nb_units = 0;
-						std::vector<ECBEntity*> entv = (*it)->Entities()->List();
+						int nb_units = 0;
+						entv = (*it)->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 						{
-							money += (*enti)->TurnMoney();
 							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
 							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
 							 */
@@ -951,7 +954,7 @@ void EChannel::CheckReadys()
 							}
 						}
 						else
-							dynamic_cast<ECPlayer*>(*it)->UpMoney(money);
+							dynamic_cast<ECPlayer*>(*it)->UpMoney(money[*it]);
 					}
 
 					if(!CheckEndOfGame())

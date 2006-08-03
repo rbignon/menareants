@@ -29,17 +29,75 @@
 
 void ECMcDo::Invest(ECBEntity* entity)
 {
-/*
 	if(Shadowed()) return;
 
-	ECEntity::Invest(entity);
+	ECEntity* enti = dynamic_cast<ECEntity*>(entity);
 
-	if(entity->IsCountryMaker())
-		return;
+	/* Pour le client, on supprime à la fois la caserne et le mcdonald */
+	Channel()->SendArm(0, enti, ARM_REMOVE|ARM_INVEST);
+	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
 
-	Channel()->SendArm(0, this, ARM_REMOVE);
-	SetShadowed();
-	* On attend de se faire purger */
+	/* On se met à autant que la caserne */
+	SetNb(enti->Nb());
+
+	/* On se rappelle de la caserne, de son ancien owner puis on se définit un nouvel owner */
+	caserne = enti;
+	ex_owner = Owner();
+	SetOwner(enti->Owner());
+	if(ex_owner)
+		ex_owner->Entities()->Remove(this);
+	else
+		Map()->Neutres()->Remove(this);
+	if(Owner())
+		Owner()->Entities()->Add(this);
+	else
+		Map()->Neutres()->Add(this);
+
+	/* On change d'identité maintenant qu'on "appartient" à l'owner de la caserne, et on réapparait */
+	SetID(Channel()->FindEntityName(Owner()));
+	Channel()->SendArm(NULL, this, ARM_CREATE|ARM_HIDE, Case()->X(), Case()->Y());
+
+	/* On se déploie pour avoir le status batiment */
+	SetDeployed();
+	Channel()->SendArm(0, this, ARM_DEPLOY);
+
+	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_INVESTED, TypToStr(caserne->Type())));
+	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
+
+	/* On supprime de la circulation la caserne */
+	Map()->RemoveAnEntity(caserne);
+}
+
+bool ECMcDo::CanCreate(const ECBEntity* entity)
+{
+	if(!Deployed() || !caserne) return false;
+
+	return caserne->CanCreate(entity);
+}
+
+int ECMcDo::TurnMoney(ECBPlayer* pl)
+{
+	if(!Deployed()) return 0;
+
+	if(ex_owner == Owner())
+		return 0; /* En effet, on a du investir le McDo avec un ingénieur ou conquérir la ville un truc du genre */
+
+	if(ex_owner == pl)
+		return 1000;
+	else if(Owner() == pl)
+		return -1000;
+	else
+		return 0;
+}
+
+void ECMcDo::ChangeOwner(ECBPlayer* pl)
+{
+	ECEntity::ChangeOwner(pl);
+
+	if(!Deployed() || !caserne) return;
+
+	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_INVESTED, TypToStr(caserne->Type())));
+	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
 }
 
 /********************************************************************************************
@@ -68,7 +126,7 @@ void ECEnginer::Invest(ECBEntity* entity)
 			return;
 	}
 
-	Channel()->SendArm(0, this, ARM_REMOVE);
+	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
 	SetShadowed();
 	/* On attend de se faire purger */
 }

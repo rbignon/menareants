@@ -223,6 +223,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb, map);
 			map->AddAnEntity(entity);
 		}
+		else if(flags & ARM_TYPE)
+		{
+			Debug(W_DESYNCH|W_SEND|W_WARNING, "ARM: Création d'une unité qui existe déjà !?!?!?!?");
+			L_SHIT("WARNING DEV: Création d'une unité qui existe déjà !!!");
+		}
 		if(!moves_str.empty())
 		{
 			std::string et_longname = entity->LongName();
@@ -749,6 +754,11 @@ void MenAreAntsApp::InGame()
 							                 " +").c_str());
 							break;
 						}
+						if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y))
+						{
+							InGameForm->BarreAct->ShowInfos();
+							break;
+						}
 
 						if(InGameForm->BarreAct->Entity())
 						{
@@ -1025,20 +1035,23 @@ TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
  *                               TBarreActIcons                                             *
  ********************************************************************************************/
 
-void TBarreActIcons::SetList(std::vector<ECEntity*> list)
+void TBarreActIcons::SetList(std::vector<ECEntity*> list, bool click)
 {
 	Clear();
 
-	int _x = X();
+	int _x = 0;
 	uint _h = 0;
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		TImage* i = AddComponent(new TImage(_x, 0, (*it)->Icon(), false));
 		_x += i->Width();
 		if(i->Height() > _h) _h = i->Height();
-		i->SetOnClick(TBarreAct::CreateUnit, (void*)*it);
-		i->SetHint(TypToStr((*it)->Cost()) + " $\n" +
-		           (*it)->Infos());
+		if(click)
+		{
+			i->SetOnClick(TBarreAct::CreateUnit, (void*)*it);
+			i->SetHint(TypToStr((*it)->Cost()) + " $\n" +
+			           (*it)->Infos());
+		}
 	}
 	TComponent* parent = dynamic_cast<TComponent*>(Parent());
 	SetWidth(_x);
@@ -1147,6 +1160,95 @@ void TBarreAct::UnSelect()
 		SetEntity(0);
 }
 
+void TBarreAct::ShowInfos()
+{
+	if(!entity) return;
+
+	if(infos)
+	{
+		SetEntity(entity);
+		return;
+	}
+
+	infos = true;
+	Name->Hide();
+	Nb->Hide();
+	Owner->Hide();
+	Infos->Hide();
+	SpecialInfo->Hide();
+	ExtractButton->Hide();
+	DeployButton->Hide();
+	AttaqButton->Hide();
+	UpButton->Hide();
+	UpgradeButton->Hide();
+	ChildIcon->Hide();
+	ChildNb->Hide();
+
+	assert(Icons);
+	std::vector<ECEntity*> elist = EntityList.CanAttaq(entity);
+	if(!elist.empty())
+	{
+		HelpAttaqs->SetCaption("Peut attaquer :");
+		Icons->SetList(elist, false);
+		HelpInfos->SetWidth(((Width() - Icons->X() > 300) ? Icons->X() : Width() - 300) - HelpInfos->X() - 10);
+		HelpAttaqs->SetX((Width() - Icons->X() > 300) ? Icons->X() : HelpInfos->X()+HelpInfos->Width()+10);
+	}
+	else if(entity->Step() && !(elist = EntityList.CanInvest(entity)).empty())
+	{
+		Icons->SetList(elist, false);
+		HelpAttaqs->SetCaption("Peut investir :");
+		HelpInfos->SetWidth(((Width() - Icons->X() > 300) ? Icons->X() : Width() - 300) - HelpInfos->X() - 10);
+		HelpAttaqs->SetX((Width() - Icons->X() > 300) ? Icons->X() : HelpInfos->X()+HelpInfos->Width()+10);
+	}
+	else
+	{
+		Icons->Clear();
+		HelpAttaqs->SetCaption("Ne peut rien attaquer.");
+	}
+
+	HelpButton->SetText("Revenir");
+	HelpInfos->ClearItems();
+	HelpInfos->Show();
+	HelpInfos->AddItem("Nom : " + std::string(entity->Name()));
+	HelpInfos->AddItem("Prix : " + TypToStr(entity->Cost()) + " $");
+	HelpInfos->AddItem(std::string(entity->Description()), red_color);
+
+	if(entity->IsCity())
+		HelpInfos->AddItem("Type : Quartier d'une ville");
+	else if(entity->IsBuilding())
+		HelpInfos->AddItem("Type : Batiment");
+	else if(entity->IsNaval())
+		HelpInfos->AddItem("Type : Unité navale");
+	else if(entity->IsVehicule())
+		HelpInfos->AddItem("Type : Vehicule");
+	else if(entity->IsInfantry())
+		HelpInfos->AddItem("Type : Infanterie");
+	else
+		HelpInfos->AddItem("Type : Indéfinie !?");
+
+	if(entity->Step())
+		HelpInfos->AddItem("Pas par tours : " + TypToStr(entity->Step()) + " cases");
+	if(entity->MyStep() < entity->Step())
+		HelpInfos->AddItem("  -> Ralentit à " + TypToStr(entity->MyStep()) + " pas par tours");
+	else if(entity->MyStep() > entity->Step())
+		HelpInfos->AddItem("  -> Accéleré à " + TypToStr(entity->MyStep()) + " pas par tours");
+
+	HelpInfos->AddItem("Visibilité : " + TypToStr(entity->Visibility()) + " cases");
+	if(entity->Porty())
+		HelpInfos->AddItem("Portée : " + TypToStr(entity->Porty()) + " cases");
+	else
+		HelpInfos->AddItem("Portée : Aucune, combats au corps à corps");
+
+	if(entity->MyUpgrade() != ECEntity::E_NONE)
+		HelpInfos->AddItem("Upgrade : " + std::string(EntityList.Get(entity->MyUpgrade())->Name()));
+
+	if(entity->WantDeploy())
+		HelpInfos->AddItem("Deployable");
+
+	HelpInfos->ScrollUp();
+	HelpAttaqs->Show();
+}
+
 void TBarreAct::SetEntity(ECEntity* e)
 {
 	ECAltThread::Put(TBarreAct::vSetEntity, e);
@@ -1160,14 +1262,22 @@ void TBarreAct::vSetEntity(void* _e)
 	if(e)
 	{
 		InGameForm->BarreAct->select = true;
+		InGameForm->BarreAct->infos = false;
+		InGameForm->BarreAct->HelpInfos->Hide();
+		InGameForm->BarreAct->HelpAttaqs->Hide();
+		InGameForm->BarreAct->Name->Show();
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
 		InGameForm->BarreAct->Nb->SetCaption(
 		    e->Nb() ?
 		       (((e->Owner() != InGameForm->BarreAct->me) ? "~ " : "") + TypToStr(e->Nb()))
 		       : "???");
+		InGameForm->BarreAct->Nb->Show();
 		InGameForm->BarreAct->SpecialInfo->SetCaption(e->SpecialInfo());
+		InGameForm->BarreAct->SpecialInfo->Show();
 
-		if(e->Deployed()) // Il est déjà deployé, donc si y a un evenement pour se déployer c'est qu'il va se replier
+		if(!InGameForm->BarreAct->SpecialInfo->Empty())
+			InGameForm->BarreAct->Infos->SetCaption("");
+		else if(e->Deployed()) // Il est déjà deployé, donc si y a un evenement pour se déployer c'est qu'il va se replier
 			InGameForm->BarreAct->Infos->SetCaption((e->EventType() & ARM_DEPLOY) ? "Va se replier" : "Déployé");
 		else if(e->EventType() & ARM_DEPLOY) // Donc il n'est pas actuellement déployé
 			InGameForm->BarreAct->Infos->SetCaption("Va se déployer");
@@ -1177,10 +1287,13 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->Infos->SetCaption("Vérouillée");
 		else
 			InGameForm->BarreAct->Infos->SetCaption("");
+		InGameForm->BarreAct->Infos->Show();
 		InGameForm->BarreAct->Icon->SetImage(e->Icon(), false);
 		InGameForm->BarreAct->Icon->SetHint(e->Infos());
 
 		int x = InGameForm->BarreAct->Width() - 5;
+		InGameForm->BarreAct->HelpButton->SetText("Plus d'infos");
+		InGameForm->BarreAct->HelpButton->SetX((x -= InGameForm->BarreAct->HelpButton->Width()));
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
 			InGameForm->BarreAct->ShowIcons(e, e->Owner());
@@ -1301,7 +1414,7 @@ void TBarreAct::vSetEntity(void* _e)
 }
 
 TBarreAct::TBarreAct(ECPlayer* pl)
-	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-200, 110), entity(0)
+	: TChildForm(0, SCREEN_HEIGHT, SCREEN_WIDTH-200, 110), entity(0), select(false), infos(false)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 	chan = pl->Channel();
@@ -1326,6 +1439,9 @@ void TBarreAct::Init()
 	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, "Upgrade", Font::GetInstance(Font::Small)));
 	UpgradeButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	UpgradeButton->SetHint("Utiliser l'amélioration de ce batiment.");
+	HelpButton = AddComponent(new TButtonText(500,15,100,30, "Plus d'infos", Font::GetInstance(Font::Small)));
+	HelpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	HelpButton->SetHint("Affiche toutes les caractéristiques de l'unité.");
 
 	Owner = AddComponent(new TLabel(60,40, "", black_color, Font::GetInstance(Font::Normal)));
 
@@ -1339,6 +1455,10 @@ void TBarreAct::Init()
 	ChildIcon = AddComponent(new TImage(200,60));
 	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
 	ChildNb = AddComponent(new TLabel(260,80, "", black_color, Font::GetInstance(Font::Normal)));
+
+	HelpInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60, 15, Width()-500, Height()-15-10));
+	HelpAttaqs = AddComponent(new TLabel(HelpInfos->X()+HelpInfos->Width()+5, 40, "Peut attaquer :", black_color,
+	                          Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::BarreAct());
 }

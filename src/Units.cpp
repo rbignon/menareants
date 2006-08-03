@@ -27,6 +27,46 @@
 #include <SDL_gfxPrimitives.h>
 
 /********************************************************************************************
+ *                                ECMcDo                                                    *
+ ********************************************************************************************/
+
+void ECMcDo::RecvData(ECData data)
+{
+	switch(data.type)
+	{
+		case DATA_INVESTED:
+		{
+			invested = static_cast<ECEntity::e_type>(StrToTyp<uint>(data.data));
+			SetMyStep(0);
+			SetRestStep(0);
+			break;
+		}
+		case DATA_EXOWNER:
+		{
+			ex_owner = data.data;
+			break;
+		}
+	}
+}
+
+std::string ECMcDo::SpecialInfo()
+{
+	if(!invested)
+		return "";
+	else if(ex_owner == Owner()->GetNick())
+		return "Consommations de McGerbale gratuites pour " + ex_owner + " !";
+	else
+		return "1000 $ consommations payés chaque tour à " + ex_owner;
+}
+
+bool ECMcDo::CanCreate(const ECBEntity* entity)
+{
+	if(!Deployed() || !invested) return false;
+
+	return EntityList.Get(invested)->CanCreate(entity);
+}
+
+/********************************************************************************************
  *                                ECTourist                                                 *
  ********************************************************************************************/
 

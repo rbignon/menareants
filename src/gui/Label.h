@@ -55,6 +55,7 @@ public:
 	void SetFontColor(Font*, Color);
 	void SetCaption(std::string text);
 	std::string Caption() const { return caption; }
+	bool Empty() const { return caption.empty(); }
 
 /* Variables privées */
 protected:

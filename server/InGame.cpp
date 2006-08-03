@@ -465,11 +465,15 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		else
 		{
 			std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
-			ECEntity* my_friend = 0;
+			ECEntity *my_friend = 0, *creator = 0;
 			for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-				if(!dynamic_cast<ECEntity*>(*enti)->Shadowed() && (*enti)->Owner() == entity->Owner() &&
-				   (*enti)->Type() == entity->Type())
+			{
+				if(dynamic_cast<ECEntity*>(*enti)->Shadowed() || (*enti)->Owner() != entity->Owner()) continue;
+				if((*enti)->CanCreate(entity) && (!creator || (*enti)->IsBuilding()))
+					creator = dynamic_cast<ECEntity*>(*enti);
+				if((*enti)->Type() == entity->Type())
 					my_friend = dynamic_cast<ECEntity*>(*enti);
+			}
 			if(my_friend)
 			{ /* On peut probablement faire une union avec une entité de cette case donc bon au lieu de
 			   * se broyer les testicule on va ARM_NUMBER simplement */
@@ -490,6 +494,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				map->AddEvent(event);
 				nb = event->Nb();
 				entity->AddEvent(flags);
+				if(creator)
+					creator->Create(entity);
+				else
+					Debug(W_WARNING, "ARM CREATE: pas de créateur !?");
 			}
 		}
 	}

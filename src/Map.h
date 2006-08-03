@@ -131,6 +131,7 @@ public:
 
 	virtual const char* Name() const = 0;
 	virtual const char* Infos() const = 0;
+	virtual const char* Description() const = 0;
 	virtual ECImage* Icon() const = 0;
 	virtual ECSpriteBase* DeadCase() const;
 
@@ -394,6 +395,26 @@ public:
 	std::vector<ECEntity*> List() const { return entities; }
 
 	ECEntity* Get(ECEntity::e_type i) const { return entities[i-1]; }
+
+	std::vector<ECEntity*> CanAttaq(ECBEntity* c) const
+	{
+		std::vector<ECEntity*> l;
+		if(!c) return l;
+		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
+			if(c->CanAttaq(*it))
+				l.push_back(*it);
+		return l;
+	}
+
+	std::vector<ECEntity*> CanInvest(ECBEntity* c) const
+	{
+		std::vector<ECEntity*> l;
+		if(!c) return l;
+		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
+			if(c->CanInvest(*it))
+				l.push_back(*it);
+		return l;
+	}
 
 	template<typename T>
 	std::vector<ECEntity*> CanCreatedBy(T c, ECBPlayer* pl) const

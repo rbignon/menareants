@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: $
+ * $Id$
  */
 
 #include <SDL.h>
@@ -62,6 +62,9 @@ void Sound::Init()
 		Mix_QuerySpec(&frequency, &audio_format, &channels);
 		Debug(W_DEBUG, "Opened audio at %d Hz %d bit %s, %d bytes audio buffer\n", frequency,
 		               (audio_format&0xFF), channels>1?"stereo":"mono", audio_buffer);
+		Debug(W_DEBUG, "ATTENTION! Si vous utilisez gdb vous risquez d'avoir une musique pas très audible. Il vous est "
+		               "conseillé dans ce cas là soit de ne pas lancer avec gdb soit de couper la musique, si vous "
+		               "remarquez un tel phenomène.");
 	}
 	Mix_ChannelFinished(Sound::EndChunk);
 	Mix_HookMusicFinished(Sound::EndMusic);

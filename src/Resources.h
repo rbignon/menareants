@@ -233,6 +233,7 @@ public:
 	R_RESOURCE(ECSpriteBase, McDo_Left);
 	R_RESOURCE(ECSpriteBase, McDo_Right);
 	R_RESOURCE(ECSpriteBase, McDo_Dos);
+	R_RESOURCE(ECSpriteBase, McDo_Caserne);
 };
 
 #undef R_RESOURCE

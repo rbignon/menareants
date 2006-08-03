@@ -1,6 +1,20 @@
+2006-08-03  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h (ECEntity::Create): Fonction qui est appelée quand une unité en créer une autre.
+
+	* server/Units.cpp (ECMcDo::Invest): Tout un principe pour que la caserne puisse avoir un mcdo et effectuer ses taches.
+
+	* src/InGame.cpp: Bouton "Infos" qui permet d'avoir pleins d'infos sur une unité dans la BarreAct.
+
+	* src/Batiments.h, src/Units.h (Description): Fonction virtuelle pure qui retourne une chaine avec une description très
+	complète de l'unité qui sera sortie dans les infos d'une unité.
+
+	* src/Map.h (ECEntityList): Fonctions CanAttaq() et CanInvest() qui retournent la liste des entités que l'unité
+	peut attaquer et investir.
+
 2006-08-01  Romain Bignon <progs@headfucking.net>
 
-	* Units.h (ECMcDo): Unité Donald De McGerbale qui ne fazit pour le moment.. rien.
+	* Units.h (ECMcDo): Unité Donald De McGerbale qui ne fait pour le moment.. rien.
 
 	* lib/Map.cpp (CheckChangingOwner): Fonction renomée en CheckInvests().
 	(CheckInvests): Maintenant vérifie aussi si une quelconque unité de la case peut investir l'unité en question.

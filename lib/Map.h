@@ -263,8 +263,12 @@ public:
 	/** Use this function to deploy your entity */
 	virtual bool WantDeploy() { return false; }
 
-	/** If this entity add money, use this function to return how many money it will add or remove */
-	virtual int TurnMoney() { return 0; }
+	/** If this entity add money, use this function to return how many money it will add or remove
+	 * @param pl this is the player who request
+	 *
+	 * \note pl isn't always Owner() !
+	 */
+	virtual int TurnMoney(ECBPlayer* pl) { return 0; }
 
 /* Methodes */
 public:
@@ -283,6 +287,9 @@ public:
 
 	/** Use this function to add some units in the entity */
 	virtual bool AddUnits(uint units);
+
+	/** Cette fonction est appelée quand une unité en créer une autre */
+	virtual void Create(ECBEntity*) { return; }
 
 	/** This function remove entity from case where it is and add it in the new case.
 	* It changes pointer \a acase to \a new_case too.

@@ -393,6 +393,8 @@ void ECEntity::ChangeOwner(ECBPlayer* pl)
 
 	SetID(c->FindEntityName(Owner()));
 	c->SendArm(NULL, this, ARM_CREATE|ARM_HIDE, Case()->X(), Case()->Y());
+	if(Deployed())
+		c->SendArm(NULL, this, ARM_DEPLOY);
 }
 
 bool ECEntity::AreFriends(std::vector<ECEntity*> list)

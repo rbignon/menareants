@@ -189,7 +189,7 @@ int TRealClient::parse_this()
 
 	if((read = recv(GetFd(), buf, sizeof buf -1, 0)) <= 0)
 	{
-		Debug(W_DEBUG, "Erreur lors de recv(%s): [%s] (%d)\n",
+		Debug(W_DEBUG, "Erreur lors de recv(%s): [%s] (%d)",
 			GetIp(), strerror(errno), errno);
 		app.delclient(this);
 	}

@@ -198,6 +198,7 @@
 	R_RESOURCE(ECSpriteBase, McDo_Left,         "units/mcdo/left");
 	R_RESOURCE(ECSpriteBase, McDo_Right,        "units/mcdo/right");
 	R_RESOURCE(ECSpriteBase, McDo_Dos,          "units/mcdo/dos");
+	R_RESOURCE(ECSpriteBase, McDo_Caserne,      "units/mcdo/caserne");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
