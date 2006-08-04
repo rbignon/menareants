@@ -223,7 +223,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb, map);
 			map->AddAnEntity(entity);
 		}
-		else if(flags & ARM_TYPE)
+		else if(flags & ARM_TYPE && (int)type != entity->Type())
 		{
 			Debug(W_DESYNCH|W_SEND|W_WARNING, "ARM: Création d'une unité qui existe déjà !?!?!?!?");
 			L_SHIT("WARNING DEV: Création d'une unité qui existe déjà !!!");
@@ -1236,7 +1236,7 @@ void TBarreAct::ShowInfos()
 	HelpInfos->AddItem("Visibilité : " + TypToStr(entity->Visibility()) + " cases");
 	if(entity->Porty())
 		HelpInfos->AddItem("Portée : " + TypToStr(entity->Porty()) + " cases");
-	else
+	else if(entity->WantAttaq(0,0))
 		HelpInfos->AddItem("Portée : Aucune, combats au corps à corps");
 
 	if(entity->MyUpgrade() != ECEntity::E_NONE)

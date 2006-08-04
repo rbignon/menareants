@@ -46,7 +46,7 @@ public:
 	TComponent(ECImage* w = 0)
 		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(0)
+		  dynamic_hint(false)
 	{}
 
 	/** Constructor with position
@@ -57,7 +57,7 @@ public:
 	TComponent(int _x, int _y, ECImage* w = 0)
 		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(0)
+		  dynamic_hint(false)
 	{}
 
 	/** Constructor with position and size
@@ -70,7 +70,7 @@ public:
 	TComponent(int _x, int _y, uint _w, uint _h, ECImage* w = 0)
 		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(0)
+		  dynamic_hint(false)
 	{}
 
 	virtual ~TComponent() {}
@@ -137,6 +137,7 @@ public:
 	template<typename T>
 	void SetHint(T h) { hint = h; }
 	std::string& Hint() { return hint; }
+	bool HaveHint() const { return !hint.empty(); }
 	bool DynamicHint() const { return dynamic_hint; }
 
 	int Tag;
