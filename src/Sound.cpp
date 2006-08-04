@@ -60,7 +60,7 @@ void Sound::Init()
 	else
 	{
 		Mix_QuerySpec(&frequency, &audio_format, &channels);
-		Debug(W_DEBUG, "Opened audio at %d Hz %d bit %s, %d bytes audio buffer\n", frequency,
+		Debug(W_DEBUG, "Opened audio at %d Hz %d bit %s, %d bytes audio buffer", frequency,
 		               (audio_format&0xFF), channels>1?"stereo":"mono", audio_buffer);
 		Debug(W_DEBUG, "ATTENTION! Si vous utilisez gdb vous risquez d'avoir une musique pas très audible. Il vous est "
 		               "conseillé dans ce cas là soit de ne pas lancer avec gdb soit de couper la musique, si vous "
@@ -145,6 +145,7 @@ void Sound::NextMusic(std::vector<Sound*>::iterator s)
 
 void Sound::NextMusic()
 {
+	if(!init) return;
 	if(!playing_music)
 		PlayMusic();
 	else
@@ -153,6 +154,7 @@ void Sound::NextMusic()
 
 void Sound::PlayMusic()
 {
+	if(!init) return;
 	StopMusic();
 
 	if(musics.empty() || !Config::GetInstance()->music) return;
@@ -165,11 +167,13 @@ void Sound::PlayMusic()
 
 void Sound::EraseMusicList()
 {
+	if(!init) return;
 	SetMusicList("");
 }
 
 void Sound::SetMusicList(std::string path)
 {
+	if(!init) return;
 	StopMusic();
 
 	FOR(Sound*, musics, s)
@@ -225,7 +229,7 @@ int Sound::Stop()
 
 void Sound::Play()
 {
-	if(Playing() || !Sound::init) { printf("shit ici\n"); return; }
+	if(Playing() || !Sound::init) { return; }
 
 	if(IsMusic())
 	{

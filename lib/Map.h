@@ -162,25 +162,25 @@ class ECBEntity
 public:
 
 	enum e_type {
-		E_NONE,
-		E_ARMY,
-		E_CASERNE,
-		E_CHARFACT,
-		E_CHAR,
-		E_MISSILAUNCHER,
-		E_CITY,
-		E_CAPITALE,
-		E_SHIPYARD,
-		E_BOAT,
-		E_NUCLEARSEARCH,
-		E_SILO,
-		E_ENGINER,
-		E_DEFENSETOWER,
-		E_TOURIST,
-		E_MINE,
-		E_OBELISK,
-		E_MCDO,
-		E_END
+		/*00*/E_NONE,
+		/*01*/E_ARMY,
+		/*02*/E_CASERNE,
+		/*03*/E_CHARFACT,
+		/*04*/E_CHAR,
+		/*05*/E_MISSILAUNCHER,
+		/*06*/E_CITY,
+		/*07*/E_CAPITALE,
+		/*08*/E_SHIPYARD,
+		/*09*/E_BOAT,
+		/*10*/E_NUCLEARSEARCH,
+		/*11*/E_SILO,
+		/*12*/E_ENGINER,
+		/*13*/E_DEFENSETOWER,
+		/*14*/E_TOURIST,
+		/*15*/E_MINE,
+		/*16*/E_OBELISK,
+		/*17*/E_MCDO,
+		/*XX*/E_END
 	};
 
 	ECBEntity()

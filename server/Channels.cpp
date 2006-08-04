@@ -338,7 +338,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Nation() != nation; ++it);
 						if(it != plv.end())
-							{ Debug(W_DESYNCH, "SET +n: d'une nation déjà utilisée"); break; }
+							break; /* Nation déjà utilisée */
 					}
 					sender->SetNation(nation);
 					if(!need_ready) need_ready = NEEDREADY_ME;
@@ -372,7 +372,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Color() != color; ++it);
 						if(it != plv.end())
-							{ Debug(W_DESYNCH, "SET +c: d'une couleur déjà utilisée"); break; }
+							break; /* Couleur déjà utilisée */
 					}
 					sender->SetColor(color);
 					if(!need_ready) need_ready = NEEDREADY_ME;
@@ -412,7 +412,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
 						if(it != plv.end())
-							{ Debug(W_DESYNCH, "SET +p: d'une position déjà utilisée"); break; }
+							break; /* Position déjà prise */
 					}
 					sender->SetPosition(place);
 					if(!need_ready) need_ready = NEEDREADY_ME;

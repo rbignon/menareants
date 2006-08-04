@@ -306,7 +306,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	std::vector<ECBEntity*> entv = c->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 	{
-		if((*enti)->CanCreate(this) && (*enti)->Owner() == owner)
+		if((*enti)->CanCreate(this) && (*enti)->Owner() && ((*enti)->Owner() == owner || (*enti)->Owner()->IsAllie(Owner())))
 			ret = true;
 		/* On vérifie que :
 		 * - si les deux sont des batiments et que ce ne sont pas les memes
@@ -322,7 +322,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	 * une case qui permet de créer une unité de ce type (donc ville etc)
 	 */
 	if(!ret && c->Country()->Owner() && c->CanCreate(this) && c->Country()->Owner() &&
-	   (c->Country()->Owner()->Player() == owner || c->Country()->Owner()->Player()->IsAllie(owner)))
+	   (c->Country()->Owner()->Player() == Owner() || c->Country()->Owner()->Player()->IsAllie(Owner())))
 		return true;
 
 	return ret;

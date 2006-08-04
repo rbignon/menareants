@@ -92,6 +92,9 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 	struct dirent *lecture;
 	DIR *rep;
 	rep = opendir(path.c_str());
+
+	if(!rep) return file_list;
+
 	while ((lecture = readdir(rep)))
 	{
 		if(lecture->d_type == DT_DIR) continue;

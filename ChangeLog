@@ -1,3 +1,15 @@
+2006-08-04  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp (ECBEntity::CanBeCreated): On peut créer une unité sur un batiment d'un de ses allié.
+
+	* src/gui/Component.h, src/gui/ChildForm.cpp, src/gui/Form.cpp: Correction avec les hints, fonction
+	TComponent::HaveHint().
+
+	* server/InGame.cpp (EChannel::NextAnim): Correction d'un bug qui purgeait les unités qui étaient dans un evenement
+	d'attaque mais dont ce dernier était supprimé.
+
+	* lib/Outils.cpp (GetFileList): Correction d'un plantage si le rep n'existe pas.
+
 2006-08-03  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h (ECEntity::Create): Fonction qui est appelée quand une unité en créer une autre.

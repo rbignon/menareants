@@ -162,8 +162,13 @@ int TClient::parsemsg(std::string buf)
 			cmd = *it;
 
 	if(!cmd || (parv.size()-1) < cmd->args)
-		return vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VName(buf)
+	{
+		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VName(buf)
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
+		if(!IsAuth(this))
+			exit(app.rpl(ECServer::ERR));
+		return 0;
+	}
 
 	if(cmd->flags && !(flag & cmd->flags))
 		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriés.", VSName(GetNick())

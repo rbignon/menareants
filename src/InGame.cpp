@@ -212,7 +212,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			if(!(flags & ARM_TYPE))
 			{
-				Debug(W_DESYNCH|W_SEND, "ARM: Entité introuvable et non créable");
+				/* Si c'est pour supprimer on s'en fou un peu à vrai dire */
+				if(!(flags & ARM_REMOVE))
+					Debug(W_DESYNCH|W_SEND, "ARM: Entité introuvable et non créable");
 				continue;
 			}
 			if(flags != ARM_CREATE || type >= ECEntity::E_END)
@@ -1341,7 +1343,10 @@ void TBarreAct::vSetEntity(void* _e)
 		}
 		else
 		{
-			InGameForm->BarreAct->ShowIcons<ECEntity*>(0,0);
+			if(e->Owner() && e->Owner()->IsAllie(InGameForm->BarreAct->me))
+				InGameForm->BarreAct->ShowIcons(e, InGameForm->BarreAct->me);
+			else
+				InGameForm->BarreAct->ShowIcons<ECEntity*>(0,0);
 			InGameForm->BarreAct->DeployButton->Hide();
 			InGameForm->BarreAct->AttaqButton->Hide();
 			InGameForm->BarreAct->UpButton->Hide();

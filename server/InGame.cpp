@@ -114,7 +114,12 @@ void EChannel::NextAnim()
 			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
 
 			if(!(flags & ARM_ATTAQ))
-				break; // Il n'y a que des amis (voir trois lignes plus haut) donc on se barre après avoir envoyé les moves
+			{
+				// Il n'y a que des amis (voir trois lignes plus haut) donc on se barre après avoir envoyé les moves
+				for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+					(*it)->SetShadowed(false);
+				break;
+			}
 
 			std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entv);
 
@@ -159,7 +164,7 @@ void EChannel::NextAnim()
 				if(!(*it)->Nb())
 				{
 					SendArm(NULL, *it, ARM_REMOVE);
-					/* On ne remove pas car il est locked et sera supprimé lors du
+					/* On ne remove pas car il est shadowed et sera supprimé lors du
 						* passage de la boucle principale.
 						*/
 					//map->RemoveAnEntity(*it, USE_DELETE);
@@ -496,8 +501,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				entity->AddEvent(flags);
 				if(creator)
 					creator->Create(entity);
-				else
-					Debug(W_WARNING, "ARM CREATE: pas de créateur !?");
 			}
 		}
 	}
@@ -759,8 +762,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						attaq_event->AddLinked(event_found);
 						map->RemoveEvent(event_found);
 					}
-					else
-						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement");
+					/*else  //ATTENTION: ça arrive lors de creations.
+						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement"); */
 				}
 			}
 			/*if(event_found)
