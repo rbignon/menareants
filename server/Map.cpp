@@ -29,12 +29,13 @@
 #include <algorithm>
 
 MapVector MapList;
+MapVector MissionList;
 
 /********************************************************************************************
  *                                 ECMap                                                    *
  ********************************************************************************************/
- 
-bool LoadMaps()
+
+bool ECMap::LoadMaps()
 {
 	std::ifstream fp(MAP_FILE);
 
@@ -45,7 +46,7 @@ bool LoadMaps()
 	}
 
 	std::string ligne;
-	uint nbmaps = 0;
+	uint nbmaps = 0, nbmissions = 0;
 
 	while(std::getline(fp, ligne))
 	{
@@ -53,7 +54,7 @@ bool LoadMaps()
 		ECMap *map = 0;
 		try
 		{
-			map = new ECMap(std::string(PKGDATADIR + ligne), nbmaps);
+			map = new ECMap(std::string(PKGDATADIR + ligne));
 			map->Init();
 		}
 		catch(TECExcept &e)
@@ -63,10 +64,10 @@ bool LoadMaps()
 			vDebug(W_ERR|W_ECHO, e.Message(), e.Vars());
 			continue;
 		}
-		nbmaps++;
-		MapList.push_back(map);
+		map->i = map->IsMission() ? nbmissions++ : nbmaps++;
+		(map->IsMission() ? MissionList : MapList).push_back(map);
 	}
-	Debug(W_ECHO|W_NOLOG, "%d maps loaded !", nbmaps);
+	Debug(W_ECHO|W_NOLOG, "%d maps and %d missions loaded !", nbmaps, nbmissions);
 	return true;
 }
 
@@ -233,7 +234,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 			}
 
 			if(step == T_ATTAQ_STEP && (*enti)->EventType() & ARM_ATTAQ && !((*enti)->EventType() & ARM_FORCEATTAQ) &&
-			   entity->Case() != Case() && (*enti)->WantAttaq(entity->Case()->X(), entity->Case()->Y()))
+			   entity->Case() != Case() && (*enti)->WantAttaq(entity->Case()->X(), entity->Case()->Y(), true))
 			{
 				Debug(W_DEBUG, "On déokace notre évenement");
 #if 0 /** FIXME: voir si ça marche bien :) */

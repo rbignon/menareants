@@ -781,7 +781,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			for(uint turn = 0; !(entity->EventType() & ARM_ATTAQ); ++turn)
 			{
 				Debug(W_DEBUG, "Recherche à (%d,%d)", c->X(), c->Y());
-				ECEvent* attaq_event = map->FindEvent(c, ARM_ATTAQ, entity);
+				ECEvent* attaq_event = 0/* = map->FindEvent(c, ARM_ATTAQ, entity)*/;
 				if(!attaq_event)
 				{
 					if(flags & ARM_FORCEATTAQ)
@@ -794,6 +794,18 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 					std::vector<ECBEntity*> entities = c->Entities()->List();
 					ECEntity* next_entity = 0;
+					bool want_move_attaq = false;
+					if(!attaq_event)
+						/* On fait un premier tour pour voir si on va bouger notre attaque, comme ça dans le second tour on ne
+						 * créé pas d'attaque si on trouve une unité avant de tomber sur l'unité qui a bougé.
+						 */
+						for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+						{
+							ECEntity* e = dynamic_cast<ECEntity*>(*enti)->FindNext();
+							if(dynamic_cast<ECEntity*>(*enti)->Shadowed() && dynamic_cast<ECEntity*>(*enti)->Move()->Empty() &&
+							   entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
+								want_move_attaq = true;
+						}
 					for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 					{
 						bool can_attaq = false;
@@ -806,14 +818,14 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						* dispositions sont là pour ramener l'attaque à la case d'arrivée.
 						* Note: si turn>=0, c'est qu'on a nous même recherché une unité qui a bougé, donc ne plus vérifier.
 						*/
-						if(!dynamic_cast<ECEntity*>(*enti)->Shadowed() && *enti != entity && entity->CanAttaq(*enti) &&
-						   !entity->Like(*enti) && (turn || dynamic_cast<ECEntity*>(*enti)->Move()->Empty()))
+						ECEntity* e = dynamic_cast<ECEntity*>(*enti);
+						if(!want_move_attaq && !e->Shadowed() && *enti != entity && entity->CanAttaq(*enti) &&
+						   !entity->Like(*enti) && (turn || e->Move()->Empty()))
 							can_attaq = true;
-						else if(dynamic_cast<ECEntity*>(*enti)->Shadowed() &&
-						        dynamic_cast<ECEntity*>(*enti)->Move()->Empty())
+						else if(e->Shadowed() && e->Move()->Empty())
 						{
 							Debug(W_DEBUG, "On a trouvé une unité qui a bougé");
-							ECEntity* e = dynamic_cast<ECEntity*>(*enti)->FindNext();
+							e = dynamic_cast<ECEntity*>(*enti)->FindNext();
 							if(entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
 								next_entity = e;
 						}

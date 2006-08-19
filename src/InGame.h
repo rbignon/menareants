@@ -48,31 +48,50 @@ class TBarreActIcons : public TChildForm
 {
 public:
 	TBarreActIcons(int _x, int _y)
-		: TChildForm(_x,_y, 0, 0)
+		: TChildForm(_x,_y, 0, 0), Next(0), Last(0), max_height(200), first(0)
 	{}
 
-	void Init() {}
+	void SetMaxHeight(uint i) { max_height = i; }
+
+	void Init();
+
+	TButton* Next;
+	TButton* Last;
 
 	void SetList(std::vector<ECEntity*> list, bool click = true);
 
+	static void GoNext(TObject*, void*);
+	static void GoLast(TObject*, void*);
+
 private:
 	std::vector<TImage*> icons;
+	uint max_height, first;
 };
 
 class TBarreLatIcons : public TChildForm
 {
 public:
 	TBarreLatIcons(int _x, int _y)
-		: TChildForm(_x,_y, 0, 0)
+		: TChildForm(_x,_y, 0, 0), Next(0), Last(0), max_height(100), first(0)
 	{}
 
-	void Init() {}
+	void SetMaxHeight(uint i) { max_height = i; }
 
-	void SetList(std::vector<ECEntity*> list);
+	//virtual void SetXY (int _x, int _y) { TChildForm::SetXY(_x,_y); Init(); }
+
+	void Init();
+
+	TButton* Next;
+	TButton* Last;
+
+	void SetList(std::vector<ECEntity*> list, TOnClickFunction func);
+
+	static void GoNext(TObject*, void*);
+	static void GoLast(TObject*, void*);
 
 private:
 	std::vector<TImage*> icons;
-	static void SelectUnit(TObject* o, void* e);
+	uint max_height, first;
 };
 
 class TBarreAct : public TChildForm
@@ -171,6 +190,7 @@ public:
 /* Evenements */
 public:
 	static void RadarClick(TObject*, int, int);
+	static void SelectUnit(TObject* o, void* e);
 
 protected:
 	EChannel* chan;
@@ -206,7 +226,8 @@ public:
 	void ShowBarreLat(bool show = true);
 	void ShowBarreAct(bool show = true);
 
-	void SetCursor(const char want);
+	void SetCursor();
+	const char GetWant(ECEntity* entity, int button_type);
 
 	#define I_INFO     0x001
 	#define I_WARNING  0x002

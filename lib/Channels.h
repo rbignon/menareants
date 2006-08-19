@@ -179,6 +179,7 @@ public:
 
 	/** Return channel name. */
 	const char* GetName() const { return name.c_str(); }
+	std::string Name() const { return name; }
 
 	/* A propos des etats de la partie */
 	e_state State() const { return state; }                 /**< Return state of game. */
@@ -223,6 +224,9 @@ public:
 	uint TurnTime() const { return turn_time; }
 	void SetTurnTime(uint t) { turn_time = t; }
 
+	bool IsMission() const { return mission; }
+	void SetMission(bool m = true) { mission = m; }
+
 /* Variables privées */
 protected:
 	BPlayerVector players;
@@ -231,6 +235,7 @@ protected:
 	unsigned int limite;
 	ECBMap *map;
 	uint turn_time;
+	bool mission;
 };
 
 #endif /* ECLIB_CHANNELS_H */

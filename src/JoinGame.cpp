@@ -132,8 +132,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
-			GameInfosForm->Preview->SetXY(GameInfosForm->Preview->X(),
-			                              GameInfosForm->Window()->GetHeight() - 50 - GameInfosForm->Preview->Height());
+			GameInfosForm->Preview->SetY(GameInfosForm->Window()->GetHeight() - 50 - GameInfosForm->Preview->Height());
 			GameInfosForm->MapTitle->SetXY(GameInfosForm->Preview->X() + GameInfosForm->Preview->Width()/2 -
 			                                   GameInfosForm->MapTitle->Width()/2,
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
@@ -356,7 +355,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							(*enti)->Played();
 						if(InGameForm)
 						{
-							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()));
+							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()), TBarreLat::SelectUnit);
 							InGameForm->GetElapsedTime()->reset();
 						}
 						me->UnlockScreen();
@@ -429,9 +428,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(GameInfosForm)
 					{
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
-						if(GameInfosForm->MyPosition)
+						if(GameInfosForm->MyPosition && !chan->IsMission())
 							GameInfosForm->MyPosition->SetEnabled();
-						if(!me->Player()->IsOwner())
+						if(!me->Player()->IsOwner() || chan->IsMission())
 							GameInfosForm->PretButton->SetEnabled(true);
 					}
 					else
@@ -514,7 +513,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						BPlayerVector plv = chan->Players();
 						uint ok = 0;
 						for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
-						if((ok+1) >= chan->Map()->MinPlayers()) /* +1 for me */
+						if((ok+1) >= chan->Map()->MinPlayers() || chan->IsMission()) /* +1 for me */
 							GameInfosForm->PretButton->SetEnabled(true);
 						else
 							GameInfosForm->PretButton->SetEnabled(false);
@@ -856,7 +855,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			for(std::vector<int>::iterator it = pos_badval.begin(); it != pos_badval.end(); ++it)
 				GameInfosForm->MyPosition->AddBadValue(*it);
-			if(me->Player()->Channel()->Map())
+			if(me->Player()->Channel()->Map() && !me->Player()->Channel()->IsMission())
 				GameInfosForm->MyPosition->SetEnabled();
 		}
 		if(GameInfosForm->MyColor)
@@ -887,6 +886,8 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{ /* C'est moi qui join */
 			EChannel *c = new EChannel(parv[1]);
 			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, false, true, false));
+			if(parv[1][0] == '.' && parv[1].size() == 1)
+				c->SetMission();
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
@@ -983,7 +984,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					BPlayerVector plv = chan->Players();
 					uint ok = 0;
 					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
-					if((ok+1) >= chan->Map()->MinPlayers()) /* +1 for me */
+					if((ok+1) >= chan->Map()->MinPlayers() || chan->IsMission()) /* +1 for me */
 						GameInfosForm->PretButton->SetEnabled(true);
 					else
 						GameInfosForm->PretButton->SetEnabled(false);
@@ -1028,7 +1029,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
+bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 {
 	if(!EC_Client::GetInstance())
 		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
@@ -1041,19 +1042,24 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 	if(!cname)
 	{
 		create = true;
-		TMessageBox mb("Entrez le nom de la partie à créer",
-						HAVE_EDIT|BT_OK|BT_CANCEL, form);
-		mb.Edit()->SetAvailChars(CHAN_CHARS);
-		mb.Edit()->SetMaxLen(GAMELEN);
-		if(mb.Show() == BT_OK)
-			name = mb.EditText();
-		if(name.empty()) return true;
+		if(mission)
+			cname = ".";
+		else
+		{
+			TMessageBox mb("Entrez le nom de la partie à créer",
+							HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			mb.Edit()->SetAvailChars(CHAN_CHARS);
+			mb.Edit()->SetMaxLen(GAMELEN);
+			if(mb.Show() == BT_OK)
+				name = mb.EditText();
+			if(name.empty()) return true;
 
-		cname = name.c_str();
+			cname = name.c_str();
+		}
 	}
 
 	/* Déclaration membres fixes */
-	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window());
+	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), mission);
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(cname), green_color);
 
@@ -1091,7 +1097,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form)
 		if(Config::GetInstance()->nation)
 			client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " +TypToStr(Config::GetInstance()->nation)).c_str());
 
-		GameInfosForm->Title->SetCaption("Jeu : " + std::string(chan->GetName()));
+		GameInfosForm->Title->SetCaption(mission ? "Partie solo" : ("Jeu : " + std::string(chan->GetName())));
 		if(client->Player()->IsOwner())
 			GameInfosForm->PretButton->SetText("Lancer la partie");
 
@@ -1364,14 +1370,17 @@ void MenAreAntsApp::ListGames()
 void TGameInfosForm::ChangeStatus(bool add)
 {
 	MapList->SetVisible(add);
-	CreateIAButton->SetVisible(add);
 	SpeedGame->SetEnabled(add);
 	BeginMoney->SetEnabled(add);
 	TurnTime->SetEnabled(add);
+
+	if(mission) return;
+
+	CreateIAButton->SetVisible(add);
 }
 
-TGameInfosForm::TGameInfosForm(ECImage* w)
-	: TForm(w)
+TGameInfosForm::TGameInfosForm(ECImage* w, bool _mission)
+	: TForm(w), RecvMapList(false), mission(_mission)
 {
 	Title = AddComponent(new TLabel(6,"Jeu", white_color, Font::GetInstance(Font::Big)));
 
@@ -1418,7 +1427,13 @@ TGameInfosForm::TGameInfosForm(ECImage* w)
 	MyPosition = 0;
 	MyColor = 0;
 	MyNation = 0;
-	RecvMapList = false;
+
+	if(mission)
+	{
+		Chat->Hide();
+		SendMessage->Hide();
+		Preview->SetX(chat_width/2);
+	}
 }
 
 void TGameInfosForm::RecalcMemo()

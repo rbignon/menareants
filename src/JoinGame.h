@@ -36,7 +36,7 @@
 #include "gui/CheckBox.h"
 
 /********************************************************************************************
- *                               TGameInfosForm                                              *
+ *                               TGameInfosForm                                             *
  ********************************************************************************************/
 /** This is a form based on TForm showed when an user joined or created a channel before start game. */
 class TGameInfosForm : public TForm
@@ -44,7 +44,7 @@ class TGameInfosForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TGameInfosForm(ECImage*);
+	TGameInfosForm(ECImage*, bool mission = false);
 
 /* Composants */
 public:
@@ -71,13 +71,10 @@ public:
 
 /* Variables publiques */
 public:
-	bool RecvMapList;
+	bool RecvMapList, mission;
 	std::vector<std::string> RecvMap;
 
 	std::string Kicked;
-
-/* Evenements */
-public:
 
 /* Fonctions */
 public:
@@ -109,10 +106,6 @@ public:
 	TButtonText  *RetourButton;
 	TListBox     *GList;
 	TLabel       *Title;
-
-/* Evenements */
-public:
-
 };
 
 /********************************************************************************************

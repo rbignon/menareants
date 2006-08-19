@@ -191,7 +191,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 		MainForm->CreditsButton->SetOnClick(MenAreAntsApp::WantCredits, this);
 		MainForm->MapEditorButton->SetOnClick(MenAreAntsApp::WantMapEditor, this);
 		MainForm->OptionsButton->SetOnClick(MenAreAntsApp::WantConfig, (void*)false);
-
 		Sound::SetMusicList(MENU_MUSIC);
 		do
 		{

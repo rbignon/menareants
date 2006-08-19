@@ -236,7 +236,7 @@ void MenAreAntsApp::request_game()
 						}
 						if(ConnectedForm->CreateButton->Test(event.button.x, event.button.y))
 						{
-							if(!GameInfos(NULL, ConnectedForm))
+							if(!GameInfos(NULL, ConnectedForm, true))
 							{
 								TMessageBox mb("Impossible de créer le salon.\n"
 												"Son nom est peut être déjà utilisé.",
@@ -305,9 +305,9 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	int button_x = Motd->X() + Motd->Width() + 15;
 
-	CreateButton = AddComponent(new TButtonText(button_x, Motd->Y(), 150,50, "Créer une partie",
+	CreateButton = AddComponent(new TButtonText(button_x, Motd->Y(), 150,50, "Mission solo",
 	                                            Font::GetInstance(Font::Normal)));
-	ListButton = AddComponent(new TButtonText(button_x,CreateButton->Y()+CreateButton->Height(),150,50, "Lister les parties",
+	ListButton = AddComponent(new TButtonText(button_x,CreateButton->Y()+CreateButton->Height(),150,50, "Multijoueur",
 	                                          Font::GetInstance(Font::Normal)));
 	DisconnectButton = AddComponent(new TButtonText(button_x,ListButton->Y()+ListButton->Height(),150,50, "Se déconnecter",
 	                                                Font::GetInstance(Font::Normal)));

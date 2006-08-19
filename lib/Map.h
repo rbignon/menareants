@@ -627,7 +627,7 @@ class ECBMapPlayer
 public:
 
 	ECBMapPlayer(char _id, uint _num)
-		: id(_id), num(_num), pl(0)
+		: id(_id), num(_num), pl(0), nick(&_id)
 	{}
 
 	virtual ~ECBMapPlayer() {}
@@ -637,7 +637,7 @@ public:
 
 	MapPlayer_ID ID() { return id; }
 
-	uint Num() { return num; }
+	uint Num() const { return num; }
 
 	void AddCountry(ECBCountry* _country) { countries.push_back(_country); }
 	bool RemoveCountry(ECBCountry* _country, bool use_delete = false);
@@ -645,16 +645,19 @@ public:
 	/** Find a country by ID */
 	ECBCountry* FindCountry(const char*id);
 
-	ECBPlayer* Player() { return pl; }
+	ECBPlayer* Player() const { return pl; }
 	void SetPlayer(ECBPlayer* _pl) { pl = _pl; }
 
-	std::vector<ECBCountry*> Countries() { return countries; }
+	std::vector<ECBCountry*> Countries() const { return countries; }
 
 	/** This is all entity who will be created by server when the game will start.
 	 * For now, this is only in text format
 	 */
 	std::vector<std::string> Units() const { return units; }
 	void AddUnit(std::string s) { units.push_back(s); }
+
+	std::string Nick() const { return nick; }
+	void SetNick(std::string n) { nick = n; }
 
 /* Variables privées */
 protected:
@@ -663,7 +666,7 @@ protected:
 	ECBPlayer* pl;
 	std::vector<ECBCountry*> countries;
 	std::vector<std::string> units;
-
+	std::string nick;
 };
 
 /********************************************************************************************
@@ -750,6 +753,8 @@ public:
 	std::vector<std::string> NeutralUnits() const { return neutres_units; }
 	void AddNeutralUnit(std::string s) { neutres_units.push_back(s); }
 
+	bool& IsMission() { return mission; }
+
 /* Variables privées */
 protected:
 	std::vector<ECBCase*> map;              /**< Alignement fait ligne par ligne !!! */
@@ -780,6 +785,8 @@ protected:
 
 	bool initialised; /**< This variable is setted to true only when \a map is empty */
 
+	bool mission;
+
 	void Destruct();  /**< Free of memory */
 
 	/** This function have to be redefined by client to set attributs of images in case */
@@ -789,6 +796,8 @@ protected:
 
 	virtual ECBMapPlayer* CreateMapPlayer(char _id, uint _num) { return new ECBMapPlayer(_id, _num); }
 	virtual void VirtualAddUnit(std::string line) { return; }
+
+	virtual void SeeMapLine(std::string line) { return; }
 
 	ECBMap();         /**< Disallowed */
 };

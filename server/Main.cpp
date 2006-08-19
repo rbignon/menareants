@@ -112,7 +112,7 @@ int ECServer::main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 		}
 	
-		if(!LoadMaps()) /* L'output est géré par LoadMaps() */
+		if(!ECMap::LoadMaps()) /* L'output est géré par LoadMaps() */
 			exit(EXIT_FAILURE);
 	
 		CurrentTS = time(NULL);

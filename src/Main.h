@@ -44,7 +44,7 @@ protected:
 
 	void request_game();
 	void ListGames();
-	bool GameInfos(const char* c, TForm* f = 0);
+	bool GameInfos(const char* c, TForm* f = 0, bool mission = false);
 	void LoadGame(EChannel* ch);
 	void Options(EChannel* ch);
 	void InGame();

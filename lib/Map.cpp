@@ -582,6 +582,7 @@ void ECBMap::Init()
 	min = 0;
 	max = 0;
 	city_money = 0;
+	mission = false;
 	
 	std::string ligne;
 
@@ -601,8 +602,9 @@ void ECBMap::Init()
 		}
 		if(!recv_map)
 		{
+			SeeMapLine(ligne);
 			std::string key = stringtok(ligne, " ");
-	
+
 			if(key == "NAME") name = ligne;
 			else if(key == "X") x = atoi(ligne.c_str());
 			else if(key == "Y") y = atoi(ligne.c_str());
@@ -615,7 +617,12 @@ void ECBMap::Init()
 				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
 				if(it != map_players.end())
 					throw ECExcept(VCName(ligne[0]), "L'identifiant est déjà utilisé");
-				map_players.push_back(CreateMapPlayer(ligne[0], ++num_player));
+				ECBMapPlayer* mp = CreateMapPlayer(ligne[0], ++num_player);
+				map_players.push_back(mp);
+
+				std::string id = stringtok(ligne, " ");
+				if(!ligne.empty())
+					mp->SetNick(ligne);
 			}
 			else if(key == "MAP") recv_map = true;
 			else if(key == "BEGIN") {}
@@ -624,6 +631,7 @@ void ECBMap::Init()
 			else if(key == "MAX") max = atoi(ligne.c_str());
 			else if(key == "DATE") date.SetDate(ligne);
 			else if(key == "INFO") map_infos.push_back(ligne);
+			else if(key == "MISSION") mission = true;
 			else if(key == "UNIT")
 			{
 				std::string line = ligne;

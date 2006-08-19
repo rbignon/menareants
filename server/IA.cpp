@@ -84,7 +84,7 @@ void TIA::FirstMovements()
 			ECBEntity* victim = 0;
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
-				if(!(*enti)->IsHidden() && !(*enti)->Like(*e) &&
+				if(!(*e)->IsHidden() && !(*enti)->Like(*e) &&
 				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
@@ -388,6 +388,26 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
  *                                FONCTIONS DE LA CLASSE TIA                                *
  ********************************************************************************************/
 
+bool TIA::Join(EChannel* chan)
+{
+	assert(chan);
+	assert(!Player());
+
+	if(!chan->Joinable() || chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
+	{
+		app.delclient(this);
+		return false;
+	}
+
+	SetPlayer(new ECPlayer(this, chan, false, false));
+	chan->sendto_players(0, app.rpl(ECServer::JOIN), GetNick(), FormatStr(chan->Name()).c_str(), "");
+
+	/* Ça me l'envoie à moi même */
+	sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
+
+	return true;
+}
+
 void TIA::recv_msgs()
 {
 	for(std::vector<std::string>::iterator it = msgs.begin(); it != msgs.end();)
@@ -486,9 +506,10 @@ int TIA::recv_one_msg(std::string msg)
  */
 int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	if(!cl->Player() || cl->IsIA())
+	if(!cl->Player() || cl->IsIA() || cl->Player()->Channel()->IsMission())
 	{
-	    vDebug(cl->IsIA() ? W_WARNING : W_DESYNCH, "JIA: Appel incorrect", VPName(cl->Player()) VBName(cl->IsIA()));
+	    vDebug(cl->IsIA() ? W_WARNING : W_DESYNCH, "JIA: Appel incorrect", VPName(cl->Player()) VBName(cl->IsIA())
+	                                                                       VName(cl->Player()->Channel()->Name()));
 	    return cl->sendrpl(app.rpl(ECServer::ERR));
 	}
 	if(!cl->Player()->IsPriv())
@@ -521,8 +542,9 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	IA->SetNick(IA_CHAR + parv[1]);
 	SetAuth(IA);
 
+	IA->Join(chan);
+
 	/* A partir de là le serveur le gere comme un client normal */
-	IA->ia_send("JOI " + FormatStr(chan->GetName()));
 
 	return 0;
 }

@@ -330,7 +330,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 		return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case())
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
 		{
 			uint dx = 0, dy = 0;
 			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;

@@ -25,7 +25,8 @@ Sommaire:
               IAM <nick> <prog> <version>       :je me présente
               LSP                               :lister les parties
               CRE <nom>                         :créé une partie
-              JOI <nom> [$]                     :joindre une partie ('$' signifie "créer le chan")
+              JOI [<nom>|.] [$]                 :joindre une partie ('$' signifie "créer le chan")
+                                                 mettre '.' comme nom créé une mission
               STAT                              :request stats
               BYE                               :au revoir
          - Dans une pré-partie

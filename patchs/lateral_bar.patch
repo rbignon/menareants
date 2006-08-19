@@ -1,0 +1,63 @@
+Index: JoinGame.cpp
+===================================================================
+--- JoinGame.cpp	(révision 798)
++++ JoinGame.cpp	(copie de travail)
+@@ -19,6 +19,7 @@
+  * $Id$
+  */
+ 
++#include <math.h>
+ #include "Config.h"
+ #include "Debug.h"
+ #include "InGame.h"
+@@ -350,11 +351,21 @@
+ 						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
+ 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
+ 				 		InGameForm->BarreLat->Show();
+-				 		for(;InGameForm->BarreLat->X() > (int)SCREEN_WIDTH - int(InGameForm->BarreLat->Width());SDL_Delay(10))
+-				 		{
+-				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()-4, InGameForm->BarreLat->Y());
++						// Move the lateral bar
++						int t0 = InGameForm->GetTimer()->get_time();
++						const int time_to_show = 300; // in ms
++						while(InGameForm->GetTimer()->get_time() < t0 + time_to_show)
++						{
++							int dt = InGameForm->GetTimer()->get_time() - t0;
++							int x = (int)SCREEN_WIDTH - int(float(InGameForm->BarreLat->Width()) * sin((float)dt / (float)time_to_show * M_PI_2));
++
++				 			InGameForm->BarreLat->SetXY(x, InGameForm->BarreLat->Y());
+ 				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+-				 		}
++							SDL_Delay(10);
++						}
++			 			InGameForm->BarreLat->SetXY((int)SCREEN_WIDTH - InGameForm->BarreLat->Width(), InGameForm->BarreLat->Y());
++			 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
++
+ 				 		InGameForm->Map->SetEnabled(true);
+ 				 		InGameForm->ShowBarreLat(true);
+ 				 	}
+@@ -370,11 +381,20 @@
+ 				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
+ 				 		InGameForm->Map->SetEnabled(false);
+ 				 		InGameForm->ShowBarreLat(false);
+-				 		for(;InGameForm->BarreLat->X() < (int)SCREEN_WIDTH; SDL_Delay(10))
+-				 		{
+-				 			InGameForm->BarreLat->SetXY(InGameForm->BarreLat->X()+4, InGameForm->BarreLat->Y());
++						// Move the lateral bar
++						int t0 = InGameForm->GetTimer()->get_time();
++						const int time_to_hide = 300; // in ms
++						while(InGameForm->GetTimer()->get_time() < t0 + time_to_hide)
++						{
++							int dt = InGameForm->GetTimer()->get_time() - t0;
++							int x = (int)SCREEN_WIDTH - int(float(InGameForm->BarreLat->Width()) * sin((float)(time_to_hide - dt) / (float)time_to_hide * M_PI_2));
++
++				 			InGameForm->BarreLat->SetXY(x, InGameForm->BarreLat->Y());
+ 				 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+-				 		}
++							SDL_Delay(10);
++						}
++			 			InGameForm->BarreLat->SetXY(SCREEN_WIDTH, InGameForm->BarreLat->Y());
++			 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
+ 				 		InGameForm->BarreLat->Hide();
+ 				 		InGameForm->BarreLat->ProgressBar->SetValue(0);
+ 				 	}

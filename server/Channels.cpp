@@ -29,6 +29,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "InGame.h"
+#include "IA.h"
 #include <cstdarg>
 #include <list>
 #include <map>
@@ -220,8 +221,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					if(j<parv.size())
 					{
 						mapi = StrToTyp<uint>(parv[j++]);
-						if(mapi >= MapList.size())
-							Debug(W_DESYNCH, "SET +m: de la map %d hors de la liste (%d)", mapi, MapList.size());
+						if(mapi >= (sender->Channel()->IsMission() ? MissionList : MapList).size())
+							Debug(W_DESYNCH, "SET +m: de la map %d hors de la liste (%d)", mapi,
+							                 (sender->Channel()->IsMission() ? MissionList : MapList).size());
 						/* Pour éviter la mise de plusieurs maps successivement, on ne traite que la dernière
 						 * donnée. Donc une fois qu'on a traité la validité du numero de la map, on le met dans
 						 * une variable qui sera vérifié à la fin de la boucle.
@@ -229,7 +231,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						 * à changed ici.
 						 */
 						else
-							map = MapList[mapi];
+							map = (sender->Channel()->IsMission() ? MissionList : MapList)[mapi];
 					}
 				}
 				else
@@ -263,7 +265,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						break; // C'est pas forcément une erreur
 				}
 
-				ready = true;
+				if(!sender->Channel()->Joinable() || !sender->IsIA())
+					ready = true;
 				sender->SetReady(add);
 				if(need_ready == NEEDREADY_ME) need_ready = 0;
 				changed = YES_NOPARAMS;
@@ -307,6 +310,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			case 'a':
 			{
+				if(sender->Channel()->IsMission() && !sender->IsIA())
+				{
+					Debug(W_DESYNCH, "SET %ca: impossible dans une mission de la part d'un humain", add ? '+' : '-');
+					break;
+				}
 				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %ca: pas de nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
 				if(!pl) { Debug(W_DESYNCH, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
@@ -394,6 +402,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(!sender->Channel()->Map())
 				{
 					Debug(W_DESYNCH, "SET %cp: alors qu'il n'y a pas de map", add ? '+' : '-');
+					break;
+				}
+				if(sender->Channel()->IsMission())
+				{
+					Debug(W_DESYNCH, "SET %cp: impossible lors d'une mission", add?'+':'-');
 					break;
 				}
 				if(add)
@@ -494,7 +507,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 /** A client wants to join a channel.
  *
- * Syntax: JOI nom [$]
+ * Syntax: JOI [nom|.] [$]
  */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
@@ -503,11 +516,13 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return vDebug(W_WARNING, "JOI: Essaye de joindre plusieurs salons", VSName(cl->GetNick())
 		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
 
-	bool create = (parv.size() == 3 && parv[2] == "$");
+	bool create = (parv.size() == 3 && parv[2] == "$"), mission = false;
 	EChannel* chan = NULL;
 	ECPlayer* pl;
 
-	if(parv[1].size() > GAMELEN)
+	if(parv[1][0] == '.' && parv[1].size() == 1)
+		mission = true;
+	else if(parv[1].size() > GAMELEN)
 		parv[1] = parv[1].substr(0,GAMELEN);
 
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
@@ -519,26 +534,28 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(!chan && create)
 	{ /* Création du salon */
-		for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
-			if(!strchr(CHAN_CHARS, *c))
-			{
-				vDebug(W_WARNING, "JOI: Le nom donné est incorrect", parv[1]);
-				return cl->sendrpl(app.rpl(ECServer::ERR));
-			}
+		if(!mission)
+			for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
+				if(!strchr(CHAN_CHARS, *c))
+				{
+					vDebug(W_WARNING, "JOI: Le nom donné est incorrect", parv[1]);
+					return cl->sendrpl(app.rpl(ECServer::ERR));
+				}
 
 		chan = new EChannel(parv[1]);
 		pl = new ECPlayer(cl, chan, true, false);
 		ChanList.push_back(chan);
 		chan->SetOwner(pl);
+		chan->SetMission(mission);
 	}
 	else
 	{ /* Rejoins un salon existant */
-		if(create || !chan)
+		if(mission || create || !chan)
 			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
-		if(!chan->Joinable())
+		if(!chan->Joinable() || chan->IsMission())
 		{
-			vDebug(W_WARNING, "JOI: Le client essaye de joindre un salon en jeu", VSName(chan->GetName())
-			                  VSName(cl->GetNick()) VIName(chan->State()));
+			vDebug(W_WARNING, "JOI: Le client essaye de joindre un salon en jeu ou une mission", VSName(chan->GetName())
+			                  VSName(cl->GetNick()) VIName(chan->State()) VName(chan->Name()));
 			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 		}
 		if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
@@ -566,12 +583,12 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), FormatStr(chan->GetName()).c_str(), "");
 
-
-	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
+	for(MapVector::iterator it = (mission?MissionList:MapList).begin(); it != (mission?MissionList:MapList).end(); ++it)
 		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name()).c_str(),
 		                                        (*it)->MinPlayers(), (*it)->MaxPlayers(),
-		                                      ((*it)->MapInfos().empty() ? "" :
-		                                          FormatStr((*it)->MapInfos().front()).c_str()));
+		                                        ((*it)->MapInfos().empty() ? "" :
+		                                         FormatStr((*it)->MapInfos().front()).c_str()));
+
 	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
 
 	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
@@ -582,7 +599,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 		{
 			const char* c = (*it).c_str();
-			if(!strncmp(c, "UNIT", 4)) continue;
+			// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
+			if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
 			cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
 		}
 
@@ -590,6 +608,12 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 	
 	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList().c_str());
+
+	if(chan->IsMission())
+	{
+		pl->SetPosition(1);
+		chan->send_modes(ToVec(pl), "+p 1");
+	}
 
 	return 0;
 }
@@ -642,9 +666,12 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
+	{
+		if((*it)->IsMission()) continue;
 		cl->sendrpl(app.rpl(ECServer::GLIST), FormatStr((*it)->GetName()).c_str(), (*it)->Joinable() ? '+' : '-',
 		                                      (*it)->NbPlayers(), (*it)->GetLimite(),
 		                                      (*it)->Map() ? FormatStr((*it)->Map()->Name()).c_str() : "");
+	}
 
 	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
 }
@@ -740,8 +767,31 @@ void EChannel::CheckReadys()
 		{
 			case EChannel::WAITING:
 			{
-				if(!Map() || c < Map()->MinPlayers() || !Owner()->Ready())
-					break; /* Si c == nbplayers, c'est ok que si nbplayers >= minplayers */
+				if(!Map() || !Owner()->Ready())
+					break;
+
+				if(c < Map()->MinPlayers())
+				{
+					if(!IsMission()) break;
+
+					BMapPlayersVector mpv = Map()->MapPlayers();
+					for(BMapPlayersVector::iterator it=mpv.begin(); it != mpv.end(); ++it)
+					{
+						if(Owner()->Position() == (*it)->Num()) continue;
+
+						TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
+						IA->SetNick(IA_CHAR + (*it)->Nick());
+						SetAuth(IA);
+
+						if(!IA->Join(this))
+						{
+							Debug(W_WARNING, "SET +!(starting game): Impossible de créer une IA");
+							continue;
+						}
+
+						//IA->ia_send("SET +p " + TypToStr((*it)->Num()));
+					}
+				}
 
 				/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
 				* si tout le monde est READY pour, dans ce cas là, lancer la partie
@@ -1279,7 +1329,8 @@ void EChannel::SetMap(ECBMap *m)
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 	{
 		const char* c = (*it).c_str();
-		if(!strncmp(c, "UNIT", 4)) continue;
+		// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
+		if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
 		sendto_players(NULL, app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
 	}
 	sendto_players(NULL, app.rpl(ECServer::ENDOFSMAP));

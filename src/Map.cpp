@@ -503,7 +503,8 @@ void TBarreCaseIcons::GoNext(TObject* o, void* e)
 void TBarreCaseIcons::SetList()
 {
 	Clear();
-
+	Next = 0;
+	Last = 0;
 	Init();
 
 	int _x = X();

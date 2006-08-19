@@ -28,6 +28,7 @@
 #include <map>
 
 class ECPlayer;
+class EChannel;
 
 /** Artificial Intelligence class based on TClient */
 class TIA : public TClient
@@ -49,6 +50,8 @@ public:
 	int recv_one_msg(std::string msg);
 	
 	int ia_send(std::string msg) { return parsemsg(msg); }
+
+	bool Join(EChannel* chan);
 
 	void FirstMovements();
 	void MakeAllies();

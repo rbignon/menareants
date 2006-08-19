@@ -60,6 +60,14 @@ char *duration(int s);
 /** Check if the string is a number */
 bool is_num(const char *num);
 
+template< typename _T>
+std::vector<_T> ToVec(_T el)
+{
+	std::vector<_T> vec;
+	vec.push_back(el);
+	return vec;
+}
+
 /** Convertit d'une chaine en un type */
 template<typename T>
 T StrToTyp(const std::string & Str)

@@ -27,6 +27,7 @@
 #include "Defines.h"
 #include "gui/MessageBox.h"
 #include "gui/ColorEdit.h" // Pour color_eq[]
+#include "gui/CheckBox.h"
 #include "Debug.h"
 #include "tools/Maths.h"
 #include "tools/Video.h"
@@ -34,6 +35,7 @@
 #include "MapEditor.h"
 #include "Units.h"
 #include "Batiments.h"
+#include "InGame.h"
 #include <fstream>
 
 /********************************************************************************************
@@ -56,6 +58,12 @@ static struct
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
+
+void EMap::SeeMapLine(std::string line)
+{
+	if(line[0] == '_')
+		other_lines.push_back(line);
+}
 
 void EMap::VirtualAddUnit(std::string line)
 {
@@ -225,6 +233,9 @@ void EMap::Save()
 
 	fp << "NAME " << name << std::endl;
 
+	if(IsMission())
+		fp << "MISSION" << std::endl;
+
 	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
 		fp << "PLAYER " << (*it)->ID() << std::endl;
 
@@ -253,6 +264,9 @@ void EMap::Save()
 	fp << "DATE " << Date()->String() << std::endl;
 	for(std::vector<std::string>:: const_iterator it = map_infos.begin(); it != map_infos.end(); ++it)
 		fp << "INFO " << *it << std::endl;
+
+	for(std::vector<std::string>::const_iterator it = other_lines.begin(); it != other_lines.end(); ++it)
+		fp << *it << std::endl;
 
 	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
 	{
@@ -594,16 +608,23 @@ TMapEditor::TMapEditor(ECImage* w, ECMap *m)
 
 void TBarreCaseIcons::Init()
 {
-  TChildForm* form = dynamic_cast<TChildForm*>(Parent());
+	TChildForm* form = dynamic_cast<TChildForm*>(Parent());
 
-  Last = AddComponent(new TButton (form->Width()-X()-10, 5 ,5,10));
-  Next = AddComponent(new TButton (form->Width()-X()-10, 40,5,10));
+	if(!Last)
+		Last = AddComponent(new TButton (form->Width()-X()-10, 5 ,5,10));
+	else
+		Last->SetX(X() + form->Width()-X()-10);
 
-  Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
-  Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
-
-  Next->SetOnClick(TBarreCaseIcons::GoNext, 0);
-  Last->SetOnClick(TBarreCaseIcons::GoLast, 0);
+	if(!Next)
+		Next = AddComponent(new TButton (form->Width()-X()-10, 80,5,10));
+	else
+		Next->SetX(X() + form->Width()-X()-10);
+	
+	Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
+	Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
+	
+	Next->SetOnClick(TBarreCaseIcons::GoNext, 0);
+	Last->SetOnClick(TBarreCaseIcons::GoLast, 0);
 }
 
 void TBarreCaseIcons::SelectCase(TObject* o, void* e)
@@ -902,7 +923,11 @@ void TBarreEntity::Init()
  *                                TEditBarreLatIcons                                        *
  ********************************************************************************************/
 
-void TEditBarreLatIcons::SelectUnit(TObject* o, void* e)
+/********************************************************************************************
+ *                               TBarreLat                                                  *
+ ********************************************************************************************/
+
+void TEditBarreLat::SelectUnit(TObject* o, void* e)
 {
 	assert(o);
 	assert(o->Parent());
@@ -920,39 +945,6 @@ void TEditBarreLatIcons::SelectUnit(TObject* o, void* e)
 
 	editor->Map->SetCreateEntity(static_cast<ECEntity*>(e));
 }
-
-void TEditBarreLatIcons::SetList(std::vector<ECEntity*> list)
-{
-	Clear();
-
-	int _x = 0, _y = 0;
-	uint _h = 0, _w = 0;
-	bool left = true;
-	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it, left = !left)
-	{
-		TImage* i = AddComponent(new TImage(_x, _y, (*it)->Icon(), false));
-
-		if(i->Width() > _w) _w = i->Width();
-		if(i->Height() > _h) _h = i->Height();
-
-		if(left)
-			_x += _w;
-		else
-		{
-			_x = 0;
-			_y += _h;
-		}
-		i->SetOnClick(TEditBarreLatIcons::SelectUnit, (void*)*it);
-	}
-	if(!left) // c'est à dire on était à droite
-		_y += _h;
-	SetWidth(2*_w);
-	SetHeight(_y);
-}
-
-/********************************************************************************************
- *                               TBarreLat                                                  *
- ********************************************************************************************/
 
 void TEditBarreLat::RadarClick(TObject* m, int x, int y)
 {
@@ -995,8 +987,9 @@ void TEditBarreLat::Init()
 
 	OptionsButton->SetOnClick(TOptionsMap::Options, (void*)editor->Map->Map());
 
-	Icons = AddComponent(new TEditBarreLatIcons(20, 340));
-	Icons->SetList(EntityList.List());
+	Icons = AddComponent(new TBarreLatIcons(20, 340));
+	Icons->SetMaxHeight(SCREEN_HEIGHT - Icons->Y());
+	Icons->SetList(EntityList.List(), TEditBarreLat::SelectUnit);
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 
 	editor->Map->Map()->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
@@ -1176,6 +1169,7 @@ void TOptionsMap::Options(TObject*, void* m)
 	map->MaxPlayers() = OptionsMap->MaxPlayers->Value();
 	map->MinPlayers() = OptionsMap->MinPlayers->Value();
 	map->CityMoney()  = StrToTyp<int>(OptionsMap->City->Text());
+	map->IsMission()  = OptionsMap->Mission->Checked();
 	
 	MyFree(OptionsMap);
 	map->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
@@ -1203,6 +1197,8 @@ void TOptionsMap::Refresh()
 
 	MinPlayers->SetMax(map->MapPlayers().size());
 	MaxPlayers->SetMax(map->MapPlayers().size());
+
+	Mission->Check(map->IsMission());
 }
 
 TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
@@ -1257,6 +1253,10 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 
 	CityLabel = AddComponent(new TLabel(50,460, "Argent par villes", white_color, Font::GetInstance(Font::Normal)));
 	City = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 480, 150, 5, "0123456789"));
+
+	Mission = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 50, 500, "Mission", white_color));
+	Mission->SetHint("Si actif, cette carte est une mission et le joueur sera le premier dans la liste.\n"
+	                 "Cet editeur ne permet pas de configurer les paramètres spéciaux des missions");
 
 	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 300, 480, 290, 100));
 	SetHint(Hints);

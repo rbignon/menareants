@@ -236,8 +236,8 @@ class ECMap : public ECBMap
 {
 /* Constructeur/Destructeur */
 public:
-	ECMap(std::string _filename, uint _i)
-		: ECBMap(_filename), i(_i)
+	ECMap(std::string _filename)
+		: ECBMap(_filename)
 	{}
 
 	ECMap(std::vector<std::string> _map_file, uint _i)
@@ -263,6 +263,8 @@ public:
 
 	void SortEvents();
 
+	static bool LoadMaps();
+
 /* Variables privées */
 protected:
 	EventVector map_events;
@@ -270,10 +272,9 @@ protected:
 	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECountry(m, ident); }
 };
 
-extern bool LoadMaps();
-
 typedef std::vector<ECMap*> MapVector;
 
 extern MapVector MapList;
+extern MapVector MissionList;
 
 #endif /* ECD_MAP_H */

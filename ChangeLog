@@ -1,3 +1,43 @@
+2006-08-19  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Changement des boutons de la souris, clic gauche pour bouger, clic droit pour deselectionner.
+
+	* server/Batiments.cpp (ECMine::Attaq): N'attaque que les unités sur la même case.
+
+	* server/InGame.cpp (ARMCommand): Même si il reste des unités qui ont pas bougés, si y en a une qui a déjà bougé, bouger
+	l'attaque.
+
+	* src/data/pics/cursors/left.png: Utilisation d'un nouveau curseur unique pour le déplacement.
+
+2006-08-18  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp, src/MapEditor.cpp:
+	- On se souvient des lignes cachées pour les réafficher quand on écrit la map.
+	- On peut paramétrer si c'est une mission ou pas dans les options de l'editeur de maps.
+
+	* src/InGame.cpp, server/Channels.cpp (SETCommand): Dans une mission, on ne peut plus s'allier
+
+2006-08-13  Romain Bignon <progs@headfucking.net>
+
+	* lib/Channels.h, server/Channels.cpp, API: Si on join le chan '.', c'est une mission solo que personne ne peut joindre.
+
+	* lib/Map.cpp, server/Map.cpp: Si "_Mission" spécifié, la map est une mission.
+
+	* server/IA.cpp (TIA::Join): Fonction pour joindre un salon plutot que de faire envoyer JOI à l'IA, ça evite déjà de
+	devoir recevoir et traiter tous les messages de join (liste des maps et map), et ensuite de faire joindre une IA à
+	une mission.
+
+	* src/JoinGame.cpp (GameInfos): Modification pour utiliser TGameInfosForm pour les missions.
+
+	* src/InGame.cpp, src/MapEditor.cpp: Utilisation d'un scroll pour chercher dans la liste des unités (barrelat et barreact).
+	En outre, utilisation du même composant TBarreLatIcons de InGame.h pour MapEditor.cpp
+
+	* server/Map.cpp (ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): Correction d'un bug.
+
+2006-08-05  Romain Bignon <progs@headfucking.net>
+
+	* lib/Outils.cpp (GetFileList): Pour windows, correction d'une boucle infinie si il trouve un dossier.
+
 2006-08-04  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp (ECBEntity::CanBeCreated): On peut créer une unité sur un batiment d'un de ses allié.

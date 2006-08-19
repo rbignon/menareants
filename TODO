@@ -3,9 +3,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-mettre une image de bousillage de terrain sous le mcgerbale deployé
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent
+-pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
@@ -34,8 +36,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
   - unité Gay
   - unité Zidane qui fou des coups de boule
   - unité Handicap International qui permet de déminer
-- USA
-  - Ronald de McDonald
+  - batiment ou unité ou upgrade du lance missile qui tire un champ electrique
 - URSS
   - Goulags où il est possible de mettre les prisoniers et qui font rapporter de l'argent
 - France

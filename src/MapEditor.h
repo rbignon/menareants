@@ -35,7 +35,9 @@
 #include "gui/Memo.h"
 #include "gui/Label.h"
 
+class TCheckBox;
 class TSpinEdit;
+class TBarreLatIcons;
 
 /********************************************************************************************
  *                                  EMap                                                    *
@@ -81,6 +83,7 @@ public:
 private:
 
 	bool can_save;
+	std::vector<std::string> other_lines;
 
 	virtual ECBMapPlayer* CreateMapPlayer(char _id, uint _num)
 	{
@@ -89,6 +92,7 @@ private:
 		return mp;
 	}
 	virtual void VirtualAddUnit(std::string line);
+	virtual void SeeMapLine(std::string line);
 };
 
 /********************************************************************************************
@@ -99,7 +103,7 @@ class TBarreCaseIcons : public TChildForm
 {
 public:
 	TBarreCaseIcons(int _x, int _y)
-		: TChildForm(_x,_y, 0, 0), first(0)
+		: TChildForm(_x,_y, 0, 0), Next(0), Last(0), first(0)
 	{}
 
 	void Init();
@@ -189,22 +193,6 @@ private:
 	bool select;
 };
 
-class TEditBarreLatIcons : public TChildForm
-{
-public:
-	TEditBarreLatIcons(int _x, int _y)
-		: TChildForm(_x,_y, 0, 0)
-	{}
-
-	void Init() {}
-
-	void SetList(std::vector<ECEntity*> list);
-
-private:
-	std::vector<TImage*> icons;
-	static void SelectUnit(TObject* o, void* e);
-};
-
 class TEditBarreLat : public TChildForm
 {
 public:
@@ -219,14 +207,14 @@ public:
 	TButtonText*        OptionsButton;
 	TButtonText*        SaveButton;
 	TImage*             ScreenPos;
-	TEditBarreLatIcons* Icons;
+	TBarreLatIcons*     Icons;
 
 /* Evenements */
 public:
 	static void RadarClick(TObject*, int, int);
 
 protected:
-
+	static void SelectUnit(TObject* o, void* e);
 };
 
 class TMapEditor : public TForm
@@ -283,6 +271,8 @@ public:
 
 	TLabel*      CityLabel;
 	TEdit*       City;
+
+	TCheckBox*   Mission;
 
 	TMemo*       Hints;
 
