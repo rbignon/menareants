@@ -1,4 +1,14 @@
+2006-08-21  Romain Bignon <progs@headfucking.net>
+
+	* src/MapEditor.cpp: Possibilité d'utiliser MAJ pour faire une selection d'un rectangle (première case selectionnée, puis
+	MAJ + case du coin opposé du rectangle de selection formé).
+
+	* server/maps/caraibes.map: Nouvelle map.
+
 2006-08-19  Romain Bignon <progs@headfucking.net>
+
+	* src/Units.h (ECMcDo): Quand un mcgerbale se fait détruire, si il était deployé, mettre la bonne case de destruction de
+	ville.
 
 	* src/InGame.cpp: Changement des boutons de la souris, clic gauche pour bouger, clic droit pour deselectionner.
 

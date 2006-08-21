@@ -138,7 +138,8 @@ public:
 public:
 
 	std::vector<ECase*> Cases() const { return cases; }
-	void AddCase(ECase* c) { c->Select(true); cases.push_back(c); Update(c); }
+	bool Empty() const { return cases.empty(); }
+	void AddCase(ECase* c, bool update = true) { c->Select(true); cases.push_back(c); if(update) Update(c); }
 	bool RemoveCase(ECase* c, bool update = true);
 
 /* Methodes */

@@ -125,6 +125,8 @@ void MenAreAntsApp::quit_app(int value)
 		Resources::Unload();
 		TTF_Quit();
 		Sound::End();
+		delete Video::GetInstance();
+		delete Config::GetInstance();
         exit(value);
 }
 

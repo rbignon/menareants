@@ -249,6 +249,8 @@ public:
 	}
 	virtual ECImage* Icon() const { return Deployed() ? Resources::Caserne_Icon() : Resources::McDo_Icon(); }
 
+	virtual ECSpriteBase* DeadCase() const { return Deployed() ? Resources::CaseCitySODead() : 0; }
+
 /* Methodes */
 public:
 

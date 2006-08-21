@@ -474,7 +474,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 	std::vector<ECBEntity*> ents = acase->Entities()->List();
 	ECBCase* e_case = !entity ? 0 : entity->Move()->Empty() ? entity->Case() : entity->Move()->Dest();
 
-	if(entity && !IsPressed(SDLK_LALT) && entity->Owner()->IsMe())
+	if(entity && !IsPressed(SDLK_LALT) && entity->Owner() && entity->Owner()->IsMe())
 	{
 		if(!(entity->EventType() & ARM_ATTAQ) && acase->Delta(e_case) <= entity->Porty())
 		{
@@ -490,7 +490,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 		if(IsPressed(SDLK_LCTRL))
 			return W_CANTATTAQ;
 	}
-	if(entity && entity->Owner()->IsMe())
+	if(entity && entity->Owner() && entity->Owner()->IsMe())
 	{
 		if(IsPressed(SDLK_SPACE))
 			return W_EXTRACT;
@@ -498,7 +498,8 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 		if(entity->Move()->Size() < entity->MyStep() &&
 		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
 		   entity->MyStep() - entity->Move()->Size() >= acase->Delta(e_case) &&
-		   !entity->Deployed() && !(entity->EventType() & ARM_DEPLOY))
+		   !entity->Deployed() && !(entity->EventType() & ARM_DEPLOY) &&
+		   acase != entity->Case() && acase != entity->Move()->Dest())
 		{
 			int can_invest = 0;
 			FOR(ECBEntity*, ents, enti)
@@ -746,6 +747,7 @@ void MenAreAntsApp::InGame()
 								entity->SetOwner(0);
 								InGameForm->Map->SetCreateEntity(0);
 							}
+							InGameForm->SetCursor();
 							break;
 						}
 
@@ -837,6 +839,7 @@ void MenAreAntsApp::InGame()
 											}
 											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
 											                " )" + std::string(contener->ID())).c_str());
+											InGameForm->SetCursor();
 											break;
 										}
 									}

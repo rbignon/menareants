@@ -504,7 +504,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						if(event.button.button == MBUTTON_LEFT)
 						{
 							ECase* c = 0;
-							if(!MapEditor->IsPressed(SDLK_LCTRL) &&
+							if(!MapEditor->IsPressed(SDLK_LCTRL) && !MapEditor->IsPressed(SDLK_LSHIFT) &&
 							   (entity = MapEditor->Map->TestEntity(event.button.x, event.button.y)))
 							{
 								MapEditor->BarreCase->UnSelect();
@@ -513,14 +513,49 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							else if((c = MapEditor->Map->TestCase(event.button.x, event.button.y)))
 							{
 								MapEditor->BarreEntity->UnSelect();
-								if(!MapEditor->BarreCase->RemoveCase(c, false))
+								if(!MapEditor->BarreCase->RemoveCase(c, false) ||
+								   MapEditor->BarreCase->Cases().size() > 1 && !MapEditor->IsPressed(SDLK_LCTRL))
 								{
-									if(!MapEditor->IsPressed(SDLK_LCTRL))
+									if(MapEditor->IsPressed(SDLK_LSHIFT) && !MapEditor->BarreCase->Empty())
+									{
+										ECase* first = MapEditor->BarreCase->Cases().front();
+										ECBCase* next = first;
+										uint t_x = abs(first->X() - c->X());
+										uint t_y = abs(first->Y() - c->Y());
 										MapEditor->BarreCase->UnSelect(false);
-									MapEditor->BarreCase->AddCase(c);
+										MapEditor->BarreCase->AddCase(first, false);
+										if(c->Y() < first->Y())
+											next = next->MoveUp(t_y);
+										if(c->X() < first->X())
+											next = next->MoveLeft(t_x);
+
+										for(uint i=0; i <= t_y; ++i)
+										{
+											uint j=0;
+											for(; j <= t_x; ++j)
+											{
+												if(next != first)
+													MapEditor->BarreCase->AddCase(dynamic_cast<ECase*>(next), false);
+												if(next->X() == next->Map()->Width()-1)
+													break;
+												next = next->MoveRight();
+											}
+											if(next->Y() == next->Map()->Height()-1)
+												break;
+											next = next->MoveDown();
+											next = next->MoveLeft(j);
+										}
+										MapEditor->BarreCase->Update(c);
+									}
+									else
+									{
+										if(!MapEditor->IsPressed(SDLK_LCTRL))
+											MapEditor->BarreCase->UnSelect(false);
+										MapEditor->BarreCase->AddCase(c);
+									}
 								}
-								else if(MapEditor->BarreCase->Cases().empty())
-									MapEditor->BarreCase->UnSelect(false);
+								else if(MapEditor->BarreCase->Empty())
+									MapEditor->BarreCase->UnSelect();
 							}
 						}
 						else if(event.button.button == MBUTTON_RIGHT)
@@ -701,10 +736,7 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 	TBarreCase* bc = dynamic_cast<TBarreCase*>(o->Parent());
 
 	if(bc->Country->GetSelectedItem() < 0)
-	{
-		Debug(W_DEBUG, "Aucun item sélectionné");
 		return;
-	}
 
 	const char* id =  bc->Country->ReadValue(bc->Country->GetSelectedItem()).c_str();
 
@@ -778,7 +810,7 @@ void TBarreCase::Init()
 	Icons = AddComponent(new TBarreCaseIcons(100,10));
 	Icons->SetList();
 
-	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 15, 100, Height()-25));
+	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 15, 100, Height()-40));
 	Country->SetOnClick(TBarreCase::ChangeOwner, 0);
 
 	SetBackground(Resources::BarreAct());
