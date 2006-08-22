@@ -31,10 +31,7 @@ TCursor::TCursor()
 	SetCursorImage(MaintainedAttaq, Resources::PointerMaintainedAttaq());
 	SetCursorImage(CantAttaq, Resources::PointerCantAttaq());
 	SetCursorImage(Invest, Resources::PointerInvest());
-	SetCursorImage(Top, Resources::PointerTop());
-	SetCursorImage(Bottom, Resources::PointerBottom());
 	SetCursorImage(Left, Resources::PointerLeft());
-	SetCursorImage(Right, Resources::PointerRight());
 	SetCursorImage(Radar, Resources::PointerRadar());
 }
 

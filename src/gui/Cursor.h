@@ -43,10 +43,7 @@ public:
 		MaintainedAttaq,
 		CantAttaq,
 		Invest,
-		Top,
-		Bottom,
 		Left,
-		Right,
 		Radar
 	};
 	typedef std::map<cursors_t, ECImage*> ImgList;

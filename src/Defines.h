@@ -34,6 +34,9 @@
 
 /* Defines */
 #undef BUGUED_INTRO
+#ifndef WIN32
+#define BUGUED_FULLSCREEN
+#endif
 
 /* Résolution de l'écran */
 //const int SCREEN_HEIGHT = 600;

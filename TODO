@@ -11,6 +11,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
+-pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Bof

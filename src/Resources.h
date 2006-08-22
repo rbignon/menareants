@@ -130,10 +130,7 @@ public:
 	R_RESOURCE(ECImage,      PointerMaintainedAttaq);
 	R_RESOURCE(ECImage,      PointerCantAttaq);
 	R_RESOURCE(ECImage,      PointerInvest);
-	R_RESOURCE(ECImage,      PointerTop);
-	R_RESOURCE(ECImage,      PointerBottom);
 	R_RESOURCE(ECImage,      PointerLeft);
-	R_RESOURCE(ECImage,      PointerRight);
 	R_RESOURCE(ECImage,      PointerRadar);
 	R_RESOURCE(ECSpriteBase, UpButton);
 	R_RESOURCE(ECSpriteBase, DownButton);

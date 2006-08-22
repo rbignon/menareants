@@ -484,7 +484,7 @@ void ECImage::Load(char *fichier, bool _alpha)
 {
 	SDL_Surface *tmp = 0;
 	if(!(tmp = IMG_Load(fichier)))
-		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
+		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image : " + std::string(fichier));
 
 	alpha = _alpha;
 	Img = alpha ? SDL_DisplayFormatAlpha(tmp) : SDL_DisplayFormat(tmp);

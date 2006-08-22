@@ -94,6 +94,10 @@ bool Video::IsFullScreen(void) const
 
 bool Video::SetConfig(uint width, uint height, bool _fullscreen)
 {
+#ifndef BUGUED_FULLSCREEN /** In win32, when you are in fullscreen mode there is a matter with the cursor */
+	_fullscreen = false;
+#endif
+
 	// initialize the main window
 	if( window.IsNull() || 
 			(width != window.GetWidth() || 

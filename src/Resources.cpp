@@ -95,10 +95,7 @@
 	R_RESOURCE_P(ECImage,    PointerMaintainedAttaq, PKGDATADIR_PICS "cursors/maintened_attaq.png", true);
 	R_RESOURCE_P(ECImage,    PointerCantAttaq, PKGDATADIR_PICS "cursors/cantattaq.png", true);
 	R_RESOURCE_P(ECImage,    PointerInvest,    PKGDATADIR_PICS "cursors/invest.png", true);
-	R_RESOURCE_P(ECImage,    PointerTop,       PKGDATADIR_PICS "cursors/top.png", true);
-	R_RESOURCE_P(ECImage,    PointerBottom,    PKGDATADIR_PICS "cursors/bottom.png", true);
 	R_RESOURCE_P(ECImage,    PointerLeft,      PKGDATADIR_PICS "cursors/left.png", true);
-	R_RESOURCE_P(ECImage,    PointerRight,     PKGDATADIR_PICS "cursors/right.png", true);
 	R_RESOURCE_P(ECImage,    PointerRadar,     PKGDATADIR_PICS "cursors/radar.png", true);
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");

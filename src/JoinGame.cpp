@@ -48,7 +48,7 @@ void LoadingGame(EC_Client* cl);
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
-bool JOINED = false;                  /**< JOINED is setted to \a true by thread when it has joined a channel */
+int JOINED = 0;                       /**< 1 = joined, -1 = error */
 
 /** Someone wants to kick me
  *
@@ -184,7 +184,7 @@ int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	JOINED = false;
+	JOINED = -1;
 	return 0;
 }
 
@@ -866,7 +866,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyNation->SetEnabledItem(*it, false);
 		GameInfosForm->RecalcMemo();
 	}
-	JOINED = true;
+	JOINED = 1;
 	return 0;
 }
 
@@ -888,6 +888,12 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, false, true, false));
 			if(parv[1][0] == '.' && parv[1].size() == 1)
 				c->SetMission();
+
+			/* En cas de gros lag, il se peut que le joueur ait supprimé GameInfosForm avant même avoir reçu le JOIN.
+			 * Dans ce cas on prévient quand même le serveur qu'on part.
+			 */
+			if(!GameInfosForm)
+				me->sendrpl(EC_Client::rpl(EC_Client::LEAVE));
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
@@ -936,7 +942,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if((*playersi)->IsMe())
 		{
 			EChannel *c = me->Player()->Channel();
-			JOINED = false;
+			JOINED = 0;
 			me->ClrPlayer(); /* <=> me->pl = 0 */
 			if(GameInfosForm)
 				GameInfosForm->Players->Hide();
@@ -1065,11 +1071,12 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 
 	EC_Client* client = EC_Client::GetInstance();
 
-	JOINED = false;
+	JOINED = 0;
 	client->sendrpl(create ? EC_Client::rpl(EC_Client::CREATE) : EC_Client::rpl(EC_Client::JOIN), FormatStr(cname).c_str());
 
-	WAIT_EVENT_T(JOINED, i, 0.5);
-	if(!JOINED)
+	/* On attend 2 secondes de lag, mais si jamais on a reçu une erreur on y partira avant */
+	WAIT_EVENT_T(JOINED != 0, i, 2);
+	if(JOINED <= 0)
 	{
 		if(client->Player())
 		{
@@ -1257,7 +1264,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			client->sendrpl(client->rpl(EC_Client::LEAVE));
 		}
 
-		WAIT_EVENT(!JOINED, i);
+		WAIT_EVENT(JOINED == 0, i);
 	}
 
 	return true;
