@@ -373,8 +373,9 @@ TCredits::TCredits(ECImage* w)
 	              "d'autorité de Mme Gay (histoire) et Mme Goetz (espagnol).\n"
 	              "\n"
 	              "Merci à lodesi pour ses patchs.\n"
+	              "Merci à Anicée pour sa voix.\n"
 	              "\n"
-                  "Merci également à Zic, Spouize, Nico, Mathieu, Thomas et Anicée pour avoir testé le jeu.", white_color);
+                  "Merci également à Zic, Spouize, Nico, Mathieu, et Thomas pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();
 
 	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, "Retour",

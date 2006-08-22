@@ -220,14 +220,14 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 
 	ECase* c = TestCase(mouse_x, mouse_y);
 
-	if(c->Entities()->empty()) return 0;
+	if(c->Entities()->empty() || Map()->Channel() && !ECMap::CanSelect(c)) return 0;
 
-	ECBEntity* e = c->Entities()->First();
+	ECEntity* e = dynamic_cast<ECEntity*>(c->Entities()->First());
 
 	c->Entities()->Remove(e);
 	c->Entities()->Add(e);
 
-	return dynamic_cast<ECEntity*>(e);
+	return (Map()->Channel() && (!e->CanBeSelected() || e->IsHiddenOnCase())) ? TestEntity(mouse_x, mouse_y) : e;
 }
 
 ECase* TMap::TestCase(int mouse_x, int mouse_y)
@@ -339,7 +339,7 @@ void TMap::Draw(int _x, int _y)
 		{
 			std::vector<ECBEntity*> ents = c->Entities()->List();
 			FOR(ECBEntity*, ents, entity)
-				if(entity && entity->IsBuilding())
+				if(entity && entity->IsBuilding() && !dynamic_cast<ECEntity*>(entity)->OnTop())
 					dynamic_cast<ECEntity*>(entity)->Draw();
 		}
 	}
@@ -356,7 +356,7 @@ void TMap::Draw(int _x, int _y)
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 			if(!entity) continue;
 
-			if(!entity->IsBuilding())
+			if(!entity->IsBuilding() && !entity->OnTop())
 				entity->Draw();
 			if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
 				entity->Case()->SetMustRedraw();
@@ -364,7 +364,12 @@ void TMap::Draw(int _x, int _y)
 		}
 
 	FOR(ECBEntity*, entities, enti)
-		dynamic_cast<ECEntity*>(enti)->AfterDraw();
+	{
+		ECEntity* e = dynamic_cast<ECEntity*>(enti);
+		if(e->OnTop())
+			e->Draw();
+		e->AfterDraw();
+	}
 
 	FOR(ECSprite*, after_draw, it)
 		if(it)

@@ -227,11 +227,34 @@ bool ECEntity::Test(int souris_x, int souris_y)
 	         && (image->Y() <= souris_y) && (souris_y < int(image->Y()+image->GetHeight()))));
 }
 
+bool ECEntity::IsHiddenOnCase()
+{
+	if(!Channel())
+		return false;
+
+	if((Channel()->CurrentEvent() & ARM_ATTAQ) && EventType() & ARM_ATTAQ)
+		return false;
+
+	if(Owner() && (Owner()->IsMe() || Owner()->IsAllie(Channel()->GetMe())))
+		return false;
+
+	std::vector<ECBEntity*> ents = Case()->Entities()->List();
+	bool hidden = false;
+	FOR(ECBEntity*, ents, enti)
+		if(dynamic_cast<ECEntity*>(enti)->IsHiddenByMe(this))
+			hidden = true;
+		else if(enti->Owner() && (dynamic_cast<ECPlayer*>(enti->Owner())->IsMe() || enti->Owner()->IsAllie(Channel()->GetMe())))
+			return false;
+
+	return hidden;
+}
+
 void ECEntity::Draw()
 {
 	if(image && !Parent() && (!Map()->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
 	{
-		image->draw();
+		if(!IsHiddenOnCase())
+			image->draw();
 
 		if(attaq)
 			attaq->draw();
@@ -361,7 +384,7 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 
 void ECEntity::SetShowedCases(bool show, bool forced)
 {
-	if(!Case() || !Owner() || !forced && (Parent() ||
+	if(!Case() || !Owner() || !Visibility() || !forced && (Parent() ||
 	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe())))
 		return;
 
@@ -563,6 +586,22 @@ ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
 	return 0;
 }
 
+bool ECMap::CanSelect(ECBCase* c)
+{
+	std::vector<ECBEntity*> es = c->Entities()->List();
+	bool continuer = false;
+	FOR(ECBEntity*, es, enti)
+	{
+		ECEntity* entii = dynamic_cast<ECEntity*>(enti);
+		if(entii->CanBeSelected() && !entii->IsHiddenOnCase())
+		{
+			continuer = true;
+			break;
+		}
+	}
+	return continuer;
+}
+
 /** \note Preview use two screen pixels for one pixel in map */
 void ECMap::CreatePreview(uint width, uint height, int flags)
 {
@@ -652,7 +691,9 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
 			if(!(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
-			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0)
+			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0 ||
+			   dynamic_cast<ECEntity*>(*enti)->IsHiddenOnCase() ||
+			   !dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
 				continue;
 			Color col = (*enti)->Owner() ? color_eq[(*enti)->Owner()->Color()] : white_color;
 			yy = (*enti)->Case()->Y() * size_y;

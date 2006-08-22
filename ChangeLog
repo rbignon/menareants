@@ -1,4 +1,17 @@
+2006-08-22  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp: Restructuration un peu de FirstMovements() avec gestion de strategies que veut faire l'IA.
+
+	* Makefile.am: Mettre à jour avec "svn update" dorénavant, pour ne pas avoir à faire ./config.status --recheck.
+
+	* Batiments.h (ECTrees): Arbres qui permettent de se cacher derrière.
+
+	* src/data/anims/units: Nouvelles images pour les membres de la ville.
+
 2006-08-21  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp: Correction d'un bug qui faisait que si un joueur partait en pleine partie, et que tous les autres joueurs
+	étaient prets, l'animation ne se lançait pas car les IA attendent que tout le monde soit pret pour se mettre pretes.
 
 	* src/MapEditor.cpp: Possibilité d'utiliser MAJ pour faire une selection d'un rectangle (première case selectionnée, puis
 	MAJ + case du coin opposé du rectangle de selection formé).

@@ -59,6 +59,36 @@ private:
 };
 
 /********************************************************************************************
+ *                                         ECTrees                                          *
+ ********************************************************************************************/
+
+class ECTrees : public ECBatiment, public ECBTrees
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECTrees) {}
+
+	ENTITY_CONSTRUCTOR(ECTrees), ECBatiment(Resources::Trees_Face()) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Forêt"; }
+	virtual const char* Infos() const { return "Quand une unité passe sous une forêt elle disparait aux yeux de l'enemie."; }
+	virtual const char* Description() const { return Infos(); }
+	virtual ECImage* Icon() const { return Resources::Trees_Icon(); }
+	virtual bool CanBeSelected() const { return false; }
+	virtual bool OnTop() const { return true; }
+	virtual bool IsHiddenByMe(ECBEntity* e) const
+	{
+		assert(e);
+		if(e->IsInfantry()) return true;
+		else return false;
+	}
+};
+
+/********************************************************************************************
  *                                         ECMine                                           *
  ********************************************************************************************/
 
@@ -328,6 +358,12 @@ public:
 	ENTITY_EMPTY_CONSTRUCTOR(ECharFact) {}
 
 	ENTITY_CONSTRUCTOR(ECharFact), ECBatiment(Resources::CharFact_Face()) {}
+
+	virtual void Init()
+	{
+		ECEntity::Init();
+		Image()->SetAnim(true);
+	}
 
 /* Infos */
 public:

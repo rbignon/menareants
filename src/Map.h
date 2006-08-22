@@ -134,6 +134,9 @@ public:
 	virtual const char* Description() const = 0;
 	virtual ECImage* Icon() const = 0;
 	virtual ECSpriteBase* DeadCase() const;
+	virtual bool CanBeSelected() const { return true; }
+	virtual bool OnTop() const { return false; }
+	virtual bool IsHiddenByMe(ECBEntity* e) const { return false; }
 
 /* Methodes */
 public:
@@ -162,6 +165,8 @@ public:
 
 /* Attributs */
 public:
+
+	bool IsHiddenOnCase();
 
 	bool Test(int x, int y);
 
@@ -350,6 +355,8 @@ public:
 	void CreatePreview(uint width, uint height, int flags);
 
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
+
+	static bool CanSelect(ECBCase* c);
 
 /* Attributs */
 public:

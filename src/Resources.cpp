@@ -199,6 +199,8 @@
 	R_RESOURCE(ECSpriteBase, McDo_Right,        "units/mcdo/right");
 	R_RESOURCE(ECSpriteBase, McDo_Dos,          "units/mcdo/dos");
 	R_RESOURCE(ECSpriteBase, McDo_Caserne,      "units/mcdo/caserne");
+	R_RESOURCE(ECImage,      Trees_Icon,        PKGDATADIR_PICS "units/trees_icon.png");
+	R_RESOURCE(ECSpriteBase, Trees_Face,        "units/trees");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects

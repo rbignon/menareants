@@ -180,6 +180,7 @@ public:
 		/*15*/E_MINE,
 		/*16*/E_OBELISK,
 		/*17*/E_MCDO,
+		/*18*/E_TREES,
 		/*XX*/E_END
 	};
 

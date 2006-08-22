@@ -368,7 +368,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					(*it)->Lock();
 			}
 		}
-		if(flags == ARM_CREATE && InGameForm && !entities.empty())
+		if(flags == ARM_CREATE && InGameForm && !entities.empty() && entities.front()->CanBeSelected())
 			InGameForm->BarreAct->SetEntity(entities.front());
 	}
 
@@ -468,10 +468,11 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 	if(!acase || acase->Showed() <= 0)
 		return W_NONE;
 
-	if(Player()->Ready())
-		return W_NONE;
-
 	std::vector<ECBEntity*> ents = acase->Entities()->List();
+
+	if(Player()->Ready())
+		return (!ents.empty() && ECMap::CanSelect(acase)) ? W_SELECT : W_NONE;
+
 	ECBCase* e_case = !entity ? 0 : entity->Move()->Empty() ? entity->Case() : entity->Move()->Dest();
 
 	if(entity && !IsPressed(SDLK_LALT) && entity->Owner() && entity->Owner()->IsMe())
@@ -484,7 +485,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 				return W_MATTAQ;
 			}
 			FOR(ECBEntity*, ents, enti)
-				if(entity->CanAttaq(enti) && !entity->Like(enti))
+				if(entity->CanAttaq(enti) && !entity->Like(enti) && !entity->IsHiddenOnCase())
 					return W_ATTAQ;
 		}
 		if(IsPressed(SDLK_LCTRL))
@@ -519,7 +520,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 		}
 	}
 
-	if(!ents.empty())
+	if(!ents.empty() && ECMap::CanSelect(acase))
 		return W_SELECT;
 
 	return W_NONE;

@@ -29,6 +29,8 @@
 
 class ECPlayer;
 class EChannel;
+class ECBEntity;
+class ECBCase;
 
 /** Artificial Intelligence class based on TClient */
 class TIA : public TClient
@@ -44,17 +46,19 @@ public:
 
 	/** Send an unformated message. */
 	int sendbuf(char* buf, int len) { return ia_recv(buf); }
-	
+
 	int ia_recv(std::string msg);
 	void recv_msgs();
 	int recv_one_msg(std::string msg);
-	
+
 	int ia_send(std::string msg) { return parsemsg(msg); }
 
 	bool Join(EChannel* chan);
 
 	void FirstMovements();
 	void MakeAllies();
+	void CheckIfIReady();
+	void WantMoveTo(ECBEntity* enti, ECBCase* dest);
 
 /* Attributs */
 public:
@@ -67,11 +71,17 @@ public:
 private:
 	static int SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	static int LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
-	static int ARMCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	bool lock;
 	std::vector<std::string> msgs;
 
 	std::map<int, uint> units;
+
+	/*struct
+	{
+		
+	} Action;*/
+	
+	std::map<ECBEntity*, bool> recruted;
 };
 
 #endif /* ECD_IA_H */

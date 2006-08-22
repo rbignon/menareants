@@ -26,6 +26,27 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                                        ECTrees                                           *
+ ********************************************************************************************/
+class ECTrees : public ECEntity, public ECBTrees
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECTrees) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+/********************************************************************************************
  *                                        ECMine                                            *
  ********************************************************************************************/
 class ECMine : public ECEntity, public ECBMine

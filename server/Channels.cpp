@@ -1517,6 +1517,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 
 	if(State() != EChannel::PLAYING || !CheckEndOfGame())
 		CheckReadys();
+
 	return true;
 }
 

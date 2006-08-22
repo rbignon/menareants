@@ -26,4 +26,5 @@ U_DECL(ECTourist)
 U_DECL(ECMine)
 U_DECL(ECObelisk)
 U_DECL(ECMcDo)
+U_DECL(ECTrees)
 U_END
