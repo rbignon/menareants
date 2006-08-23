@@ -19,8 +19,9 @@
  * $Id$
  */
 
-#include "Channels.h"
 #include "Batiments.h"
+#include "Channels.h"
+#include "Sound.h"
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
 #include "tools/Video.h" // Pour obtenir SCREEN_WIDTH
@@ -373,6 +374,7 @@ bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_C
 			                             c->X() < Case()->X() ? dx-1 : 0,
 			                             c->Y() < Case()->Y() ? dy-1 : 0,
 			                             img.MapColor(red_color));
+			Resources::SoundObelisque()->Play();
 			victim = c;
 			SDL_Delay(1500);
 			victim = 0;

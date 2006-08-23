@@ -499,6 +499,7 @@ struct case_img_t case_img[] = {
 	{ 'q', Resources::CasePontDroite,      'p' },
 	{ 'r', Resources::CasePontHaut,        'p' },
 	{ 's', Resources::CasePontBas,         'p' },
+	{ 'M', Resources::CaseMontain,         'M' }
 };
 
 void TBarreCaseIcons::GoLast(TObject* o, void* e)
@@ -572,9 +573,10 @@ static struct
 	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
 	uint flags;
 } case_type[] = {
-	{ 'm', CreateCase<ECMer>,   C_MER              },
-	{ 't', CreateCase<ECTerre>, C_TERRE            },
-	{ 'p', CreateCase<ECPont>,  C_PONT             }
+	{ 'm', CreateCase<ECMer>,      C_MER              },
+	{ 't', CreateCase<ECTerre>,    C_TERRE            },
+	{ 'p', CreateCase<ECPont>,     C_PONT             },
+	{ 'M', CreateCase<ECMontain>,  C_MONTAIN          }
 };
 
 ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)

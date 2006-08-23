@@ -31,11 +31,11 @@
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"7"
+#define APP_PVERSION	"8"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"3.0"
+#define APP_VERSION_BETA	"3.1"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */

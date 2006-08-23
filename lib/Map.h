@@ -181,6 +181,7 @@ public:
 		/*16*/E_OBELISK,
 		/*17*/E_MCDO,
 		/*18*/E_TREES,
+		/*19*/E_MEGALOPOLE,
 		/*XX*/E_END
 	};
 
@@ -437,6 +438,7 @@ protected:
 #define C_TERRE          0x0001
 #define C_MER            0x0002
 #define C_PONT           0x0004
+#define C_MONTAIN        0x0008
 
 /** This is a Case's class...
  */
@@ -535,6 +537,25 @@ public:
 public:
 
 	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && e->IsNaval()); }
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
+/** This class is a derived class from ECBCase whose is a montain */
+class ECBMontain : public virtual ECBCase
+{
+/* Constructeur/Destructeur */
+public:
+	ECBMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECBMontain() {}
+
+/* Methodes */
+public:
 
 /* Attributs */
 public:

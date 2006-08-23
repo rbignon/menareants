@@ -92,6 +92,8 @@ public:
 	R_RESOURCE(Sound,        SoundStart);
 	R_RESOURCE(Sound,        SoundBegin);
 	R_RESOURCE(Sound,        SoundEnd);
+	R_RESOURCE(Sound,        SoundMitraillette);
+	R_RESOURCE(Sound,        SoundObelisque);
 
 	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);
@@ -166,6 +168,7 @@ public:
 	R_RESOURCE(ECSpriteBase, CaseCityNEDead);
 	R_RESOURCE(ECSpriteBase, CaseCitySODead);
 	R_RESOURCE(ECSpriteBase, CaseCitySEDead);
+	R_RESOURCE(ECSpriteBase, CaseMontain);
 	R_RESOURCE(ECSpriteBase, Brouillard);
 	R_RESOURCE(ECImage,      Army_Icon);
 	R_RESOURCE(ECSpriteBase, Army_Face);
@@ -233,6 +236,8 @@ public:
 	R_RESOURCE(ECSpriteBase, McDo_Caserne);
 	R_RESOURCE(ECImage,      Trees_Icon);
 	R_RESOURCE(ECSpriteBase, Trees_Face);
+	R_RESOURCE(ECImage,      Megalopole_Icon);
+	R_RESOURCE(ECSpriteBase, Megalopole_Face);
 };
 
 #undef R_RESOURCE

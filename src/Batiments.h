@@ -205,6 +205,40 @@ private:
 };
 
 /********************************************************************************************
+ *                                ECMegalopole                                              *
+ ********************************************************************************************/
+
+class ECMegalopole : public ECBatiment, public ECBMegalopole
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECMegalopole) {}
+
+	ENTITY_CONSTRUCTOR(ECMegalopole), ECBatiment(Resources::Megalopole_Face()) {}
+
+	virtual void Init()
+	{
+		ECEntity::Init();
+		Image()->SetAnim(true);
+	}
+
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Megalopole"; }
+	virtual const char* Infos() const { return "Rapporte cinq fois plus d'argent que le centre ville"; }
+	virtual const char* Description() const
+	{
+		return "La megalopole rapporte de l'argent chaques tours, CINQ fois plus que le centre ville, et 2,5 fois plus que "
+		       "le centre d'affaires. Celui qui prend votre megalopole devient possesseur de tous les quartiers de la ville";
+	}
+	virtual ECImage* Icon() const { return Resources::Megalopole_Icon(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
+};
+
+/********************************************************************************************
  *                                ECapitale                                                 *
  ********************************************************************************************/
 
@@ -228,7 +262,7 @@ public:
 		       "prend votre centre d'affaire devient possesseur de tous les quartiers de la ville";
 	}
 	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
 };
 
 /********************************************************************************************
@@ -255,7 +289,7 @@ public:
 		       "tous les quartiers de la ville.";
 	}
 	virtual ECImage* Icon() const { return Resources::City_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
 };
 
 /********************************************************************************************
@@ -287,7 +321,7 @@ public:
 		       "elle a une porté plutot faible. Comptez sur les lances-missiles pour la détruire.";
 	}
 	virtual ECImage* Icon() const { return Resources::DefenseTower_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
 
 /* Methodes */
 public:
@@ -331,7 +365,7 @@ public:
 		       "L'obélisque du NOD est un clin d'oeil à un jeu culte.";
 	}
 	virtual ECImage* Icon() const { return Resources::Obelisk_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
 
 /* Methodes */
 public:
@@ -375,7 +409,7 @@ public:
 		return "L'usine de chars peut construire les vehicules de base.";
 	}
 	virtual ECImage* Icon() const { return Resources::CharFact_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySEDead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySEDead(); }
 };
 
 /********************************************************************************************
@@ -401,7 +435,7 @@ public:
 		return "La caserne construit l'infanterie de base.";
 	}
 	virtual ECImage* Icon() const { return Resources::Caserne_Icon(); }
-	virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySODead(); }
+	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySODead(); }
 };
 
 /********************************************************************************************

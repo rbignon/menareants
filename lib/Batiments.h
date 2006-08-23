@@ -206,6 +206,44 @@ private:
 };
 
 /********************************************************************************************
+ *                               ECBMegalopole                                              *
+ ********************************************************************************************/
+/** This is a megalopole */
+class ECBMegalopole : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBMegalopole) {}
+
+	ENTITY_CONSTRUCTOR(ECBMegalopole) {}
+
+	virtual ~ECBMegalopole() {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_MEGALOPOLE; }
+	virtual uint Cost() const { return 50000; }
+	virtual uint InitNb() const { return 5000; }
+	virtual uint Visibility() const { return 5; }
+
+	bool CanCreate(const ECBEntity*) { return false; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "la megalopole"; }
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool IsCountryMaker() const { return true; }
+	virtual bool IsCity() const { return true; }
+	virtual int TurnMoney(ECBPlayer* pl) { return (pl == Owner() && Case()) ? (5 * Case()->Map()->CityMoney()) : 0; }
+};
+
+/********************************************************************************************
  *                               ECBCapitale                                                *
  ********************************************************************************************/
 /** This is a city */
@@ -227,6 +265,7 @@ public:
 	virtual uint Cost() const { return 15000; }
 	virtual uint InitNb() const { return 2000; }
 	virtual uint Visibility() const { return 4; }
+	virtual e_type MyUpgrade() const { return E_MEGALOPOLE; }
 
 	bool CanCreate(const ECBEntity*) { return false; }
 

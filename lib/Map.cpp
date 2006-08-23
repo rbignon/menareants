@@ -426,9 +426,10 @@ static struct
 	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
 	uint flags;
 } case_type[] = {
-	{ 'm', CreateCase<ECBMer>,   C_MER              },
-	{ 't', CreateCase<ECBTerre>, C_TERRE            },
-	{ 'p', CreateCase<ECBPont>,  C_PONT             }
+	{ 'm', CreateCase<ECBMer>,     C_MER              },
+	{ 't', CreateCase<ECBTerre>,   C_TERRE            },
+	{ 'p', CreateCase<ECBPont>,    C_PONT             },
+	{ 'M', CreateCase<ECBMontain>, C_MONTAIN          }
 };
 
 ECBCase* ECBMap::CreateCase(uint _x, uint _y, char type_id)

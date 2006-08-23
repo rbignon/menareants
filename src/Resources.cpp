@@ -56,6 +56,8 @@
 	R_RESOURCE(Sound,        SoundStart,       "start.wav");
 	R_RESOURCE(Sound,        SoundBegin,       "begin.wav");
 	R_RESOURCE(Sound,        SoundEnd,         "end.wav");
+	R_RESOURCE(Sound,        SoundMitraillette,"bruits/machinegun.wav");
+	R_RESOURCE(Sound,        SoundObelisque,   "bruits/laserfire.wav");
 
 /* IMAGES*/
 	R_RESOURCE(ECSpriteBase, Intro,            "intro");
@@ -127,10 +129,11 @@
 	R_RESOURCE(ECSpriteBase, CasePontGauche,   "cases/pontgauche");
 	R_RESOURCE(ECSpriteBase, CasePontDroite,   "cases/pontdroite");
 	R_RESOURCE(ECSpriteBase, CaseTerreDead,    "cases/terredead");
-	R_RESOURCE(ECSpriteBase, CaseCityNODead,    "cases/citynodead");
-	R_RESOURCE(ECSpriteBase, CaseCityNEDead,    "cases/citynedead");
-	R_RESOURCE(ECSpriteBase, CaseCitySODead,    "cases/citysodead");
-	R_RESOURCE(ECSpriteBase, CaseCitySEDead,    "cases/citysedead");
+	R_RESOURCE(ECSpriteBase, CaseCityNODead,   "cases/citynodead");
+	R_RESOURCE(ECSpriteBase, CaseCityNEDead,   "cases/citynedead");
+	R_RESOURCE(ECSpriteBase, CaseCitySODead,   "cases/citysodead");
+	R_RESOURCE(ECSpriteBase, CaseCitySEDead,   "cases/citysedead");
+	R_RESOURCE(ECSpriteBase, CaseMontain,      "cases/montagne");
 	R_RESOURCE(ECSpriteBase, Brouillard,       "brouillard");
 	R_RESOURCE(ECImage,      Army_Icon,        PKGDATADIR_PICS "units/army_icon.png");
 	R_RESOURCE(ECSpriteBase, Army_Face,        "units/army/face");
@@ -198,6 +201,8 @@
 	R_RESOURCE(ECSpriteBase, McDo_Caserne,      "units/mcdo/caserne");
 	R_RESOURCE(ECImage,      Trees_Icon,        PKGDATADIR_PICS "units/trees_icon.png");
 	R_RESOURCE(ECSpriteBase, Trees_Face,        "units/trees");
+	R_RESOURCE(ECImage,      Megalopole_Icon,   PKGDATADIR_PICS "units/megalopole_icon.png");
+	R_RESOURCE(ECSpriteBase, Megalopole_Face,   "units/megalopole");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects

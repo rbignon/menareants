@@ -330,6 +330,26 @@ protected:
 
 };
 
+/** This class is a derived class from ECBCase whose is a montain */
+class ECMontain : public ECBMontain, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+
+/* Methodes */
+public:
+
+	virtual const char* Name() const { return "Montagne"; }
+
+/* Attributs */
+public:
+
+/* Variables privées */
+protected:
+
+};
+
 /********************************************************************************************
  *                               ECMap                                                      *
  ********************************************************************************************/

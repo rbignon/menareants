@@ -199,6 +199,7 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 	max = 0;
 	city_money = 0;
 	filename = _filename;
+	mission = false;
 
 	date.SetDate(d);
 

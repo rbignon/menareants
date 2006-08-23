@@ -24,6 +24,7 @@
 #include "gui/ColorEdit.h"
 #include "Channels.h"
 #include "Sockets.h"
+#include "Sound.h"
 #include <SDL_gfxPrimitives.h>
 
 /********************************************************************************************
@@ -289,6 +290,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 				SetAttaqImg(images[I_Attaq], Image()->X(), Image()->Y());
 				AttaqImg()->SetRepeat(false);
 				AttaqImg()->SetAnim(true);
+				Resources::SoundMitraillette()->Play(true);
 				return false;
 			}
 			if(AttaqImg()->Anim())
@@ -298,6 +300,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 			}
 	
 			SetAttaqImg(0,0,0);
+			Resources::SoundMitraillette()->Stop();
 		}
 	}
 	if(event_type & ARM_MOVE)

@@ -34,6 +34,7 @@ typedef ECBCase        ECase;
 typedef ECBMer         ECMer;
 typedef ECBTerre       ECTerre;
 typedef ECBPont        ECPont;
+typedef ECBMontain     ECMontain;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;

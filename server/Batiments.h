@@ -122,6 +122,27 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECMegalopole                                               *
+ ********************************************************************************************/
+class ECMegalopole : public ECEntity, public ECBMegalopole
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECMegalopole) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+/********************************************************************************************
  *                               ECapitale                                                  *
  ********************************************************************************************/
 class ECapitale : public ECEntity, public ECBCapitale

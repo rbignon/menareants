@@ -1,5 +1,13 @@
 2006-08-23  Romain Bignon <progs@headfucking.net>
 
+	* src/data/anims/units/defensetower: Nouvelle image.
+
+	* Batiments.h (ECMegalopole): Nouveau batiment de la ville, upgrade du centre d'affaire, qui rapporte 5x.
+
+	* Map.h (ECMontain): Case "montagne".
+
+	* src/Resources.h, src/Batiments.cpp, src/Units.cpp: Sons pour les mitraillettes et pour le tir de l'obélisque.
+
 	* src/InGame.cpp: Correction d'un bug bizare, que quand SDL_Cursor() est appelé depuis le thread, il y a une sorte de
 	boucle infinie.
 

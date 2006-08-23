@@ -227,7 +227,7 @@ int Sound::Stop()
 	return IsMusic() ? Mix_HaltMusic() : Mix_HaltChannel(channel);
 }
 
-void Sound::Play()
+void Sound::Play(bool repeat)
 {
 	if(Playing() || !Sound::init) { return; }
 
@@ -242,7 +242,7 @@ void Sound::Play()
 			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
 			return;
 		}
-		channel = Mix_PlayMusic(music,0);
+		channel = Mix_PlayMusic(music, repeat ? -1 : 0);
 	}
 	else
 	{
@@ -255,7 +255,7 @@ void Sound::Play()
 			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
 			return;
 		}
-		channel = Mix_PlayChannel(-1, chunk, 0);
+		channel = Mix_PlayChannel(-1, chunk, repeat ? -1 : 0);
 	}
 
 	if (channel == -1)
