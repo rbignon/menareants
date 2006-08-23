@@ -114,7 +114,10 @@ void EC_Client::parse_message(std::string buf)
 	EC_ACommand *cmd = NULL;
 	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end() && !cmd; ++it)
 		if((*it)->CmdName == cmdname)
+		{
 			cmd = *it;
+			break;
+		}
 
 	if(!cmd || (parv.size()-1) < cmd->args)
 	{
@@ -166,10 +169,9 @@ int EC_Client::read_sock(void *data)
 
 	while(cl != NULL && !cl->WantDisconnect())
 	{
-		char buf[MAXBUFFER + 1];
+		char buf[MAXBUFFER + 1] = {0};
 		register char *ptr;
 		int r;
-		memset((void*)&buf,0,MAXBUFFER);
 
 		tmp_fdset = cl->global_fd_set;
 

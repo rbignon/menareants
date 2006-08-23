@@ -417,7 +417,12 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			me->UnlockScreen();
 		}
 		InGameForm->BarreAct->Update();
+#if 0 /** SURTOUT PAS APPELER.
+       * Ça appelera au final SDL_Cursor(), qui fait boucler infiniement le thread (ou quelque chose du genre), et plus
+       * aucun message ne pourra être reçu
+       */
 		InGameForm->SetCursor();
+#endif
 	}
 	return 0;
 }
