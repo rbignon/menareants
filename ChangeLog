@@ -1,3 +1,18 @@
+2006-08-24  Romain Bignon <progs@headfucking.net>
+
+	* server/IA.cpp: Système de gestion de strategies.
+
+	* server/IA.cpp (UseTransportBoat): Stratégie permettant à l'IA d'utiliser les bateaux de transport.
+
+	* server/InGame.cpp: Correction d'une boucle infinie.
+
+	* server/maps/: Modification des maps.
+
+	* src/Units.cpp: Ne fait plus bouger les unités lentement quand on ne les voit pas, les faire passer à la case suivante
+	directement. Ça evite d'attendre trois plombes quand on joue contre des IA.
+
+	* src/data/anims/normalbutton/: Nouvelles images du boutton.
+
 2006-08-23  Romain Bignon <progs@headfucking.net>
 
 	* src/data/anims/units/defensetower: Nouvelle image.

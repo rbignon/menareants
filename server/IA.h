@@ -23,6 +23,7 @@
 #define ECD_IA_H
 
 #include "Server.h"
+#include "Outils.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -44,6 +45,8 @@ public:
 /* Methodes */
 public:
 
+	virtual void RemoveEntity(ECBEntity* e);
+
 	/** Send an unformated message. */
 	int sendbuf(char* buf, int len) { return ia_recv(buf); }
 
@@ -58,7 +61,7 @@ public:
 	void FirstMovements();
 	void MakeAllies();
 	void CheckIfIReady();
-	void WantMoveTo(ECBEntity* enti, ECBCase* dest);
+	void WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases = 0);
 
 /* Attributs */
 public:
@@ -71,16 +74,61 @@ public:
 private:
 	static int SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	static int LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
+
+/* Classes privées */
+private:
+
+	class UseTransportBoat;
+	/** Virtual class, might be upgraded by any other classes */
+	class Strategy
+	{
+	public:
+
+		Strategy(TIA* i) : ia(i) { assert(ia); }
+		virtual ~Strategy()
+		{
+			std::vector<ECBEntity*> ents = entities.List();
+			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+				IA()->recruted[*it] = false;
+		}
+
+		/** Return false if we want to remove this strategy */
+		virtual bool Exec() = 0;
+
+		ECList<ECBEntity*>* Entities() { return &entities; }
+		TIA* IA() const { return ia; }
+
+		void AddEntity(ECBEntity* e)
+		{
+			entities.Add(e);
+			IA()->recruted[e] = true;
+		}
+		void RemoveEntity(ECBEntity* e)
+		{
+			entities.Remove(e);
+			IA()->recruted[e] = false;
+		}
+
+	private:
+		TIA* ia;
+		ECList<ECBEntity*> entities;
+	};
+
+/* Methodes privées */
+private:
+
+	void UseStrategy(Strategy* s, ECBEntity* e);
+	void AddStrategy(Strategy* s) { strategies.push_back(s); }
+	bool RemoveStrategy(Strategy*, bool use_delete = false);
+
+/* Variables privées */
+private:
 	bool lock;
 	std::vector<std::string> msgs;
 
 	std::map<int, uint> units;
 
-	/*struct
-	{
-		
-	} Action;*/
-	
+	std::vector<Strategy*> strategies;
 	std::map<ECBEntity*, bool> recruted;
 };
 

@@ -24,21 +24,218 @@
 #include "Main.h"
 #include "Channels.h"
 #include "Debug.h"
+#include "Units.h"
 
 /********************************************************************************************
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
  ********************************************************************************************/
+class TIA::UseTransportBoat : public TIA::Strategy
+{
+public:
+	UseTransportBoat(TIA* i) : Strategy(i) {}
+	virtual bool Exec()
+	{
+		ECBoat* boat = 0;
+		ECEntity* unit = 0;
+		std::vector<ECBEntity*> entities;
+
+		entities = Entities()->List();
+		for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+			if((*it)->IsInfantry())
+			{
+				unit = dynamic_cast<ECEntity*>(*it);
+				break;
+			}
+
+		if(!unit)
+			return false;
+
+		if((entities = Entities()->Find(ECEntity::E_BOAT)).empty())
+		{ /* On a pas de bateau encore d'assigné, on en cherche un */
+
+			entities = IA()->Player()->Entities()->Find(ECEntity::E_BOAT);
+			if(!entities.empty())
+			{ /* On prend dans nos bateaux le plus proche */
+				uint d = 0;
+				for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
+						if(!IA()->recruted[*e] && !dynamic_cast<ECBoat*>(*e)->Containing() &&
+						   (!boat || d > unit->Case()->Delta((*e)->Case())))
+							boat = dynamic_cast<ECBoat*>(*e),
+							d = boat->Case()->Delta((*e)->Case());
+
+				if(boat)
+					AddEntity(boat);
+				// Sinon, si jamais il n'y a que des bateaux recrutés ou qui contiennent déjà quelqu'un,
+				// on en construit un autre
+			}
+			if(!boat)
+			{ /* Le joueur n'a pas encore de bateau, on cherche un chantier naval pour en construire un */
+				entities = IA()->Player()->Entities()->Find(ECEntity::E_SHIPYARD);
+				ECBCase* cc = 0;
+				uint d = 0;
+				if(entities.empty())
+				{ /* Le joueur n'a pas de chantier naval, on en construit un */
+					BCountriesVector countries = IA()->Player()->MapPlayer()->Countries();
+					for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
+					{
+						std::vector<ECBCase*> cases = (*cty)->Cases();
+						for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
+							if((*c)->Flags() & C_MER && (!cc || d > unit->Case()->Delta(cc)))
+								cc = *c, d = unit->Case()->Delta(cc);
+					}
+					if(!cc)
+						return false; // Semblerait qu'il n'y ait pas de mer dans nos countries
+
+					/* On créé un ShipYard, et aussi un bateau sur la même case dans le cas où le shipyard a
+					 * bien été construit */
+					IA()->ia_send("ARM - =" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()) +
+					              " + %" + TypToStr(ECEntity::E_SHIPYARD));
+					IA()->ia_send("ARM - =" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()) +
+					              " + %" + TypToStr(ECEntity::E_BOAT));
+					return true; /* On attend le prochain tour pour faire quelque chose avec */
+				}
+				else
+				{ /* On construit un bateau à partir du chantier naval le plus proche */
+					ECBEntity* shipyard = 0;
+					uint d = 0;
+					for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
+						if(!shipyard || d > unit->Case()->Delta((*e)->Case()))
+							shipyard = *e, d = unit->Case()->Delta((*e)->Case());
+
+					if(!shipyard)
+						return false; // Problème
+
+					IA()->ia_send("ARM - =" + TypToStr(shipyard->Case()->X()) + "," + TypToStr(shipyard->Case()->Y()) +
+					              " + %" + TypToStr(ECEntity::E_BOAT));
+					return true; /* On attends le prochain tour pour s'en servir */
+				}
+			}
+		}
+		else boat = dynamic_cast<ECBoat*>(entities.front());
+
+
+		if(!boat)
+			return false; // problème
+
+		/* Si le bateau ne peut contenir l'unité, on triche discretement en ajoutant le nombre nécessaire
+		 * au bateau pour avoir la capacité de contenir cette armée
+		 */
+		if(!boat->CanContain(unit))
+			boat->SetNb(unit->Nb()/50 + 10);
+
+		if(!boat->CanContain(unit))
+		{
+			Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a été augmenté à %d mais ne peut toujours pas contenir"
+			                 " les %d hommes", boat->Nb(), unit->Nb());
+			return false;
+		}
+
+		if(!boat->Containing())
+		{ /* Le code quand le bateau et l'armée cherchent à se rapprocher */
+			if(unit->Case()->Delta(boat->Case()) == 1)
+				IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+			else
+			{
+				bool in_boat = false;
+				for(uint i = 0; i < boat->MyStep(); ++i)
+				{
+					IA()->WantMoveTo(boat, unit->Case(), 1);
+					if(unit->Case()->Delta(boat->Case()) == 1)
+					{
+						IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+						in_boat = true;
+						break;
+					}
+				}
+				if(!in_boat)
+				{
+					for(uint i = 0; i < unit->MyStep(); ++i)
+					{
+						IA()->WantMoveTo(unit, boat->Case());
+						if(unit->Case()->Delta(boat->Case()) == 1)
+						{
+							IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+							break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{ /* Le code du bateau qui se déplace vers la cible */
+			std::vector<ECBEntity*> all_entities = unit->Map()->Entities()->List();
+			ECBEntity* victim = 0;
+			uint d = 0;
+			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
+				if(!(*e)->IsHidden() && !unit->Like(*e) &&
+				   (unit->CanAttaq(*e) || unit->CanInvest(*e)) &&
+				   (!victim || d > boat->Case()->Delta((*e)->Case())))
+					victim = *e, d = boat->Case()->Delta((*e)->Case());
+
+			if(!victim) return true;
+
+			for(bool first = true; ; first = !first)
+			{
+				if(!first)
+				{
+					IA()->WantMoveTo(boat, victim->Case(), d < 8 ? boat->MyStep()-1 : 0);
+				}
+				if(boat->Case()->Delta(victim->Case()) < 6 && boat->RestStep() > 0)
+				{
+					unit->SetMyStep(unit->MyStep());
+					ECBCase* last_case = boat->Last() ? boat->Last()->Case() : 0;
+					if(boat->Case()->MoveLeft() != last_case && !boat->WantMove(ECMove::Left, MOVE_SIMULE) &&
+					   boat->Case()->X() > 0 && boat->Case()->MoveLeft()->Flags() & C_TERRE)
+						IA()->ia_send("ARM " + std::string(boat->ID()) +
+									" (" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()));
+					else if(boat->Case()->MoveRight() != last_case && !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
+					        boat->Case()->X() < boat->Map()->Width()-1 && boat->Case()->MoveRight()->Flags() & C_TERRE)
+						IA()->ia_send("ARM " + std::string(boat->ID()) +
+									" (" + TypToStr(boat->Case()->X()+1) + "," + TypToStr(boat->Case()->Y()));
+					else if(boat->Case()->MoveUp() != last_case && !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
+					        boat->Case()->Y() > 0 && boat->Case()->MoveUp()->Flags() & C_TERRE)
+						IA()->ia_send("ARM " + std::string(boat->ID()) +
+									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()-1));
+					else if(boat->Case()->MoveDown() != last_case && !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
+					        boat->Case()->Y() < boat->Map()->Height()-1 && boat->Case()->MoveDown()->Flags() & C_TERRE)
+						IA()->ia_send("ARM " + std::string(boat->ID()) +
+									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()+1));
+					else
+					{
+						IA()->WantMoveTo(boat, victim->Case(), 1);
+						if(!first)
+							return true;
+						else
+							continue;
+					}
+
+					/* On file une petite aide à l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
+					unit->SetNb(unit->Nb() + 1000);
+					return false;
+				}
+				if(!first)
+					break;
+			}
+		}
+
+		return true;
+	} /* Exec() */
+
+};
+
 #if 0
 #define IA_DEBUG(x) (*Player()->Channel()) << (*enti)->LongName() + " " + x
 #else
 #define IA_DEBUG(x)
 #endif
-void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
+void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
 {
 	std::string msg;
 	ECBCase* c = enti->Case();
 	ECBCase* original_case = enti->Case();
-	for(uint k = 0; k < enti->MyStep(); k++)
+	if(!nb_cases || nb_cases > enti->MyStep())
+		nb_cases = enti->RestStep();
+	for(uint k = 0; k < nb_cases && c != dest; k++)
 	{
 		int i = c->Y() != dest->Y() && c->X() != dest->X()
 							? rand()%2
@@ -68,7 +265,6 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
 			msg += " ^", c = c->MoveUp();
 		else
 		{
-			if(c == dest) break;
 			if(!enti->WantMove(ECMove::Right, MOVE_SIMULE) || !enti->WantMove(ECMove::Left, MOVE_SIMULE))
 			{
 				uint desesperate = 0;
@@ -93,11 +289,11 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
 					}
 				IA_DEBUG("^v : " + TypToStr(dh) + " and " + TypToStr(db) +
 							" (" + TypToStr(c->Y()) + " > " + TypToStr(dest->Y()) + ")");
-				desesperate = (db < 0 && dh < 0)
+				desesperate = (db < 0 && dh < 0 && !recruted[enti])
 								? 0
-								: (db < 0)
+								: (db < 0 && !recruted[enti])
 								? 2
-								: (dh < 0)
+								: (dh < 0 && !recruted[enti])
 									? 1
 									: (c->Y() > dest->Y())
 										? 1
@@ -113,8 +309,10 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
 				else if(desesperate == 2) msg += " ^", c = c->MoveUp();
 				else if(desesperate == 0)
 				{
-					if(enti->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveUp();
-					else msg += " <", c = c->MoveRight();
+					if(enti->IsInfantry())
+						UseStrategy(new UseTransportBoat(this), enti);
+					else if(enti->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveRight();
+					else msg += " <", c = c->MoveLeft();
 				}
 			}
 			else if(!enti->WantMove(ECMove::Up, MOVE_SIMULE) || !enti->WantMove(ECMove::Down, MOVE_SIMULE))
@@ -141,11 +339,11 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
 					}
 				IA_DEBUG("<> : " + TypToStr(dl) + " and " + TypToStr(dr) +
 							" (" + TypToStr(c->X()) + " > " + TypToStr(dest->X()) + ")");
-				desesperate = (dl < 0 && dr < 0)
+				desesperate = (dl < 0 && dr < 0 && !recruted[enti])
 								? 0
-								: (dl < 0)
+								: (dl < 0 && !recruted[enti])
 								? 2
-								: (dr < 0)
+								: (dr < 0 && !recruted[enti])
 									? 1
 									: (c->X() > dest->X())
 										? 1
@@ -161,8 +359,10 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest)
 				else if(desesperate == 2) msg += " >", c = c->MoveRight();
 				else if(desesperate == 0)
 				{
-					if(enti->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
-					else msg += " v", c = c->MoveRight();
+					if(enti->IsInfantry())
+						UseStrategy(new UseTransportBoat(this), enti);
+					else if(enti->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
+					else msg += " v", c = c->MoveDown();
 				}
 			}
 		}
@@ -183,6 +383,14 @@ void TIA::FirstMovements()
 
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		units[(*enti)->Type()]++;
+
+	for(std::vector<Strategy*>::iterator strat = strategies.begin(); strat != strategies.end(); ++strat)
+		if(!(*strat)->Exec())
+		{ /* Si il return false, c'est qu'il a envie de se faire supprimer */
+			std::vector<Strategy*>::iterator s = strat - 1;
+			RemoveStrategy(*strat, USE_DELETE);
+			strat = s;
+		}
 
 	BCountriesVector countries = Player()->MapPlayer()->Countries();
 	for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
@@ -404,6 +612,35 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 /********************************************************************************************
  *                                FONCTIONS DE LA CLASSE TIA                                *
  ********************************************************************************************/
+
+void TIA::RemoveEntity(ECBEntity* e)
+{
+	for (std::vector<Strategy*>::iterator it = strategies.begin(); it != strategies.end(); ++it)
+		(*it)->Entities()->Remove(e);
+}
+
+void TIA::UseStrategy(Strategy* s, ECBEntity* e)
+{
+	AddStrategy(s);
+	s->AddEntity(e);
+}
+
+bool TIA::RemoveStrategy(Strategy* _s, bool use_delete)
+{
+	for (std::vector<Strategy*>::iterator it = strategies.begin(); it != strategies.end(); )
+	{
+		if (*it == _s)
+		{
+			if(use_delete)
+				delete _s;
+			it = strategies.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
+}
 
 bool TIA::Join(EChannel* chan)
 {

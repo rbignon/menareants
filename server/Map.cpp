@@ -114,6 +114,17 @@ void ECMap::SortEvents()
 	std::sort(map_events.begin(), map_events.end(), SortEventsFunction());
 }
 
+void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
+{
+	if(!Channel()) return;
+
+	BPlayerVector players = Channel()->Players();
+	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
+		dynamic_cast<ECPlayer*>(*pl)->Client()->RemoveEntity(e);
+
+	ECBMap::RemoveAnEntity(e, use_delete);
+}
+
 /********************************************************************************************
  *                                 ECEvent                                                  *
  ********************************************************************************************/

@@ -645,6 +645,9 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 				case 'm':
 					color = blue_color;
 					break;
+				case 'M':
+					color = black_color;
+					break;
 			}
 
 			Color marge_color =  white_color;

@@ -189,6 +189,15 @@ public:
 		return 0;
 	}
 
+	std::vector<T> Find(int type)
+	{
+		std::vector<T> l;
+		for(iterator it = list.begin(); it != list.end();++it)
+			if((*it)->Type() == type)
+				l.push_back(*it);
+		return l;
+	}
+
 	uint Sames(T t)
 	{
 		uint i = 0;

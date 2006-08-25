@@ -275,7 +275,8 @@ void EChannel::NextAnim()
 			/* On remet le niveau de vie au plus haut */
 			upgrade->SetNb(upgrade->InitNb());
 
-			Map()->RemoveAnEntity(entity);
+			/* Elle se fera supprimer */
+			entity->SetShadowed();
 			Map()->AddAnEntity(upgrade);
 
 			SendArm(NULL, upgrade, ARM_CREATE|ARM_HIDE, upgrade->Case()->X(), upgrade->Case()->Y());
@@ -781,7 +782,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			for(uint turn = 0; !(entity->EventType() & ARM_ATTAQ); ++turn)
 			{
 				Debug(W_DEBUG, "Recherche à (%d,%d)", c->X(), c->Y());
-				ECEvent* attaq_event = 0/* = map->FindEvent(c, ARM_ATTAQ, entity)*/;
+				ECEvent* attaq_event = entity->Porty() ? 0 : map->FindEvent(c, ARM_ATTAQ, entity);
 				if(!attaq_event)
 				{
 					if(flags & ARM_FORCEATTAQ)
@@ -845,7 +846,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					}
 					if(!attaq_event)
 					{
-						if(next_entity)
+						if(next_entity && c != next_entity->Case())
 						{
 							Debug(W_DEBUG, "On change de case !");
 							c = next_entity->Case();

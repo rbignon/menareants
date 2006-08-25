@@ -182,19 +182,19 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	switch(m)
 	{
 		case ECMove::Right:
-			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
+			if(Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
 				ChangeCase(acase->MoveRight()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Left:
-			if(map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
+			if(Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
 				ChangeCase(acase->MoveLeft()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Down:
-			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
+			if(Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
 				ChangeCase(acase->MoveDown()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Up:
-			if(map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
+			if(Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
 				ChangeCase(acase->MoveUp()), move.RemoveFirst(), changed_case = true;
 			break;
 	}

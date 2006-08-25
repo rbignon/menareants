@@ -259,6 +259,8 @@ public:
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete = false);
 	ECEvent* FindEvent(ECase*, uint, ECEntity* = 0);
 
+	virtual void RemoveAnEntity(ECBEntity*, bool use_delete = false);
+
 /* Méthodes */
 public:
 

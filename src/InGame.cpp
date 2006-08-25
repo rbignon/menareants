@@ -320,7 +320,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char AFTER_EVENT = 3;
 		char event_moment;
 		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 &&
-		   !(flags & (ARM_DATA|ARM_NUMBER)) && flags != ARM_REMOVE)
+		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE)
 			InGameForm->Map->CenterTo(entities[0]);
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)

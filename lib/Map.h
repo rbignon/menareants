@@ -233,18 +233,7 @@ public:
 
 	virtual bool CanContain(const ECBEntity*) { return false; }
 
-	virtual bool CanInvest(const ECBEntity* e) const
-	{
-		switch(e->Type())
-		{
-			case E_CITY:
-			case E_CAPITALE:
-				if(!Like(e))
-					return true;
-			default:
-				return false;
-		}
-	}
+	virtual bool CanInvest(const ECBEntity* e) const { return (e->IsCountryMaker() && !Like(e)); }
 
 	/** Qualitatif */
 	virtual const char* Qual() const = 0;
@@ -768,7 +757,7 @@ public:
 	 */
 	ECBCase*& operator() (uint x, uint y);
 
-	void RemoveAnEntity(ECBEntity*, bool use_delete = false);
+	virtual void RemoveAnEntity(ECBEntity*, bool use_delete = false);
 	void AddAnEntity(ECBEntity*);
 
 	/** There are all neutrales units in text format. See ECBMapPlayer::Units()'s documentation */

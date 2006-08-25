@@ -219,6 +219,10 @@ bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 	else
 		return false;
 
+	Containing()->SetCase(Case());
+	if(!Containing()->WantMove(move, MOVE_SIMULE))
+		return false;
+
 	CreateLast();
 
 	ECBEntity* entity = Containing();
@@ -412,7 +416,7 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!restStep && !(flags & MOVE_SIMULE) || Deployed()) return false;
+	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() || !Case()) return false;
 
 	ECBCase *c = 0;
 

@@ -37,6 +37,7 @@
 
 class ECPlayer;
 class TIA;
+class ECBEntity;
 
 class TClient
 {
@@ -65,6 +66,8 @@ public:
 	int parsemsg(std::string buf);
 	
 	virtual void Free();
+
+	virtual void RemoveEntity(ECBEntity* e) {}
 
 /* Attributs */
 public:
