@@ -30,7 +30,7 @@
  *                                          STATIC                                               *
  *************************************************************************************************/
 bool Sound::init = false;
-int Sound::frequency = 44100; //MIX_DEFAULT_FREQUENCY;
+int Sound::frequency = 22050; //MIX_DEFAULT_FREQUENCY;
 int Sound::channels = 2; // stereo
 std::map<int, Sound*> Sound::chunks;
 std::vector<Sound*> Sound::musics;
@@ -62,9 +62,6 @@ void Sound::Init()
 		Mix_QuerySpec(&frequency, &audio_format, &channels);
 		Debug(W_DEBUG, "Opened audio at %d Hz %d bit %s, %d bytes audio buffer", frequency,
 		               (audio_format&0xFF), channels>1?"stereo":"mono", audio_buffer);
-		Debug(W_DEBUG, "ATTENTION! Si vous utilisez gdb vous risquez d'avoir une musique pas très audible. Il vous est "
-		               "conseillé dans ce cas là soit de ne pas lancer avec gdb soit de couper la musique, si vous "
-		               "remarquez un tel phenomène.");
 	}
 	Mix_ChannelFinished(Sound::EndChunk);
 	Mix_HookMusicFinished(Sound::EndMusic);
@@ -239,8 +236,7 @@ void Sound::Play(bool repeat)
 			music = Mix_LoadMUS(path.c_str());
 		if(!music)
 		{
-			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
-			return;
+			throw ECExcept("", "Sound::Play(" + path + ") :" + Mix_GetError());
 		}
 		channel = Mix_PlayMusic(music, repeat ? -1 : 0);
 	}

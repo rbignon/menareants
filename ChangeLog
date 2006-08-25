@@ -1,3 +1,11 @@
+2006-08-25  Romain Bignon <progs@headfucking.net>
+
+	* src/Sound.cpp: Correction (enfin!) du bug qui rendait un son bizarre sous windows. La fréquence était trop élevée.
+
+	* src/data/pics/fog*: Mise de transparence dans les bords du brouillard.
+
+	* src/data/anims/units/caserne/1.png: La couleur s'affiche sur le toit.
+
 2006-08-24  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp: Système de gestion de strategies.
