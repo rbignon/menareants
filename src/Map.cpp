@@ -444,7 +444,10 @@ void ECase::Draw()
 {
 	if(image)
 	{
-		image->draw();
+		if(Showed() == 0 && dynamic_cast<ECMap*>(Map())->ShowMap()->HaveBrouillard())
+			shadowed.Draw(image->X(), image->Y());
+		else
+			image->draw();
 		if(selected)
 			Resources::Cadre()->Draw(image->X(),image->Y());
 	}
@@ -454,8 +457,22 @@ void ECase::SetImage(ECSpriteBase* spr)
 {
 	if(image) delete image;
 	SetMustRedraw();
-	if(!spr) return;
+	if(!spr)
+	{
+		shadowed.SetImage(0);
+		return;
+	}
 	image = new ECSprite(spr, Video::GetInstance()->Window());
+
+	shadowed.NewSurface(CASE_WIDTH, CASE_HEIGHT, SDL_HWSURFACE, false);
+	shadowed.Blit(spr->First());
+	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
+	ECImage brouillard;
+	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
+	shadowed.Blit(brouillard);
+
 	if(dynamic_cast<ECMap*>(map)->ShowMap())
 		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH   * X()),
 		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * Y()));
@@ -508,7 +525,8 @@ void TBarreCaseIcons::GoLast(TObject* o, void* e)
 
 	assert(parent);
 
-	if(parent->first > 0) --parent->first;
+	if(parent->first > 1) parent->first -= 2;
+	else if(parent->first > 0) --parent->first;
 
 	parent->SetList();
 }
@@ -519,7 +537,8 @@ void TBarreCaseIcons::GoNext(TObject* o, void* e)
 
 	assert(parent);
 
-	if(parent->first < (ASIZE(case_img)-1)) ++parent->first;
+	if(parent->first < (ASIZE(case_img)-2)) parent->first += 2;
+	else if(parent->first < (ASIZE(case_img)-1)) ++parent->first;
 
 	parent->SetList();
 }
@@ -531,19 +550,34 @@ void TBarreCaseIcons::SetList()
 	Last = 0;
 	Init();
 
-	int _x = X();
+	int _x = X(), _y = 0;
 	uint _h = 0;
 	TBarreCase* parent = dynamic_cast<TBarreCase*>(Parent());
-	for(uint _i = first; _i < ASIZE(case_img); ++_i)
+	bool up = true;
+	for(uint _i = first; _i < ASIZE(case_img); ++_i, up = !up)
 	{
-		TImage* i = AddComponent(new TImage(_x, 0, case_img[_i].spr()->First(), false));
-		_x += i->Width() + 1;
+		ECImage* img = new ECImage;
+		img->NewSurface(CASE_WIDTH, CASE_HEIGHT, case_img[_i].spr()->First()->Img->flags, false);
+		img->Blit(case_img[_i].spr()->First());
+		img->Zoom(double(50) / double(img->GetWidth()), double(50) / double(img->GetHeight()), true);
+
+		TImage* i = AddComponent(new TImage(_x, _y, img));
+
 		if(i->Height() > _h) _h = i->Height();
 		i->SetOnClick(TBarreCaseIcons::SelectCase, &case_img[_i]);
-		if(_x + (2 * i->Width()) >= parent->Width()) break;
+
+		if(up)
+			_y += _h + 1;
+		else
+		{
+			_x += i->Width() + 1;
+			_y = 0;
+		}
+
+		if(_x + (3 * i->Width()) + 10 >= parent->Width()) break;
 	}
 	SetWidth(parent->Width()-X());
-	SetHeight(_h);
+	SetHeight(_h * 2 + 1);
 }
 
 void ECMap::SetCaseAttr(ECBCase* c, char id)

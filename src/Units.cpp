@@ -166,7 +166,14 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 {
 	ECMap* map = dynamic_cast<ECMap*>(Case()->Map());
 	if(move.Empty())
+	{
+		if(move_anim)
+			Image()->SetAnim(false);
 		return true;
+	}
+
+	if(move_anim)
+		Image()->SetAnim(true);
 
 	ECMove::E_Move m = move.First();
 	switch(m)

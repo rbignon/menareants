@@ -116,7 +116,7 @@ void ECMap::SortEvents()
 
 void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 {
-	if(!Channel()) return;
+	if(!Channel()) throw ECExcept(VPName(Channel()), "Pas de channel lié !?");
 
 	BPlayerVector players = Channel()->Players();
 	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
@@ -497,7 +497,8 @@ void ECEntity::Union(ECEntity* entity)
 	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
 	SetNb(Nb() + entity->Nb());
 	/* Enfin on défini le nombre de pas restants */
-	SetRestStep(RestStep() > entity->RestStep() ? RestStep() - entity->RestStep() : 0);
+	SetRestStep(RestStep() > (entity->MyStep() - entity->RestStep()) ? RestStep() - (entity->MyStep() - entity->RestStep())
+	                                                                 : 0);
 }
 
 bool ECEntity::Return(ECBCase* c)

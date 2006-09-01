@@ -51,7 +51,7 @@ public:
 
 	ECUnit() : visual_step(0) {}
 
-	ECUnit(uint vs) : visual_step(vs) {}
+	ECUnit(uint vs, bool m = false) : move_anim(m), visual_step(vs) {}
 
 	virtual ~ECUnit();
 
@@ -76,6 +76,7 @@ protected:
 
 /* Variables protégées */
 private:
+	bool move_anim;
 	uint visual_step;
 	ImgList images;
 };
@@ -181,7 +182,7 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(EChar) {}
 
-	ENTITY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP, true)
 	{
 		PutImage(I_Up, Resources::Char_Dos());
 		PutImage(I_Down, Resources::Char_Face());

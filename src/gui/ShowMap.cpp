@@ -37,11 +37,6 @@ void TMap::Init()
 	h = CASE_HEIGHT * map->Height();
 	w = CASE_WIDTH  * map->Width();
 
-	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
-	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
-
 	SetMustRedraw();
 }
 
@@ -320,13 +315,6 @@ void TMap::Draw(int _x, int _y)
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
 					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
-			if(HaveBrouillard() && c->Showed() == 0)
-			{
-				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),brouillard.GetWidth(),brouillard.GetHeight()};
-				Window()->Blit(brouillard, &r_back);
-				//SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
-				//SDL_FillRect( Window(), &r_back, SDL_MapRGBA( Window()->format,0, 0, 0, 255*5/10));
-			}
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
 

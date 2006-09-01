@@ -594,6 +594,8 @@ void ECBMap::Init()
 	{
 		ligne = (*it);
 		if(ligne[0] == '#' || ligne[0] == '\0') continue; /* Commentaire */
+		if(ligne[ligne.size()-1] == '\r')
+				ligne.resize(ligne.size()-1);
 		if(ligne == "EOM")
 		{
 			if(_y < y)
@@ -617,7 +619,7 @@ void ECBMap::Init()
 				BMapPlayersVector::iterator it = map_players.begin();
 				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
 				if(it != map_players.end())
-					throw ECExcept(VCName(ligne[0]), "L'identifiant est déjà utilisé");
+					throw ECExcept(VCName(ligne[0]), "L'identifiant du player est déjà utilisé");
 				ECBMapPlayer* mp = CreateMapPlayer(ligne[0], ++num_player);
 				map_players.push_back(mp);
 
@@ -652,7 +654,7 @@ void ECBMap::Init()
 				VirtualAddUnit(ligne);
 			}
 			else
-				throw ECExcept(VName(key) VName(name), "Fichier map incorrect");
+				throw ECExcept(VName(key) VName(name), "Fichier map incorrect, ligne inconnue. " + key);
 		}
 		else
 		{

@@ -193,7 +193,7 @@ bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 
 bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 {
-	if(!Containing() || !restStep)
+	if(!Containing() || !restStep || !Containing()->RestStep())
 		return false;
 
 	ECMove::E_Move move;

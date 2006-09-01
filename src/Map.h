@@ -264,6 +264,7 @@ public:
 /* Variables privées */
 protected:
 	ECSprite* image;
+	ECImage shadowed;
 	bool selected;
 	char img_id;
 	int showed;

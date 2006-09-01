@@ -71,16 +71,16 @@ public:
 			if(!boat)
 			{ /* Le joueur n'a pas encore de bateau, on cherche un chantier naval pour en construire un */
 				entities = IA()->Player()->Entities()->Find(ECEntity::E_SHIPYARD);
-				ECBCase* cc = 0;
 				uint d = 0;
 				if(entities.empty())
 				{ /* Le joueur n'a pas de chantier naval, on en construit un */
+					ECBCase* cc = 0;
 					BCountriesVector countries = IA()->Player()->MapPlayer()->Countries();
 					for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
 					{
 						std::vector<ECBCase*> cases = (*cty)->Cases();
 						for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
-							if((*c)->Flags() & C_MER && (!cc || d > unit->Case()->Delta(cc)))
+							if(((*c)->Flags() & C_MER) && (!cc || d > unit->Case()->Delta(cc)))
 								cc = *c, d = unit->Case()->Delta(cc);
 					}
 					if(!cc)
@@ -174,47 +174,44 @@ public:
 
 			if(!victim) return true;
 
-			for(bool first = true; ; first = !first)
+			for(uint i = 0; i < boat->MyStep(); ++i)
 			{
-				if(!first)
+				if(boat->Case()->Delta(victim->Case()) < 5 && boat->RestStep() > 0)
 				{
-					IA()->WantMoveTo(boat, victim->Case(), d < 8 ? boat->MyStep()-1 : 0);
-				}
-				if(boat->Case()->Delta(victim->Case()) < 6 && boat->RestStep() > 0)
-				{
-					unit->SetMyStep(unit->MyStep());
+					unit->SetRestStep(unit->MyStep());
 					ECBCase* last_case = boat->Last() ? boat->Last()->Case() : 0;
-					if(boat->Case()->MoveLeft() != last_case && !boat->WantMove(ECMove::Left, MOVE_SIMULE) &&
+					if(boat->Case()->MoveLeft() != last_case && boat->Case()->X()-1 >= victim->Case()->X() &&
+					   !boat->WantMove(ECMove::Left, MOVE_SIMULE) &&
 					   boat->Case()->X() > 0 && boat->Case()->MoveLeft()->Flags() & C_TERRE)
 						IA()->ia_send("ARM " + std::string(boat->ID()) +
 									" (" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()));
-					else if(boat->Case()->MoveRight() != last_case && !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
+					else if(boat->Case()->MoveRight() != last_case && boat->Case()->X()+1 <= victim->Case()->X() &&
+					        !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
 					        boat->Case()->X() < boat->Map()->Width()-1 && boat->Case()->MoveRight()->Flags() & C_TERRE)
 						IA()->ia_send("ARM " + std::string(boat->ID()) +
 									" (" + TypToStr(boat->Case()->X()+1) + "," + TypToStr(boat->Case()->Y()));
-					else if(boat->Case()->MoveUp() != last_case && !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
+					else if(boat->Case()->MoveUp() != last_case && boat->Case()->Y()-1 >= victim->Case()->Y() &&
+					       !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
 					        boat->Case()->Y() > 0 && boat->Case()->MoveUp()->Flags() & C_TERRE)
 						IA()->ia_send("ARM " + std::string(boat->ID()) +
 									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()-1));
-					else if(boat->Case()->MoveDown() != last_case && !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
+					else if(boat->Case()->MoveDown() != last_case && boat->Case()->Y()+1 <= victim->Case()->Y() &&
+					        !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
 					        boat->Case()->Y() < boat->Map()->Height()-1 && boat->Case()->MoveDown()->Flags() & C_TERRE)
 						IA()->ia_send("ARM " + std::string(boat->ID()) +
 									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()+1));
 					else
 					{
 						IA()->WantMoveTo(boat, victim->Case(), 1);
-						if(!first)
-							return true;
-						else
-							continue;
+						continue;
 					}
 
 					/* On file une petite aide à l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
-					unit->SetNb(unit->Nb() + 1000);
+					if(unit->Type() == ECEntity::E_ARMY && unit->Nb() <= 1000)
+						unit->SetNb(1000 + rand()%10 * 100);
 					return false;
 				}
-				if(!first)
-					break;
+				IA()->WantMoveTo(boat, victim->Case(), 1);
 			}
 		}
 
@@ -616,7 +613,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 void TIA::RemoveEntity(ECBEntity* e)
 {
 	for (std::vector<Strategy*>::iterator it = strategies.begin(); it != strategies.end(); ++it)
-		(*it)->Entities()->Remove(e);
+		(*it)->RemoveEntity(e);
 }
 
 void TIA::UseStrategy(Strategy* s, ECBEntity* e)

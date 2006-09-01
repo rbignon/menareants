@@ -1,3 +1,32 @@
+2006-09-01  Romain Bignon <progs@headfucking.net>
+
+	* lib/Debug.cpp: Correction d'un bug qui ne mettait pas les Vars en mémoire.
+
+2006-08-30  Romain Bignon <progs@headfucking.net>
+
+	* src/MapEditor.cpp, src/Map.cpp, src/gui/ShowMap.cpp: Utilisation d'une mise en cache de la version de la case "noircie"
+	(pour le brouillard), afin d'éviter que ça rame avec la transparence lors du défilement. D'autre part, réduction des
+	icones des cases dans l'éditeur de maps, ainsi que d'utilisation de deux lignes, afin que l'affichage soit plus clair.
+
+2006-08-30  Romain Bignon <progs@headfucking.net>
+
+	* src/MapEditor.cpp: Petites corrections pour que ça soit plus facile à utiliser...
+
+	* server/maps/europa_conquest: Nouvelle carte représentant l'Europe, de zorkis, corrigée par moi même !!
+	Première carte à six joueurs. Première carte à représenter un environnement réel.
+
+2006-08-26  Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp (ARMCommand): Correction d'un crash, si on voulait extraire une unité d'un non conteneur.
+
+	* server/Map.cpp (Union): Correction, met bien la bonne valeur au RestStep de l'unité receptrice.
+
+	* server/IA.cpp: Amélioration.
+
+	* server/InGame.cpp (NextAnim): Dans l'evenement ARM_MOVE|ARM_CONTENER|ARM_UNCONTENER, vérifier les investissions(!) sur
+	la case de l'evenement, et non sur la case de l'entité, car celle-ci pourrait bien avoir un autre mouvement après (lors
+	d'une attaque par exemple).
+
 2006-08-25  Romain Bignon <progs@headfucking.net>
 
 	* src/Sound.cpp: Correction (enfin!) du bug qui rendait un son bizarre sous windows. La fréquence était trop élevée.

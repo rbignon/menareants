@@ -484,7 +484,7 @@ void ECImage::Load(char *fichier, bool _alpha)
 {
 	SDL_Surface *tmp = 0;
 	if(!(tmp = IMG_Load(fichier)))
-		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image : " + std::string(fichier));
+		throw ECExcept(VSName(fichier), "Impossible d'ouvrir le fichier image");
 
 	alpha = _alpha;
 	Img = alpha ? SDL_DisplayFormatAlpha(tmp) : SDL_DisplayFormat(tmp);
@@ -554,6 +554,8 @@ void ECImage::Draw(int x, int y)
   SDL_Rect dest;
   dest.x = x;
   dest.y = y;
+  dest.w = GetWidth();
+  dest.h = GetHeight();
   Video::GetInstance()->Window()->Blit(this, &dest);
 }
 

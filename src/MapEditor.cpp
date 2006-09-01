@@ -652,7 +652,7 @@ void TBarreCaseIcons::Init()
 		Last->SetX(X() + form->Width()-X()-10);
 
 	if(!Next)
-		Next = AddComponent(new TButton (form->Width()-X()-10, 80,5,10));
+		Next = AddComponent(new TButton (form->Width()-X()-10, 40,5,10));
 	else
 		Next->SetX(X() + form->Width()-X()-10);
 	
@@ -758,7 +758,12 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 	}
 
 	for(std::vector<ECase*>::iterator it = bc->cases.begin(); it != bc->cases.end(); ++it)
+	{
+		if((*it)->Country())
+			(*it)->Country()->RemoveCase(*it);
 		(*it)->SetCountry(country);
+		country->AddCase(*it);
+	}
 
 	dynamic_cast<TMapEditor*>(bc->Parent())->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 }
@@ -781,7 +786,7 @@ void TBarreCase::Update(ECase* c)
 
 		Country->ClearItems();
 		BCountriesVector cts = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->Countries();
-		for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
+		for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
 		{
 			uint i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID());
 			if(*it == country) Country->ScrollTo(i);
@@ -942,7 +947,7 @@ void TBarreEntity::Init()
 	RemoveButton = AddComponent(new TButtonText(Width()-150,15,100,30, "Supprimer", Font::GetInstance(Font::Small)));
 	RemoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
-	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 15, 100, Height()-15));
+	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 15, 100, Height()-40));
 
 	Icon = AddComponent(new TImage(5,15));
 
@@ -1213,7 +1218,7 @@ void TOptionsMap::Refresh()
 {
 	Countries->ClearItems();
 	BCountriesVector cts = map->Countries();
-	for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
+	for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
 		Countries->AddItem(false, (*it)->ID(), (*it)->ID(), (*it)->Cases().empty() ? green_color : black_color);
 
 	Players->ClearItems();

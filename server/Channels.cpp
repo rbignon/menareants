@@ -318,11 +318,16 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %ca: pas de nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
 				if(!pl) { Debug(W_DESYNCH, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
-				if(add)
-					sender->AddAllie(pl);
-				else if(!sender->RemoveAllie(pl))
-					Debug(W_DESYNCH, "SET -a %s: il n'est pas allié avec lui", pl->GetNick());
 				changed = YES_WITHPARAM;
+				if(add)
+				{
+					if(sender->IsAllie(pl))
+						changed = 0;
+					else
+						sender->AddAllie(pl);
+				}
+				else if(!sender->RemoveAllie(pl))
+					changed = 0; // En cas de lag, si on reçoit deux fois de suite un -a, ça peut etre long..
 				break;
 			}
 			case 'n':

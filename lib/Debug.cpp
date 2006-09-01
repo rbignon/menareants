@@ -21,7 +21,7 @@
 
 #include "Debug.h"
 
-TECExcept::TECExcept(const char* func, const char* file, int line, std::string vars, std::string buf)
+TECExcept::TECExcept(const char* func, const char* file, int line, std::string _vars, std::string buf)
 {
   std::string s;
   s = file;
@@ -31,7 +31,7 @@ TECExcept::TECExcept(const char* func, const char* file, int line, std::string v
   s += TypToStr(line);
   s += "; " + buf;
   message = s;
-  vars = vars;
+  vars = _vars;
 }
 
 TECExcept::TECExcept(std::string buf)

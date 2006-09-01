@@ -110,7 +110,6 @@ private:
 	bool schema;
 	int x_min, y_min;
 	ECEntity* create_entity;
-	ECImage brouillard;
 	bool have_brouillard;
 	bool must_redraw;
 	SDL_mutex* mutex;

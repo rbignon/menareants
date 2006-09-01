@@ -607,19 +607,23 @@ void MenAreAntsApp::InGame()
 				}
 				timer->reset();
 			}
-			if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
+			if(chan->State() == EChannel::PLAYING)
 			{
 				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
-				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
+				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
 				{
 					client->sendrpl(client->rpl(EC_Client::SET), "+!");
 					elapsed_time->reset();
 				}
 			}
-			if(chan->State() == EChannel::ANIMING && InGameForm->BarreAct->Select())
+			else if(chan->State() == EChannel::ANIMING)
 			{
-				InGameForm->BarreAct->UnSelect();
-				want = W_NONE;
+				elapsed_time->reset();
+				if(InGameForm->BarreAct->Select())
+				{
+					InGameForm->BarreAct->UnSelect();
+					want = W_NONE;
+				}
 			}
 			while( SDL_PollEvent( &event) )
 			{

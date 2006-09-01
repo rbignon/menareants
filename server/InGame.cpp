@@ -254,7 +254,7 @@ void EChannel::NextAnim()
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				(*it)->Case()->CheckInvests(*it);
+				(event->Case() ? event->Case() : (*it)->Case())->CheckInvests(*it);
 			break;
 		}
 		case ARM_UPGRADE:
@@ -432,6 +432,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				uint _x = StrToTyp<uint>(stringtok(s, ","));
 				uint _y = StrToTyp<uint>(s);
 				EContainer* container = entity ? dynamic_cast<EContainer*>(entity) : 0;
+				if(!container)
+					break;
 				ECEntity* contened = dynamic_cast<ECEntity*>(container->Containing());
 				if(container && container->Containing() && container->WantUnContain(_x,_y, moves))
 				{

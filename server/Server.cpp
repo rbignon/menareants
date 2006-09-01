@@ -181,7 +181,7 @@ int TClient::parsemsg(std::string buf)
 	catch(TECExcept &e)
 	{
 		vDebug(W_ERR, e.Message(), e.Vars());
-		exit(app.rpl(ECServer::ERR));
+		sendrpl(app.rpl(ECServer::ERR));
 	}
 
 	return 0;
