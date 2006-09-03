@@ -26,6 +26,8 @@
 
 	* src/JoinGame.cpp (LEACommand): Correction du bug qui desactivait le bouton "Pret" si un joueur partait.
 
+	* lib/Map.cpp: Il est maintenant permis de mettre des terrains ensembles du moment qu'ils ne sont pas du même type.
+
 2006-09-02  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp, server/Map.cpp: Création de classes ECase et dérivées coté serveur (plutot que typdef), et mise de la
@@ -106,7 +108,7 @@
 
 	* server/IA.cpp: Restructuration un peu de FirstMovements() avec gestion de strategies que veut faire l'IA.
 
-	* Makefile.am: Mettre à jour avec "svn update" dorénavant, pour ne pas avoir à faire ./config.status --recheck.
+	* Makefile.am: Mettre à jour avec "make update" dorénavant, pour ne pas avoir à faire ./config.status --recheck.
 
 	* Batiments.h (ECTrees): Arbres qui permettent de se cacher derrière.
 

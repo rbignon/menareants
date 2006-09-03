@@ -126,6 +126,7 @@ public:
 	virtual uint Cost() const { return 15000; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 1; } /**< Elle ne voit en effet pas bien loins... */
+	virtual bool IsTerrain() const { return true; } /**< C'est pour qu'on puisse en construire sur les rails ou arbres */
 
 	enum data_t {
 		DATA_RESTBUILD
