@@ -238,6 +238,15 @@ public:
 	R_RESOURCE(ECSpriteBase, Trees_Face);
 	R_RESOURCE(ECImage,      Megalopole_Icon);
 	R_RESOURCE(ECSpriteBase, Megalopole_Face);
+	R_RESOURCE(ECImage,      Rail_Icon);
+	R_RESOURCE(ECSpriteBase, Rail_Horiz);
+	R_RESOURCE(ECSpriteBase, Rail_Verti);
+	R_RESOURCE(ECSpriteBase, Rail_Aiguillage);
+	R_RESOURCE(ECImage,      Train_Icon);
+	R_RESOURCE(ECSpriteBase, Train_Face);
+	R_RESOURCE(ECSpriteBase, Train_Left);
+	R_RESOURCE(ECSpriteBase, Train_Right);
+	R_RESOURCE(ECSpriteBase, Train_Dos);
 };
 
 #undef R_RESOURCE

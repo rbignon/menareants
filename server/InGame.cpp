@@ -197,7 +197,7 @@ void EChannel::NextAnim()
 						EContainer* contain = dynamic_cast<EContainer*>(*it);
 						if(contain && contain->Containing())
 							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
-						(*it)->Case()->CheckInvests(*it);
+						dynamic_cast<ECase*>((*it)->Case())->CheckInvests(*it);
 						(*it)->SetShadowed(false);
 					}
 				}
@@ -254,7 +254,7 @@ void EChannel::NextAnim()
 
 			std::vector<ECEntity*> entv = event->Entities()->List();
 			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				(event->Case() ? event->Case() : (*it)->Case())->CheckInvests(*it);
+				dynamic_cast<ECase*>(event->Case() ? event->Case() : (*it)->Case())->CheckInvests(*it);
 			break;
 		}
 		case ARM_UPGRADE:
@@ -288,7 +288,7 @@ void EChannel::NextAnim()
 }
 
 template<typename T>
-static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
+static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 {
 	T* entity = new T(_name, _owner, _case);
 	entity->SetNb(entity->InitNb());
@@ -298,12 +298,12 @@ static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECase* _
 
 static struct
 {
-	ECEntity* (*func) (const Entity_ID _name, ECBPlayer* _owner, ECase* _case);
+	ECEntity* (*func) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
 
-ECEntity* CreateAnEntity(uint type, const Entity_ID _name, ECBPlayer* _owner, ECase* _case)
+ECEntity* CreateAnEntity(uint type, const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 {
 	return entities_type[type].func (_name, _owner, _case);
 }
@@ -337,7 +337,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	uint y = 0, x = 0, type = 0, nb = 0;
 	ECMove::Vector moves;
-	ECase* last_case = (entity ? entity->Case() : 0);
+	ECBCase* last_case = (entity ? entity->Case() : 0);
 	for(uint i = 2; i<parv.size(); i++)
 	{
 		switch(parv[i][0])

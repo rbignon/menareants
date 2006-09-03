@@ -38,6 +38,40 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                                        ECBRail                                           *
+ ********************************************************************************************/
+/** This is a rail for trains. */
+class ECBRail : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBRail) {}
+
+	ENTITY_CONSTRUCTOR(ECBRail) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_RAIL; }
+	virtual uint Cost() const { return 2000; }
+	virtual uint InitNb() const { return 1;}
+	virtual uint Visibility() const { return 0; } /**< Il ne voit rien du tout */
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual const char* Qual() const { return "le rail"; }
+
+	/** Rail is a building to prevent from constructing buildings here, and to be drawed at background. */
+	virtual bool IsBuilding() const { return true; }
+	virtual bool IsTerrain() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+};
+
+/********************************************************************************************
  *                                        ECBTrees                                          *
  ********************************************************************************************/
 /** This is Forest */
@@ -62,9 +96,9 @@ public:
 
 	virtual const char* Qual() const { return "la forêt"; }
 
-	/** Mine is a building to prevent from constructing buildings here, and to be drawed at background. */
+	/** Trees is a building to prevent from constructing buildings here, and to be drawed at background. */
 	virtual bool IsBuilding() const { return true; }
-	virtual bool IsCity() const { return true; }
+	virtual bool IsTerrain() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
@@ -241,7 +275,17 @@ public:
 	virtual uint InitNb() const { return 5000; }
 	virtual uint Visibility() const { return 5; }
 
-	bool CanCreate(const ECBEntity*) { return false; }
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_ARMY:
+			case ECBEntity::E_CHAR:
+				return true;
+			default:
+				return false;
+		}
+	}
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
@@ -280,7 +324,7 @@ public:
 	virtual uint Visibility() const { return 4; }
 	virtual e_type MyUpgrade() const { return E_MEGALOPOLE; }
 
-	bool CanCreate(const ECBEntity*) { return false; }
+	virtual bool CanCreate(const ECBEntity* e) { return (e->Type() == ECBEntity::E_ARMY); }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
@@ -350,7 +394,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_DEFENSETOWER; }
-	virtual uint Cost() const { return 0; }
+	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1000; }
 	virtual uint Visibility() const { return 4; }
 	virtual uint Porty() const { return 3; }
@@ -369,7 +413,7 @@ public:
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
-	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return true; }
 	virtual bool IsCity() const { return true; }
 };
 
@@ -451,6 +495,7 @@ public:
 		{
 			case ECBEntity::E_CHAR:
 			case ECBEntity::E_MISSILAUNCHER:
+			case ECBEntity::E_TRAIN:
 				return true;
 			default:
 				return false;

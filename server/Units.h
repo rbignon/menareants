@@ -30,24 +30,12 @@
  ********************************************************************************************/
 class ECUnit : public ECEntity
 {
-/* Constructeur/Destructeur */
-public:
-
-	ECUnit() : case_flags(0) {}
-
-	ECUnit(unsigned f) : case_flags(f) {}
-
 /* Methodes */
 public:
 
 	virtual bool WantMove(ECBMove::E_Move, int flags = 0);
 
 	virtual bool WantAttaq(uint x, uint y, bool force = false);
-
-/* Variables protégées */
-private:
-	unsigned case_flags;
-	
 };
 
 /********************************************************************************************
@@ -57,10 +45,6 @@ class EContainer : public virtual ECBContainer, public ECUnit
 {
 /* Constructeur/Destructeur */
 public:
-
-	EContainer() {}
-
-	EContainer(unsigned f) : ECUnit(f) {}
 
 	virtual ~EContainer() {}
 
@@ -81,6 +65,19 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECTrain                                                    *
+ ********************************************************************************************/
+class ECTrain : public EContainer, public ECBTrain
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECTrain) {}
+
+	ENTITY_CREATE_LAST(ECTrain);
+};
+
+/********************************************************************************************
  *                               ECBoat                                                     *
  ********************************************************************************************/
 class ECBoat : public EContainer, public ECBBoat
@@ -88,7 +85,7 @@ class ECBoat : public EContainer, public ECBBoat
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECBoat), EContainer(C_MER) {}
+	ENTITY_CONSTRUCTOR(ECBoat) {}
 
 	ENTITY_CREATE_LAST(ECBoat);
 };
@@ -101,7 +98,7 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECMissiLauncher), ECUnit(C_PONT|C_TERRE) {}
+	ENTITY_CONSTRUCTOR(ECMissiLauncher) {}
 
 	ENTITY_CREATE_LAST(ECMissiLauncher);
 
@@ -123,7 +120,7 @@ class EChar : public ECUnit, public ECBChar
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(EChar), ECUnit(C_TERRE) {}
+	ENTITY_CONSTRUCTOR(EChar) {}
 
 	ENTITY_CREATE_LAST(EChar);
 };
@@ -136,7 +133,7 @@ class ECMcDo : public ECUnit, public ECBMcDo
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(C_TERRE|C_PONT), caserne(0), ex_owner(0) {}
+	ENTITY_CONSTRUCTOR(ECMcDo), caserne(0), ex_owner(0) {}
 
 	ENTITY_CREATE_LAST(ECMcDo);
 
@@ -164,7 +161,7 @@ class ECTourist : public ECUnit, public ECBTourist
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECTourist) {}
 
 	ENTITY_CREATE_LAST(ECTourist);
 
@@ -182,7 +179,7 @@ class ECEnginer : public ECUnit, public ECBEnginer
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECEnginer), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECEnginer) {}
 
 	ENTITY_CREATE_LAST(ECEnginer);
 
@@ -203,7 +200,7 @@ class ECArmy : public ECUnit, public ECBArmy
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_CONSTRUCTOR(ECArmy), ECUnit(C_TERRE|C_PONT) {}
+	ENTITY_CONSTRUCTOR(ECArmy) {}
 
 	ENTITY_CREATE_LAST(ECArmy);
 };

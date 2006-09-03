@@ -94,7 +94,7 @@ EventVector::iterator ECMap::RemoveEvent(ECEvent* p, bool use_delete)
 	return EventVector::iterator(0);
 }
 
-ECEvent* ECMap::FindEvent(ECase* c, uint f, ECEntity* e)
+ECEvent* ECMap::FindEvent(ECBCase* c, uint f, ECEntity* e)
 {
 	for(EventVector::iterator it = map_events.begin(); it != map_events.end(); ++it)
 		if((!c || (*it)->Case() == c) && (!f || (*it)->Flags() == f) && (!e || (*it)->Entities()->Find(e)))
@@ -123,6 +123,60 @@ void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 		dynamic_cast<ECPlayer*>(*pl)->Client()->RemoveEntity(e);
 
 	ECBMap::RemoveAnEntity(e, use_delete);
+}
+
+template<typename T>
+static ECBCase* CreateCase(ECBMap *map, uint x, uint y, uint flags, char type_id)
+{
+	return new T(map, x, y, flags, type_id);
+}
+
+static struct
+{
+	char c;
+	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
+	uint flags;
+} case_type[] = {
+	{ 'm', CreateCase<ECMer>,      C_MER              },
+	{ 't', CreateCase<ECTerre>,    C_TERRE            },
+	{ 'p', CreateCase<ECPont>,     C_PONT             },
+	{ 'M', CreateCase<ECMontain>,  C_MONTAIN          }
+};
+
+ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
+{
+	for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
+		if(case_type[j].c == type_id)
+			return case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
+
+	return 0;
+}
+
+/********************************************************************************************
+ *                                 ECase                                                    *
+ ********************************************************************************************/
+void ECase::CheckInvests(ECBEntity* e)
+{
+	if(!e->Owner()) return;
+	std::vector<ECBEntity*> ents = entities.List();
+	for(std::vector<ECBEntity*>::const_iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	{
+		if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
+			continue;
+		if(e->CanInvest(*enti))
+		{
+			e->Invest(*enti);
+			break;
+		}
+		else if((*enti)->CanInvest(e))
+		{ /* On sait jamais, si par exemple une unité peut en investir une autre, mais que c'est cette autre qui se deplace
+		   * vers la mienne, ou si les deux se déplacent dans le même tour sur la meme case, ça serait con que juste
+		   * parce que l'unité investisseuse s'est déplacée *avant* l'unité à investir, il n'y ait pas d'investiture
+		   */
+			(*enti)->Invest(e);
+			break;
+		}
+	}
 }
 
 /********************************************************************************************

@@ -445,7 +445,7 @@ void ECase::Draw()
 	if(image)
 	{
 		if(Showed() == 0 && dynamic_cast<ECMap*>(Map())->ShowMap()->HaveBrouillard())
-			shadowed.Draw(image->X(), image->Y());
+			image->First()->Shadow()->Draw(image->X(), image->Y());
 		else
 			image->draw();
 		if(selected)
@@ -458,20 +458,9 @@ void ECase::SetImage(ECSpriteBase* spr)
 	if(image) delete image;
 	SetMustRedraw();
 	if(!spr)
-	{
-		shadowed.SetImage(0);
 		return;
-	}
-	image = new ECSprite(spr, Video::GetInstance()->Window());
 
-	shadowed.NewSurface(CASE_WIDTH, CASE_HEIGHT, SDL_HWSURFACE, false);
-	shadowed.Blit(spr->First());
-	SDL_Rect r_back = {0,0,CASE_WIDTH, CASE_HEIGHT};
-	ECImage brouillard;
-	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
-	shadowed.Blit(brouillard);
+	image = new ECSprite(spr, Video::GetInstance()->Window());
 
 	if(dynamic_cast<ECMap*>(map)->ShowMap())
 		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH   * X()),

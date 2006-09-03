@@ -1,3 +1,42 @@
+2006-09-03  Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp (GetWant): Correction du curseur par rapport au lance missile, curseur "investir" quand on veut entrer
+	dans un conteneur.
+	(InGame): Lorsqu'on souhaite rentrer dans un conteneur mais qu'on n'est pas sur une case adjacente, avancer d'abord
+	suffisament puis ensuite entrer.
+
+	* lib/Map.h, server/Units.h, server/Units.cpp, src/InGame.cpp: Utilisation d'un fonction CanWalkOn() plutot que d'une
+	variable coté serveur. Ça permet de généraliser l'endroit où l'unité peut marcher d'une part (utilité pour le train),
+	et d'autre part que le client soit au courant.
+
+	* src/JoinGame.cpp: Le nom du salon est mis par défaut (temporairement, voir), sur "nick's game".
+
+	* lib/Batiments.h (ECBCapitale): Peut créer des armées.
+
+	* lib/Batiments.h (ECBMegalopole): Peut créer des armées et des chars.
+
+	* Batiments.h (ECRail): Rail où peut transiter un train.
+
+	* Units.h (ECTrain): Train pouvant transporter de l'infanterie et des vehicules légers.
+
+	* Units.h (ECBoat): Le bateau commence à partir de 5 et il a une capacité de 100 fois plus de son nombre, ce qui simplifie
+	fortement le calcul.
+
+	* src/Units.h (ECTrain&ECBoat): Affichage de la capacité dans la barre de status.
+
+	* src/JoinGame.cpp (LEACommand): Correction du bug qui desactivait le bouton "Pret" si un joueur partait.
+
+2006-09-02  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp, server/Map.cpp: Création de classes ECase et dérivées coté serveur (plutot que typdef), et mise de la
+	fonction CheckInvests de ce côté.
+
+	* server/IA.cpp (TIA::WantMoveTo): Au lieu d'avancer droitement sans reflechir quand l'unité est recruté, paramètre
+	de la fonction qui définit si oui ou non on fait ça.
+
+	* lib/Batiments.h (ECDefenseTower): On peut maintenant acheter et poser n'importe où sur un de ses territoires une tour
+	défense pour 10 000 $.
+
 2006-09-01  Romain Bignon <progs@headfucking.net>
 
 	* lib/Debug.cpp: Correction d'un bug qui ne mettait pas les Vars en mémoire.

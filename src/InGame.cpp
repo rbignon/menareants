@@ -285,6 +285,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
+		if(flags == ARM_CREATE)
+			(*it)->Created();
 		if(flags & ARM_NUMBER)
 		{
 			if(nb != (*it)->Nb())
@@ -319,10 +321,10 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
-		if(InGameForm && dynamic_cast<ECase*>(entities[0]->Case())->Showed() > 0 &&
-		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE)
-			InGameForm->Map->CenterTo(entities[0]);
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
+		if(InGameForm && (entities.size() > 1 ? event_case : entities.front()->Case())->Showed() > 0 &&
+		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE)
+			InGameForm->Map->CenterTo((entities.size() > 1 ? event_case : entities.front()->Case()));
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -482,7 +484,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 
 	if(entity && !IsPressed(SDLK_LALT) && entity->Owner() && entity->Owner()->IsMe())
 	{
-		if(!(entity->EventType() & ARM_ATTAQ) && acase->Delta(e_case) <= entity->Porty())
+		if(entity->WantAttaq(0,0) && !(entity->EventType() & ARM_ATTAQ) && acase->Delta(e_case) <= entity->Porty())
 		{
 			if(IsPressed(SDLK_LCTRL))
 			{
@@ -504,23 +506,32 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 		if(entity->Move()->Size() < entity->MyStep() &&
 		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
 		   entity->MyStep() - entity->Move()->Size() >= acase->Delta(e_case) &&
-		   !entity->Deployed() && !(entity->EventType() & ARM_DEPLOY) &&
+		   (!entity->Deployed() ^ !!(entity->EventType() & ARM_DEPLOY)) &&
 		   acase != entity->Case() && acase != entity->Move()->Dest())
 		{
 			int can_invest = 0;
+
 			FOR(ECBEntity*, ents, enti)
 			{
-				if(entity->CanInvest(enti) && !entity->Like(enti)) can_invest = 1;
+				EContainer* container = 0;
+				if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(entity) && entity->Owner() &&
+				    entity->Owner()->IsMe() ||
+				   entity->CanInvest(enti) && !entity->Like(enti))
+					can_invest = 1;
 				if(!enti->Like(entity) && enti->CanAttaq(entity))
 				{
-					can_invest = -1; /** \todo chercher l'interet de ce truc là */
+					/* chercher l'interet de ce truc là.
+					 * -> Je suppose que c'est pour dire que dans le cas où y a une unité enemie, on ne parle pas
+					 *    d'entrer dans le batiment mais de se battre, donc on montre pas encore la fleche quoi
+					 */
+					can_invest = -1;
 					break;
 				}
 			}
 	
 			if(can_invest > 0)
 				return W_INVEST;
-			else
+			else if(entity->CanWalkOn(acase))
 				return W_MOVE;
 		}
 	}
@@ -828,46 +839,29 @@ void MenAreAntsApp::InGame()
 							{
 								if(mywant == W_MOVE || mywant == W_INVEST)
 								{
-									if(!InGameForm->IsPressed(SDLK_LALT))
-									{
-										EContainer* contener = 0;
-										std::vector<ECBEntity*> ents = acase->Entities()->List();
-										for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-											if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)))
-												break;
-										if(contener)
-										{
-											if(!contener->CanContain(selected_entity))
-											{
-												InGameForm->AddInfo(I_SHIT,
-												         "Impossible d'entrer l'unité sélectionnée dans le "
-												         "conteneur. Soit elle est pas adaptée au "
-												         "conteneur, soit il y a trop d'hommes dedans.\n"
-												         "Maintenez ALT pour forcer le déplacement sur "
-												         "la case.");
-												break;
-											}
-											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
-											                " )" + std::string(contener->ID())).c_str());
-											InGameForm->SetCursor();
-											break;
-										}
-									}
 									ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 																						: selected_entity->Case();
+									EContainer* contener = 0;
+									if(!InGameForm->IsPressed(SDLK_LALT))
+									{
+										std::vector<ECBEntity*> ents = acase->Entities()->List();
+										for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+											if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
+											   contener->CanContain(selected_entity))
+												break;
+									}
 									if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
 									{
 										std::string move;
+										uint d = acase->Delta(init_case);
 										if(acase->X() != init_case->X())
-											for(uint i=init_case->X();
-												i != acase->X(); acase->X() < init_case->X() ? --i : ++i)
+											for(uint i=0; i != (contener ? d-1 : d); ++i)
 												if(acase->X() < init_case->X())
 													move += " <";
 												else
 													move += " >";
 										if(acase->Y() != init_case->Y())
-											for(uint i=init_case->Y();
-												i != acase->Y(); acase->Y() < init_case->Y() ? --i : ++i)
+											for(uint i=0; i != (contener ? d-1 : d); ++i)
 												if(acase->Y() < init_case->Y())
 													move += " ^";
 												else
@@ -882,6 +876,13 @@ void MenAreAntsApp::InGame()
 											else
 												client->sendrpl(client->rpl(EC_Client::ARM),
 											               std::string(std::string(selected_entity->ID()) + move).c_str());
+										}
+										if(contener)
+										{
+											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
+											                " )" + std::string(contener->ID())).c_str());
+											InGameForm->SetCursor();
+											break;
 										}
 									}
 								}

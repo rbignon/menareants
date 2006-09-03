@@ -475,7 +475,7 @@ ECImage* ECSpriteBase::First() const
  ****************************************************************************************/
 
 ECImage::ECImage(char* fichier, bool _alpha)
-	: pause(0), autofree(true), alpha(_alpha), x(0), y(0)
+	: shadowed(0), pause(0), autofree(true), alpha(_alpha), x(0), y(0)
 {
 	Load(fichier, _alpha);
 }
@@ -507,6 +507,7 @@ void ECImage::Free()
 ECImage::~ECImage()
 {
 	Free();
+	delete shadowed;
 }
 
 ECImage &ECImage::operator=(const ECImage & src){
@@ -685,4 +686,22 @@ void ECImage::Zoom(double zoomx, double zoomy, bool smooth)
 
 	if(IsNull() )
 		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
+}
+
+ECImage* ECImage::Shadow()
+{
+	if(shadowed) return shadowed;
+
+	shadowed = new ECImage;
+
+	shadowed->NewSurface(CASE_WIDTH, CASE_HEIGHT, SDL_HWSURFACE, false);
+	shadowed->Blit(this);
+	SDL_Rect r_back = {0,0,GetWidth(), GetHeight()};
+	ECImage brouillard;
+	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, GetWidth(), GetHeight(),
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
+	shadowed->Blit(brouillard);
+
+	return shadowed;
 }

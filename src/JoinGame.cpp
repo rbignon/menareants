@@ -995,8 +995,6 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					else
 						GameInfosForm->PretButton->SetEnabled(false);
 				}
-				else
-					GameInfosForm->PretButton->SetEnabled(false);
 			}
 			if(LoadingForm)
 			{
@@ -1045,12 +1043,20 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	                   */
 	bool create = false;
 
+	EC_Client* client = EC_Client::GetInstance();
+
+#ifdef SETTED_NAME
+	std::string setted_name = client->GetNick() + "'s game";
+#endif
 	if(!cname)
 	{
 		create = true;
 		if(mission)
 			cname = ".";
 		else
+#ifdef SETTED_NAME
+			cname = setted_name.c_str();
+#else
 		{
 			TMessageBox mb("Entrez le nom de la partie à créer",
 							HAVE_EDIT|BT_OK|BT_CANCEL, form);
@@ -1062,14 +1068,13 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 
 			cname = name.c_str();
 		}
+#endif
 	}
 
 	/* Déclaration membres fixes */
 	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), mission);
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(cname), green_color);
-
-	EC_Client* client = EC_Client::GetInstance();
 
 	JOINED = 0;
 	client->sendrpl(create ? EC_Client::rpl(EC_Client::CREATE) : EC_Client::rpl(EC_Client::JOIN), FormatStr(cname).c_str());

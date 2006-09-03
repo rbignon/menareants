@@ -198,12 +198,12 @@ ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
 	map_country = 0;
 }
 
-ECBCase* ECBCase::MoveUp(uint c)    { return y >= c ? (*map)(x, y-c) : (*map)(x, 0); }
-ECBCase* ECBCase::MoveDown(uint c)  { return y < map->Height()-c-1 ? (*map)(x, y+c) : (*map)(x, map->Height()-1); }
-ECBCase* ECBCase::MoveLeft(uint c)  { return x >= c ? (*map)(x-c, y) : (*map)(0, y); }
-ECBCase* ECBCase::MoveRight(uint c) { return x < map->Width()-c-1 ? (*map)(x+c, y) : (*map)(map->Width()-1, y); }
+ECBCase* ECBCase::MoveUp(uint c) const    { return y >= c ? (*map)(x, y-c) : (*map)(x, 0); }
+ECBCase* ECBCase::MoveDown(uint c) const  { return y < map->Height()-c-1 ? (*map)(x, y+c) : (*map)(x, map->Height()-1); }
+ECBCase* ECBCase::MoveLeft(uint c) const  { return x >= c ? (*map)(x-c, y) : (*map)(0, y); }
+ECBCase* ECBCase::MoveRight(uint c) const { return x < map->Width()-c-1 ? (*map)(x+c, y) : (*map)(map->Width()-1, y); }
 
-uint ECBCase::Delta(ECBCase* c)
+uint ECBCase::Delta(ECBCase* c) const
 {
 	return (abs(X() - c->X()) + abs(Y() - c->Y()));
 }
@@ -213,27 +213,32 @@ void ECBCase::SetCountry(ECBCountry *mc)
 	map_country = mc;
 }
 
-/** \todo La fonction est [pour le moment] ici car il n'y a pas de dérivée de ECBCase sur le serveur
- * Ça serait quand même bien de trouver une alternative
- */
-void ECBCase::CheckInvests(ECBEntity* e)
+int ECBCase::SearchAroundType(int type, std::vector<ECBEntity*>& entities) const
 {
-	if(!e->Owner()) return;
-	std::vector<ECBEntity*> ents = entities.List();
-	for(std::vector<ECBEntity*>::const_iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		if(e->CanInvest(*enti))
-		{
-			e->Invest(*enti);
-			break;
-		}
-		else if((*enti)->CanInvest(e))
-		{ /* On sait jamais, si par exemple une unité peut en investir une autre, mais que c'est cette autre qui se deplace
-		   * vers la mienne, ou si les deux se déplacent dans le même tour sur la meme case, ça serait con que juste
-		   * parce que l'unité investisseuse s'est déplacée *avant* l'unité à investir, il n'y ait pas d'investiture
-		   */
-			(*enti)->Invest(e);
-			break;
-		}
+	int result = 0;
+	std::vector<ECBEntity*> ents;
+	if(Y() > 0 && (ents = MoveUp()->Entities()->Find(type)).empty() == false)
+	{
+		result |= C_UP;
+		for(std::vector<ECBEntity*>::iterator i = ents.begin(); i != ents.end(); ++i) entities.push_back(*i);
+	}
+	if(Y() < Map()->Height()-1 && (ents = MoveDown()->Entities()->Find(type)).empty() == false)
+	{
+		result |= C_DOWN;
+		for(std::vector<ECBEntity*>::iterator i = ents.begin(); i != ents.end(); ++i) entities.push_back(*i);
+	}
+	if(X() > 0 && (ents = MoveLeft()->Entities()->Find(type)).empty() == false)
+	{
+		result |= C_LEFT;
+		for(std::vector<ECBEntity*>::iterator i = ents.begin(); i != ents.end(); ++i) entities.push_back(*i);
+	}
+	if(X() < Map()->Width()-1 && (ents = MoveRight()->Entities()->Find(type)).empty() == false)
+	{
+		result |= C_RIGHT;
+		for(std::vector<ECBEntity*>::iterator i = ents.begin(); i != ents.end(); ++i) entities.push_back(*i);
+	}
+
+	return result;
 }
 
 /********************************************************************************************
@@ -413,33 +418,6 @@ bool ECBMapPlayer::RemoveCountry(ECBCountry* _country, bool use_delete)
 /********************************************************************************************
  *                               ECBMap                                                     *
  ********************************************************************************************/
-
-template<typename T>
-static ECBCase* CreateCase(ECBMap *map, uint x, uint y, uint flags, char type_id)
-{
-	return new T(map, x, y, flags, type_id);
-}
-
-static struct
-{
-	char c;
-	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
-	uint flags;
-} case_type[] = {
-	{ 'm', CreateCase<ECBMer>,     C_MER              },
-	{ 't', CreateCase<ECBTerre>,   C_TERRE            },
-	{ 'p', CreateCase<ECBPont>,    C_PONT             },
-	{ 'M', CreateCase<ECBMontain>, C_MONTAIN          }
-};
-
-ECBCase* ECBMap::CreateCase(uint _x, uint _y, char type_id)
-{
-	for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
-		if(case_type[j].c == type_id)
-			return case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
-
-	return 0;
-}
 
 ECBMap::ECBMap(std::vector<std::string> _map_file)
 {

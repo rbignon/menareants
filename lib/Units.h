@@ -71,6 +71,55 @@ private:
 };
 
 /********************************************************************************************
+ *                               ECBTrain                                                   *
+ ********************************************************************************************/
+/** This is a boat. */
+class ECBTrain : public virtual ECBContainer
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBTrain) {}
+
+	ENTITY_CONSTRUCTOR(ECBTrain) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_TRAIN; }
+	virtual uint Cost() const { return 4000; }
+	virtual uint InitNb() const { return 5; }
+	virtual uint Step() const { return 4; }
+	virtual uint Visibility() const { return 4; }
+
+	virtual bool CanContain(const ECBEntity* et)
+	{
+		if(Containing() || et->Nb() > 100*Nb() || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+			return false;
+		else
+			return true;
+	}
+
+	bool CanWalkOn(ECBCase* c) const
+	{
+		return (c->Entities()->Find(E_RAIL).empty() == false);
+	}
+	bool CanAttaq(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case E_TRAIN:
+				return true;
+			default:
+				return false;
+		}
+	}
+	virtual const char* Qual() const { return "le train"; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	virtual bool IsVehicule() const { return true; }
+};
+
+/********************************************************************************************
  *                               ECBBoat                                                    *
  ********************************************************************************************/
 /** This is a boat. */
@@ -88,13 +137,14 @@ public:
 
 	virtual e_type Type() const { return E_BOAT; }
 	virtual uint Cost() const { return 2000; }
-	virtual uint InitNb() const { return 10; }
+	virtual uint InitNb() const { return 5; }
 	virtual uint Step() const { return 4; }
 	virtual uint Visibility() const { return 4; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_MER)); }
 
 	virtual bool CanContain(const ECBEntity* et)
 	{
-		if(et->Nb() > 50*Nb() || !et->IsInfantry())
+		if(Containing() || et->Nb() > 100*Nb() || !et->IsInfantry())
 			return false;
 		else
 			return true;
@@ -114,15 +164,6 @@ public:
 	virtual const char* Qual() const { return "le bateau"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsNaval() const { return true; }
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
 };
 
 /********************************************************************************************
@@ -146,6 +187,7 @@ public:
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 1; }
 	virtual uint Porty() const { return 8; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -160,15 +202,6 @@ public:
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
 	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
 	bool IsVehicule() const { return true; }
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
 };
 
 /********************************************************************************************
@@ -191,11 +224,13 @@ public:
 	virtual uint Cost() const { return 20000; }
 	virtual uint InitNb() const { return 1500; }
 	virtual uint Step() const { return 3; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE)); }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
 		if((Parent() && Parent()->CanAttaq(e)) ||
-		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity() && !e->IsHidden()) && !e->IsNaval()))
+		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity() && !e->IsHidden()) && !e->IsNaval() &&
+		    !e->IsTerrain()))
 			return true;
 		else
 			return false;
@@ -203,15 +238,6 @@ public:
 	virtual const char* Qual() const { return "le char"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsVehicule() const { return true; }
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
 };
 
 /********************************************************************************************
@@ -240,6 +266,7 @@ public:
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return Deployed() ? 0 : 2; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	bool CanInvest(const ECBEntity* e) const
 	{
@@ -292,6 +319,7 @@ public:
 	virtual uint Step() const { return 4; }
 	virtual uint Visibility() const { return 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	bool CanInvest(const ECBEntity* e) const { return false; }
 	bool CanAttaq(const ECBEntity* e) { return false; }
@@ -332,10 +360,11 @@ public:
 	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return 1; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || e->Owner() == Owner() && e->Nb() < e->InitNb()))
+		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || e->Owner() == Owner() && e->Nb() < e->InitNb()) && !e->IsTerrain())
 			return true;
 		else
 			return false;
@@ -379,6 +408,7 @@ public:
 	virtual uint Cost() const { return 2000; }
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 2; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -386,7 +416,7 @@ public:
 		   (( e->IsInfantry() && e->Type() != E_MCDO ||
 		      e->IsVehicule() ||
 		      e->IsBuilding() && !e->IsCity() && !e->IsHidden()) &&
-		    !e->IsNaval()))
+		    !e->IsNaval() && !e->IsTerrain()))
 			return true;
 		else
 			return false;

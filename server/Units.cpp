@@ -429,7 +429,7 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 	}
 	if(!c || c == Case() || last && last->Case() == c) return false;
 
-	if(!(flags & MOVE_FORCE) && !(c->Flags() & case_flags)) return false;
+	if(!(flags & MOVE_FORCE) && !CanWalkOn(c)) return false;
 
 	if(flags & MOVE_SIMULE)
 		return true;

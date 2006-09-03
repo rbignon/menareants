@@ -182,6 +182,8 @@ public:
 		/*17*/E_MCDO,
 		/*18*/E_TREES,
 		/*19*/E_MEGALOPOLE,
+		/*20*/E_RAIL,
+		/*21*/E_TRAIN,
 		/*XX*/E_END
 	};
 
@@ -222,6 +224,8 @@ public:
 	virtual bool IsInfantry() const { return false; }
 	virtual bool IsVehicule() const { return false; }
 	virtual bool IsHidden() const { return false; }          /**< This unit can be views only by his owner and his allies */
+	virtual bool IsTerrain() const { return false; }         /**< This is an "unit" who represents a special terrain */
+	virtual bool CanWalkOn(ECBCase*) const { return false; }
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
@@ -446,35 +450,40 @@ public:
 
 	virtual bool CanCreate(const ECBEntity*) { return false; }
 
-	void CheckInvests(ECBEntity* e);
-
 	/** Calculate distance */
-	uint Delta(ECBCase* c);
+	uint Delta(ECBCase* c) const;
+
+	/** Search if there is this type around this case */
+	#define C_UP    0x01
+	#define C_DOWN  0x02
+	#define C_LEFT  0x04
+	#define C_RIGHT 0x08
+	int SearchAroundType(int type, std::vector<ECBEntity*> &) const;
 
 /* Attributs */
 public:
 
 	/** This case is a member of this map */
-	ECBMap* Map() { return map; }
+	ECBMap* Map() const { return map; }
 
 	/** Return type of terrain (a char) */
-	char TypeID() { return type_id; }
+	char TypeID() const { return type_id; }
 
 	/** Return flags of case */
-	uint Flags() { return flags; }
+	uint Flags() const { return flags; }
 
-	ECBCountry* Country() { return map_country; }
+	ECBCountry* Country() const { return map_country; }
 	void SetCountry(ECBCountry *mc);
 
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
-	uint X() { return x; }
-	uint Y() { return y; }
+	uint X() const { return x; }
+	uint Y() const { return y; }
 
-	ECBCase* MoveUp(uint c = 1);
-	ECBCase* MoveDown(uint c = 1);
-	ECBCase* MoveLeft(uint c = 1);
-	ECBCase* MoveRight(uint c = 1);
+	ECBCase* MoveUp(uint c = 1) const;
+	ECBCase* MoveDown(uint c = 1) const;
+	ECBCase* MoveLeft(uint c = 1) const;
+	ECBCase* MoveRight(uint c = 1) const;
 
 /* Variables privées */
 protected:
@@ -716,7 +725,7 @@ public:
 	void Reload();
 
 	/** Create a case */
-	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
+	virtual ECBCase* CreateCase(uint x, uint y, char type_id) = 0;
 
 /* Attributs */
 public:

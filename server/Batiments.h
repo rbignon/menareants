@@ -26,6 +26,27 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                                        ECRail                                            *
+ ********************************************************************************************/
+class ECRail : public ECEntity, public ECBRail
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECRail) {}
+
+/* Methodes */
+public:
+
+	/** @return last case */
+	virtual bool Return() { return false; }
+
+	virtual void CreateLast() {}
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+/********************************************************************************************
  *                                        ECTrees                                           *
  ********************************************************************************************/
 class ECTrees : public ECEntity, public ECBTrees

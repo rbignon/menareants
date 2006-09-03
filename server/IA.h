@@ -61,7 +61,7 @@ public:
 	void FirstMovements();
 	void MakeAllies();
 	void CheckIfIReady();
-	void WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases = 0);
+	void WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases = 0, bool intel_search = true);
 
 /* Attributs */
 public:

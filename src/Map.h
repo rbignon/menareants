@@ -163,6 +163,9 @@ public:
 
 	virtual void AfterDraw();
 
+	/** This function is called when this unit is created */
+	virtual void Created() {}
+
 /* Attributs */
 public:
 
@@ -229,9 +232,6 @@ public:
 
 	virtual ~ECase();
 
-/* Methodes */
-public:
-
 /* Attributs */
 public:
 
@@ -264,7 +264,6 @@ public:
 /* Variables privées */
 protected:
 	ECSprite* image;
-	ECImage shadowed;
 	bool selected;
 	char img_id;
 	int showed;
@@ -282,13 +281,6 @@ public:
 public:
 
 	virtual const char* Name() const { return "Terre"; }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is sea */
@@ -302,13 +294,6 @@ public:
 public:
 
 	virtual const char* Name() const { return "Mer"; }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is a bridge */
@@ -322,13 +307,6 @@ public:
 public:
 
 	virtual const char* Name() const { return "Pont"; }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is a montain */
@@ -342,13 +320,6 @@ public:
 public:
 
 	virtual const char* Name() const { return "Montagne"; }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /********************************************************************************************

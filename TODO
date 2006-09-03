@@ -11,6 +11,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
+-système qui permet de revenir à une partie en cas de perte de la connexion.
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
@@ -31,6 +32,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 ** Unités
 - Tout le monde
+  - train de transport
   - batiment qui permet de ne pas avoir le semi brouillard
   - upgrades de la caserne et de l'usine d'armement
   - unité Dorian qui vend de l'alcool: les unités touchées se dirigent n'importe comment !

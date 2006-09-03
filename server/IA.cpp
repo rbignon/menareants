@@ -151,7 +151,7 @@ public:
 				{
 					for(uint i = 0; i < unit->MyStep(); ++i)
 					{
-						IA()->WantMoveTo(unit, boat->Case());
+						IA()->WantMoveTo(unit, boat->Case(), 0, false);
 						if(unit->Case()->Delta(boat->Case()) == 1)
 						{
 							IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
@@ -168,7 +168,7 @@ public:
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
 				if(!(*e)->IsHidden() && !unit->Like(*e) &&
-				   (unit->CanAttaq(*e) || unit->CanInvest(*e)) &&
+				   (unit->CanAttaq(*e) || unit->CanInvest(*e)) && !(*e)->IsTerrain() &&
 				   (!victim || d > boat->Case()->Delta((*e)->Case())))
 					victim = *e, d = boat->Case()->Delta((*e)->Case());
 
@@ -225,12 +225,12 @@ public:
 #else
 #define IA_DEBUG(x)
 #endif
-void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
+void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
 {
 	std::string msg;
 	ECBCase* c = enti->Case();
 	ECBCase* original_case = enti->Case();
-	if(!nb_cases || nb_cases > enti->MyStep())
+	if(!nb_cases || nb_cases > enti->RestStep())
 		nb_cases = enti->RestStep();
 	for(uint k = 0; k < nb_cases && c != dest; k++)
 	{
@@ -286,11 +286,11 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
 					}
 				IA_DEBUG("^v : " + TypToStr(dh) + " and " + TypToStr(db) +
 							" (" + TypToStr(c->Y()) + " > " + TypToStr(dest->Y()) + ")");
-				desesperate = (db < 0 && dh < 0 && !recruted[enti])
+				desesperate = (db < 0 && dh < 0 && intel_search)
 								? 0
-								: (db < 0 && !recruted[enti])
+								: (db < 0 && intel_search)
 								? 2
-								: (dh < 0 && !recruted[enti])
+								: (dh < 0 && intel_search)
 									? 1
 									: (c->Y() > dest->Y())
 										? 1
@@ -306,7 +306,7 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
 				else if(desesperate == 2) msg += " ^", c = c->MoveUp();
 				else if(desesperate == 0)
 				{
-					if(enti->IsInfantry())
+					if(enti->IsInfantry() && !recruted[enti])
 						UseStrategy(new UseTransportBoat(this), enti);
 					else if(enti->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveRight();
 					else msg += " <", c = c->MoveLeft();
@@ -336,11 +336,11 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
 					}
 				IA_DEBUG("<> : " + TypToStr(dl) + " and " + TypToStr(dr) +
 							" (" + TypToStr(c->X()) + " > " + TypToStr(dest->X()) + ")");
-				desesperate = (dl < 0 && dr < 0 && !recruted[enti])
+				desesperate = (dl < 0 && dr < 0 && intel_search)
 								? 0
-								: (dl < 0 && !recruted[enti])
+								: (dl < 0 && intel_search)
 								? 2
-								: (dr < 0 && !recruted[enti])
+								: (dr < 0 && intel_search)
 									? 1
 									: (c->X() > dest->X())
 										? 1
@@ -356,7 +356,7 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases)
 				else if(desesperate == 2) msg += " >", c = c->MoveRight();
 				else if(desesperate == 0)
 				{
-					if(enti->IsInfantry())
+					if(enti->IsInfantry() && !recruted[enti])
 						UseStrategy(new UseTransportBoat(this), enti);
 					else if(enti->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
 					else msg += " v", c = c->MoveDown();
@@ -433,7 +433,7 @@ void TIA::FirstMovements()
 			ECBEntity* victim = 0;
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
-				if(!(*e)->IsHidden() && !(*enti)->Like(*e) &&
+				if(!(*e)->IsHidden() && !(*e)->IsTerrain() && !(*enti)->Like(*e) &&
 				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))

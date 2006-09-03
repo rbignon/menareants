@@ -33,9 +33,11 @@
 #define APP_SITE "http://menareants.coderz.info/"
 
 /* Defines */
-#undef BUGUED_INTRO
+#undef  BUGUED_INTRO
+#define SETTED_NAME
+
 #ifndef WIN32
-#define BUGUED_FULLSCREEN
+# define BUGUED_FULLSCREEN
 #endif
 
 /* Résolution de l'écran */

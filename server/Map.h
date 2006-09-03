@@ -30,11 +30,6 @@
  * C'est pourquoi pour les types qui n'ont pas été à redéfinir il y a des typedef pour les noms courants.
  */
 
-typedef ECBCase        ECase;
-typedef ECBMer         ECMer;
-typedef ECBTerre       ECTerre;
-typedef ECBPont        ECPont;
-typedef ECBMontain     ECMontain;
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
@@ -42,6 +37,7 @@ class EChannel;
 class ECPlayer;
 class TClient;
 class ECEvent;
+class ECase;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -148,6 +144,7 @@ protected:
  ********************************************************************************************/
 /** @page ECEvent_page An ECEvent's description
  *
+ *  @todo do this page
  */
 /** This is a class to describe an event maked by an or a few entity(ies). */
 class ECEvent
@@ -155,7 +152,7 @@ class ECEvent
 /* Constructeur/Destructeur */
 public:
 
-	ECEvent(uint _f, ECase* _c = 0)
+	ECEvent(uint _f, ECBCase* _c = 0)
 		: acase(_c), flags(_f), nb(0), type(0)
 	{}
 
@@ -182,8 +179,8 @@ public:
 	bool operator<(const ECEvent& e) const;
 
 	/** Case associée */
-	ECase* Case() const { return acase; }
-	void SetCase(ECase* c) { acase = c; }
+	ECBCase* Case() const { return acase; }
+	void SetCase(ECBCase* c) { acase = c; }
 
 	/** Si c'est une création, une union ou autre, mettre le nombre */
 	void SetNb(uint n) { nb = n; }
@@ -203,7 +200,7 @@ public:
 
 /* Variables privées */
 protected:
-	ECase* acase;
+	ECBCase* acase;
 	uint flags;
 	uint nb;
 	uint type;
@@ -214,6 +211,59 @@ protected:
 
 typedef std::vector<ECEvent*> EventVector;
 //typedef std::set<ECEvent*, SortEventsFunction> EventVector;
+
+/********************************************************************************************
+ *                                 ECase                                                    *
+ ********************************************************************************************/
+class ECase : public virtual ECBCase
+{
+/* Constructeur/Destructeur */
+public:
+
+	ECase() {}
+
+	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
+		: ECBCase(_map, _x, _y, _flags, _type_id)
+	{}
+
+/* Methodes */
+public:
+
+	void CheckInvests(ECBEntity* e);
+
+};
+
+/** This class is a derived class from ECBCase whose is a land */
+class ECTerre : public ECBTerre, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECTerre(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+};
+
+/** This class is a derived class from ECBCase whose is sea */
+class ECMer : public ECBMer, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECMer(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+};
+
+/** This class is a derived class from ECBCase whose is a bridge */
+class ECPont : public ECBPont, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECPont(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+};
+
+/** This class is a derived class from ECBCase whose is a montain */
+class ECMontain : public ECBMontain, public ECase
+{
+/* Constructeur/Destructeur */
+public:
+	ECMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+};
 
 /********************************************************************************************
  *                                 ECountry                                                 *
@@ -257,7 +307,7 @@ public:
 	EventVector Events() const { return map_events; }
 	void AddEvent(ECEvent* _e) { map_events.push_back(_e); }
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete = false);
-	ECEvent* FindEvent(ECase*, uint, ECEntity* = 0);
+	ECEvent* FindEvent(ECBCase*, uint, ECEntity* = 0);
 
 	virtual void RemoveAnEntity(ECBEntity*, bool use_delete = false);
 
@@ -267,6 +317,8 @@ public:
 	void SortEvents();
 
 	static bool LoadMaps();
+
+	virtual ECBCase* CreateCase(uint _x, uint _y, char type_id);
 
 /* Variables privées */
 protected:

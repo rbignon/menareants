@@ -170,9 +170,9 @@ class ECImage
 {
 /* Constructeur/Deconstructeur */
 public:
-	ECImage(SDL_Surface* _Img) : Img(_Img), pause(0), autofree(true), alpha(false), x(0), y(0) {}
+	ECImage(SDL_Surface* _Img) : Img(_Img), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 	ECImage(char* fichier, bool alpha = false);
-	ECImage() : Img(NULL), pause(0), autofree(true), alpha(false), x(0), y(0) {}
+	ECImage() : Img(NULL), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 
 	~ECImage();
 
@@ -242,9 +242,12 @@ public:
 	void SetAutoFree(bool b = true) { autofree = b; }
 	void SetAlpha(bool a = true) { alpha = a; }
 
+	ECImage* Shadow();
+
 /* Variables publiques */
 public:
 	SDL_Surface* Img;
+	ECImage* shadowed;
 	int pause;
 	bool autofree;
 	bool alpha;
