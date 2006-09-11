@@ -47,19 +47,13 @@ public:
 	 * @param IsMe say if this player is me.
 	 * @param IsIA say if this player is an Artificial Intelligence.
 	 */
-	ECPlayer(const char* nick, EChannel* chan, bool owner, bool op, bool IsMe, bool IsIA);
-
-/* Methodes */
-public:
+	ECPlayer(std::string nick, EChannel* chan, bool owner, bool op, bool IsMe, bool IsIA);
 
 /* Attributs */
 public:
 
 	/** Player's channel. */
 	EChannel *Channel() const { return (EChannel*)chan; }
-
-	/** Get nick of client. */
-	virtual const char* GetNick() const { return nick.c_str(); }
 
 	/** Is this player me ? */
 	bool IsMe() const { return isme; }
@@ -68,7 +62,6 @@ public:
 
 /* Variables privées */
 protected:
-	std::string nick;
 	bool isme;
 	bool is_ia;
 };

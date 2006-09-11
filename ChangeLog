@@ -1,3 +1,33 @@
+2006-09-11  Romain Bignon <progs@headfucking.net>
+
+	* src/Timer.h: Système qui permet de mettre le timer sur pause.
+
+	* src/InGame.cpp, src/JoinGame.cpp (TPingingForm): Affichage d'un écran lors du mode +Q (PINGING).
+
+	* lib/Defines.h: Passage protocole 9 et version 3.2.
+
+2006-09-10  Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h: Correction du bug du cp de l'id dans nick du MapPlayer.
+
+	* API, lib/Channels.h, server/Server.cpp, server/Channels.cpp: Système pour que le client puisse se reconnecter en
+	cas de perte de connexion.
+
+2006-09-08  Romain Bignon <progs@headfucking.net>
+
+	* server/Debug.cpp, server/Server.cpp, server/Channels.cpp: Utilisation de plusieurs fichiers de logs.
+
+2006-09-05  Romain Bignon <progs@headfucking.net>
+
+	* lib/Channels.h (ECBPlayer): Passage du nick comme une chaine dans la classe de base.
+
+	* server/Channels.cpp: Un joueur qui part pendant le jeu n'est pas supprimé et est juste noté comme ayant perdu. Ça
+	permet de garder ses stats.
+
+2006-09-04  Romain Bignon <progs@headfucking.net>
+
+	* src/Edit.cpp: Correction du putain de bug super simple à corriger en fait qui empechait d'utiliser d'accents !
+
 2006-09-03  Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (GetWant): Correction du curseur par rapport au lance missile, curseur "investir" quand on veut entrer

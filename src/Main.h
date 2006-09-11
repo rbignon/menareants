@@ -50,6 +50,8 @@ protected:
 	void InGame();
 	void MapEditor();
 	void Scores(EChannel*);
+	bool RecoverGame(std::string chaname);
+	void PingingGame();
 
 	static void WantQuit(TObject*, void*);
 	static void WantPlay(TObject*, void*);

@@ -225,7 +225,19 @@ public:
 public:
 
 	/** Add a component in the list */
-	void AddLine(TComponent *);
+	template<typename T>
+	void AddLine(T* c)
+	{
+		list.push_back(c);
+		c->SetParent(this);
+		c->SetWindow(Window());
+		c->SetXY(x, y+h);
+		h += c->Height();
+		if(c->Width() > w) w = c->Width();
+		c->Init();
+	}
+
+	void Clear();
 
 	/** Remove a component from list
 	 * \warning This will use \a delete on TComponent !!

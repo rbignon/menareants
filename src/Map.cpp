@@ -29,7 +29,6 @@
 #include "Sockets.h"
 #include "Units.h"
 #include "gui/ColorEdit.h"
-#include "gui/ProgressBar.h"
 #include "gui/ShowMap.h"
 #include "tools/Video.h"
 

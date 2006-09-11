@@ -71,6 +71,8 @@ public:
 
 	/// Initialise les valeurs
 	void InitVal (long val, long min, long max);
+
+	long Max() const { return max; }
 	
 	/** Set reference value
 	 * Use it after InitVal !

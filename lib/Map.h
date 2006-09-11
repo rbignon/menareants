@@ -128,6 +128,7 @@ protected:
 #define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
                             (b)->CanAttaq(a) && !(b)->Like(a))
 #define ARM_MOVE        0x0001
+/** \todo utiliser ou supprimer SPLIT */
 #define ARM_SPLIT       0x0002
 #define ARM_ATTAQ       0x0004
 #define ARM_REMOVE      0x0008
@@ -647,8 +648,10 @@ class ECBMapPlayer
 public:
 
 	ECBMapPlayer(char _id, uint _num)
-		: id(_id), num(_num), pl(0), nick(&_id)
-	{}
+		: id(_id), num(_num), pl(0)
+	{
+		nick += _id;
+	}
 
 	virtual ~ECBMapPlayer() {}
 

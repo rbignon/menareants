@@ -46,8 +46,9 @@ public:
 	TLabel*      ChanStats;
 	TLabel*      Uptime;
 
-/* Evenements */
+/* Variables publiques */
 public:
 
+	std::string Rejoin;
 };
 #endif

@@ -59,6 +59,23 @@ void Timer::reset()
 {
 	begin_time = Timer::get_time();
 	elapsed = 0;
+	pause = 0;
+}
+
+bool Timer::Pause(bool set)
+{
+	if(pause && !set)
+	{
+		begin_time = begin_time + get_time() - pause;
+		pause = 0;
+		return false;
+	}
+	else if(!pause && set)
+	{
+		pause = get_time();
+		return true;
+	}
+	return pause;
 }
 
 float Timer::time_elapsed(bool update)
@@ -69,7 +86,7 @@ float Timer::time_elapsed(bool update)
 //		begin_time = Timer::get_time();
 	}
 
-	return elapsed;
+	return pause ? pause : elapsed;
 }
 
 long Timer::get_time()

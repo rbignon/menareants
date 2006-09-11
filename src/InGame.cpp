@@ -42,6 +42,7 @@
 TLoadingForm *LoadingForm = NULL;
 TInGameForm  *InGameForm  = NULL;
 TOptionsForm *OptionsForm = NULL;
+TPingingForm* PingingForm = NULL;
 
 void EChannel::Print(std::string s, int i)
 {
@@ -506,26 +507,31 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 		if(entity->Move()->Size() < entity->MyStep() &&
 		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
 		   entity->MyStep() - entity->Move()->Size() >= acase->Delta(e_case) &&
-		   (!entity->Deployed() ^ !!(entity->EventType() & ARM_DEPLOY)) &&
+		   (!entity->Deployed() ^ !!(entity->EventType() & ARM_DEPLOY)) && // '!!' pour que le ^ ait deux bools
 		   acase != entity->Case() && acase != entity->Move()->Dest())
 		{
+			/* = -1 : on ne peut investir en cas de présence d'une unité enemie. N'arrive pas si c'est sur un conteneur
+			 * =  0 : n'a trouvé aucune unité à investir ou me contenant, ni aucune unité enemie
+			 * =  1 : peut investir
+			 * =  2 : peut me contenir
+			 */
 			int can_invest = 0;
 
 			FOR(ECBEntity*, ents, enti)
 			{
 				EContainer* container = 0;
 				if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(entity) && entity->Owner() &&
-				    entity->Owner()->IsMe() ||
-				   entity->CanInvest(enti) && !entity->Like(enti))
+				    entity->Owner()->IsMe())
+					can_invest = 2;
+				if(can_invest >= 0 && entity->CanInvest(enti) && !entity->Like(enti))
 					can_invest = 1;
-				if(!enti->Like(entity) && enti->CanAttaq(entity))
+				if(!enti->Like(entity) && enti->CanAttaq(entity) && can_invest != 2)
 				{
 					/* chercher l'interet de ce truc là.
 					 * -> Je suppose que c'est pour dire que dans le cas où y a une unité enemie, on ne parle pas
 					 *    d'entrer dans le batiment mais de se battre, donc on montre pas encore la fleche quoi
 					 */
 					can_invest = -1;
-					break;
 				}
 			}
 	
@@ -605,6 +611,10 @@ void MenAreAntsApp::InGame()
 		}
 		else
 			InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
+
+		if(client->Player()->Ready())
+			InGameForm->BarreLat->PretButton->SetEnabled(false);
+
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
 		do
@@ -620,11 +630,12 @@ void MenAreAntsApp::InGame()
 			}
 			if(chan->State() == EChannel::PLAYING)
 			{
+				//printf("%f (%ld)\n", elapsed_time->time_elapsed(true), InGameForm->BarreLat->ProgressBar->Max());
 				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
 				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
 				{
 					client->sendrpl(client->rpl(EC_Client::SET), "+!");
-					elapsed_time->reset();
+					//elapsed_time->reset();
 				}
 			}
 			else if(chan->State() == EChannel::ANIMING)
@@ -636,6 +647,14 @@ void MenAreAntsApp::InGame()
 					want = W_NONE;
 				}
 			}
+			else if(chan->State() == EChannel::PINGING)
+			{
+				elapsed_time->Pause(true);
+				PingingGame();
+				elapsed_time->Pause(false);
+				InGameForm->Map->SetMustRedraw();
+			}
+
 			while( SDL_PollEvent( &event) )
 			{
 				InGameForm->Actions(event);
@@ -1898,7 +1917,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 		throw;
 	}
 	MyFree(LoadingForm);
-	if(client->IsConnected() && client->Player() && chan->State() == EChannel::PLAYING)
+	if(client->IsConnected() && client->Player() && chan->IsInGame())
 		InGame();
 
 	return;
@@ -1974,6 +1993,97 @@ void TLoadPlayerLine::Draw(int souris_x, int souris_y)
  *                                   TScoresForm                                            *
  ********************************************************************************************/
 
+void MenAreAntsApp::PingingGame()
+{
+	EC_Client* client = EC_Client::GetInstance();
+	if(!client || !client->Player())
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+
+	EChannel* chan = client->Player()->Channel();
+
+	if(chan->State() != EChannel::PINGING)
+		return;
+
+	try
+	{
+		bool eob = false;
+		PingingForm = new TPingingForm(Video::GetInstance()->Window(), chan);
+
+		PingingForm->SetMutex(mutex);
+		//PingingForm->RetourButton->SetOnClick(TScoresForm::WantLeave, client);
+		do
+		{
+			PingingForm->Actions();
+			PingingForm->Update();
+		} while(!eob && client->IsConnected() && client->Player() &&
+		        chan->State() == EChannel::PINGING);
+	
+	}
+	catch(TECExcept &e)
+	{
+		MyFree(PingingForm);
+		throw;
+	}
+	MyFree(PingingForm);
+
+	return;
+}
+
+TPingingForm::TPingingForm(ECImage* w, EChannel* ch)
+	: TForm(w), channel(ch)
+{
+	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + " - Attente de reconnexion"), white_color,
+	                      Font::GetInstance(Font::Large)));
+
+	Message = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,150,Window()->GetWidth()-200-50,150,30, false));
+	Message->AddItem("Les joueurs ci-dessous ont été déconnecté du serveur anormalement, probablement à cause "
+	                 "du plantage de leur connexion Internet.\n"
+	                 "\n"
+	                 "Pour le moment les boutons \"Quitter\" et \"Voter\" sont inutiles, car ce système de "
+	                 "récupération de partie n'est pas fini.\n"
+	                 "Le seul moyen pour la personne de revenir est de se reconnecter au serveur et d'accepter "
+	                 "la proposition de reconnexion à la partie.\n"
+	                 "Il est à noter que si cette personne ne revient pas, il y a aucun moyen pour le moment "
+	                 "de continuer la partie.", white_color);
+	Message->ScrollUp();
+
+	Players = AddComponent(new TList(100, 350));
+	UpdateList();
+
+	LeaveButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, "Quitter",
+	                                            Font::GetInstance(Font::Normal)));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+void TPingingForm::UpdateList()
+{
+	Players->Clear();
+	BPlayerVector players = channel->Players();
+	for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+		if((*it)->CanRejoin())
+			Players->AddLine(new TPingingPlayerLine(*it));
+}
+
+TPingingPlayerLine::TPingingPlayerLine(ECBPlayer* pl)
+	: TChildForm(0,0, 300, 150), player(pl)
+{
+
+}
+
+void TPingingPlayerLine::Init()
+{
+	Nick = AddComponent(new TLabel(0, 10, player->Nick(), color_eq[player->Color()], Font::GetInstance(Font::Big)));
+
+	NbVotes = AddComponent(new TLabel(200, 10, "0", white_color, Font::GetInstance(Font::Big)));
+
+	Voter = AddComponent(new TButtonText(250, 0,150,50, "Voter", Font::GetInstance(Font::Normal)));
+}
+
+/********************************************************************************************
+ *                                   TScoresForm                                            *
+ ********************************************************************************************/
+
 TScoresForm* ScoresForm = 0;
 
 /** Scores of a player
@@ -2008,7 +2118,6 @@ void MenAreAntsApp::Scores(EChannel* chan)
 
 	try
 	{
-		bool eob = false;
 		WAIT_EVENT_T(ScoresForm,i,5);
 		if(!ScoresForm)
 			return;
@@ -2019,7 +2128,7 @@ void MenAreAntsApp::Scores(EChannel* chan)
 		{
 			ScoresForm->Actions();
 			ScoresForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() &&
+		} while(client->IsConnected() && client->Player() &&
 		        chan->State() == EChannel::SCORING);
 	
 	}

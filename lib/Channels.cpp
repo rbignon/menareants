@@ -43,8 +43,8 @@ const struct nations_str_t nations_str[] = {
 	/* N_MAX      */   { "",           "" }
 };
 
-ECBPlayer::ECBPlayer(ECBChannel *_chan, bool _owner, bool _op)
-	: chan(_chan), owner(_owner), op(_op), lost(false)
+ECBPlayer::ECBPlayer(std::string n, ECBChannel *_chan, bool _owner, bool _op)
+	: nick(n), chan(_chan), owner(_owner), op(_op), lost(false), disconnected(false)
 {
 	if(chan)
 		chan->AddPlayer(this);

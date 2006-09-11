@@ -72,7 +72,7 @@ public:
 /* Variables publiques */
 public:
 	bool RecvMapList, mission;
-	std::vector<std::string> RecvMap;
+	static std::vector<std::string> RecvMap;
 
 	std::string Kicked;
 

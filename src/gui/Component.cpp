@@ -33,20 +33,14 @@ TList::TList(int _x, int _y)
 
 TList::~TList()
 {
+	Clear();
+}
+
+void TList::Clear()
+{
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 		delete (*it);
 	list.clear();
-}
-
-void TList::AddLine(TComponent *c)
-{
-	list.push_back(c);
-	c->SetParent(this);
-	c->SetWindow(Window());
-	c->SetXY(x, y+h);
-	h += c->Height();
-	if(c->Width() > w) w = c->Width();
-	c->Init();
 }
 
 bool TList::RemoveLine(TComponent *c, bool use_delete)

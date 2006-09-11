@@ -50,6 +50,7 @@ public:
 		MOTD,         /**< MOTD */
 		ENDOFMOTD,    /**< EOM */
 		STAT,         /**< STAT */
+		REJOIN,       /**< REJOIN */
 
 		CANTJOIN,     /**< ER1 */
 		IANICKUSED,   /**< ER2 */

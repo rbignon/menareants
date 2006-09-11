@@ -27,7 +27,7 @@
 
 #include "Component.h"
 
-#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN123456789 .+-*/,;:!?()[]={}'\"&<>"
+#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN1234567890 .+-*/,;:!?()[]={}'\"&<>$יטג`_חאך"
 
 struct ECImage;
 class Font;
@@ -39,7 +39,7 @@ class TEdit : public TComponent
 /* Constructeur/Deconstructeur */
 public:
 
-	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, char* av = EDIT_CHARS,
+	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, char* av = 0,
 	      bool show_background = true);
 
 /* Methodes */

@@ -33,7 +33,9 @@ typedef unsigned int   uint;
 #define CLIENT_SMALLNAME "MenAreAnts"
 
 /* Fichier de debugage */
-#define DEBUG_LOG       "errors.log"     /* Fichier de DEBUG */
+#define DEBUG_LOG       "parses.log"     /* Fichier de DEBUG */
+#define ERROR_LOG       "errors.log"     /* Fichier d'erreurs */
+#define CONNS_LOG       "connexions.log" /* Fichier de logging des connexions */
 
 /* Interval */
 const int PINGINTERVAL=30;

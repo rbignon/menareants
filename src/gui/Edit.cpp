@@ -172,13 +172,15 @@ void TEdit::PressKey(SDL_keysym key)
 			first_char = caret > visible_len ? caret - visible_len : 0;
 			have_redraw = true;
 			break;
+		case SDLK_RETURN: break; /* On ne prend pas "entrée" comme un caractère */
 		default:
 		{
 			if(maxlen && chaine.size() >= maxlen)
 				return;
 			char c = 0;
-			if(key.unicode)
-				c = key.unicode;
+
+			if(key.unicode && key.unicode > 0)
+				c = (char)key.unicode;
 			else if(key.sym >= SDLK_a && key.sym <= SDLK_z)
 			{
 				if(key.mod & KMOD_SHIFT)

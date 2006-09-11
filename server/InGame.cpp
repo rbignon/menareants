@@ -183,7 +183,7 @@ void EChannel::NextAnim()
 						ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
 						gobeur->Union(*it);
 						(*it)->Move()->Clear((*it)->Case());
-						SendArm(NULL, *it, ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+						SendArm(NULL, *it, ARM_INVEST|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
 						SendArm(receivers, gobeur, ARM_NUMBER);
 						/* Pas besoin de mettre shadow, il l'est déjà.
 							* (*it)->SetShadowed();

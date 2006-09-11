@@ -68,9 +68,8 @@ public:
 
 	/** Get client's structure of player */
 	TClient *Client() { return client; }
-
-	/** Get client's nickname */
-	virtual const char* GetNick() const;
+	void ClearClient() { client = 0; }
+	void SetClient(TClient* c) { client = c; }
 
 	virtual bool IsIA() const;
 
@@ -133,7 +132,7 @@ public:
 	 * @param senders this will a player vector of senders.
 	 * @param msg message to send
 	 *
-	 * \warning this will only send modes, no set them in channel of on players.
+	 * \warning this will only send modes, no set them in channel or on players.
 	 */
 	void send_modes(PlayerVector senders, const char* msg);
 
@@ -212,6 +211,11 @@ public:
 
 	/** Check if this is the end of the game */
 	bool CheckEndOfGame();
+
+	bool CheckPinging();
+
+	/** Send all entities to someone */
+	void SendEntities(ECPlayer* pl);
 
 /* Attributs */
 public:

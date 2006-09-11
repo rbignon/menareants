@@ -55,6 +55,7 @@ Sommaire:
               MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
               BYE [raison]                      :au revoir
               USED                              :pseudo déjà utilisé
+              REJOIN <chan>                     :l'user est invité à rejoindre une partie à laquelle il a été déconnecté
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
               ER2 <nick>                        :le pseudo de l'IA a déjà été pris
@@ -74,7 +75,7 @@ Sommaire:
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
          - Lors des scores
-              <nick> SCO <killed> <shooted>     :score d'un joueur
+              :<nick> SCO <killed> <shooted>    :score d'un joueur
                          <created> <score>
 
 3) Particularités des commandes de positions
@@ -124,6 +125,7 @@ Sommaire:
          +S                  :envoie des infos (SENDING)
          +P                  :jeu (PLAYING)
          +A                  :animation (ANIMING)
+         +Q                  :attente d'un joueur qui a perdu la connexion (PINGING)
          +E                  :fin du jeu (SCORING)
          +t <temps>          :temps par tours maximum pour jouer
         Mode pour un user:
@@ -135,6 +137,7 @@ Sommaire:
          +$                  :l'argent du joueur (serveur -> user uniquement)
          +@ <country>        :l'user possède maintenant la terre <country>
          +a <nick>           :définie un user comme allié de lui
+         +w                  :ce joueur a été déconnecté et on attend qu'il se reconnecte
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible

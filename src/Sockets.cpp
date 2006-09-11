@@ -273,6 +273,7 @@ void EC_Client::Init()
 	Commands.push_back(new EOSMAPCommand("EOSMAP",0,0));
 
 	Commands.push_back(new SCOCommand("SCO",	0,	4));
+	Commands.push_back(new REJOINCommand("REJOIN",0,1));
 	
 }
 

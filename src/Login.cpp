@@ -104,6 +104,19 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** I've been disconnected from server when I was playing a game. It asks me if I want to rejoin this game.
+ *
+ * Syntax: REJOIN game
+ */
+int REJOINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+{
+	if(!ConnectedForm) return 0;
+
+	ConnectedForm->Rejoin = parv[1];
+
+	return 0;
+}
+
 /** I receive message of the day of server.
  *
  * Syntax: MOTD [ligne]
@@ -129,6 +142,8 @@ int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	RC_MOTD = false;
+	if(ConnectedForm)
+		ConnectedForm->Motd->ScrollUp();
 	return 0;
 }
 
@@ -252,6 +267,16 @@ void MenAreAntsApp::request_game()
 			}
 			ConnectedForm->Update();
 
+			if(ConnectedForm->Rejoin.empty() == false)
+			{
+				if(TMessageBox(("Vous avez été déconnecté pendant que vous jouiez à la partie " + ConnectedForm->Rejoin + ".\n\n"
+				               "Souhaitez-vous rejoindre la partie ?").c_str(),
+				               BT_YES|BT_NO, ConnectedForm).Show() == BT_YES)
+				{
+					RecoverGame(ConnectedForm->Rejoin);
+				}
+				ConnectedForm->Rejoin.clear();
+			}
 			if(!client || !client->IsConnected())
 			{
 				eob = true;

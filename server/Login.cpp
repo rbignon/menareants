@@ -18,7 +18,7 @@
  * $Id$
  */
 
-#include "lib/Channels.h"
+#include "Channels.h"
 #include "Commands.h"
 #include "Server.h"
 #include "Outils.h"
@@ -99,10 +99,24 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	cl->SetNick(nick);
 	SetAuth(cl);
 
+	Debug(W_CONNS, ">> Connexion de %s@%s", cl->GetNick(), cl->GetIp());
+
 	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
 
 	send_motd(cl);
 	send_stats(cl);
+
+	for(ChannelVector::const_iterator chan = ChanList.begin(); chan != ChanList.end(); ++chan)
+		if((*chan)->State() == EChannel::PINGING)
+		{
+			BPlayerVector pls = (*chan)->Players();
+			for(BPlayerVector::const_iterator pl = pls.begin(); pl != pls.end(); ++pl)
+				if((*pl)->CanRejoin() && (*pl)->Nick() == cl->Nick())
+				{
+					cl->sendrpl(app.rpl(ECServer::REJOIN), FormatStr((*chan)->Name()).c_str());
+					break;
+				}
+		}
 
 	return 0;
 }

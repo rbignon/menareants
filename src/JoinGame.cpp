@@ -43,12 +43,15 @@
 extern TLoadingForm   *LoadingForm;
 extern TInGameForm    *InGameForm;
 extern TOptionsForm   *OptionsForm;
+extern TPingingForm   *PingingForm;
 void LoadingGame(EC_Client* cl);
+std::vector<std::string> TGameInfosForm::RecvMap;
 
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 int JOINED = 0;                       /**< 1 = joined, -1 = error */
+bool RECOVERING = false;
 
 /** Someone wants to kick me
  *
@@ -72,25 +75,26 @@ int KICKCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(GameInfosForm)
+	EChannel* chan = me->Player()->Channel();
+	if(TGameInfosForm::RecvMap.empty())
 	{
-		EChannel* chan = me->Player()->Channel();
-		if(GameInfosForm->RecvMap.empty())
+		ECMap *map;
+		me->LockScreen();
+		if((map = dynamic_cast<ECMap*>(chan->Map())))
 		{
-			ECMap *map;
-			me->LockScreen();
-			if((map = dynamic_cast<ECMap*>(chan->Map())))
-			{
+			if(GameInfosForm)
 				GameInfosForm->Preview->SetImage(NULL);
-				MyFree(map);
-			}
-			chan->SetMap(NULL);
+			MyFree(map);
+		}
+		chan->SetMap(NULL);
+		if(GameInfosForm)
+		{
 			GameInfosForm->Hints->ClearItems();
 			GameInfosForm->Hints->AddItem("Chargement de la carte...");
-			me->UnlockScreen();
 		}
-		GameInfosForm->RecvMap.push_back(parv[1]);
+		me->UnlockScreen();
 	}
+	TGameInfosForm::RecvMap.push_back(parv[1]);
 	return 0;
 }
 
@@ -100,45 +104,46 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(GameInfosForm)
+	if(TGameInfosForm::RecvMap.empty())
+		Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
+	else
 	{
-		if(GameInfosForm->RecvMap.empty())
-			Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
-		else
+		me->LockScreen();
+		EChannel *chan = me->Player()->Channel();
+		ECMap *map = 0;
+		try
 		{
-			me->LockScreen();
-			EChannel *chan = me->Player()->Channel();
-			ECMap *map = 0;
-			try
-			{
-				map = new ECMap(GameInfosForm->RecvMap);
-				map->Init();
+			map = new ECMap(TGameInfosForm::RecvMap);
+			map->Init();
+			if(GameInfosForm)
 				map->CreatePreview(GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
 				                   GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
 				                   P_POSITIONS);
-			}
-			catch(TECExcept &e)
-			{
-				delete map;
-				Debug(W_ERR, "Unable to load a map :");
-				vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
-				GameInfosForm->RecvMap.clear();
-				me->UnlockScreen();
-				return 0;
-			}
-			chan->SetMap(map);
-			map->SetChannel(chan);
+		}
+		catch(TECExcept &e)
+		{
+			delete map;
+			Debug(W_ERR, "Unable to load a map :");
+			vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
+			TGameInfosForm::RecvMap.clear();
+			me->UnlockScreen();
+			return 0;
+		}
+		chan->SetMap(map);
+		map->SetChannel(chan);
+		if(GameInfosForm)
+		{
 			GameInfosForm->MapTitle->SetCaption(chan->Map()->Name() + " (" + TypToStr(chan->Map()->MinPlayers()) +
-			                                    "-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
+												"-" + TypToStr(chan->Map()->MaxPlayers()) + ")");
 			GameInfosForm->RecvMap.clear();
 			GameInfosForm->Preview->SetImage(chan->Map()->Preview(), false);
 			GameInfosForm->Preview->SetY(GameInfosForm->Window()->GetHeight() - 50 - GameInfosForm->Preview->Height());
 			GameInfosForm->MapTitle->SetXY(GameInfosForm->Preview->X() + GameInfosForm->Preview->Width()/2 -
-			                                   GameInfosForm->MapTitle->Width()/2,
+			                               GameInfosForm->MapTitle->Width()/2,
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
 			GameInfosForm->Hints->ClearItems();
-			me->UnlockScreen();
 		}
+		me->UnlockScreen();
 	}
 	return 0;
 }
@@ -302,9 +307,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	bool add = true;
 	uint j = 2;
-	for(uint i=0; i<parv[1].size(); i++)
+	for(std::string::const_iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 	{
-		switch(parv[1][i])
+		switch(*c)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
@@ -333,6 +338,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					vDebug(W_DESYNCH|W_SEND, "SET -l: interdit !", VSName(parv[0].c_str()) VSName(parv[1].c_str()));
 				break;
 			case 'W': if(add) chan->SetState(EChannel::WAITING); break;
+			case 'Q': if(add) chan->SetState(EChannel::PINGING); break;
 			case 'S':
 				if(add)
 				{
@@ -343,8 +349,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'P':
 				if(add)
 				{
-					/* On incrémente la date si ce n'est pas justement le premier jour */
-					if(chan->State() != EChannel::SENDING)
+					/* Si ce n'était pas un animation c'est pas un *nouveau* tour */
+					if(chan->State() == EChannel::ANIMING)
 					{
 						chan->Map()->NextDay();
 						++chan->Map()->NbDays();
@@ -356,7 +362,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(InGameForm)
 						{
 							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()), TBarreLat::SelectUnit);
+							Resources::SoundBegin()->Play();
 							InGameForm->GetElapsedTime()->reset();
+							InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 						}
 						me->UnlockScreen();
 					}
@@ -364,8 +372,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						*(chan->Map()->InitDate()) = ECDate(*chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
-						Resources::SoundBegin()->Play();
-						InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
 						// Move the lateral bar
@@ -427,17 +433,18 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET +m: sans numero"); break; }
 					if(GameInfosForm)
 					{
-						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j++]));
+						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j])); // pas incr j ici, lire avant le break;
 						if(GameInfosForm->MyPosition && !chan->IsMission())
 							GameInfosForm->MyPosition->SetEnabled();
 						if(!me->Player()->IsOwner() || chan->IsMission())
 							GameInfosForm->PretButton->SetEnabled(true);
 					}
-					else
-						Debug(W_DESYNCH|W_SEND, "SET +m: hors de GameInfosForm !");
 				}
 				else
 					Debug(W_DESYNCH|W_SEND, "SET -m: theoriquement impossible");
+
+				// On le fait ici car il a pu y avoir des erreurs ou surtout, il est possible qu'on ait recover une partie
+				j++;
 				break;
 			case '@':
 			{
@@ -489,7 +496,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							me->sendrpl(me->rpl(EC_Client::SET), "+!");
 						if(InGameForm)
 						{
-							InGameForm->BarreLat->PretButton->SetEnabled(!add);
+							if(!(*it)->Lost())
+								InGameForm->BarreLat->PretButton->SetEnabled(!add);
 							if(add && chan->State() == EChannel::PLAYING)
 								InGameForm->Map->SetCreateEntity(0);
 						}
@@ -567,7 +575,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			case 'b':
 				if(GameInfosForm && j<parv.size())
-					GameInfosForm->BeginMoney->SetValue(StrToTyp<int>(parv[j++]));
+					GameInfosForm->BeginMoney->SetValue(StrToTyp<int>(parv[j]));
+				j++; // Il faut ++ dans tous les cas
 				break;
 			case 't':
 			{
@@ -593,7 +602,29 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(sender->IsMe())
 						InGameForm->AddInfo(I_SHIT, "*** VOUS AVEZ PERDU !!!");
 					else
-						InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " a perdu.");
+						InGameForm->AddInfo(I_SHIT, "*** " + std::string(sender->GetNick()) + " a perdu.");
+				}
+				if(sender)
+					sender->SetLost();
+
+				if(PingingForm)
+				{
+					me->LockScreen();
+					PingingForm->UpdateList();
+					me->UnlockScreen();
+				}
+				break;
+			}
+			case 'w':
+			{
+				if(sender)
+					sender->SetDisconnected(add);
+
+				if(PingingForm)
+				{
+					me->LockScreen();
+					PingingForm->UpdateList();
+					me->UnlockScreen();
 				}
 				break;
 			}
@@ -760,7 +791,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				break;
 			default:
-				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', parv[1][i]);
+				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', *c);
 				break;
 		}
 	}
@@ -885,14 +916,14 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(parv[0] == me->GetNick())
 		{ /* C'est moi qui join */
 			EChannel *c = new EChannel(parv[1]);
-			me->SetPlayer(new ECPlayer(parv[0].c_str(), c, false, false, true, false));
+			me->SetPlayer(new ECPlayer(parv[0], c, false, false, true, false));
 			if(parv[1][0] == '.' && parv[1].size() == 1)
 				c->SetMission();
 
 			/* En cas de gros lag, il se peut que le joueur ait supprimé GameInfosForm avant même avoir reçu le JOIN.
 			 * Dans ce cas on prévient quand même le serveur qu'on part.
 			 */
-			if(!GameInfosForm)
+			if(!GameInfosForm && !RECOVERING)
 				me->sendrpl(EC_Client::rpl(EC_Client::LEAVE));
 		}
 		else
@@ -1031,6 +1062,40 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 	me->UnlockScreen();
 	return 0;
+}
+
+bool MenAreAntsApp::RecoverGame(std::string chan)
+{
+	EC_Client* client = EC_Client::GetInstance();
+
+	if(!client)
+		return false;
+
+	RECOVERING = true;
+
+	client->sendrpl(EC_Client::rpl(EC_Client::JOIN), FormatStr(chan).c_str());
+
+	{ WAIT_EVENT_T(JOINED != 0, i, 2); }
+
+	if(JOINED <= 0 || !client->Player())
+	{
+		RECOVERING = false;
+		return false;
+	}
+
+	{ WAIT_EVENT_T(client->Player()->Channel()->State() >= EChannel::SENDING, i, 5); }
+
+	RECOVERING = false;
+
+	if(client->Player()->Channel()->State() >= EChannel::SENDING)
+		LoadGame(client->Player()->Channel());
+
+	if(client->Player())
+	{
+		client->Player()->Channel()->SetWantLeave();
+		client->sendrpl(client->rpl(EC_Client::LEAVE));
+	}
+	return true;
 }
 
 bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)

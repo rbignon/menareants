@@ -55,7 +55,7 @@ class ECBPlayer
 {
 /* Constructeurs/Deconstructeurs */
 public:
-	ECBPlayer(ECBChannel *_chan, bool _owner, bool _op);
+	ECBPlayer(std::string nick, ECBChannel *_chan, bool _owner, bool _op);
 	virtual ~ECBPlayer();
 
 	/** List of nations */
@@ -108,7 +108,8 @@ public:
 	bool SetNation(unsigned int n);
 
 	/** Return nick of player. */
-	virtual const char* GetNick() const = 0;
+	virtual const char* GetNick() const { return nick.c_str(); }
+	std::string Nick() const { return nick; }
 
 	bool Ready() const { return ready; }                /**< Is player ready ? */
 	void SetReady(bool r = true) { ready = r; }         /**< Set player. */
@@ -129,8 +130,14 @@ public:
 	bool Lost() const { return lost; }
 	void SetLost(bool b = true) { lost = b; }
 
+	bool Disconnected() const { return disconnected; }
+	void SetDisconnected(bool b = true) { disconnected = b; }
+
+	bool CanRejoin() const { return (disconnected && !lost); }
+
 /* Variables privées */
 protected:
+	std::string nick;
 	ECBChannel *chan;
 	bool owner;
 	bool op;
@@ -143,6 +150,7 @@ protected:
 	unsigned int nation;
 	BPlayerVector allies;
 	bool lost;
+	bool disconnected;
 };
 
 /********************************************************************************************
@@ -168,6 +176,7 @@ public:
 		SENDING,           /**< Informations about game are sending. */
 		PLAYING,           /**< Players are playing. */
 		ANIMING,           /**< Game is in animation. */
+		PINGING,           /**< Game is paused because any players are disconnected because of a lost connexion */
 		SCORING            /**< End of game. */
 	};
 
@@ -183,8 +192,9 @@ public:
 
 	/* A propos des etats de la partie */
 	e_state State() const { return state; }                 /**< Return state of game. */
-	bool IsInGame() const { return (state >= PLAYING); }    /**< Check if channel is in game. */
+	bool IsInGame() const { return (state >= PLAYING) && (state < SCORING); }    /**< Check if channel is in game. */
 	bool Joinable() const { return (state == WAITING); }    /**< Check if channel is joinable. */
+	bool IsPinging() const { return (state == PINGING); }   /**< Is this channel pinging ? */
 	void SetState(e_state s) { state = s; }                 /**< Define state. */
 
 	/* Limite maximale pour entrer dans le chan */

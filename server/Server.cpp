@@ -45,6 +45,7 @@ const char* msgTab[] = {
      "MOTD %s",                             /* MOTD - Message Of The Day */
      "EOM",                                 /* EOM - Fin du motd */
      "STAT %d %d %d %d %d %d %d",           /* STAT - Stats du serveur */
+     "REJOIN %s",                           /* REJOIN - L'user peut rejoindre une partie où il a été déconnecté */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
      "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris */
@@ -288,6 +289,14 @@ void TClient::Free()
 		}
 		else if(c->NbPlayers() == 1) /* Dernier sur le chan */
 			delete c;
+		else if(c->IsInGame())
+		{ /* On lui laisse une chance de revenir */
+			pl->ClearClient();
+			pl->SetDisconnected();
+			c->send_modes(pl, "+w");
+			if(!c->CheckPinging())
+				c->CheckReadys();
+		}
 		else
 		{
 			if(pl->IsOwner())
@@ -301,6 +310,7 @@ void TClient::Free()
 
 void ECServer::delclient(TClient *del)
 {
+	Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
 	del->Free();
 	if(del->IsHuman())
 	{

@@ -3,7 +3,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--chercher le bug (voir console MenAreAntsD)
+-finir le système de reprise de partie avec la gestion des votes
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent
@@ -11,12 +11,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
--système qui permet de revenir à une partie en cas de perte de la connexion.
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Bof
--client: gestion des accents dans TEdit
+-faire un serveur d'indexation, et limiter à une partie par serveur de jeu.
 -lorsqu'il y a :
   BA -> AA -> (mouvement de BA deux fois vers la droite en passant par AA (1))
  il y a donc un combat prévu entre BA et AA, et si AA bouge vers le haut (2), le mouvement original de
@@ -32,7 +31,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 ** Unités
 - Tout le monde
-  - train de transport
   - batiment qui permet de ne pas avoir le semi brouillard
   - upgrades de la caserne et de l'usine d'armement
   - unité Dorian qui vend de l'alcool: les unités touchées se dirigent n'importe comment !

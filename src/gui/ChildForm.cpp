@@ -23,7 +23,7 @@
 TChildForm::TChildForm(int _x, int _y, uint _w, uint _h)
 	: TComponent(_x, _y, _w, _h), background(0), focus_order(true)
 {
-
+	composants.clear();
 }
 
 void TChildForm::SetBackground(ECImage *image)
@@ -108,7 +108,7 @@ void TChildForm::Clear()
 
 void TChildForm::SetXY(int _x, int _y)
 {
-	for(std::vector<TComponent*>::iterator it =composants.begin(); it != composants.end(); ++it)
+	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 		(*it)->SetXY(((*it)->X() - x) + _x, ((*it)->Y() - y) + _y);
 	x = _x;
 	y = _y;

@@ -238,7 +238,7 @@ void EMap::Save()
 		fp << "MISSION" << std::endl;
 
 	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
-		fp << "PLAYER " << (*it)->ID() << std::endl;
+		fp << "PLAYER " << (*it)->ID() << " " << (*it)->Nick() << std::endl;
 
 	fp << "X " << x << std::endl;
 	fp << "Y " << y << std::endl;

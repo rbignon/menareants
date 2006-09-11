@@ -389,6 +389,54 @@ private:
 /********************************************************************************************
  *                               TScoresForm                                                *
  ********************************************************************************************/
+/** Form to the +Q (PINGING) mode */
+class TPingingForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TPingingForm(ECImage*, EChannel*);
+
+/* Composants */
+public:
+
+	TLabel*       Title;
+	TMemo*        Message;
+	TButtonText*  LeaveButton;
+	TList*        Players;
+
+/* Attributs */
+public:
+	EChannel* Channel() const { return channel; }
+
+	void UpdateList();
+
+/* Variables privées */
+private:
+	EChannel* channel;
+};
+
+class TPingingPlayerLine : public TChildForm
+{
+public:
+
+	TPingingPlayerLine(ECBPlayer* pl);
+
+	TLabel*      Nick;
+	TLabel*      NbVotes;
+	TButtonText* Voter;
+
+	virtual void Init();
+
+	ECBPlayer* Player() const { return player; }
+
+private:
+	ECBPlayer* player;
+};
+
+/********************************************************************************************
+ *                               TScoresForm                                                *
+ ********************************************************************************************/
 /** This is a form who shows the channel's scores. */
 class TScoresForm : public TForm
 {

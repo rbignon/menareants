@@ -28,10 +28,11 @@ public:
 
 	void reset();
 	float time_elapsed(bool update=false);
+	bool Pause(bool set);
 	static long get_time();
 
 protected:
-
+	long pause;
 	long begin_time;
 	float elapsed;
 };
