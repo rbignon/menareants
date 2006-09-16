@@ -164,6 +164,46 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 'v':
+			{
+				if(!add)
+				{
+					Debug(W_DESYNCH, "SET -v: interdit.");
+					break;
+				}
+				if(!sender->Channel()->IsPinging())
+				{
+					Debug(W_DESYNCH, "SET +v: impossible hors du +Q (PINGING)");
+					break;
+				}
+				if(j>=parv.size()) { Debug(W_DESYNCH, "SET +v: pas de nick"); break; }
+				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
+				if(!pl) { Debug(W_DESYNCH, "SET +v: %s non trouvé", parv[(j-1)].c_str()); break; }
+
+				if(!pl->Disconnected() || pl->Lost())
+				{
+					Debug(W_DESYNCH, "SET +v: %s n'est pas deconnecté ou a déjà perdu.", pl->GetNick());
+					break;
+				}
+				if(!pl->AddVote(sender))
+				{
+					Debug(W_DESYNCH, "SET +v: %s a déjà voté pour %s", sender->GetNick(), pl->GetNick());
+					break;
+				}
+				/* Comme on a pas reçu un nombre en argument, on ne le fait pas envoyer plus bas mais tout de suite.
+				 * Comme ça ça apparait avant l'expulsion éventuelle */
+				sender->Channel()->send_modes(pl, ("+v " + TypToStr(pl->Votes())).c_str());
+				uint h = sender->Channel()->NbHumains();
+				uint r =   (h == 1) ? 1                // Il n'y a qu'un humain donc son seul vote compte
+				                    : !(h%2) ? h/2     // Nombre pair d'humains donc la moitier doit voter pour
+				                          : h/2+1;     // Nombre impair d'humains donc la moitier + 1 doit voter pour
+				if(pl->Votes() >= r)
+				{ /* EXPULSION */
+					sender->Channel()->RemovePlayer(pl, false);
+					sender->Channel()->CheckPinging();
+				}
+				break;
+			}
 			case 't':
 			{
 				if(!sender->Channel()->Joinable())
@@ -790,6 +830,16 @@ std::vector<TClient*> ECPlayer::ClientAllies() const
 			players.push_back(pl->Client());
 	}
 	return players;
+}
+
+bool ECPlayer::AddVote(ECBPlayer* pl)
+{
+	for(BPlayerVector::iterator it = votes.begin(); it != votes.end(); ++it)
+		if(*it == pl)
+			return false;
+
+	votes.push_back(pl);
+	return true;
 }
 
 /********************************************************************************************
@@ -1591,7 +1641,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 		if(pl->Client())
 			sendto_players(0, app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
 
-		if(use_delete)
+		if(!IsInGame() && use_delete)
 			delete pl;
 	}
 	else
@@ -1668,7 +1718,8 @@ bool EChannel::CheckPinging()
 	{
 		SetState(EChannel::PLAYING);
 		sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-Q+P");
-		CheckReadys();
+		if(!CheckEndOfGame())
+			CheckReadys();
 	}
 	return false;
 }

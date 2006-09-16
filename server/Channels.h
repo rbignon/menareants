@@ -87,11 +87,20 @@ public:
 
 	std::vector<TClient*> ClientAllies() const;
 
-/* Variables privées */
-protected:
-	TClient *client;
+	BPlayerVector::size_type Votes() const { return votes.size(); }
+	bool AddVote(ECBPlayer* pl);
 
+	void SetDisconnected(bool b = true)
+	{
+		ECBPlayer::SetDisconnected(b);
+		votes.clear();
+	}
+
+/* Variables privées */
+private:
+	TClient *client;
 	stats_t stats;
+	BPlayerVector votes;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

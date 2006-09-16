@@ -138,6 +138,7 @@ Sommaire:
          +@ <country>        :l'user possède maintenant la terre <country>
          +a <nick>           :définie un user comme allié de lui
          +w                  :ce joueur a été déconnecté et on attend qu'il se reconnecte
+         +v [nb]             :vote pour virer un user, pas besoin de nombre pour cl->serv, mais pour serv->cl
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible

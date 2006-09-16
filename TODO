@@ -3,10 +3,10 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--finir le système de reprise de partie avec la gestion des votes
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent
+-unité "silo de missile": data qui permet d'utiliser le silo qu'après une pose d'un ou deux tours.
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 -limiter le nombre d'unités à construire sur batiments
 

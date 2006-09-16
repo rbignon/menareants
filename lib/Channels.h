@@ -131,7 +131,7 @@ public:
 	void SetLost(bool b = true) { lost = b; }
 
 	bool Disconnected() const { return disconnected; }
-	void SetDisconnected(bool b = true) { disconnected = b; }
+	virtual void SetDisconnected(bool b = true) { disconnected = b; }
 
 	bool CanRejoin() const { return (disconnected && !lost); }
 

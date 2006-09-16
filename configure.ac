@@ -160,7 +160,7 @@ if test "x$GCC" = "xyes"; then
 
     if test "x${WARNINGS}" = "x1"; then
       dnl Enable all warnings
-# en résèrve: -Weffc++ (il fait bien mal aux variables non initialisées)
+# en reserve: -Weffc++ (il fait bien mal aux variables non initialisées)
 #             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
       GCC_FLAGS="-Wall -ansi -Wstrict-null-sentinel"

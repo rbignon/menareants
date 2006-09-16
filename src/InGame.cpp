@@ -619,6 +619,15 @@ void MenAreAntsApp::InGame()
 		elapsed_time->reset();
 		do
 		{
+			/// \todo voir si on peut pas mettre ça ailleurs
+			InGameForm->BarreLat->ScreenPos->SetXY(
+			            InGameForm->BarreLat->Radar->X() -
+			              ((int)InGameForm->BarreLat->Radar->Width()/(int)chan->Map()->Width() *
+			               InGameForm->Map->X()/CASE_WIDTH),
+			            InGameForm->BarreLat->Radar->Y() -
+			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
+			              InGameForm->Map->Y()/CASE_HEIGHT));
+			InGameForm->Update();
 			if(timer->time_elapsed(true) > 10)
 			{
 				if(InGameForm->Chat->NbItems())
@@ -630,12 +639,11 @@ void MenAreAntsApp::InGame()
 			}
 			if(chan->State() == EChannel::PLAYING)
 			{
-				//printf("%f (%ld)\n", elapsed_time->time_elapsed(true), InGameForm->BarreLat->ProgressBar->Max());
 				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
 				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
 				{
 					client->sendrpl(client->rpl(EC_Client::SET), "+!");
-					//elapsed_time->reset();
+					elapsed_time->reset();
 				}
 			}
 			else if(chan->State() == EChannel::ANIMING)
@@ -933,16 +941,6 @@ void MenAreAntsApp::InGame()
 						break;
 				}
 			}
-			/// \todo voir si on peut pas mettre ça ailleurs
-			InGameForm->BarreLat->ScreenPos->SetXY(
-			            InGameForm->BarreLat->Radar->X() -
-			              ((int)InGameForm->BarreLat->Radar->Width()/(int)chan->Map()->Width() *
-			               InGameForm->Map->X()/CASE_WIDTH),
-			            InGameForm->BarreLat->Radar->Y() -
-			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
-			              InGameForm->Map->Y()/CASE_HEIGHT));
-			//SDL_FillRect(Video::GetInstance()->Window(), NULL, 0);
-			InGameForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() != EChannel::SCORING);
 
@@ -2010,10 +2008,46 @@ void MenAreAntsApp::PingingGame()
 		PingingForm = new TPingingForm(Video::GetInstance()->Window(), chan);
 
 		PingingForm->SetMutex(mutex);
-		//PingingForm->RetourButton->SetOnClick(TScoresForm::WantLeave, client);
+
+		/* On utilise la fonction de TScoresForm qui nous convient parfaitement */
+		PingingForm->LeaveButton->SetOnClick(TScoresForm::WantLeave, client);
+
+		SDL_Event event;
 		do
 		{
-			PingingForm->Actions();
+			std::vector<TComponent*> list = PingingForm->Players->GetList();
+			for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+			{
+				TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
+				if(!pll) continue;
+
+				pll->Progress->SetValue((long)pll->timer.time_elapsed(true));
+				if(pll->Progress->Value() >= pll->Progress->Max())
+				{
+					client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
+					pll->timer.reset();
+				}
+			}
+			while( SDL_PollEvent( &event) )
+			{
+				PingingForm->Actions(event);
+				switch(event.type)
+				{
+					case SDL_MOUSEBUTTONDOWN:
+					{
+						list = PingingForm->Players->GetList();
+						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+						{
+							TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
+							if(pll && pll->Voter->Test(event.button.x, event.button.y))
+								client->sendrpl(client->rpl(EC_Client::SET),
+								                ("+v " + pll->Player()->Nick()).c_str());
+						}
+						break;
+					}
+					default: break;
+				}
+			}
 			PingingForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        chan->State() == EChannel::PINGING);
@@ -2039,12 +2073,9 @@ TPingingForm::TPingingForm(ECImage* w, EChannel* ch)
 	Message->AddItem("Les joueurs ci-dessous ont été déconnecté du serveur anormalement, probablement à cause "
 	                 "du plantage de leur connexion Internet.\n"
 	                 "\n"
-	                 "Pour le moment les boutons \"Quitter\" et \"Voter\" sont inutiles, car ce système de "
-	                 "récupération de partie n'est pas fini.\n"
-	                 "Le seul moyen pour la personne de revenir est de se reconnecter au serveur et d'accepter "
-	                 "la proposition de reconnexion à la partie.\n"
-	                 "Il est à noter que si cette personne ne revient pas, il y a aucun moyen pour le moment "
-	                 "de continuer la partie.", white_color);
+	                 "Vous pouvez voter pour éjecter un joueur. Lorsque la moitier des joueurs humains restants "
+	                 "aurront votés pour tel zombie, celui-ci sera éjecté.\n"
+	                 "Lorsque tous les zombies sont soit revenus soit ont été virés, la partie reprendra.", white_color);
 	Message->ScrollUp();
 
 	Players = AddComponent(new TList(100, 350));
@@ -2066,7 +2097,7 @@ void TPingingForm::UpdateList()
 }
 
 TPingingPlayerLine::TPingingPlayerLine(ECBPlayer* pl)
-	: TChildForm(0,0, 300, 150), player(pl)
+	: TChildForm(0,0, 300, 50), player(pl)
 {
 
 }
@@ -2075,9 +2106,15 @@ void TPingingPlayerLine::Init()
 {
 	Nick = AddComponent(new TLabel(0, 10, player->Nick(), color_eq[player->Color()], Font::GetInstance(Font::Big)));
 
-	NbVotes = AddComponent(new TLabel(200, 10, "0", white_color, Font::GetInstance(Font::Big)));
+	NbVotes = AddComponent(new TLabel(200, 10, TypToStr(dynamic_cast<ECPlayer*>(player)->Votes()), white_color,
+	                                  Font::GetInstance(Font::Big)));
 
 	Voter = AddComponent(new TButtonText(250, 0,150,50, "Voter", Font::GetInstance(Font::Normal)));
+
+	Progress = AddComponent(new TProgressBar(450, 10, 100, 30));
+	Progress->InitVal(0, 0, 300);
+
+	timer.reset();
 }
 
 /********************************************************************************************

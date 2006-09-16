@@ -41,6 +41,7 @@ void TList::Clear()
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 		delete (*it);
 	list.clear();
+	Rebuild();
 }
 
 bool TList::RemoveLine(TComponent *c, bool use_delete)

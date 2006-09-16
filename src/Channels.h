@@ -60,10 +60,19 @@ public:
 
 	virtual bool IsIA() const { return is_ia; }
 
+	uint& Votes() { return votes; }
+
+	void SetDisconnected(bool b = true)
+	{
+		ECBPlayer::SetDisconnected(b);
+		votes = 0;
+	}
+
 /* Variables privées */
 protected:
 	bool isme;
 	bool is_ia;
+	uint votes;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

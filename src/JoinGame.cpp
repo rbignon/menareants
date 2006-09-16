@@ -427,6 +427,33 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 }
 				 break;
 			case 'E': if(add) chan->SetState(EChannel::SCORING); break;
+			case 'v':
+				if(add)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET +v: sans numero"); break; }
+					sender->Votes() = StrToTyp<uint>(parv[j]);
+					if(PingingForm)
+					{
+						me->LockScreen();
+						std::vector<TComponent*> list = PingingForm->Players->GetList();
+						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+						{
+							TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
+							if(pll && pll->Player() == sender)
+							{
+								pll->NbVotes->SetCaption(parv[j]);
+								pll->Voter->SetEnabled(false);
+								break;
+							}
+						}
+						me->UnlockScreen();
+					}
+				}
+				else
+					Debug(W_DESYNCH|W_SEND, "SET -v: interdit");
+
+				j++;
+				break;
 			case 'm':
 				if(add)
 				{
@@ -1234,10 +1261,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 										{
 											if(pll->Player()->IsOp())
 												client->sendrpl(client->rpl(EC_Client::SET),
-															("-o " + std::string(pll->Player()->GetNick())).c_str());
+															("-o " + pll->Player()->Nick()).c_str());
 											else
 												client->sendrpl(client->rpl(EC_Client::SET),
-															("+o " + std::string(pll->Player()->GetNick())).c_str());
+															("+o " + pll->Player()->Nick()).c_str());
 										}
 										else if(pll->Nick->Test(event.button.x, event.button.y))
 										{

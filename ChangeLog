@@ -1,3 +1,23 @@
+2006-09-16 Romain Bignon <progs@headfucking.net>
+
+	* changelog.sh: Script qui génère à partir du svn diff le changelog.
+
+	* src/Channels.h (ECPlayer): Ajout du compte des votes.
+
+	* src/InGame.cpp (void MenAreAntsApp::InGame): Corrections d'un crash.
+	 (void MenAreAntsApp::PingingGame): Gestion des votes.
+	 (TPingingForm::TPingingForm): Gestion des votes.
+
+	* src/JoinGame.cpp (int SETCommand::Exec): Gestion des votes.
+
+	* src/gui/Component.cpp (void TList::Clear): Correction d'un bug qui ne reparamétrait pas les infos.
+
+	* server/Channels.cpp (int SETCommand::Exec):
+	 (bool EChannel::RemovePlayer): Ne delete pas même si demandé dans le cas où on est InGame.
+	 (bool EChannel::CheckPinging): Vérifie si on est en fin de partie.
+
+	* API: Le protocole gère les votes.
+
 2006-09-11  Romain Bignon <progs@headfucking.net>
 
 	* src/Timer.h: Système qui permet de mettre le timer sur pause.

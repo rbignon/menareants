@@ -409,6 +409,8 @@ public:
 public:
 	EChannel* Channel() const { return channel; }
 
+/* Methodes */
+public:
 	void UpdateList();
 
 /* Variables privées */
@@ -422,9 +424,12 @@ public:
 
 	TPingingPlayerLine(ECBPlayer* pl);
 
-	TLabel*      Nick;
-	TLabel*      NbVotes;
-	TButtonText* Voter;
+	TLabel*       Nick;
+	TLabel*       NbVotes;
+	TButtonText*  Voter;
+	TProgressBar* Progress;
+
+	Timer         timer;
 
 	virtual void Init();
 

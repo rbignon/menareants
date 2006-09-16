@@ -273,7 +273,7 @@ public:
 	virtual void Invest(ECBEntity* e);
 
 	/** This virtual function must be redefined in server to change owner, but it called by ECBCase::CheckChaningOwner() */
-	virtual void ChangeOwner(ECBPlayer*) { assert(0); }
+	virtual void ChangeOwner(ECBPlayer*) { throw std::exception(); }
 
 	/** Use this function to know if this entity can be created */
 	virtual bool CanBeCreated(ECBCase* c = 0) const;
