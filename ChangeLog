@@ -2,6 +2,8 @@
 
 	* changelog.sh: Script qui génère à partir du svn diff le changelog.
 
+	* Batiments.h (ECSilo): Le silo n'est actif que deux jours après la création.
+
 	* src/Channels.h (ECPlayer): Ajout du compte des votes.
 
 	* src/InGame.cpp (void MenAreAntsApp::InGame): Corrections d'un crash.

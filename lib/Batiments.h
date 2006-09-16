@@ -209,15 +209,16 @@ protected:
  *                               ECBSilo                                                    *
  ********************************************************************************************/
 #define SILO_IMPACT                1
+#define SILO_CHARGETIME            2
 /** This is a char factory */
 class ECBSilo : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_EMPTY_CONSTRUCTOR(ECBSilo) : nuclear_search(0) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBSilo) : nuclear_search(0), restBuild(SILO_CHARGETIME) {}
 
-	ENTITY_CONSTRUCTOR(ECBSilo), nuclear_search(0) {}
+	ENTITY_CONSTRUCTOR(ECBSilo), nuclear_search(0), restBuild(SILO_CHARGETIME) {}
 
 	virtual ~ECBSilo() {}
 
@@ -229,7 +230,11 @@ public:
 	virtual uint InitNb() const { return 500;}
 	virtual uint Porty() const { return 10; }
 
-	virtual bool CanAttaq(const ECBEntity* e) { return true; }
+	enum data_t {
+		DATA_RESTBUILD
+	};
+
+	virtual bool CanAttaq(const ECBEntity* e) { return !(restBuild); }
 
 	virtual void Init();
 
@@ -237,7 +242,7 @@ public:
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
-	virtual bool WantAttaq(uint x, uint y, bool) { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return !(restBuild); }
 
 	virtual bool CanCreate(const ECBEntity* e) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
@@ -248,9 +253,14 @@ public:
 	ECBNuclearSearch* NuclearSearch() const { return nuclear_search; }
 	void ClearNuclearSearch() { nuclear_search = 0; }
 
+	uint RestBuild() const { return restBuild; }
+
 /* Variables privées */
 private:
 	ECBNuclearSearch* nuclear_search;
+
+protected:
+	uint restBuild;
 };
 
 /********************************************************************************************

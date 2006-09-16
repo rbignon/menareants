@@ -139,6 +139,8 @@ public:
 
 	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 
+	virtual void Played();
+
 	virtual bool WantAttaq(uint x, uint y, bool);
 };
 

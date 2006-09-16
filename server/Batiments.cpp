@@ -219,6 +219,21 @@ void ECNuclearSearch::RemoveOneMissile()
  *                                        ECSilo                                            *
  ********************************************************************************************/
 
+void ECSilo::Played()
+{
+	if(restBuild)
+	{
+		restBuild--;
+		if(Owner() && Owner()->Client())
+		{
+			std::vector<TClient*> sdrs = Owner()->ClientAllies();
+			sdrs.push_back(Owner()->Client());
+			Channel()->SendArm(sdrs, this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
+		}
+	}
+	ECEntity::Played();
+}
+
 bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 {
 	if(!force && (!NuclearSearch() || !NuclearSearch()->Missiles()))

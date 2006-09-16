@@ -230,6 +230,8 @@ public:
 
 	virtual std::string SpecialInfo();
 
+	virtual void RecvData(ECData);
+
 /* Variables privées */
 private:
 	ECMissile missile;

@@ -202,12 +202,24 @@ std::string ECNuclearSearch::SpecialInfo()
  *                                         ECSilo                                           *
  ********************************************************************************************/
 
+void ECSilo::RecvData(ECData data)
+{
+	switch(data.type)
+	{
+		case DATA_RESTBUILD:
+			restBuild = StrToTyp<uint>(data.data);
+			break;
+	}
+}
+
 std::string ECSilo::SpecialInfo()
 {
 	if(!Owner()->IsMe())
 		return "";
 	else if(!NuclearSearch())
 		return "Relié à aucun Centre de recherches nucléaire.";
+	else if(restBuild)
+		return "Ce silo ne sera pret que dans " + TypToStr(restBuild) + " jours.";
 	else if(!NuclearSearch()->Missiles())
 		return "Aucun missile disponible.";
 	else
