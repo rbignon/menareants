@@ -22,6 +22,7 @@
 #include "tools/Font.h"
 #include "tools/Images.h"
 #include "Edit.h"
+#include <assert.h>
 #include <SDL.h>
 
 TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool _show_bg)

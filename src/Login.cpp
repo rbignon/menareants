@@ -76,6 +76,16 @@ int USEDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** This server rejects me because it is full.
+ *
+ * Syntax: ER3
+ */
+int ER3Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	me->SetCantConnect("Le serveur est plein");
+	return 0;
+}
+
 /** My game isn't compatible with this server.
  *
  * Syntax: MAJ <0/+/->
@@ -253,8 +263,8 @@ void MenAreAntsApp::request_game()
 						{
 							if(!GameInfos(NULL, ConnectedForm, true))
 							{
-								TMessageBox mb("Impossible de créer le salon.\n"
-												"Son nom est peut être déjà utilisé.",
+								TMessageBox mb("Impossible de créer une mission.\n"
+												"Il y a actuellement de trop de parties en cours sur le serveur.",
 												BT_OK, ConnectedForm);
 								mb.Show();
 							}
@@ -269,8 +279,9 @@ void MenAreAntsApp::request_game()
 
 			if(ConnectedForm->Rejoin.empty() == false)
 			{
-				if(TMessageBox(("Vous avez été déconnecté pendant que vous jouiez à la partie " + ConnectedForm->Rejoin + ".\n\n"
-				               "Souhaitez-vous rejoindre la partie ?").c_str(),
+				if(TMessageBox(("Vous avez été déconnecté pendant que vous jouiez à la partie " +
+				                ConnectedForm->Rejoin + ".\n\n"
+				                "Souhaitez-vous rejoindre la partie ?").c_str(),
 				               BT_YES|BT_NO, ConnectedForm).Show() == BT_YES)
 				{
 					RecoverGame(ConnectedForm->Rejoin);

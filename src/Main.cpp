@@ -22,6 +22,7 @@
 #include <SDL_image.h>
 #include <cerrno>
 #include <signal.h>
+#include <sys/resource.h>
 
 #ifndef WIN32
 #include <sys/stat.h>
@@ -117,17 +118,16 @@ void MenAreAntsApp::WantConfig(TObject*, void* b)
 	TMainForm::enter_in_main = true;
 }
 
-void MenAreAntsApp::quit_app(int value)
+void MenAreAntsApp::quit_app()
 {
 #ifdef WIN32
-		WSACleanup();
+	WSACleanup();
 #endif
-		Resources::Unload();
-		TTF_Quit();
-		Sound::End();
-		delete Video::GetInstance();
-		delete Config::GetInstance();
-        exit(value);
+	Resources::Unload();
+	TTF_Quit();
+	Sound::End();
+	delete Video::GetInstance();
+	delete Config::GetInstance();
 }
 
 int MenAreAntsApp::main(int argc, char **argv)
@@ -139,6 +139,15 @@ int MenAreAntsApp::main(int argc, char **argv)
 #endif
 
 		srand( (long)time(NULL) );
+
+		struct rlimit rlim; /* used for core size */
+		if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
+		{
+			printf("Core size limitée à %ldk, changement en illimité.\n", rlim.rlim_cur);
+			rlim.rlim_cur = RLIM_INFINITY;
+			rlim.rlim_max = RLIM_INFINITY;
+			setrlimit(RLIMIT_CORE, &rlim);
+		}
 
 		Config* conf = Config::GetInstance();
 #ifndef WIN32
@@ -199,8 +208,8 @@ int MenAreAntsApp::main(int argc, char **argv)
 			MainForm->Actions();
 			if(TMainForm::enter_in_main)
 			{
-#ifdef BUGUED_INTRO
 				TMainForm::enter_in_main = false;
+#ifdef BUGUED_INTRO
 				ECSprite sprite(Resources::Intro(), video->Window());
 				if(sprite.GetWidth() != video->Width() ||
 				   sprite.GetHeight() != video->Height())
@@ -221,8 +230,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 		} while(!want_quit);
 
 		MyFree(MainForm);
-
-		quit_app(1);
 	}
 	catch (const TECExcept &e)
 	{
@@ -231,17 +238,18 @@ int MenAreAntsApp::main(int argc, char **argv)
 #ifdef DEBUG
 		std::cout << e.Vars() << std::endl;
 #endif
-		quit_app(225);
+		quit_app();
 	}
 #ifndef DEBUG
 	catch (const std::exception &err)
 	{
 		std::cout << std::endl << "Exception caught from STL:" << std::endl;
 		std::cout << err.what() << std::endl;
-		quit_app(255);
+		quit_app();
 	}
 #endif
 
+	quit_app();
 	return 0;
 
 }
@@ -366,7 +374,7 @@ TCredits::TCredits(ECImage* w)
 	 */
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
-	Memo->AddItem("Merci au lycée Corneilles pour nous avoir mis dans le contexte emmerdant qui "
+	Memo->AddItem("Merci au lycée Corneille pour nous avoir mis dans le contexte emmerdant qui "
 	              "nous a permit de trouver des idées \"amusantes\" pour passer le temps et qui "
 	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "
 	              "cours d'histoire et d'espagnol. Je tiens d'ailleurs à remercier le manque "

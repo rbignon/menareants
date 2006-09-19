@@ -1,4 +1,58 @@
+2006-09-19 Romain Bignon <progs@headfucking.net>
+
+	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait pour le moment prendre
+	plus de mémoire (5 bools = 5 * 4 = 20 bits, 1 int = 32 bits). Mais par la suite dans trois flags ça fera gagner
+	de la place.
+
+	* lib/Map (ECBCountry): Suppression des flags inutilisés.
+
+	* lib/Debug.h: assert() ne fait plus d'exception. C'est juste que si DEBUG n'est pas déclaré, il fait comme si y
+	avait NDEBUG de déclaré. Donc quand il n'y a pas le debugage, il fait plus les vérifications.
+
+	* src/Main.cpp: Mise du core size limit à infinie pour générer un core.
+
+2006-09-18 Romain Bignon <progs@headfucking.net>
+
+	* API: Rajout des messages d'erreurs ER3(SERVFULL) et ER4(TOOMUCHGAMES).
+
+	* server/Config.h: Configuration pour PINGFREQ, MAXCONNEXIONS et MAXGAMES.
+
+	* server/menareantsd.conf: Configuration pour PINGFREQ, MAXCONNEXIONS et MAXGAMES.
+
+	* server/Main.cpp: Utilisation du PINGFREQ de la conf.
+
+	* server/Server.cpp: Utilisation du MAXCONNEXIONS de la conf avec un message d'erreur spécial.
+
+	* src/Login.cpp: Traitement de l'erreur ER3(SERVFULL).
+
+	* server/Channels.cpp: Utilisation de MAXGAMES de la conf avec un message d'erreur spécial.
+
+	* src/JoinGame.cpp: Gestion des messages d'erreurs ER2(IACANTJOIN) et ER4(TOOMUCHGAMES).
+	(TGameInfosForm): Système pour les messages d'erreurs avec une variable string statique.
+
+2006-09-17 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ShowMap.cpp (void TMap::ScrollTo): Implémentation de la fonction.
+
+	* src/InGame.cpp (ARMCommand): Lors des animations, quand la camera bouge, elle scroll, c'est beau !
+
+	* src/InGame.cpp (MenAreAntsApp::InGame): Utilisation des touches UP/DOWN/LEFT/RIGHT pour scroller la map.
+
+	* src/InGame.cpp (MenAreAntsApp::InGame): Affichage d'un message dans le cas où il y a une animation qu'on ne peut pas
+	voir.
+
+	* src/InGame.cpp (MenAreAntsApp::InGame): Le bouton "Pret" se desactive dès le clic, pour éviter une succession de clics
+	en cas de lag, risquant de fausser la partie.
+
+	* src/data/pics/help.png: Recréation de l'image mise au gout du jour.
+
+	* src/Batiments.cpp: Affiche pour le centre-ville et ses upgrades combien elles rapportent par tours.
+
+	* server/IA.cpp (UseTransportBoat): Correction d'un grave bug qui ne faisait plus debarquer !
+	
 2006-09-16 Romain Bignon <progs@headfucking.net>
+
+	* Correction des assert.h manquants (alors que bizarement sur la majorité des compilateurs ça compile sans).
 
 	* changelog.sh: Script qui génère à partir du svn diff le changelog.
 

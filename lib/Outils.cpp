@@ -242,17 +242,17 @@ bool FichierExiste(const std::string &nom)
 void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdname)
 {
 	char s[1024 + 20];
-	unsigned int i, j, len = buf.length();
+	unsigned int j;
 
-	for(i=0; i <= len; )
+	for(std::string::const_iterator it = buf.begin(); it != buf.end(); )
 	{
 		bool slash;
-		while(buf[i] == ' ' || buf[i] == '\0') i++; /* D'après valgrind il y a un problème à cette ligne, affaire à suivre */
-		for(slash=false,j=0; (i<=len && (buf[i] != ' ' || slash)); i++)
-			if(buf[i] == '\\' && (buf[i+1] == ' ' || buf[i+1] == '\\') && !slash)
+		while(*it == ' ' && it != buf.end()) ++it; /* D'après valgrind il y a un problème à cette ligne, affaire à suivre */
+		for(slash=false,j=0; (it != buf.end() && (*it != ' ' || slash)); ++it)
+			if(*it == '\\' && it+1 != buf.end() && (*(it+1) == ' ' || *(it+1) == '\\') && !slash)
 				slash = true;
 			else
-				s[j++]=buf[i], slash=false;
+				s[j++]=*it, slash=false;
 		s[j]='\0';
 		if(!j) continue;
 		if(cmdname->empty())

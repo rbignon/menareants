@@ -53,7 +53,9 @@ public:
 		REJOIN,       /**< REJOIN */
 
 		CANTJOIN,     /**< ER1 */
-		IANICKUSED,   /**< ER2 */
+		IACANTJOIN,   /**< ER2 */
+		SERVFULL,     /**< ER3 */
+		CANTCREATE,   /**< ER4 */
 
 		PING,         /**< PIG */
 		PONG,         /**< POG */

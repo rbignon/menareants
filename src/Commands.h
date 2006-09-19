@@ -87,6 +87,12 @@ class EOLCommand : public EC_ACommand { public: EOLCommand(const std::string _Cm
 
 class ER1Command : public EC_ACommand { public: ER1Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ER1Command() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class ER2Command : public EC_ACommand { public: ER2Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ER2Command() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class ER3Command : public EC_ACommand { public: ER3Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ER3Command() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class ER4Command : public EC_ACommand { public: ER4Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ER4Command() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* DANS PRE-PARTIES */
 
 class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

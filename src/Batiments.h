@@ -25,6 +25,7 @@
 #include "src/Map.h"
 #include "lib/Batiments.h"
 #include "Resources.h"
+#include <assert.h>
 
 class Color;
 
@@ -269,6 +270,7 @@ public:
 	}
 	virtual ECImage* Icon() const { return Resources::Megalopole_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
+	virtual std::string SpecialInfo();
 };
 
 /********************************************************************************************
@@ -296,6 +298,7 @@ public:
 	}
 	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
+	virtual std::string SpecialInfo();
 };
 
 /********************************************************************************************
@@ -322,6 +325,7 @@ public:
 		       "tous les quartiers de la ville.";
 	}
 	virtual ECImage* Icon() const { return Resources::City_Icon(); }
+	virtual std::string SpecialInfo();
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
 };
 

@@ -58,7 +58,9 @@ Sommaire:
               REJOIN <chan>                     :l'user est invité à rejoindre une partie à laquelle il a été déconnecté
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
-              ER2 <nick>                        :le pseudo de l'IA a déjà été pris
+              ER2 <nick>                        :le pseudo de l'IA a déjà été pris ou il y a trop de monde
+              ER3                               :trop de connexions sur ce serveur
+              ER4                               :impossible de créer la partie car il y en a déjà trop
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               LSM <nom> <nbmin> <nbmax> <infos> :envoie la liste des cartes
               EOMAP                             :fin de la liste des maps

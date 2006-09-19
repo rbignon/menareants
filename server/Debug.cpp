@@ -74,7 +74,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	if(!(flags & W_NOLOG))
 	{
 		const char* f;
-		if(flags & W_DEBUG) f = DEBUG_LOG;
+		if(flags & W_DEBUG || flags & W_ECHO) f = DEBUG_LOG;
 		else if(flags & W_CONNS) f = CONNS_LOG;
 		else f = ERROR_LOG;
 		std::ofstream file((app.GetPath() + f).c_str(), std::ios_base::app);
@@ -86,7 +86,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 		}
 #ifdef DEBUG
 		else
-			std::cout << "[WARNING] Impossible d'ouvrir " << std::string(app.GetPath() + DEBUG_LOG)
+			std::cout << "[WARNING] Impossible d'ouvrir " << std::string(app.GetPath() + f)
 			          << std::endl;
 #endif
 	}

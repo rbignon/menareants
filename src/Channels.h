@@ -53,7 +53,7 @@ public:
 public:
 
 	/** Player's channel. */
-	EChannel *Channel() const { return (EChannel*)chan; }
+	EChannel *Channel() const { return (EChannel*)ECBPlayer::Channel(); }
 
 	/** Is this player me ? */
 	bool IsMe() const { return isme; }
@@ -69,7 +69,7 @@ public:
 	}
 
 /* Variables privées */
-protected:
+private:
 	bool isme;
 	bool is_ia;
 	uint votes;
@@ -105,7 +105,7 @@ public:
 
 	ECPlayer* GetMe();
 
-	ECMap* Map() const { return dynamic_cast<ECMap*>(map); }
+	ECMap* Map() const { return dynamic_cast<ECMap*>(ECBChannel::Map()); }
 
 	bool WantLeave() const { return want_leave; }
 	void SetWantLeave() { want_leave = true; }
@@ -114,7 +114,7 @@ public:
 	void SetCurrentEvent(uint e) { current_event = e; }
 
 /* Variables privées */
-protected:
+private:
 	bool want_leave;
 	uint current_event;
 };

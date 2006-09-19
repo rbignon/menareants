@@ -38,13 +38,10 @@ typedef unsigned int   uint;
 #define CONNS_LOG       "connexions.log" /* Fichier de logging des connexions */
 
 /* Interval */
-const int PINGINTERVAL=30;
-
 const int MAXBUFFER=1024;
 const uint ECD_SENDSIZE=1024;
 const uint ECD_RECVSIZE=256;
 const int COMLEN=10;
-const int MAXCONNEX=100; /* de préférence un multiple de 4 */
 
 /* Config */
 #ifdef CONFDIR

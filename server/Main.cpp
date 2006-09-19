@@ -62,14 +62,14 @@ void ECServer::sig_alarm(int c)
 			DelPing(cl);
 			cl->exit(app.rpl(ECServer::BYE));
 		}
-		else if((cl->GetLastRead() + PINGINTERVAL) <= app.CurrentTS)
+		else if((cl->GetLastRead() + app.GetConf()->PingFreq()) <= app.CurrentTS)
 		{
 			cl->sendrpl(app.rpl(ECServer::PING));
 			SetPing(cl);
 		}
 	}
 
-	alarm(PINGINTERVAL);
+	alarm(app.GetConf()->PingFreq());
 #endif
 }
 
@@ -159,7 +159,11 @@ int ECServer::main(int argc, char **argv)
 		running = true;
 	
 		if(init_socket())
+		{
+			alarm(GetConf()->PingFreq());
+
 			run_server();
+		}
 	
 	}
 	catch (const TECExcept &e)

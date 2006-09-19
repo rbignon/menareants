@@ -48,7 +48,9 @@ const char* msgTab[] = {
      "REJOIN %s",                           /* REJOIN - L'user peut rejoindre une partie où il a été déconnecté */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
-     "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris */
+     "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris ou la partie est pleine */
+     "ER3",                                 /* ER3 - Serveur plein, impossible de connecter */
+     "ER4",                                 /* ER4 - Impossible de créer la partie */
 
      "PIG",                                 /* PIG - Envoie un ping */
      "POG",                                 /* POG - Reçoit un pong */
@@ -249,28 +251,33 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	TClient *newC = NULL;
 	if(fd >= 0)
 	{
-        if(myClients[fd])
-        {
-            Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])",
-                             ip, fd, myClients[fd]->GetIp());
-            return 0;
-        }
-        newC = new TRealClient(fd, ip);
-    }
-    else
-        newC = new TIA;
-		
-	if(fd >= 0)
-    {
-        FD_SET(fd, &global_fd_set);
-        NBco++;
-        NBtot++;
-        myClients[fd] = newC;
-        if((unsigned)fd > highsock) highsock = fd;
+		if(myClients.size() >= GetConf()->MaxConnexions())
+		{
+			send(fd, app.rpl(ECServer::SERVFULL), strlen(app.rpl(ECServer::SERVFULL)), 0);
+			return 0;
+		}
+		if(myClients[fd])
+		{
+			Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])",
+							ip, fd, myClients[fd]->GetIp());
+			return 0;
+		}
+		newC = new TRealClient(fd, ip);
+	}
+	else
+		newC = new TIA;
 
-        newC->sendrpl(rpl(ECServer::HELLO));
-    }
-    Clients.push_back(newC);
+	if(fd >= 0)
+	{
+		FD_SET(fd, &global_fd_set);
+		NBco++;
+		NBtot++;
+		myClients[fd] = newC;
+		if((unsigned)fd > highsock) highsock = fd;
+
+		newC->sendrpl(rpl(ECServer::HELLO));
+	}
+	Clients.push_back(newC);
 
 	return newC;
 }
@@ -374,8 +381,6 @@ int ECServer::init_socket(void)
     for(std::vector<TClient*>::iterator it = Clients.begin(); it != Clients.end(); ++it)
         delete *it;
     Clients.clear();
-
-	alarm(PINGINTERVAL);
 
 	return 1;
 }

@@ -173,9 +173,58 @@ void TMap::CenterTo(int _x, int _y)
 	MoveTo(_x - SCREEN_WIDTH/2, _y - SCREEN_HEIGHT/2);
 }
 
-void TMap::ScrollTo(int _x, int _y)
+void TMap::ScrollTo(int x2, int y2)
 {
-	/// \todo Implementation of this function
+	int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py, x1, y1;
+
+	x1 = - X() + SCREEN_WIDTH/2;
+	y1 = - Y() + SCREEN_HEIGHT/2;
+
+	dx = x2 - x1;               /* the horizontal distance of the line */
+	dy = y2 - y1;               /* the vertical distance of the line */
+	dxabs = abs(dx);
+	dyabs = abs(dy);
+	sdx = sgn(dx);
+	sdy = sgn(dy);
+	x = dyabs >> 1;
+	y = dxabs >> 1;
+	px = x1;
+	py = y1;
+
+	if(dxabs >= dyabs)          /* the line is more horizontal than vertical */
+	{
+		for(i = 0; i < dxabs; i++)
+		{
+			y += dyabs;
+			if(y >= dxabs)
+			{
+				y -= dxabs;
+				py += sdy;
+			}
+			px += sdx;
+			if(px < 0 || px%30)
+				continue;
+			CenterTo(px, py);
+			SDL_Delay(20);
+		}
+	}
+	else                        /* the line is more vertical than horizontal */
+	{
+		for(i = 0; i < dyabs; i++)
+		{
+			x += dxabs;
+			if(x >= dyabs)
+			{
+				x -= dyabs;
+				px += sdx;
+			}
+			py += sdy;
+			if(py < 0 || py%30)
+				continue;
+			CenterTo(px, py);
+			SDL_Delay(20);
+		}
+	}
 }
 
 void TMap::SetPosition(int _x, int _y, bool force)

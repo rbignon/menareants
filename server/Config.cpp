@@ -36,6 +36,7 @@ bool Config::set_defaults()
 	servername = "Men.Are.Ants";
 	port = 5461;
 	deflimite = 10;
+	pingfreq = 50;
 	return true;
 }
 
@@ -56,8 +57,27 @@ bool Config::load()
 		std::string key = stringtok(ligne, " ");
 
 		if(key == "SERVERNAME") servername = ligne;
-		else if(key == "PORT") port = atoi(ligne.c_str());
-		else if(key == "DEFLIMITE") deflimite = atoi(ligne.c_str());
+		else if(key == "PORT")
+		{
+			port = StrToTyp<uint>(ligne);
+			if(port < 1 || port > 65535)
+			{
+				std::cerr << "Le port donné est invalide" << std::endl;
+				return false;
+			}
+		}
+		else if(key == "DEFLIMITE")
+		{
+			deflimite = StrToTyp<uint>(ligne);
+			if(deflimite < 2)
+			{
+				std::cerr << "La limite d'utilisateurs dans une partie doit être au moins à 2" << std::endl;
+				return false;
+			}
+		}
+		else if(key == "PINGFREQ") pingfreq = StrToTyp<uint>(ligne);
+		else if(key == "MAXCONNEXIONS") maxconnexions = StrToTyp<uint>(ligne);
+		else if(key == "MAXGAMES") maxgames = StrToTyp<uint>(ligne);
 		else if(key == "MOTDFILE")
 		{
 			std::ifstream fp(ligne.c_str());
@@ -73,13 +93,8 @@ bool Config::load()
 				Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", ligne.c_str());
 		}
 		else
-			Debug(W_WARNING|W_ECHO, "Ligne incorrecte (variable %s introuvable):\n%s %s",
+			Debug(W_WARNING|W_ECHO, "Ligne incorrecte (variable %s inconnue):\n%s %s",
 			                        key.c_str(), key.c_str(), ligne.c_str());
-	}
-	if(port < 1 || port > 65535 || deflimite < 2)
-	{
-		std::cerr << "Lecture de la configuration invalide" << std::endl;
-		return false;
 	}
 
 	return true;

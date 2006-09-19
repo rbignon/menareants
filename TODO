@@ -6,11 +6,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 
 * Urgent
--unité "silo de missile": data qui permet d'utiliser le silo qu'après une pose d'un ou deux tours.
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
+-bouton qui permet de trouver aléatoirement une unité qui n'a encore aucune action
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 

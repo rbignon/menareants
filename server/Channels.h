@@ -59,12 +59,12 @@ public:
 /* Attributs */
 public:
 
-	virtual void UpMoney(int m) { SetMoney(money + m); }
-	virtual void DownMoney(int m) { SetMoney(money - m); }
+	virtual void UpMoney(int m) { SetMoney(Money() + m); }
+	virtual void DownMoney(int m) { SetMoney(Money() - m); }
 	void SetMoney(int m);
 
 	/** Return player's channel */
-	EChannel *Channel() { return (EChannel*)chan; }
+	EChannel *Channel() { return (EChannel*)ECBPlayer::Channel(); }
 
 	/** Get client's structure of player */
 	TClient *Client() { return client; }
@@ -244,7 +244,7 @@ public:
 	 */
 	virtual void SetLimite(unsigned int l);
 
-	ECMap *Map() const { return static_cast<ECMap*>(map); }
+	ECMap *Map() const { return static_cast<ECMap*>(ECBChannel::Map()); }
 
 	bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 

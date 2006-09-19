@@ -74,6 +74,8 @@ public:
 	bool RecvMapList, mission;
 	static std::vector<std::string> RecvMap;
 
+	static std::string ErrMessage;
+
 	std::string Kicked;
 
 /* Fonctions */

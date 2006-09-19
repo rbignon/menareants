@@ -72,19 +72,25 @@ public:
 			{ /* Le joueur n'a pas encore de bateau, on cherche un chantier naval pour en construire un */
 				entities = IA()->Player()->Entities()->Find(ECEntity::E_SHIPYARD);
 				uint d = 0;
-				if(entities.empty())
+				ECBEntity* shipyard = 0;
+				for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
+					if(unit->Case()->Delta((*e)->Case()) < 8 && (!shipyard || d > unit->Case()->Delta((*e)->Case())))
+						shipyard = *e, d = unit->Case()->Delta((*e)->Case());
+				if(!shipyard)
 				{ /* Le joueur n'a pas de chantier naval, on en construit un */
 					ECBCase* cc = 0;
+					d = 0;
 					BCountriesVector countries = IA()->Player()->MapPlayer()->Countries();
 					for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
 					{
 						std::vector<ECBCase*> cases = (*cty)->Cases();
 						for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
-							if(((*c)->Flags() & C_MER) && (!cc || d > unit->Case()->Delta(cc)))
-								cc = *c, d = unit->Case()->Delta(cc);
+							if(((*c)->Flags() & C_MER) && (!cc || d > unit->Case()->Delta(*c)))
+								cc = *c, d = unit->Case()->Delta(*c);
 					}
-					if(!cc)
-						return false; // Semblerait qu'il n'y ait pas de mer dans nos countries
+					// Semblerait qu'il n'y ait pas de mer dans nos countries
+					if(!cc || d > 8)
+						{ FDebug(W_WARNING, "Pas de mer ou trop loins"); return false; }
 
 					/* On créé un ShipYard, et aussi un bateau sur la même case dans le cas où le shipyard a
 					 * bien été construit */
@@ -96,15 +102,6 @@ public:
 				}
 				else
 				{ /* On construit un bateau à partir du chantier naval le plus proche */
-					ECBEntity* shipyard = 0;
-					uint d = 0;
-					for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
-						if(!shipyard || d > unit->Case()->Delta((*e)->Case()))
-							shipyard = *e, d = unit->Case()->Delta((*e)->Case());
-
-					if(!shipyard)
-						return false; // Problème
-
 					IA()->ia_send("ARM - =" + TypToStr(shipyard->Case()->X()) + "," + TypToStr(shipyard->Case()->Y()) +
 					              " + %" + TypToStr(ECEntity::E_BOAT));
 					return true; /* On attends le prochain tour pour s'en servir */
@@ -115,23 +112,25 @@ public:
 
 
 		if(!boat)
-			return false; // problème
-
-		/* Si le bateau ne peut contenir l'unité, on triche discretement en ajoutant le nombre nécessaire
-		 * au bateau pour avoir la capacité de contenir cette armée
-		 */
-		if(!boat->CanContain(unit))
-			boat->SetNb(unit->Nb()/50 + 10);
-
-		if(!boat->CanContain(unit))
-		{
-			Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a été augmenté à %d mais ne peut toujours pas contenir"
-			                 " les %d hommes", boat->Nb(), unit->Nb());
-			return false;
-		}
+			{ FDebug(W_WARNING, "Pas de bateau !?"); return false; }
 
 		if(!boat->Containing())
 		{ /* Le code quand le bateau et l'armée cherchent à se rapprocher */
+			/* Si le bateau ne peut contenir l'unité, on triche discretement en ajoutant le nombre nécessaire
+			 * au bateau pour avoir la capacité de contenir cette armée
+			 */
+			if(!boat->CanContain(unit))
+				boat->SetNb(unit->Nb()/100 + 10);
+	
+			if(!boat->CanContain(unit))
+			{
+				if(boat->Containing())
+					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau contient déjà quelqu'un !?");
+				else
+					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a été augmenté à %d mais ne peut toujours pas contenir"
+									" les %d hommes", boat->Nb(), unit->Nb());
+				return false;
+			}
 			if(unit->Case()->Delta(boat->Case()) == 1)
 				IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
 			else
@@ -206,7 +205,7 @@ public:
 						continue;
 					}
 
-					/* On file une petite aide à l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
+					/*  HACK On file une petite aide à l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
 					if(unit->Type() == ECEntity::E_ARMY && unit->Nb() <= 1000)
 						unit->SetNb(1000 + rand()%10 * 100);
 					return false;
@@ -404,15 +403,30 @@ void TIA::FirstMovements()
 		}
 	}
 
+	ents = Player()->Channel()->Map()->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
+		if((*enti)->Shadowed() || (*enti)->Locked() || !(*enti)->Owner() ||
+		   !(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner())
+			continue;
 		if((*enti)->IsBuilding())
 		{
 			int i = rand()%ECBEntity::E_END;
 			if(i)
+			{
 				ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
 				                  TypToStr(i));
+
+				/* HACK pour que les armées ne soient pas de 100 */
+				if(i == ECEntity::E_ARMY)
+					for(int j = 10; j >= 0; --j)
+						ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
+				                            TypToStr(i));
+			}
 		}
+		if((*enti)->Owner() != Player())
+			continue;
+
 		if((*enti)->MyUpgrade() != ECEntity::E_NONE && !(rand()%2))
 			ia_send("ARM " + std::string((*enti)->ID()) + " °");
 		if((*enti)->MyStep() > 0 || (*enti)->Porty() > 0)
@@ -421,8 +435,8 @@ void TIA::FirstMovements()
 			{
 				std::vector<ECBEntity*> es = (*enti)->Case()->Entities()->List();
 				for(std::vector<ECBEntity*>::iterator e = es.begin(); e != es.end(); ++e)
-					if((*e)->CanCreate(*enti) && (*e)->Owner() == Player())
-						for(int i = 0; !i ;i = rand()%3)
+					if((*e)->CanCreate(*enti))
+						for(int i = 0; !i ;i = rand()% ((*enti)->Nb() < 1000 ? 2 : 3))
 							ia_send("ARM " + std::string((*enti)->ID()) + " +");
 			}
 
@@ -644,7 +658,7 @@ bool TIA::Join(EChannel* chan)
 	assert(chan);
 	assert(!Player());
 
-	if(!chan->Joinable() || chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
+	if(!chan->Joinable() || chan->Limite() && chan->NbPlayers() >= chan->Limite())
 	{
 		app.delclient(this);
 		return false;
@@ -776,18 +790,18 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		                  VSName(cl->GetNick()) VIName(chan->State()));
 		return cl->sendrpl(app.rpl(ECServer::ERR));
 	}
-	if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
-		return cl->sendrpl(app.rpl(ECServer::ERR));
+	if(chan->NbPlayers() >= chan->Limite())
+		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN));
 
 	for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 	{
 		if(!strchr(NICK_CHARS, *c))
-			return cl->sendrpl(app.rpl(ECServer::ERR));
+			return cl->sendrpl(app.rpl(ECServer::IACANTJOIN));
 		else if(*c == ' ') *c = '_';
 	}
 
 	if(app.FindClient((IA_CHAR + parv[1]).c_str()))
-		return cl->sendrpl(app.rpl(ECServer::IANICKUSED), parv[1].c_str());
+		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
 		
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
 	IA->SetNick(IA_CHAR + parv[1]);

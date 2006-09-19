@@ -41,22 +41,22 @@ static struct ButtonList_t
 	{ BT_CANCEL,    "Annuler",  100,    30  }
 };
 
-TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form)
+TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form, bool transparence)
 	: TObject(Video::GetInstance()->Window()), x(-1), y(-1), b(_b)
 {
 	edit = 0;
 	Form = form;
 	realbg = 0;
-	Init(_s);
+	Init(_s, transparence);
 }
 
-TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form)
+TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form, bool transparence)
 	: TObject(Video::GetInstance()->Window()), x(_x), y(_y), b(_b)
 {
 	edit = 0;
 	Form = form;
 	realbg = 0;
-	Init(_s);
+	Init(_s, transparence);
 }
 
 TMessageBox::~TMessageBox()
@@ -206,7 +206,7 @@ void TMessageBox::SetEdit()
 	h += edit->Height();
 }
 
-void TMessageBox::Init(const char* s)
+void TMessageBox::Init(const char* s, bool transparence)
 {
 	h = 0;
 	w = 0;
@@ -217,9 +217,18 @@ void TMessageBox::Init(const char* s)
 
 	SDL_Rect r_back = {0,0,w,h};
 
-	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
-											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
+	if(transparence)
+	{
+		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
+		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+		background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
+	}
+	else
+	{
+		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, w, h,
+		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+		background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255));
+	}
 
 	if(x == -1 && y == -1)
 	{

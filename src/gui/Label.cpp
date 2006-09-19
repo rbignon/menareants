@@ -19,6 +19,7 @@
  */
 
 #include "Label.h"
+#include <assert.h>
 
 TLabel::TLabel()
 	: font(0), shadowed(0), bg_offset(0), auto_set(false)

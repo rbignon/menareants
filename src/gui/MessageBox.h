@@ -51,9 +51,9 @@ public:
 	 * @param _b this is flags of buttons to show.
 	 * @param form if there is a TForm, to continue to show it, put it in.
 	 */
-	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0);
+	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0, bool transparence = true);
 
-	TMessageBox(const char* _s, uint _b, TForm* form = 0);
+	TMessageBox(const char* _s, uint _b, TForm* form = 0, bool transparence = true);
 
 	~TMessageBox();
 
@@ -104,7 +104,7 @@ protected:
 
 	void SetButtons();
 	void SetEdit();
-	void Init(const char* s);
+	void Init(const char* s, bool transparence);
 	void SetText(const char* s);
 };
 

@@ -29,22 +29,20 @@
 
 void EChannel::InitAnims()
 {
-	dynamic_cast<ECMap*>(map)->SortEvents();
+	Map()->SortEvents();
 }
 
 #define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
 void EChannel::NextAnim()
 {
-	if(!map) throw ECExcept(VPName(map), "Pas de map");
-	if(state != EChannel::ANIMING)
-		throw ECExcept(VIName(state), "Appel hors du mode +A(niming)");
+	assert(Map());
+	assert(State() == EChannel::ANIMING);
 
-	if(dynamic_cast<ECMap*>(map)->Events().empty()) return;
+	if(Map()->Events().empty()) return;
 
-	ECEvent* event = (*dynamic_cast<ECMap*>(map)->Events().begin());
+	ECEvent* event = Map()->Events().front();
 
-	if(!event)
-		throw ECExcept(VPName(event) VIName(dynamic_cast<ECMap*>(map)->Events().size()), "Evenement vide");
+	assert(event);
 
 #ifdef DEBUG
 {
@@ -59,7 +57,7 @@ void EChannel::NextAnim()
 
 	if(ents.empty())
 	{
-		dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
+		Map()->RemoveEvent(event, USE_DELETE);
 		return;
 	}
 }
@@ -284,7 +282,7 @@ void EChannel::NextAnim()
 		}
 		default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
 	}
-	dynamic_cast<ECMap*>(map)->RemoveEvent(event, USE_DELETE);
+	Map()->RemoveEvent(event, USE_DELETE);
 }
 
 template<typename T>
@@ -326,13 +324,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	ECEntity* entity = 0;
 	uint flags = 0;
 
-	if(parv[1] != "-") /* Si parv[1] == "-" alors on créé une nouvelle entity */
+	if(parv[1][0] != '-') /* Si parv[1][0] == '-' alors on créé une nouvelle entity */
 	{
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
 		if(!entity || entity->Shadowed() || entity->Locked())
 			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1])
-			                          VBName(entity ? entity->Shadowed() : false));
+			                          VBName(entity ? entity->Shadowed() : false) VIName(entity ? entity->Type() : 0));
 	}
 
 	uint y = 0, x = 0, type = 0, nb = 0;

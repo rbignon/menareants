@@ -46,6 +46,7 @@ extern TOptionsForm   *OptionsForm;
 extern TPingingForm   *PingingForm;
 void LoadingGame(EC_Client* cl);
 std::vector<std::string> TGameInfosForm::RecvMap;
+std::string TGameInfosForm::ErrMessage;
 
 TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
@@ -183,13 +184,35 @@ int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 }
 
 /** We can't rejoin channel.
- * @note this function isn't very usefull...
  *
  * Syntax: ER1
  */
 int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	JOINED = -1;
+	TGameInfosForm::ErrMessage = "Impossible de joindre la partie, elle n'existe peut être plus, elle est pleine "
+	                             "ou a démarrée.";
+	return 0;
+}
+
+/** We can't create this IA because his nickname is already taken.
+ *
+ * Syntax: ER2 nick
+ */
+int ER2Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	TGameInfosForm::ErrMessage = "Impossible de créer cette IA. Veuillez choisir un autre pseudo.";
+	return 0;
+}
+
+/** We can't create a game because there is too much games.
+ *
+ * Syntax: ER4
+ */
+int ER4Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	JOINED = -1;
+	TGameInfosForm::ErrMessage = "Impossible de créer la partie, il y a trop de parties sur ce serveur.";
 	return 0;
 }
 
@@ -328,7 +351,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								TPlayerLine *pline = dynamic_cast<TPlayerLine*>(*it);
 								if(!pline) /* Ce n'est pas un TPlayerLine */
 									continue;
-								pline->position->SetMax(chan->GetLimite());
+								pline->position->SetMax(chan->Limite());
 							}
 						}
 					}
@@ -372,6 +395,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						*(chan->Map()->InitDate()) = ECDate(*chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
+						InGameForm->ShowWaitMessage = false;
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
 						// Move the lateral bar
@@ -1209,8 +1233,13 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	    Timer listmapclick;
 		do
 		{
-		    if(!GameInfosForm->MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
-		        GameInfosForm->MapList->SetEnabled();
+			if(!GameInfosForm->MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
+				GameInfosForm->MapList->SetEnabled();
+			if(TGameInfosForm::ErrMessage.empty() == false)
+			{
+				TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+				TGameInfosForm::ErrMessage.clear();
+			}
 			while( SDL_PollEvent( &event) )
 			{
 				GameInfosForm->Actions(event);
@@ -1428,11 +1457,8 @@ void MenAreAntsApp::ListGames()
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
 						{
-							TMessageBox mb(std::string("Impossible de joindre la partie " +
-							                  ListGameForm->GList->ReadValue(
-							                           ListGameForm->GList->GetSelectedItem())
-							                  + ".\nVeuillez reessayer").c_str(), BT_OK, ListGameForm);
-							mb.Show();
+							TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+							TGameInfosForm::ErrMessage.clear();
 						}
 						refresh = true;
 						timer.reset();
@@ -1443,10 +1469,8 @@ void MenAreAntsApp::ListGames()
 					{
 						if(!GameInfos(NULL, ListGameForm))
 						{
-							TMessageBox mb(std::string("Impossible de créer la partie.\n"
-												"Son nom est peut être déjà utilisé.").c_str(),
-												BT_OK, ListGameForm);
-							mb.Show();
+							TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+							TGameInfosForm::ErrMessage.clear();
 						}
 						refresh = true;
 						timer.reset();
@@ -1627,7 +1651,7 @@ void TPlayerLine::Init()
 	assert(pl);
 	if(position) delete position;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+210, y, 50, 0, pl->Channel()->GetLimite(), 1,    0);
+	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+210, y, 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
 	position->SetHint("Votre position sur la carte");
 	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  x+320, y, 50);

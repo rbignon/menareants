@@ -244,8 +244,7 @@ public:
 
 	ECPlayer* Player() const { return player; }
 
-/* Evenements */
-public:
+	bool ShowWaitMessage;
 
 private:
 	Timer timer;

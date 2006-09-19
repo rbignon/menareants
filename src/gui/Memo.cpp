@@ -26,6 +26,7 @@
 #include "tools/Maths.h"
 #include <algorithm>
 #include <SDL.h>
+#include <assert.h>
 
 TMemo::TMemo (Font* f, int _x, int _y, uint _width, uint _height, uint max_items, bool _show_background)
   : TComponent(_x, _y, _width, _height), show_background(_show_background), font(f), shadowed(false)

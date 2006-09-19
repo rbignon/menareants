@@ -140,6 +140,8 @@ private:
 /* Constructeur/Destructeur */
 public:
 
+	ECList() : list() {}
+
 	typedef typename std::vector<T>::size_type   size_type;
 	typedef typename std::vector<T>::iterator    iterator;
 

@@ -61,7 +61,7 @@ typedef char MapPlayer_ID;
 
 struct ECData
 {
-	ECData(int = 0) : type(0) {}
+	ECData(int = 0) : type(0), data() {}
 
 	ECData(int _t, std::string _d) : type(_t), data(_d) {}
 
@@ -441,7 +441,7 @@ class ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECBCase() : map(0), map_country(0) {}
+	ECBCase() : map(0), x(0), y(0), flags(0), type_id(0), map_country(0), entities() {}
 	ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
 	virtual ~ECBCase() {}
@@ -623,8 +623,6 @@ public:
 
 	ECBMap* Map() const { return map; }
 
-	uint Flags() const { return flags; }
-
 /* Variables privées */
 protected:
 	friend void ECBCase::SetCountry(ECBCountry *mc); /* Il touche à mes flags */
@@ -632,7 +630,6 @@ protected:
 	ECBMapPlayer *owner;
 	Country_ID ident;
 	ECBMap *map;
-	uint flags;
 };
 
 /********************************************************************************************
@@ -648,7 +645,7 @@ class ECBMapPlayer
 public:
 
 	ECBMapPlayer(char _id, uint _num)
-		: id(_id), num(_num), pl(0)
+		: id(_id), num(_num), pl(0), countries(), units(), nick()
 	{
 		nick += _id;
 	}

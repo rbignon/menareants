@@ -36,14 +36,20 @@ public:
 	bool load();
 
 	std::string ServerName() const { return servername; }
-	int Port() const { return port; }
-	int DefLimite() const { return deflimite; }
+	uint Port() const { return port; }
+	uint DefLimite() const { return deflimite; }
+	uint PingFreq() const { return pingfreq; }
+	uint MaxGames() const { return maxgames; }
+	uint MaxConnexions() const { return maxconnexions; }
 	std::vector<std::string> Motd() const { return motd; }
 
 private:
 	std::string servername;
-	int port;
-	int deflimite;
+	uint port;
+	uint deflimite;
+	uint pingfreq;
+	uint maxgames;
+	uint maxconnexions;
 	std::vector<std::string> motd;
 
 private:

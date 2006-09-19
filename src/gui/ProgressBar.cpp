@@ -20,6 +20,7 @@
  */
 
 #include <SDL.h>
+#include <assert.h>
 #include "ProgressBar.h"
 #include "tools/Maths.h"
 #include "tools/Video.h"

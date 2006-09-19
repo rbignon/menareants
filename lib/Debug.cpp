@@ -35,7 +35,5 @@ TECExcept::TECExcept(const char* func, const char* file, int line, std::string _
 }
 
 TECExcept::TECExcept(std::string buf)
-{
-	message = buf;
-	vars = "";
-}
+	: message(buf), vars()
+{}

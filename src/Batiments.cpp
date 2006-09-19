@@ -151,7 +151,7 @@ void ECMine::RecvData(ECData data)
 
 std::string ECMine::SpecialInfo()
 {
-	if(!Owner()->IsMe()) return "";
+	if(!Owner() || !Owner()->IsMe()) return "";
 	else if(restBuild) return "Active dans " + TypToStr(restBuild) + " jours.";
 	else return "Mine active";
 }
@@ -194,8 +194,9 @@ void ECNuclearSearch::RecvData(ECData data)
 
 std::string ECNuclearSearch::SpecialInfo()
 {
-	return Owner()->IsMe() ? (TypToStr(missiles) + " missile(s) - Nouveau missile dans " + TypToStr(restBuild) + " jour(s)")
-	                       : "";
+	return (Owner() && Owner()->IsMe())
+	           ? (TypToStr(missiles) + " missile(s) - Nouveau missile dans " + TypToStr(restBuild) + " jour(s)")
+	           : "";
 }
 
 /********************************************************************************************
@@ -214,7 +215,7 @@ void ECSilo::RecvData(ECData data)
 
 std::string ECSilo::SpecialInfo()
 {
-	if(!Owner()->IsMe())
+	if(!Owner() || !Owner()->IsMe())
 		return "";
 	else if(!NuclearSearch())
 		return "Relié à aucun Centre de recherches nucléaire.";
@@ -259,6 +260,42 @@ bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cli
 		default:
 			return true;
 	}
+}
+
+/********************************************************************************************
+ *                                 ECMegalopole                                             *
+ ********************************************************************************************/
+
+std::string ECMegalopole::SpecialInfo()
+{
+	if(!Owner() || !Owner()->IsMe())
+		return "";
+	else
+		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
+}
+
+/********************************************************************************************
+ *                                 ECapitale                                                *
+ ********************************************************************************************/
+
+std::string ECapitale::SpecialInfo()
+{
+	if(!Owner() || !Owner()->IsMe())
+		return "";
+	else
+		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
+}
+
+/********************************************************************************************
+ *                                 ECity                                                    *
+ ********************************************************************************************/
+
+std::string ECity::SpecialInfo()
+{
+	if(!Owner() || !Owner()->IsMe())
+		return "";
+	else
+		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
 }
 
 /********************************************************************************************

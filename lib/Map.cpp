@@ -30,7 +30,7 @@
  ********************************************************************************************/
 
 ECBMove::ECBMove(ECBEntity* e)
-	: first_case(0), entity(e)
+	: moves(), first_case(0), entity(e)
 {
 	if(e) first_case = e->Case();
 }
@@ -189,14 +189,8 @@ void ECBDate::SetDate(std::string date)
  ********************************************************************************************/
 
 ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: map(_map),
-	  x(_x),
-	  y(_y),
-	  flags(_flags),
-	  type_id(_type_id)
-{
-	map_country = 0;
-}
+	: map(_map), x(_x), y(_y), flags(_flags), type_id(_type_id), map_country(0), entities()
+{}
 
 ECBCase* ECBCase::MoveUp(uint c) const    { return y >= c ? (*map)(x, y-c) : (*map)(x, 0); }
 ECBCase* ECBCase::MoveDown(uint c) const  { return y < map->Height()-c-1 ? (*map)(x, y+c) : (*map)(x, map->Height()-1); }
@@ -246,7 +240,7 @@ int ECBCase::SearchAroundType(int type, std::vector<ECBEntity*>& entities) const
  ********************************************************************************************/
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
-	: owner(_owner), acase(_case), nb(0), lock(false), deployed(false), event_type(0),
+	: owner(_owner), acase(_case), nb(0), lock(false), deployed(false), myStep(0), restStep(0), event_type(0),
 	  parent(0), map(0)
 {
 	if(strlen(_name) != (sizeof name)-1)
@@ -356,10 +350,9 @@ std::string ECBEntity::LongName()
  ********************************************************************************************/
 
 ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident)
-	: map(_map)
+	: cases(), owner(0), map(_map)
 {
 	strcpy(ident, _ident);
-	owner = 0;
 }
 
 bool ECBCountry::ChangeOwner(ECBMapPlayer* mp)
@@ -421,17 +414,12 @@ bool ECBMapPlayer::RemoveCountry(ECBCountry* _country, bool use_delete)
  ********************************************************************************************/
 
 ECBMap::ECBMap(std::vector<std::string> _map_file)
-{
-	initialised = false;
-
-	map_file = _map_file;
-}
+	: map_file(_map_file), initialised(false)
+{}
 
 ECBMap::ECBMap(std::string _filename)
-	: filename(_filename)
+	: filename(_filename), initialised(false)
 {
-	initialised = false;
-
 	std::ifstream fp(filename.c_str());
 
 	if(!fp)

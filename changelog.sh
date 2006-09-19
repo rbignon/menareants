@@ -17,7 +17,7 @@ declare -a files
 name=`grep $USER /etc/passwd | cut -d : -f 5 | sed -e 's:,::g'`
 now=`date -u "+%Y-%m-%d"`
 email="<$USER@$HOST>"
-header="$now  $name   $email"
+header="$now   $name   $email"
 
 rm -f $infile
 svn diff > $infile

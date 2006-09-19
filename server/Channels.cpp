@@ -470,10 +470,10 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					uint place = StrToTyp<uint>(parv[j++]);
 					if(place > 0 && sender->Position() != place)
 					{
-						if(place > sender->Channel()->GetLimite())
+						if(place > sender->Channel()->Limite())
 						{
 							Debug(W_DESYNCH, "SET +p %d > %d(limite)", place,
-							                 sender->Channel()->GetLimite());
+							                 sender->Channel()->Limite());
 							break;
 						}
 						BPlayerVector::iterator it;
@@ -519,7 +519,9 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		modes += 'm';
 		params += " " + TypToStr(mapi);
-		if(sender->Channel()->GetLimite() != map->MaxPlayers())
+		if(map->MaxPlayers() > app.GetConf()->DefLimite())
+			map->MaxPlayers() = app.GetConf()->DefLimite();
+		if(sender->Channel()->Limite() != map->MaxPlayers())
 		{
 			modes += 'l';
 			params += " " + TypToStr(map->MaxPlayers());
@@ -530,7 +532,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
 		                                 (modes + params).c_str());
 
-	if(map && sender->Channel()->GetLimite() != map->MaxPlayers())
+	if(map && sender->Channel()->Limite() != map->MaxPlayers())
 		sender->Channel()->SetLimite(map->MaxPlayers());
 
 	if(need_ready)
@@ -589,6 +591,11 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(!chan && create)
 	{ /* Création du salon */
+
+		/* Il y a trop de parties */
+		if(ChanList.size() >= app.GetConf()->MaxGames())
+			return cl->sendrpl(app.rpl(ECServer::CANTCREATE));
+
 		if(!mission)
 			for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 				if(!strchr(CHAN_CHARS, *c))
@@ -630,7 +637,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 								VSName(cl->GetNick()) VIName(chan->State()) VName(chan->Name()));
 				return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 			}
-			if(chan->GetLimite() && chan->NbPlayers() >= chan->GetLimite())
+			if(chan->Limite() && chan->NbPlayers() >= chan->Limite())
 				return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
 			pl = new ECPlayer(cl, chan, false, false);
 		}
@@ -780,7 +787,7 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		if((*it)->IsMission()) continue;
 		cl->sendrpl(app.rpl(ECServer::GLIST), FormatStr((*it)->GetName()).c_str(), (*it)->Joinable() ? '+' : '-',
-		                                      (*it)->NbPlayers(), (*it)->GetLimite(),
+		                                      (*it)->NbPlayers(), (*it)->Limite(),
 		                                      (*it)->Map() ? FormatStr((*it)->Map()->Name()).c_str() : "");
 	}
 
@@ -799,7 +806,7 @@ ECPlayer::ECPlayer(TClient *_client, EChannel *_chan, bool _owner, bool _op)
 
 void ECPlayer::NeedReady()
 {
-	if(!ready) return;
+	if(!Ready()) return;
 
 	SetReady(false);
 	Channel()->send_modes(this, "-!");
@@ -809,7 +816,7 @@ void ECPlayer::NeedReady()
 
 void ECPlayer::SetMoney(int m)
 {
-	money = m;
+	ECBPlayer::SetMoney(m);
 	if(Client())
 		client->sendrpl(app.rpl(ECServer::SET), GetNick(), std::string("+$ " + TypToStr(m)).c_str());
 }
@@ -849,7 +856,7 @@ bool ECPlayer::AddVote(ECBPlayer* pl)
 EChannel::EChannel(std::string _name)
 	: ECBChannel(_name), owner(0), fast_game(true), begin_money(20000)
 {
-	limite = app.GetConf()->DefLimite(); /* Limite par default */
+	ECBChannel::SetLimite(app.GetConf()->DefLimite()); /* Limite par default */
 	app.NBchan++;
 	app.NBwchan++;
 	app.NBtotchan++;
@@ -858,7 +865,7 @@ EChannel::EChannel(std::string _name)
 EChannel::~EChannel()
 {
 	app.NBchan--;
-	if(state == EChannel::WAITING) app.NBwchan--;
+	if(State() == EChannel::WAITING) app.NBwchan--;
 	else app.NBachan--;
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
@@ -1024,7 +1031,7 @@ void EChannel::CheckReadys()
 
 						const char *e_name = FindEntityName(pl == players.end() ? 0 : dynamic_cast<ECPlayer*>(*pl));
 						ECEntity* entity = CreateAnEntity(StrToTyp<uint>(type), e_name, pl == players.end() ? 0 : *pl,
-						                                  (*map)(x,y));
+						                                  (*Map())(x,y));
 						entity->SetNb(StrToTyp<uint>(number));
 						Map()->AddAnEntity(entity);
 						if(entity->IsHidden())
@@ -1250,7 +1257,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 				to_send += " =" + entity->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
 				                                       "," + TypToStr((*it)->Move()->FirstCase()->Y());
 				if(!(*it)->Move()->Empty())
-					to_send += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*map)(x,y) : (*it)->Case());
+					to_send += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*Map())(x,y) : (*it)->Case());
 			}
 		}
 		else
@@ -1390,7 +1397,7 @@ const char* EChannel::FindEntityName(ECPlayer* pl)
 	num[2] = '\0';
 
 	bool unchecked = false;
-	BEntityVector ev = pl ? pl->Entities()->List() : map->Neutres()->List();
+	BEntityVector ev = pl ? pl->Entities()->List() : Map()->Neutres()->List();
 
 	do
 	{
@@ -1432,7 +1439,11 @@ void EChannel::SetMap(ECBMap *m)
 	 * </pre>
 	 */
 
-	if(map) MyFree(map);
+	if(Map())
+	{
+		delete Map();
+		ECBChannel::SetMap(0);
+	}
 
 	if(!m) return;
 
@@ -1449,11 +1460,11 @@ void EChannel::SetMap(ECBMap *m)
 		return;
 	}
 
-	map = _new_map;
-	map->SetChannel(this);
+	ECBChannel::SetMap(_new_map);
+	_new_map->SetChannel(this);
 
 	/* Envoie d'une map */
-	std::vector<std::string> map_file = map->MapFile();
+	std::vector<std::string> map_file = Map()->MapFile();
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 	{
 		const char* c = (*it).c_str();
@@ -1467,11 +1478,11 @@ void EChannel::SetMap(ECBMap *m)
 
 void EChannel::SetLimite(unsigned int l)
 {
-	limite = l;
+	ECBChannel::SetLimite(l);
 	
 	PlayerVector plv;
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
-		if((*it)->Position() > limite)
+		if((*it)->Position() > Limite())
 		{
 			(*it)->SetPosition(0);
 			plv.push_back(dynamic_cast<ECPlayer*> (*it));
@@ -1663,13 +1674,13 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 std::string EChannel::ModesStr() const
 {
 	std::string     modes = "+", params = "";
-	if(limite)      modes += "l", params = " " + TypToStr(limite);
-	if(map)         modes += "m", params += " " + TypToStr(Map()->Num());
+	if(Limite())    modes += "l", params = " " + TypToStr(Limite());
+	if(Map())       modes += "m", params += " " + TypToStr(Map()->Num());
 	                modes += "b", params += " " + TypToStr(begin_money);
-	if(fast_game)   modes += "r";
-	if(turn_time)   modes += "t", params += " " + TypToStr(turn_time);
+	if(FastGame())  modes += "r";
+	if(TurnTime())  modes += "t", params += " " + TypToStr(TurnTime());
 
-	switch(state)
+	switch(State())
 	{
 		case WAITING: modes += "W"; break;
 		case SENDING: modes += "S"; break;

@@ -24,6 +24,7 @@
 #include "ListBox.h"
 #include "Resources.h"
 #include "tools/Maths.h"
+#include <assert.h>
 #include <algorithm>
 #include <SDL.h>
 

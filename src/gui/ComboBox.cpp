@@ -23,6 +23,7 @@
 #include "tools/Color.h"
 #include "Resources.h"
 #include "tools/Font.h"
+#include <assert.h>
 
 TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
 	: TListBox(f, _x, _y, _width, f->GetHeight()), real_y(_y), opened(false), visible_len(0),

@@ -233,6 +233,7 @@ void Resources::Unload()
 {
 	R_CLEARTYPE(ECImage);
 	R_CLEARTYPE(ECSpriteBase);
+	R_CLEARTYPE(Sound);
 }
 
 #undef R_CLEARTYPE

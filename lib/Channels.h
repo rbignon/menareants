@@ -73,9 +73,6 @@ public:
 		N_MAX
 	};
 
-/* Méthodes */
-public:
-
 /* Attributs */
 public:
 
@@ -86,14 +83,6 @@ public:
 	virtual void UpMoney(int m) { money += m; }        /**< Add some money. */
 	virtual void DownMoney(int m) { money -= m; }      /**< Remove some money. */
 	virtual void SetMoney(int m) { money = m; }        /**< Set money. */
-
-	bool IsOwner() const { return owner; }             /**< Is he the owner of game ? */
-	void SetOwner(bool o = true) { owner = o; }        /**< Set a player as the owner */
-
-	bool IsOp() const { return op; }                   /**< Is he an operator of channel ? */
-	void SetOp(bool o = true) { op = o; }              /**< Set a player as an oper */
-
-	bool IsPriv() const { return op || owner; }        /**< Return true if player is op or owner */
 
 	unsigned int Position() const { return position; } /**< Position of player in the map. */
 	bool SetPosition(unsigned int p);                  /**< Set position of player. */
@@ -111,9 +100,6 @@ public:
 	virtual const char* GetNick() const { return nick.c_str(); }
 	std::string Nick() const { return nick; }
 
-	bool Ready() const { return ready; }                /**< Is player ready ? */
-	void SetReady(bool r = true) { ready = r; }         /**< Set player. */
-
 	ECBMapPlayer* MapPlayer() const { return mp; }
 	void SetMapPlayer(ECBMapPlayer* _mp) { mp = _mp; }
 
@@ -127,30 +113,40 @@ public:
 
 	virtual bool IsIA() const = 0;
 
-	bool Lost() const { return lost; }
-	void SetLost(bool b = true) { lost = b; }
+	bool Ready() const;                                 /**< Is player ready ? */
+	void SetReady(bool r = true);                       /**< Set player. */
 
-	bool Disconnected() const { return disconnected; }
-	virtual void SetDisconnected(bool b = true) { disconnected = b; }
+	bool IsOwner() const;                              /**< Is he the owner of game ? */
+	void SetOwner(bool o = true);                      /**< Set a player as the owner */
 
-	bool CanRejoin() const { return (disconnected && !lost); }
+	bool IsOp() const;                                 /**< Is he an operator of channel ? */
+	void SetOp(bool o = true);                         /**< Set a player as an oper */
+
+	bool IsPriv() const { return IsOp() || IsOwner(); }        /**< Return true if player is op or owner */
+
+	bool Lost() const;
+	void SetLost(bool b = true);
+
+	bool Disconnected() const;
+	virtual void SetDisconnected(bool b = true);
+
+	bool CanRejoin() const { return (Disconnected() && !Lost()); }
+
+protected:
+	BPlayerVector allies;
 
 /* Variables privées */
-protected:
+private:
 	std::string nick;
 	ECBChannel *chan;
-	bool owner;
-	bool op;
 	unsigned int position;
 	unsigned int color;
 	int money;
 	ECBMapPlayer* mp;
-	bool ready;
 	ECList<ECBEntity*> entities;
 	unsigned int nation;
-	BPlayerVector allies;
-	bool lost;
-	bool disconnected;
+	void SetFlag(int f, bool b);
+	int flags;
 };
 
 /********************************************************************************************
@@ -180,6 +176,8 @@ public:
 		SCORING            /**< End of game. */
 	};
 
+	ECBChannel &operator=(const ECBChannel &src) { throw std::string("La copie de cette classe est interdite"); }
+
 /* Methodes */
 public:
 
@@ -198,7 +196,7 @@ public:
 	void SetState(e_state s) { state = s; }                 /**< Define state. */
 
 	/* Limite maximale pour entrer dans le chan */
-	unsigned int GetLimite() const { return limite; }       /**< Return user limit of channel. */
+	unsigned int Limite() const { return limite; }          /**< Return user limit of channel. */
 	virtual void SetLimite(unsigned int l) { limite = l; }  /**< Define user limit of channel. */
 
 	/** Return MAP */
@@ -240,6 +238,8 @@ public:
 /* Variables privées */
 protected:
 	BPlayerVector players;
+
+private:
 	std::string name;
 	e_state state;
 	unsigned int limite;

@@ -24,6 +24,7 @@
 
 #include "Server.h"
 #include "Outils.h"
+#include <assert.h>
 #include <string>
 #include <vector>
 #include <map>

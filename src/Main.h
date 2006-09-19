@@ -65,11 +65,8 @@ protected:
 public:
 	int main(int argc, char** argv);
 	char *get_title();
-#ifndef WIN32
-	void quit_app(int value) __attribute__ ((noreturn));
-#else
-	void quit_app(int value);
-#endif
+
+	void quit_app();
 
 	std::string GetPath() const { return path; }
 

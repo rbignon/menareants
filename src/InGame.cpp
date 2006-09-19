@@ -325,7 +325,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		if(InGameForm && (entities.size() > 1 ? event_case : entities.front()->Case())->Showed() > 0 &&
 		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE)
-			InGameForm->Map->CenterTo((entities.size() > 1 ? event_case : entities.front()->Case()));
+		{
+			InGameForm->ShowWaitMessage = false;
+			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
+		}
+		else InGameForm->ShowWaitMessage = true;
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -606,7 +610,8 @@ void MenAreAntsApp::InGame()
 		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
 		if(MenAreAntsApp::GetInstance()->IsFirstGame())
 		{
-			TMessageBox("Ceci est votre première partie.\nAppuyez sur F1 pour avoir de l'aide", BT_OK, InGameForm).Show();
+			TMessageBox("Ceci est votre première partie.\nAppuyez sur F1 pour avoir de l'aide",
+			            BT_OK, InGameForm, false).Show();
 			MenAreAntsApp::GetInstance()->FirstGameDone();
 		}
 		else
@@ -617,6 +622,7 @@ void MenAreAntsApp::InGame()
 
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
+		InGameForm->Map->SetMustRedraw();
 		do
 		{
 			/// \todo voir si on peut pas mettre ça ailleurs
@@ -649,6 +655,17 @@ void MenAreAntsApp::InGame()
 			else if(chan->State() == EChannel::ANIMING)
 			{
 				elapsed_time->reset();
+				if(InGameForm->ShowWaitMessage)
+				{
+					do
+					{
+						TMessageBox("Veuillez patienter...\n\nUne animation non visible est en cours.",
+						            0, InGameForm, false).Draw();
+						SDL_Delay(20);
+					} while(InGameForm->ShowWaitMessage && chan->State() == EChannel::ANIMING);
+					InGameForm->Map->SetMustRedraw();
+				}
+
 				if(InGameForm->BarreAct->Select())
 				{
 					InGameForm->BarreAct->UnSelect();
@@ -674,6 +691,23 @@ void MenAreAntsApp::InGame()
 
 						if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
 							InGameForm->SetCursor();
+
+						switch(event.key.keysym.sym)
+						{
+							case SDLK_UP:
+								InGameForm->Map->SetPosition(InGameForm->Map->X(), InGameForm->Map->Y()+40);
+								break;
+							case SDLK_DOWN:
+								InGameForm->Map->SetPosition(InGameForm->Map->X(), InGameForm->Map->Y()-40);
+								break;
+							case SDLK_LEFT:
+								InGameForm->Map->SetPosition(InGameForm->Map->X()+40, InGameForm->Map->Y());
+								break;
+							case SDLK_RIGHT:
+								InGameForm->Map->SetPosition(InGameForm->Map->X()-40, InGameForm->Map->Y());
+								break;
+							default: break;
+						}
 						break;
 					case SDL_KEYUP:
 						switch (event.key.keysym.sym)
@@ -695,7 +729,8 @@ void MenAreAntsApp::InGame()
 									while(SDL_PollEvent(&ev))
 									{
 										HelpForm->Actions(ev);
-										if(ev.type == SDL_KEYUP && ev.key.keysym.sym == SDLK_F1)
+										if(ev.type == SDL_KEYUP &&
+										   (ev.key.keysym.sym == SDLK_F1 || ev.key.keysym.sym == SDLK_ESCAPE))
 											eobb = true;
 									}
 									HelpForm->Update();
@@ -752,7 +787,16 @@ void MenAreAntsApp::InGame()
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
+						{
+							/* Le problème est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
+							 * qu'on reçoive une confirmation et qu'ainsi le bouton soit disable.
+							 * Ça pourrait nuire car ces messages seront considérés comme confirmations des animations,
+							 * et ainsi chaque +! donné sera pris en compte par le serveur que pour le suivant et
+							 * ainsi de suite, ce qui conduirait à un +! automatique en début de prochaine partie.
+							 */
+							InGameForm->BarreLat->PretButton->SetEnabled(false);
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
+						}
 						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
@@ -763,7 +807,7 @@ void MenAreAntsApp::InGame()
 						}
 						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
 						{
-							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm);
+							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm, false);
 							if(mb.Show() == BT_YES)
 								eob = true;
 							InGameForm->Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
@@ -1031,7 +1075,7 @@ void TInGameForm::ShowBarreLat(bool show)
 }
 
 TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
-	: TForm(w)
+	: TForm(w), ShowWaitMessage(false)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 

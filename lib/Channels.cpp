@@ -44,15 +44,14 @@ const struct nations_str_t nations_str[] = {
 };
 
 ECBPlayer::ECBPlayer(std::string n, ECBChannel *_chan, bool _owner, bool _op)
-	: nick(n), chan(_chan), owner(_owner), op(_op), lost(false), disconnected(false)
+	: allies(), nick(n), chan(_chan), position(0), color(COLOR_NONE), money(0), mp(0), entities(),
+	  nation(0), flags(0)
 {
+	SetOwner(_owner);
+	SetOp(_op);
+
 	if(chan)
 		chan->AddPlayer(this);
-	ready = false;
-	money = 0;
-	position = 0;
-	color = COLOR_NONE;
-	nation = N_NONE;
 }
 
 ECBPlayer::~ECBPlayer()
@@ -93,7 +92,7 @@ bool ECBPlayer::IsAllie(ECBPlayer* p) const
 
 bool ECBPlayer::SetPosition(unsigned int p)
 {
-	if(p <= chan->GetLimite())
+	if(p <= chan->Limite())
 	{
 		position = p;
 		return true;
@@ -120,6 +119,34 @@ bool ECBPlayer::SetNation(unsigned int n)
 	}
 	return false;
 }
+
+void ECBPlayer::SetFlag(int f, bool b)
+{
+	if(b)
+		flags |= f;
+	else
+		flags &= ~f;
+}
+
+#define P_READY        0x001
+#define P_OWNER        0x002
+#define P_OP           0x004
+#define P_LOST         0x008
+#define P_DISCONNECTED 0x010
+bool ECBPlayer::Ready() const { return (flags & P_READY); }
+void ECBPlayer::SetReady(bool r) { SetFlag(P_READY, r); }
+
+bool ECBPlayer::IsOwner() const { return (flags & P_OWNER); }
+void ECBPlayer::SetOwner(bool o) { SetFlag(P_OWNER, o); }
+
+bool ECBPlayer::IsOp() const { return (flags & P_OP); }
+void ECBPlayer::SetOp(bool o) { SetFlag(P_OP, o); }
+
+bool ECBPlayer::Lost() const { return (flags & P_LOST); }
+void ECBPlayer::SetLost(bool b) { SetFlag(P_LOST, b); }
+
+bool ECBPlayer::Disconnected() const { return (flags & P_DISCONNECTED); }
+void ECBPlayer::SetDisconnected(bool b) { SetFlag(P_DISCONNECTED, b); }
 
 /********************************************************************************************
  *                               ECBChannel                                                 *

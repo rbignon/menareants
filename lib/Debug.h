@@ -23,6 +23,7 @@
 #define ECLIB_DEBUG_H
 
 #include <string>
+#include <assert.h>
 #include "Outils.h"
 
 #define VName(vr) #vr "=\"" + vr + "\"; "
@@ -50,18 +51,11 @@ public:
 	TECExcept(std::string msg);
 };
 
+/* Pour ne pas être obligé de declarer NDEBUG */
 #ifndef DEBUG
 # undef assert
-# ifndef assert
-#  ifdef NDEBUG
-#   define assert(expr)  ((void)0)
-#  else
-#   define assert(expr)                                                        \
-   ((void)(__builtin_expect(!!(expr), 1) ? 0 :                                 \
-          (throw TECExcept(__PRETTY_FUNCTION__, __FILE__, __LINE__, "", "assert failed: " #expr), 0)))
-#  endif
-# endif
-# endif
+# define assert(expr)  ((void)0)
+#endif
 
 
 #endif /* ECLIB_DEBUG_H */
