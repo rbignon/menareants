@@ -62,7 +62,7 @@ void ECServer::sig_alarm(int c)
 			DelPing(cl);
 			cl->exit(app.rpl(ECServer::BYE));
 		}
-		else if((cl->GetLastRead() + app.GetConf()->PingFreq()) <= app.CurrentTS)
+		else if(int(cl->GetLastRead() + app.GetConf()->PingFreq()) <= app.CurrentTS)
 		{
 			cl->sendrpl(app.rpl(ECServer::PING));
 			SetPing(cl);

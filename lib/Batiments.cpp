@@ -21,6 +21,7 @@
 
 #include "Batiments.h"
 #include "Channels.h"
+#include <assert.h>
 
 /********************************************************************************************
  *                               ECBNuclearSearch                                           *

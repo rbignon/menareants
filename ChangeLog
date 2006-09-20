@@ -1,8 +1,7 @@
 2006-09-19 Romain Bignon <progs@headfucking.net>
 
-	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait pour le moment prendre
-	plus de mémoire (5 bools = 5 * 4 = 20 bits, 1 int = 32 bits). Mais par la suite dans trois flags ça fera gagner
-	de la place.
+	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait économiser de la mémoire,
+	(5 bools = 5 * 8 bits = 40 bits, 1 int = 4 * 8 bits = 32 bits)
 
 	* lib/Map (ECBCountry): Suppression des flags inutilisés.
 
