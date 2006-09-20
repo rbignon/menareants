@@ -10,8 +10,16 @@ SERVERNAME menareants.coderz.info
 # Port écouté
 PORT 5461
 
-# Limite maximale par default d'une partie lorsqu'aucune
-# carte n'est sélectionnée
+# Fréquence de PINGS envoyés à un client.
+PINGFREQ 50
+
+# Nombre de connexions maximale
+MAXCONNEXIONS 10
+
+# Nombre maximum de jeux
+MAXGAMES 3
+
+# Limite maximale d'utilisateurs dans une partie.
 DEFLIMITE 8
 
 # Path du fichier motd

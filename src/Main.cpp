@@ -22,11 +22,11 @@
 #include <SDL_image.h>
 #include <cerrno>
 #include <signal.h>
-#include <sys/resource.h>
 
 #ifndef WIN32
 #include <sys/stat.h>
 #include <dirent.h>
+#include <sys/resource.h>
 #else
 #include <winsock2.h>
 #endif
@@ -136,9 +136,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 	{
 #ifndef WIN32
 		signal(SIGPIPE, SIG_IGN);
-#endif
-
-		srand( (long)time(NULL) );
 
 		struct rlimit rlim; /* used for core size */
 		if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
@@ -148,6 +145,10 @@ int MenAreAntsApp::main(int argc, char **argv)
 			rlim.rlim_max = RLIM_INFINITY;
 			setrlimit(RLIMIT_CORE, &rlim);
 		}
+
+#endif
+
+		srand( (long)time(NULL) );
 
 		Config* conf = Config::GetInstance();
 #ifndef WIN32

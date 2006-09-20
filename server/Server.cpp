@@ -49,7 +49,7 @@ const char* msgTab[] = {
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
      "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris ou la partie est pleine */
-     "ER3",                                 /* ER3 - Serveur plein, impossible de connecter */
+     "ER3\n",                               /* ER3 - Serveur plein, impossible de connecter */
      "ER4",                                 /* ER4 - Impossible de créer la partie */
 
      "PIG",                                 /* PIG - Envoie un ping */

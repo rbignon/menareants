@@ -37,6 +37,8 @@ bool Config::set_defaults()
 	port = 5461;
 	deflimite = 10;
 	pingfreq = 50;
+	maxconnexions = 10;
+	maxgames = 3;
 	return true;
 }
 
