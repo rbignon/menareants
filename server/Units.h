@@ -141,6 +141,7 @@ public:
 public:
 
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event) { return false; }
 	virtual bool WantMove(ECBMove::E_Move m, int i) { return !Deployed() ? ECUnit::WantMove(m,i) : false; }
 	virtual void Invest(ECBEntity* e);
 	virtual bool CanCreate(const ECBEntity*);

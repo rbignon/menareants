@@ -24,7 +24,7 @@
 
 /********************************************************************
  *
- *             FOR HACKER
+ *             FOR HACKERS
  *
  * It's useless to change this values in your client, because this
  * is the server who decides if an action is accepted or not.

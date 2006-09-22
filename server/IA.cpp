@@ -388,40 +388,46 @@ void TIA::FirstMovements()
 			strat = s;
 		}
 
-	BCountriesVector countries = Player()->MapPlayer()->Countries();
-	for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
-	{
-		std::vector<ECBCase*> cases = (*cty)->Cases();
-		for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
-		{
-			int i = rand()%(ECBEntity::E_END);
-			if(i && i < ECBEntity::E_END && units[i] < 2)
-			{
-				ia_send("ARM - =" + TypToStr((*c)->X()) + "," + TypToStr((*c)->Y()) + " + %" + TypToStr(i));
-				break;
-			}
-		}
-	}
-
 	ents = Player()->Channel()->Map()->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		if((*enti)->Shadowed() || (*enti)->Locked() || !(*enti)->Owner() ||
 		   !(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner())
 			continue;
-		if((*enti)->IsBuilding())
+		if((*enti)->IsBuilding() && !rand()%2)
 		{
-			int i = rand()%ECBEntity::E_END;
-			if(i)
+			int t = 0;
+			switch((*enti)->Type())
+			{
+				case ECEntity::E_CASERNE:
+					switch(rand()%4)
+					{
+						case 0: t = ECEntity::E_ARMY; break;
+						case 1: t = ECEntity::E_ENGINER; break;
+						case 2: t = ECEntity::E_TOURIST; break;
+						case 3: t = ECEntity::E_MCDO; break;
+					}
+					break;
+				case ECEntity::E_CHARFACT:
+					switch(rand()%2)
+					{
+						case 0: t = ECEntity::E_CHAR; break;
+						case 1: t = ECEntity::E_MISSILAUNCHER; break;
+					}
+					break;
+				default:
+					t = rand()%ECEntity::E_END;
+					break;
+			}
+			if(t)
 			{
 				ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
-				                  TypToStr(i));
-
+								TypToStr(t));
 				/* HACK pour que les armées ne soient pas de 100 */
-				if(i == ECEntity::E_ARMY)
+				if(t == ECEntity::E_ARMY)
 					for(int j = 10; j >= 0; --j)
-						ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
-				                            TypToStr(i));
+						ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y())
+						                  + " + %" + TypToStr(t));
 			}
 		}
 		if((*enti)->Owner() != Player())

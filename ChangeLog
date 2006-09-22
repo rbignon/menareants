@@ -1,4 +1,35 @@
-2006-09-22 Romain Bignon <rom1@>
+2006-09-22 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp (int ARMCommand::Exec): Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
+	 (const char TInGameForm::GetWant): Affichage de fleches pour un ingénieur pour réparer.
+	 (void MenAreAntsApp::InGame): Correction d'un bug qui ne faisait pas avancer sur la case quand une unité ne pouvait
+	 pas entrer dans un conteneur sur la case cible.
+	
+	* src/Units.cpp: Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
+	
+	* src/data/anims/units/mcdo/caserne/1.png: Actualisation de l'image avec la caserne actuelle.
+	* src/data/anims/units/train/dos/1.png: Mise du train vu de face.
+	* src/data/anims/units/train/left/1.png: Mise du train vu de face.
+	* src/data/anims/units/train/right/1.png: Mise du train vu de face.
+	* lib/Units.h: Le mcdo possède 300 pour se défendre, histoire de lui laisser une chance d'arriver à destination.
+
+	* lib/Defines.h: Passage en version 3.2-pre1
+	
+	* server/Server.cpp (void TClient::Free): N'affiche pas le message "Deconnexion de x" pour les IA.
+	
+	* server/Units.h: L'ingénieur ne se bat pas si on l'attaque, ses 300 ne sont que défensifs contre la tour défense.
+	
+	* server/maps/first.map: Modification un peu du terrain avec rajout de quelques mines.
+	* server/maps/three.map: Rajout de quelques mines.
+	* server/maps/ia.map: Modification du nom de l'IA.
+	
+	* server/maps/caraibes.map: Rajout d'une mine pomée.
+	
+	* server/maps/europa_conquest.map: Rajout de mines, et enlève la position de facilité de la Russie.
+	
+	* server/IA.cpp (void TIA::FirstMovements): Ne créé plus les unités n'importe comment, et ne créé plus de batiments au pif.
+	
+2006-09-22 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (void MenAreAntsApp::InGame): Suppression du bouton Attaq.
 

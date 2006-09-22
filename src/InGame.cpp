@@ -324,7 +324,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		char event_moment;
 		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
 		if(InGameForm && (entities.size() > 1 ? event_case : entities.front()->Case())->Showed() > 0 &&
-		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE)
+		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE && !entities.front()->IsHiddenOnCase())
 		{
 			InGameForm->ShowWaitMessage = false;
 			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
@@ -527,7 +527,7 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 				if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(entity) && entity->Owner() &&
 				    entity->Owner()->IsMe())
 					can_invest = 2;
-				if(can_invest >= 0 && entity->CanInvest(enti) && !entity->Like(enti))
+				if(can_invest >= 0 && entity->CanInvest(enti))
 					can_invest = 1;
 				if(!enti->Like(entity) && enti->CanAttaq(entity) && can_invest != 2)
 				{
@@ -918,6 +918,8 @@ void MenAreAntsApp::InGame()
 											if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
 											   contener->CanContain(selected_entity))
 												break;
+											else
+												contener = 0;
 									}
 									if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
 									{

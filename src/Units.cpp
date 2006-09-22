@@ -226,7 +226,7 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 			break;
 	}
 	if(changed_case && entities.size() == 1 && Case()->Showed() > 0 &&
-	   dynamic_cast<ECMap*>(acase->Map())->ShowMap())
+	   dynamic_cast<ECMap*>(acase->Map())->ShowMap() && !IsHiddenOnCase())
 		dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
 
 	if(!move.Empty() && m != move.First())

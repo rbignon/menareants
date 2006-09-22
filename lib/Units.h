@@ -24,7 +24,7 @@
 
 /********************************************************************
  *
- *             FOR HACKER
+ *             FOR HACKERS
  *
  * It's useless to change this values in your client, because this
  * is the server who decide if an action is accepted or not.
@@ -263,7 +263,7 @@ public:
 
 	virtual e_type Type() const { return E_MCDO; }
 	virtual uint Cost() const { return 10000; }
-	virtual uint InitNb() const { return 1; }
+	virtual uint InitNb() const { return 300; }
 	virtual uint Step() const { return Deployed() ? 0 : 2; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }

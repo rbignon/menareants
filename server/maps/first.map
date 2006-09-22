@@ -1,10 +1,10 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
 NAME 4 sans mercis
-PLAYER A
-PLAYER B
-PLAYER C
-PLAYER D
+PLAYER A A
+PLAYER B B
+PLAYER C C
+PLAYER D D
 X 36
 Y 22
 MAP
@@ -222,3 +222,5 @@ UNIT 18 * 7,5 1
 UNIT 18 * 7,6 1
 UNIT 18 * 8,6 1
 UNIT 18 * 8,7 1
+UNIT 15 * 17,5 1
+UNIT 15 * 17,14 1

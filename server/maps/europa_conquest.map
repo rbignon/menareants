@@ -1,39 +1,39 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
 NAME Europa Conquest
-PLAYER A
-PLAYER B
-PLAYER C
-PLAYER D
-PLAYER E
-PLAYER F
+PLAYER A A
+PLAYER B B
+PLAYER C C
+PLAYER D D
+PLAYER E E
+PLAYER F F
 X 40
 Y 30
 MAP
 mAA*mmAA*mmAA*mmAA*mmAA*mmAA*mmADAmmADAmmAA*mmAA*mmAA*mmAA*mmAA*mmAA*mmAA*gmXL*kMXL*MtXL*ttXL*ttXL*ttXM*ttXM*ttXM*tmXM*cmXM*mmXM*mmXN*mmXN*gmXN*ktXN*ttXO*ttXO*ttXO*ttXO*ttXQ*ttXQ*ttXR*ttXR*ttXR*ttXR*t
 mAA*mmAA*mmAA*mmAA*mmAA*mmAA*mmADAmmADAmmAA*mmAA*mmAA*mmAA*mmXK*mmXK*gmXK*kMXK*MMXL*MtXL*ttXL*ttXL*ttXM*ttXM*ttXM*tmXM*cmXM*mmXM*mmXN*mmXN*dtXN*ttXN*ttXO*ttXO*ttXO*ttXO*ttXQ*ttXQ*ttXR*ttXR*ttXR*ttXR*t
-mAA*mmAA*mmAA*mmAA*mmAA*mmAA*mmADAmmADAmmXJ*mmXJ*mmXJ*mmXJ*mmXK*mmXK*dMXK*MtXK*ttXL*ttXL*ttXL*ttXL*ttXM*ttXM*ttXM*tmDADlmDADbmDADhmXN*mmXN*dtXN*ttXN*ttXO*ttXO*ttXO*ttXO*ttXQ*ttXQ*ttXQ*ttXR*ttXR*ttXR*t
-mXA*mmXA*mmXA*mmXA*mmXA*mmXA*mmADAmmADAmmXJ*gmXJ*bmXJ*hmXJ*mmXK*mmXK*dtXK*ttXK*ttXK*tmXL*jmXL*itDDDttDDDttDDDttDADttDADttDADtmDADcmDADmmXP*dtXP*ttXN*ttXO*ttXO*ttXO*ttXQ*ttXQ*ttXQ*ttXQ*ttXQ*ttXS*ttXS*t
+mAA*mmAA*mmAA*mmAA*mmAA*mmAA*mmADAmmADAmmXJ*mmXJ*mmXJ*mmXJ*mmXK*mmXK*dtXK*ttXK*ttXL*ttXL*ttXL*ttXL*ttXM*ttXM*ttXM*tmDADlmDADbmDADhmXN*mmXN*dtXN*ttXN*ttXO*ttXO*ttXO*ttXO*ttXQ*ttXQ*ttXQ*ttXR*ttXR*ttXR*t
+mXA*mmXA*mmXA*mmXA*mmXA*mmXA*mmADAmmADAmmXJ*gmXJ*bmXJ*hmXJ*mmXK*mmXK*dtXK*ttXK*ttXK*tmXL*jmXL*itDDDttDDDttDDDttDADttDADttDADtmDADcmDADmmXP*dMXP*MMXN*MtXO*ttXO*ttXO*ttXQ*ttXQ*ttXQ*ttXQ*ttXQ*ttXS*ttXS*t
 mXA*mmXA*mmXA*mmXA*mmXA*mmXA*mmADAmmADAgmXJ*kMXJ*MmXJ*lmXJ*hmXJ*mmXK*fmXK*amXK*amAA*amAA*emDDDfmDDDitDDDttDDDttDADttDADttDADtmDADcmDADmmXP*dtXP*ttXP*ttXP*ttXO*ttYS*ttXQ*ttXQ*ttXQ*ttXQ*ttXS*ttXS*ttXS*t
-mXA*mmXA*mmXA*mmXA*gmXA*bmXA*hmADAgmADAktXJ*tMXJ*MMXJ*MmXJ*cmXJ*mmXK*mmXK*mmXK*mmAA*mmAA*mmDDDmmDDDdtDDDttDDDttDADttDADttDADtmDADcmDADmmXP*dtXP*ttXP*ttXP*ttYS*ttYS*ttYS*ttYS*ttXQ*ttXS*ttXS*ttXS*ttXS*t
-mXA*mmXA*mmXA*gmXA*ktXA*tmXA*cmADAdtADAttXJ*ttXJ*ttXJ*tmXJ*cmXJ*mmAA*mmAA*mmAA*mmYL*gmYL*bmYL*hmDDDfmDDDitDDDttDADttDADttDADtmDADcmDADmmXP*fmXP*amXP*amYS*itYS*ttYS*ttYS*ttYS*ttXT*ttXT*ttXS*ttXS*ttXS*t
+mXA*mmXA*mmXA*mmXA*gmXA*bmXA*hmADAgmADAktXJ*tMXJ*MMXJ*MmXJ*cmXJ*mmXK*mmXK*mmXK*mmAA*mmAA*mmDDDmmDDDdtDDDttDDDttDADttDADttDADtmDADcmDADmmXP*dtXP*ttXP*ttXP*ttYS*ttYS*ttYS*ttYS*tMXQ*MMXS*MtXS*ttXS*ttXS*t
+mXA*mmXA*mmXA*gmXA*ktXA*tmXA*cmADAdtADAttXJ*ttXJ*ttXJ*tmXJ*cmXJ*mmAA*mmAA*mmAA*mmYL*gmYL*bmYL*hmDDDfmDDDitDDDttDADttDADttDADtmDADcmDADmmXP*fmXP*amXP*amYS*itYS*ttYS*ttYS*ttYS*ttXT*tMXT*MtXS*ttXS*ttXS*t
 mXA*mmXA*mmXA*dtXA*ttXA*tmXA*cmADAdtADAttADAttXJ*ttXJ*tmXJ*cmXJ*mmAA*mmAA*mmAA*mmYL*dtYL*tmYL*lmYL*hmDBDdtDBDttDBDttDBDtmDADjmDADemYR*mmYR*gmYR*bmYR*bmYR*ktYS*ttYS*ttYS*ttYS*ttXT*ttXT*ttXT*ttXS*ttXS*t
 mXA*mmXA*mmXA*dtXA*ttXA*tmXA*cmADAdtADAttADAttADAttABAtmABAlmABAhmABAmmAA*mmAA*mmYL*dtYL*ttYL*tmYL*cmDBDfmDBDitDBDtmDBDjmYM*emYM*gmYR*bmYR*ktYR*ttYR*ttYR*ttYR*ttYS*ttYS*ttYS*tMXT*MtXT*ttXT*ttXT*ttXT*t
 mXA*mmXA*mmXA*fmXA*amXA*amXA*emADAdtADAttADAttABAttABAttABAtmABAcmABAmmAA*mmAA*mmYL*dtYL*ttYL*tmYL*lmYL*hmDBDfmDBDamDBDemYM*gmYM*ktYR*ttYR*ttYR*ttYR*ttYR*ttYR*ttFAFttFAFttFAFtMXT*MtXT*ttXT*ttXT*ttXT*t
 mXA*mmXA*mmACAmmACAmmACAmmACAgmADAktADAttABAttABAttABAttABAtmABAcmABAmmAA*mmAA*gmYK*ktYL*ttYL*ttYK*tmYK*cmYM*mmYM*gmYM*bmYM*ktYM*ttYQ*ttYQ*ttYQ*ttYQ*ttYQ*ttYQ*ttFAFtMFAFMtFAFtMFAFMtFAFttXT*ttXT*ttXT*t
-mACAmmACAmmACAmmACAgmACAbmACAktACAttACAttABAttABAttABAtmABAjmYJ*emYJ*mmYJ*mmYJ*dtYK*ttYK*ttYK*ttYK*tmYK*lmYM*bmYM*ktYM*ttYM*ttYM*ttYQ*ttYQ*ttYQ*ttYQ*ttYQ*ttFBFttFAFtMFAFMtFAFttFAFttFAFttXU*ttXU*ttXU*t
-mACAmmACAmmACAmmACAdtACAttACAttACAttACAttABAttABAtmABAjmABAemYJ*gmYJ*bmYJ*bmYJ*ktYK*ttYK*ttYK*ttYK*ttYK*ttYM*ttYM*ttYM*ttYM*ttYN*ttYN*ttYN*ttYQ*ttYQ*ttFBFttFBFttFBFttFAFttFAFttFAFtMFAFMtXU*ttXU*ttXU*t
-mACAmmACAmmACAmmACAdtACAttACAttACAttACAtmABAjmABAamABAemYJ*gmYJ*ktYJ*ttYJ*ttYJ*ttYJ*ttYK*ttYK*ttYK*ttYK*ttYO*ttYO*ttYN*ttYN*ttYN*ttYN*ttYN*ttYQ*ttFBFttFBFttFBFttFBFttFAFttFAFttFAFtMFAFMtXU*ttXU*ttXU*t
-mACAmmACAmmACAmmACAfmACAamACAamACAamACAamACAemBABgmBABbmBABktBABttYJ*ttYJ*ttYJ*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYO*ttYO*ttYN*ttYN*ttYN*ttYN*ttYE*ttYE*ttFBFttFBFttFBFttFFFttFFFttFFFttFFFttXU*ttXU*ttXU*t
+mACAmmACAmmACAmmACAgmACAbmACAktACAttACAttABAttABAttABAtmABAjmYJ*emYJ*mmYJ*mmYJ*dtYK*ttYK*ttYK*ttYK*tmYK*lmYM*bmYM*ktYM*ttYM*ttYM*ttYQ*ttYQ*ttYQ*ttYQ*tMYQ*MtFBFttFAFtMFAFMtFAFttFAFttFAFttXU*ttXU*ttXU*t
+mACAmmACAmmACAmmACAdtACAttACAttACAttACAttABAttABAtpABArmABAemYJ*gmYJ*bmYJ*bmYJ*ktYK*ttYK*ttYK*ttYK*ttYK*ttYM*ttYM*ttYM*ttYM*ttYN*ttYN*ttYN*ttYQ*ttYQ*tMFBFMtFBFttFBFttFAFttFAFttFAFtMFAFMtXU*ttXU*ttXU*t
+mACAmmACAmmACAmmACAdtACAttACAttACAttACAtmABAjmABAapABAomYJ*bmYJ*ktYJ*ttYJ*ttYJ*ttYJ*ttYK*ttYK*ttYK*ttYK*ttYO*ttYO*ttYN*ttYN*ttYN*ttYN*ttYN*ttYQ*ttFBFtMFBFMtFBFttFBFttFAFttFAFttFAFtMFAFMtXU*ttXU*ttXU*t
+mACAmmACAmmACAmmACAfmACAamACAamACAamACAamACAemBABgpBABstBABttBABttYJ*ttYJ*ttYJ*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYO*ttYO*ttYN*ttYN*ttYN*ttYN*ttYE*ttYE*tMFBFMMFBFMtFBFttFFFttFFFttFFFttFFFttXU*ttXU*ttXU*t
 mACAmmACAmmACAmmACAmmXB*mmXB*mmXB*gmXB*bmXB*bmXB*ktBABttBABttBABttBABttYI*ttYI*ttYI*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYO*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*ttFBFttFFFttFFFttFFFttFFFttXU*ttXU*ttXV*t
-mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*dtXB*ttXB*ttXB*ttBABttBABttBABttBABttYI*ttYI*ttYI*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*ttYE*ttFFFttFFFttFFFttFFFttXV*ttXV*ttXV*t
-mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*fmXB*amXB*itXB*ttBABttBABttBABttBABttBBBttBBBtMBBBMMYH*MtYH*tMYH*MMYH*MtYP*ttYP*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*ttXW*ttXW*ttXW*ttXW*ttXV*ttXV*ttXV*ttXV*t
+mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*dtXB*ttXB*ttXB*ttBABttBABttBABttBABttYI*ttYI*ttYI*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*tMYE*MtFFFttFFFttFFFttFFFttXV*ttXV*ttXV*t
+mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*fmXB*amXB*itXB*ttBABttBABttBABttBABttBBBttBBBtMBBBMMYH*MtYH*tMYH*MMYH*MtYP*ttYP*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*tMXW*MtXW*tMXW*MMXW*MtXV*ttXV*ttXV*ttXV*t
 mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*mmXB*mmXB*dtXB*ttBABttBABttBABttBBBttBBBttBBBtMBBBMtYH*ttYH*ttYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYE*ttYE*ttYE*ttYE*ttYE*ttXW*ttXW*ttXW*ttXW*ttXW*ttXV*ttXV*ttXV*t
 mAA*mmAA*mmAA*mmXH*mmXH*mmXH*mmXH*mmXC*mmXC*dtXC*ttXC*ttBCBttBCBttBBBttBBBtMBBBMMBBBMtYH*tMYH*MtYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*ttXW*tmXW*jmXW*amXW*amXV*amXV*itEAEt
 mAA*mmAA*mmAA*gmXH*bmXH*bmXH*bmXH*hmXC*mmXC*dtXC*ttXC*ttBCBttBCBttBCBttBCBtMBCBMtBCBttYG*ttYG*ttYG*ttYG*tMYG*MtCBCtmYD*jmYD*amYD*itYC*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*tmXY*jmXW*emXW*mmXW*mmEAEmmEAEdtEAEt
-mAA*mmAA*mmAA*dMXH*MtXH*ttXH*tmXH*lmXG*bmXC*ktXC*tMXC*MtBCBttBCBttBCBttBCBttBCBttBCBttYG*ttYG*ttYG*ttYG*ttYG*ttCBCtmCBClmCBChmYD*fmYC*itYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmXY*mmEBEmmEBEmmEBEgmEAEktEAEt
-mXI*mmXI*mmXI*dtXI*ttXH*ttXH*ttXG*ttXG*ttXG*ttXC*tMXC*MMXD*MtBCBttBCBttBCBtmBCBjmBCBamYG*amYG*amYG*iMYG*MtYG*ttCBCttCBCtmCBCcmCBCmmYC*dtYC*ttYC*ttYC*ttXY*tMXY*MMXY*MmXY*cmEBEgmEBEbmEBEbmEBEktEAEttEAEt
-mXI*mmXI*mmXI*dtXI*ttXI*ttXG*ttXG*ttXG*ttXG*tMXG*MMXD*MtXD*ttXD*ttBCBtmBCBjmYF*emYF*gmYF*bmYF*hmCACfmCACitCACttCACttCACtmCBClmAA*hmYB*fmYB*itYB*ttYB*ttYB*ttXZ*ttXZ*tmXZ*cmEBEdtEBEttEBEttEBEttEBEttEAEt
+mAA*mmAA*mmAA*dMXH*MtXH*ttXH*tmXH*lmXG*bmXC*ktXC*ttXC*ttBCBttBCBttBCBttBCBttBCBttBCBttYG*ttYG*ttYG*ttYG*ttYG*ttCBCtmCBClmCBChmYD*fmYC*itYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmXY*mmEBEmmEBEmmEBEgmEAEktEAEt
+mXI*mmXI*mmXI*dtXI*ttXH*ttXH*ttXG*ttXG*ttXG*ttXC*tMXC*MMXD*MMBCBMtBCBttBCBtmBCBjmBCBamYG*amYG*amYG*iMYG*MtYG*ttCBCttCBCtmCBCcmCBCmmYC*dtYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmEBEgmEBEbmEBEbmEBEktEAEttEAEt
+mXI*mmXI*mmXI*dtXI*ttXI*ttXG*ttXG*ttXG*ttXG*tMXG*MMXD*MtXD*ttXD*ttBCBtmBCBjmYF*emYF*gmYF*bmYF*hmCACfmCACitCACttCACttCACtmCBClmAA*hmYB*fmYB*itYB*ttYB*ttYB*ttXZ*ttXZ*tpXZ*ppEBEqtEBEttEBEttEBEttEBEttEAEt
 mXI*mmXI*mmXI*dtXI*ttXI*tMXG*MtXG*ttXG*ttXG*ttXD*ttXD*ttXD*tmXD*jmAA*amYF*emYF*gmYF*ktYF*tmYF*cmCACmmCACdtCACttCACttCACttCACtmAA*cmYB*mmYB*dtYB*ttYB*ttYB*ttXZ*ttXZ*tmXZ*cmEBEdtEBEttEBEttEBEttEBEttEEEt
 mXI*mmXI*gmXI*ktXI*ttXI*ttXI*ttXG*ttXG*ttXE*ttXE*ttXD*tmXD*jmXD*emAA*mmYF*mmYF*dMYF*MtYF*tmYF*cmCACmmCACdMCACMMCACMtCACttCACtmAA*cmYB*mmYB*dMYB*MMYB*MtYB*ttXZ*ttXZ*tmXZ*cmEBEfmEBEamEBEitEBEttEEEttEEEt
 mXI*mmXI*dtXI*ttXI*tMXF*MMXF*MtXE*ttXE*ttXE*ttXE*tmXE*jmXD*emXD*mmAA*mmYF*mmYF*dtYF*ttYF*tmYF*cmCCCmmCCCdMCCCMtCCCttYT*ttYT*tmYT*lmYT*hmYA*fmYA*iMYA*MtYA*ttXZ*ttXZ*tmXZ*cmXZ*mmEBEmmEBEfmEBEamEEEitEEEt
@@ -233,3 +233,34 @@ UNIT 1 * 31,2 1000
 UNIT 1 * 28,1 1000
 UNIT 1 * 28,5 1000
 UNIT 1 * 34,18 1000
+UNIT 20 * 15,16 1
+UNIT 20 * 16,16 1
+UNIT 20 * 17,16 1
+UNIT 20 * 18,16 1
+UNIT 20 * 19,16 1
+UNIT 20 * 20,16 1
+UNIT 20 * 21,16 1
+UNIT 20 * 22,16 1
+UNIT 20 * 23,16 1
+UNIT 20 * 25,16 1
+UNIT 20 * 26,16 1
+UNIT 20 * 27,16 1
+UNIT 20 * 28,16 1
+UNIT 20 * 30,16 1
+UNIT 20 * 31,16 1
+UNIT 20 * 33,16 1
+UNIT 20 * 34,16 1
+UNIT 20 * 35,16 1
+UNIT 20 * 36,16 1
+UNIT 20 * 37,16 1
+UNIT 20 * 38,16 1
+UNIT 20 * 39,16 1
+UNIT 15 * 9,19 1
+UNIT 15 * 36,1 1
+UNIT 15 * 33,5 1
+UNIT 15 * 28,13 1
+UNIT 15 * 22,13 1
+UNIT 15 * 30,19 1
+UNIT 15 * 6,25 1
+UNIT 15 * 4,6 1
+UNIT 15 * 25,18 1
