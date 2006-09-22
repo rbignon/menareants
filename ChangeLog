@@ -1,3 +1,7 @@
+2006-09-22 Romain Bignon <rom1@>
+
+	* src/InGame.cpp (void MenAreAntsApp::InGame): Suppression du bouton Attaq.
+
 2006-09-19 Romain Bignon <progs@headfucking.net>
 
 	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait économiser de la mémoire,

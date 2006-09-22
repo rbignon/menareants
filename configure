@@ -822,8 +822,8 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-server         compilation of Men Are Ants's server
-  --disable-game          compilation of Men Are Ants game
+  --enable-server         compilation of Men Are Ants' server
+  --disable-game          compilation without Men Are Ants' game
   --disable-sdltest       Do not try to compile and run a test SDL program
   --enable-warnings       enable warnings during compilation (-Wall)
   --enable-gprof          used to have some cpu's informations

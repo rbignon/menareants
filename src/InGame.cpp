@@ -887,9 +887,7 @@ void MenAreAntsApp::InGame()
 						   InGameForm->BarreAct->Test(event.button.x, event.button.y))
 							break;
 
-						if(InGameForm->BarreAct->AttaqButton->Test(event.button.x, event.button.y))
-							want = W_ATTAQ;
-						else if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y))
 							want = W_EXTRACT;
 
 						int mywant = want;
@@ -1378,7 +1376,6 @@ void TBarreAct::ShowInfos()
 	SpecialInfo->Hide();
 	ExtractButton->Hide();
 	DeployButton->Hide();
-	AttaqButton->Hide();
 	UpButton->Hide();
 	UpgradeButton->Hide();
 	ChildIcon->Hide();
@@ -1534,10 +1531,6 @@ void TBarreAct::vSetEntity(void* _e)
 			}
 			else
 				InGameForm->BarreAct->DeployButton->Hide();
-
-			InGameForm->BarreAct->AttaqButton->SetVisible(e->WantAttaq(0,0));
-
-			if(e->WantAttaq(0,0)) InGameForm->BarreAct->AttaqButton->SetX((x -= InGameForm->BarreAct->AttaqButton->Width()));
 		}
 		else
 		{
@@ -1546,7 +1539,6 @@ void TBarreAct::vSetEntity(void* _e)
 			else
 				InGameForm->BarreAct->ShowIcons<ECEntity*>(0,0);
 			InGameForm->BarreAct->DeployButton->Hide();
-			InGameForm->BarreAct->AttaqButton->Hide();
 			InGameForm->BarreAct->UpButton->Hide();
 			InGameForm->BarreAct->UpgradeButton->Hide();
 		}
@@ -1631,9 +1623,6 @@ void TBarreAct::Init()
 	DeployButton = AddComponent(new TButtonText(300,15,100,30, "Déployer", Font::GetInstance(Font::Small)));
 	DeployButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	DeployButton->SetHint("Déployer l'unité pour lui permettre d'avoir des capacités en plus.");
-	AttaqButton = AddComponent(new TButtonText(400,15,100,30, "Attaquer", Font::GetInstance(Font::Small)));
-	AttaqButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	AttaqButton->SetHint("Attaquer une autre unité sur une case choisie (cliquez dessus).\n$ Maj + clic");
 	UpButton = AddComponent(new TButtonText(500,15,100,30, "Ajouter", Font::GetInstance(Font::Small)));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	ExtractButton = AddComponent(new TButtonText(500,15,100,30, "Extraire", Font::GetInstance(Font::Small)));

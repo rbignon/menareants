@@ -110,7 +110,6 @@ public:
 	TLabel*         SpecialInfo;
 	TButtonText*    ExtractButton;
 	TButtonText*    DeployButton;
-	TButtonText*    AttaqButton;
 	TButtonText*    UpButton;
 	TButtonText*    UpgradeButton;
 	TButtonText*    HelpButton;

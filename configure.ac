@@ -27,7 +27,7 @@ AM_CONDITIONAL([WIN32], test "$WIN32" = "yes")
 # COMPILER ET INSTALLER LE SERVEUR
 
 AC_ARG_ENABLE(  server,
-                [AC_HELP_STRING([--enable-server],[compilation of Men Are Ants's server])],
+                [AC_HELP_STRING([--enable-server],[compilation of Men Are Ants' server])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 INSTALL_SERVER=server
@@ -41,7 +41,7 @@ AC_ARG_ENABLE(  server,
 INSTALL_GAME_Q=1
 
 AC_ARG_ENABLE(  game,
-                [AC_HELP_STRING([--disable-game],[compilation of Men Are Ants game])],
+                [AC_HELP_STRING([--disable-game],[compilation without Men Are Ants' game])],
                 [
                         if test "x${enableval}" = "xno"; then
                                 INSTALL_GAME_Q=0
