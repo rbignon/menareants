@@ -1700,7 +1700,7 @@ void EChannel::operator<< (std::string os)
 
 void EChannel::SendEntities(ECPlayer* pl)
 {
-	if(!Map()) return;
+	if(!Map() || !pl->Client()) return;
 
 	std::vector<ECBEntity*> ents = Map()->Entities()->List();
 

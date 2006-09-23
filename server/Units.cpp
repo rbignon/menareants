@@ -112,7 +112,7 @@ void ECEnginer::Invest(ECBEntity* entity)
 	 * une alternative
 	 */
 	if(Shadowed()) return;
-	if(entity->Owner() == Owner())
+	if(entity->Owner() == Owner() && Owner()->Client())
 	{
 		if(entity->Nb() >= entity->InitNb()) return;
 		entity->SetNb(entity->InitNb());

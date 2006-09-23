@@ -1,3 +1,14 @@
+2006-09-23 Romain Bignon <progs@headfucking.net>
+
+	* server/Units.cpp (void ECEnginer::Invest): Vérification que Client() ne soit pas nul.
+	
+	* server/Map.cpp (void ECMap::RemoveAnEntity): Vérification que Client() ne soit pas nul.
+	 (bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): Vérification que Client() ne soit pas nul.
+	
+	* server/maps/europa_conquest.map: Modifications essayant de rapprocher l'égalité.
+
+	* server/Channels.cpp (void EChannel::operator<< ): Vérification que Client() ne soit pas nul.
+
 2006-09-22 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (int ARMCommand::Exec): Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
@@ -17,7 +28,7 @@
 	
 	* server/Server.cpp (void TClient::Free): N'affiche pas le message "Deconnexion de x" pour les IA.
 	
-	* server/Units.h: L'ingénieur ne se bat pas si on l'attaque, ses 300 ne sont que défensifs contre la tour défense.
+	* server/Units.h: Le McDo ne se bat pas si on l'attaque, ses 300 ne sont que défensifs contre la tour défense.
 	
 	* server/maps/first.map: Modification un peu du terrain avec rajout de quelques mines.
 	* server/maps/three.map: Rajout de quelques mines.

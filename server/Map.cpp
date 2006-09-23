@@ -120,7 +120,8 @@ void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 
 	BPlayerVector players = Channel()->Players();
 	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
-		dynamic_cast<ECPlayer*>(*pl)->Client()->RemoveEntity(e);
+		if(dynamic_cast<ECPlayer*>(*pl)->Client())
+			dynamic_cast<ECPlayer*>(*pl)->Client()->RemoveEntity(e);
 
 	ECBMap::RemoveAnEntity(e, use_delete);
 }
@@ -348,7 +349,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 				if(step == T_ATTAQ_STEP && (*enti)->EventType() & ARM_ATTAQ && !((*enti)->EventType() & ARM_FORCEATTAQ))
 				{ /* C'était un attaquant, on lui fait faire un Return */
 					Debug(W_DEBUG, "il y a un attaquant qui se trouve fort sodomisé.");
-					if((*enti)->Return() && (*enti)->Owner())
+					if((*enti)->Return() && (*enti)->Owner() && (*enti)->Owner()->Client())
 						chan->SendArm(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client(), *enti,
 										ARM_RETURN, (*enti)->Case()->X(), (*enti)->Case()->Y());
 

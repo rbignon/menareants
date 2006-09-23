@@ -50,6 +50,7 @@ public:
 	 * @param _s this is string to show.
 	 * @param _b this is flags of buttons to show.
 	 * @param form if there is a TForm, to continue to show it, put it in.
+	 * @param transparence this define if the background is transparency.
 	 */
 	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0, bool transparence = true);
 
