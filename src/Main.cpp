@@ -54,7 +54,7 @@ extern const char* SVNVERSION;
 std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
                           std::string("-") + APP_VERSION_PATCH;
 #else
-std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA;
+std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA);
 #endif
 
 class TMainForm : public TForm
