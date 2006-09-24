@@ -75,8 +75,8 @@ bool Config::set_defaults(bool want_save)
 	nick = "";
 	color = 0;
 	nation = 0;
-	screen_width = 1280;
-	screen_height = 1024;
+	screen_width = 1024;
+	screen_height = 768;
 	ttf_file = PKGDATADIR_FONTS "Vera.ttf";
 #ifdef WIN32
 	fullscreen = true;

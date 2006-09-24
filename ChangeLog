@@ -1,3 +1,7 @@
+2006-09-24 Romain Bignon <progs@headfucking.net>
+
+	* Version 3.2 releasée !!
+
 2006-09-23 Romain Bignon <progs@headfucking.net>
 
 	* server/Units.cpp (void ECEnginer::Invest): Vérification que Client() ne soit pas nul.

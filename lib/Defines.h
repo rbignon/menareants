@@ -40,9 +40,7 @@
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #if 0
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
-#endif
 #define	APP_VERSION_PATCH	"pre1"	/* première pré release */
-#if 0
 #define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
