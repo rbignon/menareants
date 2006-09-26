@@ -333,7 +333,12 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
-			while(!ok)
+			Timer timer;
+			/* Le soucis est que si jamais une des fonctions, pour une raison X ou Y, renvoie true en permanence,
+			 * ça fait une boucle infinie. Ça serait con de couper une partie juste à cause de ça, donc au bout
+			 * de 10 secondes de boucle, on se barre.
+			 */
+			while(!ok && timer.time_elapsed() < 10)
 			{
 				ok = true;
 				for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
@@ -392,7 +397,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				case ARM_ATTAQ:
 					if(!(flags & ARM_INVEST))
 					{
-						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été vaincu !");
+						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été détruit(e) !");
 						if((*it)->DeadCase())
 							(*it)->Case()->SetImage((*it)->DeadCase());
 					}

@@ -1,3 +1,10 @@
+2006-09-26 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Anticipation sur un bug qui n'affiche pas dans certain cas AttaqImg, et qui faisait une boucle
+	infinie. On met un timer qui empeche dans la boucle du ARMCommand de faire plus de 10 secondes.
+
+	* src/Sockets.cpp, src/tools/Images.h: Modifications qui assure le portage à MacOS.
+
 2006-09-24 Romain Bignon <progs@headfucking.net>
 
 	* Version 0.3.2 releasée !!

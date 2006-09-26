@@ -149,8 +149,13 @@ void EChannel::NextAnim()
 						if(!(*it)->Nb())
 							it = entv.erase(it);
 						else
+						{
 							(*it)->Tag = T_SLEEP;
-						nb_entities--;
+							++it;
+						}
+						// Il est déjà arrivé, allez savoir pourquoi, que nb_entities soit décrémenté en dessous de 0.
+						if(nb_entities > 0)
+							nb_entities--;
 					}
 					else ++it;
 				}

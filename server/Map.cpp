@@ -614,7 +614,7 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 	if(!enemies) return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && (*it)->Case() == Case() && !Like(*it) && CanAttaq(*it))
+		if(*it != this && (*it)->Case() == Case() && !Like(*it) && (CanAttaq(*it) || Parent() && Parent()->CanAttaq(*it)))
 		{
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);

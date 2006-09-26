@@ -10,6 +10,13 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
+-lorsque quelqu'un s'allie avec une IA, celle-ci devrait s'allier avec les alliés de cette personne
+-faire des balises entre ses alliés sur la carte
+-pouvoir définir une cible sur plusieurs tours
+-pouvoir faire des déplacements en diagonal en un clique
+-quand une unité est sélectionnée marquer les cases où l'unité peut aller
+-afficher les deplacements anticipés de ses alliés (peut etre)
+-lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
 -bouton qui permet de trouver aléatoirement une unité qui n'a encore aucune action
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)

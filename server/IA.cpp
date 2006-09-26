@@ -394,13 +394,13 @@ void TIA::FirstMovements()
 		if((*enti)->Shadowed() || (*enti)->Locked() || !(*enti)->Owner() ||
 		   !(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner())
 			continue;
-		if((*enti)->IsBuilding() && !rand()%2)
+		if((*enti)->IsBuilding())
 		{
 			int t = 0;
 			switch((*enti)->Type())
 			{
 				case ECEntity::E_CASERNE:
-					switch(rand()%4)
+					switch(rand()%5)
 					{
 						case 0: t = ECEntity::E_ARMY; break;
 						case 1: t = ECEntity::E_ENGINER; break;
@@ -409,10 +409,11 @@ void TIA::FirstMovements()
 					}
 					break;
 				case ECEntity::E_CHARFACT:
-					switch(rand()%2)
+					switch(rand()%4)
 					{
-						case 0: t = ECEntity::E_CHAR; break;
-						case 1: t = ECEntity::E_MISSILAUNCHER; break;
+						case 0:
+						case 1: t = ECEntity::E_CHAR; break;
+						case 2: t = ECEntity::E_MISSILAUNCHER; break;
 					}
 					break;
 				default:
@@ -425,7 +426,7 @@ void TIA::FirstMovements()
 								TypToStr(t));
 				/* HACK pour que les armées ne soient pas de 100 */
 				if(t == ECEntity::E_ARMY)
-					for(int j = 10; j >= 0; --j)
+					for(int j = 12; j >= 0; --j)
 						ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y())
 						                  + " + %" + TypToStr(t));
 			}
