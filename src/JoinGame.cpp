@@ -466,7 +466,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							if(pll && pll->Player() == sender)
 							{
 								pll->NbVotes->SetCaption(parv[j]);
-								pll->Voter->SetEnabled(false);
 								break;
 							}
 						}

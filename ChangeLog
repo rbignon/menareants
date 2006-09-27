@@ -1,5 +1,7 @@
 2006-09-27 Romain Bignon <progs@headfucking.net>
 
+	* src/InGame.cpp: Le bouton "Voter" se grisait dès que n'importe qui votait.
+
 	* server/Config.cpp (bool Config::load): Chargement du paramètre ADMINPASS.
 
 	* server/Commands.h: Ajout de la commande ADMIN

@@ -2080,8 +2080,11 @@ void MenAreAntsApp::PingingGame()
 						{
 							TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
 							if(pll && pll->Voter->Test(event.button.x, event.button.y))
+							{
 								client->sendrpl(client->rpl(EC_Client::SET),
 								                ("+v " + pll->Player()->Nick()).c_str());
+								pll->Voter->SetEnabled(false);
+							}
 						}
 						break;
 					}
