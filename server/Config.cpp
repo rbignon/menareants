@@ -39,6 +39,8 @@ bool Config::set_defaults()
 	pingfreq = 50;
 	maxconnexions = 10;
 	maxgames = 3;
+	// Ne *PAS* définir adminpass. Lors du premier chargement il sera nul si la conf est illisible, et donc
+	// ça empechera le login en admin. Et dans le cas d'un REHASH foiré, le pass admin restera.
 	return true;
 }
 
@@ -94,6 +96,7 @@ bool Config::load()
 			else
 				Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", ligne.c_str());
 		}
+		else if(key == "ADMINPASS") adminpass = ligne;
 		else
 			Debug(W_WARNING|W_ECHO, "Ligne incorrecte (variable %s inconnue):\n%s %s",
 			                        key.c_str(), key.c_str(), ligne.c_str());

@@ -129,6 +129,7 @@ private:
 #define ECD_FREE 	0x02
 #define ECD_FLUSH	0x04
 #define ECD_PING	0x08
+#define ECD_ADMIN	0x10
 	std::string ip;
 	ECPlayer *pl;
 };

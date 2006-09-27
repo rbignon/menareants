@@ -83,6 +83,8 @@ class SETCommand : public EC_ACommand { public: SETCommand(const std::string _Cm
 
 class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
+class ADMINCommand : public EC_ACommand { public: ADMINCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ADMINCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
 /*
 DECLARE_CMD ( ERR );
 
@@ -99,6 +101,8 @@ DECLARE_CMD ( MSG );
 DECLARE_CMD ( AMSG );
 DECLARE_CMD ( SET );
 DECLARE_CMD ( ARM );
+
+DECLARE_CMD ( ADMIN );
 */
 
 #endif

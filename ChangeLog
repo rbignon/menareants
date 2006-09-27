@@ -1,3 +1,19 @@
+2006-09-27 Romain Bignon <progs@headfucking.net>
+
+	* server/Config.cpp (bool Config::load): Chargement du paramètre ADMINPASS.
+
+	* server/Commands.h: Ajout de la commande ADMIN
+
+	* server/Login.cpp: Commande ADMIN qui permet de se loguer, de rehash ou de killer quelqu'un.
+	
+	* server/menareantsd.conf.in: Ajout du paramètre ADMINPASS.
+	
+	* server/Config.h: Variable AdminPass.
+	
+	* server/Server.h: Flag ECD_ADMIN.
+	
+	* server/Main.cpp: Commande ADMIN.
+	
 2006-09-26 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Anticipation sur un bug qui n'affiche pas dans certain cas AttaqImg, et qui faisait une boucle

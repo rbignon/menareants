@@ -34,6 +34,7 @@ public:
 
 public:
 	bool load();
+	bool set_defaults();
 
 	std::string ServerName() const { return servername; }
 	uint Port() const { return port; }
@@ -42,6 +43,7 @@ public:
 	uint MaxGames() const { return maxgames; }
 	uint MaxConnexions() const { return maxconnexions; }
 	std::vector<std::string> Motd() const { return motd; }
+	std::string AdminPass() const { return adminpass; }
 
 private:
 	std::string servername;
@@ -51,10 +53,10 @@ private:
 	uint maxgames;
 	uint maxconnexions;
 	std::vector<std::string> motd;
+	std::string adminpass;
 
 private:
 	std::string filename;
-	bool set_defaults();
 };
 
 #endif

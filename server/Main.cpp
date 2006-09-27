@@ -134,6 +134,7 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
 		Commands.push_back(new ERRCommand("ERR",	0,			1));
 		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
+		Commands.push_back(new ADMINCommand("ADMIN",ECD_AUTH,	1));
 	
 		signal(SIGPIPE, SIG_IGN);
 		signal(SIGALRM, &sig_alarm);

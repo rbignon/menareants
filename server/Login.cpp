@@ -27,6 +27,56 @@
 #include <string>
 #include <fstream>
 
+/** Administration commands.
+ *
+ * Syntax: ADMIN REHASH
+ *         ADMIN LOGIN [pass]
+ *         ADMIN KILL [nick]
+ */
+int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	if(parv[1] == "LOGIN")
+	{
+		if(parv.size() < 3 || parv[2].empty() || parv[2] != app.GetConf()->AdminPass())
+		{
+			Debug(W_WARNING, "ADMIN LOGIN: Identification échouée de %s", cl->GetNick());
+			return cl->sendrpl(app.rpl(ECServer::ERR));
+		}
+		cl->SetFlag(ECD_ADMIN);
+		return 0;
+	}
+
+	if(!cl->HasFlag(ECD_ADMIN))
+	{
+		Debug(W_WARNING, "ADMIN %s: Utilisation par un non admin %s", parv[1].c_str(), cl->GetNick());
+		return cl->sendrpl(app.rpl(ECServer::ERR));
+	}
+
+	if(parv[1] == "REHASH")
+	{
+		if(!app.GetConf()->load())
+		{
+			app.GetConf()->set_defaults();
+			Debug(W_WARNING, "ADMIN REHASH: Impossible de charger la configuration, mise de la configuration par défaut");
+			return cl->sendrpl(app.rpl(ECServer::ERR));
+		}
+		return 0;
+	}
+
+	if(parv[1] == "KILL")
+	{
+		TClient* victim = 0;
+		if(parv.size() < 3 || !(victim = app.FindClient(parv[2].c_str())))
+			return cl->sendrpl(app.rpl(ECServer::ERR));
+
+		return victim->exit(app.rpl(ECServer::BYE));
+	}
+	
+	cl->sendrpl(app.rpl(ECServer::ERR));
+
+	return 0;
+}
+
 /** Send motd to client.
  *
  * @param cl client struct
