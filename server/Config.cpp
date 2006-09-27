@@ -39,6 +39,7 @@ bool Config::set_defaults()
 	pingfreq = 50;
 	maxconnexions = 10;
 	maxgames = 3;
+	motd.clear();
 	// Ne *PAS* définir adminpass. Lors du premier chargement il sera nul si la conf est illisible, et donc
 	// ça empechera le login en admin. Et dans le cas d'un REHASH foiré, le pass admin restera.
 	return true;
