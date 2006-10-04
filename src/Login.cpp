@@ -103,7 +103,13 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			break;
 		case '-':
 			me->SetCantConnect("Vous devez mettre à jour Men Are Ants pour jouer "
-			                   "sur ce serveur.\n\nAllez sur " APP_SITE " pour plus d'informations.");
+			                   "sur ce serveur.\n\n"
+#ifndef WIN32
+			                   "Tapez en console \"make update && sudo make install\".\n"
+#else
+			                   "Téléchargez MenAreAnts.zip sur le site.\n"
+#endif
+			                   "Allez sur " APP_SITE " pour plus d'informations.");
 			break;
 		default:
 			me->SetCantConnect("Impossible de se connecter");

@@ -26,6 +26,7 @@
 #include "Commands.h"
 #include "Units.h"
 #include "Batiments.h"
+#include "Main.h"
 
 void EChannel::InitAnims()
 {
@@ -763,8 +764,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					attaq_event->Entities()->Add(entity);
 					if(event_found)
 					{ /* On link dans attaq_event et on l'enlève de la boucle principale.
-					* En effet, on affichera les déplacements en meme temps que l'attaque
-					*/
+					   * En effet, on affichera les déplacements en meme temps que l'attaque
+					   */
 						attaq_event->AddLinked(event_found);
 						map->RemoveEvent(event_found);
 					}
@@ -904,5 +905,70 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			                                   (*enti)->LongName().c_str(), (*enti)->Nb());
 	}
 #endif
+	return 0;
+}
+
+/** Add a breakpoint on the map.
+ *
+ * Syntax: BP [+|-]x,y [message]
+ */
+int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
+{
+	if(!cl->Player() || cl->Player()->Channel()->State() != EChannel::PLAYING)
+		return vDebug(W_DESYNCH, "BP: Le joueur n'est pas dans une partie, ou alors la partie n'est pas +P(laying)",
+		              VPName(cl->Player()));
+
+	if(cl->Player()->Ready())
+		return Debug(W_DESYNCH, "BP: Le joueur essaye de BP alors qu'il est pret !");
+
+	EChannel* chan = cl->Player()->Channel();
+	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
+	char ch = parv[1][0];
+	std::string s = parv[1].substr(1);
+	uint x = StrToTyp<uint>(stringtok(s, ","));
+	uint y = StrToTyp<uint>(s);
+
+	ECBCase *c;
+	try
+	{
+		c = (*map)(x,y);
+	}
+	catch(TECExcept &e)
+	{
+		Debug(W_DESYNCH, "BP: %s a voulu faire un breakpoint hors de la map (%d,%d)", cl->GetNick(), x, y);
+		return cl->sendrpl(app.rpl(ECServer::ERR));
+	}
+
+	std::string message = parv.size() > 2 ? parv[2] : "";
+
+	switch(ch)
+	{
+		case '+':
+		{
+			std::vector<ECPlayer::BreakPoint> bp = cl->Player()->BreakPoints();
+			for(std::vector<ECPlayer::BreakPoint>::iterator it = bp.begin(); it != bp.end(); ++it)
+				if(it->c == c)
+					return cl->sendrpl(app.rpl(ECServer::ERR));
+
+			cl->Player()->AddBreakPoint(ECPlayer::BreakPoint(c, message));
+
+			break;
+		}
+		case '-':
+		{
+			if(!cl->Player()->RemoveBreakPoint(c))
+				return cl->sendrpl(app.rpl(ECServer::ERR));
+
+			break;
+		}
+		default: return vDebug(W_WARNING, "BP: Invalide identifiant", VCName(ch) VName(parv[1]));
+	}
+
+	cl->sendrpl(app.rpl(ECServer::BREAKPOINT), cl->GetNick(), ch, c->X(), c->Y(), message.c_str());
+
+	std::vector<TClient*> allies = cl->Player()->ClientAllies();
+	for(std::vector<TClient*>::iterator it = allies.begin(); it != allies.end(); ++it)
+		(*it)->sendrpl(app.rpl(ECServer::BREAKPOINT), cl->GetNick(), ch, c->X(), c->Y(), message.c_str());
+
 	return 0;
 }

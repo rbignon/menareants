@@ -44,7 +44,9 @@ public:
 		CantAttaq,
 		Invest,
 		Left,
-		Radar
+		Radar,
+		AddBP,
+		RemBP,
 	};
 	typedef std::map<cursors_t, ECImage*> ImgList;
 

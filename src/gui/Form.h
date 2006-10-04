@@ -148,7 +148,11 @@ public:
 	void LockScreen() const;
 	void UnlockScreen() const;
 
-	bool IsPressed(SDLKey i) const { return keys[i]; }
+	bool IsPressed(SDLKey i) const
+	{
+		Uint8 *keystate = SDL_GetKeyState(NULL);
+		return keystate[i];
+	}
 
 	void SetMaxFPS(int mps) { max_fps = mps; }
 	int MaxFPS() const { return max_fps; }
@@ -179,7 +183,6 @@ private:
 	bool focus_order;
 	TMemo* Hint;
 	SDL_mutex* mutex;
-	std::bitset<SDLK_LAST> keys;
 	uint max_fps;
 };
 

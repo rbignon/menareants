@@ -31,6 +31,7 @@ class ECBChannel;
 class ECBMap;
 class ECBMapPlayer;
 class ECBEntity;
+class ECBCase;
 
 typedef std::vector<ECBEntity*> BEntityVector;
 
@@ -42,6 +43,8 @@ extern const struct nations_str_t nations_str[];
 
 class ECBPlayer;
 typedef std::vector<ECBPlayer*> BPlayerVector;
+
+
 
 /********************************************************************************************
  *                               ECBPlayer                                                  *

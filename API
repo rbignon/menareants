@@ -40,6 +40,7 @@ Sommaire:
          - En cours de jeu
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [>] [^] [v] [<] [*<pos>]
+              BP <+|-><pos> [message]           :rajoute un breakpoint sur la carte, montré uniquement à ses alliés
 
       b) Serveur -> Client
          - Général
@@ -76,6 +77,7 @@ Sommaire:
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
+              :<nick> BP <+|-><pos> [message]   :montre un nouveau breakpoint
          - Lors des scores
               :<nick> SCO <killed> <shooted>    :score d'un joueur
                          <created> <score>

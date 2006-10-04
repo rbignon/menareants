@@ -127,6 +127,7 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
 		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
 		Commands.push_back(new AMSGCommand("AMSG",	ECD_AUTH,	1));
+		Commands.push_back(new BPCommand("BP",		ECD_AUTH,	1));
 		Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
 		Commands.push_back(new JIACommand("JIA",	ECD_AUTH,	1));
 		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));

@@ -400,9 +400,9 @@ void TMap::Draw(int _x, int _y)
 			++enti;
 		}
 
-	FOR(ECBEntity*, entities, enti)
+	FORit(ECBEntity*, entities, enti)
 	{
-		ECEntity* e = dynamic_cast<ECEntity*>(enti);
+		ECEntity* e = dynamic_cast<ECEntity*>(*enti);
 		if(e->OnTop())
 			e->Draw();
 		e->AfterDraw();
@@ -424,100 +424,115 @@ void TMap::Draw(int _x, int _y)
 #endif
 
 	if(map->Channel())
-		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 	{
-		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-		if(!entity->Move()->Empty())
+		BPlayerVector pls = map->Channel()->Players();
+		FORit(ECBPlayer*, pls, pl)
 		{
-			if(map->Channel()->State() == EChannel::ANIMING)
-			{
-
-			}
-			else if(map->Channel()->State() == EChannel::PLAYING)
-			{
-				ECase* c = dynamic_cast<ECase*>((*enti)->Case());
-				if(c != entity->Move()->FirstCase())
-					FDebug(W_WARNING|W_SEND, "La case de l'entité et le départ du mouvement ne sont pas identiques");
-
-				ECMove::Vector moves = entity->Move()->Moves();
-				ECase* next_c = 0;
-				int last_move = -1;
-				for(ECMove::Vector::iterator move = moves.begin(); move != moves.end(); ++move)
+			std::vector<ECPlayer::BreakPoint> bps = dynamic_cast<ECPlayer*>(*pl)->BreakPoints();
+			FORit(ECPlayer::BreakPoint, bps, bp)
+				if(bp->sprite)
 				{
-					switch(*move)
+					bp->sprite->set(bp->c->Image()->X() + CASE_WIDTH/2  - bp->sprite->GetWidth()/2,
+									bp->c->Image()->Y() + CASE_HEIGHT/2 - bp->sprite->GetHeight()/2);
+					bp->sprite->draw();
+					bp->c->SetMustRedraw();
+				}
+		}
+		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+		{
+			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+			if(!entity->Move()->Empty())
+			{
+				if(map->Channel()->State() == EChannel::ANIMING)
+				{
+	
+				}
+				else if(map->Channel()->State() == EChannel::PLAYING)
+				{
+					ECase* c = dynamic_cast<ECase*>((*enti)->Case());
+					if(c != entity->Move()->FirstCase())
+						FDebug(W_WARNING|W_SEND, "La case de l'entité et le départ du mouvement ne sont pas identiques");
+	
+					ECMove::Vector moves = entity->Move()->Moves();
+					ECase* next_c = 0;
+					int last_move = -1;
+					for(ECMove::Vector::iterator move = moves.begin(); move != moves.end(); ++move)
 					{
-						case ECMove::Up: next_c = dynamic_cast<ECase*>(c->MoveUp()); break;
-						case ECMove::Down: next_c = dynamic_cast<ECase*>(c->MoveDown()); break;
-						case ECMove::Left: next_c = dynamic_cast<ECase*>(c->MoveLeft()); break;
-						case ECMove::Right: next_c = dynamic_cast<ECase*>(c->MoveRight()); break;
-					}
-					if(c->Y() == next_c->Y())
-					{
-						switch(last_move)
+						switch(*move)
 						{
-							case ECMove::Up:
-								(c->X() < next_c->X() ? Resources::FlecheGaucheBas()
-								                      : Resources::FlecheDroiteBas())
-								                    ->Draw(c->Image()->X(), c->Image()->Y());
-								break;
-							case ECMove::Down:
-								(c->X() < next_c->X() ? Resources::FlecheGaucheHaut()
-								                      : Resources::FlecheDroiteHaut())
-								                    ->Draw(c->Image()->X(), c->Image()->Y());
-								break;
-							case ECMove::Left:
-							case ECMove::Right:
-							default:
-								Resources::FlecheHoriz()->Draw(c->Image()->X(), c->Image()->Y());
-								break;
+							case ECMove::Up: next_c = dynamic_cast<ECase*>(c->MoveUp()); break;
+							case ECMove::Down: next_c = dynamic_cast<ECase*>(c->MoveDown()); break;
+							case ECMove::Left: next_c = dynamic_cast<ECase*>(c->MoveLeft()); break;
+							case ECMove::Right: next_c = dynamic_cast<ECase*>(c->MoveRight()); break;
 						}
-					}
-					if(c->X() == next_c->X())
-					{
-						switch(last_move)
+						if(c->Y() == next_c->Y())
 						{
-							case ECMove::Left:
-								(c->Y() < next_c->Y() ? Resources::FlecheGaucheBas()
-								                      : Resources::FlecheGaucheHaut())
-								                    ->Draw(c->Image()->X(), c->Image()->Y());
-								break;
-							case ECMove::Right:
-								(c->Y() < next_c->Y() ? Resources::FlecheDroiteBas()
-								                      : Resources::FlecheDroiteHaut())
-								                    ->Draw(c->Image()->X(), c->Image()->Y());
-								break;
-							case ECMove::Up:
-							case ECMove::Down:
-							default:
-								Resources::FlecheVert()->Draw(c->Image()->X(), c->Image()->Y());
-								break;
+							switch(last_move)
+							{
+								case ECMove::Up:
+									(c->X() < next_c->X() ? Resources::FlecheGaucheBas()
+														: Resources::FlecheDroiteBas())
+														->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+								case ECMove::Down:
+									(c->X() < next_c->X() ? Resources::FlecheGaucheHaut()
+														: Resources::FlecheDroiteHaut())
+														->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+								case ECMove::Left:
+								case ECMove::Right:
+								default:
+									Resources::FlecheHoriz()->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+							}
 						}
+						if(c->X() == next_c->X())
+						{
+							switch(last_move)
+							{
+								case ECMove::Left:
+									(c->Y() < next_c->Y() ? Resources::FlecheGaucheBas()
+														: Resources::FlecheGaucheHaut())
+														->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+								case ECMove::Right:
+									(c->Y() < next_c->Y() ? Resources::FlecheDroiteBas()
+														: Resources::FlecheDroiteHaut())
+														->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+								case ECMove::Up:
+								case ECMove::Down:
+								default:
+									Resources::FlecheVert()->Draw(c->Image()->X(), c->Image()->Y());
+									break;
+							}
+						}
+						c->SetMustRedraw();
+						last_move = *move;
+						c = next_c;
+					}
+					switch(last_move)
+					{
+						case ECMove::Right:
+							(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqDroite()
+									: Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
+							break;
+						case ECMove::Left:
+							(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqGauche()
+									: Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
+							break;
+						case ECMove::Up:
+							(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqHaut()
+									: Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
+							break;
+						case ECMove::Down:
+							(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqBas()
+									: Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
+							break;
 					}
 					c->SetMustRedraw();
-					last_move = *move;
-					c = next_c;
+	
 				}
-				switch(last_move)
-				{
-					case ECMove::Right:
-						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqDroite()
-						         : Resources::FlecheVersDroite())->Draw(c->Image()->X(), c->Image()->Y());
-						break;
-					case ECMove::Left:
-						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqGauche()
-						         : Resources::FlecheVersGauche())->Draw(c->Image()->X(), c->Image()->Y());
-						break;
-					case ECMove::Up:
-						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqHaut()
-						         : Resources::FlecheVersHaut())->Draw(c->Image()->X(), c->Image()->Y());
-						break;
-					case ECMove::Down:
-						(entity->EventType() == ARM_ATTAQ && c == entity->Move()->Dest() ? Resources::FlecheAttaqBas()
-						         : Resources::FlecheVersBas())->Draw(c->Image()->X(), c->Image()->Y());
-						break;
-				}
-				c->SetMustRedraw();
-
 			}
 		}
 	}

@@ -49,6 +49,17 @@ public:
 	 */
 	ECPlayer(std::string nick, EChannel* chan, bool owner, bool op, bool IsMe, bool IsIA);
 
+	struct BreakPoint
+	{
+		BreakPoint(ECase* _c, std::string _message)
+			: c(_c), message(_message), sprite(0)
+		{}
+
+		ECase* c;
+		std::string message;
+		ECSprite *sprite;
+	};
+
 /* Attributs */
 public:
 
@@ -68,11 +79,16 @@ public:
 		votes = 0;
 	}
 
+	std::vector<BreakPoint> BreakPoints() const { return breakpoints; }
+	void AddBreakPoint(BreakPoint bp);
+	bool RemoveBreakPoint(ECBCase *c);
+
 /* Variables privées */
 private:
 	bool isme;
 	bool is_ia;
 	uint votes;
+	std::vector<BreakPoint> breakpoints;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

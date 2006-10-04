@@ -125,6 +125,8 @@ class SCOCommand : public EC_ACommand { public: SCOCommand(const std::string _Cm
 
 class REJOINCommand : public EC_ACommand { public: REJOINCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~REJOINCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class BPCommand : public EC_ACommand { public: BPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 #else
 DECLARE_CMD ( HEL );
 DECLARE_CMD ( PIG );
@@ -150,6 +152,7 @@ DECLARE_CMD ( EOMAP );
 DECLARE_CMD ( SMAP );
 DECLARE_CMD ( EOSMAP );
 DECLARE_CMD ( ARM );
+DECLARE_CMD ( BP );
 
 DECLARE_CMD ( SCO );
 DECLARE_CMD ( REJOIN );

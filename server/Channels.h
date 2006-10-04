@@ -50,6 +50,16 @@ public:
 	 */
 	ECPlayer(TClient* cl, EChannel* chan, bool owner, bool op);
 
+	struct BreakPoint
+	{
+		BreakPoint(ECBCase* _c, std::string _message)
+			: c(_c), message(_message)
+		{}
+	
+		ECBCase* c;
+		std::string message;
+	};
+
 /* Methodes */
 public:
 
@@ -96,11 +106,16 @@ public:
 		votes.clear();
 	}
 
+	std::vector<BreakPoint> BreakPoints() const { return breakpoints; }
+	void AddBreakPoint(BreakPoint bp) { breakpoints.push_back(bp); }
+	bool RemoveBreakPoint(ECBCase *c);
+
 /* Variables privées */
 private:
 	TClient *client;
 	stats_t stats;
 	BPlayerVector votes;
+	std::vector<BreakPoint> breakpoints;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

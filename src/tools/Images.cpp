@@ -614,6 +614,10 @@ void ECImage::Flip()
 {
 	if(!Img) return;
 	SDL_Flip( Img );
+
+#ifdef USE_OPENGL
+	SDL_GL_SwapBuffers();
+#endif
 }
 
 int ECImage::Fill(Uint32 color)

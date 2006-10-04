@@ -77,6 +77,7 @@ public:
 		JIA,         /**< JIA */
 
 		ARM,         /**< ARM */
+		BREAKPOINT,  /**< BP */
 
 		NONE
 	};

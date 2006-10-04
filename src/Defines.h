@@ -35,10 +35,12 @@
 /* Defines */
 #undef  BUGUED_INTRO
 #define SETTED_NAME
-
 #ifndef WIN32
 # define BUGUED_FULLSCREEN
 #endif
+
+// Carément inimaginable ! À ne surtout pas activer!
+#undef USE_OPENGL
 
 /* Résolution de l'écran */
 //const int SCREEN_HEIGHT = 600;

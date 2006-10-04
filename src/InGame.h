@@ -176,6 +176,7 @@ public:
 	TButtonText*    QuitButton;
 	TButtonText*    SchemaButton;
 	TButtonText*    OptionsButton;
+	TButtonText*    BaliseButton;
 	TProgressBar*   ProgressBar;
 	TLabel*         Date;
 	TLabel*         Money;
@@ -204,6 +205,21 @@ public:
 
 	TInGameForm(ECImage*, ECPlayer*);
 
+	enum Wants
+	{
+		W_NONE,
+		W_REMBP,
+		W_ADDBP,
+		W_INVEST,
+		W_UNSELECT,
+		W_CANTATTAQ,
+		W_MATTAQ,
+		W_SELECT,
+		W_EXTRACT,
+		W_ATTAQ,
+		W_MOVE
+	};
+
 /* Composants */
 public:
 
@@ -226,7 +242,7 @@ public:
 	void ShowBarreAct(bool show = true);
 
 	void SetCursor();
-	const char GetWant(ECEntity* entity, int button_type);
+	Wants GetWant(ECEntity* entity, int button_type);
 
 	#define I_INFO     0x001
 	#define I_WARNING  0x002
@@ -244,6 +260,7 @@ public:
 	ECPlayer* Player() const { return player; }
 
 	bool ShowWaitMessage;
+	bool WantBalise;
 
 private:
 	Timer timer;

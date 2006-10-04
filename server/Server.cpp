@@ -65,6 +65,7 @@ const char* msgTab[] = {
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
      "INFO %s",                             /* INFO - Envoie des messages à afficher dans le jeu des joueurs */
+     ":%s BP %c%d,%d %s",                   /* BP - Envoie des infos aux alliés sur un breakpoint de stratégie */
 
      "LSM %s %d %d %s",                     /* LSM - Liste les maps disponibles (nom, min, max, info) */
      "EOMAP",                               /* EOMAP - Fin de la liste des maps */

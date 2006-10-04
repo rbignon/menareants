@@ -22,7 +22,7 @@
 #ifndef ECLIB_Defines_h
 #define ECLIB_Defines_h
 
-#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 -_"
+#define NICK_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789-_"
 #define CHAN_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789 '`-_@-()[]{}~"
 #define MAPFILE_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN_"
 #define COUNTRY_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
@@ -35,11 +35,12 @@
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"3.2"
+#define APP_VERSION_BETA	"3.3"
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
-#if 0
+#if 1
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
+#else
 #define	APP_VERSION_PATCH	"pre1"	/* première pré release */
 #define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */

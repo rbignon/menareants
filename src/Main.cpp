@@ -376,10 +376,9 @@ TCredits::TCredits(ECImage* w)
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->AddItem("Merci au lycée Corneille pour nous avoir mis dans le contexte emmerdant qui "
-	              "nous a permit de trouver des idées \"amusantes\" pour passer le temps et qui "
+	              "nous a permis de trouver des idées \"amusantes\" pour passer le temps et qui "
 	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "
-	              "cours d'histoire et d'espagnol. Je tiens d'ailleurs à remercier le manque "
-	              "d'autorité de Mme Gay (histoire) et Mme Goetz (espagnol).\n"
+	              "cours d'histoire et d'espagnol.\n"
 	              "\n"
 	              "Merci à lodesi pour ses patchs.\n"
 	              "Merci à Anicée pour sa voix.\n"

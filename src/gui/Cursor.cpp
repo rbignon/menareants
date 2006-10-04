@@ -33,6 +33,8 @@ TCursor::TCursor()
 	SetCursorImage(Invest, Resources::PointerInvest());
 	SetCursorImage(Left, Resources::PointerLeft());
 	SetCursorImage(Radar, Resources::PointerRadar());
+	SetCursorImage(AddBP, Resources::PointerAddBP());
+	SetCursorImage(RemBP, Resources::PointerRemBP());
 }
 
 TCursor::~TCursor()

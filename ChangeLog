@@ -1,3 +1,69 @@
+2006-10-04 Romain Bignon <progs@headfucking.net>
+
+	* src/Channels.h:  Structure BreakPoint.
+
+	* src/InGame.cpp (int BPCommand::Exec): Commande de breakpoints.
+	 (TInGameForm::Wants TInGameForm::GetWant): Utilisation d'un enumerateur pour les wants, et un want pour poser une balise.
+	 (void MenAreAntsApp::InGame): Pose d'une balise.
+	 (void MenAreAntsApp::Options): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
+	 (void MenAreAntsApp::PingingGame): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
+	 (void TScoresForm::WantLeave): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
+	
+	* src/Resources.cpp: Images de balises.
+	
+	* src/Sockets.cpp: Commande BP.
+	
+	* src/tools/Images.cpp (void ECImage::Flip): Début de support OpenGL.
+	
+	* src/tools/Video.cpp (bool Video::SetConfig): Début de support OpenGL.
+	
+	* src/data/anims/balise/1.png
+	* src/data/anims/balise/2.png
+	* src/data/anims/balise/3.png
+	* src/data/anims/balise/4.png
+	* src/data/anims/balise/info: Images de la balise.
+	
+	* src/data/pics/cursors/rem_bp.png
+	* src/data/pics/cursors/add_bp.png: Curseurs.
+
+	* src/Channels.cpp: Structures de breakpoints.
+	
+	* src/gui/Form.cpp (void TForm::Actions): Gestion des touches appuyées directement de SDL.
+	
+	* src/gui/Cursor.h: Ajout des curseurs pour poser ou enlever une balise.
+	
+	* src/gui/Form.h: Gestion des touches appuyées directement de SDL.
+	
+	* src/gui/Cursor.cpp (TCursor::TCursor): Ajout des curseurs pour poser ou enlever une balise.
+	
+	* src/gui/ShowMap.cpp: Affichage des balises.
+	
+	* src/InGame.h: Passage des wants dans un enumerateur.
+	
+	* src/Commands.h: Commande BP.
+	
+	* src/Login.cpp (int MAJCommand::Exec): Changement du texte, adapté suivant l'OS.
+	
+	* src/Resources.h: Images de balise.
+	
+	* src/Sockets.h: Message BP.
+	
+	* src/Defines.h: Début de migration à OpenGL.
+	
+	* src/Main.cpp: Modification credits.
+	
+	* server/InGame.cpp: Commande BP.
+	
+	* server/Channels.h: Structure BreakPoint pour les balises.
+	
+	* server/Commands.h: Commande BP.
+	
+	* server/Main.cpp: Message BP.
+	
+	* server/Main.h: Message BP.
+	
+	* API: Commande BP pour les Balises.
+	
 2006-09-27 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Le bouton "Voter" se grisait dès que n'importe qui votait.

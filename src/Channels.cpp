@@ -21,6 +21,9 @@
 
 #include "Channels.h"
 #include "Debug.h"
+#include "Resources.h"
+#include "gui/ColorEdit.h"
+#include "gui/ShowMap.h"
 
 /********************************************************************************************
  *                               EPlayer                                                    *
@@ -30,6 +33,30 @@ ECPlayer::ECPlayer(std::string _nick, EChannel *_chan, bool _owner, bool _op, bo
 	: ECBPlayer(_nick, _chan, _owner, _op), isme(_isme), is_ia(_is_ia), votes(0)
 {
 
+}
+
+void ECPlayer::AddBreakPoint(BreakPoint bp)
+{
+	assert(Channel()->Map()->ShowMap()->Window());
+	bp.sprite = new ECSprite(Resources::Balise(), Channel()->Map()->ShowMap()->Window());
+	bp.sprite->ChangeColor(white_color, color_eq[Color()]);
+	breakpoints.push_back(bp);
+}
+
+bool ECPlayer::RemoveBreakPoint(ECBCase* c)
+{
+	for (std::vector<BreakPoint>::iterator it = breakpoints.begin(); it != breakpoints.end(); )
+	{
+		if (it->c == c)
+		{
+			delete it->sprite;
+			it = breakpoints.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
 }
 
 /********************************************************************************************

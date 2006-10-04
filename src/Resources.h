@@ -134,6 +134,9 @@ public:
 	R_RESOURCE(ECImage,      PointerInvest);
 	R_RESOURCE(ECImage,      PointerLeft);
 	R_RESOURCE(ECImage,      PointerRadar);
+	R_RESOURCE(ECImage,      PointerAddBP);
+	R_RESOURCE(ECImage,      PointerRemBP);
+	R_RESOURCE(ECSpriteBase, Balise);
 	R_RESOURCE(ECSpriteBase, UpButton);
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);

@@ -849,6 +849,21 @@ bool ECPlayer::AddVote(ECBPlayer* pl)
 	return true;
 }
 
+bool ECPlayer::RemoveBreakPoint(ECBCase* c)
+{
+	for (std::vector<BreakPoint>::iterator it = breakpoints.begin(); it != breakpoints.end(); )
+	{
+		if (it->c == c)
+		{
+			it = breakpoints.erase(it);
+			return true;
+		}
+		else
+			++it;
+	}
+	return false;
+}
+
 /********************************************************************************************
  *                               EChannel                                                   *
  ********************************************************************************************/

@@ -71,6 +71,7 @@ public:
 		EOGLIST,      /**< EOL */
 		MSG,          /**< MSG */
 		INFO,         /**< INFO */
+		BREAKPOINT,   /**< BP */
 
 
 		LISTMAP,      /**< LSM */

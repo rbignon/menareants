@@ -443,6 +443,56 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 #undef L_SHIT
 #undef L_GREAT
 
+/** Add a breakpoint on the map.
+ *
+ * Syntax: :sender BP [+|-]x,y [message]
+ */
+int BPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	ECPlayer *pl = players.front();
+
+	EChannel* chan = pl->Channel();
+	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
+	char ch = parv[1][0];
+	std::string s = parv[1].substr(1);
+	uint x = StrToTyp<uint>(stringtok(s, ","));
+	uint y = StrToTyp<uint>(s);
+
+	ECBCase *c;
+	try
+	{
+		c = (*map)(x,y);
+	}
+	catch(TECExcept &e)
+	{
+		return Debug(W_DESYNCH|W_SEND, "BP: %s a fait un breakpoint hors de la map (%d,%d)", pl->GetNick(), x, y);
+	}
+
+	std::string message = parv.size() > 2 ? parv[2] : "";
+
+	switch(ch)
+	{
+		case '+':
+		{
+			pl->AddBreakPoint(ECPlayer::BreakPoint(dynamic_cast<ECase*>(c), message));
+
+			break;
+		}
+		case '-':
+		{
+			me->LockScreen();
+			pl->RemoveBreakPoint(c);
+			me->UnlockScreen();
+			dynamic_cast<ECase*>(c)->SetMustRedraw();
+
+			break;
+		}
+		default: return vDebug(W_DESYNCH|W_SEND, "BP: Invalide identifiant", VCName(ch) VName(parv[1]));
+	}
+
+	return 0;
+}
+
 /********************************************************************************************
  *                               TInGame                                                    *
  ********************************************************************************************/
@@ -457,17 +507,7 @@ public:
 	}
 };
 
-const char W_INVEST = 8;
-const char W_UNSELECT = 7;
-const char W_CANTATTAQ = 6;
-const char W_MATTAQ = 5;
-const char W_SELECT = 4;
-const char W_EXTRACT = 3;
-const char W_ATTAQ = 2;
-const char W_MOVE = 1;
-const char W_NONE = 0;
-
-const char TInGameForm::GetWant(ECEntity* entity, int button_type)
+TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 {
 	if(BarreLat->Test(Cursor->X(), Cursor->Y()) ||
 	   BarreAct->Test(Cursor->X(), Cursor->Y()) ||
@@ -484,6 +524,16 @@ const char TInGameForm::GetWant(ECEntity* entity, int button_type)
 
 	if(!acase || acase->Showed() <= 0)
 		return W_NONE;
+
+	if(WantBalise || IsPressed(SDLK_b))
+	{
+		std::vector<ECPlayer::BreakPoint> bs = Player()->BreakPoints();
+		FORit(ECPlayer::BreakPoint, bs, bp)
+			if(bp->c == acase)
+				return W_REMBP;
+
+		return W_ADDBP;
+	}
 
 	std::vector<ECBEntity*> ents = acase->Entities()->List();
 
@@ -580,6 +630,8 @@ void TInGameForm::SetCursor()
 		case W_EXTRACT:
 		case W_MOVE: Cursor->SetCursor(TCursor::Left); break;
 		case W_ATTAQ: Cursor->SetCursor(TCursor::Attaq); break;
+		case W_ADDBP: Cursor->SetCursor(TCursor::AddBP); break;
+		case W_REMBP: Cursor->SetCursor(TCursor::RemBP); break;
 		default: Cursor->SetCursor(TCursor::Standard); break;
 	}
 
@@ -604,7 +656,7 @@ void MenAreAntsApp::InGame()
 		InGameForm->Map->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
-		char want = 0;
+		TInGameForm::Wants want = TInGameForm::W_NONE;
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Timer* timer = InGameForm->GetTimer();
@@ -674,7 +726,7 @@ void MenAreAntsApp::InGame()
 				if(InGameForm->BarreAct->Select())
 				{
 					InGameForm->BarreAct->UnSelect();
-					want = W_NONE;
+					want = TInGameForm::W_NONE;
 				}
 			}
 			else if(chan->State() == EChannel::PINGING)
@@ -804,6 +856,8 @@ void MenAreAntsApp::InGame()
 						}
 						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
 							InGameForm->Map->ToggleSchema();
+						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y))
+							InGameForm->WantBalise = !InGameForm->WantBalise;
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
 						{
 							Options(chan);
@@ -888,30 +942,60 @@ void MenAreAntsApp::InGame()
 							}
 						}
 
+						if(event.button.button == MBUTTON_RIGHT)
+							InGameForm->WantBalise = false;
+
 						if(InGameForm->BarreLat->Test(event.button.x, event.button.y) ||
 						   InGameForm->BarreAct->Test(event.button.x, event.button.y))
 							break;
 
 						if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y))
-							want = W_EXTRACT;
+							want = TInGameForm::W_EXTRACT;
 
-						int mywant = want;
+						TInGameForm::Wants mywant = want;
 						if(want)
 							mywant = want;
 						else
 							mywant = InGameForm->GetWant(InGameForm->BarreAct->Entity(), event.button.button);
 
-						if(mywant == W_UNSELECT)
+						if(mywant == TInGameForm::W_UNSELECT)
 							InGameForm->BarreAct->UnSelect();
-						else if(mywant == W_SELECT && (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
+						else if(mywant == TInGameForm::W_SELECT &&
+						        (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
 							InGameForm->BarreAct->SetEntity(entity);
 						else if((acase = InGameForm->Map->TestCase(event.button.x, event.button.y)))
 						{
+							if(mywant == TInGameForm::W_ADDBP)
+							{
+#if 0 /* TODO: Gestion du texte dans l'image */
+								TMessageBox mb("Entrez le texte de la balise :",
+												HAVE_EDIT|BT_OK|BT_CANCEL, InGameForm, false);
+								if(mb.Show() == BT_OK)
+								{
+									std::string msg = mb.EditText();
+									client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
+									                '+', acase->X(), acase->Y(), msg.c_str());
+								}
+#else
+								client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
+								                '+', acase->X(), acase->Y(), "");
+#endif
+								want = TInGameForm::W_NONE;
+								InGameForm->WantBalise = false;
+								InGameForm->Map->SetMustRedraw();
+							}
+							if(mywant == TInGameForm::W_REMBP)
+							{
+								client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
+											               '-', acase->X(), acase->Y(), "");
+								want = TInGameForm::W_NONE;
+								InGameForm->WantBalise = false;
+							}
 							ECEntity* selected_entity = InGameForm->BarreAct->Entity();
 							if(mywant && selected_entity && selected_entity->Owner() == client->Player() &&
 							   !selected_entity->Locked())
 							{
-								if(mywant == W_MOVE || mywant == W_INVEST)
+								if(mywant == TInGameForm::W_MOVE || mywant == TInGameForm::W_INVEST)
 								{
 									ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 																						: selected_entity->Case();
@@ -962,25 +1046,25 @@ void MenAreAntsApp::InGame()
 										}
 									}
 								}
-								else if(mywant == W_ATTAQ || mywant == W_MATTAQ)
+								else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
 								{
 									client->sendrpl(client->rpl(EC_Client::ARM),
 									                           std::string(std::string(selected_entity->ID())
 								                               + " *" + TypToStr(acase->X()) + "," +
 								                               TypToStr(acase->Y()) +
-								                               (mywant == W_MATTAQ ? " !" : "")).c_str());
-									want = W_NONE;
+								                               (mywant == TInGameForm::W_MATTAQ ? " !" : "")).c_str());
+									want = TInGameForm::W_NONE;
 								}
-								else if(mywant == W_EXTRACT)
+								else if(mywant == TInGameForm::W_EXTRACT)
 								{
 									client->sendrpl(client->rpl(EC_Client::ARM),
 									                           std::string(std::string(selected_entity->ID())
 								                               + " (" + TypToStr(acase->X()) + "," +
 								                               TypToStr(acase->Y())).c_str());
-									want = W_NONE;
+									want = TInGameForm::W_NONE;
 								}
 							}
-							else if(mywant == W_UNSELECT)
+							else if(mywant == TInGameForm::W_UNSELECT)
 									InGameForm->BarreAct->UnSelect();
 						}
 						InGameForm->SetCursor();
@@ -1080,7 +1164,7 @@ void TInGameForm::ShowBarreLat(bool show)
 }
 
 TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
-	: TForm(w), ShowWaitMessage(false)
+	: TForm(w), ShowWaitMessage(false), WantBalise(false)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 
@@ -1740,7 +1824,11 @@ void TBarreLat::Init()
 	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	OptionsButton->SetHint("Voir les options (notament les alliances)");
 	OptionsButton->SetX(X() + Width()/2 - OptionsButton->Width()/2);
-	QuitButton = AddComponent(new TButtonText(30,310,100,30, "Quitter", Font::GetInstance(Font::Small)));
+	BaliseButton = AddComponent(new TButtonText(30,310,100,30, "Balise", Font::GetInstance(Font::Small)));
+	BaliseButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	BaliseButton->SetHint("Poser une balise visible pour ses alliés\nRaccourci: B + clic");
+	BaliseButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
+	QuitButton = AddComponent(new TButtonText(30,340,100,30, "Quitter", Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	QuitButton->SetHint("Quitter la partie");
 	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
@@ -1770,7 +1858,7 @@ void TBarreLat::Init()
 	ScreenPos->SetImage(new ECImage(surf));
 	ScreenPos->SetEnabled(false);
 
-	Icons = AddComponent(new TBarreLatIcons(0, 360));
+	Icons = AddComponent(new TBarreLatIcons(0, 390));
 	Icons->SetMaxHeight(UnitsInfos->Y() - Icons->Y());
 	Icons->SetList(EntityList.Buildings(player), TBarreLat::SelectUnit);
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
@@ -1887,7 +1975,7 @@ void TOptionsPlayerLine::Init()
 	                                              nations_str[pl->Nation()].name,
 	                                              pl->Lost() ? "(mort)" : "");
 
-	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal));
+	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
 	MyComponent(label);
 
 	allie = new TLabel(x+20, y, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Normal));
@@ -2147,7 +2235,7 @@ TPingingPlayerLine::TPingingPlayerLine(ECBPlayer* pl)
 
 void TPingingPlayerLine::Init()
 {
-	Nick = AddComponent(new TLabel(0, 10, player->Nick(), color_eq[player->Color()], Font::GetInstance(Font::Big)));
+	Nick = AddComponent(new TLabel(0, 10, player->Nick(), color_eq[player->Color()], Font::GetInstance(Font::Big), true));
 
 	NbVotes = AddComponent(new TLabel(200, 10, TypToStr(dynamic_cast<ECPlayer*>(player)->Votes()), white_color,
 	                                  Font::GetInstance(Font::Big)));
@@ -2175,7 +2263,8 @@ int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(!ScoresForm)
 		ScoresForm = new TScoresForm(Video::GetInstance()->Window(), me->Player()->Channel());
 
-	ScoresForm->Players->AddLine(new TScoresPlayerLine(players[0]->GetNick(), color_eq[players[0]->Color()],
+	std::string nick = (players.front()->Lost() ? "(-)" : "(+)") + players.front()->Nick();
+	ScoresForm->Players->AddLine(new TScoresPlayerLine(nick, color_eq[players[0]->Color()],
 	                                                   parv[1], parv[2], parv[3], parv[4]));
 	return 0;
 }
@@ -2272,7 +2361,7 @@ TScoresPlayerLine::~TScoresPlayerLine()
 
 void TScoresPlayerLine::Init()
 {
-	Nick = new TLabel(x, y, nick, color, Font::GetInstance(Font::Big));
+	Nick = new TLabel(x, y, nick, color, Font::GetInstance(Font::Big), true);
 
 	Killed = new TLabel(x+170, y, killed, color, Font::GetInstance(Font::Big));
 	Shooted = new TLabel(x+300, y, shooted, color, Font::GetInstance(Font::Big));

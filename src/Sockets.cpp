@@ -54,6 +54,7 @@ const char* msgTab[] = {
 	"JIA %s",                                 /* JIA - Créer une IA dans le jeu */
 
 	"ARM %s",                                 /* ARM - Envoie des infos sur une armée */
+	"BP %c%d,%d %s",                          /* BP - Pose une balise sur la carte pour ses alliés */
      0
 };
 
@@ -114,10 +115,7 @@ void EC_Client::parse_message(std::string buf)
 	EC_ACommand *cmd = NULL;
 	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end() && !cmd; ++it)
 		if((*it)->CmdName == cmdname)
-		{
 			cmd = *it;
-			break;
-		}
 
 	if(!cmd || (parv.size()-1) < cmd->args)
 	{
@@ -244,8 +242,10 @@ void EC_Client::Init()
 	mutex = 0;
 
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
-	Commands.push_back(new HELCommand("HEL",	0,	1));
+	Commands.push_back(new ARMCommand("ARM",	0,	0));
+
 	Commands.push_back(new PIGCommand("PIG",	0,	0));
+	Commands.push_back(new HELCommand("HEL",	0,	1));
 	Commands.push_back(new AIMCommand("AIM",	0,	1));
 	Commands.push_back(new USEDCommand("USED",	0,	0));
 	Commands.push_back(new MAJCommand("MAJ",	0,	1));
@@ -260,7 +260,7 @@ void EC_Client::Init()
 	Commands.push_back(new LSPCommand("LSP",	0,	3));
 	Commands.push_back(new EOLCommand("EOL",	0,	0));
 
-	Commands.push_back(new ARMCommand("ARM",	0,	0));
+	Commands.push_back(new BPCommand("BP",		0,	1));
 
 	Commands.push_back(new JOICommand("JOI",	0,	1));
 	Commands.push_back(new SETCommand("SET",	0,	1));
