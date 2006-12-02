@@ -21,7 +21,7 @@
 
 # «server»
 # Cette section contient les informations propres
-# au serveur lancé
+# au serveur lancé.
 server {
 
 	# Nom du serveur
