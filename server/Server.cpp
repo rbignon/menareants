@@ -370,20 +370,23 @@ int ECServer::init_socket(void)
 		return 0;
 	}
 
-    highsock = 0;
+	highsock = 0;
 
 	listen(sock, 5);
-	if((unsigned)sock > highsock) highsock = sock;
+	if((unsigned)sock > highsock)
+		highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
 	std::cout << "Server " << APP_NAME << "(" << APP_VERSION << ") running (Port " << conf->Port() << ")"
-		<< std::endl;
+	          << std::endl;
 	uptime = CurrentTS;
 
-    myClients.clear();
-    for(std::vector<TClient*>::iterator it = Clients.begin(); it != Clients.end(); ++it)
-        delete *it;
-    Clients.clear();
+	Debug(W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
+
+	myClients.clear();
+	for(std::vector<TClient*>::iterator it = Clients.begin(); it != Clients.end(); ++it)
+		delete *it;
+	Clients.clear();
 
 	return 1;
 }

@@ -2152,6 +2152,7 @@ TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
  ********************************************************************************************/
 
 TLoadPlayerLine::TLoadPlayerLine(ECPlayer *_pl)
+	: label(0), ready(0)
 {
 	pl = _pl;
 	h = 20;
@@ -2160,6 +2161,7 @@ TLoadPlayerLine::TLoadPlayerLine(ECPlayer *_pl)
 TLoadPlayerLine::~TLoadPlayerLine()
 {
 	delete label;
+	delete ready;
 }
 
 void TLoadPlayerLine::Init()
@@ -2170,13 +2172,17 @@ void TLoadPlayerLine::Init()
 	                                              pl->GetNick(),
 	                                              nations_str[pl->Nation()].name);
 
-	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal));
+	label = new TLabel(x+30, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
+	ready = new TLabel(x, y, "OK", red_color, Font::GetInstance(Font::Normal));
 	MyComponent(label);
+	MyComponent(ready);
 }
 
 void TLoadPlayerLine::Draw(int souris_x, int souris_y)
 {
 	label->Draw(souris_x, souris_y);
+	if(pl->Ready() && pl->Channel()->GetMe()->Ready())
+		ready->Draw(souris_x, souris_y);
 }
 
 /********************************************************************************************

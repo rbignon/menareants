@@ -469,6 +469,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'S':
 				if(add)
 				{
+					me->Player()->SetReady(false);
 					LoadingGame(me);
 					chan->SetState(EChannel::SENDING);
 				}

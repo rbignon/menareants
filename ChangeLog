@@ -6,6 +6,8 @@
 
 	* lib/Colors.h, src/gui/ColorEdit.h: Suppression couleur blanche, rajout du violet, bleu ciel et noir.
 
+	* src/InGame.cpp (TLoadPlayerLine): Affichage d'un "OK" devant un user quand il est pret (lors du chargement).
+
 2006-12-01 Romain Bignon <progs@headfucking.net>
 
 	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Possibilité de donner de l'argent à un autre joueur (par le menu des options), ou un territoire à un autre joueur (en

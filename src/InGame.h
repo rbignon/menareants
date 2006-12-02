@@ -390,6 +390,7 @@ public:
 public:
 
 	TLabel* label;
+	TLabel* ready;
 
 /* Attributs */
 public:
