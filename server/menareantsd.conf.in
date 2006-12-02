@@ -10,45 +10,45 @@
 #
 # Ceci est la configuration du daemon Men Are Ants D.
 #
-# Les lignes commençant (sans compter espaces et tabulations) par
-# le caractère '#' sont considérées comme des commentaires.
-# En outre, lors de la declaration d'une section, mettez le caractère
-# '{' sur la même ligne que le type (exemple « server { »).
+# Les lignes commenÃ§ant (sans compter espaces et tabulations) par
+# le caractÃ¨re '#' sont considÃ©rÃ©es comme des commentaires.
+# En outre, lors de la declaration d'une section, mettez le caractÃ¨re
+# '{' sur la mÃªme ligne que le type (exemple Â« server { Â»).
 #
 # Veuillez prendre le temps de bien configurer chaque section, chaque
 # sous section et chaque champ.
 ##########################################################################
 
-# «server»
+# Â«serverÂ»
 # Cette section contient les informations propres
-# au serveur lancé.
+# au serveur lancÃ©.
 server {
 
 	# Nom du serveur
 	name = menareants.coderz.info
 
-	# Port écouté
+	# Port Ã©coutÃ©
 	port = 5461
 
-	# Fréquence de PINGS envoyés à un client.
+	# FrÃ©quence de PINGS envoyÃ©s Ã  un client.
 	fping = 50
 
 	# Nombre maximal de connexions.
 	maxcons = 10
 
-	# Path du fichier du MOTD (Message Of The Day) affiché
-	# à la connexion
+	# Path du fichier du MOTD (Message Of The Day) affichÃ©
+	# Ã  la connexion
 	motdfile = @prefix@/etc/menareantsd.motd
 
 	# Mot de passe de l'administrateur.
 	# adminpass = azerty
 }
 
-# «games»
-# Paramètres des jeux
+# Â«gamesÂ»
+# ParamÃ¨tres des jeux
 games {
 
-	# Nombre maximum de jeux simultanément.
+	# Nombre maximum de jeux simultanÃ©ment.
 	maxgames = 3
 
 	# Limite maximale d'utilisateurs dans une partie.
