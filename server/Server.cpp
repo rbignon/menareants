@@ -352,7 +352,7 @@ int ECServer::init_socket(void)
 	sock = socket(AF_INET, SOCK_STREAM, 0); /* on demande un socket */
 	if(sock < 0)
 	{
-		std::cerr << "Impossible de lancer le serveur. (socket non créé)" << std::endl;
+		std::cerr << "Unable to run server. (socket not found)" << std::endl;
 		return 0;
 	}
 	fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -365,7 +365,7 @@ int ECServer::init_socket(void)
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		std::cerr << "Impossible d'écouter au port " << conf->Port() << " pour le serveur." << std::endl;
+		std::cerr << "Unable to listen port " << conf->Port() << "." << std::endl;
 		close(sock);
 		return 0;
 	}
@@ -376,7 +376,7 @@ int ECServer::init_socket(void)
 	if((unsigned)sock > highsock) highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
-	std::cout << "Serveur " << APP_NAME << "(" << APP_VERSION << ") lancé (Port " << conf->Port() << ")"
+	std::cout << "Server " << APP_NAME << "(" << APP_VERSION << ") running (Port " << conf->Port() << ")"
 		<< std::endl;
 	uptime = CurrentTS;
 
@@ -400,7 +400,7 @@ int ECServer::run_server(void)
 		{
 			if(errno != EINTR)
 			{
-				Debug(W_WARNING, "Erreur lors de select() (%d: %s)\n", errno, strerror(errno));
+				Debug(W_WARNING, "Error in select() (%d: %s)\n", errno, strerror(errno));
 				break;
 			}
 		}

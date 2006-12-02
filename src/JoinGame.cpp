@@ -845,6 +845,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							else
 								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
 								                            " s'est allié avec vous et vous propose de faire de même");
+							me->LockScreen();
+							chan->Map()->CreatePreview(120,120, P_ENTITIES);
+							me->UnlockScreen();
 						}
 						else
 							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " s'est allié avec " +
@@ -882,6 +885,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							else
 								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " n'est plus allié "
 								                            "avec vous");
+							me->LockScreen();
+							chan->Map()->CreatePreview(120,120, P_ENTITIES);
+							me->UnlockScreen();
 						}
 						else
 							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +

@@ -29,9 +29,11 @@ Color color_eq[] = {
 	/* COLOR_BLUE   */          fblue_color,
 	/* COLOR_RED    */          fred_color,
 	/* COLOR_GREEN  */          green_color,
-	/* COLOR_WHITE  */          fwhite_color,
+	/* COLOR_VIOLET */          violet_color,
 	/* COLOR_BROWN  */          fbrown_color,
-	/* COLOR_ORANGE */          orange_color
+	/* COLOR_ORANGE */          orange_color,
+	/* COLOR_CYAN   */          cyan_color,
+	/* COLOR_BLACK  */          black_color
 };
 
 TColorEdit::TColorEdit(Font* f, std::string _label, int _x, int _y, uint _width, int _defvalue)
@@ -89,7 +91,7 @@ void TColorEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
 void TColorEdit::Draw (int mouse_x, int mouse_y)
 {
 	txt_label.Draw(mouse_x, mouse_y);
-	
+
 	if(!img.IsNull())
 	{
 		SDL_Rect r_back = {imgx,y,img.GetWidth(),img.GetHeight()};

@@ -33,9 +33,11 @@ enum e_color
 	COLOR_BLUE,             /**< Blue color */
 	COLOR_RED,              /**< Red color */
 	COLOR_GREEN,            /**< Green color */
-	COLOR_WHITE,            /**< White color */
+	COLOR_VIOLET,           /**< Violet color */
 	COLOR_BROWN,            /**< Brown color */
 	COLOR_ORANGE,           /**< Orange color */
+	COLOR_BLACK,            /**< Black color */
+	COLOR_CYAN,             /**< Cyan color */
 	COLOR_MAX
 };
 

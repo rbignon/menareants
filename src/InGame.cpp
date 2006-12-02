@@ -615,6 +615,28 @@ void TInGameForm::SetCursor()
 
 }
 
+void TInGameForm::FindIdling()
+{
+	static int i;
+	std::vector<ECBEntity*> ents = player->Entities()->List(), idle_ents;
+	FORit(ECBEntity*, ents, enti)
+		if((*enti)->EventType() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
+			idle_ents.push_back(*enti);
+
+	if(idle_ents.empty())
+	{
+		TMessageBox mb("Il n'y a plus aucune de vos unité qui soit inactive", BT_OK, InGameForm, false);
+		mb.Show();
+		Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
+	}
+	else
+	{
+		ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[++i % idle_ents.size()]);
+		Map->CenterTo(e);
+		BarreAct->SetEntity(e);
+	}
+}
+
 void MenAreAntsApp::InGame()
 {
 	EC_Client* client = EC_Client::GetInstance();
@@ -775,6 +797,9 @@ void MenAreAntsApp::InGame()
 								InGameForm->Map->SetMustRedraw();
 								break;
 							}
+							case SDLK_TAB:
+								InGameForm->FindIdling();
+								break;
 							case SDLK_ESCAPE:
 								InGameForm->BarreAct->UnSelect();
 								break;
@@ -837,26 +862,7 @@ void MenAreAntsApp::InGame()
 						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y))
 							InGameForm->WantBalise = !InGameForm->WantBalise;
 						if(InGameForm->BarreLat->IdleFindButton->Test(event.button.x, event.button.y))
-						{
-							static int i = 0;
-							std::vector<ECBEntity*> ents = client->Player()->Entities()->List(), idle_ents;
-							FORit(ECBEntity*, ents, enti)
-								if((*enti)->EventType() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
-									idle_ents.push_back(*enti);
-
-							if(idle_ents.empty())
-							{
-								TMessageBox mb("Il n'y a plus aucune de vos unité qui soit inactive", BT_OK, InGameForm, false);
-								mb.Show();
-								InGameForm->Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
-							}
-							else
-							{
-								ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[++i % idle_ents.size()]);
-								InGameForm->Map->CenterTo(e);
-								InGameForm->BarreAct->SetEntity(e);
-							}
-						}
+							InGameForm->FindIdling();
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
 						{
 							Options(chan);

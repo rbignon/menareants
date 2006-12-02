@@ -91,7 +91,7 @@ int ECServer::main(int argc, char **argv)
 				conf_file = optarg;
 				break;
 			default:
-				std::cout << "Usage: " << argv[0] << " [-n] [-c <fichier de configuration]" << std::endl;
+				std::cout << "Usage: " << argv[0] << " [-n] [-c <configuration file]" << std::endl;
 				exit(EXIT_FAILURE);
 		}
 
@@ -103,21 +103,21 @@ int ECServer::main(int argc, char **argv)
 			mkdir( path.c_str(), 0755 );
 		else closedir(d);
 
-		std::cout << "Logs dans: " << path << std::endl;
+		std::cout << "Logs in: " << path << std::endl;
 
 		conf = new Config(conf_file);
 		if(!conf->load())
 		{
-				std::cout << "Erreur lors de la lecture de la configuration" << std::endl;
+				std::cout << "Unable to read configuration" << std::endl;
 				exit(EXIT_FAILURE);
 		}
-	
+
 		if(!ECMap::LoadMaps()) /* L'output est géré par LoadMaps() */
 			exit(EXIT_FAILURE);
-	
+
 		CurrentTS = time(NULL);
 		srand( (long)CurrentTS );
-	
+
 		/* Déclarations des commandes */
 		/*                                 NOM		flag		args */
 		Commands.push_back(new IAMCommand("IAM",	0,			0)); /* Args vérifié dans IAMCommand::Exec */
@@ -136,37 +136,37 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new ERRCommand("ERR",	0,			1));
 		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
 		Commands.push_back(new ADMINCommand("ADMIN",ECD_AUTH,	1));
-	
+
 		signal(SIGPIPE, SIG_IGN);
 		signal(SIGALRM, &sig_alarm);
-	
+
 		if(background)
 		{
 			if((tmp = fork()) == -1)
 			{
-				printf("Impossible de lancer en background\n");
+				printf("Unable to run in backgroudn\n");
 				exit(0);
 			}
 			if(tmp > 1) exit(0);
 		}
-	
+
 		if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
 		{
-			printf("Core size limitée à %ldk, changement en illimité.\n", rlim.rlim_cur);
+			printf("Core size limited to %ldk, changed to infinity.\n", rlim.rlim_cur);
 			rlim.rlim_cur = RLIM_INFINITY;
 			rlim.rlim_max = RLIM_INFINITY;
 			setrlimit(RLIMIT_CORE, &rlim);
 		}
-	
+
 		running = true;
-	
+
 		if(init_socket())
 		{
 			alarm(GetConf()->PingFreq());
 
 			run_server();
 		}
-	
+
 	}
 	catch (const TECExcept &e)
 	{

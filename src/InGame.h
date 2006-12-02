@@ -254,6 +254,8 @@ public:
 	#define I_GREAT    0x020
 	void AddInfo(int flags, std::string line, ECPlayer* = 0);
 
+	void FindIdling();
+
 /* Attributs */
 public:
 	Timer* GetTimer() { return &timer; }
