@@ -30,4 +30,6 @@ U_DECL(ECTrees)
 U_DECL(ECMegalopole)
 U_DECL(ECRail)
 U_DECL(ECTrain)
+U_DECL(ECPlane)
+U_DECL(ECJouano)
 U_END

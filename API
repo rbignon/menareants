@@ -73,7 +73,7 @@ Sommaire:
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
-              INFO <msg>                        :message envoyé par le serveur qui s'affiche à l'écran des joueurs
+              INFO <ID> <args>                  :message envoyé par le serveur qui s'affiche à l'écran des joueurs
               :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
@@ -101,6 +101,7 @@ Sommaire:
           <data>
          °           :upgrade
          @           :investit
+         |<niveau>   :changement de niveau de l'unité
       Et client -> server :
          >           :déplacement de un à droite
          v           :déplacement de un vers le bas
@@ -143,6 +144,8 @@ Sommaire:
          +a <nick>           :définie un user comme allié de lui
          +w                  :ce joueur a été déconnecté et on attend qu'il se reconnecte
          +v [nb]             :vote pour virer un user, pas besoin de nombre pour cl->serv, mais pour serv->cl
+         +d <nb:user>        :donner de l'argent à un de ses alliés
+         +e <country:user>   :donner une country à un de ses alliés
 
 5) PLS
      La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible

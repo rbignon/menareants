@@ -91,6 +91,23 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECPlane                                                    *
+ ********************************************************************************************/
+class ECPlane : public EContainer, public ECBPlane
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECPlane) {}
+
+	ENTITY_CREATE_LAST(ECPlane);
+
+	virtual bool WantDeploy();
+
+	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
+};
+
+/********************************************************************************************
  *                               ECMissiLauncher                                            *
  ********************************************************************************************/
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
@@ -126,6 +143,26 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECJouano                                                   *
+ ********************************************************************************************/
+class ECJouano : public ECUnit, public ECBJouano
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECJouano) {}
+
+	ENTITY_CREATE_LAST(ECJouano);
+
+/* Methodes */
+public:
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event) { return false; }
+	virtual void Invest(ECBEntity* e);
+};
+
+/********************************************************************************************
  *                               ECMcDo                                                     *
  ********************************************************************************************/
 class ECMcDo : public ECUnit, public ECBMcDo
@@ -147,6 +184,12 @@ public:
 	virtual bool CanCreate(const ECBEntity*);
 	virtual int TurnMoney(ECBPlayer*);
 	virtual void ChangeOwner(ECBPlayer*);
+	virtual void Played();
+
+/* Attributs */
+public:
+
+	ECPlayer* ExOwner() const { return ex_owner; }
 
 /* Variables privées */
 private:

@@ -108,12 +108,8 @@ bool Video::SetConfig(uint width, uint height, bool _fullscreen)
 		 )
 	{
 
-#ifdef USE_OPENGL
-		int flags = SDL_OPENGL; // *NEVER* use SDL_OPENGLBLIT !!
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-#else
 		int flags = SDL_HWSURFACE | SDL_HWACCEL | SDL_DOUBLEBUF;
-#endif
+
 		if(_fullscreen) flags |= SDL_FULLSCREEN;
 
 		window.SetImage( SDL_SetVideoMode(width, height, 32, flags), false );
@@ -149,7 +145,6 @@ void Video::InitWindow()
 		throw ECExcept("", "Unable to initialize SDL window.");
 
 	SetWindowCaption(MenAreAntsApp::GetInstance()->get_title());
-	/// \todo put an icon : SetWindowIcon( config->GetDataDir() + PATH_SEPARATOR + "wormux-32.xpm" );
 }
 
 void Video::SetWindowCaption(std::string caption)

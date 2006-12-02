@@ -475,7 +475,7 @@ ECImage* ECSpriteBase::First() const
  ****************************************************************************************/
 
 ECImage::ECImage(char* fichier, bool _alpha)
-	: shadowed(0), pause(0), autofree(true), alpha(_alpha), x(0), y(0)
+	: Img(0), shadowed(0), pause(0), autofree(true), alpha(_alpha), x(0), y(0)
 {
 	Load(fichier, _alpha);
 }
@@ -503,20 +503,30 @@ void ECImage::Free()
 	}
 }
 
-
 ECImage::~ECImage()
 {
 	Free();
 	delete shadowed;
 }
 
-ECImage &ECImage::operator=(const ECImage & src){
-        Free();
-        Img = src.Img;
-        if( Img != NULL )
-                Img->refcount++;
+ECImage::ECImage(const ECImage & src)
+	: shadowed(0), pause(src.pause), autofree(true), alpha(src.alpha), x(src.x), y(src.y)
+{
+	Img = src.Img;
+	if(Img)
+		Img->refcount++;
+}
 
-        return *this;
+ECImage &ECImage::operator=(const ECImage & src)
+{
+	assert(this != &src);
+	Free();
+	Img = src.Img;
+	autofree = true;
+	if( Img != NULL )
+		Img->refcount++;
+
+	return *this;
 }
 
 int ECImage::Blit(const ECImage& src, SDL_Rect *srcRect, SDL_Rect *dstRect)
@@ -614,10 +624,6 @@ void ECImage::Flip()
 {
 	if(!Img) return;
 	SDL_Flip( Img );
-
-#ifdef USE_OPENGL
-	SDL_GL_SwapBuffers();
-#endif
 }
 
 int ECImage::Fill(Uint32 color)

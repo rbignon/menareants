@@ -185,7 +185,17 @@ public:
 		/*19*/E_MEGALOPOLE,
 		/*20*/E_RAIL,
 		/*21*/E_TRAIN,
+		/*22*/E_PLANE,
+		/*23*/E_JOUANO,
 		/*XX*/E_END
+	};
+
+	enum e_level {
+		L_UNDERGROUND,
+		L_SEA,
+		L_BUILDING,
+		L_GROUND,
+		L_AIR
 	};
 
 	ECBEntity()
@@ -226,7 +236,15 @@ public:
 	virtual bool IsVehicule() const { return false; }
 	virtual bool IsHidden() const { return false; }          /**< This unit can be views only by his owner and his allies */
 	virtual bool IsTerrain() const { return false; }         /**< This is an "unit" who represents a special terrain */
+	virtual bool IsPlane() const { return false; }           /**< This entity is a plane */
 	virtual bool CanWalkOn(ECBCase*) const { return false; }
+
+	virtual e_level Level() const
+	{
+		if(IsNaval()) return L_SEA;
+		if(IsBuilding() || IsTerrain()) return L_BUILDING;
+		return L_GROUND;
+	}
 
 	/** Use this function to know if this entity can create an other entity */
 	virtual bool CanCreate(const ECBEntity*) = 0;
@@ -239,9 +257,6 @@ public:
 	virtual bool CanContain(const ECBEntity*) { return false; }
 
 	virtual bool CanInvest(const ECBEntity* e) const { return (e->IsCountryMaker() && !Like(e)); }
-
-	/** Qualitatif */
-	virtual const char* Qual() const = 0;
 
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(const ECBEntity* e) = 0;
@@ -760,8 +775,8 @@ public:
 	ECBDate* NextDay() { return &(++date); }                        /**< Increment date to next day */
 
 	std::vector<std::string> MapInfos() { return map_infos; }       /**< Map informations */
-	
-	/** Access to a case of map 
+
+	/** Access to a case of map
 	 * example: map(x,y)
 	 */
 	ECBCase*& operator() (uint x, uint y);
@@ -780,9 +795,9 @@ protected:
 	std::vector<ECBCase*> map;              /**< Alignement fait ligne par ligne !!! */
 
 	std::vector<std::string> map_file;
-	
+
 	std::vector<ECBMapPlayer*> map_players;
-	
+
 	std::vector<ECBCountry*> map_countries;
 
 	std::vector<std::string> map_infos;

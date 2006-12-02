@@ -84,8 +84,7 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Shoot(dynamic_cast<ECEntity*>(*it), killed);
-			(*Channel()) << "L'obélisque du NOD " + LongName() + " dégomme " + (*it)->Qual() + " " +
-							(*it)->LongName() + " de " + TypToStr(killed);
+			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
 		}
 
 	return false;
@@ -150,8 +149,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Shoot(dynamic_cast<ECEntity*>(*it), killed);
-			(*Channel()) << "La tour de défense " + LongName() + " dégomme " + (*it)->Qual() + " " +
-							(*it)->LongName() + " de " + TypToStr(killed);
+			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
 		}
 
 

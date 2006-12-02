@@ -85,6 +85,7 @@ public:
 
 	virtual const char* Name() const { return "Rail"; }
 	virtual const char* Infos() const { return "Les trains peuvent rouler uniquement sur les rails."; }
+	virtual const char* Qual() const { return "le rail"; }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Rail_Icon(); }
 	virtual bool CanBeSelected() const { return false; }
@@ -107,6 +108,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Forêt"; }
+	virtual const char* Qual() const { return "la forêt"; }
 	virtual const char* Infos() const { return "Quand une unité passe sous une forêt elle disparait aux yeux de l'enemie."; }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Trees_Icon(); }
@@ -141,6 +143,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Mine sous-terraine"; }
+	virtual const char* Qual() const { return "la mine"; }
 	virtual const char* Infos() const { return "La mine explose au passage d'une unité enemie."; }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Mine_Icon(); }
@@ -175,6 +178,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Centre de recherches nucléaire"; }
+	virtual const char* Qual() const { return "le centre de recherches nucléaire"; }
 	virtual const char* Infos() const { return "Fabrication de missiles nucléaires"; }
 	virtual const char* Description() const
 	{
@@ -211,6 +215,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Silo de lancement"; }
+	virtual const char* Qual() const { return "le silo de lancement"; }
 	virtual const char* Infos() const { return "Silo de lancement de missile nucléaire"; }
 	virtual const char* Description() const
 	{
@@ -262,6 +267,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Megalopole"; }
+	virtual const char* Qual() const { return "la megalopole"; }
 	virtual const char* Infos() const { return "Rapporte cinq fois plus d'argent que le centre ville"; }
 	virtual const char* Description() const
 	{
@@ -289,11 +295,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Centre d'affaire"; }
+	virtual const char* Name() const { return "Centre d'affaires"; }
+	virtual const char* Qual() const { return "le centre d'affaires"; }
 	virtual const char* Infos() const { return "Rapporte deux fois plus d'argent que le centre ville"; }
 	virtual const char* Description() const
 	{
-		return "Le centre d'affaire rapporte de l'argent chaques tours, deux fois plus que le centre ville. Celui qui "
+		return "Le centre d'affaires rapporte de l'argent chaques tours, deux fois plus que le centre ville. Celui qui "
 		       "prend votre centre d'affaire devient possesseur de tous les quartiers de la ville";
 	}
 	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
@@ -318,6 +325,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Centre ville"; }
+	virtual const char* Qual() const { return "le centre ville"; }
 	virtual const char* Infos() const { return "Rapporte une certaine somme par tours"; }
 	virtual const char* Description() const
 	{
@@ -351,6 +359,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Tour de défense"; }
+	virtual const char* Qual() const { return "la tour défense"; }
 	virtual const char* Infos() const { return "Peut tirer pour defendre la ville."; }
 	virtual const char* Description() const
 	{
@@ -391,6 +400,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Obélisque du NOD"; }
+	virtual const char* Qual() const { return "l'obélisque"; }
 	virtual const char* Infos() const { return "Bien plus puissantes que la tour de défense, les fans de C&C "
 	                                           "reconnaitront."; }
 	virtual const char* Description() const
@@ -440,6 +450,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Usine de chars"; }
+	virtual const char* Qual() const { return "l'usine de chars"; }
 	virtual const char* Infos() const { return "Construit des vehicules."; }
 	virtual const char* Description() const
 	{
@@ -466,6 +477,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Caserne"; }
+	virtual const char* Qual() const { return "la caserne"; }
 	virtual const char* Infos() const { return "Caserne pour entraîner des hommes"; }
 	virtual const char* Description() const
 	{
@@ -492,6 +504,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Chantier naval"; }
+	virtual const char* Qual() const { return "le chantier naval"; }
 	virtual const char* Infos() const { return "Construit des bateaux"; }
 	virtual const char* Description() const
 	{

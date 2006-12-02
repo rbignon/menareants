@@ -215,6 +215,15 @@
 	R_RESOURCE(ECSpriteBase, Train_Left,        "units/train/left");
 	R_RESOURCE(ECSpriteBase, Train_Right,       "units/train/right");
 	R_RESOURCE(ECSpriteBase, Train_Dos,         "units/train/dos");
+	R_RESOURCE(ECImage,      Jouano_Icon,       PKGDATADIR_PICS "units/jouano_icon.png");
+	R_RESOURCE(ECSpriteBase, Jouano_Face,       "units/jouano/face");
+	R_RESOURCE(ECImage,      Plane_Icon,        PKGDATADIR_PICS "units/plane_icon.png");
+	R_RESOURCE(ECSpriteBase, Plane_Face,        "units/plane/face");
+	R_RESOURCE(ECSpriteBase, Plane_Left,        "units/plane/left");
+	R_RESOURCE(ECSpriteBase, Plane_Right,       "units/plane/right");
+	R_RESOURCE(ECSpriteBase, Plane_Dos,         "units/plane/dos");
+	R_RESOURCE(ECSpriteBase, Plane_Deployed,    "units/plane/deployed");
+	R_RESOURCE(ECSpriteBase, Plane_Reployed,    "units/plane/reployed");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects

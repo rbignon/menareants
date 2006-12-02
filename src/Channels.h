@@ -27,6 +27,12 @@
 
 class EChannel;
 
+struct nations_str_t {
+  const char* name;
+  const char* infos;
+};
+extern const struct nations_str_t nations_str[];
+
 /********************************************************************************************
  *                               ECPlayers                                                  *
  ********************************************************************************************/

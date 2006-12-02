@@ -41,7 +41,7 @@ static struct ButtonList_t
 	{ BT_CANCEL,    "Annuler",  100,    30  }
 };
 
-TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form, bool transparence)
+TMessageBox::TMessageBox(std::string _s, uint _b, TForm* form, bool transparence)
 	: TObject(Video::GetInstance()->Window()), x(-1), y(-1), b(_b)
 {
 	edit = 0;
@@ -50,7 +50,7 @@ TMessageBox::TMessageBox(const char* _s, uint _b, TForm* form, bool transparence
 	Init(_s, transparence);
 }
 
-TMessageBox::TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form, bool transparence)
+TMessageBox::TMessageBox(int _x, int _y, std::string _s, uint _b, TForm* form, bool transparence)
 	: TObject(Video::GetInstance()->Window()), x(_x), y(_y), b(_b)
 {
 	edit = 0;
@@ -164,15 +164,16 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 	return;
 }
 
-void TMessageBox::SetText(const char* _s)
+void TMessageBox::SetText(std::string __s)
 {
 	height_string = Font::GetInstance(Font::Normal)->GetHeight();
+	std::string::const_iterator _s = __s.begin();
 
 	/* On parse le message pour le découper en différentes lignes */
 	char s[MSGBOX_MAXWIDTH + 20 + 2];
 	for(uint i=0;;)
 	{
-		if(*_s == '\n' || ((i > MSGBOX_MAXWIDTH) && *_s == ' ') || (i > (MSGBOX_MAXWIDTH+20)) || !(*_s))
+		if(*_s == '\n' || ((i > MSGBOX_MAXWIDTH) && *_s == ' ') || (i > (MSGBOX_MAXWIDTH+20)) || _s == __s.end() || !(*_s))
 		{ /* Retour à la ligne. Si ça dépasse le MSGBOX_MAXWIDTH lettres, on laisse une chance
 		   * à un caractère ' ' ou '\n' de s'interposer pour couper proprement. A partir de
 		   * MSGBOX_MAXWIDTH + 20 on coupe net.
@@ -187,9 +188,9 @@ void TMessageBox::SetText(const char* _s)
 			if(w < yw) w = yw;
 
 			if(*_s == '\n')
-				_s++; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
-			while(*_s == ' ') _s++;
-			if(!*_s) break;
+				++_s; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
+			while(*_s == ' ') ++_s;
+			if(_s == __s.end() || !*_s) break;
 		}
 		else
 			s[i++] = *_s++;
@@ -206,7 +207,7 @@ void TMessageBox::SetEdit()
 	h += edit->Height();
 }
 
-void TMessageBox::Init(const char* s, bool transparence)
+void TMessageBox::Init(std::string s, bool transparence)
 {
 	h = 0;
 	w = 0;

@@ -23,7 +23,6 @@
 #include "gui/ShowMap.h"
 #include "gui/ColorEdit.h"
 #include "Channels.h"
-#include "Sockets.h"
 #include "Sound.h"
 #include <SDL_gfxPrimitives.h>
 
@@ -44,20 +43,33 @@ void ECMcDo::RecvData(ECData data)
 		}
 		case DATA_EXOWNER:
 		{
-			ex_owner = data.data;
+			ex_owner = Channel()->GetPlayer(data.data.c_str());
+			break;
+		}
+		case DATA_JOUANO:
+		{
+			restDestroy = StrToTyp<int>(data.data);
 			break;
 		}
 	}
 }
 
+ECMcDo::~ECMcDo()
+{
+	if(Deployed() && ex_owner && ex_owner->IsMe())
+		SetShowedCases(false);
+}
+
 std::string ECMcDo::SpecialInfo()
 {
-	if(!invested)
+	if(!invested || !ex_owner)
 		return "";
-	else if(ex_owner == Owner()->GetNick())
-		return "Consommations de McGerbale gratuites pour " + ex_owner + " !";
+	else if(restDestroy > 0)
+		return "Jouano est en train de bouffer tous les Big Mac ! Il aurra fini dans " + TypToStr(restDestroy) + " jours !";
+	else if(ex_owner == Owner())
+		return "Consommations de McGerbale gratuites pour " + ex_owner->Nick() + " !";
 	else
-		return "1000 $ consommations payés chaque tour à " + ex_owner;
+		return "1000 $ consommations payés chaque tour à " + ex_owner->Nick();
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)
@@ -79,6 +91,19 @@ void ECTourist::ChangeCase(ECBCase* newcase)
 	 */
 	ECEntity::ChangeCase(newcase);
 	SetShowedCases(true);
+}
+
+/********************************************************************************************
+ *                                ECPlane                                                   *
+ ********************************************************************************************/
+std::string ECPlane::SpecialInfo()
+{
+	std::string s = !Deployed() ? "En plein vol" : "Au sol";
+
+	if(Containing()) s += " - Contient :";
+	else if(Owner()->IsMe()) s += " - Capacité : " + TypToStr(100 * Nb());
+
+	return s;
 }
 
 /********************************************************************************************
@@ -301,7 +326,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			if(event_type & ARM_MOVE || event_type & ARM_ATTAQ)
 				return MoveEffect(entities);
 			break;
-		
+
 	}
 	return true;
 }
@@ -325,7 +350,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 				SDL_Delay(20);
 				return false;
 			}
-	
+
 			SetAttaqImg(0,0,0);
 			Resources::SoundMitraillette()->Stop();
 		}

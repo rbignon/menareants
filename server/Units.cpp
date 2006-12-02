@@ -22,6 +22,64 @@
 #include "Units.h"
 #include "Debug.h"
 #include "Channels.h"
+#include "InGame.h"
+
+/********************************************************************************************
+ *                               ECPlane                                                    *
+ ********************************************************************************************/
+
+bool ECPlane::WantDeploy()
+{
+	if(EventType() & ARM_DEPLOY)
+		return false;
+
+	/** \note On switch sur ce qu'on VEUT mettre */
+	switch(!Deployed())
+	{
+		case false:
+			if(EventType() & ARM_ATTAQ)
+				return false;
+			break;
+		case true:
+			break;
+	}
+
+	CreateLast();
+
+	SetDeployed(!Deployed());
+	return true;
+}
+
+bool ECPlane::WantUnContain(uint x, uint y, ECMove::Vector& moves)
+{
+	if(!Deployed()) return false;
+
+	return EContainer::WantUnContain(x, y, moves);
+}
+
+/********************************************************************************************
+ *                               ECJouano                                                   *
+ ********************************************************************************************/
+void ECJouano::Invest(ECBEntity* entity)
+{
+	ECMcDo* mcdo = dynamic_cast<ECMcDo*>(entity);
+
+	assert(mcdo);
+
+	Channel()->send_info(0, EChannel::I_JOUANO, LongName() + " " + mcdo->ExOwner()->Nick() + " " + mcdo->LongName() + " " + TypToStr(JOUANO_DESTROYTURN));
+
+	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
+
+	mcdo->RestDestroy() = JOUANO_DESTROYTURN + 1;
+
+	/* >  Channel()->SendArm(0, entity, ARM_DATA, 0, 0, ECData(DATA_JOUANO, entity->RestDestroy()));
+	 * Inutile: à la fin du tour, ECMcDo::Played() sera appellé et l'enverra de lui même.
+	 * C'est d'ailleurs pour cela que l'on fait JOUANO_DESTROYTURN + 1, car la fonction en question
+	 * va decrementer la variable.
+	 */
+
+	SetShadowed();
+}
 
 /********************************************************************************************
  *                               ECMcDo                                                     *
@@ -65,7 +123,36 @@ void ECMcDo::Invest(ECBEntity* entity)
 	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
 
 	/* On supprime de la circulation la caserne */
-	Map()->RemoveAnEntity(caserne);
+	caserne->SetShadowed();
+}
+
+void ECMcDo::Played()
+{
+	if(Deployed() && restDestroy > 0)
+	{
+		restDestroy--;
+		if(restDestroy > 0)
+			Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_JOUANO, TypToStr(restDestroy)));
+		else
+		{
+			/* On supprime le malheureux McDo, et on restaure la caserne */
+
+			// Suppression propagée de notre mcdo
+			Channel()->SendArm(0, this, ARM_REMOVE);
+
+			/* On créé notre caserne avec les propriétés du McDo, et je rappelle que Owner() est bien l'owner
+			 * de l'ex caserne
+			 */
+			ECEntity* caserne = CreateAnEntity(E_CASERNE, Channel()->FindEntityName(Owner()), Owner(), Case());
+			Channel()->SendArm(0, caserne, ARM_CREATE, Case()->X(), Case()->Y());
+			caserne->SetNb(Nb());
+			Map()->AddAnEntity(caserne);
+			caserne->Create(false);
+
+			SetShadowed(); // Et on supprime notre brave McDo qui a rendu de mauvais services
+		}
+	}
+	ECEntity::Played();
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)
@@ -121,7 +208,7 @@ void ECEnginer::Invest(ECBEntity* entity)
 	else
 	{
 		ECEntity::Invest(entity);
-	
+
 		if(entity->IsCountryMaker())
 			return;
 	}
@@ -366,8 +453,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Shoot(*it, killed);
-			(*Channel()) << "Le lance missile " + LongName() + " dégomme " + (*it)->Qual() + " " +
-							(*it)->LongName() + " de " + TypToStr(killed);
+			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
 		}
 
 #if 0 // Uniquement si on veut qu'un lance-missile se reploie après avoir tiré

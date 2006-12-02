@@ -96,7 +96,7 @@ void EMap::VirtualAddUnit(std::string line)
 
 	ECEntity* entity = entities_type[StrToTyp<uint>(type)].create ("**", pl, map[ y * Width() + x ], StrToTyp<uint>(number),
 	                                                               this);
-	
+
 
 	AddAnEntity(entity);
 }
@@ -365,7 +365,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 			MyFree(map);
 			return false;
 		}
-		
+
 	}
 
 	BMapPlayersVector mps = map->MapPlayers();
@@ -449,8 +449,8 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							}
 							catch(const TECExcept &e)
 							{
-								TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
-								               e.Message()).c_str(), BT_OK, MapEditor);
+								TMessageBox m(std::string("Impossible de sauvegarder la carte :\n\n") + e.Message(),
+								              BT_OK, MapEditor);
 								m.Show();
 							}
 						}
@@ -479,8 +479,8 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								}
 								catch(const TECExcept &e)
 								{
-									TMessageBox m((std::string("Impossible de sauvegarder la carte :\n\n") +
-									               e.Message()).c_str(), BT_OK, MapEditor);
+									TMessageBox m(std::string("Impossible de sauvegarder la carte :\n\n") +
+									               e.Message(), BT_OK, MapEditor);
 									m.Show();
 								}
 							}
@@ -655,10 +655,10 @@ void TBarreCaseIcons::Init()
 		Next = AddComponent(new TButton (form->Width()-X()-10, 40,5,10));
 	else
 		Next->SetX(X() + form->Width()-X()-10);
-	
+
 	Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
 	Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
-	
+
 	Next->SetOnClick(TBarreCaseIcons::GoNext, 0);
 	Last->SetOnClick(TBarreCaseIcons::GoLast, 0);
 }
@@ -928,7 +928,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 			dynamic_cast<TMapEditor*>(Parent())->ShowBarreAct(false);
 
 			Hide();
-			
+
 		}
 		entity = 0;
 	}
@@ -1121,7 +1121,7 @@ void TOptionsMap::Options(TObject*, void* m)
 							map->RemovePlayer(m_id);
 							OptionsMap->Refresh();
 						}
-						
+
 						if(OptionsMap->AddCountryButton->Test(event.button.x, event.button.y))
 						{
 							std::string c_id = OptionsMap->AddCountryEdit->Text();
@@ -1208,7 +1208,7 @@ void TOptionsMap::Options(TObject*, void* m)
 	map->MinPlayers() = OptionsMap->MinPlayers->Value();
 	map->CityMoney()  = StrToTyp<int>(OptionsMap->City->Text());
 	map->IsMission()  = OptionsMap->Mission->Checked();
-	
+
 	MyFree(OptionsMap);
 	map->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
 	map->SetCanSave();
@@ -1335,10 +1335,10 @@ void MenAreAntsApp::MapEditor()
 						{
 							if(!TMapEditor::Editor(NULL, LoadMapFile))
 							{
-								TMessageBox mb(std::string("Impossible de créer la carte.\n"
-													"Son nom est peut être déjà utilisé, ou alors les informations "
-													"que vous avez fournis sont invalides.").c_str(),
-													BT_OK, LoadMapFile);
+								TMessageBox mb("Impossible de créer la carte.\n"
+								               "Son nom est peut être déjà utilisé, ou alors les informations "
+								               "que vous avez fournis sont invalides.",
+								               BT_OK, LoadMapFile);
 								mb.Show();
 							}
 							LoadMapFile->Refresh();
@@ -1349,10 +1349,9 @@ void MenAreAntsApp::MapEditor()
 							   !TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
 										LoadMapFile->MapsList->GetSelectedItem()).c_str()))
 							{
-								TMessageBox mb(std::string("Impossible d'ouvrir la map " +
-												LoadMapFile->MapsList->ReadValue(
-														LoadMapFile->MapsList->GetSelectedItem())
-												+ ".\nVeuillez reessayer").c_str(), BT_OK, LoadMapFile);
+								TMessageBox mb("Impossible d'ouvrir la map " +
+								               LoadMapFile->MapsList->ReadValue(LoadMapFile->MapsList->GetSelectedItem()) +
+								               ".\nVeuillez reessayer", BT_OK, LoadMapFile);
 								mb.Show();
 							}
 							LoadMapFile->Refresh();

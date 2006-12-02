@@ -1,29 +1,56 @@
-########################
-# Ceci est un exemple  #
-########################
-# Veuillez le modifier #
-########################
+##########################################################################
+#  __  __                 _                  _          _         ____   #
+# |  \/  | ___ _ __      / \   _ __ ___     / \   _ __ | |_ ___  |  _ \  #
+# | |\/| |/ _ \ '_ \    / _ \ | '__/ _ \   / _ \ | '_ \| __/ __| | | | | #
+# | |  | |  __/ | | |  / ___ \| | |  __/  / ___ \| | | | |_\__ \ | |_| | #
+# |_|  |_|\___|_| |_| /_/   \_\_|  \___| /_/   \_\_| |_|\__|___/ |____/  #
+#                                                                        #
+##########################################################################
+##########################################################################
+#
+# Ceci est la configuration du daemon Men Are Ants D.
+#
+# Les lignes commençant (sans compter espaces et tabulations) par
+# le caractère '#' sont considérées comme des commentaires.
+# En outre, lors de la declaration d'une section, mettez le caractère
+# '{' sur la même ligne que le type (exemple « server { »).
+#
+# Veuillez prendre le temps de bien configurer chaque section, chaque
+# sous section et chaque champ.
+##########################################################################
 
-# Nom du serveur
-SERVERNAME menareants.coderz.info
+# «server»
+# Cette section contient les informations propres
+# au serveur lancé
+server {
 
-# Port écouté
-PORT 5461
+	# Nom du serveur
+	name = menareants.coderz.info
 
-# Fréquence de PINGS envoyés à un client.
-PINGFREQ 50
+	# Port écouté
+	port = 5461
 
-# Nombre maximal de connexions.
-MAXCONNEXIONS 10
+	# Fréquence de PINGS envoyés à un client.
+	fping = 50
 
-# Nombre maximum de jeux simultanément.
-MAXGAMES 3
+	# Nombre maximal de connexions.
+	maxcons = 10
 
-# Mot de passe administrateur.
-ADMINPASS azerty
+	# Path du fichier du MOTD (Message Of The Day) affiché
+	# à la connexion
+	motdfile = @prefix@/etc/menareantsd.motd
 
-# Limite maximale d'utilisateurs dans une partie.
-DEFLIMITE 8
+	# Mot de passe de l'administrateur.
+	# adminpass = azerty
+}
 
-# Path du fichier motd
-MOTDFILE @prefix@/etc/menareantsd.motd
+# «games»
+# Paramètres des jeux
+games {
+
+	# Nombre maximum de jeux simultanément.
+	maxgames = 3
+
+	# Limite maximale d'utilisateurs dans une partie.
+	deflimite = 8
+}

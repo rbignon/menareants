@@ -26,6 +26,8 @@
 #else
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #endif
 
 #include "Sockets.h"
@@ -63,7 +65,7 @@ EC_Client* EC_Client::GetInstance(bool create)
 {
 	if (singleton == NULL && create)
 		singleton = new EC_Client();
-	
+
 	return singleton;
 }
 
@@ -80,11 +82,11 @@ int EC_Client::sendrpl(const char *pattern, ...)
 
 	static char buf[MAXBUFFER + 20];
 	va_list vl;
-	int len;
+	size_t len;
 
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf -2, pattern, vl);
-	if(len < 0) len = sizeof buf-2;
+	if(len > sizeof buf - 2) len = sizeof buf -2;
 
 	buf[len++] = '\r';
 	buf[len++] = '\n';
@@ -132,7 +134,7 @@ void EC_Client::parse_message(std::string buf)
 		{
 			std::string tmp;
 			tmp = stringtok(line, ",");
-			if(tmp.find('!')) tmp = stringtok(tmp, "!");
+			if(tmp.find('!') != std::string::npos) tmp = stringtok(tmp, "!");
 			ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
 			if(tmpl) players.push_back(tmpl);
 			/* Il est tout à fait possible que le player ne soit pas trouvé,
@@ -277,7 +279,7 @@ void EC_Client::Init()
 
 	Commands.push_back(new SCOCommand("SCO",	0,	4));
 	Commands.push_back(new REJOINCommand("REJOIN",0,1));
-	
+
 }
 
 EC_Client::EC_Client()

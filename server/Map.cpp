@@ -220,12 +220,12 @@ bool ECEvent::operator<(const ECEvent& e) const
 	EV_BEGIN;
 
 	EV(CREATE);
-	EV_IF(REPLOY, ARM_DEPLOY, !Entity()->Deployed(), !e.Entity()->Deployed());
 	EV(CONTAIN);
+	EV_IF(REPLOY, ARM_DEPLOY, !Entity()->Deployed(), !e.Entity()->Deployed());
 	EV(MOVE);
-	EV(UNCONTAIN);
 	EV(UNION);
 	EV_IF(DEPLOY, ARM_DEPLOY, Entity()->Deployed(), e.Entity()->Deployed());
+	EV(UNCONTAIN);
 	/* On fait d'abord passer les evenements avec evenets linkés, histoire que les mouvements linkés se fassent bien
 	   en premiers */
 	EV_IF(ATTAQ, ARM_ATTAQ, !linked.empty(), !e.linked.empty());

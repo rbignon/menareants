@@ -1,3 +1,62 @@
+2006-12-01 Romain Bignon <progs@headfucking.net>
+
+	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Possibilité de donner de l'argent à un autre joueur (par le menu des options), ou un territoire à un autre joueur (en
+	sélectionnant la ville en question, en cliquant sur le bouton "Don. Territoire", puis en donnant le pseudo du joueur).
+
+2006-11-30 Romain Bignon <progs@headfucking.net>
+
+	* server/Channels.cpp (JOICommand): En cas de recover, on envoie les informations concernant la propriété des countries.
+
+2006-11-27 Romain Bignon <progs@headfucking.net>
+
+	* src/data/anims/units/: Utilisation des images pour l'avion.
+
+2006-11-26 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ShowMap.cpp: Lorsqu'une unité est selectionnée, affichage en jaune des cases où elle peut aller, et en rouge des cases où elle peut tirer.
+
+	* server/Channels.cpp (JOICommand): Lors d'un recover d'une partie par un user, on envoie bien les personnes avec qui il est allié.
+
+2006-11-24 Romain Bignon <progs@headfucking.net>
+
+	* Units.h: Création de l'unité Jouano qui permet de bouffer les mcdonalds.
+
+2006-11-23 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Bouton qui permet de trouver les unités inactives.
+
+	* API, src/JoinGame.cpp: Modification du protocole pour la commande INFO. Ça permet la traduction du client en attribuant les messages à celui-ci avec un formatage spécial.
+	Le serveur n'a plus qu'à transmettre l'ID du message et les arguments nécessaires.
+
+	* server/Channels.cpp, server/Batiments.cpp, server/Units.cpp (EChannel::send_info): Fonction pour envoyer une info à un client.
+
+2006-11-04 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp (ARMCommand): Le timer pour éviter qu'une animation marche plus de 10 secondes marche maintenant.
+
+2006-10-27 Romain Bignon <progs@headfucking.net>
+
+	* server/maps/*: Correction du bug du crash lors de la lecture de la liste de maps par le client alors qu'il join
+	une partie. En fait le soucis réside dans le fait que la chaine du nom contenait un 'Î'. Je ne sais pas pourquoi
+	ça crash pour ça mais bon il suffit de ne jamais mettre d'accents dans les noms et ça ne devrait plus poser
+	de problèmes.
+
+2006-10-24 Romain Bignon <progs@headfucking.net>
+
+	* src/data/pics/MAA.ico: Icone du jeu.
+
+	* src/Main.cpp: Utilisation de l'icone du jeu dans la fenêtre.
+
+	* lib/LibConfig.h: Librairie de lecture (et bientot de sauvegarde) de configuration.
+
+	* server/Config.cpp: Utilisation de LibConfig.
+
+2006-10-09 Romain Bignon <progs@headfucking.net>
+
+	* Units.h: Avion de transport.
+
+	* lib/Map.h, ...: Gestion de niveaux en hauteur d'une unité.
+
 2006-10-04 Romain Bignon <progs@headfucking.net>
 
 	* src/Channels.h:  Structure BreakPoint.
@@ -8,62 +67,58 @@
 	 (void MenAreAntsApp::Options): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
 	 (void MenAreAntsApp::PingingGame): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
 	 (void TScoresForm::WantLeave): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
-	
+
 	* src/Resources.cpp: Images de balises.
-	
+
 	* src/Sockets.cpp: Commande BP.
-	
-	* src/tools/Images.cpp (void ECImage::Flip): Début de support OpenGL.
-	
-	* src/tools/Video.cpp (bool Video::SetConfig): Début de support OpenGL.
-	
+
 	* src/data/anims/balise/1.png
 	* src/data/anims/balise/2.png
 	* src/data/anims/balise/3.png
 	* src/data/anims/balise/4.png
 	* src/data/anims/balise/info: Images de la balise.
-	
+
 	* src/data/pics/cursors/rem_bp.png
 	* src/data/pics/cursors/add_bp.png: Curseurs.
 
 	* src/Channels.cpp: Structures de breakpoints.
-	
+
 	* src/gui/Form.cpp (void TForm::Actions): Gestion des touches appuyées directement de SDL.
-	
+
 	* src/gui/Cursor.h: Ajout des curseurs pour poser ou enlever une balise.
-	
+
 	* src/gui/Form.h: Gestion des touches appuyées directement de SDL.
-	
+
 	* src/gui/Cursor.cpp (TCursor::TCursor): Ajout des curseurs pour poser ou enlever une balise.
-	
+
 	* src/gui/ShowMap.cpp: Affichage des balises.
-	
+
 	* src/InGame.h: Passage des wants dans un enumerateur.
-	
+
 	* src/Commands.h: Commande BP.
-	
+
 	* src/Login.cpp (int MAJCommand::Exec): Changement du texte, adapté suivant l'OS.
-	
+
 	* src/Resources.h: Images de balise.
-	
+
 	* src/Sockets.h: Message BP.
-	
+
 	* src/Defines.h: Début de migration à OpenGL.
-	
+
 	* src/Main.cpp: Modification credits.
-	
+
 	* server/InGame.cpp: Commande BP.
-	
+
 	* server/Channels.h: Structure BreakPoint pour les balises.
-	
+
 	* server/Commands.h: Commande BP.
-	
+
 	* server/Main.cpp: Message BP.
-	
+
 	* server/Main.h: Message BP.
-	
+
 	* API: Commande BP pour les Balises.
-	
+
 2006-09-27 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Le bouton "Voter" se grisait dès que n'importe qui votait.
@@ -73,15 +128,15 @@
 	* server/Commands.h: Ajout de la commande ADMIN
 
 	* server/Login.cpp: Commande ADMIN qui permet de se loguer, de rehash ou de killer quelqu'un.
-	
+
 	* server/menareantsd.conf.in: Ajout du paramètre ADMINPASS.
-	
+
 	* server/Config.h: Variable AdminPass.
-	
+
 	* server/Server.h: Flag ECD_ADMIN.
-	
+
 	* server/Main.cpp: Commande ADMIN.
-	
+
 2006-09-26 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Anticipation sur un bug qui n'affiche pas dans certain cas AttaqImg, et qui faisait une boucle
@@ -96,10 +151,10 @@
 2006-09-23 Romain Bignon <progs@headfucking.net>
 
 	* server/Units.cpp (void ECEnginer::Invest): Vérification que Client() ne soit pas nul.
-	
+
 	* server/Map.cpp (void ECMap::RemoveAnEntity): Vérification que Client() ne soit pas nul.
 	 (bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): Vérification que Client() ne soit pas nul.
-	
+
 	* server/maps/europa_conquest.map: Modifications essayant de rapprocher l'égalité.
 
 	* server/Channels.cpp (void EChannel::operator<< ): Vérification que Client() ne soit pas nul.
@@ -110,9 +165,9 @@
 	 (const char TInGameForm::GetWant): Affichage de fleches pour un ingénieur pour réparer.
 	 (void MenAreAntsApp::InGame): Correction d'un bug qui ne faisait pas avancer sur la case quand une unité ne pouvait
 	 pas entrer dans un conteneur sur la case cible.
-	
+
 	* src/Units.cpp: Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
-	
+
 	* src/data/anims/units/mcdo/caserne/1.png: Actualisation de l'image avec la caserne actuelle.
 	* src/data/anims/units/train/dos/1.png: Mise du train vu de face.
 	* src/data/anims/units/train/left/1.png: Mise du train vu de face.
@@ -120,21 +175,21 @@
 	* lib/Units.h: Le mcdo possède 300 pour se défendre, histoire de lui laisser une chance d'arriver à destination.
 
 	* lib/Defines.h: Passage en version 3.2-pre1
-	
+
 	* server/Server.cpp (void TClient::Free): N'affiche pas le message "Deconnexion de x" pour les IA.
-	
+
 	* server/Units.h: Le McDo ne se bat pas si on l'attaque, ses 300 ne sont que défensifs contre la tour défense.
-	
+
 	* server/maps/first.map: Modification un peu du terrain avec rajout de quelques mines.
 	* server/maps/three.map: Rajout de quelques mines.
 	* server/maps/ia.map: Modification du nom de l'IA.
-	
+
 	* server/maps/caraibes.map: Rajout d'une mine pomée.
-	
+
 	* server/maps/europa_conquest.map: Rajout de mines, et enlève la position de facilité de la Russie.
-	
+
 	* server/IA.cpp (void TIA::FirstMovements): Ne créé plus les unités n'importe comment, et ne créé plus de batiments au pif.
-	
+
 2006-09-22 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (void MenAreAntsApp::InGame): Suppression du bouton Attaq.
@@ -189,7 +244,7 @@
 	* src/Batiments.cpp: Affiche pour le centre-ville et ses upgrades combien elles rapportent par tours.
 
 	* server/IA.cpp (UseTransportBoat): Correction d'un grave bug qui ne faisait plus debarquer !
-	
+
 2006-09-16 Romain Bignon <progs@headfucking.net>
 
 	* Correction des assert.h manquants (alors que bizarement sur la majorité des compilateurs ça compile sans).
@@ -1707,15 +1762,15 @@
 	vérifié qu'elle ne comportait pas d'erreurs.
 
 	* src/Map.cpp: Création des différentes classes ainsi que de diverses fonctions. Le chargement de la map MARCHE !
-	
+
 	* src/Commands.h (ER1): Prise en charge (enfin) de l'ER1 (CANTJOIN) même si elle est inutile !!
-	
+
 	* lib/Debug.h (VCName): macro pour les char.
-	
+
 	* src/Debug.cpp: Correction du bug qui envoyait deux fois la meme chaine au serveur avec W_SEND.
-	
+
 	* src/Login.cpp: Utilisation des accents.
-	
+
 	* src/gui/Label.cpp: Correction: on peut maintenant utiliser des accents dans les Label.
 
 2006-02-13  Romain Bignon <progs@headfucking.net>

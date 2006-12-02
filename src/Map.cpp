@@ -288,6 +288,52 @@ void ECEntity::AfterDraw()
 	}
 }
 
+bool ECEntity::FindFastPath(ECase* c, ECMove::Vector& path)
+{
+	return true;
+}
+
+bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
+{
+	/* = -1 : on ne peut investir en cas de présence d'une unité enemie. N'arrive pas si c'est sur un conteneur
+	 * =  0 : n'a trouvé aucune unité à investir ou me contenant, ni aucune unité enemie
+	 * =  1 : peut investir
+	 * =  2 : peut me contenir
+	 */
+	int can_invest = 0;
+	std::vector<ECBEntity*> ents = c->Entities()->List();
+
+	move = invest = false;
+
+	ECMove::Vector path;
+	if(!FindFastPath(c, path)) return false;
+
+	FOR(ECBEntity*, ents, enti)
+	{
+		EContainer* container = 0;
+		if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(this) && this->Owner() &&
+		   this->Owner()->IsMe())
+			can_invest = 2;
+		if(can_invest >= 0 && this->CanInvest(enti))
+			can_invest = 1;
+		if(!enti->Like(this) && enti->CanAttaq(this) && can_invest != 2)
+		{
+			/* chercher l'interet de ce truc là.
+				* -> Je suppose que c'est pour dire que dans le cas où y a une unité enemie, on ne parle pas
+				*    d'entrer dans le batiment mais de se battre, donc on montre pas encore la fleche quoi
+				*/
+			can_invest = -1;
+		}
+	}
+
+	if(can_invest > 0)
+		return (invest = true);
+	else if(this->CanWalkOn(c))
+		return (move = true);
+	else
+		return false;
+}
+
 void ECEntity::SetNb(uint n)
 {
 	ECBEntity::SetNb(n);
@@ -359,7 +405,7 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	}
 	if(Case())
 		dynamic_cast<ECase*>(Case())->SetMustRedraw();
-	
+
 	if(!spr) return;
 	image = new ECSprite(spr, Video::GetInstance()->Window());
 	image->SetAnim(anim);

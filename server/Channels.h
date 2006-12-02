@@ -55,7 +55,7 @@ public:
 		BreakPoint(ECBCase* _c, std::string _message)
 			: c(_c), message(_message)
 		{}
-	
+
 		ECBCase* c;
 		std::string message;
 	};
@@ -134,6 +134,13 @@ public:
 	EChannel(std::string _name);
 	virtual ~EChannel();
 
+	enum info_messages
+	{
+		I_NONE,
+		I_SHOOT,  // attaquant, attaqué, domage
+		I_JOUANO  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+	};
+
 /* Methodes */
 public:
 
@@ -141,12 +148,19 @@ public:
 	void NeedReady();
 
 	/** Send a message to all players.
-	 * 
+	 *
 	 * @param one if not null, we will not send message to \b this player.
 	 * @return always 0.
 	 */
 	int sendto_players(ECPlayer* one, const char*, ...);
-	
+
+	/** Send an INFO message to someone
+	 * @param pl player will receive message. if null, all players will receive message.
+	 * @param id \b info_messages enumerator to identificate message
+	 * @param args arguments used to format message
+	 */
+	void send_info(ECPlayer* pl, info_messages id, std::string args);
+
 	/** Send modes to all players from \a sender
 	 * \warning this will only send modes, no set them in channel or on player.
 	 */
@@ -252,7 +266,7 @@ public:
 
 	/** Define the map */
 	virtual void SetMap(ECBMap *m);
-	
+
 	/** Define user limit of channel.
 	 * \warning This function will send to all players, if they have a position bigger than new limite, a
 	 * SET message to set their position to 0 !
@@ -269,9 +283,6 @@ public:
 
 	/** Number of humans players in this channel */
 	BPlayerVector::size_type NbHumains() const;
-
-	/** This operator can be used to send a INFO message to all players */
-	void operator<< (std::string os);
 
 	bool FastGame() const { return fast_game; }
 	void SetFastGame(bool b = true) { fast_game = b; }

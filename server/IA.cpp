@@ -121,7 +121,7 @@ public:
 			 */
 			if(!boat->CanContain(unit))
 				boat->SetNb(unit->Nb()/100 + 10);
-	
+
 			if(!boat->CanContain(unit))
 			{
 				if(boat->Containing())
@@ -535,8 +535,13 @@ void TIA::MakeAllies()
 				have_ia = false;
 				break;
 			}
-		if(have_ia && !Player()->IsAllie(*it))
-			ia_send("SET +a " + std::string((*it)->GetNick()));
+		if(have_ia)
+		{
+			if(!Player()->IsAllie(*it))
+				ia_send("SET +a " + std::string((*it)->GetNick()));
+		}
+		else if(Player()->IsAllie(*it))
+			ia_send("SET -a " + std::string((*it)->GetNick()));
 	}
 
 	/*for(std::vector<std::string>::iterator it = to_send.begin(); it != to_send.end(); ++it)
@@ -594,6 +599,13 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				}
 				if(!add && ia_allies)
 					want_make_allies = true;
+				else if(add)
+				{
+					pls = sender->Allies();
+					FORit(ECBPlayer*, pls, pl)
+						if(*pl != me->Player())
+							to_send.push_back("SET +a " + std::string((*pl)->GetNick()));
+				}
 
 				to_send.push_back("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
 				break;
@@ -749,14 +761,14 @@ int TIA::recv_one_msg(std::string msg)
 		{
 			std::string tmp;
 			tmp = stringtok(line, ",");
-			if(tmp.find('!')) tmp = stringtok(tmp, "!");
+			if(tmp.find('!') != std::string::npos) tmp = stringtok(tmp, "!");
 			ECPlayer* tmpl = Player()->Channel()->GetPlayer(tmp.c_str());
 			if(tmpl) players.push_back(tmpl);
 			/* Il est tout à fait possible que le player ne soit pas trouvé,
 			   genre si c'est un join... */
 		}
 	}
-	
+
 	try
 	{
 	    cmd->func(players, this, parv);
@@ -798,18 +810,18 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		return cl->sendrpl(app.rpl(ECServer::ERR));
 	}
 	if(chan->NbPlayers() >= chan->Limite())
-		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN));
+		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
 
 	for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 	{
-		if(!strchr(NICK_CHARS, *c))
-			return cl->sendrpl(app.rpl(ECServer::IACANTJOIN));
-		else if(*c == ' ') *c = '_';
+		if(*c == ' ') *c = '_';
+		else if(!strchr(NICK_CHARS, *c))
+			return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
 	}
 
 	if(app.FindClient((IA_CHAR + parv[1]).c_str()))
 		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
-		
+
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
 	IA->SetNick(IA_CHAR + parv[1]);
 	SetAuth(IA);

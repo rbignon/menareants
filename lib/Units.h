@@ -89,7 +89,7 @@ public:
 	virtual e_type Type() const { return E_TRAIN; }
 	virtual uint Cost() const { return 4000; }
 	virtual uint InitNb() const { return 5; }
-	virtual uint Step() const { return 4; }
+	virtual uint Step() const { return 6; }
 	virtual uint Visibility() const { return 4; }
 
 	virtual bool CanContain(const ECBEntity* et)
@@ -114,7 +114,6 @@ public:
 				return false;
 		}
 	}
-	virtual const char* Qual() const { return "le train"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsVehicule() const { return true; }
 };
@@ -161,9 +160,48 @@ public:
 				return false;
 		}
 	}
-	virtual const char* Qual() const { return "le bateau"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsNaval() const { return true; }
+};
+
+/********************************************************************************************
+ *                               ECBPlane                                                   *
+ ********************************************************************************************/
+class ECBPlane : public virtual ECBContainer
+{
+public:
+	ENTITY_EMPTY_CONSTRUCTOR(ECBPlane) {}
+
+	ENTITY_CONSTRUCTOR(ECBPlane) {}
+
+	virtual void Init() { ECBEntity::Init(); SetDeployed(true); }
+
+	virtual e_type Type() const { return E_PLANE; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 5; }
+	virtual uint Step() const { return 3; }
+	virtual uint Visibility() const { return 5; }
+	virtual bool CanWalkOn(ECBCase *c) const { return true; }
+	virtual e_level Level() const { return !Deployed() ? L_AIR : L_GROUND; }
+
+	// Cet avion de transport ne peut PAS prendre une ville
+	virtual bool CanInvest(const ECBEntity* e) const { return false; }
+
+	virtual bool CanContain(const ECBEntity *et)
+	{
+		if(Containing() || et->Nb() > 100*Nb() || !Deployed())
+			return false;
+		return true;
+	}
+
+	bool CanAttaq(const ECBEntity *e)
+	{
+		return false;
+	}
+
+	bool CanCreate(const ECBEntity*) { return false; }
+	virtual bool IsPlane() const { return true; }
+	virtual bool WantDeploy() { return true; }
 };
 
 /********************************************************************************************
@@ -191,13 +229,13 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if(e->Case() == Case() || e->IsCountryMaker() ||
-		   !e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval())
+		if(e->Case() == Case() || e->IsCountryMaker() || e->Level() > L_GROUND ||
+		   !e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval() &&
+		   !e->IsPlane())
 			return false;
 		else
 			return true;
 	}
-	virtual const char* Qual() const { return "le lance-missiles"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
 	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
@@ -228,34 +266,72 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((Parent() && Parent()->CanAttaq(e)) ||
-		   ((e->IsInfantry() || e->IsVehicule() || e->IsBuilding() && !e->IsCity() && !e->IsHidden()) && !e->IsNaval() &&
-		    !e->IsTerrain()))
+		if((Parent() && Parent()->CanAttaq(e)) || e->Level() == Level() && !e->IsHidden() ||
+		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain())
 			return true;
 		else
 			return false;
 	}
-	virtual const char* Qual() const { return "le char"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsVehicule() const { return true; }
+};
+
+
+/********************************************************************************************
+ *                               ECBJouano                                                  *
+ ********************************************************************************************/
+/** This is an enginer who can take enemey's buildings */
+class ECBJouano : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBJouano) {}
+
+	ENTITY_CONSTRUCTOR(ECBJouano) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_JOUANO; }
+	virtual uint Cost() const { return 5000; }
+	virtual uint InitNb() const { return 1; }
+	virtual uint Step() const { return 2; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+
+	virtual bool CanInvest(const ECBEntity* e) const
+	{
+		if(e->Type() == E_MCDO && e->Deployed())
+			return true;
+		else
+			return false;
+	}
+
+	bool CanAttaq(const ECBEntity* e) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+	bool IsInfantry() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool AddUnits(uint) { return false; }
 };
 
 /********************************************************************************************
  *                               ECBMcDo                                                    *
  ********************************************************************************************/
+#define JOUANO_DESTROYTURN  3
 /** This is a special Unit for USA nation */
 class ECBMcDo : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_EMPTY_CONSTRUCTOR(ECBMcDo) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECBMcDo) : restDestroy(-1) {}
 
-	ENTITY_CONSTRUCTOR(ECBMcDo) {}
+	ENTITY_CONSTRUCTOR(ECBMcDo), restDestroy(-1) {}
 
 	enum data_t {
 		DATA_INVESTED,
-		DATA_EXOWNER
+		DATA_EXOWNER,
+		DATA_JOUANO
 	};
 
 /* Constantes */
@@ -277,7 +353,6 @@ public:
 			return false;
 	}
 	bool CanAttaq(const ECBEntity* e) { return false; }
-	virtual const char* Qual() const { return "Donald de McGerbale"; }
 	virtual bool CanCreate(const ECBEntity*) { return false; }
 	virtual void Create(ECBEntity*);
 	virtual bool IsBuilding() const { return Deployed(); }
@@ -287,14 +362,14 @@ public:
 	virtual bool WantMove(ECBMove::E_Move, int) { return !Deployed(); }
 	virtual bool IsCity() const { return Deployed(); }
 
-/* Methodes */
-public:
-
 /* Attributs */
 public:
 
+	int& RestDestroy() { return restDestroy; }
+
 /* Variables privées */
 protected:
+	int restDestroy;
 };
 
 /********************************************************************************************
@@ -323,7 +398,6 @@ public:
 
 	bool CanInvest(const ECBEntity* e) const { return false; }
 	bool CanAttaq(const ECBEntity* e) { return false; }
-	virtual const char* Qual() const { return "le touriste japonais"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
@@ -338,7 +412,6 @@ public:
 /* Variables privées */
 protected:
 };
-
 
 /********************************************************************************************
  *                               ECBEnginer                                                 *
@@ -371,7 +444,6 @@ public:
 	}
 
 	bool CanAttaq(const ECBEntity* e) { return false; }
-	virtual const char* Qual() const { return "l'ingénieur"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
@@ -412,16 +484,12 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((Parent() && Parent()->CanAttaq(e)) ||
-		   (( e->IsInfantry() && e->Type() != E_MCDO ||
-		      e->IsVehicule() ||
-		      e->IsBuilding() && !e->IsCity() && !e->IsHidden()) &&
-		    !e->IsNaval() && !e->IsTerrain()))
+		if((Parent() && Parent()->CanAttaq(e)) || e->Level() == Level() && !e->IsHidden() && e->Type() != E_MCDO ||
+		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain())
 			return true;
 		else
 			return false;
 	}
-	virtual const char* Qual() const { return "l'armée"; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
 

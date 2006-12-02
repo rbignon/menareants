@@ -60,8 +60,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "le rail"; }
-
 	/** Rail is a building to prevent from constructing buildings here, and to be drawed at background. */
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsTerrain() const { return true; }
@@ -93,8 +91,6 @@ public:
 	virtual uint Visibility() const { return 0; } /**< Elle ne voit rien du tout */
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
-
-	virtual const char* Qual() const { return "la forêt"; }
 
 	/** Trees is a building to prevent from constructing buildings here, and to be drawed at background. */
 	virtual bool IsBuilding() const { return true; }
@@ -132,9 +128,7 @@ public:
 		DATA_RESTBUILD
 	};
 
-	virtual bool CanAttaq(const ECBEntity* e) { return (!restBuild); }
-
-	virtual const char* Qual() const { return "la mine"; }
+	virtual bool CanAttaq(const ECBEntity* e) { return (!restBuild && Level() == e->Level()); }
 
 	/** Mine is a building to prevent from constructing buildings here, and to be drawed at background. */
 	virtual bool IsBuilding() const { return true; }
@@ -183,9 +177,7 @@ public:
 		DATA_RESTBUILD
 	};
 
-	virtual bool CanAttaq(const ECBEntity* e) { return true; }
-
-	virtual const char* Qual() const { return "le centre de recherches nucléaire"; }
+	virtual bool CanAttaq(const ECBEntity* e) { return e->Level() == Level(); }
 
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
@@ -234,15 +226,17 @@ public:
 		DATA_RESTBUILD
 	};
 
-	virtual bool CanAttaq(const ECBEntity* e) { return !(restBuild); }
+	virtual bool CanAttaq(const ECBEntity* e)
+	{
+		return e->Level() <= L_GROUND;
+	}
 
 	virtual void Init();
 
-	virtual const char* Qual() const { return "le silo de lancement"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
-	virtual bool WantAttaq(uint x, uint y, bool) { return !(restBuild); }
+	virtual bool WantAttaq(uint x, uint y, bool) { return (!restBuild && NuclearSearch() && NuclearSearch()->Missiles()); }
 
 	virtual bool CanCreate(const ECBEntity* e) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
@@ -300,7 +294,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "la megalopole"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -339,7 +332,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "le centre d'affaire"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -375,7 +367,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "le centre ville"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -413,13 +404,12 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
-		if(!e->IsBuilding() && e->Case() != Case()) return true;
+		if(!e->IsBuilding() && e->Case() != Case() && e->Level() <= L_GROUND) return true;
 		else return false;
 	}
 
 	bool CanCreate(const ECBEntity*) { return false; }
 
-	virtual const char* Qual() const { return "la tour de défense"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -460,7 +450,6 @@ public:
 
 	bool CanCreate(const ECBEntity*) { return false; }
 
-	virtual const char* Qual() const { return "l'obélisque"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -494,7 +483,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "l'usine de chars"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -507,6 +495,7 @@ public:
 			case ECBEntity::E_CHAR:
 			case ECBEntity::E_MISSILAUNCHER:
 			case ECBEntity::E_TRAIN:
+			case ECBEntity::E_PLANE:
 				return true;
 			default:
 				return false;
@@ -539,7 +528,6 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
-	virtual const char* Qual() const { return "la caserne"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool AddUnits(uint) { return false; }
 	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
@@ -553,6 +541,7 @@ public:
 			case E_ENGINER:
 			case E_TOURIST:
 			case E_MCDO:
+			case E_JOUANO:
 				return true;
 			default:
 				return false;
@@ -580,9 +569,8 @@ public:
 	virtual uint Cost() const { return 4000; }
 	virtual uint InitNb() const { return 200; }
 
-	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this); }
+	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this) && e->Level() == L_SEA; }
 
-	virtual const char* Qual() const { return "le port"; }
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsNaval() const { return true; }
 	virtual bool AddUnits(uint) { return false; }

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 		printf("NbCountries: %10d\n", map->NbCountries());
 		printf("MinPlayers:  %10d\n", map->MinPlayers());
 		printf("MaxPlayers:  %10d\n", map->MaxPlayers());
-		printf("BeginFric:   %10d\n", map->BeginMoney());
+//		printf("BeginFric:   %10d\n", map->BeginMoney());
 		printf("CityFric:    %10d\n", map->CityMoney());
 		printf("-----------------------\n");
 		printf("TERRAIN :\n\n");

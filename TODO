@@ -3,25 +3,31 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
+-pouvoir faire des déplacements en diagonal en un clique
 
 * Urgent
+-vérifier l'arme nucléaire (il avait pas l'air de supprimer toutes les unités de la case)
+-mettre un raccourci "tab" pour le bouton "FindIdle"
+-pouvoir envoyer un changement de niveau via le protocole
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 -limiter le nombre d'unités à construire sur batiments
 
 * Après
+-faire une mission de tutoriel
+-pouvoir annuler
+-à la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
+
+-bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 -permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
--lorsque quelqu'un s'allie avec une IA, celle-ci devrait s'allier avec les alliés de cette personne
 -pouvoir définir une cible sur plusieurs tours
--pouvoir faire des déplacements en diagonal en un clique
 -quand une unité est sélectionnée marquer les cases où l'unité peut aller
 -afficher les deplacements anticipés de ses alliés (peut etre)
 -lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
--bouton qui permet de trouver aléatoirement une unité qui n'a encore aucune action
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Bof
+-passer à de la 3d isometrique (à confirmer)
 -faire un serveur d'indexation, et limiter à une partie par serveur de jeu.
 -lorsqu'il y a :
   BA -> AA -> (mouvement de BA deux fois vers la droite en passant par AA (1))

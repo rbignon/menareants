@@ -35,12 +35,6 @@ class ECBCase;
 
 typedef std::vector<ECBEntity*> BEntityVector;
 
-struct nations_str_t {
-  const char* name;
-  const char* infos;
-}; 
-extern const struct nations_str_t nations_str[];
-
 class ECBPlayer;
 typedef std::vector<ECBPlayer*> BPlayerVector;
 

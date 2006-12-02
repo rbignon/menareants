@@ -86,7 +86,7 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 			continue;
 		file_list.push_back(File.cFileName);
 	}
-	
+
 	FindClose(hSearch);
 	SetCurrentDirectory(dir);
 #else
@@ -127,7 +127,7 @@ bool is_ip(const char *ip)
         {       /* Note about strtol: stores in endptr either NULL or '\0' if conversion is complete */
                 if(!isdigit((unsigned char) *ip) /* most current case (not ip, letter host) */
                         || (d = strtol(ip, &ptr, 10)) < 0 || d > 255 /* ok, valid number? */
-                        || (ptr && *ptr != 0 && *ptr != '.' && ptr != ip)) return false;
+                        || (ptr && *ptr != 0 && (*ptr != '.' || 3 == i) && ptr != ip)) return false;
                 if(ptr) ip = ptr + 1, ptr = NULL; /* jump the dot */
         }
         return true;

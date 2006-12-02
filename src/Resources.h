@@ -250,6 +250,15 @@ public:
 	R_RESOURCE(ECSpriteBase, Train_Left);
 	R_RESOURCE(ECSpriteBase, Train_Right);
 	R_RESOURCE(ECSpriteBase, Train_Dos);
+	R_RESOURCE(ECImage,      Jouano_Icon);
+	R_RESOURCE(ECSpriteBase, Jouano_Face);
+	R_RESOURCE(ECImage,      Plane_Icon);
+	R_RESOURCE(ECSpriteBase, Plane_Face);
+	R_RESOURCE(ECSpriteBase, Plane_Left);
+	R_RESOURCE(ECSpriteBase, Plane_Right);
+	R_RESOURCE(ECSpriteBase, Plane_Dos);
+	R_RESOURCE(ECSpriteBase, Plane_Deployed);
+	R_RESOURCE(ECSpriteBase, Plane_Reployed);
 };
 
 #undef R_RESOURCE

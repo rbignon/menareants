@@ -113,6 +113,7 @@ public:
 	TButtonText*    UpButton;
 	TButtonText*    UpgradeButton;
 	TButtonText*    HelpButton;
+	TButtonText*    GiveButton;
 	TBarreActIcons* Icons;
 
 	TImage*         ChildIcon;
@@ -177,6 +178,7 @@ public:
 	TButtonText*    SchemaButton;
 	TButtonText*    OptionsButton;
 	TButtonText*    BaliseButton;
+	TButtonText*    IdleFindButton;
 	TProgressBar*   ProgressBar;
 	TLabel*         Date;
 	TLabel*         Money;
@@ -317,6 +319,7 @@ public:
 	TLabel* label;
 	TLabel* allie;
 	TLabel* recipr;
+	TButtonText* GiveMoneyButton;
 
 /* Attributs */
 public:

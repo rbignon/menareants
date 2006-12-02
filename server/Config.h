@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+class MyConfig;
+
 /** Config class.
  * \todo documente.
  */
@@ -31,32 +33,26 @@ class Config
 {
 public:
 	Config(std::string _filename);
+	~Config();
 
 public:
 	bool load();
-	bool set_defaults();
 
-	std::string ServerName() const { return servername; }
-	uint Port() const { return port; }
-	uint DefLimite() const { return deflimite; }
-	uint PingFreq() const { return pingfreq; }
-	uint MaxGames() const { return maxgames; }
-	uint MaxConnexions() const { return maxconnexions; }
+	std::string ServerName() const;
+	uint Port() const;
+	uint DefLimite() const;
+	uint PingFreq() const;
+	uint MaxGames() const;
+	uint MaxConnexions() const;
+	std::string AdminPass() const;
 	std::vector<std::string> Motd() const { return motd; }
-	std::string AdminPass() const { return adminpass; }
 
 private:
-	std::string servername;
-	uint port;
-	uint deflimite;
-	uint pingfreq;
-	uint maxgames;
-	uint maxconnexions;
 	std::vector<std::string> motd;
-	std::string adminpass;
 
 private:
 	std::string filename;
+	MyConfig* conf;
 };
 
 #endif

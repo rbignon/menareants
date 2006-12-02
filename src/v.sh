@@ -1,6 +1,6 @@
 # Fichier original de Cesar@scoderz
 
-version=`svn info | sed -n 's/R.vision : \(.*\)/\1/p'`
+version=`svn info | sed -n 's/R.vision*: \(.*\)/\1/p'`
 
 if [ -f "Version.cpp" ]; then
 	currentv=`sed -n 's/^const char\* SVNVERSION = \"\(.*\)\";/\1/p' < Version.cpp`

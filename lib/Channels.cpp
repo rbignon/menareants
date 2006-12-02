@@ -30,19 +30,6 @@
  *                               ECBPlayer                                                  *
  ********************************************************************************************/
 
-const struct nations_str_t nations_str[] = {
-	/* N_NONE     */   { "Aléatoire",  "Votre nation sera choisie aléatoirement." },
-	/* N_NOISY    */   { "Noisy",      "La contrée de Noisy et ses cavernes." },
-	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis investissent le monde avec des McDonalds." },
-	/* N_FRANCE   */   { "France",     "La france de Dominique de Villepin." },
-	/* N_URSS     */   { "URSS",       "L'URSS et ses goulags..." },
-	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda et ses boïngs détournés." },
-	/* N_ESPAGNE  */   { "Espagne",    "La prof d'espagnol qui impose des règles débiles et nous emmerde." },
-	/* N_JAPON    */   { "Japon",      "Les touristes japonais et l'avantage de la photographie." },
-	/* N_COLOMBIE */   { "Colombie",   "La Colombie productrive de cocaïne." },
-	/* N_MAX      */   { "",           "" }
-};
-
 ECBPlayer::ECBPlayer(std::string n, ECBChannel *_chan, bool _owner, bool _op)
 	: allies(), nick(n), chan(_chan), position(0), color(COLOR_NONE), money(0), mp(0), entities(),
 	  nation(0), flags(0)

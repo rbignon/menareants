@@ -52,9 +52,9 @@ public:
 	 * @param form if there is a TForm, to continue to show it, put it in.
 	 * @param transparence this define if the background is transparency.
 	 */
-	TMessageBox(int _x, int _y, const char* _s, uint _b, TForm* form = 0, bool transparence = true);
+	explicit TMessageBox(int _x, int _y, std::string s, uint _b, TForm* form = 0, bool transparence = true);
 
-	TMessageBox(const char* _s, uint _b, TForm* form = 0, bool transparence = true);
+	explicit TMessageBox(std::string s, uint _b, TForm* form = 0, bool transparence = true);
 
 	~TMessageBox();
 
@@ -105,8 +105,8 @@ protected:
 
 	void SetButtons();
 	void SetEdit();
-	void Init(const char* s, bool transparence);
-	void SetText(const char* s);
+	void Init(std::string s, bool transparence);
+	void SetText(std::string s);
 };
 
 #endif /* EC_MSGBOX_H */

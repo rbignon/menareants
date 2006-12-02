@@ -212,7 +212,7 @@ void MenAreAntsApp::request_game()
 				msg = "Connexion impossible";
 			else
 				msg = "Connexion impossible :\n\n" + client->CantConnect();
-			TMessageBox mb(msg.c_str(), BT_OK, NULL);
+			TMessageBox mb(msg, BT_OK, NULL);
 			mb.SetBackGround(Resources::Titlescreen());
 			mb.Show();
 			if(client)
@@ -285,9 +285,9 @@ void MenAreAntsApp::request_game()
 
 			if(ConnectedForm->Rejoin.empty() == false)
 			{
-				if(TMessageBox(("Vous avez été déconnecté pendant que vous jouiez à la partie " +
+				if(TMessageBox("Vous avez été déconnecté pendant que vous jouiez à la partie " +
 				                ConnectedForm->Rejoin + ".\n\n"
-				                "Souhaitez-vous rejoindre la partie ?").c_str(),
+				                "Souhaitez-vous rejoindre la partie ?",
 				               BT_YES|BT_NO, ConnectedForm).Show() == BT_YES)
 				{
 					RecoverGame(ConnectedForm->Rejoin);

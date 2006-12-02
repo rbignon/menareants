@@ -137,6 +137,8 @@ public:
 	virtual bool CanBeSelected() const { return true; }
 	virtual bool OnTop() const { return false; }
 	virtual bool IsHiddenByMe(ECBEntity* e) const { return false; }
+	/** Qualitatif */
+	virtual const char* Qual() const = 0;
 
 /* Methodes */
 public:
@@ -159,12 +161,18 @@ public:
 
 	virtual std::string SpecialInfo() { return ""; }
 
+	virtual std::string DeployButton() { return Deployed() ? "Replier" : "Deployer"; }
+
 	virtual void Draw();
 
 	virtual void AfterDraw();
 
 	/** This function is called when this unit is created */
 	virtual void Created() {}
+
+	bool CanWalkTo(ECase* c, bool &move, bool &invest);
+
+	bool FindFastPath(ECase* c, ECMove::Vector& path);
 
 /* Attributs */
 public:

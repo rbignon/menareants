@@ -37,7 +37,7 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(parv[1] == "LOGIN")
 	{
-		if(parv.size() < 3 || parv[2].empty() || parv[2] != app.GetConf()->AdminPass())
+		if(parv.size() < 3 || parv[2].empty() || parv[2] == " " || parv[2] != app.GetConf()->AdminPass())
 		{
 			Debug(W_WARNING, "ADMIN LOGIN: Identification échouée de %s", cl->GetNick());
 			return cl->sendrpl(app.rpl(ECServer::ERR));
@@ -56,8 +56,7 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		if(!app.GetConf()->load())
 		{
-			app.GetConf()->set_defaults();
-			Debug(W_WARNING, "ADMIN REHASH: Impossible de charger la configuration, mise de la configuration par défaut");
+			Debug(W_WARNING, "ADMIN REHASH: Impossible de charger la configuration");
 			return cl->sendrpl(app.rpl(ECServer::ERR));
 		}
 		return 0;

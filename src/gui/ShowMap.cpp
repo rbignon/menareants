@@ -342,7 +342,7 @@ void TMap::Draw(int _x, int _y)
 			xx -= 30 - (SCREEN_WIDTH - _x);
 		if(_y > int(SCREEN_HEIGHT-20) && _y <= int(SCREEN_HEIGHT))
 			yy -= 30 - (SCREEN_HEIGHT - _y);
-	
+
 		if(xx != x || yy != y)
 			SetXY(xx, yy);
 	}
@@ -351,7 +351,7 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c && (MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity()))
+		if(c && (MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity() || SelectedEntity()))
 		{
 			if(HaveBrouillard() && c->Showed() < 0)
 			{
@@ -360,6 +360,35 @@ void TMap::Draw(int _x, int _y)
 				continue;
 			}
 			c->Draw();
+			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe())
+			{
+				if(SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
+				   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
+				{
+					bool move, invest;
+					if(SelectedEntity()->CanWalkTo(c, move, invest))
+					{
+						ECImage background;
+						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
+						background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+						background.FillRect(r_back, background.MapRGBA(255, 249, 126, 255*3/10));
+						SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+						Window()->Blit(background, &r_back2);
+					}
+				}
+				if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
+				   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
+				{
+					ECImage background;
+					SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
+					background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+										32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+					background.FillRect(r_back, background.MapRGBA(255, 0, 0, 255*3/10));
+					SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+					Window()->Blit(background, &r_back2);
+				}
+			}
 			if(CreateEntity() && c->Test(_x, _y))
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
 					                                                               : Resources::BadHashure())
@@ -433,7 +462,7 @@ void TMap::Draw(int _x, int _y)
 				if(bp->sprite)
 				{
 					bp->sprite->set(bp->c->Image()->X() + CASE_WIDTH/2  - bp->sprite->GetWidth()/2,
-									bp->c->Image()->Y() + CASE_HEIGHT/2 - bp->sprite->GetHeight()/2);
+					                bp->c->Image()->Y() + CASE_HEIGHT/2 - bp->sprite->GetHeight()/2);
 					bp->sprite->draw();
 					bp->c->SetMustRedraw();
 				}
@@ -445,14 +474,14 @@ void TMap::Draw(int _x, int _y)
 			{
 				if(map->Channel()->State() == EChannel::ANIMING)
 				{
-	
+
 				}
 				else if(map->Channel()->State() == EChannel::PLAYING)
 				{
 					ECase* c = dynamic_cast<ECase*>((*enti)->Case());
 					if(c != entity->Move()->FirstCase())
 						FDebug(W_WARNING|W_SEND, "La case de l'entité et le départ du mouvement ne sont pas identiques");
-	
+
 					ECMove::Vector moves = entity->Move()->Moves();
 					ECase* next_c = 0;
 					int last_move = -1;
@@ -531,7 +560,7 @@ void TMap::Draw(int _x, int _y)
 							break;
 					}
 					c->SetMustRedraw();
-	
+
 				}
 			}
 		}

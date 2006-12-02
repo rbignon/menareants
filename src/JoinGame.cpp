@@ -54,6 +54,123 @@ bool EOL = false;                     /**< EOL is setted to \a true by thread wh
 int JOINED = 0;                       /**< 1 = joined, -1 = error */
 bool RECOVERING = false;
 
+/** We received an information showed in the player's screen.
+ *
+ * Syntax: INFO id [arg1 [arg2 ...]]
+ *
+ * Formatage informations :
+ * - All format tags begin with '%' character
+ * - There is a number between 0 and 9 in second position to identifiat number of argument in list
+ * - After, there is a list of formaters :
+ *    * 's' show as test argument
+ *    * 'E' in form "Player!ID", this is an entity. There is an other formater :
+ *          -> 'o' is this owner of entity
+ *          -> 't' is the string type of entity (like "boat", it calls ECEntity::Qual() function)
+ * - For example, a string like "%0Eo's %0Et shoots %1Eo's %1Et of %2s" will call for an INFO command
+ *   formated like "INFO 01 Player!AA Player2!AB 200" and will show "Player's missilauncher shoots Player2's army of 200"
+ */
+int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	static struct
+	{
+		int flag;
+		const char* msg;
+	} messages[] =
+	{
+		/* 00 */ { 0,      0 },
+		/* 01 */ { I_INFO, "%0Et de %0Eo dégomme %1Et de %1Eo de %2s" }, // attaquant, attaqué, dommage
+		/* 02 */ { I_SHIT, "%0Et de %0Eo vient d'investir le McDo de %1s installé dans la caserne de %2Eo !! Il va tout bouffer ! "
+		                   "Il lui faudra %3s jours !" } // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+	};
+	if(InGameForm)
+	{
+		uint id = StrToTyp<uint>(parv[1]);
+		if(!id || id > ASIZE(messages)) return Debug(W_DESYNCH|W_SEND, "INFO: Reception d'un message dont l'id n'est pas dans la liste");
+
+		const char* msg = messages[id].msg;
+		std::string fmsg;
+
+		while(*msg)
+		{
+			if(*msg == '%')
+			{
+				msg++;
+				ParvList::size_type i;
+				if(*msg < '0' || *msg > '9' || (i = *msg - '0' + 2) >= parv.size())
+				{
+					fmsg += '%', fmsg += *msg;
+					Debug(W_WARNING|W_SEND, "INFO: Le numero %c est incorrect", *msg);
+				}
+				else
+					switch(*++msg)
+					{
+						case 's':
+						{
+							msg++;
+							fmsg += parv[i];
+							break;
+						}
+						case 'E':
+						{
+							std::string et_name = parv[i];
+							std::string nick = stringtok(et_name, "!");
+							ECPlayer* pl = 0;
+							if(nick != "*")
+							{
+								pl = me->Player()->Channel()->GetPlayer(nick.c_str());
+								if(!pl)
+								{
+									fmsg += "<unknown entity>";
+									Debug(W_WARNING|W_SEND, "INFO: Le player de l'unité %s est introuvable", parv[i].c_str());
+									break;
+								}
+							}
+
+							ECEntity* entity = 0;
+							if(pl)
+								entity = dynamic_cast<ECEntity*>(pl->Entities()->Find(et_name.c_str()));
+							else
+								entity = dynamic_cast<ECEntity*>(me->Player()->Channel()->Map()->Neutres()->Find(et_name.c_str()));
+
+							if(!entity)
+							{
+								fmsg += "<unknown entity>";
+								Debug(W_WARNING|W_SEND, "INFO: L'unité %s est introuvable", parv[i].c_str());
+							}
+							else switch(*++msg)
+							{
+								case 'o':
+								{
+									++msg;
+									fmsg += pl ? nick : "neutre";
+									break;
+								}
+								case 't':
+								{
+									++msg;
+									fmsg += entity->Qual();
+									break;
+								}
+								default: fmsg += *msg;
+							}
+							break;
+						}
+						default: fmsg += '%';
+					}
+			}
+			else
+				fmsg += *msg++;
+		}
+
+
+		me->LockScreen();
+		InGameForm->AddInfo(I_INFO, fmsg, 0);
+		me->UnlockScreen();
+	}
+
+	return 0;
+}
+
 /** Someone wants to kick me
  *
  * Syntax: nick KICK victime [reason]
@@ -201,7 +318,10 @@ int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int ER2Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	TGameInfosForm::ErrMessage = "Impossible de créer cette IA. Veuillez choisir un autre pseudo.";
+	TGameInfosForm::ErrMessage = "Impossible de créer cette IA pour une des raisons suivantes:\n"
+	                             "- Le pseudo choisi est incorrect.\n"
+	                             "- Le pseudo choisi est déjà utilisé par une autre IA (pas forcément dans votre partie).\n"
+	                             "- Il n'y a plus de place pour un joueur supplémentaire.";
 	return 0;
 }
 
@@ -213,22 +333,6 @@ int ER4Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	JOINED = -1;
 	TGameInfosForm::ErrMessage = "Impossible de créer la partie, il y a trop de parties sur ce serveur.";
-	return 0;
-}
-
-/** We received an information showed in the player's screen.
- *
- * Syntax: INFO message
- */
-int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	if(InGameForm)
-	{
-		me->LockScreen();
-		InGameForm->AddInfo(I_INFO, parv[1], 0);
-		me->UnlockScreen();
-	}
-
 	return 0;
 }
 
@@ -451,6 +555,36 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 }
 				 break;
 			case 'E': if(add) chan->SetState(EChannel::SCORING); break;
+			case 'd':
+				if(add && InGameForm)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET +d: sans infos"); break; }
+					std::string s = parv[j++];
+					std::string nick = stringtok(s, ":");
+					ECPlayer* pl = chan->GetPlayer(nick.c_str());
+					if(!pl)
+						Debug(W_DESYNCH|W_SEND, "SET +d '%s:%s': player introuvable", nick.c_str(), s.c_str());
+					else if(pl->IsMe())
+						InGameForm->AddInfo(I_INFO, sender->Nick() + " vous donne " + s + " $");
+					else
+						InGameForm->AddInfo(I_INFO, sender->Nick() + " donne " + s + " $ à " + pl->Nick());
+				}
+				break;
+			case 'e':
+				if(add && InGameForm)
+				{
+					if(j>=parv.size()) { Debug(W_DESYNCH|W_SEND, "SET +d: sans infos"); break; }
+					std::string s = parv[j++];
+					std::string nick = stringtok(s, ":");
+					ECPlayer* pl = chan->GetPlayer(nick.c_str());
+					if(!pl)
+						Debug(W_DESYNCH|W_SEND, "SET +d '%s:%s': player introuvable", nick.c_str(), s.c_str());
+					else if(pl->IsMe())
+						InGameForm->AddInfo(I_INFO, sender->Nick() + " vous donne un territoire");
+					else
+						InGameForm->AddInfo(I_INFO, sender->Nick() + " donne un territoire à " + pl->Nick());
+				}
+				break;
 			case 'v':
 				if(add)
 				{
@@ -527,6 +661,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							                                players[0]->GetNick());
 							else
 								InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
+						}
+						if(InGameForm && chan->State() == EChannel::PLAYING)
+						{ // Il n'est pas nécessaire de mettre à jour la preview en ANIMING, car c'est fait automatiquement à la fin du tour
+							me->LockScreen();
+							chan->Map()->CreatePreview(120,120, P_ENTITIES);
+							me->UnlockScreen();
 						}
 						break;
 					}
@@ -653,6 +793,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						InGameForm->AddInfo(I_SHIT, "*** VOUS AVEZ PERDU !!!");
 					else
 						InGameForm->AddInfo(I_SHIT, "*** " + std::string(sender->GetNick()) + " a perdu.");
+					me->LockScreen();
+					chan->Map()->CreatePreview(120,120, P_ENTITIES);
+					me->UnlockScreen();
 				}
 				if(sender)
 					sender->SetLost();
@@ -916,7 +1059,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			else
 			{ /* GameInfosForm->MyPosition et GameInfosForm->MyColor ne sont probablement pas encore défini ! */
-				if(pos > 0) 
+				if(pos > 0)
 					pos_badval.push_back(pos);
 				if(col > 0)
 					col_badval.push_back(col);
@@ -1003,7 +1146,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 /** Someone (or me) has leave the channel.
  *
- * Syntax: nick LEA 
+ * Syntax: nick LEA
  */
 int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -1236,7 +1379,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 				GameInfosForm->MapList->SetEnabled();
 			if(TGameInfosForm::ErrMessage.empty() == false)
 			{
-				TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+				TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
 				TGameInfosForm::ErrMessage.clear();
 			}
 			while( SDL_PollEvent( &event) )
@@ -1296,8 +1439,8 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 										}
 										else if(pll->Nick->Test(event.button.x, event.button.y))
 										{
-											TMessageBox mb(("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
-											               "Veuillez entrer la raison :").c_str(),
+											TMessageBox mb("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
+											               "Veuillez entrer la raison :",
 											               HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
 											std::string name;
 											if(mb.Show() == BT_OK)
@@ -1360,7 +1503,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			GameInfosForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() == EChannel::WAITING);
-	
+
 	}
 	catch(TECExcept &e)
 	{
@@ -1374,7 +1517,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		throw;
 	}
 	if(GameInfosForm && !GameInfosForm->Kicked.empty())
-		TMessageBox(GameInfosForm->Kicked.c_str(), BT_OK, GameInfosForm).Show();
+		TMessageBox(GameInfosForm->Kicked, BT_OK, GameInfosForm).Show();
 
 	if(!client || !client->Player())
 		MyFree(GameInfosForm);
@@ -1456,7 +1599,7 @@ void MenAreAntsApp::ListGames()
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
 						{
-							TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+							TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
 							TGameInfosForm::ErrMessage.clear();
 						}
 						refresh = true;
@@ -1468,7 +1611,7 @@ void MenAreAntsApp::ListGames()
 					{
 						if(!GameInfos(NULL, ListGameForm))
 						{
-							TMessageBox(TGameInfosForm::ErrMessage.c_str(), BT_OK, GameInfosForm).Show();
+							TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
 							TGameInfosForm::ErrMessage.clear();
 						}
 						refresh = true;

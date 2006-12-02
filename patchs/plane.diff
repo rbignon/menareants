@@ -1,0 +1,141 @@
+Index: src/Units.h
+===================================================================
+--- src/Units.h	(révision 846)
++++ src/Units.h	(copie de travail)
+@@ -206,6 +206,27 @@
+ 	virtual std::string SpecialInfo();
+ };
+ 
++#define PLANE_VISUAL_STEP 5
++class ECPlane : public ECUnit, public ECBPlane {
++	public:
++		ECPlane() {}
++	ENTITY_CONSTRUCTOR(ECPlane), ECUnit(BOAT_VISUAL_STEP)
++	{
++		PutImage(I_Up, Resources::Boat_Dos());
++		PutImage(I_Down, Resources::Boat_Face());
++		PutImage(I_Right, Resources::Boat_Right());
++		PutImage(I_Left, Resources::Boat_Left());
++		PutImage(I_Attaq, Resources::Brouillard());
++	}
++		
++		virtual const char *Name() const { return "Avion-cargot"; }
++		virtual const char *Infos() const { return "Avion de transport"; }
++		virtual const char *Description() const {
++			return "Cet avion permet transporter tout et n'importe quoi.";
++		}
++		virtual ECImage *Icon() const { return Resources::Boat_Icon(); }
++		virtual std::string SpecialInfo();
++};
+ 
+ /********************************************************************************************
+  *                                EChar                                                     *
+Index: server/Units.h
+===================================================================
+--- server/Units.h	(révision 846)
++++ server/Units.h	(copie de travail)
+@@ -90,6 +90,15 @@
+ 	ENTITY_CREATE_LAST(ECBoat);
+ };
+ 
++/*
++ * ECPlane
++ */
++class ECPlane : public EContainer, public ECBPlane {
++	public:
++		ENTITY_CONSTRUCTOR(ECPlane) {}
++		ENTITY_CREATE_LAST(ECPlane);
++};
++
+ /********************************************************************************************
+  *                               ECMissiLauncher                                            *
+  ********************************************************************************************/
+Index: lib/UnitsList.h
+===================================================================
+--- lib/UnitsList.h	(révision 846)
++++ lib/UnitsList.h	(copie de travail)
+@@ -30,4 +30,5 @@
+ U_DECL(ECMegalopole)
+ U_DECL(ECRail)
+ U_DECL(ECTrain)
++U_DECL(ECPlane)
+ U_END
+Index: lib/Units.h
+===================================================================
+--- lib/Units.h	(révision 846)
++++ lib/Units.h	(copie de travail)
+@@ -166,6 +166,41 @@
+ 	virtual bool IsNaval() const { return true; }
+ };
+ 
++/*
++ * ECBPlane
++ */
++
++class ECBPlane : public virtual ECBContainer {
++	public:
++		ENTITY_EMPTY_CONSTRUCTOR(ECBPlane) {}
++		ENTITY_CONSTRUCTOR(ECBPlane) {}
++
++		virtual e_type Type() const { return E_PLANE; }
++		virtual uint Cost() const { return 1000; }
++	        virtual uint InitNb() const { return 5; }
++		virtual uint Step() const { return 8; }
++		virtual uint Visibility() const { return 8; }
++		virtual bool CanWalkOn(ECBCase *c) const {  return true; }
++
++		virtual bool CanContain(const ECBEntity *et) {
++			if(Containing() || et->Nb() > 10*Nb() || et->IsInAir())
++				return false;
++			return true;
++		}
++
++		bool CanAttaq(const ECBEntity *e) {
++			if(Deployed())
++				return e->IsInAir();
++			return e->IsInfantry();
++		}
++		
++		bool CanCreate(const ECBEntity*) { return false; }
++		bool IsVehicle() const { return true; }
++		virtual bool IsInAir() { return Deployed(); }
++		virtual const char* Qual() const { return "l'avion"; }
++};
++
++
+ /********************************************************************************************
+  *                               ECBMissiLauncher                                           *
+  ********************************************************************************************/
+Index: lib/Map.h
+===================================================================
+--- lib/Map.h	(révision 846)
++++ lib/Map.h	(copie de travail)
+@@ -185,6 +185,7 @@
+ 		/*19*/E_MEGALOPOLE,
+ 		/*20*/E_RAIL,
+ 		/*21*/E_TRAIN,
++		/*22*/E_PLANE,
+ 		/*XX*/E_END
+ 	};
+ 
+@@ -240,6 +241,8 @@
+ 
+ 	virtual bool CanInvest(const ECBEntity* e) const { return (e->IsCountryMaker() && !Like(e)); }
+ 
++	virtual bool IsInAir() const { return false; }
++
+ 	/** Qualitatif */
+ 	virtual const char* Qual() const = 0;
+ 
+Index: lib/Batiments.h
+===================================================================
+--- lib/Batiments.h	(révision 846)
++++ lib/Batiments.h	(copie de travail)
+@@ -507,6 +507,7 @@
+ 			case ECBEntity::E_CHAR:
+ 			case ECBEntity::E_MISSILAUNCHER:
+ 			case ECBEntity::E_TRAIN:
++			case ECBEntity::E_PLANE:
+ 				return true;
+ 			default:
+ 				return false;

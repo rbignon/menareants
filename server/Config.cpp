@@ -22,15 +22,22 @@
 #include <fstream>
 #include <iostream>
 
+#include "lib/LibConfig.h"
 #include "Outils.h"
 #include "Config.h"
 #include "Debug.h"
 
 Config::Config(std::string _filename)
+	: filename(_filename), conf(0)
 {
-	filename = _filename;
 }
 
+Config::~Config()
+{
+	delete conf;
+}
+
+#if 0
 bool Config::set_defaults()
 {
 	servername = "Men.Are.Ants";
@@ -44,64 +51,63 @@ bool Config::set_defaults()
 	// ça empechera le login en admin. Et dans le cas d'un REHASH foiré, le pass admin restera.
 	return true;
 }
+#endif
+
+std::string Config::ServerName() const { return conf->GetSection("server")->GetItem("name")->String(); }
+uint Config::Port() const { return conf->GetSection("server")->GetItem("port")->Integer(); }
+uint Config::DefLimite() const { return conf->GetSection("games")->GetItem("deflimite")->Integer(); }
+uint Config::PingFreq() const { return conf->GetSection("server")->GetItem("fping")->Integer(); }
+uint Config::MaxGames() const { return conf->GetSection("games")->GetItem("maxgames")->Integer(); }
+uint Config::MaxConnexions() const { return conf->GetSection("server")->GetItem("maxcons")->Integer(); }
+std::string Config::AdminPass() const { return conf->GetSection("server")->GetItem("adminpass")->String(); }
 
 bool Config::load()
 {
-	std::ifstream fp(filename.c_str());
-
-	if(!fp)
-		return false;
-
-	set_defaults();
-
-	std::string ligne;
-
-	while(std::getline(fp, ligne))
+	MyConfig* save = conf;
+	conf = new MyConfig(filename);
+	try
 	{
-		if(ligne[0] == '#' || ligne.empty()) continue;
-		std::string key = stringtok(ligne, " ");
+		ConfigSection* section = conf->AddSection("server", "Declaration of server settings", false);
+		section->AddItem(new ConfigItem_string("name", "Name of the server"), true);
+		section->AddItem(new ConfigItem_int("port", "Port listened by server", 1, 65535));
+		section->AddItem(new ConfigItem_int("fping", "Ping frequence", 0));
+		section->AddItem(new ConfigItem_int("maxcons", "Maximum of connections", 0));
+		section->AddItem(new ConfigItem_string("motdfile", "File for motd"));
+		section->AddItem(new ConfigItem_string("adminpass", "Administrator password", " "));
 
-		if(key == "SERVERNAME") servername = ligne;
-		else if(key == "PORT")
-		{
-			port = StrToTyp<uint>(ligne);
-			if(port < 1 || port > 65535)
-			{
-				std::cerr << "Le port donné est invalide" << std::endl;
-				return false;
-			}
-		}
-		else if(key == "DEFLIMITE")
-		{
-			deflimite = StrToTyp<uint>(ligne);
-			if(deflimite < 2)
-			{
-				std::cerr << "La limite d'utilisateurs dans une partie doit être au moins à 2" << std::endl;
-				return false;
-			}
-		}
-		else if(key == "PINGFREQ") pingfreq = StrToTyp<uint>(ligne);
-		else if(key == "MAXCONNEXIONS") maxconnexions = StrToTyp<uint>(ligne);
-		else if(key == "MAXGAMES") maxgames = StrToTyp<uint>(ligne);
-		else if(key == "MOTDFILE")
-		{
-			std::ifstream fp(ligne.c_str());
+		section = conf->AddSection("games", "Rules of games", false);
+		section->AddItem(new ConfigItem_int("maxgames", "Maximum of games", 0));
+		section->AddItem(new ConfigItem_int("deflimite", "Maximum of users in a game", 2));
 
-			if(fp)
-			{
-				std::string line;
-
-				while(std::getline(fp, line))
-					motd.push_back(line);
-			}
-			else
-				Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", ligne.c_str());
+		if(!conf->Load())
+		{
+			delete conf;
+			conf = save;
+			return false;
 		}
-		else if(key == "ADMINPASS") adminpass = ligne;
+
+		std::string motdfile = conf->GetSection("server")->GetItem("motdfile")->String();
+		std::ifstream fp(motdfile.c_str());
+
+		if(fp)
+		{
+			std::string line;
+
+			while(std::getline(fp, line))
+				motd.push_back(line);
+		}
 		else
-			Debug(W_WARNING|W_ECHO, "Ligne incorrecte (variable %s inconnue):\n%s %s",
-			                        key.c_str(), key.c_str(), ligne.c_str());
-	}
+			Debug(W_WARNING|W_ECHO, "Le fichier de motd %s n'existe pas.", motdfile.c_str());
 
-	return true;
+		delete save;
+		return true;
+	}
+	catch(MyConfig::error &e)
+	{
+		std::cerr << "Received an exception when initialisation of configuration :" << std::endl;
+		std::cerr << " " << e.Reason() << std::endl;
+	}
+	delete conf;
+	conf = save;
+	return false;
 }

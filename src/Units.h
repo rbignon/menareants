@@ -111,12 +111,13 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Lance-missile"; }
+	virtual const char* Name() const { return "Lance-missiles"; }
+	virtual const char* Qual() const { return "le lance-missiles"; }
 	virtual const char* Infos() const
 		{ return "Véhicule lanceur de missiles à portée de 8 cases une fois déployé."; }
 	virtual const char* Description() const
 	{
-		return "Le lance missile est une activité avec très peu de défense mais très efficace avec ses tirs à distance.\n"
+		return "Le lance missiles est une activité avec très peu de défense mais très efficace avec ses tirs à distance.\n"
 		       "Il est très efficace contre les batiments, moyennement contre les vehicules et peu efficace contre "
 		       "l'infanterie.";
 	}
@@ -162,6 +163,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Train"; }
+	virtual const char* Qual() const { return "le train"; }
 	virtual const char* Infos() const { return "Transporteur de troupes et de vehicules terrestre"; }
 	virtual const char* Description() const
 	{
@@ -196,6 +198,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Bateau"; }
+	virtual const char* Qual() const { return "le bateau"; }
 	virtual const char* Infos() const { return "Bateau de transport"; }
 	virtual const char* Description() const
 	{
@@ -206,6 +209,38 @@ public:
 	virtual std::string SpecialInfo();
 };
 
+/********************************************************************************************
+ *                                ECPlane                                                   *
+ ********************************************************************************************/
+#define PLANE_VISUAL_STEP 5
+class ECPlane : public ECUnit, public ECBPlane
+{
+/* Constructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECPlane) {}
+
+	ENTITY_CONSTRUCTOR(ECPlane), ECUnit(PLANE_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::Plane_Dos());
+		PutImage(I_Down, Resources::Plane_Face());
+		PutImage(I_Right, Resources::Plane_Right());
+		PutImage(I_Left, Resources::Plane_Left());
+		PutImage(I_Attaq, Resources::Brouillard());
+		PutImage(I_Deployed, Resources::Plane_Deployed());
+		PutImage(I_Reployed, Resources::Plane_Reployed());
+		SetImage(GetSprite(I_Deployed));
+	}
+
+public:
+	virtual const char *Name() const { return "Avion-cargot"; }
+	virtual const char* Qual() const { return "l'avion-cargot"; }
+	virtual const char *Infos() const { return "Avion de transport"; }
+	virtual const char *Description() const { return "Cet avion permet transporter tout et n'importe quoi."; }
+	virtual ECImage *Icon() const { return Resources::Plane_Icon(); }
+	virtual std::string SpecialInfo();
+	virtual std::string DeployButton() { return Deployed() ? "Décoller" : "Atterir"; }
+};
 
 /********************************************************************************************
  *                                EChar                                                     *
@@ -231,6 +266,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Char"; }
+	virtual const char* Qual() const { return "le char"; }
 	virtual const char* Infos() const { return "Char d'assaut"; }
 	virtual const char* Description() const
 	{
@@ -238,6 +274,38 @@ public:
 		       "pour la même puissance. Cependant il ne peut traverser les ponts.";
 	}
 	virtual ECImage* Icon() const { return Resources::Char_Icon(); }
+};
+
+/********************************************************************************************
+ *                                ECJouano                                                  *
+ ********************************************************************************************/
+#define JOUANO_VISUAL_STEP 2
+class ECJouano : public ECUnit, public ECBJouano
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECJouano) {}
+
+	ENTITY_CONSTRUCTOR(ECJouano), ECUnit(JOUANO_VISUAL_STEP)
+	{
+		PutImage(I_Up, Resources::Jouano_Face());
+		PutImage(I_Down, Resources::Jouano_Face());
+		PutImage(I_Right, Resources::Jouano_Face());
+		PutImage(I_Left, Resources::Jouano_Face());
+	}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return "Jouano"; }
+	virtual const char* Qual() const { return "le Jouano"; }
+	virtual const char* Infos() const { return "Mal habillé et gros ventre, il peut détruire un Mc Gerbale installé dans votre caserne."; }
+	virtual const char* Description() const
+	{
+		return "Envoyez votre gros Jouano sur une de vos casernes investies d'un Mc Gerbale, il mangera tout et fera exploser celui-ci.";
+	}
+	virtual ECImage* Icon() const { return Resources::Jouano_Icon(); }
 };
 
 /********************************************************************************************
@@ -249,9 +317,9 @@ class ECMcDo : public ECUnit, public ECBMcDo
 /* Constructeur/Destructeur */
 public:
 
-	ENTITY_EMPTY_CONSTRUCTOR(ECMcDo) : invested(ECEntity::E_NONE) {}
+	ENTITY_EMPTY_CONSTRUCTOR(ECMcDo) : invested(ECEntity::E_NONE), ex_owner(0) {}
 
-	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(MCDO_VISUAL_STEP), invested(ECEntity::E_NONE)
+	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(MCDO_VISUAL_STEP), invested(ECEntity::E_NONE), ex_owner(0)
 	{
 		PutImage(I_Up, Resources::McDo_Dos());
 		PutImage(I_Down, Resources::McDo_Face());
@@ -260,6 +328,8 @@ public:
 		PutImage(I_Deployed, Resources::McDo_Caserne());
 	}
 
+	virtual ~ECMcDo();
+
 /* Infos */
 public:
 
@@ -267,6 +337,7 @@ public:
 	{
 		return Deployed() ? "Caserne + McGerbale" : "Donald de McGerbale";
 	}
+	virtual const char* Qual() const { return Deployed() ? "la caserne+mcgerbale" : "le donald de McGerbale"; }
 	virtual const char* Infos() const
 	{
 		return Deployed() ? "" : "Emmenez-le sur une caserne pour qu'il y installe un McGerbale.";
@@ -286,7 +357,7 @@ public:
 	}
 	virtual ECImage* Icon() const { return Deployed() ? Resources::Caserne_Icon() : Resources::McDo_Icon(); }
 
-	virtual ECSpriteBase* DeadCase() const { return Deployed() ? Resources::CaseCitySODead() : 0; }
+	//virtual ECSpriteBase* DeadCase() const { return Deployed() ? Resources::CaseCitySODead() : 0; }
 
 /* Methodes */
 public:
@@ -298,7 +369,7 @@ public:
 /* Variables privées */
 public:
 	ECEntity::e_type invested;
-	std::string ex_owner;
+	ECPlayer* ex_owner;
 };
 
 /********************************************************************************************
@@ -324,6 +395,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Touriste japonais"; }
+	virtual const char* Qual() const { return "le touriste japonais"; }
 	virtual const char* Infos() const { return "Il a un champs de vision élevé, et le terrain où il passe reste visible "
 	                                           "en permanence."; }
 	virtual const char* Description() const
@@ -362,6 +434,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Ingénieur"; }
+	virtual const char* Qual() const { return "l'ingénieur"; }
 	virtual const char* Infos() const { return "Il peut capturer les batiments enemies ou réparer les votres."; }
 	virtual const char* Description() const
 	{
@@ -395,6 +468,7 @@ public:
 public:
 
 	virtual const char* Name() const { return "Armée"; }
+	virtual const char* Qual() const { return "l'armée"; }
 	virtual const char* Infos() const { return "Armée de base"; }
 	virtual const char* Description() const
 	{

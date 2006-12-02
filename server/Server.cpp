@@ -64,7 +64,9 @@ const char* msgTab[] = {
      "LSP %s %c %d %d %s",                  /* LSP - Liste les parties */
      "EOL",                                 /* EOL - Fin de la liste */
      ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
-     "INFO %s",                             /* INFO - Envoie des messages à afficher dans le jeu des joueurs */
+     "INFO %d %s",                          /* INFO - Envoie des messages à afficher dans le jeu des joueurs.
+                                             *        Contient l'ID ainsi que les arguments, pour que le client puisse traiter
+                                             */
      ":%s BP %c%d,%d %s",                   /* BP - Envoie des infos aux alliés sur un breakpoint de stratégie */
 
      "LSM %s %d %d %s",                     /* LSM - Liste les maps disponibles (nom, min, max, info) */
@@ -91,11 +93,11 @@ int TRealClient::exit(const char *pattern, ...)
 {
 	static char buf[MAXBUFFER + 1];
 	va_list vl;
-	int len;
+	size_t len;
 
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len < 0) len = sizeof buf -2;
+	if(len > sizeof buf - 2) len = sizeof buf -2;
 
 	buf[len] = 0;
 	va_end(vl);
@@ -126,11 +128,11 @@ int TClient::sendrpl(const char *pattern, ...)
 {
 	static char buf[MAXBUFFER + 1];
 	va_list vl;
-	int len;
+	size_t len;
 
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len < 0) len = sizeof buf -2;
+	if(len > sizeof buf - 2) len = sizeof buf -2;
 
 	buf[len] = 0;
 	va_end(vl);
@@ -417,12 +419,12 @@ int ECServer::run_server(void)
 				}
 				else
 				{
-					TRealClient *cl = dynamic_cast<TRealClient*>(myClients[i]);
-					
-					if(!cl)
-                        Debug(W_WARNING, "Reading data from sock #%d, not registered ?", i);
-                    else
-                        cl->parse_this();
+					RealClientList::iterator cl = myClients.find(i);
+
+					if(cl == myClients.end())
+						Debug(W_WARNING, "Reading data from sock #%d, not registered ?", i);
+					else
+						dynamic_cast<TRealClient*>(cl->second)->parse_this();
 				}
 			}
 		}

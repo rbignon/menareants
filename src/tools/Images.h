@@ -171,8 +171,9 @@ class ECImage
 /* Constructeur/Deconstructeur */
 public:
 	ECImage(SDL_Surface* _Img) : Img(_Img), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
+	ECImage(const ECImage&);
 	ECImage(char* fichier, bool alpha = false);
-	ECImage() : Img(NULL), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
+	ECImage() : Img(0), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 
 	~ECImage();
 

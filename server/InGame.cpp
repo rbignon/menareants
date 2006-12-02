@@ -247,6 +247,14 @@ void EChannel::NextAnim()
 			else
 				SendArm(0, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
 				                                                                           event->Case()->Y());
+
+			// false veut dire qu'on est dans un evenement, au moment où la création est propagée
+			/* Note: comme je viens de relire ce commentaire sans le comprendre du premier coup, je
+			 * me permet de rajouter que la fonction ECEntity::Create() est appellée quand l'unité est créée,
+			 * et qu'en l'occurence on met "false" pour spécifier qu'on est dans l'evenement qui
+			 * propage la création de l'unité.
+			 */
+			event->Entity()->Created(false);
 			break;
 		case ARM_CONTAIN:
 		case ARM_UNCONTAIN:
@@ -836,7 +844,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							if(entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
 								next_entity = e;
 						}
-	
+
 						if(can_attaq)
 						{
 							if(!attaq_event)
@@ -872,6 +880,9 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		recvers.push_back(cl);
 		chan->SendArm(recvers, entity, flags, x, y, 0, events_sended);
+
+		if(flags == ARM_CREATE)
+			entity->Created(true); // true veut dire que ça a été créé tout de suite
 
 	}
 #ifdef DEBUG
@@ -917,9 +928,6 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(!cl->Player() || cl->Player()->Channel()->State() != EChannel::PLAYING)
 		return vDebug(W_DESYNCH, "BP: Le joueur n'est pas dans une partie, ou alors la partie n'est pas +P(laying)",
 		              VPName(cl->Player()));
-
-	if(cl->Player()->Ready())
-		return Debug(W_DESYNCH, "BP: Le joueur essaye de BP alors qu'il est pret !");
 
 	EChannel* chan = cl->Player()->Channel();
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());

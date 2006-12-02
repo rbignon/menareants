@@ -95,6 +95,12 @@ public:
 	/** Use this function when an entity have played. */
 	virtual void Played();
 
+	/** This unit was created.
+	 * It is call when a client creates it in PLAYING (with for_me = true)
+	 * and when it is propagate to other players in ANIMING (with for_me = false)
+	 */
+	virtual void Created(bool for_me) {}
+
 	/** Shoot an entity */
 	void Shoot(ECEntity*, uint);
 	void Shooted(uint n) { shooted += n; }

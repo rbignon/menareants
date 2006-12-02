@@ -29,6 +29,19 @@
  *                               EPlayer                                                    *
  ********************************************************************************************/
 
+const struct nations_str_t nations_str[] = {
+	/* N_NONE     */   { "Aléatoire",  "Votre nation sera choisie aléatoirement." },
+	/* N_NOISY    */   { "Noisy",      "La contrée de Noisy et ses cavernes." },
+	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis investissent le monde avec des McDonalds." },
+	/* N_FRANCE   */   { "France",     "La france de Dominique de Villepin." },
+	/* N_URSS     */   { "URSS",       "L'URSS et ses goulags..." },
+	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda et ses boïngs détournés." },
+	/* N_ESPAGNE  */   { "Espagne",    "La prof d'espagnol qui impose des règles débiles et nous emmerde." },
+	/* N_JAPON    */   { "Japon",      "Les touristes japonais et l'avantage de la photographie." },
+	/* N_COLOMBIE */   { "Colombie",   "La Colombie productrive de cocaïne." },
+	/* N_MAX      */   { "",           "" }
+};
+
 ECPlayer::ECPlayer(std::string _nick, EChannel *_chan, bool _owner, bool _op, bool _isme, bool _is_ia)
 	: ECBPlayer(_nick, _chan, _owner, _op), isme(_isme), is_ia(_is_ia), votes(0)
 {
@@ -75,6 +88,6 @@ ECPlayer *EChannel::GetPlayer(const char* nick)
 {
 	BPlayerVector::iterator it;
 	for(it=players.begin(); it != players.end() && strcasecmp((*it)->GetNick(),nick); ++it);
-	
+
 	return (it == players.end() ? 0 : (dynamic_cast<ECPlayer*>(*it)));
 }

@@ -67,7 +67,7 @@ int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
 	{
 		pl->Client()->sendrpl(app.rpl(ECServer::KICK), cl->GetNick(), pl->GetNick(),
 		                                               parv.size() > 2 ? FormatStr(parv[2]).c_str() : "");
-	
+
 		pl->Client()->ClrPlayer();
 	}
 
@@ -164,6 +164,76 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case 'd':
+			{
+				if(!add)
+				{
+					Debug(W_DESYNCH, "SET -d: interdit.");
+					break;
+				}
+				if(sender->Channel()->State() != EChannel::PLAYING)
+				{
+					Debug(W_DESYNCH, "SET +d: channel non +P");
+					break;
+				}
+				std::string s = parv[j++];
+				if(s.find(':') == std::string::npos)
+				{
+					Debug(W_DESYNCH, "SET +d '%s': chaine invalide", s.c_str());
+					break;
+				}
+				std::string nick = stringtok(s, ":");
+				ECPlayer* pl = sender->Channel()->GetPlayer(nick.c_str());
+				if(!pl)
+				{
+					Debug(W_DESYNCH, "SET +d '%s:%s': player introuvable", nick.c_str(), s.c_str());
+					break;
+				}
+				int value = StrToTyp<int>(s);
+				if(value <= 0)
+					break;
+				if(sender->Money() < value)
+					value = sender->Money();
+				sender->DownMoney(value);
+				pl->UpMoney(value);
+				changed = YES_WITHPARAM;
+				break;
+			}
+			case 'e':
+			{
+				if(!add)
+				{
+					Debug(W_DESYNCH, "SET -e: interdit.");
+					break;
+				}
+				if(sender->Channel()->State() != EChannel::PLAYING)
+				{
+					Debug(W_DESYNCH, "SET +e: channel non +P");
+					break;
+				}
+				std::string s = parv[j++];
+				if(s.find(':') == std::string::npos)
+				{
+					Debug(W_DESYNCH, "SET +e '%s': chaine invalide", s.c_str());
+					break;
+				}
+				std::string nick = stringtok(s, ":");
+				ECPlayer* pl = sender->Channel()->GetPlayer(nick.c_str());
+				if(!pl)
+				{
+					Debug(W_DESYNCH, "SET +e '%s:%s': player introuvable", nick.c_str(), s.c_str());
+					break;
+				}
+				ECBCountry* country = sender->MapPlayer()->FindCountry(s.c_str());
+				if(!country)
+				{
+					Debug(W_DESYNCH, "SET +e '%s:%s': country introuvable pour %s", nick.c_str(), s.c_str(), sender->GetNick());
+					break;
+				}
+				country->ChangeOwner(pl->MapPlayer());
+				changed = YES_WITHPARAM;
+				break;
+			}
 			case 'v':
 			{
 				if(!add)
@@ -703,17 +773,34 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(chan->IsPinging())
 	{
-		/* On avertit le joueur de tous les autres +w (disconnected) */
+		/* On avertit le joueur de tous les autres +w (disconnected), ainsi que de ceux
+		 * qui sont alliés avec vous. */
 		BPlayerVector players = chan->Players();
 		for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
+		{
 			if((*it)->CanRejoin())
 				cl->sendrpl(app.rpl(ECServer::SET), (*it)->GetNick(), "+w");
+			if((*it)->IsAllie(pl))
+				cl->sendrpl(app.rpl(ECServer::SET), (*it)->GetNick(), ("+a " + pl->Nick()).c_str());
+		}
+		/* Et ceux avec qui vous etes alliés */
+		players = pl->Allies();
+		for(BPlayerVector::const_iterator it = players.begin(); it != players.end(); ++it)
+			cl->sendrpl(app.rpl(ECServer::SET), pl->GetNick(), ("+a " + (*it)->Nick()).c_str());
 
 		/* On se met en mode +S pour que le joueur se synch */
 		cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), "-Q+S");
 
-		/* On envoie les entitées et l'argent */
+		/* On envoie les entitées */
 		chan->SendEntities(pl);
+
+		/* On envoie les propriétés */
+		std::vector<ECBCountry*> cntys = chan->Map()->Countries();
+		FORit(ECBCountry*, cntys, cnty)
+			if((*cnty)->Owner() && (*cnty)->Owner()->Player())
+				cl->sendrpl(app.rpl(ECServer::SET), (*cnty)->Owner()->Player()->GetNick(), (std::string("+@") + (*cnty)->ID()).c_str());
+
+		/* Et l'argent */
 		cl->sendrpl(app.rpl(ECServer::SET), cl->GetNick(), std::string("+$ " + TypToStr(pl->Money())).c_str());
 
 		/* On repasse en mode +Q dans le cas où y a encore pinging.
@@ -1128,7 +1215,7 @@ void EChannel::CheckReadys()
 							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
 							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
 							 */
-							if(!(*enti)->IsHidden() && ((*enti)->IsBuilding() && !(*enti)->IsNaval() || !FastGame()))
+							if(!(*enti)->IsHidden() && !(*enti)->IsTerrain() && ((*enti)->IsBuilding() && !(*enti)->IsNaval() || !FastGame()))
 								nb_units++;
 						}
 						if(!nb_units)
@@ -1494,7 +1581,7 @@ void EChannel::SetMap(ECBMap *m)
 void EChannel::SetLimite(unsigned int l)
 {
 	ECBChannel::SetLimite(l);
-	
+
 	PlayerVector plv;
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 		if((*it)->Position() > Limite())
@@ -1563,7 +1650,7 @@ void EChannel::send_modes(PlayerVector senders, const char* msg)
 	if(senders.empty()) return;
 
 	std::string snds;
-	
+
 	for(PlayerVector::const_iterator it = senders.begin(); it != senders.end(); ++it)
 	{
 		if(!snds.empty())
@@ -1578,11 +1665,11 @@ int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
 {
 	static char buf[MAXBUFFER + 1];
 	va_list vl;
-	int len;
+	size_t len;
 
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len < 0) len = sizeof buf -2;
+	if(len > sizeof buf - 2) len = sizeof buf -2;
 
 	buf[len] = 0;
 	va_end(vl);
@@ -1708,9 +1795,15 @@ std::string EChannel::ModesStr() const
 	return (modes + params);
 }
 
-void EChannel::operator<< (std::string os)
+void EChannel::send_info (ECPlayer* pl, info_messages id, std::string args)
 {
-	sendto_players(0, app.rpl(ECServer::INFO), FormatStr(os).c_str());
+	if(pl)
+	{
+		assert(pl->Client());
+		pl->Client()->sendrpl(app.rpl(ECServer::INFO), id, args.c_str());
+	}
+	else
+		sendto_players(0, app.rpl(ECServer::INFO), id, args.c_str());
 }
 
 void EChannel::SendEntities(ECPlayer* pl)
@@ -1724,7 +1817,7 @@ void EChannel::SendEntities(ECPlayer* pl)
 	clients.push_back(pl->Client());
 
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		SendArm(clients, dynamic_cast<ECEntity*>(*enti), ARM_CREATE|ARM_HIDE, (*enti)->Case()->X(), (*enti)->Case()->Y());
+		SendArm(clients, dynamic_cast<ECEntity*>(*enti), ARM_CREATE, (*enti)->Case()->X(), (*enti)->Case()->Y());
 }
 
 bool EChannel::CheckPinging()

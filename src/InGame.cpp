@@ -334,11 +334,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			bool ok = false;
 			Timer timer;
-			/* Le soucis est que si jamais une des fonctions, pour une raison X ou Y, renvoie true en permanence,
+			/* Le soucis est que si jamais une des fonctions, pour une raison X ou Y, renvoie false en permanence,
 			 * ça fait une boucle infinie. Ça serait con de couper une partie juste à cause de ça, donc au bout
 			 * de 10 secondes de boucle, on se barre.
 			 */
-			while(!ok && timer.time_elapsed() < 10)
+			while(!ok && timer.time_elapsed(true) < 10)
 			{
 				ok = true;
 				for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
@@ -560,7 +560,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 	}
 	if(entity && entity->Owner() && entity->Owner()->IsMe())
 	{
-		if(IsPressed(SDLK_SPACE))
+		if(IsPressed(SDLK_SPACE) && dynamic_cast<EContainer*>(entity) && dynamic_cast<EContainer*>(entity)->Containing())
 			return W_EXTRACT;
 
 		if(entity->Move()->Size() < entity->MyStep() &&
@@ -569,34 +569,12 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 		   (!entity->Deployed() ^ !!(entity->EventType() & ARM_DEPLOY)) && // '!!' pour que le ^ ait deux bools
 		   acase != entity->Case() && acase != entity->Move()->Dest())
 		{
-			/* = -1 : on ne peut investir en cas de présence d'une unité enemie. N'arrive pas si c'est sur un conteneur
-			 * =  0 : n'a trouvé aucune unité à investir ou me contenant, ni aucune unité enemie
-			 * =  1 : peut investir
-			 * =  2 : peut me contenir
-			 */
-			int can_invest = 0;
+			bool move, invest;
+			entity->CanWalkTo(acase, move, invest);
 
-			FOR(ECBEntity*, ents, enti)
-			{
-				EContainer* container = 0;
-				if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(entity) && entity->Owner() &&
-				    entity->Owner()->IsMe())
-					can_invest = 2;
-				if(can_invest >= 0 && entity->CanInvest(enti))
-					can_invest = 1;
-				if(!enti->Like(entity) && enti->CanAttaq(entity) && can_invest != 2)
-				{
-					/* chercher l'interet de ce truc là.
-					 * -> Je suppose que c'est pour dire que dans le cas où y a une unité enemie, on ne parle pas
-					 *    d'entrer dans le batiment mais de se battre, donc on montre pas encore la fleche quoi
-					 */
-					can_invest = -1;
-				}
-			}
-	
-			if(can_invest > 0)
+			if(invest)
 				return W_INVEST;
-			else if(entity->CanWalkOn(acase))
+			else if(move)
 				return W_MOVE;
 		}
 	}
@@ -858,6 +836,27 @@ void MenAreAntsApp::InGame()
 							InGameForm->Map->ToggleSchema();
 						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y))
 							InGameForm->WantBalise = !InGameForm->WantBalise;
+						if(InGameForm->BarreLat->IdleFindButton->Test(event.button.x, event.button.y))
+						{
+							static int i = 0;
+							std::vector<ECBEntity*> ents = client->Player()->Entities()->List(), idle_ents;
+							FORit(ECBEntity*, ents, enti)
+								if((*enti)->EventType() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
+									idle_ents.push_back(*enti);
+
+							if(idle_ents.empty())
+							{
+								TMessageBox mb("Il n'y a plus aucune de vos unité qui soit inactive", BT_OK, InGameForm, false);
+								mb.Show();
+								InGameForm->Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
+							}
+							else
+							{
+								ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[++i % idle_ents.size()]);
+								InGameForm->Map->CenterTo(e);
+								InGameForm->BarreAct->SetEntity(e);
+							}
+						}
 						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
 						{
 							Options(chan);
@@ -902,22 +901,29 @@ void MenAreAntsApp::InGame()
 							break;
 						}
 
-						if(InGameForm->BarreAct->Entity() && (InGameForm->IsPressed(SDLK_PLUS) ||
-						   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y)))
-						{
-							client->sendrpl(client->rpl(EC_Client::ARM),
-							                 std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
-							                 " +").c_str());
-							break;
-						}
-						if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y))
-						{
-							InGameForm->BarreAct->ShowInfos();
-							break;
-						}
-
 						if(InGameForm->BarreAct->Entity())
 						{
+							if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y))
+							{
+								InGameForm->BarreAct->ShowInfos();
+								break;
+							}
+							if(InGameForm->BarreAct->GiveButton->Test(event.button.x, event.button.y))
+							{
+								TMessageBox mb("Entrez le pseudo du joueur à qui vous souhaitez donner ce territoire",
+								               BT_OK|HAVE_EDIT|BT_CANCEL, InGameForm);
+								mb.Edit()->SetAvailChars(NICK_CHARS "&"); // On rajoute le caractère spécifique aux IA
+								if(mb.Show() == BT_OK)
+								{
+									if(!chan->GetPlayer(mb.EditText().c_str()))
+										TMessageBox("Le joueur est introuvable", BT_OK, InGameForm, false).Show();
+									else
+										client->sendrpl(client->rpl(EC_Client::SET),
+										                ("+e " + mb.EditText() + ":" + InGameForm->BarreAct->Entity()->Case()->Country()->ID()).c_str());
+								}
+								InGameForm->Map->SetMustRedraw();
+								break;
+							}
 							if(InGameForm->IsPressed(SDLK_PLUS) ||
 							   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y))
 							{
@@ -1148,7 +1154,7 @@ void TInGameForm::ShowBarreAct(bool show)
 	           (e && (e->Image()->Y() + e->Image()->GetHeight()) >= (SCREEN_HEIGHT - BarreAct->Height())) ?
 	               Map->Y() - e->Image()->GetHeight()
 	             : Map->Y());
-		
+
 	//Map->SetXY(Map->X(), Map->Y());
 }
 
@@ -1585,6 +1591,13 @@ void TBarreAct::vSetEntity(void* _e)
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
 			InGameForm->BarreAct->ShowIcons(e, e->Owner());
+			if(e->IsCountryMaker())
+			{
+				InGameForm->BarreAct->GiveButton->Show();
+				InGameForm->BarreAct->GiveButton->SetX((x -= InGameForm->BarreAct->GiveButton->Width()));
+			}
+			else
+				InGameForm->BarreAct->GiveButton->Hide();
 			/* On subterfuge avec ces fonctions WantDeploy, AddUnits et WantAttaq qui, dans le client,
 			 * ne font que renvoyer true ou false. Mais comme elles sont virtuelles et
 			 * surchargées sur le serveur, on se tape les arguments.
@@ -1618,7 +1631,7 @@ void TBarreAct::vSetEntity(void* _e)
 				InGameForm->BarreAct->DeployButton->Show();
 				InGameForm->BarreAct->DeployButton->SetX((x -= InGameForm->BarreAct->DeployButton->Width()));
 				InGameForm->BarreAct->DeployButton->SetEnabled(!(e->EventType() & ARM_DEPLOY));
-				InGameForm->BarreAct->DeployButton->SetText(e->Deployed() ? "Replier" : "Déployer");
+				InGameForm->BarreAct->DeployButton->SetText(e->DeployButton());
 			}
 			else
 				InGameForm->BarreAct->DeployButton->Hide();
@@ -1652,7 +1665,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->ChildNb->Hide();
 			InGameForm->BarreAct->ExtractButton->Hide();
 		}
-		
+
 		if(e->Owner())
 		{
 			InGameForm->BarreAct->Owner->Show();
@@ -1678,24 +1691,26 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->ShowBarreAct(true);
 		}
 		InGameForm->BarreAct->entity = e;
+		InGameForm->Map->SetSelectedEntity(e);
 	}
 	else
 	{
 		InGameForm->BarreAct->select = false;
 		if(InGameForm->BarreAct->entity)
 			InGameForm->BarreAct->entity->Select(false);
+		InGameForm->Map->SetSelectedEntity(0);
 		if(InGameForm->BarreAct->entity)
 		{
 			InGameForm->ShowBarreAct(false);
+			InGameForm->BarreAct->entity = 0;
 			while(InGameForm->BarreAct->Y() < int(SCREEN_HEIGHT))
 			{
 				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+4), SDL_Delay(10);
 				InGameForm->Map->ToRedraw(InGameForm->BarreAct);
 			}
 			InGameForm->BarreAct->Hide();
-			
+
 		}
-		InGameForm->BarreAct->entity = 0;
 	}
 }
 
@@ -1725,6 +1740,9 @@ void TBarreAct::Init()
 	HelpButton = AddComponent(new TButtonText(500,15,100,30, "Plus d'infos", Font::GetInstance(Font::Small)));
 	HelpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	HelpButton->SetHint("Affiche toutes les caractéristiques de l'unité.");
+	GiveButton = AddComponent(new TButtonText(500,15,100,30, "Don. Territoire", Font::GetInstance(Font::Small)));
+	GiveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	GiveButton->SetHint("Donner ce territoire à un autre joueur.");
 
 	Owner = AddComponent(new TLabel(60,40, "", black_color, Font::GetInstance(Font::Normal)));
 
@@ -1765,7 +1783,7 @@ void TBarreLat::SelectUnit(TObject* o, void* e)
 	TInGameForm* ingame = static_cast<TInGameForm*>(o->Parent()->Parent()->Parent());
 	if(!ingame || ingame->Player()->Ready())
 		return;
-		 
+
 	if(int(static_cast<ECEntity*>(e)->Cost()) > ingame->Player()->Money())
 	{
 		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer ce batiment");
@@ -1828,7 +1846,11 @@ void TBarreLat::Init()
 	BaliseButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	BaliseButton->SetHint("Poser une balise visible pour ses alliés\nRaccourci: B + clic");
 	BaliseButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
-	QuitButton = AddComponent(new TButtonText(30,340,100,30, "Quitter", Font::GetInstance(Font::Small)));
+	IdleFindButton = AddComponent(new TButtonText(30,340,100,30, "Find idling", Font::GetInstance(Font::Small)));
+	IdleFindButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	IdleFindButton->SetHint("Random find an unit who idles.");
+	IdleFindButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
+	QuitButton = AddComponent(new TButtonText(30,370,100,30, "Quitter", Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	QuitButton->SetHint("Quitter la partie");
 	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
@@ -1858,7 +1880,7 @@ void TBarreLat::Init()
 	ScreenPos->SetImage(new ECImage(surf));
 	ScreenPos->SetEnabled(false);
 
-	Icons = AddComponent(new TBarreLatIcons(0, 390));
+	Icons = AddComponent(new TBarreLatIcons(0, 420));
 	Icons->SetMaxHeight(UnitsInfos->Y() - Icons->Y());
 	Icons->SetList(EntityList.Buildings(player), TBarreLat::SelectUnit);
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
@@ -1900,14 +1922,37 @@ void MenAreAntsApp::Options(EChannel* chan)
 						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 						{
 							TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
-							if(pll && pll->AllieZone(event.button.x, event.button.y) && !pll->Player()->IsMe())
+							if(pll)
 							{
-								if(client->Player()->IsAllie(pll->Player()))
-									client->sendrpl(client->rpl(EC_Client::SET),
-												("-a " + std::string(pll->Player()->GetNick())).c_str());
-								else
-									client->sendrpl(client->rpl(EC_Client::SET),
-												("+a " + std::string(pll->Player()->GetNick())).c_str());
+								if(pll->AllieZone(event.button.x, event.button.y) && !pll->Player()->IsMe())
+								{
+									if(client->Player()->IsAllie(pll->Player()))
+										client->sendrpl(client->rpl(EC_Client::SET),
+													("-a " + std::string(pll->Player()->GetNick())).c_str());
+									else
+										client->sendrpl(client->rpl(EC_Client::SET),
+													("+a " + std::string(pll->Player()->GetNick())).c_str());
+								}
+								else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(event.button.x, event.button.y))
+								{
+									TMessageBox m("Combien voulez-vous donner à " + pll->Player()->Nick() + " ?", BT_OK|HAVE_EDIT|BT_CANCEL, OptionsForm);
+									m.Edit()->SetAvailChars("0123456789");
+									if(m.Show() == BT_OK)
+									{
+										int v = StrToTyp<int>(m.EditText());
+										if(v <= 0)
+											TMessageBox("La valeur rentrée est incorrect.", BT_OK, OptionsForm).Show();
+										else if(v > client->Player()->Money())
+											TMessageBox("Vous ne possédez pas autant d'argent !", BT_OK, OptionsForm).Show();
+										else
+										{
+											client->sendrpl(client->rpl(EC_Client::SET),
+											                 ("+d " + std::string(pll->Player()->Nick() + ":" + m.EditText())).c_str());
+											TMessageBox("Vous avez bien donné " + m.EditText() + " $ à " + pll->Player()->Nick(),
+											             BT_OK, OptionsForm).Show();
+										}
+									}
+								}
 							}
 						}
 						break;
@@ -1919,7 +1964,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 			OptionsForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        client->Player()->Channel()->State() == EChannel::PLAYING);
-	
+
 	}
 	catch(TECExcept &e)
 	{
@@ -1938,7 +1983,7 @@ TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TOptionsPlayerLine(_me, dynamic_cast<ECPlayer*>(*it)));
 
-	OkButton = AddComponent(new TButtonText(550,350,150,50, "OK", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, Window()->GetHeight() - 100,150,50, "OK", Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }
@@ -1950,7 +1995,7 @@ TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
 TOptionsPlayerLine::TOptionsPlayerLine(ECPlayer* _me, ECPlayer *_pl)
 	: pl(_pl), me(_me)
 {
-	h = 20;
+	h = 30;
 }
 
 TOptionsPlayerLine::~TOptionsPlayerLine()
@@ -1958,6 +2003,7 @@ TOptionsPlayerLine::~TOptionsPlayerLine()
 	delete label;
 	delete allie;
 	delete recipr;
+	delete GiveMoneyButton;
 }
 
 bool TOptionsPlayerLine::AllieZone(int _x, int _y)
@@ -1982,6 +2028,16 @@ void TOptionsPlayerLine::Init()
 
 	recipr = new TLabel(x+10, y, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Normal));
 
+	if(pl->IsMe() == false)
+	{
+		GiveMoneyButton = new TButtonText(x+350, y, 100,30, "Don. argent", Font::GetInstance(Font::Small));
+		GiveMoneyButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+		GiveMoneyButton->SetHint("Donner de l'argent à ce joueur.");
+		MyComponent(GiveMoneyButton);
+	}
+	else
+		GiveMoneyButton = 0;
+
 	MyComponent(allie);
 	MyComponent(recipr);
 }
@@ -1991,6 +2047,8 @@ void TOptionsPlayerLine::Draw(int souris_x, int souris_y)
 	label->Draw(souris_x, souris_y);
 	allie->Draw(souris_x, souris_y);
 	recipr->Draw(souris_x, souris_y);
+	if(GiveMoneyButton)
+		GiveMoneyButton->Draw(souris_x, souris_y);
 }
 
 /********************************************************************************************
@@ -2035,7 +2093,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 			LoadingForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        chan->State() == EChannel::SENDING);
-	
+
 	}
 	catch(TECExcept &e)
 	{
@@ -2182,7 +2240,7 @@ void MenAreAntsApp::PingingGame()
 			PingingForm->Update();
 		} while(!eob && client->IsConnected() && client->Player() &&
 		        chan->State() == EChannel::PINGING);
-	
+
 	}
 	catch(TECExcept &e)
 	{
@@ -2299,7 +2357,7 @@ void MenAreAntsApp::Scores(EChannel* chan)
 			ScoresForm->Update();
 		} while(client->IsConnected() && client->Player() &&
 		        chan->State() == EChannel::SCORING);
-	
+
 	}
 	catch(TECExcept &e)
 	{
@@ -2363,10 +2421,10 @@ void TScoresPlayerLine::Init()
 {
 	Nick = new TLabel(x, y, nick, color, Font::GetInstance(Font::Big), true);
 
-	Killed = new TLabel(x+170, y, killed, color, Font::GetInstance(Font::Big));
-	Shooted = new TLabel(x+300, y, shooted, color, Font::GetInstance(Font::Big));
-	Created = new TLabel(x+420, y, created, color, Font::GetInstance(Font::Big));
-	Score = new TLabel(x+580, y, score, color, Font::GetInstance(Font::Big));
+	Killed = new TLabel(x+170, y, killed, color, Font::GetInstance(Font::Big), true);
+	Shooted = new TLabel(x+300, y, shooted, color, Font::GetInstance(Font::Big), true);
+	Created = new TLabel(x+420, y, created, color, Font::GetInstance(Font::Big), true);
+	Score = new TLabel(x+580, y, score, color, Font::GetInstance(Font::Big), true);
 	MyComponent(Nick);
 	MyComponent(Killed);
 	MyComponent(Shooted);

@@ -168,6 +168,8 @@ int MenAreAntsApp::main(int argc, char **argv)
 		Video* video = Video::GetInstance();
 		video->InitWindow();
 
+		video->SetWindowIcon(PKGDATADIR_PICS "MAA.xpm" );
+
 		ECImage *loading_image = Resources::Loadscreen();
 
 		if(loading_image->GetWidth() != video->Width() ||
