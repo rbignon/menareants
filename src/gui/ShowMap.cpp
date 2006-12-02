@@ -362,7 +362,7 @@ void TMap::Draw(int _x, int _y)
 			c->Draw();
 			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe())
 			{
-				if(SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
+				if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
 				   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
 				{
 					bool move, invest;

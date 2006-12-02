@@ -530,13 +530,6 @@ public:
 
 	/** ECBTerre can create all buildings */
 	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && !e->IsNaval()); }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is sea */
@@ -551,13 +544,6 @@ public:
 public:
 
 	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && e->IsNaval()); }
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is a montain */
@@ -567,16 +553,6 @@ class ECBMontain : public virtual ECBCase
 public:
 	ECBMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
 	ECBMontain() {}
-
-/* Methodes */
-public:
-
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
 };
 
 /** This class is a derived class from ECBCase whose is a bridge */
@@ -590,12 +566,16 @@ public:
 /* Methodes */
 public:
 
-/* Attributs */
-public:
-
-/* Variables privées */
-protected:
-
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_RAIL:
+				return true;
+			default:
+				return false;
+		}
+	}
 };
 
 /********************************************************************************************

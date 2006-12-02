@@ -19,7 +19,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 -permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
 -pouvoir définir une cible sur plusieurs tours
--quand une unité est sélectionnée marquer les cases où l'unité peut aller
 -afficher les deplacements anticipés de ses alliés (peut etre)
 -lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
 -pouvoir envoyer de ses propres maps au serveur pendant la création de la partie

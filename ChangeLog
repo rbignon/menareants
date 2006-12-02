@@ -8,6 +8,12 @@
 
 	* src/InGame.cpp (TLoadPlayerLine): Affichage d'un "OK" devant un user quand il est pret (lors du chargement).
 
+	* server/maps/europa_conquest.map: Rajout de rails sur les ponts pour les joueurs un peu éloignés.
+
+	* lib/Units.h, lib/Batiments.h: Réduction du prix d'un rail (500$) et d'un train (2000$ pour une capacité de 500)
+
+	* lib/Map.h: Possibilité de créer un rail sur un pont.
+
 2006-12-01 Romain Bignon <progs@headfucking.net>
 
 	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Possibilité de donner de l'argent à un autre joueur (par le menu des options), ou un territoire à un autre joueur (en

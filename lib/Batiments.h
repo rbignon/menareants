@@ -54,7 +54,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_RAIL; }
-	virtual uint Cost() const { return 2000; }
+	virtual uint Cost() const { return 500; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 0; } /**< Il ne voit rien du tout */
 

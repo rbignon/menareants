@@ -87,7 +87,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_TRAIN; }
-	virtual uint Cost() const { return 4000; }
+	virtual uint Cost() const { return 2000; }
 	virtual uint InitNb() const { return 5; }
 	virtual uint Step() const { return 6; }
 	virtual uint Visibility() const { return 4; }
