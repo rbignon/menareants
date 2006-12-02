@@ -202,6 +202,7 @@
 	R_RESOURCE(ECSpriteBase, McDo_Right,        "units/mcdo/right");
 	R_RESOURCE(ECSpriteBase, McDo_Dos,          "units/mcdo/dos");
 	R_RESOURCE(ECSpriteBase, McDo_Caserne,      "units/mcdo/caserne");
+	R_RESOURCE(ECSpriteBase, McDo_Jouano,       "units/mcdo/jouano");
 	R_RESOURCE(ECImage,      Trees_Icon,        PKGDATADIR_PICS "units/trees_icon.png");
 	R_RESOURCE(ECSpriteBase, Trees_Face,        "units/trees");
 	R_RESOURCE(ECImage,      Megalopole_Icon,   PKGDATADIR_PICS "units/megalopole_icon.png");

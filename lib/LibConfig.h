@@ -178,7 +178,7 @@ public:
 	 */
 	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(error);
 
-	uint NbLines() const { return line; }
+	unsigned NbLines() const { return line; }
 	std::string Path() const { return path; }
 
 /* Variables privées */
@@ -187,7 +187,7 @@ private:
 	std::string path;
 	bool loaded;
 	SectionMap sections;
-	uint line;
+	unsigned line;
 };
 
 /********************************************************************************************

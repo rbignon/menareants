@@ -104,7 +104,7 @@ fi
 
 # WIN32
 if test "${WIN32}" = "yes"; then
-	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image /usr/local/cross-tools/i586-mingw32msvc//lib/libSDL_mixer.a -lwinmm"
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
 #	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
 fi
 

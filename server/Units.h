@@ -105,6 +105,8 @@ public:
 	virtual bool WantDeploy();
 
 	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
+
+	virtual int TurnMoney(ECBPlayer*);
 };
 
 /********************************************************************************************

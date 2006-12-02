@@ -57,6 +57,13 @@ bool ECPlane::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 	return EContainer::WantUnContain(x, y, moves);
 }
 
+int ECPlane::TurnMoney(ECBPlayer* pl)
+{
+	if(Deployed() || !Containing() || Owner() != pl) return 0;
+
+	return - (Containing()->Nb() * VolCost());
+}
+
 /********************************************************************************************
  *                               ECJouano                                                   *
  ********************************************************************************************/

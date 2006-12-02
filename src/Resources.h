@@ -237,6 +237,7 @@ public:
 	R_RESOURCE(ECSpriteBase, McDo_Right);
 	R_RESOURCE(ECSpriteBase, McDo_Dos);
 	R_RESOURCE(ECSpriteBase, McDo_Caserne);
+	R_RESOURCE(ECSpriteBase, McDo_Jouano);
 	R_RESOURCE(ECImage,      Trees_Icon);
 	R_RESOURCE(ECSpriteBase, Trees_Face);
 	R_RESOURCE(ECImage,      Megalopole_Icon);

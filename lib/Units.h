@@ -89,7 +89,7 @@ public:
 	virtual e_type Type() const { return E_TRAIN; }
 	virtual uint Cost() const { return 2000; }
 	virtual uint InitNb() const { return 5; }
-	virtual uint Step() const { return 6; }
+	virtual uint Step() const { return 8; }
 	virtual uint Visibility() const { return 4; }
 
 	virtual bool CanContain(const ECBEntity* et)
@@ -176,10 +176,19 @@ public:
 
 	virtual void Init() { ECBEntity::Init(); SetDeployed(true); }
 
+	/** Prix par tours de l'avion en vol
+	 * Cette fonction constante indique le prix, lorsque l'avion est en vol, que paye
+	 * le propriétaire chaque tours où l'avion est en vol, la correspondance entre
+	 * le nombre d'hommes contenus et le prix.
+	 * Par exemple, si elle retourne \b 1, le joueur payera 1 * nombre_d'hommes $ par tours,
+	 * donc 1000 $ par tours si l'avion contient 1000 hommes.
+	 */
+	virtual uint VolCost() const { return 1; }
+
 	virtual e_type Type() const { return E_PLANE; }
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 5; }
-	virtual uint Step() const { return 3; }
+	virtual uint Step() const { return 5; }
 	virtual uint Visibility() const { return 5; }
 	virtual bool CanWalkOn(ECBCase *c) const { return true; }
 	virtual e_level Level() const { return !Deployed() ? L_AIR : L_GROUND; }
@@ -189,7 +198,7 @@ public:
 
 	virtual bool CanContain(const ECBEntity *et)
 	{
-		if(Containing() || et->Nb() > 100*Nb() || !Deployed())
+		if(Containing() || et->Nb() > 100*Nb() || !Deployed() || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
 			return false;
 		return true;
 	}

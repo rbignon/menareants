@@ -49,6 +49,7 @@ void ECMcDo::RecvData(ECData data)
 		case DATA_JOUANO:
 		{
 			restDestroy = StrToTyp<int>(data.data);
+			SetImage(Resources::McDo_Jouano());
 			break;
 		}
 	}
@@ -100,8 +101,19 @@ std::string ECPlane::SpecialInfo()
 {
 	std::string s = !Deployed() ? "En plein vol" : "Au sol";
 
-	if(Containing()) s += " - Contient :";
-	else if(Owner()->IsMe()) s += " - Capacité : " + TypToStr(100 * Nb());
+	if(Owner()->IsMe())
+	{
+		if(Containing())
+		{
+			if(!Deployed())
+				s = "Vous payez " + TypToStr(Containing()->Nb() * VolCost()) + " $/tours";
+			else
+				s += " - Contient :";
+		}
+		else s += " - Capacité : " + TypToStr(100 * Nb());
+	}
+	else if(Containing())
+		s += " - Contient :";
 
 	return s;
 }
@@ -111,9 +123,9 @@ std::string ECPlane::SpecialInfo()
  ********************************************************************************************/
 std::string ECTrain::SpecialInfo()
 {
-	if(!Owner()->IsMe()) return "";
-	else if(Containing()) return "Contient :";
-	else return "Capacité : " + TypToStr(100 * Nb());
+	if(Containing()) return "Contient :";
+	else if(!Owner()->IsMe()) return "Capacité : " + TypToStr(100 * Nb());
+	else return "";
 }
 
 /********************************************************************************************
@@ -121,9 +133,9 @@ std::string ECTrain::SpecialInfo()
  ********************************************************************************************/
 std::string ECBoat::SpecialInfo()
 {
-	if(!Owner()->IsMe()) return "";
-	else if(Containing()) return "Contient :";
-	else return "Capacité : " + TypToStr(100 * Nb());
+	if(Containing()) return "Contient :";
+	else if(!Owner()->IsMe()) return "Capacité : " + TypToStr(100 * Nb());
+	else return "";
 }
 
 /********************************************************************************************

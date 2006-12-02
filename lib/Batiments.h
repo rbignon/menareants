@@ -86,7 +86,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_TREES; }
-	virtual uint Cost() const { return 10000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 0; } /**< Elle ne voit rien du tout */
 
@@ -119,7 +119,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_MINE; }
-	virtual uint Cost() const { return 15000; }
+	virtual uint Cost() const { return 7000; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 1; } /**< Elle ne voit en effet pas bien loins... */
 	virtual bool IsTerrain() const { return true; } /**< C'est pour qu'on puisse en construire sur les rails ou arbres */

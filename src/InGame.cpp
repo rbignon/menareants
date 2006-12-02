@@ -1759,9 +1759,9 @@ void TBarreAct::Init()
 
 	Icons = AddComponent(new TBarreActIcons(200, 59));
 
-	ChildIcon = AddComponent(new TImage(200,60));
+	ChildIcon = AddComponent(new TImage(250,60));
 	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
-	ChildNb = AddComponent(new TLabel(260,80, "", black_color, Font::GetInstance(Font::Normal)));
+	ChildNb = AddComponent(new TLabel(310,80, "", black_color, Font::GetInstance(Font::Normal)));
 
 	HelpInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60, 15, Width()-500, Height()-15-10));
 	HelpAttaqs = AddComponent(new TLabel(HelpInfos->X()+HelpInfos->Width()+5, 40, "Peut attaquer :", black_color,

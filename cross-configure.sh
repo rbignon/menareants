@@ -2,7 +2,7 @@
 
 CONFIG_SHELL=/bin/sh
 export CONFIG_SHELL
-PREFIX=/usr/local/cross-tools
+PREFIX=/usr/
 TARGET=i586-mingw32msvc
 PATH="$PREFIX/bin:$PREFIX/$TARGET/bin:$PATH"
 export PATH
