@@ -2207,9 +2207,6 @@ void MenAreAntsApp::PingingGame()
 
 		PingingForm->SetMutex(mutex);
 
-		/* On utilise la fonction de TScoresForm qui nous convient parfaitement */
-		PingingForm->LeaveButton->SetOnClick(TScoresForm::WantLeave, client);
-
 		SDL_Event event;
 		do
 		{
@@ -2233,6 +2230,10 @@ void MenAreAntsApp::PingingGame()
 				{
 					case SDL_MOUSEBUTTONDOWN:
 					{
+						if(PingingForm->LeaveButton->Test(event.button.x, event.button.y) &&
+						   TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, PingingForm).Show() == BT_YES)
+							client->sendrpl(client->rpl(EC_Client::LEAVE));
+
 						list = PingingForm->Players->GetList();
 						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 						{

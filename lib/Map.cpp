@@ -104,6 +104,14 @@ ECBDate::ECBDate(std::string date)
 	SetDate(date);
 }
 
+void ECBDate::SetDate(ECBDate* date)
+{
+	d = date->d;
+	m = date->m;
+	y = date->y;
+	CheckDate();
+}
+
 void ECBDate::SetDate(uint days)
 {
 	for(uint i = 0; i < days; ++i)
@@ -551,7 +559,7 @@ void ECBMap::Init()
 	max = 0;
 	city_money = 0;
 	mission = false;
-	
+
 	std::string ligne;
 
 	bool recv_map = false;
@@ -615,7 +623,7 @@ void ECBMap::Init()
 					for(; it != map_players.end() && (*it)->ID() != owner[0]; ++it);
 					if(it == map_players.end())
 						throw ECExcept(VName(owner), "Déclaration d'une unité pour un owner qui n'existe pas");
-	
+
 					(*it)->AddUnit(ligne);
 				}
 				VirtualAddUnit(ligne);

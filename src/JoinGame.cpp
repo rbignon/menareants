@@ -497,7 +497,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						me->UnlockScreen();
 					}
 					else
-						*(chan->Map()->InitDate()) = ECDate(*chan->Map()->Date());
+						chan->Map()->InitDate()->SetDate(chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
 						InGameForm->ShowWaitMessage = false;

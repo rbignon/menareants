@@ -427,7 +427,7 @@ public:
 	void SetYear(int _y) { y = _y; }
 
 	void SetDate(std::string date);
-
+	void SetDate(ECBDate* d);
 	void SetDate(uint days);
 
 	ECBDate& operator++ ();    ///< prefix ++
