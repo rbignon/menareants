@@ -620,7 +620,7 @@ void TInGameForm::FindIdling()
 	static int i;
 	std::vector<ECBEntity*> ents = player->Entities()->List(), idle_ents;
 	FORit(ECBEntity*, ents, enti)
-		if((*enti)->EventType() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
+		if((*enti)->EventType() == 0 && (*enti)->Parent() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
 			idle_ents.push_back(*enti);
 
 	if(idle_ents.empty())
