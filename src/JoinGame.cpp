@@ -638,6 +638,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					Debug(W_DESYNCH|W_SEND, "SET %c@: incorrect", add ? '+' : '-');
 					break;
 				}
+				me->LockScreen();
 				BCountriesVector cv = chan->Map()->Countries();
 				const char* ident = parv[j++].c_str();
 				for(BCountriesVector::iterator ci = cv.begin(); ci != cv.end(); ++ci)
@@ -664,13 +665,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
 						}
 						if(InGameForm && chan->State() == EChannel::PLAYING)
-						{ // Il n'est pas nécessaire de mettre à jour la preview en ANIMING, car c'est fait automatiquement à la fin du tour
-							me->LockScreen();
+							// Il n'est pas nécessaire de mettre à jour la preview en ANIMING, car c'est fait automatiquement à la fin du tour
 							chan->Map()->CreatePreview(120,120, P_ENTITIES);
-							me->UnlockScreen();
-						}
 						break;
 					}
+				me->UnlockScreen();
 				break;
 			}
 			case '!':
@@ -846,9 +845,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							else
 								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
 								                            " s'est allié avec vous et vous propose de faire de même");
-							me->LockScreen();
-							chan->Map()->CreatePreview(120,120, P_ENTITIES);
-							me->UnlockScreen();
 						}
 						else
 							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " s'est allié avec " +
@@ -886,9 +882,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							else
 								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " n'est plus allié "
 								                            "avec vous");
-							me->LockScreen();
-							chan->Map()->CreatePreview(120,120, P_ENTITIES);
-							me->UnlockScreen();
 						}
 						else
 							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
@@ -915,6 +908,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					std::vector<ECBEntity*> ents = sender->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 						dynamic_cast<ECEntity*>(*enti)->SetShowedCases(add, true);
+					me->LockScreen();
+					chan->Map()->CreatePreview(120,120, P_ENTITIES);
+					me->UnlockScreen();
 				}
 				break;
 			}

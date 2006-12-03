@@ -798,7 +798,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		std::vector<ECBCountry*> cntys = chan->Map()->Countries();
 		FORit(ECBCountry*, cntys, cnty)
 			if((*cnty)->Owner() && (*cnty)->Owner()->Player())
-				cl->sendrpl(app.rpl(ECServer::SET), (*cnty)->Owner()->Player()->GetNick(), (std::string("+@") + (*cnty)->ID()).c_str());
+				cl->sendrpl(app.rpl(ECServer::SET), (*cnty)->Owner()->Player()->GetNick(), (std::string("+@ ") + (*cnty)->ID()).c_str());
 
 		/* Et l'argent */
 		cl->sendrpl(app.rpl(ECServer::SET), cl->GetNick(), std::string("+$ " + TypToStr(pl->Money())).c_str());
@@ -1817,7 +1817,10 @@ void EChannel::SendEntities(ECPlayer* pl)
 	clients.push_back(pl->Client());
 
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		SendArm(clients, dynamic_cast<ECEntity*>(*enti), ARM_CREATE, (*enti)->Case()->X(), (*enti)->Case()->Y());
+	{
+		if((*enti)->IsHidden() && (*enti)->Owner() != pl) continue;
+		SendArm(clients, dynamic_cast<ECEntity*>(*enti), (*enti)->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE), (*enti)->Case()->X(), (*enti)->Case()->Y());
+	}
 }
 
 bool EChannel::CheckPinging()
