@@ -414,7 +414,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 			(*it)->SetShowedCases(false);
 			if(InGameForm)
+			{
 				InGameForm->Map->ToRedraw(*it);
+				if((*it)->Selected())
+					InGameForm->BarreAct->UnSelect();
+			}
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
 

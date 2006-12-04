@@ -1,3 +1,11 @@
+2006-12-04 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp: Correction du crash de don de territoire.
+
+2006-12-03 Romain Bignon <progs@headfucking.net>
+
+	* Release version 0.3.3
+
 2006-12-02 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Utilisation de la touche TAB pour chercher les unités inactives.
