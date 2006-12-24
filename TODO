@@ -3,25 +3,41 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--pouvoir faire des déplacements en diagonal en un clique
+-finir la connexion à un serveur, selectionné dans la liste reçue du meta-server
+
+-améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
+ la plus proche de la case d'arrivée.
 
 * Urgent
 -vérifier l'arme nucléaire (il avait pas l'air de supprimer toutes les unités de la case)
+ -> il faut améliorer le système d'attaques pour vérifier *qui* est sur la case à ce moment là.
+    tout du moins, il faut voir pour gérer, coté serveur le fait que ça soit l'entité qui envoye les informations
+    de changement de nb ou de suppression.
 -pouvoir envoyer un changement de niveau via le protocole
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 -limiter le nombre d'unités à construire sur batiments
+-pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
+
+** Objectifs pour la version 0.4
+-> Multiplier les unités
+-> Sauvegarder les parties
+-> Language de scripting opérationnel pour les missions
+-> Création de quelques missions
+-> Création d'un tutoriel, obligatoire au premier lancement du jeu
+-> Modification fondamentale du système des attaques: permettre plusieurs attaques implicites d'affilé
+    (mon char avance de 3 cases, et rencontre d'abord une unité enemie. Il y a combat. Si mon unité gagne,
+     elle continue son chemin. Il est possible qu'elle rencontre encore une unité enemie. Il y a recombat.
+     Si je gagne, on continue encore).
+-> Un Fast Find Path qui marche avec une recherche de la case accessible la plus proche de la case voulue (si non accessible)
+[DONE] Pouvoir annuler les actions d'une unité
 
 * Après
--faire une mission de tutoriel
--pouvoir annuler
 -à la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
-
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 -permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
 -pouvoir définir une cible sur plusieurs tours
 -afficher les deplacements anticipés de ses alliés (peut etre)
 -lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
--pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Bof
@@ -37,19 +53,17 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
  présents dans ses mouvements. Je proposerais une annulation du mouvement et un appel arbitraire à
  ARMCommand::Exec pour ne pas avoir à réécrire tout le code.
 
-** Objectif actuel
--Multiplier les unités
-
 ** Unités
 - Tout le monde
-  - batiment qui permet de ne pas avoir le semi brouillard
+  - char qui permet de tirer à une ou deux cases d'interval..
+  - batiment qui permet de ne pas avoir le semi brouillard (premiere version, toutes les cases -1 passent en 0, et upgrade pour tout tout voir)
   - upgrades de la caserne et de l'usine d'armement
   - unité Dorian qui vend de l'alcool: les unités touchées se dirigent n'importe comment !
   - unité Gay
   - unité Zidane qui fou des coups de boule
   - unité Handicap International qui permet de déminer
   - batiment ou unité ou upgrade du lance missile qui tire un champ electrique
-  - "unité" mur
+  - barbelés
   - déchets radioactifs après une bombe nucléaire
   - sous marins
   - lance missile marin

@@ -28,14 +28,25 @@
 #define COUNTRY_CHARS "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN"
 #define IA_CHAR '&'
 
+#define SERV_SMALLNAME "MenAreAntsD"
+#define CLIENT_SMALLNAME "MenAreAnts"
+#define MS_SMALLNAME "MenAreAntsMS"
+
+#define SERV_DEFPORT 5461
+#define MSERV_DEFPORT 5460
+
 /* Version protocolaire
  * À incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"10"
+#define APP_PVERSION	"11"
+#define APP_MSPROTO	"1"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"3.3"
+#define APP_VERSION_BETA	"4"
+
+/* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
+#define UNSTABLE
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
 #if 1
@@ -45,6 +56,8 @@
 #define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
 #define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
 #endif
+
+#ifdef __cplusplus
 
 /* Tailles de variables */
 const unsigned int NICKLEN=10;
@@ -71,5 +84,6 @@ const unsigned int GAMELEN=20;
 
 #define FORit(T, v, x) \
                           for(std::vector<T>::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
+#endif /* __cplusplus */
 
 #endif /* ECLIB_Defines_h */

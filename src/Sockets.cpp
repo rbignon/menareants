@@ -39,24 +39,24 @@
 
 /* Messages à envoyer */
 const char* msgTab[] = {
-	"IAM %s " APP_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
-	"POG",                                    /* POG - PONG */
-	"ERR %s",                                 /* ERR - Message d'erreur */
-	"ERR %s %s",                              /* ERR - Message d'erreur avec vars */
-	"STAT",                                   /* STAT - Infos sur l'etat du serveur */
+	"IAM %s " CLIENT_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
+	"POG",                                       /* POG - PONG */
+	"ERR %s",                                    /* ERR - Message d'erreur */
+	"ERR %s %s",                                 /* ERR - Message d'erreur avec vars */
+	"STAT",                                      /* STAT - Infos sur l'etat du serveur */
 
-	"LSP",                                    /* LSP - Liste les jeux */
-	"JOI %s",                                 /* JOI - Joindre une partie */
-	"JOI %s $",                               /* JOI $ - Crée une partie */
-	"LEA",                                    /* LEA - Partir d'une partie */
-	"KICK %s %s",                             /* KICK - Éjecter quelqu'un du jeu */
-	"MSG %s",                                 /* MSG - Message dans une partie */
-	"AMSG %s",                                /* AMSG - Envoie un message à ses alliés */
-	"SET %s",                                 /* SET - Définit un paramètre dans le chan */
-	"JIA %s",                                 /* JIA - Créer une IA dans le jeu */
+	"LSP",                                       /* LSP - Liste les jeux */
+	"JOI %s",                                    /* JOI - Joindre une partie */
+	"JOI %s $",                                  /* JOI $ - Crée une partie */
+	"LEA",                                       /* LEA - Partir d'une partie */
+	"KICK %s %s",                                /* KICK - Éjecter quelqu'un du jeu */
+	"MSG %s",                                    /* MSG - Message dans une partie */
+	"AMSG %s",                                   /* AMSG - Envoie un message à ses alliés */
+	"SET %s",                                    /* SET - Définit un paramètre dans le chan */
+	"JIA %s",                                    /* JIA - Créer une IA dans le jeu */
 
-	"ARM %s",                                 /* ARM - Envoie des infos sur une armée */
-	"BP %c%d,%d %s",                          /* BP - Pose une balise sur la carte pour ses alliés */
+	"ARM %s",                                    /* ARM - Envoie des infos sur une armée */
+	"BP %c%d,%d %s",                             /* BP - Pose une balise sur la carte pour ses alliés */
      0
 };
 
@@ -156,46 +156,50 @@ void EC_Client::parse_message(std::string buf)
 
 int EC_Client::read_sock(void *data)
 {
-	EC_Client *cl = EC_Client::GetInstance(true);
-	cl->mutex = reinterpret_cast<SDL_mutex*>(data);
+	EC_Client *cl = reinterpret_cast<EC_Client*>(data);
 
-	if(!cl->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port))
+	if(!cl->Connect(cl->hostname.c_str(), cl->port))
 		return 0;
 
-	//EC_Client* cl = app.getclient();
+	cl->Loop();
 
+	return 0;
+}
+
+void EC_Client::Loop()
+{
 	fd_set tmp_fdset;
 	struct timeval timeout = {0,0};
 
-	while(cl != NULL && !cl->WantDisconnect())
+	while(!WantDisconnect())
 	{
 		char buf[MAXBUFFER + 1] = {0};
 		register char *ptr;
 		int r;
 
-		tmp_fdset = cl->global_fd_set;
+		tmp_fdset = global_fd_set;
 
 		timeout.tv_sec = 1; /*  Nécessaire pour être au courant du WantDisconnect() */
 		timeout.tv_usec = 0; /* quand il y a une inactivité au niveau des sockets */
 
-		if(select(cl->sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
+		if(select(sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
 			{
 				printf("Erreur lors de select() (%d: %s)\n", errno, strerror(errno));
-				cl->connected = false;
+				connected = false;
 				break;
 			}
 			continue;
 		}
-		if(cl->WantDisconnect()) break;
+		if(WantDisconnect()) break;
 
-		if(!FD_ISSET(cl->sock, &tmp_fdset)) continue;
+		if(!FD_ISSET(sock, &tmp_fdset)) continue;
 
-		if((r = recv(cl->sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
+		if((r = recv(sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
 		{
-			cl->connected = false;
 			printf("Erreur lors de recv() (%d: %s)\n", errno, strerror(errno));
+			connected = false;
 			break;
 		}
 
@@ -206,16 +210,15 @@ int EC_Client::read_sock(void *data)
 		{
 			if(*ptr == '\n')
 			{
-				cl->readQ[cl->readQi-1] = 0; /* pour le \r devant le \n */
-				cl->parse_message(cl->readQ);
-				cl->readQi = 0;
+				readQ[readQi-1] = 0; /* pour le \r devant le \n */
+				parse_message(readQ);
+				readQi = 0;
 			}
-			else cl->readQ[cl->readQi++] = *ptr;
+			else readQ[readQi++] = *ptr;
 			++ptr;
 		}
 	}
-
-	return 0;
+	Disconnect();
 }
 
 void EC_Client::LockScreen() const
@@ -242,44 +245,6 @@ void EC_Client::Init()
 	logging = true;
 	FD_ZERO(&global_fd_set);
 	mutex = 0;
-
-	/* Ajout des commandes            CMDNAME FLAGS ARGS */
-	Commands.push_back(new ARMCommand("ARM",	0,	0));
-
-	Commands.push_back(new PIGCommand("PIG",	0,	0));
-	Commands.push_back(new HELCommand("HEL",	0,	1));
-	Commands.push_back(new AIMCommand("AIM",	0,	1));
-	Commands.push_back(new USEDCommand("USED",	0,	0));
-	Commands.push_back(new MAJCommand("MAJ",	0,	1));
-	Commands.push_back(new MOTDCommand("MOTD",	0,	0));
-	Commands.push_back(new EOMCommand("EOM",	0,	0));
-	Commands.push_back(new STATCommand("STAT",	0,	7));
-	Commands.push_back(new ER1Command("ER1",	0,	0));
-	Commands.push_back(new ER2Command("ER2",	0,	1));
-	Commands.push_back(new ER3Command("ER3",	0,	0));
-	Commands.push_back(new ER4Command("ER4",	0,	0));
-
-	Commands.push_back(new LSPCommand("LSP",	0,	3));
-	Commands.push_back(new EOLCommand("EOL",	0,	0));
-
-	Commands.push_back(new BPCommand("BP",		0,	1));
-
-	Commands.push_back(new JOICommand("JOI",	0,	1));
-	Commands.push_back(new SETCommand("SET",	0,	1));
-	Commands.push_back(new PLSCommand("PLS",	0,	1));
-	Commands.push_back(new LEACommand("LEA",	0,	0));
-	Commands.push_back(new KICKCommand("KICK",	0,	1));
-	Commands.push_back(new MSGCommand("MSG",	0,	1));
-	Commands.push_back(new INFOCommand("INFO",	0,	1));
-
-	Commands.push_back(new LSMCommand("LSM",	0,	3));
-	Commands.push_back(new EOMAPCommand("EOMAP",0,	0));
-	Commands.push_back(new SMAPCommand("SMAP",	0,	1));
-	Commands.push_back(new EOSMAPCommand("EOSMAP",0,0));
-
-	Commands.push_back(new SCOCommand("SCO",	0,	4));
-	Commands.push_back(new REJOINCommand("REJOIN",0,1));
-
 }
 
 EC_Client::EC_Client()
@@ -307,9 +272,22 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 	const char* ip = hostname;
 
+	error = false;
+	logging = true;
+	want_disconnect = false;
+
 	/* Si c'est une host, on la résoud */
 	if(!is_ip(hostname))
-		ip = inet_ntoa(*(struct in_addr *)(*(gethostbyname(hostname)->h_addr_list)));
+	{
+		struct hostent *hp = gethostbyname(hostname);
+		if(!hp)
+		{
+			SetCantConnect("L'hostname est inaccessible.");
+			return false;
+		}
+
+		ip = inet_ntoa(*(struct in_addr *)(*(hp->h_addr_list)));
+	}
 
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_addr.s_addr = inet_addr(ip);
@@ -331,17 +309,30 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	return true;
 }
 
-EC_Client::~EC_Client()
+void EC_Client::Disconnect()
 {
 	if(connected)
+	{
 #ifdef WIN32
 		closesocket(sock);
 #else
 		close(sock);
 #endif
-	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end(); ++it)
-		delete *it;
+		sock = 0;
+		connected = false;
+	}
 
 	if(pl)
+	{
 		delete pl->Channel();
+		pl = 0;
+	}
+}
+
+EC_Client::~EC_Client()
+{
+	Disconnect();
+
+	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end(); ++it)
+		delete *it;
 }

@@ -962,6 +962,7 @@ EChannel::EChannel(std::string _name)
 	app.NBchan++;
 	app.NBwchan++;
 	app.NBtotchan++;
+	app.MSet("+wg", TypToStr(app.NBwchan) + " " + TypToStr(app.NBchan));
 }
 
 EChannel::~EChannel()
@@ -969,6 +970,9 @@ EChannel::~EChannel()
 	app.NBchan--;
 	if(State() == EChannel::WAITING) app.NBwchan--;
 	else app.NBachan--;
+
+	app.MSet("+wg", TypToStr(app.NBwchan) + " " + TypToStr(app.NBchan));
+
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
 		if (*it == this)
@@ -1697,39 +1701,8 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+			entity->CancelEvents();
 			SendArm(0, entity, ARM_REMOVE);
-			EventVector events = Map()->Events();
-			for(EventVector::iterator evti = events.begin(); evti != events.end();)
-			{
-				bool want_remove = false;
-				if(!(*evti)->Entities()->Find(entity))
-				{
-					++evti;
-					continue;
-				}
-				switch((*evti)->Flags())
-				{
-					case ARM_UNION:  // Concerne que des unités du même joueur
-					case ARM_MOVE:   // Forcément qu'une seule unité
-					case ARM_CREATE: // Forcément qu'une seule unité
-					case ARM_SPLIT:  // Concerne que des unités du même joueur
-					case ARM_DEPLOY: // Forcément qu'une seule unité
-						want_remove = true;
-						break;
-					case ARM_ATTAQ:
-						want_remove = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
-						break;
-					default:
-						FDebug(W_WARNING, "Vérification de la suppression d'un evenement dont le type est non géré...");
-				}
-				if(want_remove)
-				{
-					Map()->RemoveEvent(*evti, USE_DELETE);
-					evti = events.erase(evti);
-				}
-				else
-					++evti;
-			}
 			entity->SetOwner(0);
 			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
 			entity->Case()->Entities()->Remove(entity);

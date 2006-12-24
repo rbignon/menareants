@@ -60,6 +60,8 @@ uint Config::PingFreq() const { return conf->GetSection("server")->GetItem("fpin
 uint Config::MaxGames() const { return conf->GetSection("games")->GetItem("maxgames")->Integer(); }
 uint Config::MaxConnexions() const { return conf->GetSection("server")->GetItem("maxcons")->Integer(); }
 std::string Config::AdminPass() const { return conf->GetSection("server")->GetItem("adminpass")->String(); }
+std::string Config::MSHost() const { return conf->GetSection("meta-server")->GetItem("host")->String(); }
+uint Config::MSPort() const { return conf->GetSection("meta-server")->GetItem("port")->Integer(); }
 
 bool Config::load()
 {
@@ -74,6 +76,10 @@ bool Config::load()
 		section->AddItem(new ConfigItem_int("maxcons", "Maximum of connections", 0));
 		section->AddItem(new ConfigItem_string("motdfile", "File for motd"));
 		section->AddItem(new ConfigItem_string("adminpass", "Administrator password", " "));
+
+		section = conf->AddSection("meta-server", "Meta-server settings", false);
+		section->AddItem(new ConfigItem_string("host", "Hostname of meta-server"));
+		section->AddItem(new ConfigItem_int("port", "Port of meta-server", 1, 65535));
 
 		section = conf->AddSection("games", "Rules of games", false);
 		section->AddItem(new ConfigItem_int("maxgames", "Maximum of games", 0));

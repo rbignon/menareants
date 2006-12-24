@@ -24,6 +24,8 @@
 
 #include <string>
 #include <vector>
+#include <stack>
+#include <map>
 #include "Outils.h"
 
 /** @page Map_structure Map structure
@@ -316,6 +318,13 @@ public:
 	/** Does this entity like an other entity ? */
 	bool Like(const ECBEntity* e) const;
 
+	/** Find the fast path...
+	 * @param dest this is the destination of the target
+	 * @param moves a list of movements (usage of ECBMove::E_Move)
+	 * @return true if there is a path, and false if there isn't any solution.
+	 */
+	bool FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& moves, ECBCase* from = 0);
+
 /* Attributs */
 public:
 
@@ -579,6 +588,58 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECBFindFastPath                                            *
+ ********************************************************************************************/
+
+class ECBFindFastPath
+{
+/* Variables privées */
+private:
+	struct noeud
+	{
+		noeud() : cout_g(0), cout_h(0), cout_f(0), parent(0) {}
+		float cout_g, cout_h, cout_f;
+		ECBCase* parent;
+	};
+	typedef std::map<ECBCase*, noeud> l_noeud;
+
+	ECBMap* map;
+	ECBEntity* entity;
+	ECBCase* to_case;
+	ECBCase* from_case;
+	l_noeud liste_fermee;
+	l_noeud liste_ouverte;
+	std::stack<ECBMove::E_Move> moves;
+
+/* Constructeur */
+public:
+
+	ECBFindFastPath(ECBEntity* _entity, ECBCase* _c, ECBCase* _from)
+		: map(_entity->Map()), entity(_entity), to_case(_c), from_case(_from)
+	{}
+
+/* Methodes */
+public:
+
+	bool FindPath();
+
+/* Attributs */
+public:
+
+	std::stack<ECBMove::E_Move> Moves() const { return moves; }
+
+/* Methodes privées */
+private:
+
+	bool deja_present_dans_liste(ECBCase* n, l_noeud& l);
+	void ajouter_cases_adjacentes(ECBCase* n);
+	ECBCase* meilleur_noeud(l_noeud& l);
+	void ajouter_liste_fermee(ECBCase* p);
+	ECBMove::E_Move find_movement(ECBCase* from, ECBCase* to);
+	void retrouver_chemin();
+};
+
+/********************************************************************************************
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 /** This class is a country in the map
@@ -781,6 +842,8 @@ protected:
 	std::vector<ECBCountry*> map_countries;
 
 	std::vector<std::string> map_infos;
+
+	std::vector<std::string> scripting;
 
 	ECList<ECBEntity*> entities;
 	ECList<ECBEntity*> neutres;

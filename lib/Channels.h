@@ -38,8 +38,6 @@ typedef std::vector<ECBEntity*> BEntityVector;
 class ECBPlayer;
 typedef std::vector<ECBPlayer*> BPlayerVector;
 
-
-
 /********************************************************************************************
  *                               ECBPlayer                                                  *
  ********************************************************************************************/

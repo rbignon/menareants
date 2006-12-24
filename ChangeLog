@@ -1,3 +1,35 @@
+2006-12-23 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: EC_Client est maintenant utilisable pour plusieurs fins (meta-server et menareantsd).
+
+	* src/Login.cpp (TListServerForm): Récupération et affichage d'une liste de serveurs depuis un meta-serveur, spécifié dans la conf.
+
+2006-12-22 Romain Bignon <progs@headfucking.net>
+
+	* src/data/fonts/: Changement pour une font fixed.
+
+	* meta-server: Création d'un daemon meta-serveur qui permet de recenser tous les serveurs lancés. Le client se connecte dessus d'abord pour obtenir une liste avec des informations, puis
+	choisis le serveur.
+
+	* server/*: Utilisation du meta-serveur.
+
+2006-12-08 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: Résolution du problème qui faisait crasher lorsqu'il ne trouvait pas une dns.
+
+	* server/Map.cpp, server/Channels.cpp: Récupération de la partie de la fonction EChannel::RemovePlayer() qui supprimait les evenements des entités, création
+	de la fonction ECEntity::CancelEvents().
+
+	* API, server/InGame.cpp, src/InGame.cpp: Gestion de l'annulation pour les unités.
+
+2006-12-05 Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.h: Implémentation d'un algorithme de recherche du chemin le plus court (A*).
+
+	* server/IA.cpp: Application dans la fonction TIA::WantMoveTo(), qui passe de 150 lignes à 25 lignes !
+
+	* src/InGame.cpp: Application lors du clique, permettant un clique direct en diagonale.
+
 2006-12-04 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Correction du crash de don de territoire.

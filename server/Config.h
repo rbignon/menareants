@@ -45,6 +45,8 @@ public:
 	uint MaxGames() const;
 	uint MaxConnexions() const;
 	std::string AdminPass() const;
+	std::string MSHost() const;
+	uint MSPort() const;
 	std::vector<std::string> Motd() const { return motd; }
 
 private:

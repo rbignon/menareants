@@ -382,6 +382,9 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					moves.push_back(ECMove::Left);
 				}
 				break;
+			case 'C':
+				flags |= ARM_RETURN;
+				break;
 			case '=':
 			{
 				if(!moves.empty())
@@ -523,6 +526,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		std::nrvector<TClient*> recvers;
 		std::vector<ECEvent*> events_sended;
+		if(flags == ARM_RETURN)
+		{
+			entity->CancelEvents();
+			flags = 0;
+		}
 		if(flags == ARM_NUMBER)
 		{
 			if(entity->CanBeCreated() && int(entity->Cost()) <= cl->Player()->Money() && entity->AddUnits(entity->InitNb()))

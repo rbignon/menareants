@@ -61,6 +61,14 @@ public: \
 }
 
 #if 1
+/* META-SERVER */
+
+class HELmsCommand : public EC_ACommand { public: HELmsCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class LSPmsCommand : public EC_ACommand { public: LSPmsCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
+class EOLmsCommand : public EC_ACommand { public: EOLmsCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOLmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* GENERAL */
 
 class HELCommand : public EC_ACommand { public: HELCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

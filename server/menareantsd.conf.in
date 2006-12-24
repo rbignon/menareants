@@ -44,6 +44,23 @@ server {
 	# adminpass = azerty
 }
 
+# «meta-server»
+# Le serveur de jeu doit se connecter à un meta-serveur pour être
+# référencé.
+# Les clients se connectent à ce meta-serveur pour obtenir la liste
+# des serveurs qui s'y sont déclarés.
+meta-server {
+
+	# Host du serveur
+	# Important: si le meta serveur est en local, veuillez à entrer
+	# l'IP d'accès par Internet, sinon le meta-server renverra aux
+	# clients l'ip 127.0.0.1...
+	host = game.coderz.info
+
+	# Port du meta-serveur
+	port = 5460
+}
+
 # «games»
 # Paramètres des jeux
 games {

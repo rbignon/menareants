@@ -15,6 +15,7 @@ Sommaire:
 6) Etat d'une partie
 7) Intelligence Artificielle
 8) Entités Conteneurs
+9) Meta serveur
 
 1) Principe du jeu
 
@@ -116,6 +117,7 @@ Sommaire:
          )<entité>   :s'envoyer dans une unité conteneur (voir 8. Entités Conteneurs)
          (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
          °           :upgrader
+         C           :annuler les déplacements
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
@@ -213,3 +215,34 @@ Sommaire:
      case et non se mettre dans la liste des entités d'une case, vu qu'elle ne doit plsu exister).
 
      Il faut également que la taille maximale à contenir soit proportionnel au "nombre" du conteneur.
+
+9) Meta serveur
+
+     Le meta-server permet de constituer une liste des serveurs lancés. Chaque serveur au démarrage se connecte au meta-serveur et
+     le restera jusqu'à son extinction. A chaque evenement il envoie des informations, tels que le nombre de joueurs connectés, le
+     nom de la carte, etc.
+
+     Le client, quant à lui, se connecte au meta-serveur pour obtenir cette liste.
+
+     a) Meta-server -> Serveur
+         HEL <prog> <version>                              :Dit bonjour, s'informe sur son type et sa version de protocole
+
+     b) Serveur -> Meta-server
+
+        IAM <name> <prog> <version>                        :Donne son nom, son prog et sa version
+        SET <modes> [<args> ..]                            :Change un paramètre
+            +p <nb players>                                :- nombre de players actuellement
+            +P <max players>                               :- max players
+            +g <nb games>                                  :- nombre de jeux
+            +G <max games>                                 :- max jeux
+            +w <nb waiting games>                          :- nombre de jeux en attente
+            +v <version>                                   :- version du protocole
+            +i <port>                                      :- port
+
+     c) Meta-server <-> Client
+
+        > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
+        < IAM <name> <prog> <version>                      :Donne son nom, son prog et sa version
+        > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste une partie
+                     <nbmax> <nbgames> <maxgames> <proto>
+        > EOL                                              :fin du listing

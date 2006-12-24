@@ -358,6 +358,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 				(*it)->Tag = 0;
 		}
+		/// @todo laid
 		if(flags & ARM_ATTAQ && (event_case->Flags() & C_TERRE) &&
 		   event_case->Image()->SpriteBase() == Resources::CaseTerre())
 			event_case->SetImage(Resources::CaseTerreDead());
@@ -370,8 +371,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(flags == ARM_RETURN)
 			{
 				(*it)->Move()->Return((*map)(x,y));
-				if((*it)->Move()->FirstCase())
-					(*it)->DelEvent(ARM_ATTAQ|ARM_MOVE);
+				(*it)->DelEvent(ARM_ATTAQ); // Il est certain que l'on perd *au moins* l'evenement d'attaque
+				if((*it)->Move()->Empty()) // Dans le cas où l'on est revenu au début, on a plus aucun evenement
+					(*it)->SetEvent(0);
 			}
 			else
 			{
@@ -568,7 +570,9 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 			return W_EXTRACT;
 
 		if(entity->Move()->Size() < entity->MyStep() &&
+#if 0
 		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
+#endif
 		   entity->MyStep() - entity->Move()->Size() >= acase->Delta(e_case) &&
 		   (!entity->Deployed() ^ !!(entity->EventType() & ARM_DEPLOY)) && // '!!' pour que le ^ ait deux bools
 		   acase != entity->Case() && acase != entity->Move()->Dest())
@@ -807,6 +811,10 @@ void MenAreAntsApp::InGame()
 							case SDLK_ESCAPE:
 								InGameForm->BarreAct->UnSelect();
 								break;
+							case SDLK_BACKSPACE:
+								if(InGameForm->BarreAct->Entity())
+									client->sendrpl(client->rpl(EC_Client::ARM), (std::string(InGameForm->BarreAct->Entity()->ID()) + " C").c_str());
+								break;
 							case SDLK_RETURN:
 								if(InGameForm->SendMessage->Focused())
 								{
@@ -1014,7 +1022,7 @@ void MenAreAntsApp::InGame()
 								if(mywant == TInGameForm::W_MOVE || mywant == TInGameForm::W_INVEST)
 								{
 									ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
-																						: selected_entity->Case();
+									                                                     : selected_entity->Case();
 									EContainer* contener = 0;
 									if(!InGameForm->IsPressed(SDLK_LALT))
 									{
@@ -1026,6 +1034,44 @@ void MenAreAntsApp::InGame()
 											else
 												contener = 0;
 									}
+#if 1
+									std::stack<ECBMove::E_Move> moves;
+									if(selected_entity->FindFastPath(acase, moves, init_case))
+									{
+										std::string move;
+										while(moves.empty() == false)
+										{
+											ECBMove::E_Move m = moves.top();
+											moves.pop();
+											if(contener && moves.empty()) break;
+											switch(m)
+											{
+												case ECBMove::Up: move += " ^"; break;
+												case ECBMove::Down: move += " v"; break;
+												case ECBMove::Left: move += " <"; break;
+												case ECBMove::Right: move += " >"; break;
+											}
+										}
+										if(!move.empty())
+										{
+											if(selected_entity->MyStep() == 0)
+												InGameForm->AddInfo(I_SHIT, "Cette unité ne peut avancer.");
+											else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
+												InGameForm->AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une "
+												                            "journée !");
+											else
+												client->sendrpl(client->rpl(EC_Client::ARM),
+											               std::string(std::string(selected_entity->ID()) + move).c_str());
+										}
+										if(contener)
+										{
+											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
+											                " )" + std::string(contener->ID())).c_str());
+											InGameForm->SetCursor();
+											break;
+										}
+									}
+#else
 									if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
 									{
 										std::string move;
@@ -1061,6 +1107,7 @@ void MenAreAntsApp::InGame()
 											break;
 										}
 									}
+#endif
 								}
 								else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
 								{
@@ -1189,6 +1236,7 @@ TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
 
 	Map = AddComponent(new TMap(ch->Map()));
 	ch->Map()->SetShowMap(Map);
+	//Map->SetBrouillard(false);
 	dynamic_cast<ECMap*>(ch->Map())->SetBrouillard();
 
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
@@ -2018,12 +2066,12 @@ TOptionsPlayerLine::~TOptionsPlayerLine()
 
 bool TOptionsPlayerLine::AllieZone(int _x, int _y)
 {
-	return (_x > x+5 && _x < x+40 && _y > y && _y < int(y+h));
+	return (_x > x+15 && _x < x+40 && _y > y && _y < int(y+h));
 }
 
 void TOptionsPlayerLine::Init()
 {
-	std::string s = StringF("%s %c%c %-2d %-20s %s %s", pl->IsMe() ? "           " : " [     ] ",
+	std::string s = StringF("%s %c%c %-2d %-20s %s %s", pl->IsMe() ? "      " : " [  ] ",
 	                                              pl->IsOwner() ? '*' : ' ',
 	                                              pl->IsOp() ? '@' : ' ',
 	                                              pl->Position(),
@@ -2034,13 +2082,13 @@ void TOptionsPlayerLine::Init()
 	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
 	MyComponent(label);
 
-	allie = new TLabel(x+20, y, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Normal));
+	allie = new TLabel(x+24, y-3, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Big));
 
-	recipr = new TLabel(x+10, y, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Normal));
+	recipr = new TLabel(x+15, y-3, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Big));
 
 	if(pl->IsMe() == false)
 	{
-		GiveMoneyButton = new TButtonText(x+350, y, 100,30, "Don. argent", Font::GetInstance(Font::Small));
+		GiveMoneyButton = new TButtonText(x+400, y, 100,30, "Don. argent", Font::GetInstance(Font::Small));
 		GiveMoneyButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 		GiveMoneyButton->SetHint("Donner de l'argent à ce joueur.");
 		MyComponent(GiveMoneyButton);

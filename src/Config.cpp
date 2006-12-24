@@ -58,7 +58,7 @@ Config* Config::GetInstance()
 {
 	if (singleton == NULL)
 		singleton = new Config();
-	
+
 	return singleton;
 }
 
@@ -71,23 +71,20 @@ Config::Config()
 bool Config::set_defaults(bool want_save)
 {
 	hostname = "game.coderz.info";
-	port = 5461;
+	port = 5460;
 	nick = "";
 	color = 0;
 	nation = 0;
 	screen_width = 1024;
 	screen_height = 768;
-	ttf_file = PKGDATADIR_FONTS "Vera.ttf";
+	ttf_file = PKGDATADIR_FONTS "larabieb.ttf";
 #ifdef WIN32
 	fullscreen = true;
 #else
 	fullscreen = false;
 #endif
 	server_list.clear();
-	server_list.push_back("game.coderz.info:5461");
-#ifndef WIN32
-	server_list.push_back("127.0.0.1:5461");
-#endif
+	server_list.push_back("game.coderz.info:5460");
 	music = true;
 	effect = true;
 	if(want_save)
@@ -98,6 +95,7 @@ bool Config::set_defaults(bool want_save)
 bool Config::load()
 {
 	std::ifstream fp(filename.c_str());
+	int version = 0;
 
 	if(!fp)
 	{
@@ -115,15 +113,16 @@ bool Config::load()
 
 		std::string key = stringtok(ligne, " ");
 
-		if(key == "SERVER") hostname = ligne;
+		if(key == "VERSION") version = StrToTyp<int>(ligne);
+		else if(key == "SERVER") hostname = ligne;
 		else if(key == "PORT" && is_num(ligne.c_str())) port = StrToTyp<int>(ligne);
 		else if(key == "COLOR" && is_num(ligne.c_str())) color = StrToTyp<uint>(ligne);
 		else if(key == "NATION" && is_num(ligne.c_str())) nation = StrToTyp<uint>(ligne);
 		else if(key == "NICK") nick = ligne;
 		else if(key == "SWIDTH") screen_width = StrToTyp<uint>(ligne);
 		else if(key == "SHEIGHT") screen_height = StrToTyp<uint>(ligne);
-		else if(key == "SERVERLIST") server_list.push_back(ligne);
-		else if(key == "TTF") ttf_file = ligne;
+		else if(key == "SERVERLIST" && version >= 2) server_list.push_back(ligne);
+		else if(key == "TTF" && version >= 2) ttf_file = ligne;
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
 		else if(key == "EFFECT") effect = (ligne == "1" || ligne == "true");
@@ -155,6 +154,7 @@ bool Config::save() const
         return 0;
     }
 
+    fp << "VERSION " << CLIENT_CONFVERSION << std::endl;
     fp << "SERVER " << hostname << std::endl;
     fp << "PORT " << port << std::endl;
     fp << "NICK " << nick << std::endl;
@@ -278,7 +278,7 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 
 	std::string p = form->ServerList->ReadValue(form->ServerList->GetSelectedItem());
 	std::string h = stringtok(p, ":");
-	int pp = StrToTyp<int>(p);
+	int pp = h.empty() ? MSERV_DEFPORT : StrToTyp<int>(p);
 	if(pp > 1 && pp < 65535)
 	{
 		conf->port = pp;

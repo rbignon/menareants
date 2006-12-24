@@ -80,7 +80,8 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		/* 00 */ { 0,      0 },
 		/* 01 */ { I_INFO, "%0Et de %0Eo dégomme %1Et de %1Eo de %2s" }, // attaquant, attaqué, dommage
 		/* 02 */ { I_SHIT, "%0Et de %0Eo vient d'investir le McDo de %1s installé dans la caserne de %2Eo !! Il va tout bouffer ! "
-		                   "Il lui faudra %3s jours !" } // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+		                   "Il lui faudra %3s jours !" }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+		/* 03 */ { I_INFO, "DEBUGINFO: %0s" }
 	};
 	if(InGameForm)
 	{
@@ -1779,7 +1780,7 @@ void TPlayerLine::SetXY (int px, int py)
 
 bool TPlayerLine::OwnZone(int _x, int _y)
 {
-	if(_x > x+45 && _x < x+70 && _y > y && _y < int(y+h))
+	if(_x > x+75 && _x < x+95 && _y > y && _y < int(y+h))
 		return true;
 	else
 		return false;
@@ -1796,18 +1797,18 @@ void TPlayerLine::Init()
 	assert(pl);
 	if(position) delete position;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+210, y, 50, 0, pl->Channel()->Limite(), 1,    0);
+	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+230, y, 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
 	position->SetHint("Votre position sur la carte");
-	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  x+320, y, 50);
+	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  x+340, y, 50);
 	MyComponent(couleur);
 	couleur->SetHint("La couleur de votre camp");
-	nation = new TComboBox(Font::GetInstance(Font::Small), x+430, y, 120);
+	nation = new TComboBox(Font::GetInstance(Font::Small), x+440, y, 120);
 	MyComponent(nation);
 
 	Ready = new TLabel(x, y, "OK", gray_color, Font::GetInstance(Font::Big));
-	Status = new TLabel(x+45, y, pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
-	Nick = new TLabel(x+70, y, pl->GetNick(), white_color, Font::GetInstance(Font::Big));
+	Status = new TLabel(x+75, y, pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
+	Nick = new TLabel(x+95, y, pl->GetNick(), white_color, Font::GetInstance(Font::Big));
 
 	MyComponent(Ready);
 	MyComponent(Status);
@@ -1865,7 +1866,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = "Pret   Pseudo           Pos.    Couleur     Nation";
+	std::string s = "Pret   Pseudo      Pos.  Couleur  Nation";
 	label = new TLabel(x, y, s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
 }

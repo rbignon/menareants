@@ -279,18 +279,13 @@ void ECEntity::AfterDraw()
 			else life.SetValueColor(red_color);
 			life.Draw(0,0);
 		}
-		if(AttaquedCase())
+		if(AttaquedCase() && (EventType() & ARM_ATTAQ))
 			trajectoire.Draw(
 		         AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2
 		                                           : Image()->X()+CASE_WIDTH /2,
 		         AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2
 		                                           : Image()->Y()+CASE_HEIGHT/2);
 	}
-}
-
-bool ECEntity::FindFastPath(ECase* c, ECMove::Vector& path)
-{
-	return true;
 }
 
 bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
@@ -304,9 +299,6 @@ bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 	std::vector<ECBEntity*> ents = c->Entities()->List();
 
 	move = invest = false;
-
-	ECMove::Vector path;
-	if(!FindFastPath(c, path)) return false;
 
 	FOR(ECBEntity*, ents, enti)
 	{

@@ -108,9 +108,17 @@ public:
 
 	bool Error() { return error; }
 
+	void SetMutex(SDL_mutex* m) { mutex = m; }
 	SDL_mutex* Mutex() const { return mutex; }
 	void LockScreen() const;
 	void UnlockScreen() const;
+
+	void AddCommand(EC_ACommand* cmd) { Commands.push_back(cmd); }
+
+	void SetHostName(std::string h) { hostname = h; }
+	std::string HostName() const { return hostname; }
+	void SetPort(unsigned p) { port = p; }
+	unsigned Port() const { return port; }
 
 /* Variables protégées */
 protected:
@@ -135,9 +143,14 @@ protected:
 	ECPlayer *pl;
 	SDL_mutex* mutex;
 
+	std::string hostname;
+	unsigned int port;
+
 /* Variables privées */
 private:
 	void Init();
+	void Loop();
+	void Disconnect();
 };
 
 #endif /* EC_Sockets_h */

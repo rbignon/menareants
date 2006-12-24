@@ -117,15 +117,17 @@ public:
 	time_t Uptime() { return uptime; }
 
 	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0) {}
-	
+
 	TClient* FindClient(int fd) { return myClients[fd]; }
-	
+
 	TClient* FindClient(const char*) const;
 
 	RealClientList MyClients() const { return myClients; }
-	
+
 	TClient *addclient(int fd, const char *ip);
 	void delclient(TClient *del);
+
+	int MSet(std::string, std::string = "");
 
 protected:
 	Config *conf;
@@ -135,16 +137,19 @@ protected:
 	static void sig_alarm(int c);
 
 	time_t uptime;
-	int sock;
+	int sock, ms_sock;
 	unsigned int highsock;
 	fd_set global_fd_set;
 	std::string path;
 
 	std::vector<EC_ACommand*> Commands;
 	void CleanUp();
-	
+
 	std::map<int, TClient*> myClients;
 	std::vector<TClient*> Clients;
+
+	bool ConnectMetaServer();
+	int SendMetaServer(std::string s);
 };
 
 extern ECServer app;

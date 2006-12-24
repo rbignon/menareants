@@ -36,6 +36,17 @@ AC_ARG_ENABLE(  server,
                 ],
         )
 
+AC_ARG_ENABLE(  meta-server,
+                [AC_HELP_STRING([--enable-meta-server],[compilation of Men Are Ants' meta-server])],
+                [
+                        if test "x${enableval}" != "xno"; then
+                                INSTALL_META_SERVER=meta-server
+                                AC_SUBST(INSTALL_META_SERVER)
+                        fi
+                ],
+        )
+
+
 # NE PAS COMPILER ET INSTALLER LE JEU
 
 INSTALL_GAME_Q=1
@@ -163,7 +174,8 @@ if test "x$GCC" = "xyes"; then
 # en reserve: -Weffc++ (il fait bien mal aux variables non initialisées)
 #             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
-      GCC_FLAGS="-Wall -ansi -Wstrict-null-sentinel"
+      GCC_FLAGS="-Wall -ansi"
+      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel"
 
       dnl Enable *more* warnings
       if test "$gccvernum" -ge "400"; then
@@ -203,7 +215,7 @@ MAP_FILES=`echo $MAP_FILES`
 
 AC_SUBST([MAP_FILES])
 
-AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile)
+AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile meta-server/Makefile)
 
 AC_OUTPUT
 

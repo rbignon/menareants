@@ -351,7 +351,7 @@ bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity* entity)
 					Debug(W_DEBUG, "il y a un attaquant qui se trouve fort sodomisé.");
 					if((*enti)->Return() && (*enti)->Owner() && (*enti)->Owner()->Client())
 						chan->SendArm(dynamic_cast<ECPlayer*>((*enti)->Owner())->Client(), *enti,
-										ARM_RETURN, (*enti)->Case()->X(), (*enti)->Case()->Y());
+						              ARM_RETURN, (*enti)->Case()->X(), (*enti)->Case()->Y());
 
 					/* On supprime l'evenement de mouvement linké */
 					std::vector<ECEvent*>::iterator ev;
@@ -582,7 +582,7 @@ bool ECEntity::Return(ECBCase* c)
 	lastlast->last = 0;
 
 	/* On récupère les pas */
-	if(last && last->Case() != acase)
+	if(!last || last->Case() != Case())
 		restStep = !last ? myStep : (last->RestStep()) ? last->RestStep() - 1 : 0;
 
 	if(last)
@@ -631,4 +631,44 @@ std::nrvector<TClient*> ECEntity::EntitiesToClients(std::vector<ECEntity*> entit
 		if((*it)->Owner() && (*it)->Owner()->Client())
 			players.push_back((*it)->Owner()->Client());
 	return players;
+}
+
+void ECEntity::CancelEvents()
+{
+	ECMap* map = dynamic_cast<ECMap*>(Map());
+	EventVector events = map->Events();
+	for(EventVector::iterator evti = events.begin(); evti != events.end();)
+	{
+		bool want_remove = false;
+		if(!(*evti)->Entities()->Find(this))
+		{
+			++evti;
+			continue;
+		}
+		switch((*evti)->Flags())
+		{
+			case ARM_UNION:  // Concerne que des unités du même joueur
+			case ARM_MOVE:   // Forcément qu'une seule unité
+			case ARM_CREATE: // Forcément qu'une seule unité
+			case ARM_SPLIT:  // Concerne que des unités du même joueur
+			case ARM_DEPLOY: // Forcément qu'une seule unité
+				want_remove = true;
+				break;
+			case ARM_ATTAQ:
+				want_remove = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(this);
+				break;
+			default:
+				FDebug(W_WARNING, "Vérification de la suppression d'un evenement dont le type est non géré...");
+		}
+		if(want_remove)
+		{
+			map->RemoveEvent(*evti, USE_DELETE);
+			evti = events.erase(evti);
+		}
+		else
+			++evti;
+	}
+	Return(Move()->FirstCase());
+	Channel()->SendArm(Owner()->Client(), this,
+	                   ARM_RETURN, Case()->X(), Case()->Y());
 }

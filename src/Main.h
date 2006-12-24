@@ -35,14 +35,16 @@ class EC_Client;
 
 class MenAreAntsApp
 {
-protected:
-	
+private:
+
 	SDL_Thread* Thread;
 	SDL_mutex* mutex;
 	std::string path;
 	bool want_quit;
 
-	void request_game();
+	void ServerList();
+	void RefreshList();
+	void ConnectedTo(std::string host);
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0, bool mission = false);
 	void LoadGame(EChannel* ch);

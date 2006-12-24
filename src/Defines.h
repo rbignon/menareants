@@ -27,8 +27,6 @@
 
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants"
-#define APP_SMALLNAME "MenAreAnts"
-#define SERV_SMALLNAME "MenAreAntsD"
 
 #define APP_SITE "http://menareants.coderz.info/"
 

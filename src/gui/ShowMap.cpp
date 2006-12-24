@@ -291,7 +291,7 @@ ECase* TMap::TestCase(int mouse_x, int mouse_y)
 void TMap::DrawFog(ECase* c)
 {
 	// Fog borders: if adjacents cases are fogged and this one is not, then we add fog borders!
-	if(c->Showed() < 0)
+	if(c->Showed() < 0 || !HaveBrouillard())
 		return;
 
 	// Side borders

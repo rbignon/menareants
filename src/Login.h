@@ -23,6 +23,7 @@
 
 #include "gui/Form.h"
 #include "gui/BouttonText.h"
+#include "gui/ListBox.h"
 #include "gui/Memo.h"
 #include "gui/Label.h"
 
@@ -38,7 +39,8 @@ public:
 public:
 
 	TMemo*       Motd;
-	TButtonText* CreateButton;
+	TButtonText* MissionButton;
+	TButtonText* EscarmoucheButton;
 	TButtonText* ListButton;
 	TButtonText* DisconnectButton;
 	TLabel*      Welcome;
@@ -50,5 +52,26 @@ public:
 public:
 
 	std::string Rejoin;
+};
+
+/** This is class based on TForm show a server list received from a meta-server */
+class TListServerForm : public TForm
+{
+/* Constructeur/Destructeur */
+public:
+
+	TListServerForm(ECImage*);
+
+/* Composants */
+public:
+
+	TListBox*    ServerList;
+	TButtonText* RetourButton;
+	TButtonText* RefreshButton;
+	TButtonText* ConnectButton;
+	TLabel*      Label1;
+	TLabel*      Label2;
+
+	bool RecvSList;
 };
 #endif

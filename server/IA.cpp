@@ -25,6 +25,7 @@
 #include "Channels.h"
 #include "Debug.h"
 #include "Units.h"
+#include <sys/time.h>
 
 /********************************************************************************************
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
@@ -224,6 +225,43 @@ public:
 #else
 #define IA_DEBUG(x)
 #endif
+#define USE_FINDFASTPATH
+#ifdef USE_FINDFASTPATH
+void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
+{
+	std::string msg;
+	std::stack<ECBMove::E_Move> moves;
+	if(!nb_cases || nb_cases > enti->RestStep())
+		nb_cases = enti->RestStep();
+
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	int burst = tv.tv_usec;
+	if(!enti->FindFastPath(dest, moves))
+	{
+		if(enti->IsInfantry() && !recruted[enti])
+			UseStrategy(new UseTransportBoat(this), enti);
+		return;
+	}
+	gettimeofday(&tv, NULL);
+	double tt = (tv.tv_usec - burst) / 1000000.0;
+	dynamic_cast<ECEntity*>(enti)->Channel()->send_info(0, EChannel::I_DEBUG, FormatStr("Pour " + TypToStr(enti->Case()->Delta(dest)) + " cases, l'algorithme met: " + StringF("%.6f", tt) + "s"));
+
+	for(uint i = 0; moves.empty() == false && i < nb_cases; ++i)
+	{
+		ECBMove::E_Move m = moves.top();
+		moves.pop();
+		switch(m)
+		{
+			case ECBMove::Up: msg += " ^"; break;
+			case ECBMove::Down: msg += " v"; break;
+			case ECBMove::Left: msg += " <"; break;
+			case ECBMove::Right: msg += " >"; break;
+		}
+	}
+	ia_send("ARM " + std::string(enti->ID()) + msg);
+}
+#else
 void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
 {
 	std::string msg;
@@ -368,6 +406,7 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_s
 	if(!msg.empty())
 		ia_send("ARM " + std::string(enti->ID()) + msg);
 }
+#endif
 
 void TIA::FirstMovements()
 {

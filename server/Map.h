@@ -106,6 +106,8 @@ public:
 	void Shooted(uint n) { shooted += n; }
 	virtual void ReleaseShoot();
 
+	void CancelEvents();
+
 	static std::nrvector<TClient*> EntitiesToClients(std::vector<ECEntity*>);
 
 /* Attributs */

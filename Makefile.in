@@ -97,6 +97,7 @@ ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_GAME = @INSTALL_GAME@
+INSTALL_META_SERVER = @INSTALL_META_SERVER@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_SERVER = @INSTALL_SERVER@
@@ -175,7 +176,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-SUBDIRS = lib ${INSTALL_SERVER} ${INSTALL_GAME}
+SUBDIRS = lib ${INSTALL_META_SERVER} ${INSTALL_SERVER} ${INSTALL_GAME}
 AUTOMAKE_OPTIONS = foreign
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -607,7 +608,7 @@ doxygen:
 
 update:
 	@echo "Updating.."
-	@svn update 
+	@svn update
 	@echo "Compilation.."
 	@./config.status --recheck > /dev/null && make > /dev/null
 	@echo "MenAreAnts is Up-to-date !"

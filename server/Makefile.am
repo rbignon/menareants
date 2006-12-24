@@ -4,8 +4,8 @@ DEFS = -DCONFDIR=\"${sysconfdir}/\" -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
 LIBS =
 
-bin_PROGRAMS = menareantsserver
-menareantsserver_SOURCES = \
+bin_PROGRAMS = menareants-server
+menareants_server_SOURCES = \
 	Main.cpp \
 	Server.cpp \
 	Config.cpp \
@@ -18,7 +18,7 @@ menareantsserver_SOURCES = \
 	Units.cpp \
 	InGame.cpp
 
-menareantsserver_LDADD =$(top_srcdir)/lib/libmenareants.a
+menareants_server_LDADD =$(top_srcdir)/lib/libmenareants.a
 
 install-data-local:
 	@if test ! -f "${sysconfdir}/menareantsd.conf"; then \

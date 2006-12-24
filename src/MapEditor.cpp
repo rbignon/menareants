@@ -282,6 +282,14 @@ void EMap::Save()
 		fp << "UNIT " << (*st)->Type() << " " << "*"
 		   << " " << (*st)->Case()->X() << "," << (*st)->Case()->Y()
 		   << " " << (*st)->Nb()  << std::endl;
+
+	if(scripting.empty() == false)
+	{
+		fp << "START_SCRIPTING" << std::endl;
+		FORit(std::string, scripting, it)
+			fp << *it << std::endl;
+		fp << "STOP_SCRIPTING" << std::endl;
+	}
 }
 
 /********************************************************************************************
@@ -1130,7 +1138,7 @@ void TOptionsMap::Options(TObject*, void* m)
 								TMessageBox mb("L'identifiant doit faire 2 caractères", BT_OK, OptionsMap);
 								mb.Show();
 							}
-							if(map->GetCountry(c_id.c_str()))
+							else if(map->GetCountry(c_id.c_str()))
 							{
 								TMessageBox mb("L'identifiant est déjà utilisé", BT_OK, OptionsMap);
 								mb.Show();

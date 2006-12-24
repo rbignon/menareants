@@ -49,6 +49,10 @@
 #include "tools/Video.h"
 #include <functional>
 
+#if !defined(DEBUG) && defined(UNSTABLE)
+#error Vous tentez de compiler une version instable. Si vous êtes certain de vouloir la compiler, rajoutez --enable-debug dans les options du script ./configure
+#endif
+
 extern const char* SVNVERSION;
 #ifdef APP_VERSION_PATCH
 std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
@@ -86,7 +90,7 @@ MenAreAntsApp* MenAreAntsApp::GetInstance()
 {
 	if (singleton == NULL)
 		singleton = new MenAreAntsApp();
-	
+
 	return singleton;
 }
 
@@ -102,7 +106,7 @@ void MenAreAntsApp::WantQuit(TObject*, void*)
 
 void MenAreAntsApp::WantPlay(TObject*, void*)
 {
-	MenAreAntsApp::GetInstance()->request_game();
+	MenAreAntsApp::GetInstance()->ServerList();
 	TMainForm::enter_in_main = true;
 }
 

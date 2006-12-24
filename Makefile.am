@@ -1,6 +1,7 @@
 INSTALL_SERVER=@INSTALL_SERVER@
 INSTALL_GAME=@INSTALL_GAME@
-SUBDIRS = lib ${INSTALL_SERVER} ${INSTALL_GAME}
+INSTALL_META_SERVER=@INSTALL_META_SERVER@
+SUBDIRS = lib ${INSTALL_META_SERVER} ${INSTALL_SERVER} ${INSTALL_GAME}
 
 AUTOMAKE_OPTIONS = foreign
 
@@ -10,11 +11,11 @@ doxygen:
 
 update:
 	@echo "Updating.."
-	@svn update 
+	@svn update
 	@echo "Compilation.."
 	@./config.status --recheck > /dev/null && make > /dev/null
 	@echo "MenAreAnts is Up-to-date !"
 	@echo "You have to reinstall (with make install) this game."
-	
+
 clean-generic:
 	-rm -f .#* *~

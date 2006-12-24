@@ -653,6 +653,7 @@ RANLIB
 WIN32_TRUE
 WIN32_FALSE
 INSTALL_SERVER
+INSTALL_META_SERVER
 INSTALL_GAME
 SDL_CONFIG
 CC
@@ -1261,6 +1262,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-server         compilation of Men Are Ants' server
+  --enable-meta-server    compilation of Men Are Ants' meta-server
   --disable-game          compilation without Men Are Ants' game
   --disable-sdltest       Do not try to compile and run a test SDL program
   --enable-warnings       enable warnings during compilation (-Wall)
@@ -3311,6 +3313,18 @@ if test "${enable_server+set}" = set; then
 fi
 
 
+# Check whether --enable-meta-server was given.
+if test "${enable_meta_server+set}" = set; then
+  enableval=$enable_meta_server;
+                        if test "x${enableval}" != "xno"; then
+                                INSTALL_META_SERVER=meta-server
+
+                        fi
+
+fi
+
+
+
 # NE PAS COMPILER ET INSTALLER LE JEU
 
 INSTALL_GAME_Q=1
@@ -4994,7 +5008,8 @@ echo "${ECHO_T}$gccver" >&6; }
       # en reserve: -Weffc++ (il fait bien mal aux variables non initialisées)
 #             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
-      GCC_FLAGS="-Wall -ansi -Wstrict-null-sentinel"
+      GCC_FLAGS="-Wall -ansi"
+      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel"
 
             if test "$gccvernum" -ge "400"; then
                             GCC_FLAGS="$GCC_FLAGS -Wextra"
@@ -5031,7 +5046,7 @@ MAP_FILES=`echo $MAP_FILES`
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile meta-server/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -5620,6 +5635,7 @@ do
     "server/Makefile") CONFIG_FILES="$CONFIG_FILES server/Makefile" ;;
     "server/menareantsd.conf") CONFIG_FILES="$CONFIG_FILES server/menareantsd.conf" ;;
     "server/maps/Makefile") CONFIG_FILES="$CONFIG_FILES server/maps/Makefile" ;;
+    "meta-server/Makefile") CONFIG_FILES="$CONFIG_FILES meta-server/Makefile" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -5772,13 +5788,13 @@ RANLIB!$RANLIB$ac_delim
 WIN32_TRUE!$WIN32_TRUE$ac_delim
 WIN32_FALSE!$WIN32_FALSE$ac_delim
 INSTALL_SERVER!$INSTALL_SERVER$ac_delim
+INSTALL_META_SERVER!$INSTALL_META_SERVER$ac_delim
 INSTALL_GAME!$INSTALL_GAME$ac_delim
 SDL_CONFIG!$SDL_CONFIG$ac_delim
 CC!$CC$ac_delim
 CFLAGS!$CFLAGS$ac_delim
 ac_ct_CC!$ac_ct_CC$ac_delim
 CCDEPMODE!$CCDEPMODE$ac_delim
-am__fastdepCC_TRUE!$am__fastdepCC_TRUE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -5820,6 +5836,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+am__fastdepCC_TRUE!$am__fastdepCC_TRUE$ac_delim
 am__fastdepCC_FALSE!$am__fastdepCC_FALSE$ac_delim
 SDL_CFLAGS!$SDL_CFLAGS$ac_delim
 SDL_LIBS!$SDL_LIBS$ac_delim
@@ -5829,7 +5846,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 7; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 8; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

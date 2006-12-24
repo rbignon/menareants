@@ -354,6 +354,182 @@ std::string ECBEntity::LongName()
 }
 
 /********************************************************************************************
+ *                               ECBFindFastPath                                            *
+ ********************************************************************************************/
+
+bool ECBFindFastPath::FindPath()
+{
+	ECBCase* courant = from_case;
+
+	noeud depart;
+	depart.parent = 0;
+
+	/* ajout de courant dans la liste ouverte */
+	liste_ouverte[courant]=depart;
+	ajouter_liste_fermee(courant);
+	ajouter_cases_adjacentes(courant);
+
+	/* tant que la destination n'a pas été atteinte et qu'il reste des noeuds à explorer dans la liste ouverte */
+	while(courant != to_case && !liste_ouverte.empty())
+	{
+		/* on cherche le meilleur noeud de la liste ouverte, on sait qu'elle n'est pas vide donc il existe */
+		courant = meilleur_noeud(liste_ouverte);
+
+		/* on le passe dans la liste fermee, il ne peut pas déjà y être */
+		ajouter_liste_fermee(courant);
+
+		/* on recommence la recherche des noeuds adjacents */
+		ajouter_cases_adjacentes(courant);
+	}
+
+	/* si la destination est atteinte, on remonte le chemin */
+	if (courant == to_case)
+	{
+		retrouver_chemin();
+		return true;
+	}
+	return false;
+}
+
+bool ECBFindFastPath::deja_present_dans_liste(ECBCase* n, l_noeud& l)
+{
+	l_noeud::iterator i = l.find(n);
+	if (i==l.end())
+		return false;
+	else
+		return true;
+}
+
+void ECBFindFastPath::ajouter_cases_adjacentes(ECBCase* n)
+{
+	noeud tmp;
+	/* on met tous les noeud adjacents dans la liste ouverte (+vérif) */
+	for (int _i=n->X()-1; _i<=int(n->X()+1); _i++)
+	{
+		if ((_i<0) || (_i >= (int)map->Width()))  /* en dehors de l'image, on oublie */
+			continue;
+		uint i = _i;
+		for (int _j=n->Y()-1; _j<=int(n->Y()+1); _j++)
+		{
+			if ((_j<0) || (_j>=(int)map->Height()))   /* en dehors de l'image, on oublie */
+				continue;
+
+			uint j = _j;
+
+			if(!((i==n->X()) ^ (j==n->Y()))) // Case actuelle ou diagonale
+				continue;
+
+			ECBCase* it = (*map)(i,j);
+
+			if (entity->CanWalkOn(it) == false)
+				/* obstace, terrain non franchissable, on oublie */
+				continue;
+			if (!deja_present_dans_liste(it, liste_fermee))
+			{
+				/* le noeud n'est pas déjà présent dans la liste fermée */
+
+				/* calcul du cout G du noeud en cours d'étude : cout du parent + distance jusqu'au parent */
+				tmp.cout_g = liste_fermee[n].cout_g + n->Delta(it);
+
+				/* calcul du cout H du noeud à la destination */
+				tmp.cout_h = it->Delta(to_case);
+				tmp.cout_f = tmp.cout_g + tmp.cout_h;
+				tmp.parent = n;
+
+				if (deja_present_dans_liste(it, liste_ouverte))
+				{
+					/* le noeud est déjà présent dans la liste ouverte, il faut comparer les couts */
+					if (tmp.cout_f < liste_ouverte[it].cout_f){
+						/* si le nouveau chemin est meilleur, on met à jour */
+						liste_ouverte[it]=tmp;
+					}
+					/* le noeud courant a un moins bon chemin, on ne change rien */
+				}else{
+					/* le noeud n'est pas présent dans la liste ouverte, on l'y ajoute */
+					liste_ouverte[it]=tmp;
+				}
+			}
+		}
+	}
+}
+
+ECBCase* ECBFindFastPath::meilleur_noeud(l_noeud& l)
+{
+	float m_coutf = l.begin()->second.cout_f;
+	ECBCase* m_noeud = l.begin()->first;
+
+	for (l_noeud::iterator i = l.begin(); i!=l.end(); i++)
+		if (i->second.cout_f< m_coutf)
+		{
+			m_coutf = i->second.cout_f;
+			m_noeud = i->first;
+		}
+
+	return m_noeud;
+}
+
+void ECBFindFastPath::ajouter_liste_fermee(ECBCase* p)
+{
+	noeud n = liste_ouverte[p];
+	liste_fermee[p]=n;
+
+	/* il faut le supprimer de la liste ouverte, ce n'est plus une solution explorable */
+	if (liste_ouverte.erase(p)==0)
+		throw ECExcept("", "Erreur, le noeud n'apparait pas dans la liste ouverte, impossible à supprimer");
+	return;
+}
+
+ECBMove::E_Move ECBFindFastPath::find_movement(ECBCase* from, ECBCase* to)
+{
+	if(from->X() == to->X())
+	{
+		if(from->Y() > to->Y())
+			return ECBMove::Up;
+		else
+			return ECBMove::Down;
+	}
+	else if(from->Y() == to->Y())
+	{
+		if(from->X() > to->X())
+			return ECBMove::Left;
+		else
+			return ECBMove::Right;
+	}
+	else
+		throw ECExcept(VIName(from->X()) VIName(from->Y()) VIName(to->X()) VIName(to->Y()), "Mouvement introuvable");
+}
+
+void ECBFindFastPath::retrouver_chemin()
+{
+	noeud& tmp = liste_fermee[to_case];
+
+	ECBCase* n = to_case;
+	ECBCase* prec = tmp.parent;
+
+	//moves.push(find_movement(n, ));
+
+	while (prec)
+	{
+		moves.push(find_movement(prec, n));
+		n = prec;
+
+		tmp = liste_fermee[tmp.parent];
+		prec = tmp.parent;
+	}
+}
+
+bool ECBEntity::FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& move, ECBCase* from)
+{
+	ECBFindFastPath fastpath(this, dest, from ? from : Case());
+
+	if(fastpath.FindPath() == false) return false;
+
+	move = fastpath.Moves();
+
+	return true;
+}
+
+/********************************************************************************************
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 
@@ -562,7 +738,7 @@ void ECBMap::Init()
 
 	std::string ligne;
 
-	bool recv_map = false;
+	bool recv_map = false, recv_scripting = false;
 	uint _x = 0, _y = 0, num_player = 0;
 
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
@@ -570,7 +746,7 @@ void ECBMap::Init()
 		ligne = (*it);
 		if(ligne[0] == '#' || ligne[0] == '\0') continue; /* Commentaire */
 		if(ligne[ligne.size()-1] == '\r')
-				ligne.resize(ligne.size()-1);
+			ligne.resize(ligne.size()-1);
 		if(ligne == "EOM")
 		{
 			if(_y < y)
@@ -578,7 +754,14 @@ void ECBMap::Init()
 			recv_map = false;
 			continue;
 		}
-		if(!recv_map)
+		else if(ligne == "STOP_SCRIPTING")
+		{
+			recv_scripting = false;
+			continue;
+		}
+		else if(recv_scripting)
+			scripting.push_back(ligne);
+		else if(!recv_map)
 		{
 			SeeMapLine(ligne);
 			std::string key = stringtok(ligne, " ");
@@ -603,7 +786,8 @@ void ECBMap::Init()
 					mp->SetNick(ligne);
 			}
 			else if(key == "MAP") recv_map = true;
-			else if(key == "BEGIN") {}
+			else if(key == "START_SCRIPTING") recv_scripting = true;
+			else if(key == "BEGIN") {} // compatibilité
 			else if(key == "CITY") city_money = atoi(ligne.c_str());
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());

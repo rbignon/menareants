@@ -25,6 +25,50 @@
 
 #define DEFAULT_FILE "gna.map"
 
+class ECMap : public ECBMap
+{
+/* Constructeur/Destructeur */
+public:
+	/** Path of map (used only by Server) */
+	ECMap(std::string _filename)
+		: ECBMap(_filename)
+	{}
+
+	/** Constructor from a string's vector
+	 * @param _map_file this is a string's vector where there is informations about map
+	 */
+//	ECMap(std::vector<std::string> _map_file);
+
+	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
+};
+
+template<typename T>
+static ECBCase* CreateCase(ECBMap *map, uint x, uint y, uint flags, char type_id)
+{
+	return new T(map, x, y, flags, type_id);
+}
+
+static struct
+{
+	char c;
+	ECBCase* (*func) (ECBMap *map, uint x, uint y, uint flgs, char type_id);
+	uint flags;
+} case_type[] = {
+	{ 'm', CreateCase<ECBMer>,      C_MER              },
+	{ 't', CreateCase<ECBTerre>,    C_TERRE            },
+	{ 'p', CreateCase<ECBPont>,     C_PONT             },
+	{ 'M', CreateCase<ECBMontain>,  C_MONTAIN          }
+};
+
+ECBCase* ECMap::CreateCase(uint _x, uint _y, char type_id)
+{
+	for(uint j=0; j < (sizeof case_type / sizeof *case_type); j++)
+		if(case_type[j].c == type_id)
+			return case_type[j].func (this, _x, _y, case_type[j].flags, case_type[j].c);
+
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	char* filename = 0;
@@ -33,10 +77,10 @@ int main(int argc, char **argv)
 	else
 		filename = DEFAULT_FILE;
 
-	ECBMap *map = 0;
+	ECMap *map = 0;
 	try
 	{
-		map = new ECBMap("../server/maps/" + std::string(filename));
+		map = new ECMap("../server/maps/" + std::string(filename));
 		map->Init();
 
 		/* Utilisation de printf parce que c'est plus beau */
@@ -77,14 +121,34 @@ int main(int argc, char **argv)
 			printf("\n");
 		}
 		printf("-----------------------\n");
+		std::stack<ECBMove::E_Move> moves;
+		if(!map->Entities()->First()->FindFastPath(, moves))
+			printf("Path introuvable\n");
+		else
+		{
+			while(moves.empty() == false)
+			{
+				ECBMove::E_Move m = moves.top();
+				switch(m)
+				{
+					case ECBMove::Up: printf("^"); break;
+					case ECBMove::Down: printf("v"); break;
+					case ECBMove::Right: printf(">"); break;
+					case ECBMove::Left: printf("<"); break;
+				}
+				moves.pop();
+			}
+			printf("\n");
+		}
+		printf("-----------------------\n");
 		std::vector<ECBMapPlayer*> m_p = map->MapPlayers();
 		for(std::vector<ECBMapPlayer*>::iterator it=m_p.begin(); it != m_p.end(); ++it)
 			printf("Player %c : %d countries\n", (*it)->ID(), (*it)->Countries().size());
 	}
 	catch(TECExcept &e)
 	{
-		std::cout << "Erreur    : " << e.Message << std::endl;
-		std::cout << "Variables : " << e.Vars << std::endl;
+		std::cout << "Erreur    : " << e.Message() << std::endl;
+		std::cout << "Variables : " << e.Vars() << std::endl;
 	}
 
 	delete map;

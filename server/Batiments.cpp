@@ -83,8 +83,8 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 		}
 
 	return false;
@@ -148,8 +148,8 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			Shoot(dynamic_cast<ECEntity*>(*it), killed);
 		}
 
 

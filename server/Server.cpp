@@ -34,10 +34,11 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <cstdarg>
+#include <netdb.h>
 
 /* Messages à envoyer */
 const char* msgTab[] = {
-     "HEL " APP_SMALLNAME " " APP_PVERSION, /* HEL - Hello */
+     "HEL " SERV_SMALLNAME " " APP_PVERSION, /* HEL - Hello */
      "MAJ %c",                              /* MAJ - Nécessite une mise à jour du client */
      "ERR",                                 /* ERR - Erreur en provenance theorique du client */
      "BYE",                                 /* BYE - Dis adieu à un client */
@@ -275,6 +276,7 @@ TClient *ECServer::addclient(int fd, const char *ip)
 		FD_SET(fd, &global_fd_set);
 		NBco++;
 		NBtot++;
+		MSet("+p " + TypToStr(NBco));
 		myClients[fd] = newC;
 		if((unsigned)fd > highsock) highsock = fd;
 
@@ -335,6 +337,7 @@ void ECServer::delclient(TClient *del)
 					highsock = it->second->GetFd();
 		}
 		NBco--;
+		MSet("+p " + TypToStr(NBco));
 	}
 	Clients.erase(std::remove(Clients.begin(), Clients.end(), del), Clients.end());
 	delete del;
@@ -388,7 +391,79 @@ int ECServer::init_socket(void)
 		delete *it;
 	Clients.clear();
 
+	if(ConnectMetaServer() == false)
+		return 0;
+
 	return 1;
+}
+
+int ECServer::SendMetaServer(std::string s)
+{
+	if(ms_sock == 0) return -1;
+
+	s = s + "\r\n";
+
+	send(ms_sock, s.c_str(), s.size(), 0);
+	printf("MS S - %s", s.c_str());
+
+	return 0;
+}
+
+int ECServer::MSet(std::string c, std::string s)
+{
+	return SendMetaServer("SET " + c + " " + s);
+}
+
+bool ECServer::ConnectMetaServer()
+{
+	if(ms_sock != 0) return false;
+
+	const char *hostname = conf->MSHost().c_str();
+	unsigned short port = conf->MSPort();
+
+	/* Création du socket
+	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
+	 * valeur d'une variable statique qui s'initialise elle toute seule.
+	 */
+	static struct sockaddr_in fsocket_init;
+	struct sockaddr_in fsocket = fsocket_init;
+	ms_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	const char* ip = hostname;
+
+	/* Si c'est une host, on la résoud */
+	if(!is_ip(hostname))
+	{
+		struct hostent *hp = gethostbyname(hostname);
+		if(!hp)
+		{
+			std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ")" << std::endl;
+			return false;
+		}
+
+		ip = inet_ntoa(*(struct in_addr *)(*(hp->h_addr_list)));
+	}
+
+	fsocket.sin_family = AF_INET;
+	fsocket.sin_addr.s_addr = inet_addr(ip);
+	fsocket.sin_port = htons(port);
+
+	/* Connexion */
+	if(connect(ms_sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
+	{
+		std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ") : " << strerror(errno) << std::endl;
+		return false;
+	}
+
+	FD_SET(ms_sock, &global_fd_set);
+
+	if((unsigned)ms_sock > highsock)
+		highsock = ms_sock;
+
+	SendMetaServer("IAM " + conf->ServerName() + " " SERV_SMALLNAME " " APP_MSPROTO);
+	MSet("+iPGv", TypToStr(conf->Port()) + " " + TypToStr(conf->MaxConnexions()) + " " + TypToStr(conf->MaxGames()) + " " APP_PVERSION);
+
+	return true;
 }
 
 int ECServer::run_server(void)
@@ -419,6 +494,18 @@ int ECServer::run_server(void)
 					int newfd = accept(sock, (struct sockaddr *) &newcon, &addrlen);
 					if(newfd > 0)
 						if(!addclient(newfd, inet_ntoa(newcon.sin_addr))) close(newfd);
+				}
+				else if(i == (unsigned)ms_sock)
+				{
+					char buf[MAXBUFFER];
+					if(recv(i, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
+					{
+						Debug(W_WARNING, "Error in recv(%d) (%d: %s)\n", i, errno, strerror(errno));
+						close(ms_sock);
+						ms_sock = 0;
+						ConnectMetaServer();
+					}
+					/* On ne fait rien, car le serveur n'est rien censé nous dire */
 				}
 				else
 				{

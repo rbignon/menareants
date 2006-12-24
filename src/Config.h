@@ -27,6 +27,8 @@
 class TObject;
 class TListBox;
 
+#define CLIENT_CONFVERSION 2
+
 class Config
 {
 /* Constructeur/Destructeur */

@@ -138,7 +138,8 @@ public:
 	{
 		I_NONE,
 		I_SHOOT,  // attaquant, attaqué, domage
-		I_JOUANO  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+		I_JOUANO,  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+		I_DEBUG,
 	};
 
 /* Methodes */

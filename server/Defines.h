@@ -29,8 +29,6 @@ typedef unsigned int   uint;
 
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants Daemon"
-#define APP_SMALLNAME "MenAreAntsD"
-#define CLIENT_SMALLNAME "MenAreAnts"
 
 /* Fichier de debugage */
 #define DEBUG_LOG       "parses.log"     /* Fichier de DEBUG */

@@ -172,8 +172,6 @@ public:
 
 	bool CanWalkTo(ECase* c, bool &move, bool &invest);
 
-	bool FindFastPath(ECase* c, ECMove::Vector& path);
-
 /* Attributs */
 public:
 
@@ -377,7 +375,7 @@ public:
 	ECDate* InitDate() { return &init_date; }
 
 /* Variables privées */
-protected:
+private:
 	ECImage preview;
 	TMap *showmap;
 	ECDate init_date;
