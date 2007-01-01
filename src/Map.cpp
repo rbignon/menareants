@@ -1,6 +1,6 @@
 /* src/Map.cpp - Map classes
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -318,7 +318,7 @@ bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 		}
 	}
 
-	if(can_invest > 0)
+	if(can_invest >= 2 || can_invest >= 1 && this->CanWalkOn(c))
 		return (invest = true);
 	else if(this->CanWalkOn(c))
 		return (move = true);

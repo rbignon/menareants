@@ -1,3 +1,13 @@
+2007-01-01 Romain Bignon <progs@headfucking.net>
+
+	* src/Login.cpp: Affichage du ping dans la liste des serveurs.
+
+2006-12-25 Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp: Le FindFastPath accepte aussi les cases où l'entité trouve une unité à investir.
+
+	* src/InGame.cpp: Modification du message d'attente.
+
 2006-12-23 Romain Bignon <progs@headfucking.net>
 
 	* src/Sockets.cpp: EC_Client est maintenant utilisable pour plusieurs fins (meta-server et menareantsd).

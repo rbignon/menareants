@@ -1,5 +1,5 @@
 /* src/InGame.cpp - Functions in game !
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -326,10 +326,10 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(InGameForm && (entities.size() > 1 ? event_case : entities.front()->Case())->Showed() > 0 &&
 		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE && !entities.front()->IsHiddenOnCase())
 		{
-			InGameForm->ShowWaitMessage = false;
+			InGameForm->ShowWaitMessage.clear();
 			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
 		}
-		else InGameForm->ShowWaitMessage = true;
+		else InGameForm->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : "Neutre";
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -720,14 +720,14 @@ void MenAreAntsApp::InGame()
 			else if(chan->State() == EChannel::ANIMING)
 			{
 				elapsed_time->reset();
-				if(InGameForm->ShowWaitMessage)
+				if(InGameForm->ShowWaitMessage.empty() == false)
 				{
 					do
 					{
-						TMessageBox("Veuillez patienter...\n\nUne animation non visible est en cours.",
+						TMessageBox("Veuillez patienter...\n\nUne unité de " + InGameForm->ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
 						            0, InGameForm, false).Draw();
 						SDL_Delay(20);
-					} while(InGameForm->ShowWaitMessage && chan->State() == EChannel::ANIMING);
+					} while(InGameForm->ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
 					InGameForm->Map->SetMustRedraw();
 				}
 
@@ -1034,7 +1034,6 @@ void MenAreAntsApp::InGame()
 											else
 												contener = 0;
 									}
-#if 1
 									std::stack<ECBMove::E_Move> moves;
 									if(selected_entity->FindFastPath(acase, moves, init_case))
 									{
@@ -1071,43 +1070,6 @@ void MenAreAntsApp::InGame()
 											break;
 										}
 									}
-#else
-									if((acase->X() != init_case->X() ^ acase->Y() != init_case->Y()))
-									{
-										std::string move;
-										uint d = acase->Delta(init_case);
-										if(acase->X() != init_case->X())
-											for(uint i=0; i != (contener ? d-1 : d); ++i)
-												if(acase->X() < init_case->X())
-													move += " <";
-												else
-													move += " >";
-										if(acase->Y() != init_case->Y())
-											for(uint i=0; i != (contener ? d-1 : d); ++i)
-												if(acase->Y() < init_case->Y())
-													move += " ^";
-												else
-													move += " v";
-										if(!move.empty())
-										{
-											if(selected_entity->MyStep() == 0)
-												InGameForm->AddInfo(I_SHIT, "Cette unité ne peut avancer.");
-											else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
-												InGameForm->AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une "
-												                            "journée !");
-											else
-												client->sendrpl(client->rpl(EC_Client::ARM),
-											               std::string(std::string(selected_entity->ID()) + move).c_str());
-										}
-										if(contener)
-										{
-											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
-											                " )" + std::string(contener->ID())).c_str());
-											InGameForm->SetCursor();
-											break;
-										}
-									}
-#endif
 								}
 								else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
 								{
@@ -1227,7 +1189,7 @@ void TInGameForm::ShowBarreLat(bool show)
 }
 
 TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
-	: TForm(w), ShowWaitMessage(false), WantBalise(false)
+	: TForm(w), WantBalise(false)
 {
 	assert(pl && pl->Channel() && pl->Channel()->Map());
 
@@ -1798,7 +1760,7 @@ void TBarreAct::Init()
 	HelpButton = AddComponent(new TButtonText(500,15,100,30, "Plus d'infos", Font::GetInstance(Font::Small)));
 	HelpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	HelpButton->SetHint("Affiche toutes les caractéristiques de l'unité.");
-	GiveButton = AddComponent(new TButtonText(500,15,100,30, "Don. Territoire", Font::GetInstance(Font::Small)));
+	GiveButton = AddComponent(new TButtonText(500,15,100,30, "Don. Terr.", Font::GetInstance(Font::Small)));
 	GiveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	GiveButton->SetHint("Donner ce territoire à un autre joueur.");
 

@@ -1,6 +1,6 @@
 /* server/Serveur.cpp - Server
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -380,11 +380,9 @@ int ECServer::init_socket(void)
 		highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
-	std::cout << "Server " << APP_NAME << "(" << APP_VERSION << ") running (Port " << conf->Port() << ")"
-	          << std::endl;
 	uptime = CurrentTS;
 
-	Debug(W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
+	Debug(W_ECHO|W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
 
 	myClients.clear();
 	for(std::vector<TClient*>::iterator it = Clients.begin(); it != Clients.end(); ++it)
@@ -404,7 +402,6 @@ int ECServer::SendMetaServer(std::string s)
 	s = s + "\r\n";
 
 	send(ms_sock, s.c_str(), s.size(), 0);
-	printf("MS S - %s", s.c_str());
 
 	return 0;
 }

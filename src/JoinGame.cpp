@@ -1,6 +1,6 @@
 /* src/JoinGame.cpp - Functions to list game and join/create a game.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -501,7 +501,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->Map()->InitDate()->SetDate(chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
-						InGameForm->ShowWaitMessage = false;
+						InGameForm->ShowWaitMessage.clear();
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
 						// Move the lateral bar

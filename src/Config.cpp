@@ -1,6 +1,6 @@
 /* src/Config.cpp - Configuration
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,11 @@ bool Config::set_defaults(bool want_save)
 {
 	hostname = "game.coderz.info";
 	port = 5460;
-	nick = "";
+#ifdef WIN32
+	nick = getenv("USERNAME");
+#else
+	nick = getenv("USER");
+#endif
 	color = 0;
 	nation = 0;
 	screen_width = 1024;

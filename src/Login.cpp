@@ -1,6 +1,6 @@
 /* src/Login.cpp - Login commands
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,15 @@
 #include "Main.h"
 #include "Config.h"
 #include "Timer.h"
+
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#endif
 
 TConnectedForm  *ConnectedForm  = NULL;
 TListServerForm *ListServerForm = NULL;
@@ -201,11 +210,30 @@ int HELmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	int sock;
+	static struct sockaddr_in fsocket_init;
+	struct sockaddr_in fsocket = fsocket_init;
+	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	std::string host = parv[1];
+
+	fsocket.sin_family = AF_INET;
+	fsocket.sin_addr.s_addr = inet_addr(stringtok(host, ":").c_str());
+	fsocket.sin_port = htons(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
+
+	Timer timer;
+	int t0 = SDL_GetTicks();
+
+	/* Connexion */
+	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
+		return 0;
+
 	ListServerForm->ServerList->AddItem(false,
-	                      StringF("%-3d %-27s %2s     %3s/%-3s    %3s/%-3s       %-3s", 0, parv[2].c_str(), parv[9].c_str(),
+	                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 	                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
 	                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? black_color : red_color,
 	                               (parv[3][0] == '+' && parv[9] == APP_PVERSION));
+	close(sock);
 	return 0;
 }
 
@@ -415,9 +443,9 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 				client->SetWantDisconnect();
 
 			if(!client)
-				msg = "Connexion impossible au meta-serveur";
+				msg = "Connexion impossible à " + host;
 			else
-				msg = "Connexion impossible au meta-serveur :\n\n" + client->CantConnect();
+				msg = "Connexion impossible à " + host + " :\n\n" + client->CantConnect();
 			TMessageBox(msg, BT_OK, ListServerForm).Show();
 
 			SDL_WaitThread(Thread, 0);
@@ -573,156 +601,3 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	SetBackground(Resources::Titlescreen());
 }
-
-#if 0
-void MenAreAntsApp::request_game()
-{
-	if(EC_Client::GetInstance())
-	{
-		FDebug(W_SEND|W_ERR, "Appel en étant déjà connecté !");
-		return;
-	}
-
-	try
-	{
-		bool eob = false;
-		SDL_Event event;
-		do
-		{
-			while( SDL_PollEvent( &event) )
-			{
-				ConnectedForm->Actions(event);
-				switch(event.type)
-				{
-					case SDL_KEYUP:
-						switch (event.key.keysym.sym)
-						{
-							case SDLK_ESCAPE:
-								client->SetWantDisconnect();
-								eob = true;
-								break;
-							default: break;
-						}
-						break;
-					case SDL_MOUSEBUTTONDOWN:
-						if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y))
-						{
-							client->SetWantDisconnect();
-							eob = true;
-						}
-						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y))
-						{
-							ListGames();
-							client->sendrpl(client->rpl(EC_Client::STAT));
-						}
-						if(ConnectedForm->MissionButton->Test(event.button.x, event.button.y))
-						{
-							if(!GameInfos(NULL, ConnectedForm, true))
-								TMessageBox("Impossible de créer une mission.\n"
-								            "Il y a actuellement de trop de parties en cours sur le serveur.",
-								            BT_OK, ConnectedForm).Show();
-
-							client->sendrpl(client->rpl(EC_Client::STAT));
-						}
-						if(ConnectedForm->EscarmoucheButton->Test(event.button.x, event.button.y))
-						{
-							if(!GameInfos(NULL, ConnectedForm))
-								TMessageBox("Impossible de créer une escarmouche.\n"
-								            "Il y a actuellement de trop de parties en cours sur le serveur.",
-								            BT_OK, ConnectedForm).Show();
-							client->sendrpl(client->rpl(EC_Client::STAT));
-						}
-						break;
-					default:
-						break;
-				}
-			}
-			ConnectedForm->Update();
-
-			if(ConnectedForm->Rejoin.empty() == false)
-			{
-				if(TMessageBox("Vous avez été déconnecté pendant que vous jouiez à la partie " +
-				                ConnectedForm->Rejoin + ".\n\n"
-				                "Souhaitez-vous rejoindre la partie ?",
-				               BT_YES|BT_NO, ConnectedForm).Show() == BT_YES)
-				{
-					RecoverGame(ConnectedForm->Rejoin);
-				}
-				ConnectedForm->Rejoin.clear();
-			}
-			if(!client || !client->IsConnected())
-			{
-				eob = true;
-
-				TMessageBox mb("Vous avez été déconnecté.", BT_OK, NULL);
-				mb.SetBackGround(Resources::Titlescreen());
-				mb.Show();
-			}
-		} while(!eob);
-	}
-	catch(const TECExcept &e)
-	{
-		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
-		EC_Client::GetInstance()->SetWantDisconnect();
-		TMessageBox mb("Une erreur s'est produite dans le jeu !!\n\n"
-		               "Elle a été envoyée aux programmeurs du jeu qui feront leur "
-		               "possible pour le corriger.\n\n"
-		               "Veuillez nous excuser de la gêne occasionée", BT_OK, NULL);
-				mb.SetBackGround(Resources::Titlescreen());
-				mb.Show();
-#ifdef DEBUG
-		throw;
-#endif
-	}
-	if(EC_Client::GetInstance())
-	{
-		EC_Client::GetInstance()->SetWantDisconnect();
-		SDL_WaitThread(Thread, 0);
-		delete EC_Client::GetInstance();
-		EC_Client::singleton = NULL;
-	}
-	else if(Thread)
-		SDL_WaitThread(Thread, 0);
-
-	MyFree(ConnectedForm);
-
-	if(mutex)
-	{
-		SDL_DestroyMutex(mutex);
-		mutex = 0;
-	}
-
-	return;
-}
-
-/********************************************************************************************
- *                               TConnectedForm                                             *
- ********************************************************************************************/
-
-TConnectedForm::TConnectedForm(ECImage* w)
-	: TForm(w)
-{
-	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 0, 0, 500,350, 0));
-	Motd->SetXY(Window()->GetWidth()/2 - Motd->Width()/2, Window()->GetHeight()/2 - Motd->Height()/2);
-
-	Welcome = AddComponent(new TLabel(Motd->Y()-40,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
-
-	int button_x = Motd->X() + Motd->Width() + 15;
-
-	MissionButton = AddComponent(new TButtonText(button_x, Motd->Y(), 150,50, "Missions",
-	                                            Font::GetInstance(Font::Normal)));
-	EscarmoucheButton = AddComponent(new TButtonText(button_x, MissionButton->Y()+MissionButton->Height(), 150,50, "Escarmouche",
-	                                            Font::GetInstance(Font::Normal)));
-	ListButton = AddComponent(new TButtonText(button_x,EscarmoucheButton->Y()+EscarmoucheButton->Height(),150,50, "Multijoueur",
-	                                          Font::GetInstance(Font::Normal)));
-	DisconnectButton = AddComponent(new TButtonText(button_x,ListButton->Y()+ListButton->Height(),150,50, "Se déconnecter",
-	                                                Font::GetInstance(Font::Normal)));
-
-	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90," ", white_color, Font::GetInstance(Font::Normal)));
-	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height()," ", white_color, Font::GetInstance(Font::Normal)));
-	ChanStats = AddComponent(new TLabel(75,UserStats->Y()+UserStats->Height()," ", white_color,
-	                                    Font::GetInstance(Font::Normal)));
-
-	SetBackground(Resources::Titlescreen());
-}
-#endif

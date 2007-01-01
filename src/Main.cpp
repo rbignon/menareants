@@ -1,6 +1,6 @@
 /* src/main.cpp - Main file
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,7 +144,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 		struct rlimit rlim; /* used for core size */
 		if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
 		{
-			printf("Core size limitée à %ldk, changement en illimité.\n", rlim.rlim_cur);
 			rlim.rlim_cur = RLIM_INFINITY;
 			rlim.rlim_max = RLIM_INFINITY;
 			setrlimit(RLIMIT_CORE, &rlim);

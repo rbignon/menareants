@@ -1,6 +1,6 @@
 /* server/InGame.cpp - Commands called in a game.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -910,20 +910,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	}
 #endif
 
-#if 0
-	BCaseVector casv = map->Cases();
-	for(BCaseVector::iterator casi = casv.begin(); casi != casv.end(); ++casi)
-	{
-		if((*casi)->Entities()->empty())
-			continue;
-		std::vector<ECBEntity*> entv = (*casi)->Entities()->List();
-		Debug(W_DEBUG, "%d,%d: (%s)", (*casi)->X(), (*casi)->Y(),
-						(*casi)->Country()->Owner() ? (*casi)->Country()->Owner()->Player()->GetNick() : "*");
-		for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
-			Debug(W_DEBUG, "    [%c] %s (%d)", dynamic_cast<ECEntity*>(*enti)->Shadowed() ? '*' : ' ',
-			                                   (*enti)->LongName().c_str(), (*enti)->Nb());
-	}
-#endif
 	return 0;
 }
 

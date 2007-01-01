@@ -3,8 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--finir la connexion à un serveur, selectionné dans la liste reçue du meta-server
-
 -améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
  la plus proche de la case d'arrivée.
 

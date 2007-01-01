@@ -1,6 +1,6 @@
 /* server/IA.cpp - Functions about Artificial Intelligence
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -225,8 +225,6 @@ public:
 #else
 #define IA_DEBUG(x)
 #endif
-#define USE_FINDFASTPATH
-#ifdef USE_FINDFASTPATH
 void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
 {
 	std::string msg;
@@ -261,152 +259,6 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_s
 	}
 	ia_send("ARM " + std::string(enti->ID()) + msg);
 }
-#else
-void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
-{
-	std::string msg;
-	ECBCase* c = enti->Case();
-	ECBCase* original_case = enti->Case();
-	if(!nb_cases || nb_cases > enti->RestStep())
-		nb_cases = enti->RestStep();
-	for(uint k = 0; k < nb_cases && c != dest; k++)
-	{
-		int i = c->Y() != dest->Y() && c->X() != dest->X()
-							? rand()%2
-							: c->X() != dest->X()
-							? 1
-							: 0;
-
-		if(i && c->X() < dest->X() && enti->WantMove(ECMove::Right, MOVE_SIMULE) &&
-				(c->Y() == dest->Y() ||
-					c->Y() < dest->Y() && enti->WantMove(ECMove::Down, MOVE_SIMULE) ||
-					c->Y() > dest->Y() && enti->WantMove(ECMove::Up, MOVE_SIMULE)))
-			msg += " >", c = c->MoveRight();
-		else if(i && c->X() > dest->X() && enti->WantMove(ECMove::Left, MOVE_SIMULE) &&
-				(c->Y() == dest->Y() ||
-					c->Y() < dest->Y() && enti->WantMove(ECMove::Down, MOVE_SIMULE) ||
-					c->Y() > dest->Y() && enti->WantMove(ECMove::Up, MOVE_SIMULE)))
-			msg += " <", c = c->MoveLeft();
-		else if(c->Y() < dest->Y() && enti->WantMove(ECMove::Down, MOVE_SIMULE) &&
-				(c->X() == dest->X() ||
-					c->X() < dest->X() && enti->WantMove(ECMove::Right, MOVE_SIMULE) ||
-					c->X() > dest->X() && enti->WantMove(ECMove::Left, MOVE_SIMULE)))
-			msg += " v", c = c->MoveDown();
-		else if(c->Y() > dest->Y() && enti->WantMove(ECMove::Up, MOVE_SIMULE) &&
-				(c->X() == dest->X() ||
-					c->X() < dest->X() && enti->WantMove(ECMove::Right, MOVE_SIMULE) ||
-					c->X() > dest->X() && enti->WantMove(ECMove::Left, MOVE_SIMULE)))
-			msg += " ^", c = c->MoveUp();
-		else
-		{
-			if(!enti->WantMove(ECMove::Right, MOVE_SIMULE) || !enti->WantMove(ECMove::Left, MOVE_SIMULE))
-			{
-				uint desesperate = 0;
-				int dh = 0, db = 0;
-				for(enti->SetCase(c);
-						!(c->X() < dest->X() && enti->WantMove(ECMove::Right, MOVE_SIMULE)) &&
-						!(c->X() > dest->X() && enti->WantMove(ECMove::Left, MOVE_SIMULE));
-						enti->SetCase(enti->Case()->MoveUp()), dh++)
-					if(!enti->WantMove(ECMove::Up, MOVE_SIMULE))
-					{
-						dh = -1;
-						break;
-					}
-				for(enti->SetCase(c);
-						!(c->X() < dest->X() && enti->WantMove(ECMove::Right, MOVE_SIMULE)) &&
-						!(c->X() > dest->X() && enti->WantMove(ECMove::Left, MOVE_SIMULE));
-						enti->SetCase(enti->Case()->MoveDown()), db++)
-					if(!enti->WantMove(ECMove::Down, MOVE_SIMULE))
-					{
-						db = -1;
-						break;
-					}
-				IA_DEBUG("^v : " + TypToStr(dh) + " and " + TypToStr(db) +
-							" (" + TypToStr(c->Y()) + " > " + TypToStr(dest->Y()) + ")");
-				desesperate = (db < 0 && dh < 0 && intel_search)
-								? 0
-								: (db < 0 && intel_search)
-								? 2
-								: (dh < 0 && intel_search)
-									? 1
-									: (c->Y() > dest->Y())
-										? 1
-										: (c->Y() < dest->Y())
-										? 2
-										: (db < dh)
-											? 1
-											: 2;
-				enti->SetCase(c);
-
-				if(desesperate == 1 && enti->WantMove(ECMove::Down, MOVE_SIMULE))
-					msg += " v", c = c->MoveDown();
-				else if(desesperate == 2) msg += " ^", c = c->MoveUp();
-				else if(desesperate == 0)
-				{
-					if(enti->IsInfantry() && !recruted[enti])
-						UseStrategy(new UseTransportBoat(this), enti);
-					else if(enti->WantMove(ECMove::Right, MOVE_SIMULE)) msg += " >", c = c->MoveRight();
-					else msg += " <", c = c->MoveLeft();
-				}
-			}
-			else if(!enti->WantMove(ECMove::Up, MOVE_SIMULE) || !enti->WantMove(ECMove::Down, MOVE_SIMULE))
-			{
-				uint desesperate = 0;
-				int dl = 0, dr = 0;
-				for(enti->SetCase(c);
-						!(c->Y() < dest->Y() && enti->WantMove(ECMove::Down, MOVE_SIMULE)) &&
-						!(c->Y() > dest->Y() && enti->WantMove(ECMove::Up, MOVE_SIMULE));
-						enti->SetCase(enti->Case()->MoveLeft()), dl++)
-					if(!enti->WantMove(ECMove::Left, MOVE_SIMULE))
-					{
-						dl = -1;
-						break;
-					}
-				for(enti->SetCase(c);
-						!(c->Y() < dest->Y() && enti->WantMove(ECMove::Down, MOVE_SIMULE)) &&
-						!(c->Y() > dest->Y() && enti->WantMove(ECMove::Up, MOVE_SIMULE));
-						enti->SetCase(enti->Case()->MoveRight()), dr++)
-					if(!enti->WantMove(ECMove::Right, MOVE_SIMULE))
-					{
-						dr = -1;
-						break;
-					}
-				IA_DEBUG("<> : " + TypToStr(dl) + " and " + TypToStr(dr) +
-							" (" + TypToStr(c->X()) + " > " + TypToStr(dest->X()) + ")");
-				desesperate = (dl < 0 && dr < 0 && intel_search)
-								? 0
-								: (dl < 0 && intel_search)
-								? 2
-								: (dr < 0 && intel_search)
-									? 1
-									: (c->X() > dest->X())
-										? 1
-										: (c->X() < dest->X())
-										? 2
-										: (dl < dr)
-											? 1
-											: 2;
-				enti->SetCase(c);
-
-				if(desesperate == 1 && enti->WantMove(ECMove::Left, MOVE_SIMULE))
-					msg += " <", c = c->MoveLeft();
-				else if(desesperate == 2) msg += " >", c = c->MoveRight();
-				else if(desesperate == 0)
-				{
-					if(enti->IsInfantry() && !recruted[enti])
-						UseStrategy(new UseTransportBoat(this), enti);
-					else if(enti->WantMove(ECMove::Up, MOVE_SIMULE)) msg += " ^", c = c->MoveUp();
-					else msg += " v", c = c->MoveDown();
-				}
-			}
-		}
-		enti->SetCase(c);
-	}
-	enti->SetCase(original_case);
-	if(!msg.empty())
-		ia_send("ARM " + std::string(enti->ID()) + msg);
-}
-#endif
 
 void TIA::FirstMovements()
 {

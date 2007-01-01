@@ -1,6 +1,6 @@
 /* lib/Map.cpp - Map classes
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "Debug.h"
 #include "Outils.h"
 #include "Channels.h"
+#include "Units.h"
 #include <fstream>
 
 /********************************************************************************************
@@ -422,8 +423,21 @@ void ECBFindFastPath::ajouter_cases_adjacentes(ECBCase* n)
 			ECBCase* it = (*map)(i,j);
 
 			if (entity->CanWalkOn(it) == false)
-				/* obstace, terrain non franchissable, on oublie */
-				continue;
+			{
+				bool can_invest = false;
+				std::vector<ECBEntity*> ents = it->Entities()->List();
+
+				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+				{
+					ECBContainer* container = 0;
+					if((container = dynamic_cast<ECBContainer*>(*enti)) && container->CanContain(entity) && entity->Owner() &&
+					   entity->Owner() == container->Owner())
+						can_invest = true;
+				}
+
+				if(!can_invest)
+					continue;
+			}
 			if (!deja_present_dans_liste(it, liste_fermee))
 			{
 				/* le noeud n'est pas déjà présent dans la liste fermée */
@@ -933,22 +947,6 @@ void ECBMap::Init()
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
 		               VIName(max) VIName(map_countries.size()),
 		               "Fichier incorrect !");
-
-#if 0 /** \todo les villes sont des unités, il faut voir si on ne fait pas une vérification auprès des UNIT */
-	/* On vérifie si il y a bien une ville par country */
-	for(std::vector<ECBCountry*>::iterator it= map_countries.begin(); it != map_countries.end(); ++it)
-	{
-		uint count = 0;
-		std::vector<ECBCase*> acase = (*it)->Cases();
-		std::vector<ECBCase*>::iterator cc;
-		for(cc = acase.begin(); cc != acase.end(); ++cc)
-			if((*cc)->Flags() & C_VILLE)
-				count++;
-		if(count != 1)
-			throw ECExcept(VIName(count) VSName((*it)->ID()),
-			               count > 1 ? "La country a trop de villes !" : "La country n'a pas de ville !");
-	}
-#endif
 
 	/* La map est *bien* initialisée !! */
 	initialised = true;
