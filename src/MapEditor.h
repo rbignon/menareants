@@ -1,6 +1,6 @@
 /* src/MapEditor.h - Header of MapEditor.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,10 +49,14 @@ class EMapPlayer : public ECMapPlayer, public ECPlayer
 public:
 	EMapPlayer(char _id, uint _num)
 		: ECMapPlayer(_id, _num), ECPlayer("",0,false,false,false,false)
-	{}
+	{
+		SetMapPlayer(this);
+		SetPlayer(this);
+	}
 
 	virtual bool IsIA() const { return true; }
 	virtual const char* GetNick() const { return ""; }
+
 };
 
 class EMap : public ECMap

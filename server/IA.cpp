@@ -232,18 +232,22 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_s
 	if(!nb_cases || nb_cases > enti->RestStep())
 		nb_cases = enti->RestStep();
 
+#ifdef DEBUG
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	int burst = tv.tv_usec;
+#endif
 	if(!enti->FindFastPath(dest, moves))
 	{
 		if(enti->IsInfantry() && !recruted[enti])
 			UseStrategy(new UseTransportBoat(this), enti);
 		return;
 	}
+#ifdef DEBUG
 	gettimeofday(&tv, NULL);
 	double tt = (tv.tv_usec - burst) / 1000000.0;
 	dynamic_cast<ECEntity*>(enti)->Channel()->send_info(0, EChannel::I_DEBUG, FormatStr("Pour " + TypToStr(enti->Case()->Delta(dest)) + " cases, l'algorithme met: " + StringF("%.6f", tt) + "s"));
+#endif
 
 	for(uint i = 0; moves.empty() == false && i < nb_cases; ++i)
 	{

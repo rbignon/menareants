@@ -465,7 +465,7 @@ class ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECBCase() : map(0), x(0), y(0), flags(0), type_id(0), map_country(0), entities() {}
+	ECBCase() : map(0), x(0), y(0), flags(0), type_id(0), img_id(0), map_country(0), entities() {}
 	ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
 	virtual ~ECBCase() {}
@@ -497,6 +497,9 @@ public:
 	/** Return flags of case */
 	uint Flags() const { return flags; }
 
+	void SetImgID(char id) { img_id = id; }
+	char ImgID() const { return img_id; }
+
 	ECBCountry* Country() const { return map_country; }
 	void SetCountry(ECBCountry *mc);
 
@@ -520,6 +523,8 @@ protected:
 	uint flags;
 
 	char type_id;
+
+	char img_id;
 
 	ECBCountry *map_country;
 
@@ -780,6 +785,8 @@ public:
 	/** Reload */
 	void Reload();
 
+	void Save(std::vector<std::string>& fp);
+
 	/** Create a case */
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id) = 0;
 
@@ -868,7 +875,7 @@ protected:
 	void Destruct();  /**< Free of memory */
 
 	/** This function have to be redefined by client to set attributs of images in case */
-	virtual void SetCaseAttr(ECBCase*, char) {}
+	virtual void SetCaseAttr(ECBCase* c, char id) { c->SetImgID(id); }
 
 	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECBCountry(m, ident); }
 

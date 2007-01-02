@@ -286,8 +286,11 @@ public:
 /* Composants */
 public:
 
+	TLabel*      Title;
+
 	TList*       Players;
 
+	TButtonText* SaveButton;
 	TButtonText* OkButton;
 
 /* Evenements */

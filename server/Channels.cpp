@@ -1,6 +1,6 @@
 /* server/Channels.cpp - Channels functions
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,29 @@ ChannelVector ChanList;
 /********************************************************************************************
  *                              Commandes                                                   *
  ********************************************************************************************/
+
+/** The owner can save the game.
+ *
+ * Syntax: SAVE filename
+ */
+int SAVECommand::Exec(TClient* cl, std::vector<std::string> parv)
+{
+	if(!cl || !cl->Player() || !cl->Player()->IsOwner())
+		return Debug(W_DESYNCH, "SAVE: par un non owner ou en dehors d'un salon");
+
+	if(!cl->Player()->Channel()->Map() || cl->Player()->Channel()->State() != EChannel::PLAYING)
+		return Debug(W_DESYNCH, "SAVE: pas de map ou pas +P(laying)");
+
+	std::vector<std::string> map_file;
+	cl->Player()->Channel()->Map()->Save(map_file);
+
+	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
+		cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+
+	cl->sendrpl((std::string(app.rpl(ECServer::ENDOFSMAP)) + " " + parv[1]).c_str());
+
+	return 0;
+}
 
 /** The owner can eject someone from channel.
  *

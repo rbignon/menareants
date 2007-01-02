@@ -198,7 +198,7 @@ void ECBDate::SetDate(std::string date)
  ********************************************************************************************/
 
 ECBCase::ECBCase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: map(_map), x(_x), y(_y), flags(_flags), type_id(_type_id), map_country(0), entities()
+	: map(_map), x(_x), y(_y), flags(_flags), type_id(_type_id), img_id(0), map_country(0), entities()
 {}
 
 ECBCase* ECBCase::MoveUp(uint c) const    { return y >= c ? (*map)(x, y-c) : (*map)(x, 0); }
@@ -1044,5 +1044,68 @@ void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 		neutres.Remove(e);
 	if(use_delete)
 		delete e;
+}
+
+void ECBMap::Save(std::vector<std::string>& fp)
+{
+	if(map_players.empty())
+		throw ECExcept("", "Veuillez créer des joueurs !");
+
+	fp.push_back ("# Please don't edit this file by hand.");
+	fp.push_back ("# Use the game's map editor.");
+
+	fp.push_back ("NAME " + name);
+
+	if(IsMission())
+		fp.push_back ("MISSION");
+
+	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
+	{
+		if((*it)->Player())
+			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " + (*it)->Player()->Nick() + " " + TypToStr((*it)->Player()->Money()));
+		else
+			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " + (*it)->Nick());
+	}
+
+	fp.push_back ("X " + TypToStr(x));
+	fp.push_back ("Y " + TypToStr(y));
+
+	fp.push_back ("MAP");
+
+	for(uint _y = 0; _y < y; ++_y)
+	{
+		std::string line;
+		for(uint _x = 0; _x < x; ++_x)
+		{
+			ECBCase *c = dynamic_cast<ECBCase*>(map[ _y * x + _x ]);
+			if(!c)
+				throw ECExcept(VPName(c), "Veuillez ne pas enregistrer une carte non achevée");
+			line += TypToStr(c->TypeID()) + c->Country()->ID();
+			line += TypToStr(c->Country()->Owner() ? c->Country()->Owner()->ID() : '*') + c->ImgID();
+		}
+		fp.push_back (line);
+	}
+
+	fp.push_back ("EOM");
+	fp.push_back ("CITY " + TypToStr(CityMoney()));
+	fp.push_back ("MIN " + TypToStr(MinPlayers()));
+	fp.push_back ("MAX " + TypToStr(MaxPlayers()));
+	fp.push_back ("DATE " + Date()->String());
+	for(std::vector<std::string>:: const_iterator it = map_infos.begin(); it != map_infos.end(); ++it)
+		fp.push_back ("INFO " + *it);
+
+	std::vector<ECBEntity*> n = entities.List();
+	for(std::vector<ECBEntity*>::iterator st = n.begin(); st != n.end(); ++st)
+		fp.push_back ("UNIT " + TypToStr((*st)->Type()) + " " + TypToStr((*st)->Owner() ? (*st)->Owner()->MapPlayer()->ID() : '*')
+		   + " " + TypToStr((*st)->Case()->X()) + "," + TypToStr((*st)->Case()->Y())
+		   + " " + TypToStr((*st)->Nb()) );
+
+	if(scripting.empty() == false)
+	{
+		fp.push_back ("START_SCRIPTING");
+		FORit(std::string, scripting, it)
+			fp.push_back (*it);
+		fp.push_back ("STOP_SCRIPTING");
+	}
 }
 

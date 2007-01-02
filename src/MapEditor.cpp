@@ -1,6 +1,6 @@
 /* src/MapEditor.cpp - This is a map editor
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -222,74 +222,13 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 
 void EMap::Save()
 {
-	if(map_players.empty())
-		throw ECExcept("", "Veuillez créer des joueurs !");
+	std::vector<std::string> file;
+	ECMap::Save(file);
 
 	std::ofstream fp(filename.c_str());
-	if (!fp)
-		throw ECExcept(VName(filename), "Impossible de créer le fichier map.");
 
-	fp << "# Veuillez ne pas éditer le fichier map à la main." << std::endl;
-	fp << "# Utilisez plutôt l'éditeur de carte intégré au jeu." << std::endl;
-
-	fp << "NAME " << name << std::endl;
-
-	if(IsMission())
-		fp << "MISSION" << std::endl;
-
-	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
-		fp << "PLAYER " << (*it)->ID() << " " << (*it)->Nick() << std::endl;
-
-	fp << "X " << x << std::endl;
-	fp << "Y " << y << std::endl;
-
-	fp << "MAP" << std::endl;
-
-	for(uint _y = 0; _y < y; ++_y)
-	{
-		for(uint _x = 0; _x < x; ++_x)
-		{
-			ECase *c = dynamic_cast<ECase*>(map[ _y * x + _x ]);
-			if(!c)
-				throw ECExcept(VPName(c), "Veuillez ne pas enregistrer une carte non achevée");
-			fp << c->TypeID() << c->Country()->ID();
-			fp << (c->Country()->Owner() ? c->Country()->Owner()->ID() : '*') << c->ImgID();
-		}
-		fp << std::endl;
-	}
-
-	fp << "EOM" << std::endl;
-	fp << "CITY " << CityMoney() << std::endl;
-	fp << "MIN " << MinPlayers() << std::endl;
-	fp << "MAX " << MaxPlayers() << std::endl;
-	fp << "DATE " << Date()->String() << std::endl;
-	for(std::vector<std::string>:: const_iterator it = map_infos.begin(); it != map_infos.end(); ++it)
-		fp << "INFO " << *it << std::endl;
-
-	for(std::vector<std::string>::const_iterator it = other_lines.begin(); it != other_lines.end(); ++it)
+	FORit(std::string, file, it)
 		fp << *it << std::endl;
-
-	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
-	{
-		std::vector<ECBEntity*> sts = dynamic_cast<EMapPlayer*>(*it)->Entities()->List();
-		for(std::vector<ECBEntity*>::iterator st = sts.begin(); st != sts.end(); ++st)
-			fp << "UNIT " << (*st)->Type() << " " << dynamic_cast<EMapPlayer*>((*st)->Owner())->ID()
-			   << " " << (*st)->Case()->X() << "," << (*st)->Case()->Y()
-			   << " " << (*st)->Nb()  << std::endl;
-	}
-	std::vector<ECBEntity*> n = neutres.List();
-	for(std::vector<ECBEntity*>::iterator st = n.begin(); st != n.end(); ++st)
-		fp << "UNIT " << (*st)->Type() << " " << "*"
-		   << " " << (*st)->Case()->X() << "," << (*st)->Case()->Y()
-		   << " " << (*st)->Nb()  << std::endl;
-
-	if(scripting.empty() == false)
-	{
-		fp << "START_SCRIPTING" << std::endl;
-		FORit(std::string, scripting, it)
-			fp << *it << std::endl;
-		fp << "STOP_SCRIPTING" << std::endl;
-	}
 }
 
 /********************************************************************************************

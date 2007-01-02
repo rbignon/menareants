@@ -1934,7 +1934,27 @@ void MenAreAntsApp::Options(EChannel* chan)
 					case SDL_MOUSEBUTTONDOWN:
 					{
 						if(OptionsForm->OkButton->Test(event.button.x, event.button.y))
+						{
 							eob = true;
+							break;
+						}
+						else if(OptionsForm->SaveButton->Test(event.button.x, event.button.y))
+						{
+							TMessageBox m("Quel nom voulez-vous donner à la sauvegarde ?", BT_OK|BT_CANCEL|HAVE_EDIT, OptionsForm);
+							m.Edit()->SetAvailChars(MAPFILE_CHARS);
+							if(m.Show() == BT_OK && m.EditText().empty() == false)
+							{
+								std::string filename = GetPath() + m.EditText() + ".sav";
+								if(FichierExiste(filename) &&
+								   TMessageBox("Une sauvegarde contient le même nom. Voulez vous la remplacer ?", BT_YES|BT_NO, OptionsForm).Show() == BT_NO)
+									break;
+
+								client->sendrpl(client->rpl(EC_Client::SAVE), m.EditText().c_str());
+								//chan->Map()->Save(filename);
+								TMessageBox("Sauvegarde effectuée.\nVous pourrez la recharger en créant une partie et en utilisant la map de ce nom.",
+								            BT_OK, OptionsForm).Show();
+							}
+						}
 
 						if(client->Player()->Channel()->IsMission())
 							break; // On ne peut pas s'allier dans une mission
@@ -1998,12 +2018,18 @@ void MenAreAntsApp::Options(EChannel* chan)
 TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
 	: TForm(w)
 {
+	Title = AddComponent(new TLabel(100, "Options", white_color, Font::GetInstance(Font::Big)));
+
 	Players = AddComponent(new TList(60, 200));
 	BPlayerVector plvec = ch->Players();
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TOptionsPlayerLine(_me, dynamic_cast<ECPlayer*>(*it)));
 
 	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, Window()->GetHeight() - 100,150,50, "OK", Font::GetInstance(Font::Normal)));
+
+	SaveButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, OkButton->Y()-50, 150, 50, "Sauvegarder", Font::GetInstance(Font::Normal)));
+	if(_me->IsOwner() == false)
+		SaveButton->SetEnabled(false);
 
 	SetBackground(Resources::Titlescreen());
 }

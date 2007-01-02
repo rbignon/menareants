@@ -1,6 +1,6 @@
 /* src/Map.h - Header of Map.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -232,7 +232,7 @@ class ECase : public virtual ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECase() : image(0), selected(0), img_id(0), showed(-1), must_redraw(true) { }
+	ECase() : image(0), selected(0), showed(-1), must_redraw(true) { }
 
 	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
@@ -252,9 +252,6 @@ public:
 	void Select(bool s = true) { selected = s; }
 	bool Selected() const { return selected; }
 
-	void SetImgID(char id) { img_id = id; }
-	char ImgID() const { return img_id; }
-
 	/** Is this case is showed ?
 	 * o -1 = hidden
 	 * o 0  = shadowed
@@ -271,7 +268,6 @@ public:
 protected:
 	ECSprite* image;
 	bool selected;
-	char img_id;
 	int showed;
 	bool must_redraw;
 };

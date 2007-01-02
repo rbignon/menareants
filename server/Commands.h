@@ -1,6 +1,6 @@
 /* src/Commands.h - Command list
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,6 +86,8 @@ class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _Cm
 class ADMINCommand : public EC_ACommand { public: ADMINCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ADMINCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 class BPCommand : public EC_ACommand { public: BPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+
+class SAVECommand : public EC_ACommand { public: SAVECommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SAVECommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 /*
 DECLARE_CMD ( ERR );

@@ -17,6 +17,9 @@
 #
 # Veuillez prendre le temps de bien configurer chaque section, chaque
 # sous section et chaque champ.
+#
+# Dernière modification :
+# $Id$
 ##########################################################################
 
 # «server»
@@ -25,7 +28,7 @@
 server {
 
 	# Nom du serveur
-	name = menareants.coderz.info
+	name = personnal.server
 
 	# Port écouté
 	port = 5461

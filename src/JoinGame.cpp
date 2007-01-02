@@ -19,6 +19,7 @@
  * $Id$
  */
 
+#include <fstream>
 #include <math.h>
 #include "Config.h"
 #include "Debug.h"
@@ -195,7 +196,7 @@ int KICKCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	EChannel* chan = me->Player()->Channel();
-	if(TGameInfosForm::RecvMap.empty())
+	if(TGameInfosForm::RecvMap.empty() && chan->IsInGame() == false)
 	{
 		ECMap *map;
 		me->LockScreen();
@@ -219,16 +220,27 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 /** This is end of map.
  *
- * Syntax: EOSMAP
+ * Syntax: EOSMAP [filename]
  */
 int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	EChannel *chan = me->Player()->Channel();
 	if(TGameInfosForm::RecvMap.empty())
 		Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
+	else if(chan->IsInGame())
+	{
+		if(parv.size() < 2)
+			return Debug(W_DESYNCH|W_SEND, "EOSMAP: Dans le cas d'une sauvegarde, pas de nom de fichier");
+
+		std::string filename = MenAreAntsApp::GetInstance()->GetPath() + parv[1] + ".sav";
+		std::ofstream fp(filename.c_str());
+
+		FORit(std::string, TGameInfosForm::RecvMap, it)
+			fp << *it << std::endl;
+	}
 	else
 	{
 		me->LockScreen();
-		EChannel *chan = me->Player()->Channel();
 		ECMap *map = 0;
 		try
 		{

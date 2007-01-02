@@ -31,6 +31,7 @@
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
 #include "tools/Video.h"
+#include <fstream>
 
 /********************************************************************************************
  *                               ECEntityList                                               *
@@ -614,7 +615,7 @@ void ECMap::SetCaseAttr(ECBCase* c, char id)
 		if(case_img[j].c == id)
 		{
 			dynamic_cast<ECase*>(c)->SetImage(case_img[j].spr());
-			dynamic_cast<ECase*>(c)->SetImgID(id);
+			c->SetImgID(id);
 			return;
 		}
 

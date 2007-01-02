@@ -36,7 +36,7 @@
 #define MSERV_DEFPORT 5460
 
 /* Version protocolaire
- * À incrémenter en cas de modification du protocole
+ * ï¿½incrï¿½enter en cas de modification du protocole
  */
 #define APP_PVERSION	"11"
 #define APP_MSPROTO	"1"
@@ -48,13 +48,13 @@
 /* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
 #define UNSTABLE
 
-/* Définir un (seul) des "patch" suivant (ou aucun) */
+/* Dï¿½inir un (seul) des "patch" suivant (ou aucun) */
 #if 1
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
 #else
-#define	APP_VERSION_PATCH	"pre1"	/* première pré release */
-#define	APP_VERSION_PATCH	"pre2"	/* seconde pré release */
-#define	APP_VERSION_PATCH	"pre3"	/* troisième pré release */
+#define	APP_VERSION_PATCH	"pre1"	/* premiï¿½e prï¿½release */
+#define	APP_VERSION_PATCH	"pre2"	/* seconde prï¿½release */
+#define	APP_VERSION_PATCH	"pre3"	/* troisiï¿½e prï¿½release */
 #endif
 
 #ifdef __cplusplus
@@ -63,27 +63,6 @@
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
 
-/** This is a macro to simplify a loop on a vector
- * @param T this is the vector's type
- * @param v this is the vector
- * @param x this is the iterator's pointer
- *
- * Use this like this:
- * <pre>
- *  std::vector<ECBEntity*> entities;
- *  FOR(ECBEntity*, entities, entity)
- *  {
- *    entity->DoSomething();
- *    FuckSomeone(entity);
- *  }
- * </pre>
- */
-#define FOR(T, v, x) \
-                          T (x); \
-                          for(std::vector<T>::iterator x##it = (v).begin(); x##it != (v).end() && (x = *x##it); ++x##it)
-
-#define FORit(T, v, x) \
-                          for(std::vector<T>::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
 #endif /* __cplusplus */
 
 #endif /* ECLIB_Defines_h */

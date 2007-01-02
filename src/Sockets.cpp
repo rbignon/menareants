@@ -1,6 +1,6 @@
 /* src/Sockets.cpp - Gestion des sockets.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ const char* msgTab[] = {
 
 	"ARM %s",                                    /* ARM - Envoie des infos sur une armée */
 	"BP %c%d,%d %s",                             /* BP - Pose une balise sur la carte pour ses alliés */
+	"SAVE %s",                                   /* SAVE - Sauvegarde la partie */
      0
 };
 

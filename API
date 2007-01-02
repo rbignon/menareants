@@ -42,6 +42,7 @@ Sommaire:
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [>] [^] [v] [<] [*<pos>]
               BP <+|-><pos> [message]           :rajoute un breakpoint sur la carte, montré uniquement à ses alliés
+              SAVE <name>                       :faire une sauvegarde (reception d'un fichier)
 
       b) Serveur -> Client
          - Général

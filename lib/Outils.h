@@ -60,6 +60,28 @@ char *duration(int s);
 /** Check if the string is a number */
 bool is_num(const char *num);
 
+/** This is a macro to simplify a loop on a vector
+ * @param T this is the vector's type
+ * @param v this is the vector
+ * @param x this is the iterator's pointer
+ *
+ * Use this like this:
+ * <pre>
+ *  std::vector<ECBEntity*> entities;
+ *  FOR(ECBEntity*, entities, entity)
+ *  {
+ *    entity->DoSomething();
+ *    FuckSomeone(entity);
+ *  }
+ * </pre>
+ */
+#define FOR(T, v, x) \
+                          T (x); \
+                          for(std::vector<T>::iterator x##it = (v).begin(); x##it != (v).end() && (x = *x##it); ++x##it)
+
+#define FORit(T, v, x) \
+                          for(std::vector<T>::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
+
 template< typename _T>
 std::vector<_T> ToVec(_T el)
 {
@@ -236,7 +258,7 @@ public:
 public:
 	size_type size() { return list.size(); }
 	bool empty() { return list.empty(); }
-	
+
 };
 
 #endif

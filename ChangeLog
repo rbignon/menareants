@@ -1,3 +1,7 @@
+2007-01-02 Romain Bignon <progs@headfucking.net>
+
+	* lib/Map.cpp, server/Channels.cpp, src/InGame.cpp: Création des sauvegardes.
+
 2007-01-01 Romain Bignon <progs@headfucking.net>
 
 	* src/Login.cpp: Affichage du ping dans la liste des serveurs.
