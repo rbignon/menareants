@@ -38,6 +38,8 @@ Sommaire:
               GO!                               :l'owner lance le jeu
               MSG <message>                     :envoie un message à tous les joueurs
               AMSG <message>                    :envoie un message à ses alliés
+              SMAP <map>                        :envoie une map
+              EOSMAP                            :fin du SMAP
          - En cours de jeu
               ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
                   [/<nb>] [>] [^] [v] [<] [*<pos>]

@@ -129,8 +129,8 @@ void ECMcDo::Invest(ECBEntity* entity)
 	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_INVESTED, TypToStr(caserne->Type())));
 	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
 
-	/* On supprime de la circulation la caserne */
-	caserne->SetShadowed();
+	/* On enlève caserne de partout, mais on ne libère PAS la mémoire ! */
+	Map()->RemoveAnEntity(caserne);
 }
 
 void ECMcDo::Played()
@@ -146,6 +146,8 @@ void ECMcDo::Played()
 
 			// Suppression propagée de notre mcdo
 			Channel()->SendArm(0, this, ARM_REMOVE);
+
+			delete caserne; // on supprime la caserne qu'on avait gardé et qui n'est plus dans aucune liste
 
 			/* On créé notre caserne avec les propriétés du McDo, et je rappelle que Owner() est bien l'owner
 			 * de l'ex caserne

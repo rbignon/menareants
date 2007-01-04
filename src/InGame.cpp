@@ -515,8 +515,8 @@ public:
 
 TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 {
-	if(BarreLat->Test(Cursor->X(), Cursor->Y()) ||
-	   BarreAct->Test(Cursor->X(), Cursor->Y()) ||
+	if(BarreLat->Mouse(Cursor->X(), Cursor->Y()) ||
+	   BarreAct->Mouse(Cursor->X(), Cursor->Y()) ||
 	   Player()->Channel()->State() != EChannel::PLAYING)
 		return W_NONE;
 
@@ -600,7 +600,7 @@ void TInGameForm::SetCursor()
 
 	if(!want)
 	{
-		if(BarreLat->Radar->Test(Cursor->X(), Cursor->Y()))
+		if(BarreLat->Radar->Mouse(Cursor->X(), Cursor->Y()))
 			Cursor->SetCursor(TCursor::Radar);
 		else
 			Cursor->SetCursor(TCursor::Standard);

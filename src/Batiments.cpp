@@ -64,7 +64,7 @@ bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 				SDL_Delay(20);
 				return false;
 			}
-	
+
 			SetAttaqImg(0,0,0);
 		}
 	}
@@ -163,6 +163,7 @@ std::string ECMine::SpecialInfo()
 void ECNuclearSearch::Init()
 {
 	ECBNuclearSearch::Init();
+	Image()->SetAnim(true);
 	if(Owner() && Channel() && !Owner()->IsMe())
 		Channel()->Print("ATTENTION!! " + std::string(Owner()->GetNick()) + " possède maintenant la technologie nucléaire "
 		                 "avec son centre de recherches nucléaire", 0x008);

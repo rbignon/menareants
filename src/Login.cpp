@@ -548,6 +548,9 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 		               "Veuillez nous excuser de la gêne occasionée", BT_OK, NULL);
 				mb.SetBackGround(Resources::Titlescreen());
 				mb.Show();
+#ifdef DEBUG
+		throw;
+#endif
 	}
 	if(client)
 	{

@@ -1,5 +1,11 @@
 2007-01-04 Romain Bignon <progs@headfucking.net>
 
+	* server/Units.cpp (ECMcDo): Correction d'un crash.
+
+	* src/data/anims/units/nuclearsearch: Changement de l'image pour une animation (que m'a envoyé thomas y a plusieurs mois..).
+
+2007-01-03 Romain Bignon <progs@headfucking.net>
+
 	* src/gui/*, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp: Support des différences de boutons de la souris (gauche/droit/molette).
 
 	* src/InGame.cpp, lib/Channels.cpp: Dans une mission solo, par défaut le temps de reflexion est de 0 secondes, donc illimité.
