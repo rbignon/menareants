@@ -1,3 +1,13 @@
+2007-01-04 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/*, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp: Support des différences de boutons de la souris (gauche/droit/molette).
+
+	* src/InGame.cpp, lib/Channels.cpp: Dans une mission solo, par défaut le temps de reflexion est de 0 secondes, donc illimité.
+
+	* lib/Batiments.h (ECBMine): Correction: elle remarche maintenant.
+
+	* src/Units.h (ECMissiLauncher): Tire ses missiles plus rapidement.
+
 2007-01-02 Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp, server/Channels.cpp, src/InGame.cpp: Création des sauvegardes.

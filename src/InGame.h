@@ -316,7 +316,7 @@ public:
 	void Init();
 	void Draw(int souris_x, int souris_y);              /**< Draw */
 
-	bool AllieZone(int _x, int _y);
+	bool AllieZone(int _x, int _y, int button);
 
 /* Composants */
 public:

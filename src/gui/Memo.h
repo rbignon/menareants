@@ -1,6 +1,6 @@
 /* src/gui/Memo.h - Header of Memo.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ public:
   ~TMemo();
   void Init ();
   void Draw (int mouse_x, int mouse_y);
-  bool Clic (int mouse_x, int mouse_y);
+  bool Clic (int mouse_x, int mouse_y, int button);
   void AddItem (const std::string &label, Color _color = black_color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);

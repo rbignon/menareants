@@ -1,6 +1,6 @@
 /* src/gui/CheckBox.cpp - ComboBox component.
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,9 +64,9 @@ void TCheckBox::SetXY (int _x, int _y)
 	text.SetXY(_x+20, _y);
 }
 
-bool TCheckBox::Clic(int _x, int _y)
+bool TCheckBox::Clic(int _x, int _y, int button)
 {
-	if(!TComponent::Clic(_x, _y))
+	if(!TComponent::Clic(_x, _y, button))
 		return false;
 
 	checked = !checked;

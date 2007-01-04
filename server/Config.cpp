@@ -1,6 +1,6 @@
 /* server/Config.cpp - Configuration
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,6 +94,7 @@ bool Config::load()
 
 		std::string motdfile = conf->GetSection("server")->GetItem("motdfile")->String();
 		std::ifstream fp(motdfile.c_str());
+		motd.clear();
 
 		if(fp)
 		{

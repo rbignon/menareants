@@ -1,6 +1,6 @@
 /* src/gui/ChildForm.cpp - This is a form include in another form
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,14 +44,14 @@ void TChildForm::PressKey(SDL_keysym k)
 		(*it)->PressKey(k);
 }
 
-bool TChildForm::Clic(int _x, int _y)
+bool TChildForm::Clic(int _x, int _y, int _button)
 {
-	if(!Test(_x,_y)) return false;
+	if(!Test(_x,_y,_button)) return false;
 
 	TComponent* clicked = 0;
 	/* Va dans l'ordre inverse */
 	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-		if((*it)->Visible() && !clicked && (*it)->Clic(_x, _y))
+		if((*it)->Visible() && !clicked && (*it)->Clic(_x, _y, _button))
 		{
 			(*it)->SetFocus();
 			if((*it)->OnClick())

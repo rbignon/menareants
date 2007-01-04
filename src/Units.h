@@ -1,6 +1,6 @@
 /* src/Units.h - Header of Units.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ private:
  *                                ECMissiLauncher                                           *
  ********************************************************************************************/
 #define MISSILAUNCHER_VISUAL_STEP  1
-#define MISSILAUNCHER_MISSILE_STEP 5
+#define MISSILAUNCHER_MISSILE_STEP 7
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 {
 /* Constructeur/Destructeur */

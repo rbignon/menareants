@@ -1,6 +1,6 @@
 /* src/Channels.h - Header of Channels.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,8 +110,8 @@ class EChannel : public ECBChannel
 /* Constructeurs/Deconstructeurs */
 public:
 
-	EChannel(std::string _name)
-		: ECBChannel(_name), want_leave(false), current_event(0)
+	EChannel(std::string _name, bool mission)
+		: ECBChannel(_name, mission), want_leave(false), current_event(0)
 	{}
 
 /* Methodes */

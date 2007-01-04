@@ -1,6 +1,6 @@
 /* src/gui/SpinEdit.cpp - To increment or decrement a comptor
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 	{
 		if(new_value > max) new_value = max;
 		else if(new_value < min) new_value = min;
-		
+
 		std::vector<int>::iterator it;
 		for(it = bad_values.begin(); it != bad_values.end() && *it != new_value; ++it);
 		if(it != bad_values.end())
@@ -121,14 +121,14 @@ void TSpinEdit::Draw (int mouse_x, int mouse_y)
 
 //-----------------------------------------------------------------------------
 
-bool TSpinEdit::Clic (int mouse_x, int mouse_y)
+bool TSpinEdit::Clic (int mouse_x, int mouse_y, int button)
 {
-  if(!enabled) return false;
+  if(!enabled || !Mouse(mouse_x, mouse_y)) return false;
 
-  if (m_minus.Test(mouse_x, mouse_y))
-    return ChangeValueByClick(false);
-  else if (m_plus.Test(mouse_x, mouse_y))
+  if(button == SDL_BUTTON_WHEELUP || m_plus.Test(mouse_x, mouse_y))
     return ChangeValueByClick(true);
+  else if(button == SDL_BUTTON_WHEELDOWN || m_minus.Test(mouse_x, mouse_y))
+    return ChangeValueByClick(false);
 
   return false;
 }

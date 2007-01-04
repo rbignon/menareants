@@ -1,6 +1,6 @@
 /* lib/Channels.cpp - Game's channel of client AND server
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,8 +139,8 @@ void ECBPlayer::SetDisconnected(bool b) { SetFlag(P_DISCONNECTED, b); }
  *                               ECBChannel                                                 *
  ********************************************************************************************/
 
-ECBChannel::ECBChannel(std::string _name)
-	: name(_name), state(WAITING), limite(0), map(0), turn_time(120), mission(false)
+ECBChannel::ECBChannel(std::string _name, bool _mission)
+	: name(_name), state(WAITING), limite(0), map(0), turn_time(_mission ? 0 : 120), mission(_mission)
 {
 
 }

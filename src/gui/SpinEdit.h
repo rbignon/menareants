@@ -1,6 +1,6 @@
 /* src/gui/SpinEdit.h - Header of SpinEdit.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ public:
 
 	void Draw (int mouse_x, int mouse_y);
 
-	bool Clic (int mouse_x, int mouse_y);
+	bool Clic (int mouse_x, int mouse_y, int button);
 
 	void SetColorFont(Color new_color, Font* new_font);
 
@@ -69,12 +69,12 @@ public:
 	 */
 	virtual bool SetValue(int _value, bool first = false);
 	int Value() { return value; }
-	
+
 	void SetMax(int _max);                                        /**< Set maximal value */
 	void SetMin(int _min);                                        /**< Set minimal value */
-	
+
 	virtual void SetXY (int _x, int _y);                          /**< Set \a x and \a y positions */
-	
+
 	/* Valeurs interdites */
 	void AddBadValue(int i);                                      /**< Add a bad value */
 	void DelBadValue(int i);                                      /**< Remove a bad value */
@@ -87,9 +87,9 @@ protected:
 	uint step;
 	uint visible_len;
 	std::string label;
-	
+
 	std::vector<int> bad_values;
-	
+
 	/** This function is used by Clic() to check in bad_values */
 	bool ChangeValueByClick(bool up);
 

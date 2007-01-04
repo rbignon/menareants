@@ -1,6 +1,6 @@
 /* src/gui/CheckBox.h - Header of CheckBox.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public:
 
 	/** Affiche */
 	void Draw(int m_x, int m_y);
-	bool Clic(int m_x, int m_y);
+	bool Clic(int m_x, int m_y, int button);
 
 /* Attributs */
 public:

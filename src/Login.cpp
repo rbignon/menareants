@@ -322,7 +322,7 @@ void MenAreAntsApp::ServerList()
 			switch(event.type)
 			{
 				case SDL_MOUSEBUTTONDOWN:
-					if(ListServerForm->ServerList->Test(event.button.x, event.button.y))
+					if(ListServerForm->ServerList->Test(event.button.x, event.button.y, event.button.button))
 					{
 						if(ListServerForm->ServerList->GetSelectedItem() >= 0 &&
 						ListServerForm->ServerList->EnabledItem(ListServerForm->ServerList->GetSelectedItem()))
@@ -330,12 +330,12 @@ void MenAreAntsApp::ServerList()
 						else
 							ListServerForm->ConnectButton->SetEnabled(false);
 					}
-					if(ListServerForm->RefreshButton->Test(event.button.x, event.button.y))
+					if(ListServerForm->RefreshButton->Test(event.button.x, event.button.y, event.button.button))
 						RefreshList();
-					else if(ListServerForm->ConnectButton->Test(event.button.x, event.button.y))
+					else if(ListServerForm->ConnectButton->Test(event.button.x, event.button.y, event.button.button))
 						ConnectedTo(ListServerForm->ServerList->ReadValue(
 						             ListServerForm->ServerList->GetSelectedItem()));
-					else if(ListServerForm->RetourButton->Test(event.button.x, event.button.y))
+					else if(ListServerForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
 						eob = true;
 					break;
 				default: break;
@@ -483,17 +483,17 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 						}
 						break;
 					case SDL_MOUSEBUTTONDOWN:
-						if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y))
+						if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							client->SetWantDisconnect();
 							eob = true;
 						}
-						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y))
+						if(ConnectedForm->ListButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							ListGames();
 							client->sendrpl(client->rpl(EC_Client::STAT));
 						}
-						if(ConnectedForm->MissionButton->Test(event.button.x, event.button.y))
+						if(ConnectedForm->MissionButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(!GameInfos(NULL, ConnectedForm, true))
 								TMessageBox("Impossible de créer une mission.\n"
@@ -502,7 +502,7 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 
 							client->sendrpl(client->rpl(EC_Client::STAT));
 						}
-						if(ConnectedForm->EscarmoucheButton->Test(event.button.x, event.button.y))
+						if(ConnectedForm->EscarmoucheButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(!GameInfos(NULL, ConnectedForm))
 								TMessageBox("Impossible de créer une escarmouche.\n"

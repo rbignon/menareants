@@ -1,6 +1,6 @@
 /* src/gui/ChildForm.h - Header of ChildForm.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public:
 	/** Use this function to init your components with AddComponent() */
 	virtual void Init() = 0;
 
-	virtual bool Clic(int x, int y);
+	virtual bool Clic(int x, int y, int button);
 
 	void Clear();
 

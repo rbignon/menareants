@@ -25,7 +25,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
     (mon char avance de 3 cases, et rencontre d'abord une unité enemie. Il y a combat. Si mon unité gagne,
      elle continue son chemin. Il est possible qu'elle rencontre encore une unité enemie. Il y a recombat.
      Si je gagne, on continue encore).
--> Un Fast Find Path qui marche avec une recherche de la case accessible la plus proche de la case voulue (si non accessible)
+[DONE] Un Fast Find Path qui marche avec une recherche de la case accessible la plus proche de la case voulue (si non accessible)
 [DONE] Pouvoir annuler les actions d'une unité
 
 * Après
@@ -39,7 +39,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 * Bof
 -passer à de la 3d isometrique (à confirmer)
--faire un serveur d'indexation, et limiter à une partie par serveur de jeu.
 -lorsqu'il y a :
   BA -> AA -> (mouvement de BA deux fois vers la droite en passant par AA (1))
  il y a donc un combat prévu entre BA et AA, et si AA bouge vers le haut (2), le mouvement original de

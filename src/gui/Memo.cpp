@@ -1,6 +1,6 @@
 /* src/gui/TMemo.cpp - TMemo GUI
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,11 +64,14 @@ void TMemo::Init()
 
 }
 
-bool TMemo::Clic (int mouse_x, int mouse_y)
+bool TMemo::Clic (int mouse_x, int mouse_y, int button)
 {
+  if(Mouse(mouse_x, mouse_y) == false) return false;
+
+
   if (m_items.size() > nb_visible_items_max)
   {
-    if ( m_down.Test(mouse_x, mouse_y) )
+    if (button == SDL_BUTTON_WHEELDOWN || m_down.Test(mouse_x, mouse_y))
     {
       // bottom button
       if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
@@ -76,7 +79,7 @@ bool TMemo::Clic (int mouse_x, int mouse_y)
     }
 
 
-    if ( m_up.Test(mouse_x,mouse_y) )
+    if (button == SDL_BUTTON_WHEELUP || m_up.Test(mouse_x,mouse_y))
     {
       // top button
       if (first_visible_item > 0) first_visible_item-- ;
@@ -108,7 +111,7 @@ void TMemo::Draw (int mouse_x, int mouse_y)
 	{
 		m_up.SetXY(x+w-12, y+2);
 		m_down.SetXY(x+w-12, y+h-7);
-	
+
 		m_up.Draw (mouse_x, mouse_y);
 		m_down.Draw (mouse_x, mouse_y);
 	}

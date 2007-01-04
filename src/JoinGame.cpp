@@ -564,7 +564,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			 			InGameForm->BarreLat->SetXY(SCREEN_WIDTH, InGameForm->BarreLat->Y());
 			 			InGameForm->Map->ToRedraw(InGameForm->BarreLat);
 				 		InGameForm->BarreLat->Hide();
-				 		InGameForm->BarreLat->ProgressBar->SetValue(0);
+				 		if(InGameForm->BarreLat->ProgressBar)
+				 			InGameForm->BarreLat->ProgressBar->SetValue(0);
 				 	}
 				 }
 				 break;
@@ -1124,10 +1125,8 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	{ /* Le joueur est inconnu */
 		if(parv[0] == me->GetNick())
 		{ /* C'est moi qui join */
-			EChannel *c = new EChannel(parv[1]);
+			EChannel *c = new EChannel(parv[1], (parv[1] == "."));
 			me->SetPlayer(new ECPlayer(parv[0], c, false, false, true, false));
-			if(parv[1][0] == '.' && parv[1].size() == 1)
-				c->SetMission();
 
 			/* En cas de gros lag, il se peut que le joueur ait supprimé GameInfosForm avant même avoir reçu le JOIN.
 			 * Dans ce cas on prévient quand même le serveur qu'on part.
@@ -1427,7 +1426,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 					{
 						if(client->Player()->IsPriv())
 						{
-							if(GameInfosForm->MapList->Test( event.button.x, event.button.y) &&
+							if(GameInfosForm->MapList->Test( event.button.x, event.button.y, event.button.button) &&
 							   GameInfosForm->MapList->GetSelectedItem() != -1)
 							{
 								client->sendrpl(client->rpl(EC_Client::SET),
@@ -1444,7 +1443,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 									TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
 									if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
 									{
-										if(pll->OwnZone(event.button.x, event.button.y))
+										if(pll->OwnZone(event.button.x, event.button.y, event.button.button))
 										{
 											if(pll->Player()->IsOp())
 												client->sendrpl(client->rpl(EC_Client::SET),
@@ -1453,7 +1452,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 												client->sendrpl(client->rpl(EC_Client::SET),
 															("+o " + pll->Player()->Nick()).c_str());
 										}
-										else if(pll->Nick->Test(event.button.x, event.button.y))
+										else if(pll->Nick->Test(event.button.x, event.button.y, event.button.button))
 										{
 											TMessageBox mb("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
 											               "Veuillez entrer la raison :",
@@ -1472,33 +1471,33 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 						}
 						bool tmp = GameInfosForm->MyNation->Opened();
 						if(GameInfosForm->MyPosition &&
-						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y))
+						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y, event.button.button))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
 						else if(GameInfosForm->MyColor &&
-						   GameInfosForm->MyColor->Clic(event.button.x, event.button.y))
+						   GameInfosForm->MyColor->Clic(event.button.x, event.button.y, event.button.button))
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
 						else if(GameInfosForm->MyNation &&
-						   GameInfosForm->MyNation->Clic(event.button.x, event.button.y) &&
+						   GameInfosForm->MyNation->Clic(event.button.x, event.button.y, event.button.button) &&
 						  tmp && !GameInfosForm->MyNation->Opened() && GameInfosForm->MyNation->GetSelectedItem() != -1)
 								client->sendrpl(client->rpl(EC_Client::SET),
 									("+n " + TypToStr(GameInfosForm->MyNation->GetSelectedItem())).c_str());
 /*						break;
 					case SDL_MOUSEBUTTONDOWN:*/
-						else if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
 							eob = true;
-						else if(GameInfosForm->PretButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->PretButton->Test(event.button.x, event.button.y, event.button.button))
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
-						else if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y, event.button.button))
 							client->sendrpl(client->rpl(EC_Client::SET), GameInfosForm->SpeedGame->Checked() ? "+r" : "-r");
-						else if(GameInfosForm->BeginMoney->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->BeginMoney->Test(event.button.x, event.button.y, event.button.button))
 							client->sendrpl(client->rpl(EC_Client::SET),
 							   ("+b " + TypToStr(GameInfosForm->BeginMoney->Value())).c_str());
-						else if(GameInfosForm->TurnTime->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->TurnTime->Test(event.button.x, event.button.y, event.button.button))
 							client->sendrpl(client->rpl(EC_Client::SET),
 							   ("+t " + TypToStr(GameInfosForm->TurnTime->Value())).c_str());
-						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y))
+						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
 							mb.Edit()->SetAvailChars(NICK_CHARS);
@@ -1601,7 +1600,7 @@ void MenAreAntsApp::ListGames()
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					if(ListGameForm->GList->Test(event.button.x, event.button.y))
+					if(ListGameForm->GList->Test(event.button.x, event.button.y, event.button.button))
 					{
 						if(ListGameForm->GList->GetSelectedItem() >= 0 &&
 						ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
@@ -1610,7 +1609,7 @@ void MenAreAntsApp::ListGames()
 							ListGameForm->JoinButton->SetEnabled(false);
 					}
 					if(ListGameForm->JoinButton->Enabled() &&
-					   ListGameForm->JoinButton->Test(event.button.x, event.button.y))
+					   ListGameForm->JoinButton->Test(event.button.x, event.button.y, event.button.button))
 					{
 						if(!GameInfos(ListGameForm->GList->ReadValue(
 						             ListGameForm->GList->GetSelectedItem()).c_str()))
@@ -1621,9 +1620,9 @@ void MenAreAntsApp::ListGames()
 						refresh = true;
 						timer.reset();
 					}
-					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y))
+					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y, event.button.button))
 						refresh = true;
-					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y))
+					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y, event.button.button))
 					{
 						if(!GameInfos(NULL, ListGameForm))
 						{
@@ -1633,7 +1632,7 @@ void MenAreAntsApp::ListGames()
 						refresh = true;
 						timer.reset();
 					}
-					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y))
+					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
 						eob = true;
 					break;
 				default:
@@ -1694,7 +1693,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, bool _mission)
 	15000));
 	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
 
-	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  right_x, 405, 150, 15, 360, 15,
+	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  right_x, 405, 150, /*min*/mission ? 0 : 15, 360, 15,
 	60));
 	TurnTime->SetHint("Temps en secondes maximal de reflexion chaques tours");
 
@@ -1790,15 +1789,15 @@ void TPlayerLine::SetXY (int px, int py)
 	if(Nick) Nick->SetXY(px+70, py);
 }
 
-bool TPlayerLine::OwnZone(int _x, int _y)
+bool TPlayerLine::OwnZone(int _x, int _y, int button)
 {
-	if(_x > x+75 && _x < x+95 && _y > y && _y < int(y+h))
+	if(button == SDL_BUTTON_LEFT && _x > x+75 && _x < x+95 && _y > y && _y < int(y+h))
 		return true;
 	else
 		return false;
 }
 
-bool TPlayerLine::Test (int souris_x, int souris_y) const
+bool TPlayerLine::Test (int souris_x, int souris_y, int button) const
 {
   return (visible && enabled && ((x <= souris_x) && (souris_x <= int(x+w)) && (y <= souris_y) &&
          (souris_y <= int((nation && nation->Opened() ? nation->Y() + nation->Height() : y+h)))));

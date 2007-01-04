@@ -1,6 +1,6 @@
 /* src/gui/ComboBox.cpp - This component is an edit'form with a list
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,20 +126,20 @@ void TComboBox::Deselect (uint index)
 	return;
 }
 
-bool TComboBox::Clic (int mouse_x, int mouse_y)
+bool TComboBox::Clic (int mouse_x, int mouse_y, int button)
 {
 	if(!enabled) return false;
 
 	bool r = false;
 
 	if(opened)
-		r = TListBox::Clic(mouse_x,mouse_y);
-	if(m_open.Test(mouse_x, mouse_y))
+		r = TListBox::Clic(mouse_x,mouse_y, button);
+	if(m_open.Test(mouse_x, mouse_y, button))
 		SetOpened(!opened), r = true;
 	if(opened && MouseIsOnWitchItem(mouse_x,mouse_y) != -1)
 		SetOpened(false), r = true;
 
-	if(!r && opened && !Test(mouse_x,mouse_y))
+	if(!r && opened && !Mouse(mouse_x,mouse_y))
 		SetOpened(false), r = true;
 
 	return r;

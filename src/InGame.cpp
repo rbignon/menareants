@@ -708,7 +708,7 @@ void MenAreAntsApp::InGame()
 				}
 				timer->reset();
 			}
-			if(chan->State() == EChannel::PLAYING)
+			if(chan->State() == EChannel::PLAYING && InGameForm->BarreLat->ProgressBar)
 			{
 				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
 				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
@@ -858,7 +858,7 @@ void MenAreAntsApp::InGame()
 					}
 					case SDL_MOUSEBUTTONDOWN:
 					{
-						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							/* Le problème est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
 							 * qu'on reçoive une confirmation et qu'ainsi le bouton soit disable.
@@ -869,19 +869,19 @@ void MenAreAntsApp::InGame()
 							InGameForm->BarreLat->PretButton->SetEnabled(false);
 							client->sendrpl(client->rpl(EC_Client::SET), "+!");
 						}
-						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y, event.button.button))
 							InGameForm->Map->ToggleSchema();
-						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y, event.button.button))
 							InGameForm->WantBalise = !InGameForm->WantBalise;
-						if(InGameForm->BarreLat->IdleFindButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->IdleFindButton->Test(event.button.x, event.button.y, event.button.button))
 							InGameForm->FindIdling();
-						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							Options(chan);
 							InGameForm->Map->SetMustRedraw();
 							InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
 						}
-						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm, false);
 							if(mb.Show() == BT_YES)
@@ -902,8 +902,8 @@ void MenAreAntsApp::InGame()
 								InGameForm->Map->SetCreateEntity(0);
 								InGameForm->Map->ToRedraw(event.button.x, event.button.y);
 							}
-							else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y) &&
-						            !InGameForm->BarreAct->Test(event.button.x, event.button.y) &&
+							else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y, event.button.button) &&
+						            !InGameForm->BarreAct->Test(event.button.x, event.button.y, event.button.button) &&
 						            (acase = InGameForm->Map->TestCase(event.button.x, event.button.y)) &&
 							        entity->CanBeCreated(acase))
 							{
@@ -921,12 +921,12 @@ void MenAreAntsApp::InGame()
 
 						if(InGameForm->BarreAct->Entity())
 						{
-							if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y))
+							if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y, event.button.button))
 							{
 								InGameForm->BarreAct->ShowInfos();
 								break;
 							}
-							if(InGameForm->BarreAct->GiveButton->Test(event.button.x, event.button.y))
+							if(InGameForm->BarreAct->GiveButton->Test(event.button.x, event.button.y, event.button.button))
 							{
 								TMessageBox mb("Entrez le pseudo du joueur à qui vous souhaitez donner ce territoire",
 								               BT_OK|HAVE_EDIT|BT_CANCEL, InGameForm);
@@ -943,21 +943,21 @@ void MenAreAntsApp::InGame()
 								break;
 							}
 							if(InGameForm->IsPressed(SDLK_PLUS) ||
-							   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y))
+							   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y, event.button.button))
 							{
 								client->sendrpl(client->rpl(EC_Client::ARM),
 								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
 								                " +").c_str());
 								break;
 							}
-							if(InGameForm->BarreAct->DeployButton->Test(event.button.x, event.button.y))
+							if(InGameForm->BarreAct->DeployButton->Test(event.button.x, event.button.y, event.button.button))
 							{
 								client->sendrpl(client->rpl(EC_Client::ARM),
 								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
 								                " #").c_str());
 								break;
 							}
-							if(InGameForm->BarreAct->UpgradeButton->Test(event.button.x, event.button.y))
+							if(InGameForm->BarreAct->UpgradeButton->Test(event.button.x, event.button.y, event.button.button))
 							{
 								client->sendrpl(client->rpl(EC_Client::ARM),
 								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
@@ -969,11 +969,11 @@ void MenAreAntsApp::InGame()
 						if(event.button.button == MBUTTON_RIGHT)
 							InGameForm->WantBalise = false;
 
-						if(InGameForm->BarreLat->Test(event.button.x, event.button.y) ||
-						   InGameForm->BarreAct->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreLat->Test(event.button.x, event.button.y, event.button.button) ||
+						   InGameForm->BarreAct->Test(event.button.x, event.button.y, event.button.button))
 							break;
 
-						if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y))
+						if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y, event.button.button))
 							want = TInGameForm::W_EXTRACT;
 
 						TInGameForm::Wants mywant = want;
@@ -1843,12 +1843,17 @@ TBarreLat::TBarreLat(ECPlayer* pl)
 
 void TBarreLat::Init()
 {
-	ProgressBar = AddComponent(new TProgressBar(39, 202, 117, 12));
-	ProgressBar->InitVal(0, 0, chan->TurnTime());
-	ProgressBar->SetBackground(false);
-	/* Position absolue due au dessin
-	 * ProgressBar->SetX(X() + Width()/2 - ProgressBar->Width()/2);
-	 */
+	if(chan->TurnTime())
+	{
+		ProgressBar = AddComponent(new TProgressBar(39, 202, 117, 12));
+		ProgressBar->InitVal(0, 0, chan->TurnTime());
+		ProgressBar->SetBackground(false);
+		/* Position absolue due au dessin
+		* ProgressBar->SetX(X() + Width()/2 - ProgressBar->Width()/2);
+		*/
+	}
+	else
+		ProgressBar = 0;
 
 	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
@@ -1933,12 +1938,12 @@ void MenAreAntsApp::Options(EChannel* chan)
 				{
 					case SDL_MOUSEBUTTONDOWN:
 					{
-						if(OptionsForm->OkButton->Test(event.button.x, event.button.y))
+						if(OptionsForm->OkButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							eob = true;
 							break;
 						}
-						else if(OptionsForm->SaveButton->Test(event.button.x, event.button.y))
+						else if(OptionsForm->SaveButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							TMessageBox m("Quel nom voulez-vous donner à la sauvegarde ?", BT_OK|BT_CANCEL|HAVE_EDIT, OptionsForm);
 							m.Edit()->SetAvailChars(MAPFILE_CHARS);
@@ -1964,7 +1969,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 							TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
 							if(pll)
 							{
-								if(pll->AllieZone(event.button.x, event.button.y) && !pll->Player()->IsMe())
+								if(pll->AllieZone(event.button.x, event.button.y, event.button.button) && !pll->Player()->IsMe())
 								{
 									if(client->Player()->IsAllie(pll->Player()))
 										client->sendrpl(client->rpl(EC_Client::SET),
@@ -1973,7 +1978,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 										client->sendrpl(client->rpl(EC_Client::SET),
 													("+a " + std::string(pll->Player()->GetNick())).c_str());
 								}
-								else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(event.button.x, event.button.y))
+								else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(event.button.x, event.button.y, event.button.button))
 								{
 									TMessageBox m("Combien voulez-vous donner à " + pll->Player()->Nick() + " ?", BT_OK|HAVE_EDIT|BT_CANCEL, OptionsForm);
 									m.Edit()->SetAvailChars("0123456789");
@@ -2052,9 +2057,9 @@ TOptionsPlayerLine::~TOptionsPlayerLine()
 	delete GiveMoneyButton;
 }
 
-bool TOptionsPlayerLine::AllieZone(int _x, int _y)
+bool TOptionsPlayerLine::AllieZone(int _x, int _y, int button)
 {
-	return (_x > x+15 && _x < x+40 && _y > y && _y < int(y+h));
+	return (button == SDL_BUTTON_LEFT && _x > x+15 && _x < x+40 && _y > y && _y < int(y+h));
 }
 
 void TOptionsPlayerLine::Init()
@@ -2270,7 +2275,7 @@ void MenAreAntsApp::PingingGame()
 				{
 					case SDL_MOUSEBUTTONDOWN:
 					{
-						if(PingingForm->LeaveButton->Test(event.button.x, event.button.y) &&
+						if(PingingForm->LeaveButton->Test(event.button.x, event.button.y, event.button.button) &&
 						   TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, PingingForm).Show() == BT_YES)
 							client->sendrpl(client->rpl(EC_Client::LEAVE));
 
@@ -2278,7 +2283,7 @@ void MenAreAntsApp::PingingGame()
 						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 						{
 							TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
-							if(pll && pll->Voter->Test(event.button.x, event.button.y))
+							if(pll && pll->Voter->Test(event.button.x, event.button.y, event.button.button))
 							{
 								client->sendrpl(client->rpl(EC_Client::SET),
 								                ("+v " + pll->Player()->Nick()).c_str());

@@ -1,6 +1,6 @@
 /* src/gui/ListBox.h - Header of ListBox.cpp
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,9 +60,9 @@ public:
 public:
 
 	virtual void Init ();
-	
+
 	virtual void Draw (int mouse_x, int mouse_y);
-	virtual bool Clic (int mouse_x, int mouse_y);
+	virtual bool Clic (int mouse_x, int mouse_y, int button);
 
 	virtual void SetEnabled(bool _en = true);
 

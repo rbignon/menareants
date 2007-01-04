@@ -697,11 +697,10 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 					return cl->sendrpl(app.rpl(ECServer::ERR));
 				}
 
-		chan = new EChannel(parv[1]);
+		chan = new EChannel(parv[1], mission);
 		pl = new ECPlayer(cl, chan, true, false);
 		ChanList.push_back(chan);
 		chan->SetOwner(pl);
-		chan->SetMission(mission);
 	}
 	else
 	{ /* Rejoins un salon existant */
@@ -978,8 +977,8 @@ bool ECPlayer::RemoveBreakPoint(ECBCase* c)
  *                               EChannel                                                   *
  ********************************************************************************************/
 
-EChannel::EChannel(std::string _name)
-	: ECBChannel(_name), owner(0), fast_game(true), begin_money(20000)
+EChannel::EChannel(std::string _name, bool mission)
+	: ECBChannel(_name, mission), owner(0), fast_game(true), begin_money(20000)
 {
 	ECBChannel::SetLimite(app.GetConf()->DefLimite()); /* Limite par default */
 	app.NBchan++;

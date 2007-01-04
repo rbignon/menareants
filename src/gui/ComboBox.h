@@ -40,7 +40,7 @@ public:
 public:
 
 	virtual void Draw (int mouse_x, int mouse_y);
-	virtual bool Clic (int mouse_x, int mouse_y);
+	virtual bool Clic (int mouse_x, int mouse_y, int button);
 	virtual void Init ();
 
 /* Attributs */

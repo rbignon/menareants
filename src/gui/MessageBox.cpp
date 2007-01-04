@@ -1,6 +1,6 @@
 /* src/gui/MessageBox.cpp - Show a window with a message.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,9 +96,9 @@ uint TMessageBox::Show()
 
 					case SDL_MOUSEBUTTONDOWN:
 						if(edit)
-							edit->Clic(event.button.x, event.button.y);
+							edit->Clic(event.button.x, event.button.y, event.button.button);
 						for(uint i=0; i<boutons.size();i++)
-							if(boutons[i]->Test(event.button.x, event.button.y))
+							if(boutons[i]->Clic(event.button.x, event.button.y, event.button.button))
 								return boutons[i]->Tag;
 						break;
 					default:

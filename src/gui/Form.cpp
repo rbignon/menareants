@@ -1,6 +1,6 @@
 /* src/gui/Form.cpp - Form is base of a component's screen
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,8 +134,8 @@ void TForm::Actions(SDL_Event event, uint a)
 			bool click = false;
 			/* Va dans l'ordre inverse */
 			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				if((*it)->Visible() && !click && a & ACTION_NOCLIC ? (*it)->Test(event.button.x, event.button.y)
-				                                                   : (*it)->Clic(event.button.x, event.button.y))
+				if((*it)->Visible() && !click && (a & ACTION_NOCLIC) ? (*it)->Test(event.button.x, event.button.y, event.button.button)
+				                                                     : (*it)->Clic(event.button.x, event.button.y, event.button.button))
 				{
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();

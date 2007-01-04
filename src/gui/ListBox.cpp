@@ -1,6 +1,6 @@
 /* src/gui/TListBox.cpp - To draw a listbox
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,29 +89,30 @@ void TListBox::ScrollTo(uint id)
 		first_visible_item = m_items.size() - nb_visible_items_max;
 }
 
-bool TListBox::Clic (int mouse_x, int mouse_y)
+bool TListBox::Clic (int mouse_x, int mouse_y, int button)
 {
-	if(!Enabled()) return false;
-	
+	if(!Enabled() || !Mouse(mouse_x, mouse_y)) return false;
+
 	// buttons for listbox with more items than visible
 	if (m_items.size() > nb_visible_items_max)
 	{
-		if ( m_down.Test(mouse_x, mouse_y) )
+		if (button == SDL_BUTTON_WHEELDOWN || m_down.Test(mouse_x, mouse_y, button))
 		{
-		// bottom button
-		if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
-		return true;
+			// bottom button
+			if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
+			return true;
 		}
-	
-	
-		if ( m_up.Test(mouse_x,mouse_y) )
+
+
+		if (button == SDL_BUTTON_WHEELUP || m_up.Test(mouse_x,mouse_y, button))
 		{
-		// top button
-		if (first_visible_item > 0) first_visible_item-- ;
-		return true;
+			// top button
+			if (first_visible_item > 0) first_visible_item-- ;
+			return true;
 		}
 	}
-	
+	if(button != SDL_BUTTON_LEFT) return false;
+
 	int item = MouseIsOnWitchItem(mouse_x,mouse_y);
 	if (item == -1 || !m_items[item].enabled) return false;
 #if 0
@@ -128,7 +129,7 @@ bool TListBox::Clic (int mouse_x, int mouse_y)
 void TListBox::Draw (int mouse_x, int mouse_y)
 {
 	int item = MouseIsOnWitchItem(mouse_x, mouse_y);
-	
+
 	// blit a surface as SDL_FillRect don't alpha blit a rectangle
 	SDL_Rect r_back = {x,y,w,h};
 	Window()->Blit(background, &r_back);
@@ -164,7 +165,7 @@ void TListBox::Draw (int mouse_x, int mouse_y)
 	{
 		m_up.SetXY(x+w-12, y+2);
 		m_down.SetXY(x+w-12, y+h-7);
-	
+
 		m_up.Draw (mouse_x, mouse_y);
 		m_down.Draw (mouse_x, mouse_y);
 	}

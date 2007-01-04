@@ -1,6 +1,6 @@
 /* src/gui/Component.h - Header of Component.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,8 +116,10 @@ public:
 	virtual void DelFocus() { focus = false; }
 
 	virtual inline bool Mouse (int souris_x, int souris_y) const;
-	virtual bool Test (int souris_x, int souris_y) const { return (Mouse(souris_x, souris_y) && Enabled()); }
-	virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
+	virtual bool Test (int souris_x, int souris_y, int button) const { return (Mouse(souris_x, souris_y) && Enabled() && button == 1); }
+	virtual bool Test (int souris_x, int souris_y) const { return Test(souris_x, souris_y, 1); }
+	//virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
+	virtual bool Clic (int mouse_x, int mouse_y, int button) { return Test(mouse_x, mouse_y, button); }
 	virtual void PressKey(SDL_keysym) { return; }
 
 	void SetOnClick(TOnClickFunction c, void* param) { on_click_func = c; on_click_param = param; }
@@ -250,7 +252,7 @@ public:
 	/** Initialization not requiered... But it is a virtual function so i have to implemente this  */
 	void Init() {}
 
-	virtual bool Clic (int mouse_x, int mouse_y);
+	virtual bool Clic (int mouse_x, int mouse_y, int button);
 
 	virtual void DelFocus();
 

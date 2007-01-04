@@ -323,7 +323,8 @@ void ECServer::delclient(TClient *del)
 	del->Free();
 	if(del->IsHuman())
 	{
-		Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
+		if(del->HasFlag(ECD_AUTH))
+			Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
 		FD_CLR(del->GetFd(), &global_fd_set);
 		myClients.erase(del->GetFd());
 		close(del->GetFd());

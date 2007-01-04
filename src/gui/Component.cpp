@@ -1,6 +1,6 @@
 /* src/gui/Component.cpp - Base of components
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005,2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,9 +86,9 @@ void TList::Draw(int souris_x, int souris_y)
 			if((*it)->Visible() && (*it)->Focused() == (first ? false : true))
 			{ // Affiche seulement à la fin les composants selectionnés
 				(*it)->Draw(souris_x, souris_y);
-				if((*it)->OnMouseOn() && (*it)->Test(souris_x, souris_y))
+				if((*it)->OnMouseOn() && (*it)->Mouse(souris_x, souris_y))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Test(souris_x, souris_y))
+				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Mouse(souris_x, souris_y))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;
@@ -101,12 +101,12 @@ void TList::Draw(int souris_x, int souris_y)
 		SetHint("");
 }
 
-bool TList::Clic (int mouse_x, int mouse_y)
+bool TList::Clic (int mouse_x, int mouse_y, int button)
 {
 	bool click = false;
 
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
-		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y))
+		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y, button))
 		{
 			(*it)->SetFocus();
 			if((*it)->OnClick())

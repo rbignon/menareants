@@ -365,9 +365,9 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 
 							if(event.button.button == MBUTTON_RIGHT)
 								MapEditor->Map->SetCreateEntity(0);
-							else if(!MapEditor->BarreLat->Test(event.button.x, event.button.y) &&
-						            !MapEditor->BarreEntity->Test(event.button.x, event.button.y) &&
-						            !MapEditor->BarreCase->Test(event.button.x, event.button.y) &&
+							else if(!MapEditor->BarreLat->Test(event.button.x, event.button.y, event.button.button) &&
+						            !MapEditor->BarreEntity->Test(event.button.x, event.button.y, event.button.button) &&
+						            !MapEditor->BarreCase->Test(event.button.x, event.button.y, event.button.button) &&
 						            (acase = MapEditor->Map->TestCase(event.button.x, event.button.y)))
 							{
 								ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb(), map);
@@ -381,7 +381,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							}
 							break;
 						}
-						if(MapEditor->BarreLat->SaveButton->Test(event.button.x, event.button.y))
+						if(MapEditor->BarreLat->SaveButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(!map->CanSave())
 							{
@@ -401,7 +401,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 								m.Show();
 							}
 						}
-						if(MapEditor->BarreLat->QuitButton->Test(event.button.x, event.button.y))
+						if(MapEditor->BarreLat->QuitButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							uint result = 0;
 							if(map->CanSave())
@@ -436,7 +436,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 						ECEntity* entity = 0;
 
 						if((entity = MapEditor->BarreEntity->Entity()) &&
-						   MapEditor->BarreEntity->RemoveButton->Test(event.button.x, event.button.y))
+						   MapEditor->BarreEntity->RemoveButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							MapEditor->BarreEntity->UnSelect();
 							map->RemoveAnEntity(entity);
@@ -444,9 +444,9 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 							break;
 						}
 
-						if(MapEditor->BarreEntity->Test(event.button.x, event.button.y) ||
-						   MapEditor->BarreCase->Test(event.button.x, event.button.y) ||
-						   MapEditor->BarreLat->Test(event.button.x, event.button.y))
+						if(MapEditor->BarreEntity->Test(event.button.x, event.button.y, event.button.button) ||
+						   MapEditor->BarreCase->Test(event.button.x, event.button.y, event.button.button) ||
+						   MapEditor->BarreLat->Test(event.button.x, event.button.y, event.button.button))
 							break;
 
 						if(event.button.button == MBUTTON_LEFT)
@@ -1027,7 +1027,7 @@ void TOptionsMap::Options(TObject*, void* m)
 				{
 					case SDL_MOUSEBUTTONDOWN:
 					{
-						if(OptionsMap->OkButton->Test(event.button.x, event.button.y))
+						if(OptionsMap->OkButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(OptionsMap->Name->Text().empty())
 								TMessageBox("Veuillez donner un nom à la carte !", BT_OK, OptionsMap).Show();
@@ -1053,7 +1053,7 @@ void TOptionsMap::Options(TObject*, void* m)
 
 						const char* id = 0;
 						char m_id = 0;
-						if(OptionsMap->AddPlayerButton->Test(event.button.x, event.button.y))
+						if(OptionsMap->AddPlayerButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							map->AddPlayer();
 							OptionsMap->Refresh();
@@ -1061,15 +1061,15 @@ void TOptionsMap::Options(TObject*, void* m)
 						else if(OptionsMap->Players->GetSelectedItem() < 0 ||
 						  !(m_id = OptionsMap->Players->ReadValue(OptionsMap->Players->GetSelectedItem())[0]))
 							OptionsMap->DelPlayerButton->SetEnabled(false);
-						else if(OptionsMap->Players->Test(event.button.x, event.button.y))
+						else if(OptionsMap->Players->Test(event.button.x, event.button.y, event.button.button))
 							OptionsMap->DelPlayerButton->SetEnabled(true);
-						else if(OptionsMap->DelPlayerButton->Test(event.button.x, event.button.y))
+						else if(OptionsMap->DelPlayerButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							map->RemovePlayer(m_id);
 							OptionsMap->Refresh();
 						}
 
-						if(OptionsMap->AddCountryButton->Test(event.button.x, event.button.y))
+						if(OptionsMap->AddCountryButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							std::string c_id = OptionsMap->AddCountryEdit->Text();
 							if(c_id.empty() || c_id.size() != 2)
@@ -1095,7 +1095,7 @@ void TOptionsMap::Options(TObject*, void* m)
 							OptionsMap->CountryPlayer->SetEnabled(false);
 							OptionsMap->DelCountryButton->SetEnabled(false);
 						}
-						else if(OptionsMap->Countries->Test(event.button.x, event.button.y))
+						else if(OptionsMap->Countries->Test(event.button.x, event.button.y, event.button.button))
 						{
 							ECBCountry* country = 0;
 
@@ -1118,7 +1118,7 @@ void TOptionsMap::Options(TObject*, void* m)
 								OptionsMap->CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
 								                                   TypToStr((*it)->ID()));
 						}
-						else if(OptionsMap->DelCountryButton->Test(event.button.x, event.button.y))
+						else if(OptionsMap->DelCountryButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							map->RemoveCountry(id);
 							OptionsMap->Refresh();
@@ -1270,7 +1270,7 @@ void MenAreAntsApp::MapEditor()
 				switch(event.type)
 				{
 					case SDL_MOUSEBUTTONDOWN:
-						if(LoadMapFile->MapsList->Test(event.button.x, event.button.y))
+						if(LoadMapFile->MapsList->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(LoadMapFile->MapsList->GetSelectedItem() >= 0 &&
 							   LoadMapFile->MapsList->EnabledItem(LoadMapFile->MapsList->GetSelectedItem()))
@@ -1278,7 +1278,7 @@ void MenAreAntsApp::MapEditor()
 							else
 								LoadMapFile->LoadButton->SetEnabled(false);
 						}
-						else if(LoadMapFile->NewButton->Test(event.button.x, event.button.y))
+						else if(LoadMapFile->NewButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(!TMapEditor::Editor(NULL, LoadMapFile))
 							{
@@ -1290,7 +1290,7 @@ void MenAreAntsApp::MapEditor()
 							}
 							LoadMapFile->Refresh();
 						}
-						else if(LoadMapFile->LoadButton->Test(event.button.x, event.button.y))
+						else if(LoadMapFile->LoadButton->Test(event.button.x, event.button.y, event.button.button))
 						{
 							if(LoadMapFile->MapsList->GetSelectedItem() >= 0 &&
 							   !TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
@@ -1304,7 +1304,7 @@ void MenAreAntsApp::MapEditor()
 							LoadMapFile->Refresh();
 							LoadMapFile->LoadButton->SetEnabled(false);
 						}
-						else if(LoadMapFile->RetourButton->Test(event.button.x, event.button.y))
+						else if(LoadMapFile->RetourButton->Test(event.button.x, event.button.y, event.button.button))
 							eob = true;
 						break;
 					default:

@@ -1,6 +1,6 @@
 /* lib/Batiments.h - Header of Batiments.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ public:
 		DATA_RESTBUILD
 	};
 
-	virtual bool CanAttaq(const ECBEntity* e) { return (!restBuild && Level() == e->Level()); }
+	virtual bool CanAttaq(const ECBEntity* e) { return (!restBuild && e->Level() <= L_GROUND); }
 
 	/** Mine is a building to prevent from constructing buildings here, and to be drawed at background. */
 	virtual bool IsBuilding() const { return true; }
