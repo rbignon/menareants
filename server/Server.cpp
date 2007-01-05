@@ -113,7 +113,7 @@ int TRealClient::sendbuf(char* buf, int len)
 {
 #ifdef DEBUG
 	if(strncmp(buf, "PIG", 3) && strncmp(buf, "POG", 3))
-		Debug(W_ECHO, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), buf);
+		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), buf);
 #endif
 
 	buf[len++] = '\r';
@@ -157,7 +157,7 @@ int TClient::parsemsg(std::string buf)
 
 #ifdef DEBUG
 	if(strncmp(buf.c_str(), "PIG", 3) && strncmp(buf.c_str(), "POG", 3))
-		Debug(W_ECHO, "R(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
+		Debug(W_ECHO|W_DEBUG, "R(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
 #endif
 
 	SplitBuf(buf, &parv, &cmdname);

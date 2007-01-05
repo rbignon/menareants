@@ -308,6 +308,7 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	                                      " serveurs, dont " + TypToStr(ListServerForm->nb_chans - ListServerForm->nb_wchans) + " en cours de jeu et " +
 	                                      TypToStr(ListServerForm->nb_wchans) + " en préparation.");
 	ListServerForm->nb_chans = ListServerForm->nb_wchans = ListServerForm->nb_users = ListServerForm->nb_tchans = ListServerForm->nb_tusers = 0;
+	ListServerForm->RefreshButton->SetEnabled(true);
 	return 0;
 }
 
@@ -325,7 +326,11 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 
 void MenAreAntsApp::RefreshList()
 {
+	if(ListServerForm->RecvSList == false) return;
+
 	ListServerForm->RecvSList = false;
+	ListServerForm->RefreshButton->SetEnabled(false);
+
 	mutex = SDL_CreateMutex();
 	EC_Client* client = EC_Client::GetInstance(true);
 
@@ -425,6 +430,7 @@ void MenAreAntsApp::ServerList()
 					        ListServerForm->EscarmoucheButton->Test(event.button.x, event.button.y, event.button.button))
 					{
 						int size = ListServerForm->ServerList->Size();
+						if(!size) break;
 						int r = 0, i = 0;
 						do
 						{
@@ -616,7 +622,7 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 			return;
 
 		ConnectedForm->SetMutex(mutex);
-		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en temps que " +
+		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en tant que " +
 		                                               client->GetNick());
 
 		bool eob = false, refresh = true;
