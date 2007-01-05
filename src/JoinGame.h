@@ -89,28 +89,6 @@ public:
 };
 
 /********************************************************************************************
- *                               TListGameForm                                              *
- ********************************************************************************************/
-/** This is a form based on TForm showed when client want to list channels. */
-class TListGameForm : public TForm
-{
-/* Constructeur/Deconstructeur */
-public:
-
-	TListGameForm(ECImage*);
-
-/* Composants */
-public:
-
-	TButtonText  *JoinButton;
-	TButtonText  *RefreshButton;
-	TButtonText  *CreerButton;
-	TButtonText  *RetourButton;
-	TListBox     *GList;
-	TLabel       *Title;
-};
-
-/********************************************************************************************
  *                               TPlayerLine                                                *
  ********************************************************************************************/
 /** This is a line to show a player status in TGameInfos form */

@@ -1,6 +1,6 @@
 /* meta-server/sockets.c - Socket functions
  *
- * Copyright (C) 2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2006-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@ int sock = 0;
 int running = 0;
 fd_set global_fd_set;
 unsigned highsock = 0;
+unsigned nb_tchan = 0;
+unsigned nb_tusers = 0;
 static struct Client myClients[MAXCLIENTS];
 
 int sendbuf(struct Client* cl, char* buf, int len)
@@ -233,7 +235,7 @@ int init_socket(void)
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		printf("Unable to listen port %d.", PORT);
+		printf("Unable to listen port %d.\n", PORT);
 		close(sock);
 		return 0;
 	}

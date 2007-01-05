@@ -1,6 +1,6 @@
 /* meta-server/sockets.h - Socket functions
  *
- * Copyright (C) 2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2006-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,5 +54,8 @@ int delclient(struct Client *del);
 int sendrpl(struct Client* cl, const char *pattern, ...);
 int run_server(void);
 int init_socket(void);
+
+extern unsigned nb_tchan;
+extern unsigned nb_tusers;
 
 #endif /* ECMS_SOCKETS_H */

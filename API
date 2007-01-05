@@ -246,6 +246,7 @@ Sommaire:
 
         > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
         < IAM <name> <prog> <version>                      :Donne son nom, son prog et sa version
+        > STAT <nbtchan> <nbtusers>                        :Statistiques
         > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste une partie
                      <nbmax> <nbgames> <maxgames> <proto>
         > EOL                                              :fin du listing

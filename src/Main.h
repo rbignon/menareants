@@ -1,6 +1,6 @@
 /* src/main.h - Main file
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ private:
 	void ServerList();
 	void RefreshList();
 	void ConnectedTo(std::string host);
+	EC_Client* Connect(std::string host);
+	void Disconnect(EC_Client*);
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0, bool mission = false);
 	void LoadGame(EChannel* ch);

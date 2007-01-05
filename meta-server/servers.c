@@ -1,6 +1,6 @@
 /* meta-server/servers.c - About servers
  *
- * Copyright (C) 2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2006-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,14 +48,24 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 			case '+': add = 1; break;
 			case '-': add = 0; break;
 			case 'p':
-				cl->server->nb_players = (i < parc && add) ? atoi(parv[i++]) : 0;
+			{
+				int nb = (i < parc && add) ? atoi(parv[i++]) : 0;
+				if(nb > cl->server->nb_players)
+					nb_tusers += nb - cl->server->nb_players;
+				cl->server->nb_players = nb;
 				break;
+			}
 			case 'P':
 				cl->server->max_players = (i < parc && add) ? atoi(parv[i++]) : 0;
 				break;
 			case 'g':
-				cl->server->nb_games = (i < parc && add) ? atoi(parv[i++]) : 0;
+			{
+				int nb = (i < parc && add) ? atoi(parv[i++]) : 0;
+				if(nb > cl->server->nb_games)
+					nb_tchan += nb - cl->server->nb_games;
+				cl->server->nb_games = nb;
 				break;
+			}
 			case 'G':
 				cl->server->max_games = (i < parc && add) ? atoi(parv[i++]) : 0;
 				break;

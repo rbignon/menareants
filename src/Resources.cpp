@@ -1,6 +1,6 @@
 /* src/Resources.cpp - Struct which define all resources.
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,6 +110,8 @@
 	R_RESOURCE(ECSpriteBase, OptionsButton,    "optionsbutton");
 	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
 	R_RESOURCE(ECSpriteBase, QuitterButton,    "quitterbutton");
+	R_RESOURCE(ECSpriteBase, MissionButton,    "missionbutton");
+	R_RESOURCE(ECSpriteBase, EscarmoucheButton,"escarmouchebutton");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");

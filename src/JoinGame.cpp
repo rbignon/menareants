@@ -49,9 +49,7 @@ void LoadingGame(EC_Client* cl);
 std::vector<std::string> TGameInfosForm::RecvMap;
 std::string TGameInfosForm::ErrMessage;
 
-TListGameForm  *ListGameForm = NULL;  /**< Pointer to form whose list games */
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
-bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 int JOINED = 0;                       /**< 1 = joined, -1 = error */
 bool RECOVERING = false;
 
@@ -364,49 +362,6 @@ int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
 	me->UnlockScreen();
 
-	return 0;
-}
-
-/** List games.
- *
- * Syntax: LSP nom ingame nbjoueur nbmax [mapname]
- */
-int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	if(!ListGameForm)
-		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ListGameForm));
-
-	me->LockScreen();
-	if(parv[2][0] == '+')
-	{
-		if(parv[3] == "0")
-			ListGameForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[2].c_str()), parv[1],
-			                             black_color, true);
-		else if(parv.size() > 5)
-			ListGameForm->GList->AddItem(false, StringF("%-8s %2s/%-2s %s", parv[1].c_str(), parv[3].c_str(),
-			                                                                parv[4].c_str(), parv[5].c_str()), parv[1],
-							(parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-							(parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
-		else
-			ListGameForm->GList->AddItem(false, StringF("%-8s %2s/%-2s", parv[1].c_str(), parv[3].c_str(),
-			                                                            parv[4].c_str()), parv[1],
-							(parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-							(parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
-	}
-	else
-		ListGameForm->GList->AddItem(false, StringF("%-8s  Playing: %s", parv[1].c_str(), parv[5].c_str()), parv[1],
-		                             red_color, false);
-	me->UnlockScreen();
-	return 0;
-}
-
-/** End of channel list
- *
- * Syntax: EOL
- */
-int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	EOL = true;
 	return 0;
 }
 
@@ -1553,101 +1508,6 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	return true;
 }
 
-void MenAreAntsApp::ListGames()
-{
-	if(!EC_Client::GetInstance())
-		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
-
-	SDL_Event event;
-
-	ListGameForm = new TListGameForm(Video::GetInstance()->Window());
-	ListGameForm->SetMutex(mutex);
-
-	EC_Client* client = EC_Client::GetInstance();
-
-	bool eob = false, refresh = true;
-	Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
-	do
-	{
-		if(refresh)
-		{
-			ListGameForm->GList->ClearItems();
-			EOL = false;
-			client->sendrpl(client->rpl(EC_Client::LISTGAME));
-			WAIT_EVENT(EOL, j);
-			if(!EOL)
-			{
-				delete ListGameForm;
-				ListGameForm = 0;
-				return; /* On a attendu pour rien */
-			}
-			refresh = false;
-			ListGameForm->JoinButton->SetEnabled(false);
-			timer.reset();
-		}
-		while( SDL_PollEvent( &event) )
-		{
-			ListGameForm->Actions(event);
-			switch(event.type)
-			{
-				case SDL_KEYUP:
-					switch (event.key.keysym.sym)
-					{
-						case SDLK_ESCAPE:
-							eob = true;
-							break;
-						default: break;
-					}
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					if(ListGameForm->GList->Test(event.button.x, event.button.y, event.button.button))
-					{
-						if(ListGameForm->GList->GetSelectedItem() >= 0 &&
-						ListGameForm->GList->EnabledItem(ListGameForm->GList->GetSelectedItem()))
-							ListGameForm->JoinButton->SetEnabled(true);
-						else
-							ListGameForm->JoinButton->SetEnabled(false);
-					}
-					if(ListGameForm->JoinButton->Enabled() &&
-					   ListGameForm->JoinButton->Test(event.button.x, event.button.y, event.button.button))
-					{
-						if(!GameInfos(ListGameForm->GList->ReadValue(
-						             ListGameForm->GList->GetSelectedItem()).c_str()))
-						{
-							TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
-							TGameInfosForm::ErrMessage.clear();
-						}
-						refresh = true;
-						timer.reset();
-					}
-					else if(ListGameForm->RefreshButton->Test(event.button.x, event.button.y, event.button.button))
-						refresh = true;
-					else if(ListGameForm->CreerButton->Test(event.button.x, event.button.y, event.button.button))
-					{
-						if(!GameInfos(NULL, ListGameForm))
-						{
-							TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
-							TGameInfosForm::ErrMessage.clear();
-						}
-						refresh = true;
-						timer.reset();
-					}
-					else if(ListGameForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
-						eob = true;
-					break;
-				default:
-					break;
-			}
-		}
-		ListGameForm->Update();
-
-		if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
-	} while(!eob && client->IsConnected());
-
-	MyFree(ListGameForm);
-	return;
-}
-
 /********************************************************************************************
  *                               TGameInfosForm                                             *
  ********************************************************************************************/
@@ -1725,28 +1585,6 @@ void TGameInfosForm::RecalcMemo()
 {
 	Chat->SetXY(50, Players->Y() + Players->Height());
 	Chat->SetHeight(Window()->GetHeight() - 65 - Players->Height()-Players->Y()); /* On définit une jolie taille */
-}
-
-/********************************************************************************************
- *                               TListGameForm                                              *
- ********************************************************************************************/
-
-TListGameForm::TListGameForm(ECImage* w)
-	: TForm(w)
-{
-	GList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,200,200,300));
-	GList->SetXY(Window()->GetWidth()/2 - GList->Width()/2, Window()->GetHeight()/2 - GList->Height()/2);
-
-	Title = AddComponent(new TLabel(GList->Y()-50,"Liste des parties", white_color, Font::GetInstance(Font::Big)));
-
-	int button_x = GList->X()+GList->Width()+50;
-	int button_y = GList->Y();
-	JoinButton = AddComponent(new TButtonText(button_x,button_y,150,50, "Rejoindre", Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(button_x,button_y+50,150,50, "Actualiser", Font::GetInstance(Font::Normal)));
-	CreerButton = AddComponent(new TButtonText(button_x,button_y+100,150,50, "Créer", Font::GetInstance(Font::Normal)));
-	RetourButton = AddComponent(new TButtonText(button_x,button_y+150,150,50, "Retour", Font::GetInstance(Font::Normal)));
-
-	SetBackground(Resources::Titlescreen());
 }
 
 /********************************************************************************************

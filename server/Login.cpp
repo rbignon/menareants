@@ -1,6 +1,6 @@
 /* src/Login.cpp - Login commands
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 		return victim->exit(app.rpl(ECServer::BYE));
 	}
-	
+
 	cl->sendrpl(app.rpl(ECServer::ERR));
 
 	return 0;
@@ -149,6 +149,10 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	SetAuth(cl);
 
 	Debug(W_CONNS, ">> Connexion de %s@%s", cl->GetNick(), cl->GetIp());
+
+	app.NBco++;
+	app.NBtot++;
+	app.MSet("+p " + TypToStr(app.NBco));
 
 	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
 

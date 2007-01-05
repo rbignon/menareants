@@ -272,9 +272,6 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	if(fd >= 0)
 	{
 		FD_SET(fd, &global_fd_set);
-		NBco++;
-		NBtot++;
-		MSet("+p " + TypToStr(NBco));
 		myClients[fd] = newC;
 		if((unsigned)fd > highsock) highsock = fd;
 
@@ -324,7 +321,11 @@ void ECServer::delclient(TClient *del)
 	if(del->IsHuman())
 	{
 		if(del->HasFlag(ECD_AUTH))
+		{
+			NBco--;
+			MSet("+p " + TypToStr(NBco));
 			Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
+		}
 		FD_CLR(del->GetFd(), &global_fd_set);
 		myClients.erase(del->GetFd());
 		close(del->GetFd());
@@ -335,8 +336,6 @@ void ECServer::delclient(TClient *del)
 				if((unsigned)it->second->GetFd() > highsock)
 					highsock = it->second->GetFd();
 		}
-		NBco--;
-		MSet("+p " + TypToStr(NBco));
 	}
 	Clients.erase(std::remove(Clients.begin(), Clients.end(), del), Clients.end());
 	delete del;
@@ -401,6 +400,8 @@ int ECServer::SendMetaServer(std::string s)
 	s = s + "\r\n";
 
 	send(ms_sock, s.c_str(), s.size(), 0);
+
+	printf("S- %s", s.c_str());
 
 	return 0;
 }

@@ -1,6 +1,6 @@
 /* src/Login.h - Header of Login.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,14 +39,17 @@ public:
 public:
 
 	TMemo*       Motd;
-	TButtonText* MissionButton;
-	TButtonText* EscarmoucheButton;
-	TButtonText* ListButton;
+	TButtonText* CreerButton;
+	TButtonText* JoinButton;
+	TButtonText* RefreshButton;
 	TButtonText* DisconnectButton;
 	TLabel*      Welcome;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
 	TLabel*      Uptime;
+	TLabel*      ListLabel;
+	TLabel*      MOTDLabel;
+	TListBox*    GList;
 
 /* Variables publiques */
 public:
@@ -69,8 +72,14 @@ public:
 	TButtonText* RetourButton;
 	TButtonText* RefreshButton;
 	TButtonText* ConnectButton;
+	TButton*     MissionButton;
+	TButton*     EscarmoucheButton;
 	TLabel*      Label1;
 	TLabel*      Label2;
+	TLabel*      UserStats;
+	TLabel*      ChanStats;
+
+	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers;
 
 	bool RecvSList;
 };

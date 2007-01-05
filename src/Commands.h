@@ -69,6 +69,8 @@ class LSPmsCommand : public EC_ACommand { public: LSPmsCommand(const std::string
 
 class EOLmsCommand : public EC_ACommand { public: EOLmsCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~EOLmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class STATmsCommand : public EC_ACommand { public: STATmsCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* GENERAL */
 
 class HELCommand : public EC_ACommand { public: HELCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

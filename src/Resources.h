@@ -1,6 +1,6 @@
 /* src/Resources.h - Header of Resources.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -145,6 +145,8 @@ public:
 	R_RESOURCE(ECSpriteBase, OptionsButton);
 	R_RESOURCE(ECSpriteBase, CreditsButton);
 	R_RESOURCE(ECSpriteBase, QuitterButton);
+	R_RESOURCE(ECSpriteBase, MissionButton);
+	R_RESOURCE(ECSpriteBase, EscarmoucheButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);

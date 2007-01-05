@@ -1,6 +1,6 @@
 /* meta-server/clients.c - About clients
  *
- * Copyright (C) 2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2006-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ int m_login (struct Client* cl, int parc, char** parv)
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
 		cl->flags = CL_USER;
+		sendrpl(cl, "STAT %d %d", nb_tchan, nb_tusers);
 		list_servers(cl);
 	}
 	else if(!strcmp(parv[2], SERV_SMALLNAME))

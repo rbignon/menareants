@@ -1,3 +1,20 @@
+2007-01-05 Romain Bignon <progs@headfucking.net>
+
+	* src/data/anims/escarmouchebutton: Bouton pour créer une escarmouche à partir de la liste des serveurs.
+
+	* src/data/anims/missionbutton: Pareil pour les missions.
+
+	* src/Login.cpp (TListServerForm): Maintenant, en plus de la liste des serveurs, se trouvent des statistiques données par le meta-server
+	  et basées sur la liste donnée. En outre, se trouve également deux boutons, "Mission solo" et "Escarmouche", qui choisissent un serveur
+	  au hasard parmis ceux présents accessibles, s'y connectent et créent respectivement une mission ou une escarmouche.
+	(TConnectedForm): La liste des parties se trouve maintenant dans cette fenêtre.
+
+	* src/JoinGame.cpp (TListGameForm): Suppression de cette fenêtre.
+
+	* meta-server/clients.c, meta-server/servers.c: Création de statistiques sur le nombre de joueurs et de parties crées.
+
+	* src/Config.cpp: Rajout de la résolution 1680x1050.
+
 2007-01-04 Romain Bignon <progs@headfucking.net>
 
 	* server/Units.cpp (ECMcDo): Correction d'un crash.

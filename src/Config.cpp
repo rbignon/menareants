@@ -49,7 +49,8 @@ struct resolutions_t
 	{ 800, 600 },
 	{ 1024, 768 },
 	{ 1152, 864 },
-	{ 1280, 1024 }
+	{ 1280, 1024 },
+	{ 1680, 1050 }
 };
 
 Config* Config::singleton = NULL;
