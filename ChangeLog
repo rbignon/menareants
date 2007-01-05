@@ -15,6 +15,10 @@
 
 	* src/Config.cpp: Rajout de la résolution 1680x1050.
 
+	* src/gui/MessageBox.cpp: On peut maintenir appuyer sur "entrée" pour faire OK.
+
+	* src/data/anims/escarmouchebutton, src/data/anims/missionbutton: Modification des images des boutons
+
 2007-01-04 Romain Bignon <progs@headfucking.net>
 
 	* server/Units.cpp (ECMcDo): Correction d'un crash.

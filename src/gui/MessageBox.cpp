@@ -80,18 +80,15 @@ uint TMessageBox::Show()
 				switch(event.type)
 				{
 					case SDL_KEYDOWN:
-						if(edit)
+						switch (event.key.keysym.sym)
 						{
-							switch (event.key.keysym.sym)
-							{
-								case SDLK_RETURN:
-									if(edit->Focused() && !boutons.empty())
-										return boutons[0]->Tag;
-									break;
-								default: break;
-							}
-							edit->PressKey(event.key.keysym);
+							case SDLK_RETURN:
+								if((!edit || edit->Focused()) && !boutons.empty())
+									return boutons[0]->Tag;
+								break;
+							default: break;
 						}
+						edit->PressKey(event.key.keysym);
 						break;
 
 					case SDL_MOUSEBUTTONDOWN:
