@@ -401,8 +401,6 @@ int ECServer::SendMetaServer(std::string s)
 
 	send(ms_sock, s.c_str(), s.size(), 0);
 
-	printf("S- %s", s.c_str());
-
 	return 0;
 }
 
