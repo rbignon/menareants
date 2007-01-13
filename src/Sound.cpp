@@ -236,6 +236,7 @@ void Sound::Play(bool repeat)
 			music = Mix_LoadMUS(path.c_str());
 		if(!music)
 		{
+			// Why do I send an exception ??
 			throw ECExcept("", "Sound::Play(" + path + ") :" + Mix_GetError());
 		}
 		channel = Mix_PlayMusic(music, repeat ? -1 : 0);

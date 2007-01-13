@@ -4247,21 +4247,20 @@ fi
 
 
   if test x$sdl_exec_prefix != x ; then
-    sdl_args="$sdl_args --exec-prefix=$sdl_exec_prefix"
-    if test x${SDL_CONFIG+set} != xset ; then
-      SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
-    fi
+     sdl_args="$sdl_args --exec-prefix=$sdl_exec_prefix"
+     if test x${SDL_CONFIG+set} != xset ; then
+        SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
+     fi
   fi
   if test x$sdl_prefix != x ; then
-    sdl_args="$sdl_args --prefix=$sdl_prefix"
-    if test x${SDL_CONFIG+set} != xset ; then
-      SDL_CONFIG=$sdl_prefix/bin/sdl-config
-    fi
+     sdl_args="$sdl_args --prefix=$sdl_prefix"
+     if test x${SDL_CONFIG+set} != xset ; then
+        SDL_CONFIG=$sdl_prefix/bin/sdl-config
+     fi
   fi
 
-  if test "x$prefix" != xNONE; then
-    PATH="$prefix/bin:$prefix/usr/bin:$PATH"
-  fi
+
+  PATH="$prefix/bin:$prefix/usr/bin:$PATH"
   # Extract the first word of "sdl-config", so it can be a program name with args.
 set dummy sdl-config; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -4321,10 +4320,8 @@ echo $ECHO_N "checking for SDL - version >= $min_sdl_version... $ECHO_C" >&6; }
            sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
     if test "x$enable_sdltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
-      ac_save_CXXFLAGS="$CXXFLAGS"
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $SDL_CFLAGS"
-      CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
       LIBS="$LIBS $SDL_LIBS"
       rm -f conf.sdltest
       if test "$cross_compiling" = yes; then
@@ -4429,7 +4426,6 @@ fi
 
 
        CFLAGS="$ac_save_CFLAGS"
-       CXXFLAGS="$ac_save_CXXFLAGS"
        LIBS="$ac_save_LIBS"
      fi
   fi
@@ -4451,7 +4447,6 @@ echo "${ECHO_T}no" >&6; }
        else
           echo "*** Could not run SDL test program, checking why..."
           CFLAGS="$CFLAGS $SDL_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
           LIBS="$LIBS $SDL_LIBS"
           cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -4532,7 +4527,6 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
           CFLAGS="$ac_save_CFLAGS"
-          CXXFLAGS="$ac_save_CXXFLAGS"
           LIBS="$ac_save_LIBS"
        fi
      fi

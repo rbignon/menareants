@@ -94,6 +94,7 @@ public:
 	R_RESOURCE(Sound,        SoundEnd);
 	R_RESOURCE(Sound,        SoundMitraillette);
 	R_RESOURCE(Sound,        SoundObelisque);
+	R_RESOURCE(Sound,        SoundMcDo);
 
 	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);

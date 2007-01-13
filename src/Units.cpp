@@ -39,6 +39,7 @@ void ECMcDo::RecvData(ECData data)
 			invested = static_cast<ECEntity::e_type>(StrToTyp<uint>(data.data));
 			SetMyStep(0);
 			SetRestStep(0);
+			Resources::SoundMcDo()->Play();
 			break;
 		}
 		case DATA_EXOWNER:
