@@ -351,7 +351,8 @@ void TMap::Draw(int _x, int _y)
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
-		if(c && (MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity() || SelectedEntity()))
+		if(!c) continue;
+		if(MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity() || SelectedEntity())
 		{
 			if(HaveBrouillard() && c->Showed() < 0)
 			{
@@ -396,18 +397,18 @@ void TMap::Draw(int _x, int _y)
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
 
-			DrawFog(c);
-
 			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
 				c->SetMustRedraw(false);
 		}
-		if(c && !c->Entities()->empty())
+		if(!c->Entities()->empty())
 		{
 			std::vector<ECBEntity*> ents = c->Entities()->List();
 			FOR(ECBEntity*, ents, entity)
 				if(entity && entity->IsBuilding() && !dynamic_cast<ECEntity*>(entity)->OnTop())
 					dynamic_cast<ECEntity*>(entity)->Draw();
 		}
+
+		DrawFog(c);
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();

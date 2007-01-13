@@ -116,23 +116,31 @@ public:
 	virtual void DelFocus() { focus = false; }
 
 	virtual inline bool Mouse (int souris_x, int souris_y) const;
-	virtual bool Test (int souris_x, int souris_y, int button) const { return (Mouse(souris_x, souris_y) && Enabled() && button == 1); }
-	virtual bool Test (int souris_x, int souris_y) const { return Test(souris_x, souris_y, 1); }
-	//virtual bool Clic (int mouse_x, int mouse_y) { return Test(mouse_x, mouse_y); }
-	virtual bool Clic (int mouse_x, int mouse_y, int button) { return Test(mouse_x, mouse_y, button); }
-	virtual void PressKey(SDL_keysym) { return; }
 
+	/* Pas terrible, mais pour éviter une dépendance, on ne met pas SDL_BUTTON_LEFT mais sa valeur qui est 1.
+	 * On considère donc que par défaut le boutton cliqué est le GAUCHE, et donc pour que le test réussisse il faut justement
+	 * que le bouton soit le GAUCHE.
+	 */
+	virtual bool Test (int souris_x, int souris_y, int button = 1) const { return (Mouse(souris_x, souris_y) && Enabled() && button == 1); }
+	virtual bool Clic (int mouse_x, int mouse_y, int button) { return Test(mouse_x, mouse_y, button); }
+
+	virtual void PressKey(SDL_keysym) { return; }         /**< Called when user press a key.. */
+
+	/** Call back when user clic on component */
 	void SetOnClick(TOnClickFunction c, void* param) { on_click_func = c; on_click_param = param; }
 	TOnClickFunction OnClick() const { return on_click_func; }
 	void* OnClickParam() const { return on_click_param; }
 
+	/** Call back when user clic on component. We give mouse position too. */
 	void SetOnClickPos(TOnClickPosFunction c) { on_click_pos_func = c;  }
 	TOnClickPosFunction OnClickPos() const { return on_click_pos_func; }
 
+	/** Call back when user's mouse is on this component */
 	void SetOnMouseOn(TOnMouseOnFunction m, void* param) { on_mouse_on_func = m; on_mouse_on_param = param; }
 	TOnMouseOnFunction OnMouseOn() const { return on_mouse_on_func; }
 	void* OnMouseOnParam() const { return on_mouse_on_param; }
 
+	/** This component is always focused. */
 	void SetForceFocus(bool b = true) { force_focus = b; }
 	bool ForceFocus() const { return force_focus; }
 

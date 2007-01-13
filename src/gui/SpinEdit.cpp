@@ -125,9 +125,11 @@ bool TSpinEdit::Clic (int mouse_x, int mouse_y, int button)
 {
   if(!enabled || !Mouse(mouse_x, mouse_y)) return false;
 
-  if(button == SDL_BUTTON_WHEELUP || m_plus.Test(mouse_x, mouse_y))
+  if(button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_RIGHT || m_plus.Test(mouse_x, mouse_y, button))
     return ChangeValueByClick(true);
-  else if(button == SDL_BUTTON_WHEELDOWN || m_minus.Test(mouse_x, mouse_y))
+  else if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT
+          /* inutile du coup, vu que Test() nécessite button == SDL_BUTTON_LEFT|| m_minus.Test(mouse_x, mouse_y, button) */
+         )
     return ChangeValueByClick(false);
 
   return false;

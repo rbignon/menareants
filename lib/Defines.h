@@ -46,7 +46,7 @@
 #define APP_VERSION_BETA	"4"
 
 /* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
-#define UNSTABLE
+#undef UNSTABLE
 
 /* D�inir un (seul) des "patch" suivant (ou aucun) */
 #if 1

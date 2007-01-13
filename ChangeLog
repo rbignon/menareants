@@ -2,6 +2,8 @@
 
 	* src/data/sound/units/McDo.ogg, src/Resources.cpp, src/Units.cpp: Lors de la création d'un McGerbale, diffusion d'un son.
 
+	* lib/Defines.h: La macro UNSTABLE est desactivée...
+
 2007-01-05 Romain Bignon <progs@headfucking.net>
 
 	* src/data/anims/escarmouchebutton: Bouton pour créer une escarmouche à partir de la liste des serveurs.

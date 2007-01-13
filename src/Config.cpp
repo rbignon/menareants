@@ -359,7 +359,11 @@ void Config::Configuration(bool first)
 	ConfigForm->Music->SetOnClick(Config::SetMusic, this);
 	ConfigForm->Effect->Check(effect);
 	ConfigForm->FullScreen->Check(fullscreen);
+#ifdef BUGUED_FULLSCREEN
+	ConfigForm->FullScreen->SetEnabled(false);
+#else
 	ConfigForm->FullScreen->SetOnClick(Config::SetFullScreen, this);
+#endif
 	ConfigForm->Resolution->SetOnChange(Config::ChangeResolution);
 	for(uint i = 0; i < ASIZE(resolutions); ++i)
 		if(screen_width == resolutions[i].w && screen_height == resolutions[i].h)
