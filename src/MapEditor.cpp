@@ -326,205 +326,9 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 	TMapEditor* MapEditor = 0;
 	try
 	{
-		bool eob = false;
 		MapEditor = new TMapEditor(Video::GetInstance()->Window(), map);
 
-		SDL_Event event;
-		do
-		{
-			while( SDL_PollEvent( &event) )
-			{
-				MapEditor->Actions(event);
-				switch(event.type)
-				{
-					case SDL_KEYUP:
-					{
-						switch(event.key.keysym.sym)
-						{
-							case SDLK_DELETE:
-							{
-								ECEntity* entity = 0;
-								if((entity = MapEditor->BarreEntity->Entity()))
-								{
-									MapEditor->BarreEntity->UnSelect();
-									map->RemoveAnEntity(entity);
-									map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
-									break;
-								}
-								break;
-							}
-							default: break;
-						}
-					}
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(MapEditor->Map->CreateEntity())
-						{
-							ECase *acase = 0;
-							ECEntity* entity = MapEditor->Map->CreateEntity();
-
-							if(event.button.button == MBUTTON_RIGHT)
-								MapEditor->Map->SetCreateEntity(0);
-							else if(!MapEditor->BarreLat->Test(event.button.x, event.button.y, event.button.button) &&
-						            !MapEditor->BarreEntity->Test(event.button.x, event.button.y, event.button.button) &&
-						            !MapEditor->BarreCase->Test(event.button.x, event.button.y, event.button.button) &&
-						            (acase = MapEditor->Map->TestCase(event.button.x, event.button.y)))
-							{
-								ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb(), map);
-								map->AddAnEntity(et);
-
-								MapEditor->BarreCase->UnSelect();
-								MapEditor->Map->SetCreateEntity(0);
-								MapEditor->BarreEntity->SetEntity(et);
-								MapEditor->Map->SetPosition(MapEditor->Map->X(), MapEditor->Map->Y(), true);
-								map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
-							}
-							break;
-						}
-						if(MapEditor->BarreLat->SaveButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(!map->CanSave())
-							{
-								TMessageBox("Vous ne pouvez pas sauvegarder tant que vous n'avez pas configuré la carte.",
-								              BT_OK, MapEditor).Show();
-								break;
-							}
-							try
-							{
-								map->Save();
-								TMessageBox("Sauvegarde effectuée", BT_OK, MapEditor).Show();
-							}
-							catch(const TECExcept &e)
-							{
-								TMessageBox m(std::string("Impossible de sauvegarder la carte :\n\n") + e.Message(),
-								              BT_OK, MapEditor);
-								m.Show();
-							}
-						}
-						if(MapEditor->BarreLat->QuitButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							uint result = 0;
-							if(map->CanSave())
-							{
-								TMessageBox mb("Voulez-vous sauvegarder la carte ?", BT_YES|BT_NO|BT_CANCEL, MapEditor);
-								result = mb.Show();
-							}
-							else
-							{
-								TMessageBox mb("Vous n'avez pas configuré la carte, vous ne pouvez donc pas la sauvegarder.\n"
-								               "Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL,
-								                MapEditor);
-								result = mb.Show();
-							}
-							if(result != BT_CANCEL)
-							{
-								try
-								{
-									if(result == BT_YES)
-										map->Save();
-									eob = true;
-								}
-								catch(const TECExcept &e)
-								{
-									TMessageBox m(std::string("Impossible de sauvegarder la carte :\n\n") +
-									               e.Message(), BT_OK, MapEditor);
-									m.Show();
-								}
-							}
-							break;
-						}
-						ECEntity* entity = 0;
-
-						if((entity = MapEditor->BarreEntity->Entity()) &&
-						   MapEditor->BarreEntity->RemoveButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							MapEditor->BarreEntity->UnSelect();
-							map->RemoveAnEntity(entity);
-							map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
-							break;
-						}
-
-						if(MapEditor->BarreEntity->Test(event.button.x, event.button.y, event.button.button) ||
-						   MapEditor->BarreCase->Test(event.button.x, event.button.y, event.button.button) ||
-						   MapEditor->BarreLat->Test(event.button.x, event.button.y, event.button.button))
-							break;
-
-						if(event.button.button == MBUTTON_LEFT)
-						{
-							ECase* c = 0;
-							if(!MapEditor->IsPressed(SDLK_LCTRL) && !MapEditor->IsPressed(SDLK_LSHIFT) &&
-							   (entity = MapEditor->Map->TestEntity(event.button.x, event.button.y)))
-							{
-								MapEditor->BarreCase->UnSelect();
-								MapEditor->BarreEntity->SetEntity(entity);
-							}
-							else if((c = MapEditor->Map->TestCase(event.button.x, event.button.y)))
-							{
-								MapEditor->BarreEntity->UnSelect();
-								if(!MapEditor->BarreCase->RemoveCase(c, false) ||
-								   MapEditor->BarreCase->Cases().size() > 1 && !MapEditor->IsPressed(SDLK_LCTRL))
-								{
-									if(MapEditor->IsPressed(SDLK_LSHIFT) && !MapEditor->BarreCase->Empty())
-									{
-										ECase* first = MapEditor->BarreCase->Cases().front();
-										ECBCase* next = first;
-										uint t_x = abs(first->X() - c->X());
-										uint t_y = abs(first->Y() - c->Y());
-										MapEditor->BarreCase->UnSelect(false);
-										MapEditor->BarreCase->AddCase(first, false);
-										if(c->Y() < first->Y())
-											next = next->MoveUp(t_y);
-										if(c->X() < first->X())
-											next = next->MoveLeft(t_x);
-
-										for(uint i=0; i <= t_y; ++i)
-										{
-											uint j=0;
-											for(; j <= t_x; ++j)
-											{
-												if(next != first)
-													MapEditor->BarreCase->AddCase(dynamic_cast<ECase*>(next), false);
-												if(next->X() == next->Map()->Width()-1)
-													break;
-												next = next->MoveRight();
-											}
-											if(next->Y() == next->Map()->Height()-1)
-												break;
-											next = next->MoveDown();
-											next = next->MoveLeft(j);
-										}
-										MapEditor->BarreCase->Update(c);
-									}
-									else
-									{
-										if(!MapEditor->IsPressed(SDLK_LCTRL))
-											MapEditor->BarreCase->UnSelect(false);
-										MapEditor->BarreCase->AddCase(c);
-									}
-								}
-								else if(MapEditor->BarreCase->Empty())
-									MapEditor->BarreCase->UnSelect();
-							}
-						}
-						else if(event.button.button == MBUTTON_RIGHT)
-						{
-							MapEditor->BarreEntity->UnSelect();
-							MapEditor->BarreCase->UnSelect();
-						}
-					}
-					default: break;
-				}
-			}
-			MapEditor->BarreLat->ScreenPos->SetXY(
-			            MapEditor->BarreLat->Radar->X() -
-			              ((int)MapEditor->BarreLat->Radar->Width()/(int)map->Width() *
-			               MapEditor->Map->X()/CASE_WIDTH),
-			            MapEditor->BarreLat->Radar->Y() -
-			              ((int)MapEditor->BarreLat->Radar->Height()/(int)map->Height() *
-			              MapEditor->Map->Y()/CASE_HEIGHT));
-			Video::GetInstance()->Window()->Fill(0);
-			MapEditor->Update();
-		} while(!eob);
+		MapEditor->Run();
 	}
 	catch(const TECExcept &e)
 	{
@@ -537,6 +341,194 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 	MyFree(map);
 
 	return true;
+}
+
+void TMapEditor::BeforeDraw()
+{
+	BarreLat->ScreenPos->SetXY(
+	         BarreLat->Radar->X() -
+	         ((int)BarreLat->Radar->Width()/(int)map->Width() *
+	         Map->X()/CASE_WIDTH),
+	         BarreLat->Radar->Y() -
+	         ((int)BarreLat->Radar->Height()/(int)map->Height() *
+	         Map->Y()/CASE_HEIGHT));
+	//Window()->Fill(0);
+	SetMustRedraw();
+}
+
+void TMapEditor::OnKeyUp(SDL_keysym key)
+{
+	switch(key.sym)
+	{
+		case SDLK_DELETE:
+		{
+			ECEntity* entity = 0;
+			if((entity = BarreEntity->Entity()))
+			{
+				BarreEntity->UnSelect();
+				map->RemoveAnEntity(entity);
+				map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+				break;
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(Map->CreateEntity())
+	{
+		ECase *acase = 0;
+		ECEntity* entity = Map->CreateEntity();
+
+		if(button == MBUTTON_RIGHT)
+			Map->SetCreateEntity(0);
+		else if(!BarreLat->Test(mouse, button) &&
+		        !BarreEntity->Test(mouse, button) &&
+		        !BarreCase->Test(mouse, button) &&
+		        (acase = Map->TestCase(mouse)))
+		{
+			ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb(), map);
+			map->AddAnEntity(et);
+
+			BarreCase->UnSelect();
+			Map->SetCreateEntity(0);
+			BarreEntity->SetEntity(et);
+			Map->SetPosition(Map->X(), Map->Y(), true);
+			map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+		}
+		return;
+	}
+	if(BarreLat->SaveButton->Test(mouse, button))
+	{
+		if(!map->CanSave())
+		{
+			TMessageBox("Vous ne pouvez pas sauvegarder tant que vous n'avez pas configuré la carte.",
+					BT_OK, this).Show();
+			return;
+		}
+		try
+		{
+			map->Save();
+			TMessageBox("Sauvegarde effectuée", BT_OK, this).Show();
+		}
+		catch(const TECExcept &e)
+		{
+			TMessageBox(std::string("Impossible de sauvegarder la carte :\n\n") + e.Message(),
+					BT_OK, this).Show();
+		}
+	}
+	if(BarreLat->QuitButton->Test(mouse, button))
+	{
+		uint result = 0;
+		if(map->CanSave())
+		{
+			TMessageBox mb("Voulez-vous sauvegarder la carte ?", BT_YES|BT_NO|BT_CANCEL, this);
+			result = mb.Show();
+		}
+		else
+		{
+			TMessageBox mb("Vous n'avez pas configuré la carte, vous ne pouvez donc pas la sauvegarder.\n"
+					"Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL,
+					this);
+			result = mb.Show();
+		}
+		if(result != BT_CANCEL)
+		{
+			try
+			{
+				if(result == BT_YES)
+					map->Save();
+				want_quit = true;
+			}
+			catch(const TECExcept &e)
+			{
+				TMessageBox(std::string("Impossible de sauvegarder la carte :\n\n") +
+						e.Message(), BT_OK, this).Show();
+			}
+		}
+		return;
+	}
+	ECEntity* entity = 0;
+
+	if((entity = BarreEntity->Entity()) &&
+	   BarreEntity->RemoveButton->Test(mouse, button))
+	{
+		BarreEntity->UnSelect();
+		map->RemoveAnEntity(entity);
+		map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+		return;
+	}
+
+	if(BarreEntity->Test(mouse, button) ||
+	   BarreCase->Test(mouse, button) ||
+	   BarreLat->Test(mouse, button))
+		return;
+
+	if(button == MBUTTON_LEFT)
+	{
+		ECase* c = 0;
+		if(!IsPressed(SDLK_LCTRL) && !IsPressed(SDLK_LSHIFT) &&
+		   (entity = Map->TestEntity(mouse)))
+		{
+			BarreCase->UnSelect();
+			BarreEntity->SetEntity(entity);
+		}
+		else if((c = Map->TestCase(mouse)))
+		{
+			BarreEntity->UnSelect();
+			if(!BarreCase->RemoveCase(c, false) ||
+			   BarreCase->Cases().size() > 1 && !IsPressed(SDLK_LCTRL))
+			{
+				if(IsPressed(SDLK_LSHIFT) && !BarreCase->Empty())
+				{
+					ECase* first = BarreCase->Cases().front();
+					ECBCase* next = first;
+					uint t_x = abs(first->X() - c->X());
+					uint t_y = abs(first->Y() - c->Y());
+					BarreCase->UnSelect(false);
+					BarreCase->AddCase(first, false);
+					if(c->Y() < first->Y())
+						next = next->MoveUp(t_y);
+					if(c->X() < first->X())
+						next = next->MoveLeft(t_x);
+
+					for(uint i=0; i <= t_y; ++i)
+					{
+						uint j=0;
+						for(; j <= t_x; ++j)
+						{
+							if(next != first)
+								BarreCase->AddCase(dynamic_cast<ECase*>(next), false);
+							if(next->X() == next->Map()->Width()-1)
+								break;
+							next = next->MoveRight();
+						}
+						if(next->Y() == next->Map()->Height()-1)
+							break;
+						next = next->MoveDown();
+						next = next->MoveLeft(j);
+					}
+					BarreCase->Update(c);
+				}
+				else
+				{
+					if(!IsPressed(SDLK_LCTRL))
+						BarreCase->UnSelect(false);
+					BarreCase->AddCase(c);
+				}
+			}
+			else if(BarreCase->Empty())
+				BarreCase->UnSelect();
+		}
+	}
+	else if(button == MBUTTON_RIGHT)
+	{
+		BarreEntity->UnSelect();
+		BarreCase->UnSelect();
+	}
 }
 
 void TMapEditor::ShowBarreAct(bool show, ECase* c)
@@ -567,8 +559,8 @@ void TMapEditor::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TMapEditor::TMapEditor(ECImage* w, ECMap *m)
-	: TForm(w)
+TMapEditor::TMapEditor(ECImage* w, EMap *m)
+	: TForm(w), map(m)
 {
 	Map = AddComponent(new TMap(m));
 	m->SetShowMap(Map);
@@ -586,7 +578,7 @@ TMapEditor::TMapEditor(ECImage* w, ECMap *m)
 }
 
 /********************************************************************************************
- *                                TBarreCaseIcons                                        *
+ *                                TBarreCaseIcons                                           *
  ********************************************************************************************/
 
 void TBarreCaseIcons::Init()
@@ -683,10 +675,10 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 {
 	TBarreCase* bc = dynamic_cast<TBarreCase*>(o->Parent());
 
-	if(bc->Country->GetSelectedItem() < 0)
+	if(bc->Country->Selected() < 0)
 		return;
 
-	const char* id =  bc->Country->ReadValue(bc->Country->GetSelectedItem()).c_str();
+	const char* id =  bc->Country->SelectedItem()->Value().c_str();
 
 	ECBCountry* country = 0;
 
@@ -735,7 +727,7 @@ void TBarreCase::Update(ECase* c)
 		BCountriesVector cts = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->Countries();
 		for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
 		{
-			uint i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID());
+			TListBoxItem* i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID());
 			if(*it == country) Country->ScrollTo(i);
 		}
 
@@ -763,7 +755,7 @@ void TBarreCase::Init()
 	Icons = AddComponent(new TBarreCaseIcons(100,10));
 	Icons->SetList();
 
-	Country = AddComponent(new TListBox(Font::GetInstance(Font::Small), 2, 15, 100, Height()-40));
+	Country = AddComponent(new TListBox(Rectanglei(2, 15, 100, Height()-40)));
 	Country->SetOnClick(TBarreCase::ChangeOwner, 0);
 
 	SetBackground(Resources::BarreAct());
@@ -790,7 +782,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 			mb.Show();
 			return;
 		}
-		if(Owner->GetSelectedItem() < 0)
+		if(Owner->Selected() < 0)
 		{
 			TMessageBox mb ("Veuillez sélectionner un propriétaire", BT_OK, dynamic_cast<TForm*>(Parent()));
 			mb.Show();
@@ -802,7 +794,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		Color last_color = white_color;
 		if(entity->Owner())
 		{
-			if(dynamic_cast<EMapPlayer*>(entity->Owner())->ID() == Owner->ReadValue(Owner->GetSelectedItem())[0])
+			if(dynamic_cast<EMapPlayer*>(entity->Owner())->ID() == Owner->SelectedItem()->Value()[0])
 				dont_check = true;
 			else
 			{
@@ -812,7 +804,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		}
 		else
 		{
-			if(Owner->ReadValue(Owner->GetSelectedItem())[0] == '*')
+			if(Owner->SelectedItem()->Value()[0] == '*')
 				dont_check = true;
 			else
 				entity->Case()->Map()->Neutres()->Remove(entity);
@@ -820,7 +812,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 
 		if(!dont_check)
 		{
-			if(Owner->ReadValue(Owner->GetSelectedItem())[0] == '*')
+			if(Owner->SelectedItem()->Value()[0] == '*')
 			{
 				entity->SetOwner(0);
 				entity->Case()->Map()->Neutres()->Add(entity);
@@ -829,7 +821,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 			{
 				BMapPlayersVector mps = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->MapPlayers();
 				for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
-					if((*it)->ID() == Owner->ReadValue(Owner->GetSelectedItem())[0])
+					if((*it)->ID() == Owner->SelectedItem()->Value()[0])
 					{
 						entity->SetOwner(dynamic_cast<EMapPlayer*>(*it));
 						dynamic_cast<EMapPlayer*>(*it)->Entities()->Add(entity);
@@ -894,7 +886,7 @@ void TBarreEntity::Init()
 	RemoveButton = AddComponent(new TButtonText(Width()-150,15,100,30, "Supprimer", Font::GetInstance(Font::Small)));
 	RemoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
-	Owner = AddComponent(new TListBox(Font::GetInstance(Font::Small), RemoveButton->X()-105, 15, 100, Height()-40));
+	Owner = AddComponent(new TListBox(Rectanglei(RemoveButton->X()-105, 15, 100, Height()-40)));
 
 	Icon = AddComponent(new TImage(5,15));
 
@@ -906,10 +898,6 @@ void TBarreEntity::Init()
 
 /********************************************************************************************
  *                                TEditBarreLatIcons                                        *
- ********************************************************************************************/
-
-/********************************************************************************************
- *                               TBarreLat                                                  *
  ********************************************************************************************/
 
 void TEditBarreLat::SelectUnit(TObject* o, void* e)
@@ -931,7 +919,7 @@ void TEditBarreLat::SelectUnit(TObject* o, void* e)
 	editor->Map->SetCreateEntity(static_cast<ECEntity*>(e));
 }
 
-void TEditBarreLat::RadarClick(TObject* m, int x, int y)
+void TEditBarreLat::RadarClick(TObject* m, const Point2i& mouse)
 {
 	TImage* map = dynamic_cast<TImage*>(m);
 	TMapEditor* editor = dynamic_cast<TMapEditor*>(m->Parent()->Parent());
@@ -941,8 +929,8 @@ void TEditBarreLat::RadarClick(TObject* m, int x, int y)
 
 	int size_x = map->Width() / editor->Map->Map()->Width();
 	int size_y = map->Height() / editor->Map->Map()->Height();
-	int _x = BorneInt((x - map->X()) / size_x, 0, editor->Map->Map()->Width()-1);
-	int _y = BorneInt((y - map->Y()) / size_y, 0, editor->Map->Map()->Height()-1);
+	int _x = BorneInt((mouse.X() - map->X()) / size_x, 0, editor->Map->Map()->Width()-1);
+	int _y = BorneInt((mouse.Y() - map->Y()) / size_y, 0, editor->Map->Map()->Height()-1);
 
 	if(editor->Map->Enabled())
 		editor->Map->CenterTo(dynamic_cast<ECase*>((*editor->Map->Map())(_x,_y)));
@@ -985,10 +973,10 @@ void TEditBarreLat::Init()
 	Radar->SetOnClickPos(TEditBarreLat::RadarClick);
 
 	ScreenPos = AddComponent(new TImage(0,0));
-	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
+	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), Height(),
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
 	DrawRect(surf, 0, 0,
-	          editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
+	          editor->Map->Map()->Preview()->GetWidth()/editor->Map->Map()->Width()  * (SCREEN_WIDTH-Width()) / CASE_WIDTH,
 	          editor->Map->Map()->Preview()->GetHeight()/editor->Map->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
 	         SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
 	ScreenPos->SetImage(new ECImage(surf));
@@ -1007,8 +995,6 @@ void TOptionsMap::Options(TObject*, void* m)
 	TOptionsMap* OptionsMap = 0;
 	try
 	{
-		SDL_Event event;
-		bool eob = false;
 		OptionsMap = new TOptionsMap(Video::GetInstance()->Window(), map);
 		OptionsMap->Refresh();
 
@@ -1018,131 +1004,7 @@ void TOptionsMap::Options(TObject*, void* m)
 		OptionsMap->MaxPlayers->SetValue(map->MaxPlayers());
 		OptionsMap->City->SetString(TypToStr(map->CityMoney()));
 
-		do
-		{
-			while( SDL_PollEvent( &event) )
-			{
-				OptionsMap->Actions(event);
-				switch(event.type)
-				{
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(OptionsMap->OkButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(OptionsMap->Name->Text().empty())
-								TMessageBox("Veuillez donner un nom à la carte !", BT_OK, OptionsMap).Show();
-							else if(OptionsMap->Players->Size() < 2)
-								TMessageBox("Il doit y avoir au moins deux joueur", BT_OK, OptionsMap).Show();
-							else if(OptionsMap->Countries->Empty())
-								TMessageBox("Il doit y avoir au moins une country", BT_OK, OptionsMap).Show();
-							else if(OptionsMap->City->Empty())
-								TMessageBox("Vous devez mettre l'argent des villes",
-								               BT_OK, OptionsMap).Show();
-							else if(OptionsMap->MinPlayers->Value() < 2)
-								TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
-								            OptionsMap).Show();
-							else if(OptionsMap->MaxPlayers->Value() < OptionsMap->MinPlayers->Value())
-								TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de "
-								            "joueurs minimal", BT_OK, OptionsMap).Show();
-							else if(StrToTyp<int>(OptionsMap->City->Text()) < 1)
-								TMessageBox("Il faut qu'il y ait de l'argent pour chaque ville par tour",
-								            BT_OK, OptionsMap).Show();
-							else
-								eob = true;
-						}
-
-						const char* id = 0;
-						char m_id = 0;
-						if(OptionsMap->AddPlayerButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							map->AddPlayer();
-							OptionsMap->Refresh();
-						}
-						else if(OptionsMap->Players->GetSelectedItem() < 0 ||
-						  !(m_id = OptionsMap->Players->ReadValue(OptionsMap->Players->GetSelectedItem())[0]))
-							OptionsMap->DelPlayerButton->SetEnabled(false);
-						else if(OptionsMap->Players->Test(event.button.x, event.button.y, event.button.button))
-							OptionsMap->DelPlayerButton->SetEnabled(true);
-						else if(OptionsMap->DelPlayerButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							map->RemovePlayer(m_id);
-							OptionsMap->Refresh();
-						}
-
-						if(OptionsMap->AddCountryButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							std::string c_id = OptionsMap->AddCountryEdit->Text();
-							if(c_id.empty() || c_id.size() != 2)
-							{
-								TMessageBox mb("L'identifiant doit faire 2 caractères", BT_OK, OptionsMap);
-								mb.Show();
-							}
-							else if(map->GetCountry(c_id.c_str()))
-							{
-								TMessageBox mb("L'identifiant est déjà utilisé", BT_OK, OptionsMap);
-								mb.Show();
-							}
-							else
-							{
-								map->AddCountry(c_id.c_str());
-								OptionsMap->AddCountryEdit->ClearString();
-								OptionsMap->Refresh();
-							}
-						}
-						else if(OptionsMap->Countries->GetSelectedItem() < 0 ||
-						  !(id = OptionsMap->Countries->ReadValue(OptionsMap->Countries->GetSelectedItem()).c_str()))
-						{
-							OptionsMap->CountryPlayer->SetEnabled(false);
-							OptionsMap->DelCountryButton->SetEnabled(false);
-						}
-						else if(OptionsMap->Countries->Test(event.button.x, event.button.y, event.button.button))
-						{
-							ECBCountry* country = 0;
-
-							BCountriesVector cts = map->Countries();
-							for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
-								if(!strcmp((*it)->ID(), id))
-								{
-									country = *it;
-									break;
-								}
-							if(!country) break;
-
-							OptionsMap->DelCountryButton->SetEnabled(country->Cases().empty());
-
-							OptionsMap->CountryPlayer->SetEnabled();
-							OptionsMap->CountryPlayer->ClearItems();
-							OptionsMap->CountryPlayer->AddItem(true, "Neutre", "*");
-							BMapPlayersVector mps = map->MapPlayers();
-							for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
-								OptionsMap->CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
-								                                   TypToStr((*it)->ID()));
-						}
-						else if(OptionsMap->DelCountryButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							map->RemoveCountry(id);
-							OptionsMap->Refresh();
-						}
-						else if(OptionsMap->CountryPlayer->GetSelectedItem() != -1)
-						{
-							const char map_id = OptionsMap->CountryPlayer->ReadValue(
-							                               OptionsMap->CountryPlayer->GetSelectedItem())[0];
-							ECBMapPlayer* mp = map_id == '*' ? 0 : map->GetPlayer(map_id);
-							if(!mp && map_id != '*') break;
-
-							ECBCountry* country = map->GetCountry(id);
-							if(!country) break;
-
-							country->ChangeOwner(mp);
-						}
-						break;
-					}
-					default:
-						break;
-				}
-			}
-			OptionsMap->Update();
-		} while(!eob);
+		OptionsMap->Run();
 	}
 	catch(TECExcept &e)
 	{
@@ -1159,6 +1021,118 @@ void TOptionsMap::Options(TObject*, void* m)
 	MyFree(OptionsMap);
 	map->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
 	map->SetCanSave();
+}
+
+void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(OkButton->Test(mouse, button))
+	{
+		if(Name->Text().empty())
+			TMessageBox("Veuillez donner un nom à la carte !", BT_OK, this).Show();
+		else if(Players->Size() < 2)
+			TMessageBox("Il doit y avoir au moins deux joueur", BT_OK, this).Show();
+		else if(Countries->Empty())
+			TMessageBox("Il doit y avoir au moins une country", BT_OK, this).Show();
+		else if(City->Empty())
+			TMessageBox("Vous devez mettre l'argent des villes",
+					BT_OK, this).Show();
+		else if(MinPlayers->Value() < 2)
+			TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
+					this).Show();
+		else if(MaxPlayers->Value() < MinPlayers->Value())
+			TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de "
+					"joueurs minimal", BT_OK, this).Show();
+		else if(StrToTyp<int>(City->Text()) < 1)
+			TMessageBox("Il faut qu'il y ait de l'argent pour chaque ville par tour",
+					BT_OK, this).Show();
+		else
+		{
+			want_quit = true;
+			return;
+		}
+	}
+
+	const char* id = 0;
+	char m_id = 0;
+	if(AddPlayerButton->Test(mouse, button))
+	{
+		map->AddPlayer();
+		Refresh();
+	}
+	else if(Players->Selected() < 0 || !(m_id = Players->SelectedItem()->Value()[0]))
+		DelPlayerButton->SetEnabled(false);
+	else if(Players->Test(mouse, button))
+		DelPlayerButton->SetEnabled(true);
+	else if(DelPlayerButton->Test(mouse, button))
+	{
+		map->RemovePlayer(m_id);
+		Refresh();
+	}
+
+	if(AddCountryButton->Test(mouse, button))
+	{
+		std::string c_id = AddCountryEdit->Text();
+		if(c_id.empty() || c_id.size() != 2)
+		{
+			TMessageBox mb("L'identifiant doit faire 2 caractères", BT_OK, this);
+			mb.Show();
+		}
+		else if(map->GetCountry(c_id.c_str()))
+		{
+			TMessageBox mb("L'identifiant est déjà utilisé", BT_OK, this);
+			mb.Show();
+		}
+		else
+		{
+			map->AddCountry(c_id.c_str());
+			AddCountryEdit->ClearString();
+			Refresh();
+		}
+	}
+	else if(Countries->Selected() < 0 || !(id = Countries->SelectedItem()->Value().c_str()))
+	{
+		CountryPlayer->SetEnabled(false);
+		DelCountryButton->SetEnabled(false);
+	}
+	else if(Countries->Test(mouse, button))
+	{
+		ECBCountry* country = 0;
+
+		BCountriesVector cts = map->Countries();
+		for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
+			if(!strcmp((*it)->ID(), id))
+			{
+				country = *it;
+				break;
+			}
+		if(!country) return;
+
+		DelCountryButton->SetEnabled(country->Cases().empty());
+
+		CountryPlayer->SetEnabled();
+		CountryPlayer->ClearItems();
+		CountryPlayer->AddItem(true, "Neutre", "*");
+		BMapPlayersVector mps = map->MapPlayers();
+		for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
+			CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
+			                       TypToStr((*it)->ID()));
+	}
+	else if(DelCountryButton->Test(mouse, button))
+	{
+		map->RemoveCountry(id);
+		Refresh();
+	}
+	else if(CountryPlayer->Selected() != -1)
+	{
+		const char map_id = CountryPlayer->SelectedItem()->Value()[0];
+		ECBMapPlayer* mp = map_id == '*' ? 0 : map->GetPlayer(map_id);
+		if(!mp && map_id != '*') return;
+
+		ECBCountry* country = map->GetCountry(id);
+		if(!country) return;
+
+		country->ChangeOwner(mp);
+	}
 }
 
 void TOptionsMap::Refresh()
@@ -1194,7 +1168,7 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 	OkButton = AddComponent(new TButtonText(600,500,150,50, "OK", Font::GetInstance(Font::Normal)));
 
 	PlayersLabel = AddComponent(new TLabel(100, 130, "Joueurs :", white_color, Font::GetInstance(Font::Normal)));
-	Players = AddComponent(new TListBox(Font::GetInstance(Font::Small), 100,150,150,200));
+	Players = AddComponent(new TListBox(Rectanglei(100,150,150,200)));
 	Players->SetNoItemHint();
 	Players->SetHint("Ce sont les différents joueurs susceptibles d'être joués.\nChaque territoire et unité peut être lié à "
 	                 " un joueur.");
@@ -1206,7 +1180,7 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
 	CountriesLabel = AddComponent(new TLabel(400, 130, "Territoires :", white_color, Font::GetInstance(Font::Normal)));
-	Countries = AddComponent(new TListBox(Font::GetInstance(Font::Small), 400,150,150,200));
+	Countries = AddComponent(new TListBox(Rectanglei(400,150,150,200)));
 	Countries->SetNoItemHint();
 	Countries->SetHint("Liste des différents territoires. Vous pouvez assigner chaque case à un territoire.\n"
 	                   "Vous ne pouvez supprimer que les territoires en vert, qui ne sont assignés à aucune case.");
@@ -1258,61 +1232,11 @@ void MenAreAntsApp::MapEditor()
 	TLoadMapFile* LoadMapFile = 0;
 	try
 	{
-		SDL_Event event;
-		bool eob = false;
 		LoadMapFile = new TLoadMapFile(Video::GetInstance()->Window());
 		LoadMapFile->SetMutex(mutex);
-		do
-		{
-			while( SDL_PollEvent( &event) )
-			{
-				LoadMapFile->Actions(event);
-				switch(event.type)
-				{
-					case SDL_MOUSEBUTTONDOWN:
-						if(LoadMapFile->MapsList->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(LoadMapFile->MapsList->GetSelectedItem() >= 0 &&
-							   LoadMapFile->MapsList->EnabledItem(LoadMapFile->MapsList->GetSelectedItem()))
-								LoadMapFile->LoadButton->SetEnabled(true);
-							else
-								LoadMapFile->LoadButton->SetEnabled(false);
-						}
-						else if(LoadMapFile->NewButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(!TMapEditor::Editor(NULL, LoadMapFile))
-							{
-								TMessageBox mb("Impossible de créer la carte.\n"
-								               "Son nom est peut être déjà utilisé, ou alors les informations "
-								               "que vous avez fournis sont invalides.",
-								               BT_OK, LoadMapFile);
-								mb.Show();
-							}
-							LoadMapFile->Refresh();
-						}
-						else if(LoadMapFile->LoadButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(LoadMapFile->MapsList->GetSelectedItem() >= 0 &&
-							   !TMapEditor::Editor(LoadMapFile->MapsList->ReadValue(
-										LoadMapFile->MapsList->GetSelectedItem()).c_str()))
-							{
-								TMessageBox mb("Impossible d'ouvrir la map " +
-								               LoadMapFile->MapsList->ReadValue(LoadMapFile->MapsList->GetSelectedItem()) +
-								               ".\nVeuillez reessayer", BT_OK, LoadMapFile);
-								mb.Show();
-							}
-							LoadMapFile->Refresh();
-							LoadMapFile->LoadButton->SetEnabled(false);
-						}
-						else if(LoadMapFile->RetourButton->Test(event.button.x, event.button.y, event.button.button))
-							eob = true;
-						break;
-					default:
-						break;
-				}
-			}
-			LoadMapFile->Update();
-		} while(!eob);
+
+		LoadMapFile->Run();
+
 	}
 	catch(TECExcept &e)
 	{
@@ -1320,6 +1244,42 @@ void MenAreAntsApp::MapEditor()
 		throw;
 	}
 	MyFree(LoadMapFile);
+}
+
+void TLoadMapFile::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(MapsList->Test(mouse, button))
+	{
+		if(MapsList->Selected() >= 0 && MapsList->SelectedItem()->Enabled())
+			LoadButton->SetEnabled(true);
+		else
+			LoadButton->SetEnabled(false);
+	}
+	else if(NewButton->Test(mouse, button))
+	{
+		if(!TMapEditor::Editor(NULL, this))
+		{
+			TMessageBox mb("Impossible de créer la carte.\n"
+					"Son nom est peut être déjà utilisé, ou alors les informations "
+					"que vous avez fournis sont invalides.",
+					BT_OK, this);
+			mb.Show();
+		}
+		Refresh();
+	}
+	else if(LoadButton->Test(mouse, button))
+	{
+		if(MapsList->Selected() >= 0 && !TMapEditor::Editor(MapsList->SelectedItem()->Value().c_str()))
+		{
+			TMessageBox mb("Impossible d'ouvrir la map " + MapsList->SelectedItem()->Value() +
+			               ".\nVeuillez reessayer", BT_OK, this);
+			mb.Show();
+		}
+		Refresh();
+		LoadButton->SetEnabled(false);
+	}
+	else if(RetourButton->Test(mouse, button))
+		want_quit = true;
 }
 
 void TLoadMapFile::Refresh()
@@ -1337,7 +1297,7 @@ TLoadMapFile::TLoadMapFile(ECImage* w)
 	: TForm(w)
 {
 
-	MapsList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,200,200,300));
+	MapsList = AddComponent(new TListBox(Rectanglei(300,200,200,300)));
 	Refresh();
 
 	NewButton = AddComponent(new TButtonText(550,250,150,50, "Nouveau", Font::GetInstance(Font::Normal)));

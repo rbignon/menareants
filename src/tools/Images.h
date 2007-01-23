@@ -25,7 +25,7 @@
 #include <SDL_image.h>
 #include <string>
 #include "Defines.h"
-
+#include "tools/Rectangle.h"
 
 class ECSpriteBase;
 class Color;
@@ -106,8 +106,8 @@ public:
 
 	int X() { return mX; }
 	int Y() { return mY; }
-	uint GetWidth();                             /**< Fonction pour la largeur */
-	uint GetHeight();                            /**< Fonction pour la hauteur */
+	int GetWidth();                             /**< Fonction pour la largeur */
+	int GetHeight();                            /**< Fonction pour la hauteur */
 
 	ECImage* First() const;
 
@@ -193,19 +193,33 @@ public:
 	void Draw();
 
 	/** Obtenir la largeur */
-	unsigned int GetWidth() { return (Img ? Img->w : 0); }
+	int GetWidth() const { return (Img ? Img->w : 0); }
 
 	/** Obtenir la hauteur */
-	unsigned int GetHeight() { return (Img ? Img->h : 0); }
+	int GetHeight() const { return (Img ? Img->h : 0); }
 
 	void SetColorKey(unsigned int, unsigned int, unsigned int);
 
+	int BoxColor(const Rectanglei &rect, const Color &color);
+	int RectangleColor(const Rectanglei &rect, const Color &color, const uint &border_size = 1);
+	int VlineColor(const uint &x1, const uint &y1, const uint &y2, const Color &color);
+	int LineColor(const uint &x1, const uint &x2, const uint &y1, const uint &y2, const Color &color);
+	int AALineColor(const uint &x1, const uint &x2, const uint &y1, const uint &y2, const Color &color);
+	int CircleColor(const uint &x, const uint &y, const uint &rad, const Color &color);
+
 	int Blit(const ECImage* src, SDL_Rect *srcRect, SDL_Rect *dstRect);
 	int Blit(const ECImage* src, SDL_Rect *dstRect);
+	int Blit(const ECImage* src, const Rectanglei &srcRect, const Point2i &dstPoint);
+	int Blit(const ECImage* src, const Point2i &dstPoint);
 	int Blit(const ECImage* src);
 	int Blit(const ECImage& src, SDL_Rect *srcRect, SDL_Rect *dstRect);
 	int Blit(const ECImage& src, SDL_Rect *dstRect);
 	int Blit(const ECImage& src);
+	int Blit(const ECImage& src, const Rectanglei &srcRect, const Point2i &dstPoint);
+	int Blit(const ECImage& src, const Point2i &dstPoint);
+
+	SDL_Rect GetSDLRect(const Rectanglei &r) const;
+	SDL_Rect GetSDLRect(const Point2i &pt, const Point2i &pt2) const;
 
 	ECImage &operator=(const ECImage &src);
 

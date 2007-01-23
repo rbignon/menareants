@@ -26,42 +26,34 @@
 #include <assert.h>
 
 TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
-	: TListBox(f, _x, _y, _width, f->GetHeight()), real_y(_y), opened(false), visible_len(0),
-		  chaine(_x+5, _y, "", black_color, f), COMBOBOX_HEIGHT(f->GetHeight())
+	: TListBox(Rectanglei(_x, _y, _width, f->GetHeight())), real_y(_y), opened(false), visible_len(0),
+		  chaine(_x+5, _y, "", black_color, f), COMBOBOX_HEIGHT(f->GetHeight()), font(f)
 {
-	gray_disable = true;
+
 }
 
 void TComboBox::Init()
 {
   // Load images
   assert(font);
-  visible_len = ((w) / font->GetWidth("A"));
+  visible_len = ((Width()) / font->GetWidth("A"));
 
   MyComponent(&m_open);
   MyComponent(&chaine);
 
   m_open.SetImage (new ECSprite(Resources::DownButton(), Window()));
-  m_open.SetXY(x+w-12, y);
+  m_open.SetXY(X()+Width()-12, Y());
 
-  SDL_Rect r_back = {0,0,w-13,COMBOBOX_HEIGHT};
+  // FIXME: What does 13 mean ?
+  SDL_Rect r_back = {0,0,Width()-13,COMBOBOX_HEIGHT};
 
-  edit_bg.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w-13, COMBOBOX_HEIGHT,
+  edit_bg.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width()-13, COMBOBOX_HEIGHT,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-  edit_bg.FillRect(r_back, edit_bg.MapRGBA(255, 255, 255, 255*3/10));
+  edit_bg.FillRect(r_back, edit_bg.MapColor(BoxColor));
+
+  box_color = Color(172, 183, 255, 255);
 
   TListBox::Init();
-
-  background.SetImage(0);
-  nb_visible_items_max = uint(-1);
-}
-
-void TComboBox::SetBackGround(uint _h)
-{
-	SDL_Rect r_back = {0,0,w,_h};
-	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, _h,
-					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
 }
 
 void TComboBox::SetOpened(bool _o)
@@ -73,49 +65,55 @@ void TComboBox::SetOpened(bool _o)
 
 	if(opened)
 	{
-		y = real_y + COMBOBOX_HEIGHT + 1;
-		h = height_item * m_items.size();
-		visible_height = h;
+		position.y = real_y + COMBOBOX_HEIGHT + 1;
+		size.y = CalculateHeight();
 		m_open.SetImage (new ECSprite(Resources::UpButton(), Window()));
-		SetBackGround(h);
 	}
 	else
 	{
-		y = real_y;
-		h = COMBOBOX_HEIGHT;
+		position.y = real_y;
+		size.y = COMBOBOX_HEIGHT;
 		m_open.SetImage (new ECSprite(Resources::DownButton(), Window()));
 	}
 }
 
-uint TComboBox::AddItem (bool selected,
-		       const std::string &label,
-		       const std::string &value, Color _color, bool enabled)
+int TComboBox::CalculateHeight()
 {
-	uint j = TListBox::AddItem(selected, label, value, _color, enabled);
+	int h = 0;
+	for(uint i=0; i < m_items.size(); i++)
+		h += m_items.at(i)->Height();
+	return h;
+}
+
+TListBoxItem* TComboBox::AddItem (bool selected,
+                         const std::string &label,
+                         const std::string &value,
+                         const Color& color,
+                         bool enabled,
+                         Font& font)
+{
+	TListBoxItem* item = TListBox::AddItem(selected, label, value, color, enabled, font);
+	item->SetGrayDisable();
 	if(opened)
-	{
-		h = height_item * m_items.size();
-		visible_height = h;
-		SetBackGround(h);
-	}
-	return j;
+		size.y = CalculateHeight();
+
+	return item;
 }
 
 void TComboBox::ClearItems()
 {
 	TListBox::ClearItems();
 	SetOpened(false);
-	background.SetImage(0);
 	chaine.SetCaption("");
 }
 
 void TComboBox::Select (uint index)
 {
-	if(index >= m_items.size() || !m_items[index].enabled) return;
+	if(index >= m_items.size() || !m_items[index]->Enabled()) return;
 
-	m_selection = index;
+	selected_item = index;
 
-	std::string s = ReadLabel(m_selection);
+	std::string s = m_items[index]->Label();
 
 	chaine.SetCaption((s.size() > visible_len) ? s.substr(0, visible_len) : s);
 }
@@ -126,44 +124,44 @@ void TComboBox::Deselect (uint index)
 	return;
 }
 
-bool TComboBox::Clic (int mouse_x, int mouse_y, int button)
+bool TComboBox::Clic (const Point2i& mouse, int button)
 {
-	if(!enabled) return false;
+	if(!Enabled()) return false;
 
 	bool r = false;
 
 	if(opened)
-		r = TListBox::Clic(mouse_x,mouse_y, button);
-	if(m_open.Test(mouse_x, mouse_y, button))
+		r = TListBox::Clic(mouse, button);
+	if(m_open.Test(mouse, button))
 		SetOpened(!opened), r = true;
-	if(opened && MouseIsOnWitchItem(mouse_x,mouse_y) != -1)
+	if(opened && MouseIsOnWhichItem(mouse) != -1)
 		SetOpened(false), r = true;
 
-	if(!r && opened && !Mouse(mouse_x,mouse_y))
+	if(!r && opened && !Mouse(mouse))
 		SetOpened(false), r = true;
 
 	return r;
 }
 
-void TComboBox::Draw (int mouse_x, int mouse_y)
+void TComboBox::Draw (const Point2i& mouse)
 {
-	SDL_Rect r_back = {x,real_y,w-13,COMBOBOX_HEIGHT};
+	SDL_Rect r_back = {X(),real_y,Width()-13,COMBOBOX_HEIGHT};
 	Window()->Blit(edit_bg, &r_back);
 
-	chaine.Draw(mouse_x, mouse_y);
+	chaine.Draw(mouse);
 
-	if(enabled)
-		m_open.Draw(mouse_x,mouse_y);
+	if(Enabled())
+		m_open.Draw(mouse);
 
 	if(opened)
-		TListBox::Draw(mouse_x,mouse_y);
+		TListBox::Draw(mouse);
 }
 
 void TComboBox::SetXY (int _x, int _y)
 {
-	x = _x;
+	position.x = _x;
 	real_y = _y;
 	chaine.SetXY(_x+5, real_y);
-	m_open.SetXY(x+w-12, real_y);
+	m_open.SetXY(X()+Width()-12, real_y);
 	SetOpened(Opened());
 }

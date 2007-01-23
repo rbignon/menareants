@@ -41,13 +41,15 @@ public:
 
 	virtual void Init();
 
-	virtual void Draw (int mouse_x, int mouse_y);
+	virtual void Draw (const Point2i&);
 
 /* Attributs */
 public:
 
 	ECImage* Image() const { return image; }
 	void SetImage(ECImage* _img, bool wana_delete = true);/**< Set maximal value */
+
+	virtual bool RedrawBackground() const { return false; }
 
 /* Variables privées */
 protected:

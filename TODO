@@ -2,6 +2,12 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 À faire:
 
+* BUGFIXES À FAIRE SUITE AUX MODIFS DE CE WEEK END :
+- mettre à jour le code client pour supporter la nouvelle listbox.
+- des problèmes de freezes d'affichage lors de certains evenements (attaques, fin du tour, début du tour, ...)
+- vérifier le gain de perfs et continuer d'optimiser avec les aménagements faits
+- vérifier si l'intégralité du jeu n'a pas subit de dysfonctionnements dûs aux modifs
+
 * En cours
 -améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
  la plus proche de la case d'arrivée.

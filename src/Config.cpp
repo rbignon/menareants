@@ -248,11 +248,11 @@ void Config::WantDelServer(TObject* OkButton, void* configinst)
 	TConfigForm* form = static_cast<TConfigForm*>(OkButton->Parent());
 	Config* conf = static_cast<Config*>(configinst);
 
-	if(form->ServerList->GetSelectedItem() < 0)
+	if(form->ServerList->Selected() == -1)
 		return;
 
-	std::string text = form->ServerList->ReadValue(form->ServerList->GetSelectedItem());
-	form->ServerList->RemoveItem(form->ServerList->GetSelectedItem());
+	std::string text = form->ServerList->SelectedItem()->Value();
+	form->ServerList->RemoveSelected();
 
 	for(std::vector<std::string>::iterator it = conf->server_list.begin(); it != conf->server_list.end(); ++it)
 		if((*it) == text)
@@ -275,13 +275,13 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 
 	conf->nick = form->Nick->GetString();
 
-	if(form->ServerList->GetSelectedItem() < 0)
+	if(form->ServerList->Selected() == -1)
 	{
 		TMessageBox("Veuillez sélectionner un serveur.", BT_OK, form).Show();
 		return;
 	}
 
-	std::string p = form->ServerList->ReadValue(form->ServerList->GetSelectedItem());
+	std::string p = form->ServerList->SelectedItem()->Value();
 	std::string h = stringtok(p, ":");
 	int pp = h.empty() ? MSERV_DEFPORT : StrToTyp<int>(p);
 	if(pp > 1 && pp < 65535)
@@ -291,7 +291,7 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 	}
 
 	conf->color = form->Color->Value();
-	conf->nation = form->Nation->GetSelectedItem();
+	conf->nation = form->Nation->Selected();
 
 	conf->fullscreen = form->FullScreen->Checked();
 	conf->music = form->Music->Checked();
@@ -332,7 +332,7 @@ void Config::SetMusic(TObject* obj, void* configinst)
 
 void Config::ChangeResolution(TListBox* listbox)
 {
-	int i = listbox->GetSelectedItem ();
+	int i = listbox->Selected ();
 	Config* conf = Config::GetInstance();
 	conf->screen_width = resolutions[i].w;
 	conf->screen_height = resolutions[i].h;
@@ -436,10 +436,10 @@ TConfigForm::TConfigForm(ECImage *w)
 	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK", Font::GetInstance(Font::Normal)));
 	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", Font::GetInstance(Font::Normal)));
 
-	ServerList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 50, 200, 220, 300));
+	ServerList = AddComponent(new TListBox(Rectanglei(50, 200, 220, 300)));
 	ServerList->SetHint("Sélectionnez le serveur auquel vous souhaitez vous connecter.");
 
-	NewServer = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,510,220));
+	NewServer = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,510,208));
 	NewServer->SetHint("Serveur à ajouter sous la forme \"host[:port]\"");
 
 	DelServerButton = AddComponent(new TButtonText(280,460,100,30, "Supprimer", Font::GetInstance(Font::Small)));
@@ -459,10 +459,9 @@ TConfigForm::TConfigForm(ECImage *w)
 	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, Font::GetInstance(Font::Normal)));
 	Nation = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
-	{
-		uint j = Nation->AddItem(false, std::string(nations_str[i].name), TypToStr(i));
-		Nation->SetItemHint(j, nations_str[i].infos);
-	}
+		// Pour la visibilité, je précise dans ce commentaire qu'on ajoute un item qui retourne un TListBoxItem,
+		// sur lequel on fait un SetHint.
+		Nation->AddItem(false, std::string(nations_str[i].name), TypToStr(i))->SetHint(nations_str[i].infos);
 
 	ResolutionInfo = AddComponent(new TLabel(300, 320, "Résolution :", white_color, Font::GetInstance(Font::Normal)));
 	Resolution = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 345, 200));

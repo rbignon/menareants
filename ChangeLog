@@ -1,3 +1,22 @@
+2007-01-23 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ListBox.cpp: Récupération de la ListBox de wormux, et amélioration pour avoir une scrollbar.
+
+2007-01-21 Romain Bignon <progs@headfucking.net>
+
+	* src/tools/Rectangle.h, src/tools/Vector2.h: Importation de ces classes de Wormux pour pouvoir représenter des couples de 2 ou 4 entiers dans un seul type.
+
+	* src/gui/*, src/*: - Utilisation de Vector2i pour prendre en compte les couples x,y, et de Rectanglei pour les couples x,y,w,h (pour les widgets et les ECImage).
+	- On ne redessine plus que les composants qui le demandent ou qui inter-agissent avec l'utilisateur (si le curseur est au dessus, etc.)
+
+	* src/gui/Form.h, src/Main.h, src/Config.h, src/InGame.h, src/JoinGame.h, src/Login.h, src/MapEditor.h: La classe TForm met à disposition des fonctions virtuelles
+	de callback pour que les dérivées puissent réagir à un evenement, plutôt que de gérer nous même dans la boucle principale. Ceci permet d'éviter justement
+	l'utilisation de ces boucles, et ainsi les objets s'auto-gèrent. On peut noter les evenements types OnClic(), OnMouseMotion(), OnKeyDown(), BeforeDraw(), etc.
+
+	* src/Color.h, src/gui/*: Utilisation d'une couleur dans les teintes bleu/violet pour toutes les box (semi transparent).
+
+	* src/gui/ComboBox.cpp: La liste n'est plus transparente (pour éviter les problèmes), mais sa couleur bleuté est plus jolie que blanche.
+
 2007-01-13 Romain Bignon <progs@headfucking.net>
 
 	* src/data/sound/units/McDo.ogg, src/Resources.cpp, src/Units.cpp: Lors de la création d'un McGerbale, diffusion d'un son.

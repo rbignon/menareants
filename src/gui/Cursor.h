@@ -55,7 +55,7 @@ public:
 
 	void Init();
 
-	void Draw(int, int);
+	void Draw(const Point2i&);
 
 /* Attributs */
 public:

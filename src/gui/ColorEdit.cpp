@@ -47,8 +47,8 @@ void TColorEdit::Init()
   uint max_value_w = 20;
   uint margin = 10;
 
-  m_plus.SetXY(x+w-10,y);
-  m_minus.SetXY(x+w-max_value_w-10-2*margin,y);
+  m_plus.SetXY(X()+Width()-10,Y());
+  m_minus.SetXY(X()+Width()-max_value_w-10-2*margin,Y());
   MyComponent(&m_plus);
   MyComponent(&m_minus);
   m_plus.SetImage (new ECSprite(Resources::UpButton(), Window()));
@@ -61,7 +61,7 @@ void TColorEdit::Init()
 
   imgx = m_minus.X() + m_minus.Width() + 5;
 
-  img.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, 20, h,
+  img.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, 20, Height(),
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 
   SetValue(value, true);
@@ -83,24 +83,26 @@ bool TColorEdit::SetValue(int _value, bool first)
   else
     img.FillRect(r_back, img.MapRGBA(255,255,255, 0));
 
+  SetWantRedraw();
+
   return true;
 }
 
-void TColorEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
+void TColorEdit::SetXY (int px, int py) { TComponent::SetXY(px, py); Init(); }
 
-void TColorEdit::Draw (int mouse_x, int mouse_y)
+void TColorEdit::Draw (const Point2i& mouse)
 {
-	txt_label.Draw(mouse_x, mouse_y);
+	txt_label.Draw(mouse);
 
 	if(!img.IsNull())
 	{
-		SDL_Rect r_back = {imgx,y,img.GetWidth(),img.GetHeight()};
+		SDL_Rect r_back = {imgx,Y(),img.GetWidth(),img.GetHeight()};
 		Window()->Blit(img, &r_back);
 	}
 
-	if(enabled)
+	if(Enabled())
 	{
-		m_minus.Draw (mouse_x, mouse_y);
-		m_plus.Draw (mouse_x, mouse_y);
+		m_minus.Draw (mouse);
+		m_plus.Draw (mouse);
 	}
 }

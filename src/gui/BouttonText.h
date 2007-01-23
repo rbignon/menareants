@@ -44,7 +44,7 @@ public:
 
   virtual void SetImage (ECSprite *image);
 
-  virtual void Draw (int souris_x, int souris_y);
+  virtual void Draw (const Point2i&);
   void SetText (const std::string &text);
   void SetEnabled(bool b = true);
   virtual void SetXY(int, int);

@@ -51,21 +51,21 @@ TButton::~TButton()
 
 //-----------------------------------------------------------------------------
 
-void TButton::Draw (int souris_x, int souris_y)
+void TButton::Draw (const Point2i& mouse)
 {
-   DrawImage (souris_x, souris_y);
+   DrawImage (mouse);
 }
 
 //-----------------------------------------------------------------------------
 
-void TButton::DrawImage (int souris_x, int souris_y)
+void TButton::DrawImage (const Point2i& mouse)
 {
   if(!image) return;
 
-  unsigned int frame = Test(souris_x,souris_y) ? 1 : 0;
+  unsigned int frame = Test(mouse) ? 1 : 0;
 
   image->SetFrame(frame);
-  image->set(x, y);
+  image->set(X(), Y());
   image->draw();
 
 }
@@ -81,4 +81,5 @@ void TButton::SetImage (ECSprite *_image)
 
 	SetWidth(image->GetWidth());
 	SetHeight(image->GetHeight());
+	SetWantRedraw();
 }

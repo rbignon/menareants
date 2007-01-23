@@ -29,62 +29,55 @@ TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool
   : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f),
     color(black_color)
 {
-  assert(font);
+	assert(font);
 
-  EDIT_HEIGHT = f->GetHeight();
-  first_char = 0;
-  maxlen = _maxlen;
-  focus = false;
-  chaine = "";
+	EDIT_HEIGHT = f->GetHeight();
+	first_char = 0;
+	maxlen = _maxlen;
+	DelFocus();
+	chaine = "";
 
-  avail_chars = av;
+	avail_chars = av;
 }
 
 void TEdit::Init()
 {
-	visible_len = ((w) / font->GetWidth("A"));
-	
+	visible_len = (Width() / font->GetWidth("A"));
+
 	if(!show_background) return;
-	
-	SDL_Rect r_back = {0,0,w,h};
-	
-	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
+
+	SDL_Rect r_back = {0,0,Width(), Height()};
+
+	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), Height(),
 						32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
+	background.FillRect(r_back, background.MapColor(BoxColor));
 }
 
 void TEdit::SetFocus()
 {
 	TComponent::SetFocus();
 	have_redraw = true;
+	SetWantRedraw();
 }
 
 void TEdit::DelFocus()
 {
 	TComponent::DelFocus();
 	have_redraw = true;
+	SetWantRedraw();
 }
 
-void TEdit::Draw (int m_x, int m_y)
+void TEdit::Draw (const Point2i& mouse)
 {
 	if(have_redraw)
 		Redraw();
 
 	if(!background.IsNull())
-	{
-		SDL_Rect r_back = {x,y,background.GetWidth(),background.GetHeight()};
-		Window()->Blit(background, &r_back);
-	}
+		Window()->Blit(background, position);
 
 	if(edit.IsNull()) return;
 
-	SDL_Rect dst_rect;
-	dst_rect.x = x;
-	dst_rect.y = y;
-	dst_rect.w = edit.GetWidth();
-	dst_rect.h = edit.GetHeight();
-
-	Window()->Blit(edit, &dst_rect);
+	Window()->Blit(edit, position);
 }
 
 void TEdit::SetString(std::string s)
@@ -92,11 +85,12 @@ void TEdit::SetString(std::string s)
 	chaine = s;
 	caret = s.size();
 	first_char = caret > visible_len ? caret - visible_len : 0;
+	SetWantRedraw();
 }
 
 void TEdit::Redraw()
 {
-	if(!focus && chaine.empty())
+	if(!Focused() && chaine.empty())
 	{
 		edit.SetImage(0);
 		return;
@@ -116,7 +110,7 @@ void TEdit::Redraw()
 	{
 		uint caret_x = font->GetWidth(substring.substr(0, caret-first_char));
 		SLOCK(edit.Img);
-		DrawLine(edit.Img, caret_x, 1, caret_x, h-2, edit.MapColor(color));
+		DrawLine(edit.Img, caret_x, 1, caret_x, Height()-2, edit.MapColor(color));
 		SUNLOCK(edit.Img);
 	}
 	have_redraw = false;
@@ -124,7 +118,7 @@ void TEdit::Redraw()
 
 void TEdit::PressKey(SDL_keysym key)
 {
-	if(!focus) return;
+	if(!Focused()) return;
 
 	switch(key.sym)
 	{
@@ -203,4 +197,5 @@ void TEdit::PressKey(SDL_keysym key)
 			break;
 		}
 	}
+	SetWantRedraw();
 }

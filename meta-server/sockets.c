@@ -180,6 +180,7 @@ struct Client *addclient(int fd, const char *ip)
 	newC->flags = 0;
 	newC->recvlen = 0;
 	newC->fd = fd;
+	newC->server = 0;
 	strncpy(newC->ip, ip, IPLEN);
 
 	FD_SET(fd, &global_fd_set);

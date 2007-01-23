@@ -52,26 +52,26 @@ void TMemo::Init()
   m_up.SetImage (new ECSprite(Resources::UpButton(), Window()));
   m_down.SetImage (new ECSprite(Resources::DownButton(), Window()));
 
-  nb_visible_items_max = h/height_item;
+  nb_visible_items_max = Height()/height_item;
 
   if(!show_background) return;
 
-  SDL_Rect r_back = {0,0,w,h};
+  SDL_Rect r_back = {0,0,Width(), Height()};
 
-  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
+  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), Height(),
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-  background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*3/10));
+  background.FillRect(r_back, background.MapColor(BoxColor));
 
 }
 
-bool TMemo::Clic (int mouse_x, int mouse_y, int button)
+bool TMemo::Clic (const Point2i& mouse, int button)
 {
-  if(Mouse(mouse_x, mouse_y) == false) return false;
+  if(Mouse(mouse) == false) return false;
 
 
   if (m_items.size() > nb_visible_items_max)
   {
-    if (button == SDL_BUTTON_WHEELDOWN || m_down.Test(mouse_x, mouse_y))
+    if (button == SDL_BUTTON_WHEELDOWN || m_down.Test(mouse))
     {
       // bottom button
       if ( m_items.size() - first_visible_item > nb_visible_items_max ) first_visible_item++ ;
@@ -79,7 +79,7 @@ bool TMemo::Clic (int mouse_x, int mouse_y, int button)
     }
 
 
-    if (button == SDL_BUTTON_WHEELUP || m_up.Test(mouse_x,mouse_y))
+    if (button == SDL_BUTTON_WHEELUP || m_up.Test(mouse))
     {
       // top button
       if (first_visible_item > 0) first_visible_item-- ;
@@ -90,30 +90,27 @@ bool TMemo::Clic (int mouse_x, int mouse_y, int button)
   return false;
 }
 
-void TMemo::Draw (int mouse_x, int mouse_y)
+void TMemo::Draw (const Point2i& mouse)
 {
 	if(!background.IsNull())
-	{
-		SDL_Rect r_back = {x,y,w,h};
-		Window()->Blit(background, &r_back);
-	}
+		Window()->Blit(background, position);
 
 	uint i=0;
 	for(std::vector<TLabel*>::iterator it = m_items.begin()+first_visible_item;
 	    i < nb_visible_items && it != m_items.end(); i++, ++it)
 	{
-		(*it)->SetXY(x+5, y+i*height_item);
-		(*it)->Draw(mouse_x, mouse_y);
+		(*it)->SetXY(X()+5, Y()+i*height_item);
+		(*it)->Draw(mouse);
 	}
 
 	// buttons for listbox with more items than visible
 	if (m_items.size() > nb_visible_items_max)
 	{
-		m_up.SetXY(x+w-12, y+2);
-		m_down.SetXY(x+w-12, y+h-7);
+		m_up.SetXY(X()+Width()-12, Y()+2);
+		m_down.SetXY(X()+Width()-12, Y()+Height()-7);
 
-		m_up.Draw (mouse_x, mouse_y);
-		m_down.Draw (mouse_x, mouse_y);
+		m_up.Draw (mouse);
+		m_down.Draw (mouse);
 	}
 }
 
@@ -127,7 +124,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 
 	while(1)
 	{
-		uint size = font->GetWidth(s);
+		int size = font->GetWidth(s);
 		if(*_s == '\n' || ((size > Width()-marge) && *_s == ' ') || ((size+20) > Width()) || !(*_s))
 		{
 			/* Suppression du premier element */
@@ -141,7 +138,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 			// Push item
 			if((size+20) > (Width())) s += "-"; // On a tronqué on rajoute un indicateur
 
-			TLabel* label = new TLabel(x,y, s, _color, font, shadowed);
+			TLabel* label = new TLabel(X(),Y(), s, _color, font, shadowed);
 			MyComponent(label);
 			m_items.push_back (label);
 
@@ -150,7 +147,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 				nb_visible_items = nb_visible_items_max;
 
 			visible_height = nb_visible_items*height_item;
-			if (h < visible_height)  visible_height = h;
+			if (Height() < visible_height)  visible_height = Height();
 			s.clear();
 
 			if(*_s == '\n')
@@ -161,6 +158,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 		else
 			s += *_s++;
 	}
+	SetWantRedraw();
 }
 
 void TMemo::RemoveItem (uint index)
@@ -174,7 +172,9 @@ void TMemo::RemoveItem (uint index)
 		nb_visible_items = nb_visible_items_max;
 
 	visible_height = nb_visible_items*height_item;
-	if (h < visible_height)  visible_height = h;
+	if (Height() < visible_height)  visible_height = Height();
+
+	SetWantRedraw();
 }
 
 void TMemo::ClearItems()
@@ -185,4 +185,5 @@ void TMemo::ClearItems()
 	first_visible_item = 0;
 	visible_height = 0;
 	nb_visible_items = 0;
+	SetWantRedraw();
 }

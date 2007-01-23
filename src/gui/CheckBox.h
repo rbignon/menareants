@@ -43,8 +43,8 @@ public:
 	void Init ();
 
 	/** Affiche */
-	void Draw(int m_x, int m_y);
-	bool Clic(int m_x, int m_y, int button);
+	void Draw(const Point2i&);
+	bool Clic(const Point2i&, int button);
 
 /* Attributs */
 public:

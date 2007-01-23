@@ -41,7 +41,7 @@ public:
 public:
 	void Init();
 
-	virtual void Draw (int souris_x, int souris_y);
+	virtual void Draw (const Point2i&);
 
 /* Attributs */
 public:
@@ -55,7 +55,7 @@ protected:
 
 	ECSprite *image;
 
-	void DrawImage (int souris_x, int souris_y);
+	void DrawImage (const Point2i&);
 };
 
 

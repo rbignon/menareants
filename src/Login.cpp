@@ -285,6 +285,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 		return 0;
 
+	me->LockScreen();
 	ListServerForm->ServerList->AddItem(false,
 	                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 	                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
@@ -294,6 +295,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
 	ListServerForm->nb_wchans += StrToTyp<uint>(parv[8]);
 	ListServerForm->nb_users += StrToTyp<uint>(parv[4]);
+	me->UnlockScreen();
 	close(sock);
 	return 0;
 }
@@ -301,7 +303,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
 	assert(ListServerForm);
-	ListServerForm->RecvSList = true;
+	ListServerForm->RecvSList = false;
 	ListServerForm->UserStats->SetCaption("Il y a " + TypToStr(ListServerForm->nb_users) + " utilisateur(s), avec " + TypToStr(ListServerForm->nb_tusers) + " connexions totales et " +
 	                                     TypToStr(ListServerForm->nb_tchans) + " parties jouées.");
 	ListServerForm->ChanStats->SetCaption("Il y a actuellement " + TypToStr(ListServerForm->nb_chans) + " partie(s) sur " + TypToStr(ListServerForm->ServerList->Size()) +
@@ -326,9 +328,9 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 
 void MenAreAntsApp::RefreshList()
 {
-	if(ListServerForm->RecvSList == false) return;
+	if(ListServerForm->RecvSList == true || EC_Client::GetInstance()) return;
 
-	ListServerForm->RecvSList = false;
+	ListServerForm->RecvSList = true;
 	ListServerForm->RefreshButton->SetEnabled(false);
 
 	mutex = SDL_CreateMutex();
@@ -347,9 +349,9 @@ void MenAreAntsApp::RefreshList()
 
 	ListServerForm->ServerList->ClearItems();
 
-	WAIT_EVENT_T(client->IsConnected() || client->Error() || ListServerForm->RecvSList, i, 5);
+	WAIT_EVENT_T(client->IsConnected() || client->Error() || !ListServerForm->RecvSList, i, 5);
 
-	if((!client || !client->IsConnected()) && !ListServerForm->RecvSList)
+	if((!client || !client->IsConnected()) && ListServerForm->RecvSList)
 	{
 		std::string msg;
 		if(client)
@@ -380,19 +382,10 @@ void MenAreAntsApp::ServerList()
 {
 	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
 
-	SDL_Event event;
-	bool eob = false;
-
 	RefreshList();
-	Timer timer;
 	do
 	{
-		if(timer.time_elapsed() > 60)
-		{
-			RefreshList();
-			timer.reset();
-		}
-		if(ListServerForm->RecvSList && EC_Client::GetInstance() != 0 && EC_Client::GetInstance()->IsConnected() == false)
+		if(!ListServerForm->RecvSList && EC_Client::GetInstance() != 0 && EC_Client::GetInstance()->IsConnected() == false)
 		{
 			EC_Client::GetInstance()->SetWantDisconnect();
 			SDL_WaitThread(Thread, 0);
@@ -400,67 +393,11 @@ void MenAreAntsApp::ServerList()
 			EC_Client::singleton = NULL;
 			mutex = 0;
 			ListServerForm->SetMutex(0);
-			ListServerForm->RecvSList = false;
+			//ListServerForm->RecvSList = false;
 		}
-		while(SDL_PollEvent(&event))
-		{
-			ListServerForm->Actions(event);
-			switch(event.type)
-			{
-				case SDL_MOUSEBUTTONDOWN:
-					if(ListServerForm->ServerList->Test(event.button.x, event.button.y, event.button.button))
-					{
-						if(ListServerForm->ServerList->GetSelectedItem() >= 0 &&
-						ListServerForm->ServerList->EnabledItem(ListServerForm->ServerList->GetSelectedItem()))
-							ListServerForm->ConnectButton->SetEnabled(true);
-						else
-							ListServerForm->ConnectButton->SetEnabled(false);
-					}
-					if(ListServerForm->RefreshButton->Test(event.button.x, event.button.y, event.button.button))
-						RefreshList();
-					else if(ListServerForm->ConnectButton->Test(event.button.x, event.button.y, event.button.button))
-					{
-						ConnectedTo(ListServerForm->ServerList->ReadValue(
-						             ListServerForm->ServerList->GetSelectedItem()));
-						RefreshList();
-					}
-					else if(ListServerForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
-						eob = true;
-					else if(ListServerForm->MissionButton->Test(event.button.x, event.button.y, event.button.button) ||
-					        ListServerForm->EscarmoucheButton->Test(event.button.x, event.button.y, event.button.button))
-					{
-						int size = ListServerForm->ServerList->Size();
-						if(!size) break;
-						int r = 0, i = 0;
-						do
-						{
-							r = rand()%size;
-							i++;
-						} while(i < 20 && ListServerForm->ServerList->EnabledItem(r) == false);
-						if(i >= 20)
-							TMessageBox("Il n'y a aucun serveur pour heberger votre partie.\n\n"
-							            "Veuillez réessayez plus tard.",
-								            BT_OK, ListServerForm).Show();
-						else
-						{
-							EC_Client* client = Connect(ListServerForm->ServerList->ReadValue(r));
-							if(!client)
-								break;
-							if(!GameInfos(NULL, ConnectedForm, ListServerForm->MissionButton->Test(event.button.x, event.button.y, event.button.button)))
-								TMessageBox("Impossible de créer la partie.\n"
-								            "Il y a actuellement de trop de parties en cours sur le serveur. Réessayez.",
-								            BT_OK, ConnectedForm).Show();
-							client->SetWantDisconnect();
-							Disconnect(client);
-							RefreshList();
-						}
-					}
-					break;
-				default: break;
-			}
-		}
+		ListServerForm->Actions();
 		ListServerForm->Update();
-	} while(!eob);
+	} while(!ListServerForm->WantQuit());
 	MyFree(ListServerForm);
 }
 
@@ -468,10 +405,67 @@ void MenAreAntsApp::ServerList()
  *                               TListServerForm                                             *
  ********************************************************************************************/
 
-TListServerForm::TListServerForm(ECImage* w)
-	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0)
+void TListServerForm::AfterDraw()
 {
-	ServerList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 0, 0, 500,350));
+	if(timer.time_elapsed() > 60)
+	{
+		MenAreAntsApp::GetInstance()->RefreshList();
+		timer.reset();
+	}
+}
+
+void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
+{
+	if(ServerList->Test(mouse, button))
+	{
+		if(ServerList->Selected() >= 0 && ServerList->SelectedItem()->Enabled())
+			ConnectButton->SetEnabled(true);
+		else
+			ConnectButton->SetEnabled(false);
+	}
+	if(RefreshButton->Test(mouse, button))
+		MenAreAntsApp::GetInstance()->RefreshList();
+	else if(ConnectButton->Test(mouse, button))
+	{
+		MenAreAntsApp::GetInstance()->ConnectedTo(ServerList->SelectedItem()->Value());
+		MenAreAntsApp::GetInstance()->RefreshList();
+	}
+	else if(RetourButton->Test(mouse, button))
+		want_quit = true;
+	else if(MissionButton->Test(mouse, button) || EscarmoucheButton->Test(mouse, button))
+	{
+		int size = ServerList->Size();
+		if(!size) return;
+		int r = 0, i = 0;
+		do
+		{
+			r = rand()%size;
+			i++;
+		} while(i < 20 && ServerList->Item(r)->Enabled() == false);
+		if(i >= 20)
+			TMessageBox("Il n'y a aucun serveur pour heberger votre partie.\n\n"
+					"Veuillez réessayez plus tard.",
+						BT_OK, this).Show();
+		else
+		{
+			EC_Client* client = MenAreAntsApp::GetInstance()->Connect(ServerList->ReadValue(r));
+			if(!client)
+				return;
+			if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, ConnectedForm, MissionButton->Test(mouse, button)))
+				TMessageBox("Impossible de créer la partie.\n"
+				            "Il y a actuellement de trop de parties en cours sur le serveur. Réessayez.",
+				            BT_OK, ConnectedForm).Show();
+			client->SetWantDisconnect();
+			MenAreAntsApp::GetInstance()->Disconnect(client);
+			MenAreAntsApp::GetInstance()->RefreshList();
+		}
+	}
+}
+
+TListServerForm::TListServerForm(ECImage* w)
+	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), RecvSList(false)
+{
+	ServerList = AddComponent(new TListBox(Rectanglei(0, 0, 500,350)));
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
 
 	Label1 = AddComponent(new TLabel(ServerList->Y()-60,"Veuillez choisir un serveur dans la liste suivante :", white_color, Font::GetInstance(Font::Big)));
@@ -622,110 +616,16 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 			return;
 
 		ConnectedForm->SetMutex(mutex);
+		ConnectedForm->SetClient(client);
 		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en tant que " +
 		                                               client->GetNick());
 
-		bool eob = false, refresh = true;
-		Timer timer; /* Utilisation d'un timer pour compter une véritable minute */
-		SDL_Event event;
 		do
 		{
-			if(refresh)
-			{
-				ConnectedForm->GList->ClearItems();
-				EOL = false;
-				client->sendrpl(client->rpl(EC_Client::LISTGAME));
-				WAIT_EVENT(EOL, j);
-				if(!EOL)
-					break;
-
-				refresh = false;
-				ConnectedForm->JoinButton->SetEnabled(false);
-				timer.reset();
-			}
-			while( SDL_PollEvent( &event) )
-			{
-				ConnectedForm->Actions(event);
-				switch(event.type)
-				{
-					case SDL_KEYUP:
-						switch (event.key.keysym.sym)
-						{
-							case SDLK_ESCAPE:
-								client->SetWantDisconnect();
-								eob = true;
-								break;
-							default: break;
-						}
-						break;
-					case SDL_MOUSEBUTTONDOWN:
-						if(ConnectedForm->GList->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(ConnectedForm->GList->GetSelectedItem() >= 0 &&
-							   ConnectedForm->GList->EnabledItem(ConnectedForm->GList->GetSelectedItem()))
-								ConnectedForm->JoinButton->SetEnabled(true);
-							else
-								ConnectedForm->JoinButton->SetEnabled(false);
-						}
-						else if(ConnectedForm->DisconnectButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							client->SetWantDisconnect();
-							eob = true;
-						}
-						else if(ConnectedForm->JoinButton->Enabled() &&
-						   ConnectedForm->JoinButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(!GameInfos(ConnectedForm->GList->ReadValue(
-								ConnectedForm->GList->GetSelectedItem()).c_str(), ConnectedForm))
-							{
-								TMessageBox(TGameInfosForm::ErrMessage, BT_OK, ConnectedForm).Show();
-								TGameInfosForm::ErrMessage.clear();
-							}
-							refresh = true;
-							timer.reset();
-							client->sendrpl(client->rpl(EC_Client::STAT));
-						}
-						else if(ConnectedForm->RefreshButton->Test(event.button.x, event.button.y, event.button.button))
-							refresh = true;
-						else if(ConnectedForm->CreerButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							if(!GameInfos(NULL, ConnectedForm))
-							{
-								TMessageBox(TGameInfosForm::ErrMessage, BT_OK, ConnectedForm).Show();
-								TGameInfosForm::ErrMessage.clear();
-							}
-							refresh = true;
-							timer.reset();
-							client->sendrpl(client->rpl(EC_Client::STAT));
-						}
-						break;
-					default:
-						break;
-				}
-			}
+			ConnectedForm->Actions();
 			ConnectedForm->Update();
 
-			if(ConnectedForm->Rejoin.empty() == false)
-			{
-				if(TMessageBox("Vous avez été déconnecté pendant que vous jouiez à la partie " +
-				                ConnectedForm->Rejoin + ".\n\n"
-				                "Souhaitez-vous rejoindre la partie ?",
-				               BT_YES|BT_NO, ConnectedForm).Show() == BT_YES)
-				{
-					RecoverGame(ConnectedForm->Rejoin);
-				}
-				ConnectedForm->Rejoin.clear();
-			}
-			if(!client || !client->IsConnected())
-			{
-				eob = true;
-
-				TMessageBox mb("Vous avez été déconnecté.", BT_OK, NULL);
-				mb.SetBackGround(Resources::Titlescreen());
-				mb.Show();
-			}
-			if(timer.time_elapsed(true) > 60) refresh = true; /* VÉRITABLE minute */
-		} while(!eob);
+		} while(!ConnectedForm->WantQuit());
 	}
 	catch(const TECExcept &e)
 	{
@@ -754,15 +654,92 @@ void MenAreAntsApp::ConnectedTo(std::string host)
  *                               TConnectedForm                                             *
  ********************************************************************************************/
 
+void TConnectedForm::AfterDraw()
+{
+	if(Rejoin.empty() == false)
+	{
+		if(TMessageBox("Vous avez été déconnecté pendant que vous jouiez à la partie " +
+		               Rejoin + ".\n\n"
+		               "Souhaitez-vous rejoindre la partie ?",
+				BT_YES|BT_NO, this).Show() == BT_YES)
+		{
+			MenAreAntsApp::GetInstance()->RecoverGame(Rejoin);
+		}
+		Rejoin.clear();
+	}
+	if(!client || !client->IsConnected())
+	{
+		TMessageBox mb("Vous avez été déconnecté.", BT_OK, NULL);
+		mb.SetBackGround(Resources::Titlescreen());
+		mb.Show();
+		want_quit = true;
+		return;
+	}
+	if(timer.time_elapsed(true) > 60 || refresh)
+	{
+		GList->ClearItems();
+		EOL = false;
+		client->sendrpl(client->rpl(EC_Client::LISTGAME));
+		WAIT_EVENT(EOL, j);
+		if(!EOL)
+			return;
+
+		refresh = false;
+		JoinButton->SetEnabled(false);
+		timer.reset();
+	}
+}
+
+void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(GList->Test(mouse, button))
+	{
+		if(GList->Selected() >= 0 && GList->SelectedItem()->Enabled())
+			JoinButton->SetEnabled(true);
+		else
+			JoinButton->SetEnabled(false);
+	}
+	else if(DisconnectButton->Test(mouse, button))
+	{
+		client->SetWantDisconnect();
+		want_quit = true;
+	}
+	else if(JoinButton->Enabled() && JoinButton->Test(mouse, button))
+	{
+		if(!MenAreAntsApp::GetInstance()->GameInfos(GList->SelectedItem()->Value().c_str(), this))
+		{
+			TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
+			TGameInfosForm::ErrMessage.clear();
+		}
+		refresh = true;
+		timer.reset();
+		client->sendrpl(client->rpl(EC_Client::STAT));
+	}
+	else if(RefreshButton->Test(mouse, button))
+		refresh = true;
+	else if(CreerButton->Test(mouse, button))
+	{
+		if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, this))
+		{
+			TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
+			TGameInfosForm::ErrMessage.clear();
+		}
+		refresh = true;
+		timer.reset();
+		client->sendrpl(client->rpl(EC_Client::STAT));
+	}
+
+}
+
 TConnectedForm::TConnectedForm(ECImage* w)
-	: TForm(w)
+	: TForm(w), refresh(false), client(0)
 {
 	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 0, 0, 400,350, 0));
 	Motd->SetXY(Window()->GetWidth()/2 - Motd->Width()/2 - (200+150+10+10)/2, Window()->GetHeight()/2 - Motd->Height()/2);
 
 	MOTDLabel = AddComponent(new TLabel(Motd->X()+5, Motd->Y()-20, "Message du jour du serveur :", white_color, Font::GetInstance(Font::Normal)));
 
-	GList = AddComponent(new TListBox(Font::GetInstance(Font::Small), 300,350,200,350));
+	GList = AddComponent(new TListBox(Rectanglei(300,350,200,350)));
 	GList->SetXY(Motd->X()+Motd->Width()+10, Motd->Y());
 
 	ListLabel = AddComponent(new TLabel(GList->X()+5, GList->Y()-20, "Liste des parties :", white_color, Font::GetInstance(Font::Normal)));

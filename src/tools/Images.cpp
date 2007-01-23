@@ -24,6 +24,7 @@
 #include "Debug.h"
 #include "tools/Color.h"
 #include <fstream>
+#include <SDL_gfxPrimitives.h>
 
 void DrawLargeLine(SDL_Surface* screen, int x1, int y1, int x2, int y2, Uint32 color)
 {
@@ -153,8 +154,8 @@ SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
 void ChangePixelColor(ECImage* surf, Color last_color, Color new_color)
 {
 	SLOCK(surf->Img);
-	for(uint x = 0; x < surf->GetWidth(); x++)
-		for(uint y = 0; y < surf->GetHeight(); y++)
+	for(int x = 0; x < surf->GetWidth(); x++)
+		for(int y = 0; y < surf->GetHeight(); y++)
 		{
 			Uint32 col = getpixel(surf->Img, x, y);
 			/*Uint8 r, g, b;
@@ -309,9 +310,9 @@ void ECSprite::draw()
 			mLastupdate = SDL_GetTicks();
 		}
 	}
-	
+
 	if(mDrawn==0) mDrawn=1;
-	
+
 	SDL_Rect dest;
 	dest.x = mX;
 	dest.y = mY;
@@ -320,11 +321,11 @@ void ECSprite::draw()
 	mScreen->Blit(&mSpriteBase->mAnim[mFrame], &dest);
 }
 
-uint ECSprite::GetWidth()
+int ECSprite::GetWidth()
 {
 	return (mSpriteBase ? mSpriteBase->mW : 0);
 }
-uint ECSprite::GetHeight()
+int ECSprite::GetHeight()
 {
 	return (mSpriteBase ? mSpriteBase->mH : 0);
 }
@@ -544,6 +545,21 @@ int ECImage::Blit(const ECImage& src)
 	return SDL_BlitSurface( src.Img, 0, Img, 0);
 }
 
+int ECImage::Blit(const ECImage& src, const Point2i &dst)
+{
+	SDL_Rect dstRect = GetSDLRect( dst, Point2i(src.GetWidth(), src.GetHeight()) );
+
+	return Blit(src, NULL, &dstRect);
+}
+
+int ECImage::Blit(const ECImage& src, const Rectanglei &srcRect, const Point2i &dstPoint)
+{
+	SDL_Rect sdlSrcRect = GetSDLRect( srcRect );
+	SDL_Rect sdlDstRect = GetSDLRect( dstPoint, Point2i(src.GetWidth(), src.GetHeight()) );
+
+	return Blit(src, &sdlSrcRect, &sdlDstRect);
+}
+
 int ECImage::Blit(const ECImage* src, SDL_Rect *srcRect, SDL_Rect *dstRect)
 {
 	return SDL_BlitSurface( src->Img, srcRect, Img, dstRect );
@@ -557,6 +573,45 @@ int ECImage::Blit(const ECImage* src, SDL_Rect *dstRect)
 int ECImage::Blit(const ECImage* src)
 {
 	return SDL_BlitSurface( src->Img, 0, Img, 0);
+}
+
+int ECImage::Blit(const ECImage* src, const Point2i &dst)
+{
+	SDL_Rect dstRect = GetSDLRect( dst, Point2i(src->GetWidth(), src->GetHeight()) );
+
+	return Blit(src, NULL, &dstRect);
+}
+
+int ECImage::Blit(const ECImage* src, const Rectanglei &srcRect, const Point2i &dstPoint)
+{
+	SDL_Rect sdlSrcRect = GetSDLRect( srcRect );
+	SDL_Rect sdlDstRect = GetSDLRect( dstPoint, Point2i(src->GetWidth(), src->GetHeight()) );
+
+	return Blit(src, &sdlSrcRect, &sdlDstRect);
+}
+
+SDL_Rect ECImage::GetSDLRect(const Rectanglei &r) const
+{
+  SDL_Rect sdlRect;
+
+  sdlRect.x = r.X();
+  sdlRect.y = r.Y();
+  sdlRect.w = r.Width();
+  sdlRect.h = r.Height();
+
+  return sdlRect;
+}
+
+SDL_Rect ECImage::GetSDLRect(const Point2i &pt, const Point2i &pt2) const
+{
+  SDL_Rect sdlRect;
+
+  sdlRect.x = pt.X();
+  sdlRect.y = pt.Y();
+  sdlRect.w = pt2.X();
+  sdlRect.h = pt2.Y();
+
+  return sdlRect;
 }
 
 void ECImage::Draw(int x, int y)
@@ -696,6 +751,69 @@ void ECImage::Zoom(double zoomx, double zoomy, bool smooth)
 
 	if(IsNull() )
 		throw ECExcept("", "Unable to make a rotozoom on the surface !" );
+}
+
+int ECImage::BoxColor(const Rectanglei &rect, const Color &color)
+{
+	if( rect.IsSizeZero() )
+		return 0;
+
+	Point2i ptBR = rect.GetBottomRightPoint();
+
+	return boxRGBA( Img, rect.X(), rect.Y(), ptBR.X(), ptBR.Y(), color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+}
+
+int ECImage::RectangleColor(const Rectanglei &rect, const Color &color, const uint &border_size)
+{
+	if( rect.IsSizeZero() )
+		return 0;
+
+	Point2i ptBR = rect.GetBottomRightPoint();
+
+	if (border_size == 1)
+		return rectangleRGBA( Img, rect.X(), rect.Y(), ptBR.X(), ptBR.Y(), color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+
+	// top border
+	boxRGBA (Img,
+		rect.X(), rect.Y(), ptBR.X(), rect.Y()+border_size,
+		color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+
+	// bottom border
+	boxRGBA (Img,
+		rect.X(), ptBR.Y() - border_size, ptBR.X(), ptBR.Y(),
+		color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+
+	// left border
+	boxRGBA (Img,
+		rect.X(), rect.Y() + border_size, rect.X()+border_size, ptBR.Y()-border_size,
+		color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+
+	// right border
+	boxRGBA (Img,
+		ptBR.X() - border_size, rect.Y() + border_size, ptBR.X(), ptBR.Y()-border_size,
+		color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+
+	return 1;
+}
+
+int ECImage::VlineColor(const uint &x1, const uint &y1, const uint &y2, const Color &color)
+{
+	return vlineRGBA( Img, x1, y1, y2, color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+}
+
+int ECImage::LineColor(const uint &x1, const uint &x2, const uint &y1, const uint &y2, const Color &color)
+{
+  return lineRGBA( Img, x1, y1, x2, y2, color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+}
+
+int ECImage::AALineColor(const uint &x1, const uint &x2, const uint &y1, const uint &y2, const Color &color)
+{
+  return aalineRGBA( Img, x1, y1, x2, y2, color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
+}
+
+int ECImage::CircleColor(const uint &x, const uint &y, const uint &rad, const Color &color)
+{
+    return circleRGBA( Img, x, y, rad, color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha() );
 }
 
 ECImage* ECImage::Shadow()

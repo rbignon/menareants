@@ -29,14 +29,14 @@ TLabel::TLabel()
 
 TLabel::TLabel(const TLabel& label)
 	: TComponent(label), font(label.font), color(label.color),
-	  shadowed(label.shadowed), bg_offset(label.bg_offset), auto_set(label.auto_set)
+	  shadowed(label.shadowed), bg_offset(label.bg_offset), auto_set(label.auto_set), gray_disable(label.gray_disable)
 {
 	caption = "";
 	SetCaption(label.caption);
 }
 
-TLabel::TLabel(int x, int y, std::string new_txt, Color new_color, Font* new_font, bool _shadowed)
-	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(false)
+TLabel::TLabel(int x, int y, const std::string& new_txt, Color new_color, Font* new_font, bool _shadowed)
+	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(false), gray_disable(false)
 {
 	assert(new_font!=NULL);
 	caption = "";
@@ -50,8 +50,8 @@ TLabel::TLabel(int x, int y, std::string new_txt, Color new_color, Font* new_fon
 	SetCaption(new_txt);
 }
 
-TLabel::TLabel(int y, std::string new_txt, Color new_color, Font* new_font, bool _shadowed)
-	: TComponent(0, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(true)
+TLabel::TLabel(int y, const std::string& new_txt, Color new_color, Font* new_font, bool _shadowed)
+	: TComponent(0, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(true), gray_disable(false)
 {
 	assert(new_font!=NULL);
 	caption = "";
@@ -100,6 +100,13 @@ void TLabel::SetFont(Font* f)
 	Reinit();
 }
 
+void TLabel::SetEnabled(bool _en)
+{
+	if(gray_disable && _en != Enabled())
+		Reinit();
+	TComponent::SetEnabled(_en);
+}
+
 void TLabel::Reinit()
 {
 	if(caption.empty())
@@ -109,7 +116,7 @@ void TLabel::Reinit()
 		return;
 	}
 
-	surf = font->CreateSurface(caption,color);
+	surf = font->CreateSurface(caption, (!Enabled() && gray_disable) ? gray_color : color);
 
 	if(shadowed)
 		background = font->CreateSurface(caption, white_color);
@@ -118,25 +125,18 @@ void TLabel::Reinit()
 	SetWidth(surf.GetWidth());
 	if(auto_set && Window())
 		SetX(Window()->GetWidth()/2 - font->GetWidth(caption)/2);
+
+	SetWantRedraw();
 }
 
-void TLabel::Draw(int m_x, int m_y)
+void TLabel::Draw(const Point2i& mouse)
 {
 	if(surf.IsNull() || caption.empty()) return; /* Possible (mais bizare). Par exemple un SpinEdit sans texte */
 
 	assert(Window());
 
-	SDL_Rect dst_rect;
-	dst_rect.x = x;
-	dst_rect.y = y;
-	dst_rect.w = surf.GetWidth();
-	dst_rect.h = surf.GetHeight();
-
 	if(shadowed && !background.IsNull())
-	{
-		SDL_Rect shad_rect = {x+bg_offset, y+bg_offset, background.GetWidth(), background.GetHeight()};
+		Window()->Blit(background, Point2i(X()+bg_offset, Y()+bg_offset));
 
-		Window()->Blit(background, &shad_rect);
-	}
-	Window()->Blit(surf, &dst_rect);
+	Window()->Blit(surf, Point2i(X(), Y()));
 }

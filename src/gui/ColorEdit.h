@@ -40,7 +40,7 @@ public:
 
 	void Init();
 
-	void Draw (int mouse_x, int mouse_y);
+	void Draw (const Point2i&);
 
 /* Attributs */
 public:

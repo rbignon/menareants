@@ -35,6 +35,8 @@
 #include "gui/ComboBox.h"
 #include "gui/CheckBox.h"
 
+class EC_Client;
+
 /********************************************************************************************
  *                               TGameInfosForm                                             *
  ********************************************************************************************/
@@ -44,7 +46,7 @@ class TGameInfosForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TGameInfosForm(ECImage*, bool mission = false);
+	TGameInfosForm(ECImage*, EC_Client*, bool mission = false);
 
 /* Composants */
 public:
@@ -86,6 +88,18 @@ public:
 
 	void ChangeStatus(bool);
 
+/* Evenements */
+private:
+
+	void OnClic(const Point2i&, int, bool&);
+	void OnKeyUp(SDL_keysym key);
+	void AfterDraw();
+
+/* Variables privées */
+private:
+
+	Timer listmapclick;
+	EC_Client* client;
 };
 
 /********************************************************************************************
@@ -105,12 +119,12 @@ public:
 public:
 
 	void Init();                                          /**< Initialisation */
-	void Draw(int souris_x, int souris_y);                /**< Draw */
+	void Draw(const Point2i&);                /**< Draw */
 	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 
-	bool OwnZone(int _x, int _y, int button);
+	bool OwnZone(const Point2i&, int button);
 
-	virtual bool Test (int souris_x, int souris_y, int button) const;
+	virtual bool Test (const Point2i&, int button) const;
 
 /* Composants */
 public:
@@ -153,7 +167,7 @@ public:
 public:
 
 	void Init();                                          /**< No initialisation */
-	void Draw(int souris_x, int souris_y);                /**< Draw */
+	void Draw(const Point2i&);                /**< Draw */
 	virtual void SetXY (int _x, int _y);                  /**< Set \a x and \a y positions */
 
 /* Composants */

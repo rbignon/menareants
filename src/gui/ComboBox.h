@@ -39,8 +39,8 @@ public:
 /* Methodes */
 public:
 
-	virtual void Draw (int mouse_x, int mouse_y);
-	virtual bool Clic (int mouse_x, int mouse_y, int button);
+	virtual void Draw (const Point2i&);
+	virtual bool Clic (const Point2i&, int button);
 	virtual void Init ();
 
 /* Attributs */
@@ -48,10 +48,12 @@ public:
 
 	bool Opened() const { return opened; }
 
-	uint AddItem (bool selected,
-	              const std::string &label,
-	              const std::string &value,
-	              Color _color = black_color, bool _enabled = true);
+	TListBoxItem* AddItem (bool selected,
+	                       const std::string &label,
+	                       const std::string &value,
+	                       const Color& _color = black_color,
+	                       bool _enabled = true,
+	                       Font& font = *Font::GetInstance(Font::Small));
 	void ClearItems();
 	virtual void Deselect (uint index);
 	virtual void Select(uint index);
@@ -68,9 +70,11 @@ protected:
 	bool opened;
 	uint visible_len;
 	void SetOpened(bool _o);
-	void SetBackGround(uint _h);
 	TLabel chaine;
 	uint COMBOBOX_HEIGHT;
+	Font* font;
+
+	int CalculateHeight();
 };
 
 #endif /* EC_COMBOBOX_H */

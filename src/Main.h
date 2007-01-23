@@ -42,6 +42,7 @@ private:
 	std::string path;
 	bool want_quit;
 
+public:
 	void ServerList();
 	void RefreshList();
 	void ConnectedTo(std::string host);
@@ -57,6 +58,7 @@ private:
 	bool RecoverGame(std::string chaname);
 	void PingingGame();
 
+private:
 	static void WantQuit(TObject*, void*);
 	static void WantPlay(TObject*, void*);
 	static void WantConfig(TObject*, void*);

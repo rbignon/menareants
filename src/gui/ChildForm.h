@@ -43,12 +43,12 @@ public:
 public:
 
 	/* Dessine chaques composants */
-	void Draw(int x, int y);
+	void Draw(const Point2i&);
 
 	/** Use this function to init your components with AddComponent() */
 	virtual void Init() = 0;
 
-	virtual bool Clic(int x, int y, int button);
+	virtual bool Clic(const Point2i&, int button);
 
 	void Clear();
 
@@ -64,6 +64,8 @@ public:
 
 	virtual void PressKey(SDL_keysym);
 
+	virtual bool WantRedraw() const { return true; }
+
 /* Variables protégées */
 protected:
 
@@ -74,7 +76,7 @@ protected:
 		composants.push_back(comp);
 		comp->SetParent(this);
 		comp->SetWindow(Window());
-		comp->SetXY(comp->X()+x, comp->Y()+y);
+		comp->SetXY(comp->X() + X(), comp->Y() + Y());
 		comp->Init();
 		return comp;
 	}
@@ -83,10 +85,11 @@ protected:
 	bool FocusOrder() { return focus_order; }
 
 /* Variables privées */
-protected:
+private:
 	std::vector<TComponent*> composants;
 	ECImage *background;
 	bool focus_order;
+	Point2i lastmpos;
 };
 
 #endif /* EC_CHILDFORM_H */

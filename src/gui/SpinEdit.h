@@ -55,9 +55,9 @@ public:
 
 	virtual void Init();
 
-	void Draw (int mouse_x, int mouse_y);
+	void Draw (const Point2i&);
 
-	bool Clic (int mouse_x, int mouse_y, int button);
+	bool Clic (const Point2i&, int button);
 
 	void SetColorFont(Color new_color, Font* new_font);
 

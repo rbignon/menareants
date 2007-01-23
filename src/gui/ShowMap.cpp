@@ -33,10 +33,11 @@
 
 void TMap::Init()
 {
-	SetPosition(x, y, true);
-	h = CASE_HEIGHT * map->Height();
-	w = CASE_WIDTH  * map->Width();
+	SetPosition(X(), Y(), true);
+	size.y = CASE_HEIGHT * map->Height();
+	size.x = CASE_WIDTH  * map->Width();
 
+	SetAlwaysRedraw();
 	SetMustRedraw();
 }
 
@@ -66,22 +67,22 @@ void TMap::RemoveAfterDraw(ECSprite* s)
 	}
 }
 
-ECase* TMap::Pixel2Case(int x, int y)
+ECase* TMap::Pixel2Case(const Point2i& pixel)
 {
-	uint x_ = (x - X()) / CASE_WIDTH;
-	uint y_ = (y - Y()) / CASE_HEIGHT;
+	uint x_ = (pixel.x - X()) / CASE_WIDTH;
+	uint y_ = (pixel.y - Y()) / CASE_HEIGHT;
 	if(x_ >= Map()->Width())  x_ = Map()->Width()  - 1;
 	if(y_ >= Map()->Height()) y_ = Map()->Height() - 1;
 	return dynamic_cast<ECase*>((*Map())(x_, y_));
 }
 
-std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
+std::vector<ECase*> TMap::Rect2Case(const Rectanglei& rect)
 {
 	std::vector<ECase*> cases;
 
-	ECBCase* c = Pixel2Case(x, y);
-	uint nb_x = (x % CASE_WIDTH  + w) / CASE_WIDTH + 1;
-	uint nb_y = (y % CASE_HEIGHT + h) / CASE_HEIGHT + 1;
+	ECBCase* c = Pixel2Case(rect.GetPosition());
+	uint nb_x = (rect.X() % CASE_WIDTH  + rect.Width()) / CASE_WIDTH + 1;
+	uint nb_y = (rect.Y() % CASE_HEIGHT + rect.Height()) / CASE_HEIGHT + 1;
 
 	//printf("%d,%d,%d,%d\n", c->X(), c->Y(), nb_x, nb_y);
 
@@ -108,18 +109,18 @@ std::vector<ECase*> TMap::Rect2Case(int x, int y, uint w, uint h)
 
 void TMap::ToRedraw(ECSprite* img)
 {
-	ToRedraw(img->X(), img->Y(), img->GetWidth(), img->GetHeight());
+	ToRedraw(Rectanglei(img->X(), img->Y(), img->GetWidth(), img->GetHeight()));
 }
 
-void TMap::ToRedraw(int x, int y)
+void TMap::ToRedraw(const Point2i& pixel)
 {
-	ToRedraw(Pixel2Case(x, y));
+	ToRedraw(Pixel2Case(pixel));
 }
 
-void TMap::ToRedraw(int x, int y, int w, int h)
+void TMap::ToRedraw(const Rectanglei& rect)
 {
 	LockScreen();
-	std::vector<ECase*> cases = Rect2Case(x, y, w, h);
+	std::vector<ECase*> cases = Rect2Case(rect);
 	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
 		(*it)->SetMustRedraw();
 	UnlockScreen();
@@ -128,13 +129,13 @@ void TMap::ToRedraw(int x, int y, int w, int h)
 void TMap::ToRedraw(TComponent* c)
 {
 	assert(c);
-	ToRedraw(c->X(), c->Y(), c->Width(), c->Height());
+	ToRedraw(*c);
 }
 
 void TMap::ToRedraw(ECEntity* e)
 {
 	assert(e);
-	ToRedraw(e->Image()->X(), e->Image()->Y(), e->Image()->GetWidth(), e->Image()->GetHeight());
+	ToRedraw(Rectanglei(e->Image()->X(), e->Image()->Y(), e->Image()->GetWidth(), e->Image()->GetHeight()));
 }
 
 void TMap::ToRedraw(ECase* c)
@@ -233,36 +234,36 @@ void TMap::SetPosition(int _x, int _y, bool force)
 
 	if(_x > 0) _x = 0;
 	if(Xmin() <= 0 && _x < Xmin()) _x = Xmin();
-	if(Xmin() > 0) _x = x;
+	if(Xmin() > 0) _x = X();
 	if(_y > 0) _y = 0;
 	if(Ymin() <= 0 && _y < Ymin()) _y = Ymin();
-	if(Ymin() > 0) _y = y;
+	if(Ymin() > 0) _y = Y();
 
-	if(!force && x == _x && y == _y) return;
+	if(!force && X() == _x && Y() == _y) return;
 
-	x = _x;
-	y = _y;
+	position.x = _x;
+	position.y = _y;
 
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 		if(*casi)
-			dynamic_cast<ECase*>(*casi)->Image()->set(x+(CASE_WIDTH  * (*casi)->X()),
-		                                              y+(CASE_HEIGHT * (*casi)->Y()));
+			dynamic_cast<ECase*>(*casi)->Image()->set(X()+(CASE_WIDTH  * (*casi)->X()),
+		                                                  Y()+(CASE_HEIGHT * (*casi)->Y()));
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 		if((*enti)->Case())
-			dynamic_cast<ECEntity*>(*enti)->Image()->set(x+(CASE_WIDTH  * (*enti)->Case()->X()),
-		                                                 y+(CASE_HEIGHT * (*enti)->Case()->Y()));
+			dynamic_cast<ECEntity*>(*enti)->Image()->set(X()+(CASE_WIDTH  * (*enti)->Case()->X()),
+		                                                     Y()+(CASE_HEIGHT * (*enti)->Case()->Y()));
 
 	SetMustRedraw();
 }
 
-ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
+ECEntity* TMap::TestEntity(const Point2i& mouse)
 {
-	if(!Focused()) return 0;
+	//if(!Focused()) return 0;
 
-	ECase* c = TestCase(mouse_x, mouse_y);
+	ECase* c = TestCase(mouse);
 
 	if(c->Entities()->empty() || Map()->Channel() && !ECMap::CanSelect(c)) return 0;
 
@@ -271,12 +272,12 @@ ECEntity* TMap::TestEntity(int mouse_x, int mouse_y)
 	c->Entities()->Remove(e);
 	c->Entities()->Add(e);
 
-	return (Map()->Channel() && (!e->CanBeSelected() || e->IsHiddenOnCase())) ? TestEntity(mouse_x, mouse_y) : e;
+	return (Map()->Channel() && (!e->CanBeSelected() || e->IsHiddenOnCase())) ? TestEntity(mouse) : e;
 }
 
-ECase* TMap::TestCase(int mouse_x, int mouse_y)
+ECase* TMap::TestCase(const Point2i& mouse)
 {
-	if(!Focused()) return 0;
+	//if(!Focused()) return 0;
 
 #if 0
 	BCaseVector cases = map->Cases();
@@ -285,7 +286,7 @@ ECase* TMap::TestCase(int mouse_x, int mouse_y)
 			return dynamic_cast<ECase*>(*casi);
 	return 0;
 #endif
-	return Pixel2Case(mouse_x, mouse_y);
+	return Pixel2Case(mouse);
 }
 
 void TMap::DrawFog(ECase* c)
@@ -325,25 +326,25 @@ void TMap::DrawFog(ECase* c)
 }
 
 
-void TMap::Draw(int _x, int _y)
+void TMap::Draw(const Point2i& mouse)
 {
 	if(!map) return;
 
 	if(Enabled())
 	{
-		int xx = x, yy = y;
+		int xx = X(), yy = Y();
 
 		/* Changement de position automatique */
-		if(_x >=0 && _x < 20)
-			xx += 30 - _x;
-		if(_y >= 0 && _y < 20)
-			yy += 30 - _y;
-		if(_x > int(SCREEN_WIDTH-20) && _x <= int(SCREEN_WIDTH))
-			xx -= 30 - (SCREEN_WIDTH - _x);
-		if(_y > int(SCREEN_HEIGHT-20) && _y <= int(SCREEN_HEIGHT))
-			yy -= 30 - (SCREEN_HEIGHT - _y);
+		if(mouse.x >= 0 && mouse.x < 20)
+			xx += 30 - mouse.x;
+		if(mouse.y >= 0 && mouse.y < 20)
+			yy += 30 - mouse.y;
+		if(mouse.x > int(SCREEN_WIDTH-20) && mouse.x <= int(SCREEN_WIDTH))
+			xx -= 30 - (SCREEN_WIDTH - mouse.x);
+		if(mouse.y > int(SCREEN_HEIGHT-20) && mouse.y <= int(SCREEN_HEIGHT))
+			yy -= 30 - (SCREEN_HEIGHT - mouse.y);
 
-		if(xx != x || yy != y)
+		if(xx != X() || yy != Y())
 			SetXY(xx, yy);
 	}
 
@@ -390,7 +391,7 @@ void TMap::Draw(int _x, int _y)
 					Window()->Blit(background, &r_back2);
 				}
 			}
-			if(CreateEntity() && c->Test(_x, _y))
+			if(CreateEntity() && c->Test(mouse.x, mouse.y))
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
 					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
@@ -399,6 +400,8 @@ void TMap::Draw(int _x, int _y)
 
 			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
 				c->SetMustRedraw(false);
+
+			DrawFog(c);
 		}
 		if(!c->Entities()->empty())
 		{
@@ -407,8 +410,6 @@ void TMap::Draw(int _x, int _y)
 				if(entity && entity->IsBuilding() && !dynamic_cast<ECEntity*>(entity)->OnTop())
 					dynamic_cast<ECEntity*>(entity)->Draw();
 		}
-
-		DrawFog(c);
 	}
 
 	std::vector<ECBEntity*> entities = map->Entities()->List();

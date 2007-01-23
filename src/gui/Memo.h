@@ -38,7 +38,7 @@ class TMemo : public TComponent
 {
 private:
   // for the placement
-  uint visible_height;
+  int visible_height;
   uint nb_visible_items, nb_visible_items_max;
   uint height_item;
   uint maxitems;
@@ -62,8 +62,8 @@ public:
   TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
   ~TMemo();
   void Init ();
-  void Draw (int mouse_x, int mouse_y);
-  bool Clic (int mouse_x, int mouse_y, int button);
+  void Draw (const Point2i& mouse);
+  bool Clic (const Point2i& mouse, int button);
   void AddItem (const std::string &label, Color _color = black_color);
   void ScrollUp() { first_visible_item = 0; };
   void RemoveItem (uint index);

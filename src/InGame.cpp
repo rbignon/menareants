@@ -506,17 +506,33 @@ int BPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 class THelpForm : public TForm
 {
 public:
-	THelpForm(ECImage* window)
-		: TForm(window)
+	THelpForm(ECImage* window, EC_Client* cl)
+		: TForm(window), client(cl)
 	{
 		SetBackground(Resources::HelpScreen());
+	}
+
+private:
+
+	EC_Client* client;
+
+	void AfterDraw()
+	{
+		if(!client->IsConnected() || !client->Player() || client->Player()->Channel()->State() != EChannel::PLAYING)
+			want_quit = true;
+	}
+
+	void OnKeyUp(SDL_keysym key)
+	{
+		if(key.sym == SDLK_F1 || key.sym == SDLK_ESCAPE)
+			want_quit = true;
 	}
 };
 
 TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 {
-	if(BarreLat->Mouse(Cursor->X(), Cursor->Y()) ||
-	   BarreAct->Mouse(Cursor->X(), Cursor->Y()) ||
+	if(BarreLat->Mouse(Cursor->GetPosition()) ||
+	   BarreAct->Mouse(Cursor->GetPosition()) ||
 	   Player()->Channel()->State() != EChannel::PLAYING)
 		return W_NONE;
 
@@ -526,7 +542,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 	if(button_type != SDL_BUTTON_LEFT)
 		return W_NONE;
 
-	ECase* acase = Map->TestCase(Cursor->X(), Cursor->Y());
+	ECase* acase = Map->TestCase(Cursor->GetPosition());
 
 	if(!acase || acase->Showed() <= 0)
 		return W_NONE;
@@ -600,7 +616,7 @@ void TInGameForm::SetCursor()
 
 	if(!want)
 	{
-		if(BarreLat->Radar->Mouse(Cursor->X(), Cursor->Y()))
+		if(BarreLat->Radar->Mouse(Cursor->GetPosition()))
 			Cursor->SetCursor(TCursor::Radar);
 		else
 			Cursor->SetCursor(TCursor::Standard);
@@ -635,7 +651,7 @@ void TInGameForm::FindIdling()
 	{
 		TMessageBox mb("Il n'y a plus aucune de vos unité qui soit inactive", BT_OK, InGameForm, false);
 		mb.Show();
-		Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
+		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
 	}
 	else
 	{
@@ -655,20 +671,14 @@ void MenAreAntsApp::InGame()
 
 	try
 	{
-		SDL_Event event;
-		bool eob = false;
-
 		Sound::SetMusicList(INGAME_MUSIC);
-		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client->Player());
+		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client);
 		InGameForm->SetMutex(mutex);
 		InGameForm->Map->SetMutex(mutex);
 		SDL_mutex *Mutex = SDL_CreateMutex();
 		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
-		TInGameForm::Wants want = TInGameForm::W_NONE;
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
-		Timer* timer = InGameForm->GetTimer();
-		timer->reset();
 		Resources::SoundStart()->Play();
 		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
 		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
@@ -688,419 +698,8 @@ void MenAreAntsApp::InGame()
 		Timer* elapsed_time = InGameForm->GetElapsedTime();
 		elapsed_time->reset();
 		InGameForm->Map->SetMustRedraw();
-		do
-		{
-			/// \todo voir si on peut pas mettre ça ailleurs
-			InGameForm->BarreLat->ScreenPos->SetXY(
-			            InGameForm->BarreLat->Radar->X() -
-			              ((int)InGameForm->BarreLat->Radar->Width()/(int)chan->Map()->Width() *
-			               InGameForm->Map->X()/CASE_WIDTH),
-			            InGameForm->BarreLat->Radar->Y() -
-			              ((int)InGameForm->BarreLat->Radar->Height()/(int)chan->Map()->Height() *
-			              InGameForm->Map->Y()/CASE_HEIGHT));
-			InGameForm->Update();
-			if(timer->time_elapsed(true) > 10)
-			{
-				if(InGameForm->Chat->NbItems())
-				{
-					InGameForm->Chat->RemoveItem(0);
-					InGameForm->Map->ToRedraw(InGameForm->Chat);
-				}
-				timer->reset();
-			}
-			if(chan->State() == EChannel::PLAYING && InGameForm->BarreLat->ProgressBar)
-			{
-				InGameForm->BarreLat->ProgressBar->SetValue((long)elapsed_time->time_elapsed(true));
-				if(InGameForm->BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
-				{
-					client->sendrpl(client->rpl(EC_Client::SET), "+!");
-					elapsed_time->reset();
-				}
-			}
-			else if(chan->State() == EChannel::ANIMING)
-			{
-				elapsed_time->reset();
-				if(InGameForm->ShowWaitMessage.empty() == false)
-				{
-					do
-					{
-						TMessageBox("Veuillez patienter...\n\nUne unité de " + InGameForm->ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
-						            0, InGameForm, false).Draw();
-						SDL_Delay(20);
-					} while(InGameForm->ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
-					InGameForm->Map->SetMustRedraw();
-				}
 
-				if(InGameForm->BarreAct->Select())
-				{
-					InGameForm->BarreAct->UnSelect();
-					want = TInGameForm::W_NONE;
-				}
-			}
-			else if(chan->State() == EChannel::PINGING)
-			{
-				elapsed_time->Pause(true);
-				PingingGame();
-				elapsed_time->Pause(false);
-				InGameForm->Map->SetMustRedraw();
-			}
-
-			while( SDL_PollEvent( &event) )
-			{
-				InGameForm->Actions(event);
-				switch(event.type)
-				{
-					case SDL_KEYDOWN:
-						if(InGameForm->SendMessage->Focused())
-							InGameForm->Map->ToRedraw(InGameForm->SendMessage);
-
-						if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
-							InGameForm->SetCursor();
-
-						switch(event.key.keysym.sym)
-						{
-							case SDLK_UP:
-								InGameForm->Map->SetPosition(InGameForm->Map->X(), InGameForm->Map->Y()+40);
-								break;
-							case SDLK_DOWN:
-								InGameForm->Map->SetPosition(InGameForm->Map->X(), InGameForm->Map->Y()-40);
-								break;
-							case SDLK_LEFT:
-								InGameForm->Map->SetPosition(InGameForm->Map->X()+40, InGameForm->Map->Y());
-								break;
-							case SDLK_RIGHT:
-								InGameForm->Map->SetPosition(InGameForm->Map->X()-40, InGameForm->Map->Y());
-								break;
-							default: break;
-						}
-						break;
-					case SDL_KEYUP:
-						switch (event.key.keysym.sym)
-						{
-							case SDLK_n:
-							{
-								Sound::NextMusic();
-								break;
-							}
-							case SDLK_F1:
-							{
-								if(client->Player()->Channel()->State() != EChannel::PLAYING)
-									break;
-								THelpForm* HelpForm = new THelpForm(Video::GetInstance()->Window());
-								SDL_Event ev;
-								bool eobb = false;
-								do
-								{
-									while(SDL_PollEvent(&ev))
-									{
-										HelpForm->Actions(ev);
-										if(ev.type == SDL_KEYUP &&
-										   (ev.key.keysym.sym == SDLK_F1 || ev.key.keysym.sym == SDLK_ESCAPE))
-											eobb = true;
-									}
-									HelpForm->Update();
-								} while(!eobb && client->IsConnected() && client->Player() &&
-								        client->Player()->Channel()->State() == EChannel::PLAYING);
-								MyFree(HelpForm);
-								InGameForm->Map->SetMustRedraw();
-								break;
-							}
-							case SDLK_TAB:
-								InGameForm->FindIdling();
-								break;
-							case SDLK_ESCAPE:
-								InGameForm->BarreAct->UnSelect();
-								break;
-							case SDLK_BACKSPACE:
-								if(InGameForm->BarreAct->Entity())
-									client->sendrpl(client->rpl(EC_Client::ARM), (std::string(InGameForm->BarreAct->Entity()->ID()) + " C").c_str());
-								break;
-							case SDLK_RETURN:
-								if(InGameForm->SendMessage->Focused())
-								{
-									if(!InGameForm->SendMessage->GetString().empty())
-									{
-										if(InGameForm->IsPressed(SDLK_LCTRL))
-										{
-											client->sendrpl(client->rpl(EC_Client::AMSG),
-														FormatStr(InGameForm->SendMessage->GetString()).c_str());
-											InGameForm->AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " +
-														InGameForm->SendMessage->GetString(), client->Player());
-										}
-										else
-										{
-											client->sendrpl(client->rpl(EC_Client::MSG),
-														FormatStr(InGameForm->SendMessage->GetString()).c_str());
-											InGameForm->AddInfo(I_CHAT, "<" + client->GetNick() + "> " +
-														InGameForm->SendMessage->GetString(), client->Player());
-										}
-									}
-									InGameForm->SendMessage->ClearString();
-									InGameForm->SendMessage->Hide();
-									InGameForm->SendMessage->DelFocus();
-									InGameForm->Map->ToRedraw(InGameForm->SendMessage);
-								}
-								else
-								{
-									InGameForm->SendMessage->SetFocus();
-									InGameForm->SendMessage->Show();
-									InGameForm->Map->ToRedraw(InGameForm->SendMessage);
-								}
-								break;
-							default: break;
-						}
-						InGameForm->SetCursor();
-						break;
-					case SDL_MOUSEMOTION:
-					{
-						InGameForm->SetCursor();
-						break;
-					}
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(InGameForm->BarreLat->PretButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							/* Le problème est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
-							 * qu'on reçoive une confirmation et qu'ainsi le bouton soit disable.
-							 * Ça pourrait nuire car ces messages seront considérés comme confirmations des animations,
-							 * et ainsi chaque +! donné sera pris en compte par le serveur que pour le suivant et
-							 * ainsi de suite, ce qui conduirait à un +! automatique en début de prochaine partie.
-							 */
-							InGameForm->BarreLat->PretButton->SetEnabled(false);
-							client->sendrpl(client->rpl(EC_Client::SET), "+!");
-						}
-						if(InGameForm->BarreLat->SchemaButton->Test(event.button.x, event.button.y, event.button.button))
-							InGameForm->Map->ToggleSchema();
-						if(InGameForm->BarreLat->BaliseButton->Test(event.button.x, event.button.y, event.button.button))
-							InGameForm->WantBalise = !InGameForm->WantBalise;
-						if(InGameForm->BarreLat->IdleFindButton->Test(event.button.x, event.button.y, event.button.button))
-							InGameForm->FindIdling();
-						if(InGameForm->BarreLat->OptionsButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							Options(chan);
-							InGameForm->Map->SetMustRedraw();
-							InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
-						}
-						if(InGameForm->BarreLat->QuitButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, InGameForm, false);
-							if(mb.Show() == BT_YES)
-								eob = true;
-							InGameForm->Map->ToRedraw(mb.X(), mb.Y(), mb.Width(), mb.Height());
-						}
-
-						ECEntity* entity = 0;
-						ECase* acase = 0;
-
-						if(InGameForm->Map->CreateEntity())
-						{
-							entity = InGameForm->Map->CreateEntity();
-
-							if(event.button.button == MBUTTON_RIGHT)
-							{
-								entity->SetOwner(0);
-								InGameForm->Map->SetCreateEntity(0);
-								InGameForm->Map->ToRedraw(event.button.x, event.button.y);
-							}
-							else if(!InGameForm->BarreLat->Test(event.button.x, event.button.y, event.button.button) &&
-						            !InGameForm->BarreAct->Test(event.button.x, event.button.y, event.button.button) &&
-						            (acase = InGameForm->Map->TestCase(event.button.x, event.button.y)) &&
-							        entity->CanBeCreated(acase))
-							{
-								std::string s = "-";
-								s += " %" + TypToStr(entity->Type());
-								s += " =" + TypToStr(acase->X()) + "," + TypToStr(acase->Y());
-								s += " +";
-								client->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
-								entity->SetOwner(0);
-								InGameForm->Map->SetCreateEntity(0);
-							}
-							InGameForm->SetCursor();
-							break;
-						}
-
-						if(InGameForm->BarreAct->Entity())
-						{
-							if(InGameForm->BarreAct->HelpButton->Test(event.button.x, event.button.y, event.button.button))
-							{
-								InGameForm->BarreAct->ShowInfos();
-								break;
-							}
-							if(InGameForm->BarreAct->GiveButton->Test(event.button.x, event.button.y, event.button.button))
-							{
-								TMessageBox mb("Entrez le pseudo du joueur à qui vous souhaitez donner ce territoire",
-								               BT_OK|HAVE_EDIT|BT_CANCEL, InGameForm);
-								mb.Edit()->SetAvailChars(NICK_CHARS "&"); // On rajoute le caractère spécifique aux IA
-								if(mb.Show() == BT_OK)
-								{
-									if(!chan->GetPlayer(mb.EditText().c_str()))
-										TMessageBox("Le joueur est introuvable", BT_OK, InGameForm, false).Show();
-									else
-										client->sendrpl(client->rpl(EC_Client::SET),
-										                ("+e " + mb.EditText() + ":" + InGameForm->BarreAct->Entity()->Case()->Country()->ID()).c_str());
-								}
-								InGameForm->Map->SetMustRedraw();
-								break;
-							}
-							if(InGameForm->IsPressed(SDLK_PLUS) ||
-							   InGameForm->BarreAct->UpButton->Test(event.button.x, event.button.y, event.button.button))
-							{
-								client->sendrpl(client->rpl(EC_Client::ARM),
-								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
-								                " +").c_str());
-								break;
-							}
-							if(InGameForm->BarreAct->DeployButton->Test(event.button.x, event.button.y, event.button.button))
-							{
-								client->sendrpl(client->rpl(EC_Client::ARM),
-								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
-								                " #").c_str());
-								break;
-							}
-							if(InGameForm->BarreAct->UpgradeButton->Test(event.button.x, event.button.y, event.button.button))
-							{
-								client->sendrpl(client->rpl(EC_Client::ARM),
-								                std::string(std::string(InGameForm->BarreAct->Entity()->ID()) +
-								                " °").c_str());
-								break;
-							}
-						}
-
-						if(event.button.button == MBUTTON_RIGHT)
-							InGameForm->WantBalise = false;
-
-						if(InGameForm->BarreLat->Test(event.button.x, event.button.y, event.button.button) ||
-						   InGameForm->BarreAct->Test(event.button.x, event.button.y, event.button.button))
-							break;
-
-						if(InGameForm->BarreAct->ExtractButton->Test(event.button.x, event.button.y, event.button.button))
-							want = TInGameForm::W_EXTRACT;
-
-						TInGameForm::Wants mywant = want;
-						if(want)
-							mywant = want;
-						else
-							mywant = InGameForm->GetWant(InGameForm->BarreAct->Entity(), event.button.button);
-
-						if(mywant == TInGameForm::W_UNSELECT)
-							InGameForm->BarreAct->UnSelect();
-						else if(mywant == TInGameForm::W_SELECT &&
-						        (entity = InGameForm->Map->TestEntity(event.button.x, event.button.y)))
-							InGameForm->BarreAct->SetEntity(entity);
-						else if((acase = InGameForm->Map->TestCase(event.button.x, event.button.y)))
-						{
-							if(mywant == TInGameForm::W_ADDBP)
-							{
-#if 0 /* TODO: Gestion du texte dans l'image */
-								TMessageBox mb("Entrez le texte de la balise :",
-												HAVE_EDIT|BT_OK|BT_CANCEL, InGameForm, false);
-								if(mb.Show() == BT_OK)
-								{
-									std::string msg = mb.EditText();
-									client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
-									                '+', acase->X(), acase->Y(), msg.c_str());
-								}
-#else
-								client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
-								                '+', acase->X(), acase->Y(), "");
-#endif
-								want = TInGameForm::W_NONE;
-								InGameForm->WantBalise = false;
-								InGameForm->Map->SetMustRedraw();
-							}
-							if(mywant == TInGameForm::W_REMBP)
-							{
-								client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
-											               '-', acase->X(), acase->Y(), "");
-								want = TInGameForm::W_NONE;
-								InGameForm->WantBalise = false;
-							}
-							ECEntity* selected_entity = InGameForm->BarreAct->Entity();
-							if(mywant && selected_entity && selected_entity->Owner() == client->Player() &&
-							   !selected_entity->Locked())
-							{
-								if(mywant == TInGameForm::W_MOVE || mywant == TInGameForm::W_INVEST)
-								{
-									ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
-									                                                     : selected_entity->Case();
-									EContainer* contener = 0;
-									if(!InGameForm->IsPressed(SDLK_LALT))
-									{
-										std::vector<ECBEntity*> ents = acase->Entities()->List();
-										for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-											if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
-											   contener->CanContain(selected_entity))
-												break;
-											else
-												contener = 0;
-									}
-									std::stack<ECBMove::E_Move> moves;
-									if(selected_entity->FindFastPath(acase, moves, init_case))
-									{
-										std::string move;
-										while(moves.empty() == false)
-										{
-											ECBMove::E_Move m = moves.top();
-											moves.pop();
-											if(contener && moves.empty()) break;
-											switch(m)
-											{
-												case ECBMove::Up: move += " ^"; break;
-												case ECBMove::Down: move += " v"; break;
-												case ECBMove::Left: move += " <"; break;
-												case ECBMove::Right: move += " >"; break;
-											}
-										}
-										if(!move.empty())
-										{
-											if(selected_entity->MyStep() == 0)
-												InGameForm->AddInfo(I_SHIT, "Cette unité ne peut avancer.");
-											else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
-												InGameForm->AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une "
-												                            "journée !");
-											else
-												client->sendrpl(client->rpl(EC_Client::ARM),
-											               std::string(std::string(selected_entity->ID()) + move).c_str());
-										}
-										if(contener)
-										{
-											client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
-											                " )" + std::string(contener->ID())).c_str());
-											InGameForm->SetCursor();
-											break;
-										}
-									}
-								}
-								else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
-								{
-									client->sendrpl(client->rpl(EC_Client::ARM),
-									                           std::string(std::string(selected_entity->ID())
-								                               + " *" + TypToStr(acase->X()) + "," +
-								                               TypToStr(acase->Y()) +
-								                               (mywant == TInGameForm::W_MATTAQ ? " !" : "")).c_str());
-									want = TInGameForm::W_NONE;
-								}
-								else if(mywant == TInGameForm::W_EXTRACT)
-								{
-									client->sendrpl(client->rpl(EC_Client::ARM),
-									                           std::string(std::string(selected_entity->ID())
-								                               + " (" + TypToStr(acase->X()) + "," +
-								                               TypToStr(acase->Y())).c_str());
-									want = TInGameForm::W_NONE;
-								}
-							}
-							else if(mywant == TInGameForm::W_UNSELECT)
-									InGameForm->BarreAct->UnSelect();
-						}
-						InGameForm->SetCursor();
-						break;
-					}
-					default:
-						break;
-				}
-			}
-		} while(!eob && client->IsConnected() && client->Player() &&
-		        client->Player()->Channel()->State() != EChannel::SCORING);
+		InGameForm->Run();
 
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
@@ -1126,6 +725,401 @@ void MenAreAntsApp::InGame()
 	Sound::SetMusicList(MENU_MUSIC);
 
 	return;
+}
+
+void TInGameForm::BeforeDraw()
+{
+	BarreLat->ScreenPos->SetXY(
+		            BarreLat->Radar->X() -
+		              ((int)BarreLat->Radar->Width()/(int)chan->Map()->Width() *
+		               Map->X()/CASE_WIDTH),
+		            BarreLat->Radar->Y() -
+		              ((int)BarreLat->Radar->Height()/(int)chan->Map()->Height() *
+		              Map->Y()/CASE_HEIGHT));
+	SetMustRedraw();
+}
+
+void TInGameForm::AfterDraw()
+{
+	if(!client->IsConnected() || !client->Player() || client->Player()->Channel()->State() == EChannel::SCORING)
+	{
+		want_quit = true;
+		return;
+	}
+
+	EChannel* chan = player->Channel();
+
+	if(timer.time_elapsed(true) > 10)
+	{
+		if(Chat->NbItems())
+		{
+			Chat->RemoveItem(0);
+			Map->ToRedraw(Chat);
+		}
+		timer.reset();
+	}
+	if(chan->State() == EChannel::PLAYING && BarreLat->ProgressBar)
+	{
+		BarreLat->ProgressBar->SetValue((long)elapsed_time.time_elapsed(true));
+		if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
+		{
+			client->sendrpl(client->rpl(EC_Client::SET), "+!");
+			elapsed_time.reset();
+		}
+	}
+	else if(chan->State() == EChannel::ANIMING)
+	{
+		elapsed_time.reset();
+		if(ShowWaitMessage.empty() == false)
+		{
+			do
+			{
+				TMessageBox("Veuillez patienter...\n\nUne unité de " + ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
+				            0, InGameForm, false).Draw();
+				SDL_Delay(20);
+			} while(ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
+			Map->SetMustRedraw();
+		}
+
+		if(BarreAct->Select())
+		{
+			BarreAct->UnSelect();
+			want = TInGameForm::W_NONE;
+		}
+	}
+	else if(chan->State() == EChannel::PINGING)
+	{
+		elapsed_time.Pause(true);
+		MenAreAntsApp::GetInstance()->PingingGame();
+		elapsed_time.Pause(false);
+		Map->SetMustRedraw();
+	}
+}
+
+void TInGameForm::OnKeyDown(SDL_keysym key)
+{
+	if(SendMessage->Focused())
+		Map->ToRedraw(SendMessage);
+
+	if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
+		SetCursor();
+
+	switch(key.sym)
+	{
+		case SDLK_UP:
+			Map->SetPosition(Map->X(), Map->Y()+40);
+			break;
+		case SDLK_DOWN:
+			Map->SetPosition(Map->X(), Map->Y()-40);
+			break;
+		case SDLK_LEFT:
+			Map->SetPosition(Map->X()+40, Map->Y());
+			break;
+		case SDLK_RIGHT:
+			Map->SetPosition(Map->X()-40, Map->Y());
+			break;
+		default: break;
+	}
+}
+
+void TInGameForm::OnKeyUp(SDL_keysym key)
+{
+	switch (key.sym)
+	{
+		case SDLK_n:
+		{
+			Sound::NextMusic();
+			break;
+		}
+		case SDLK_F1:
+		{
+			if(client->Player()->Channel()->State() != EChannel::PLAYING)
+				break;
+			THelpForm* HelpForm = new THelpForm(Video::GetInstance()->Window(), client);
+
+			HelpForm->Run();
+
+			MyFree(HelpForm);
+			Map->SetMustRedraw();
+			break;
+		}
+		case SDLK_TAB:
+			FindIdling();
+			break;
+		case SDLK_ESCAPE:
+			BarreAct->UnSelect();
+			break;
+		case SDLK_BACKSPACE:
+			if(BarreAct->Entity())
+				client->sendrpl(client->rpl(EC_Client::ARM), (std::string(BarreAct->Entity()->ID()) + " C").c_str());
+			break;
+		case SDLK_RETURN:
+			if(SendMessage->Focused())
+			{
+				if(!SendMessage->GetString().empty())
+				{
+					if(IsPressed(SDLK_LCTRL))
+					{
+						client->sendrpl(client->rpl(EC_Client::AMSG),
+									FormatStr(SendMessage->GetString()).c_str());
+						AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " + SendMessage->GetString(), client->Player());
+					}
+					else
+					{
+						client->sendrpl(client->rpl(EC_Client::MSG),
+						                FormatStr(InGameForm->SendMessage->GetString()).c_str());
+						AddInfo(I_CHAT, "<" + client->GetNick() + "> " + SendMessage->GetString(), client->Player());
+					}
+				}
+				SendMessage->ClearString();
+				SendMessage->Hide();
+				SendMessage->DelFocus();
+				Map->ToRedraw(SendMessage);
+			}
+			else
+			{
+				SendMessage->SetFocus();
+				SendMessage->Show();
+				Map->ToRedraw(SendMessage);
+			}
+			break;
+		default: break;
+	}
+	SetCursor();
+}
+
+void TInGameForm::OnMouseMotion(const Point2i& mouse)
+{
+	InGameForm->SetCursor();
+}
+
+void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(BarreLat->PretButton->Test(mouse, button))
+	{
+		/* Le problème est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
+		 * qu'on reçoive une confirmation et qu'ainsi le bouton soit disable.
+		 * Ça pourrait nuire car ces messages seront considérés comme confirmations des animations,
+		 * et ainsi chaque +! donné sera pris en compte par le serveur que pour le suivant et
+		 * ainsi de suite, ce qui conduirait à un +! automatique en début de prochaine partie.
+		 */
+		BarreLat->PretButton->SetEnabled(false);
+		client->sendrpl(client->rpl(EC_Client::SET), "+!");
+	}
+	if(BarreLat->SchemaButton->Test(mouse, button))
+		Map->ToggleSchema();
+	if(BarreLat->BaliseButton->Test(mouse, button))
+		WantBalise = !InGameForm->WantBalise;
+	if(BarreLat->IdleFindButton->Test(mouse, button))
+		FindIdling();
+	if(BarreLat->OptionsButton->Test(mouse, button))
+	{
+		MenAreAntsApp::GetInstance()->Options(chan);
+		Map->SetMustRedraw();
+		Map->Map()->CreatePreview(120,120, P_ENTITIES);
+	}
+	if(BarreLat->QuitButton->Test(mouse, button))
+	{
+		TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, this, false);
+		if(mb.Show() == BT_YES)
+			want_quit = true;
+		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
+		return;
+	}
+
+	ECEntity* entity = 0;
+	ECase* acase = 0;
+
+	if(Map->CreateEntity())
+	{
+		entity = Map->CreateEntity();
+
+		if(button == MBUTTON_RIGHT)
+		{
+			entity->SetOwner(0);
+			Map->SetCreateEntity(0);
+			Map->ToRedraw(mouse);
+		}
+		else if(!BarreLat->Test(mouse, button) && !BarreAct->Test(mouse, button) &&
+		        (acase = Map->TestCase(mouse)) && entity->CanBeCreated(acase))
+		{
+			std::string s = "-";
+			s += " %" + TypToStr(entity->Type());
+			s += " =" + TypToStr(acase->X()) + "," + TypToStr(acase->Y());
+			s += " +";
+			client->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
+			entity->SetOwner(0);
+			Map->SetCreateEntity(0);
+		}
+		SetCursor();
+		return;
+	}
+
+	if(BarreAct->Entity())
+	{
+		if(BarreAct->HelpButton->Test(mouse, button))
+		{
+			BarreAct->ShowInfos();
+			return;
+		}
+		if(BarreAct->GiveButton->Test(mouse, button))
+		{
+			TMessageBox mb("Entrez le pseudo du joueur à qui vous souhaitez donner ce territoire",
+			               BT_OK|HAVE_EDIT|BT_CANCEL, this);
+			mb.Edit()->SetAvailChars(NICK_CHARS "&"); // On rajoute le caractère spécifique aux IA
+			if(mb.Show() == BT_OK)
+			{
+				if(!chan->GetPlayer(mb.EditText().c_str()))
+					TMessageBox("Le joueur est introuvable", BT_OK, this, false).Show();
+				else
+					client->sendrpl(client->rpl(EC_Client::SET),
+					                ("+e " + mb.EditText() + ":" + BarreAct->Entity()->Case()->Country()->ID()).c_str());
+			}
+			Map->SetMustRedraw();
+			return;
+		}
+		if(IsPressed(SDLK_PLUS) || BarreAct->UpButton->Test(mouse, button))
+		{
+			client->sendrpl(client->rpl(EC_Client::ARM),
+					std::string(std::string(BarreAct->Entity()->ID()) + "+").c_str());
+			return;
+		}
+		if(BarreAct->DeployButton->Test(mouse, button))
+		{
+			client->sendrpl(client->rpl(EC_Client::ARM),
+			                std::string(std::string(BarreAct->Entity()->ID()) + " #").c_str());
+			return;
+		}
+		if(BarreAct->UpgradeButton->Test(mouse, button))
+		{
+			client->sendrpl(client->rpl(EC_Client::ARM),
+					std::string(std::string(BarreAct->Entity()->ID()) + " °").c_str());
+			return;
+		}
+	}
+
+	if(button == MBUTTON_RIGHT)
+		WantBalise = false;
+
+	if(BarreLat->Test(mouse, button) || BarreAct->Test(mouse, button))
+		return;
+
+	if(BarreAct->ExtractButton->Test(mouse, button))
+		want = TInGameForm::W_EXTRACT;
+
+	TInGameForm::Wants mywant = want;
+	if(want)
+		mywant = want;
+	else
+		mywant = GetWant(BarreAct->Entity(), button);
+
+	if(mywant == TInGameForm::W_UNSELECT)
+		BarreAct->UnSelect();
+	else if(mywant == TInGameForm::W_SELECT && (entity = Map->TestEntity(mouse)))
+		BarreAct->SetEntity(entity);
+	else if((acase = Map->TestCase(mouse)))
+	{
+		if(mywant == TInGameForm::W_ADDBP)
+		{
+		#if 0 /* TODO: Gestion du texte dans l'image */
+			TMessageBox mb("Entrez le texte de la balise :",
+							HAVE_EDIT|BT_OK|BT_CANCEL, InGameForm, false);
+			if(mb.Show() == BT_OK)
+			{
+				std::string msg = mb.EditText();
+				client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
+						'+', acase->X(), acase->Y(), msg.c_str());
+			}
+		#else
+			client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
+					'+', acase->X(), acase->Y(), "");
+		#endif
+			want = TInGameForm::W_NONE;
+			WantBalise = false;
+			Map->SetMustRedraw();
+		}
+		if(mywant == TInGameForm::W_REMBP)
+		{
+			client->sendrpl(client->rpl(EC_Client::BREAKPOINT), '-', acase->X(), acase->Y(), "");
+			want = TInGameForm::W_NONE;
+			WantBalise = false;
+		}
+		ECEntity* selected_entity = BarreAct->Entity();
+		if(mywant && selected_entity && selected_entity->Owner() == client->Player() && !selected_entity->Locked())
+		{
+			if(mywant == TInGameForm::W_MOVE || mywant == TInGameForm::W_INVEST)
+			{
+				ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
+				                                                     : selected_entity->Case();
+				EContainer* contener = 0;
+				if(!IsPressed(SDLK_LALT))
+				{
+					std::vector<ECBEntity*> ents = acase->Entities()->List();
+					for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+						if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
+						   contener->CanContain(selected_entity))
+							break;
+						else
+							contener = 0;
+				}
+				std::stack<ECBMove::E_Move> moves;
+				if(selected_entity->FindFastPath(acase, moves, init_case))
+				{
+					std::string move;
+					while(moves.empty() == false)
+					{
+						ECBMove::E_Move m = moves.top();
+						moves.pop();
+						if(contener && moves.empty()) break;
+						switch(m)
+						{
+							case ECBMove::Up: move += " ^"; break;
+							case ECBMove::Down: move += " v"; break;
+							case ECBMove::Left: move += " <"; break;
+							case ECBMove::Right: move += " >"; break;
+						}
+					}
+					if(!move.empty())
+					{
+						if(selected_entity->MyStep() == 0)
+							AddInfo(I_SHIT, "Cette unité ne peut avancer.");
+						else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
+							AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une journée !");
+						else
+							client->sendrpl(client->rpl(EC_Client::ARM),
+							                std::string(std::string(selected_entity->ID()) + move).c_str());
+					}
+					if(contener)
+					{
+						client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
+						                " )" + std::string(contener->ID())).c_str());
+						SetCursor();
+						return;
+					}
+				}
+			}
+			else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
+			{
+				client->sendrpl(client->rpl(EC_Client::ARM),
+								std::string(std::string(selected_entity->ID())
+							+ " *" + TypToStr(acase->X()) + "," +
+							TypToStr(acase->Y()) +
+							(mywant == TInGameForm::W_MATTAQ ? " !" : "")).c_str());
+				want = TInGameForm::W_NONE;
+			}
+			else if(mywant == TInGameForm::W_EXTRACT)
+			{
+				client->sendrpl(client->rpl(EC_Client::ARM),
+								std::string(std::string(selected_entity->ID())
+							+ " (" + TypToStr(acase->X()) + "," +
+							TypToStr(acase->Y())).c_str());
+				want = TInGameForm::W_NONE;
+			}
+		}
+		else if(mywant == TInGameForm::W_UNSELECT)
+				BarreAct->UnSelect();
+	}
+	SetCursor();
 }
 
 void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
@@ -1188,23 +1182,20 @@ void TInGameForm::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
-TInGameForm::TInGameForm(ECImage* w, ECPlayer* pl)
-	: TForm(w), WantBalise(false)
+TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
+	: TForm(w), WantBalise(false), player(cl->Player()), client(cl), chan(cl->Player()->Channel()), want(W_NONE)
 {
-	assert(pl && pl->Channel() && pl->Channel()->Map());
+	assert(player && chan && chan->Map());
 
-	EChannel* ch = pl->Channel();
-	player = pl;
-
-	Map = AddComponent(new TMap(ch->Map()));
-	ch->Map()->SetShowMap(Map);
+	Map = AddComponent(new TMap(chan->Map()));
+	chan->Map()->SetShowMap(Map);
 	//Map->SetBrouillard(false);
-	dynamic_cast<ECMap*>(ch->Map())->SetBrouillard();
+	dynamic_cast<ECMap*>(chan->Map())->SetBrouillard();
 
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
 
-	BarreAct = AddComponent(new TBarreAct(pl));
-	BarreLat = AddComponent(new TBarreLat(pl));
+	BarreAct = AddComponent(new TBarreAct(player));
+	BarreLat = AddComponent(new TBarreLat(player));
 
 	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
 	SendMessage->SetColor(white_color);
@@ -1271,7 +1262,8 @@ void TBarreActIcons::Init()
 	Next->SetOnClick(TBarreActIcons::GoNext, 0);
 	Last->SetOnClick(TBarreActIcons::GoLast, 0);
 
-	uint line = 0, _h = 0, _x = 0;
+	uint line = 0;
+	int _h = 0, _x = 0;
 	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it)
 	{
 		if((*it)->Width() > _h) _h = (*it)->Width();
@@ -1298,7 +1290,7 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list, bool click)
 	first = 0;
 
 	uint _x = 0;
-	uint _h = 0;
+	int _h = 0;
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
 		TImage* i = AddComponent(new TImage(_x, 0, (*it)->Icon(), false));
@@ -1373,7 +1365,8 @@ void TBarreLatIcons::Init()
 	Last->SetOnClick(TBarreLatIcons::GoLast, 0);
 
 	bool left = true;
-	uint line = 0, _h = 0;
+	uint line = 0;
+	int _h = 0;
 	for(std::vector<TImage*>::iterator it = icons.begin(); it != icons.end(); ++it, left = !left)
 	{
 		if((*it)->Height() > _h) _h = (*it)->Height();
@@ -1397,7 +1390,7 @@ void TBarreLatIcons::SetList(std::vector<ECEntity*> list, TOnClickFunction func)
 	first = 0;
 
 	uint _x = 0, _y = 0;
-	uint _h = 0, _w = 0;
+	int _h = 0, _w = 0;
 	bool left = true;
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it, left = !left)
 	{
@@ -1815,7 +1808,7 @@ void TBarreLat::SelectUnit(TObject* o, void* e)
 	ingame->Map->SetCreateEntity(static_cast<ECEntity*>(e));
 }
 
-void TBarreLat::RadarClick(TObject* m, int x, int y)
+void TBarreLat::RadarClick(TObject* m, const Point2i& mouse)
 {
 	TImage* map = dynamic_cast<TImage*>(m);
 
@@ -1824,8 +1817,8 @@ void TBarreLat::RadarClick(TObject* m, int x, int y)
 
 	int size_x = map->Width() / InGameForm->Map->Map()->Width();
 	int size_y = map->Height() / InGameForm->Map->Map()->Height();
-	int _x = BorneInt((x - map->X()) / size_x, 0, InGameForm->Map->Map()->Width()-1);
-	int _y = BorneInt((y - map->Y()) / size_y, 0, InGameForm->Map->Map()->Height()-1);
+	int _x = BorneInt((mouse.x - map->X()) / size_x, 0, InGameForm->Map->Map()->Width()-1);
+	int _y = BorneInt((mouse.y - map->Y()) / size_y, 0, InGameForm->Map->Map()->Height()-1);
 
 	if(InGameForm->Map->Enabled())
 		InGameForm->Map->CenterTo(dynamic_cast<ECase*>((*InGameForm->Map->Map())(_x,_y)));
@@ -1897,12 +1890,12 @@ void TBarreLat::Init()
 	UnitsInfos->SetX(X() + Width()/2 - UnitsInfos->Width()/2);
 
 	ScreenPos = AddComponent(new TImage(0,0));
-	SDL_Surface *surf = SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000);
-	DrawRect(surf, 0, 0, chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-w) / CASE_WIDTH,
-	                     chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
-	                     SDL_MapRGB(surf->format, 0xff,0xfc,0x00));
-	ScreenPos->SetImage(new ECImage(surf));
+	ECImage* surf = new ECImage();
+	surf->NewSurface(chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-Width()) / CASE_WIDTH,
+	                 chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	                 SDL_HWSURFACE|SDL_SRCALPHA, true);
+	surf->RectangleColor(Rectanglei(0,0,surf->GetWidth(), surf->GetHeight()), Color(0xff, 0xfc, 0x00, 255), 1);
+	ScreenPos->SetImage(surf);
 	ScreenPos->SetEnabled(false);
 
 	Icons = AddComponent(new TBarreLatIcons(0, 420));
@@ -1925,91 +1918,10 @@ void MenAreAntsApp::Options(EChannel* chan)
 
 	try
 	{
-		SDL_Event event;
-		bool eob = false;
-		OptionsForm = new TOptionsForm(Video::GetInstance()->Window(), client->Player(), chan);
+		OptionsForm = new TOptionsForm(Video::GetInstance()->Window(), client, chan);
 		OptionsForm->SetMutex(mutex);
-		do
-		{
-			while( SDL_PollEvent( &event) )
-			{
-				OptionsForm->Actions(event);
-				switch(event.type)
-				{
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(OptionsForm->OkButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							eob = true;
-							break;
-						}
-						else if(OptionsForm->SaveButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							TMessageBox m("Quel nom voulez-vous donner à la sauvegarde ?", BT_OK|BT_CANCEL|HAVE_EDIT, OptionsForm);
-							m.Edit()->SetAvailChars(MAPFILE_CHARS);
-							if(m.Show() == BT_OK && m.EditText().empty() == false)
-							{
-								std::string filename = GetPath() + m.EditText() + ".sav";
-								if(FichierExiste(filename) &&
-								   TMessageBox("Une sauvegarde contient le même nom. Voulez vous la remplacer ?", BT_YES|BT_NO, OptionsForm).Show() == BT_NO)
-									break;
 
-								client->sendrpl(client->rpl(EC_Client::SAVE), m.EditText().c_str());
-								//chan->Map()->Save(filename);
-								TMessageBox("Sauvegarde effectuée.\nVous pourrez la recharger en créant une partie et en utilisant la map de ce nom.",
-								            BT_OK, OptionsForm).Show();
-							}
-						}
-
-						if(client->Player()->Channel()->IsMission())
-							break; // On ne peut pas s'allier dans une mission
-						std::vector<TComponent*> list = OptionsForm->Players->GetList();
-						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
-						{
-							TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
-							if(pll)
-							{
-								if(pll->AllieZone(event.button.x, event.button.y, event.button.button) && !pll->Player()->IsMe())
-								{
-									if(client->Player()->IsAllie(pll->Player()))
-										client->sendrpl(client->rpl(EC_Client::SET),
-													("-a " + std::string(pll->Player()->GetNick())).c_str());
-									else
-										client->sendrpl(client->rpl(EC_Client::SET),
-													("+a " + std::string(pll->Player()->GetNick())).c_str());
-								}
-								else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(event.button.x, event.button.y, event.button.button))
-								{
-									TMessageBox m("Combien voulez-vous donner à " + pll->Player()->Nick() + " ?", BT_OK|HAVE_EDIT|BT_CANCEL, OptionsForm);
-									m.Edit()->SetAvailChars("0123456789");
-									if(m.Show() == BT_OK)
-									{
-										int v = StrToTyp<int>(m.EditText());
-										if(v <= 0)
-											TMessageBox("La valeur rentrée est incorrect.", BT_OK, OptionsForm).Show();
-										else if(v > client->Player()->Money())
-											TMessageBox("Vous ne possédez pas autant d'argent !", BT_OK, OptionsForm).Show();
-										else
-										{
-											client->sendrpl(client->rpl(EC_Client::SET),
-											                 ("+d " + std::string(pll->Player()->Nick() + ":" + m.EditText())).c_str());
-											TMessageBox("Vous avez bien donné " + m.EditText() + " $ à " + pll->Player()->Nick(),
-											             BT_OK, OptionsForm).Show();
-										}
-									}
-								}
-							}
-						}
-						break;
-					}
-					default:
-						break;
-				}
-			}
-			OptionsForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() &&
-		        client->Player()->Channel()->State() == EChannel::PLAYING);
-
+		OptionsForm->Run();
 	}
 	catch(TECExcept &e)
 	{
@@ -2020,20 +1932,92 @@ void MenAreAntsApp::Options(EChannel* chan)
 	return;
 }
 
-TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
-	: TForm(w)
+void TOptionsForm::AfterDraw()
+{
+	if(!client->IsConnected() || !client->Player() || client->Player()->Channel()->State() != EChannel::PLAYING)
+		want_quit = true;
+}
+
+void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(OkButton->Test(mouse, button))
+	{
+		want_quit = true;
+		return;
+	}
+	else if(SaveButton->Test(mouse, button))
+	{
+		TMessageBox m("Quel nom voulez-vous donner à la sauvegarde ?", BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		m.Edit()->SetAvailChars(MAPFILE_CHARS);
+		if(m.Show() == BT_OK && m.EditText().empty() == false)
+		{
+			std::string filename = MenAreAntsApp::GetInstance()->GetPath() + m.EditText() + ".sav";
+			if(FichierExiste(filename) &&
+				TMessageBox("Une sauvegarde contient le même nom. Voulez vous la remplacer ?", BT_YES|BT_NO, this).Show() == BT_NO)
+				return;
+
+			client->sendrpl(client->rpl(EC_Client::SAVE), m.EditText().c_str());
+			//chan->Map()->Save(filename);
+			TMessageBox("Sauvegarde effectuée.\nVous pourrez la recharger en créant une partie et en utilisant la map de ce nom.",
+					BT_OK, this).Show();
+		}
+	}
+
+	if(client->Player()->Channel()->IsMission())
+		return; // On ne peut pas s'allier dans une mission
+	std::vector<TComponent*> list = Players->GetList();
+	for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+	{
+		TOptionsPlayerLine* pll = dynamic_cast<TOptionsPlayerLine*>(*it);
+		if(pll)
+		{
+			if(pll->AllieZone(mouse, button) && !pll->Player()->IsMe())
+			{
+				if(client->Player()->IsAllie(pll->Player()))
+					client->sendrpl(client->rpl(EC_Client::SET),
+								("-a " + std::string(pll->Player()->GetNick())).c_str());
+				else
+					client->sendrpl(client->rpl(EC_Client::SET),
+								("+a " + std::string(pll->Player()->GetNick())).c_str());
+			}
+			else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(mouse, button))
+			{
+				TMessageBox m("Combien voulez-vous donner à " + pll->Player()->Nick() + " ?", BT_OK|HAVE_EDIT|BT_CANCEL, this);
+				m.Edit()->SetAvailChars("0123456789");
+				if(m.Show() == BT_OK)
+				{
+					int v = StrToTyp<int>(m.EditText());
+					if(v <= 0)
+						TMessageBox("La valeur rentrée est incorrect.", BT_OK, this).Show();
+					else if(v > client->Player()->Money())
+						TMessageBox("Vous ne possédez pas autant d'argent !", BT_OK, this).Show();
+					else
+					{
+						client->sendrpl(client->rpl(EC_Client::SET),
+									("+d " + std::string(pll->Player()->Nick() + ":" + m.EditText())).c_str());
+						TMessageBox("Vous avez bien donné " + m.EditText() + " $ à " + pll->Player()->Nick(),
+								BT_OK, this).Show();
+					}
+				}
+			}
+		}
+	}
+}
+
+TOptionsForm::TOptionsForm(ECImage* w, EC_Client* _me, EChannel* ch)
+	: TForm(w), client(_me)
 {
 	Title = AddComponent(new TLabel(100, "Options", white_color, Font::GetInstance(Font::Big)));
 
 	Players = AddComponent(new TList(60, 200));
 	BPlayerVector plvec = ch->Players();
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
-		Players->AddLine(new TOptionsPlayerLine(_me, dynamic_cast<ECPlayer*>(*it)));
+		Players->AddLine(new TOptionsPlayerLine(_me->Player(), dynamic_cast<ECPlayer*>(*it)));
 
 	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, Window()->GetHeight() - 100,150,50, "OK", Font::GetInstance(Font::Normal)));
 
 	SaveButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, OkButton->Y()-50, 150, 50, "Sauvegarder", Font::GetInstance(Font::Normal)));
-	if(_me->IsOwner() == false)
+	if(_me->Player()->IsOwner() == false)
 		SaveButton->SetEnabled(false);
 
 	SetBackground(Resources::Titlescreen());
@@ -2046,7 +2030,7 @@ TOptionsForm::TOptionsForm(ECImage* w, ECPlayer* _me, EChannel* ch)
 TOptionsPlayerLine::TOptionsPlayerLine(ECPlayer* _me, ECPlayer *_pl)
 	: pl(_pl), me(_me)
 {
-	h = 30;
+	size.y = 30;
 }
 
 TOptionsPlayerLine::~TOptionsPlayerLine()
@@ -2057,9 +2041,9 @@ TOptionsPlayerLine::~TOptionsPlayerLine()
 	delete GiveMoneyButton;
 }
 
-bool TOptionsPlayerLine::AllieZone(int _x, int _y, int button)
+bool TOptionsPlayerLine::AllieZone(const Point2i& mouse, int button)
 {
-	return (button == SDL_BUTTON_LEFT && _x > x+15 && _x < x+40 && _y > y && _y < int(y+h));
+	return (button == SDL_BUTTON_LEFT && mouse.x > X()+15 && mouse.x < X()+40 && mouse.y > Y() && mouse.y < int(Y()+Height()));
 }
 
 void TOptionsPlayerLine::Init()
@@ -2072,16 +2056,16 @@ void TOptionsPlayerLine::Init()
 	                                              nations_str[pl->Nation()].name,
 	                                              pl->Lost() ? "(mort)" : "");
 
-	label = new TLabel(x, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
+	label = new TLabel(X(), Y(), s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
 	MyComponent(label);
 
-	allie = new TLabel(x+24, y-3, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Big));
+	allie = new TLabel(X()+24, Y()-3, me->IsAllie(pl) ? ">" : " ", red_color, Font::GetInstance(Font::Big));
 
-	recipr = new TLabel(x+15, y-3, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Big));
+	recipr = new TLabel(X()+15, Y()-3, pl->IsAllie(me) ? "<" : " ", red_color, Font::GetInstance(Font::Big));
 
 	if(pl->IsMe() == false)
 	{
-		GiveMoneyButton = new TButtonText(x+400, y, 100,30, "Don. argent", Font::GetInstance(Font::Small));
+		GiveMoneyButton = new TButtonText(X()+400, Y(), 100,30, "Don. argent", Font::GetInstance(Font::Small));
 		GiveMoneyButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 		GiveMoneyButton->SetHint("Donner de l'argent à ce joueur.");
 		MyComponent(GiveMoneyButton);
@@ -2093,13 +2077,13 @@ void TOptionsPlayerLine::Init()
 	MyComponent(recipr);
 }
 
-void TOptionsPlayerLine::Draw(int souris_x, int souris_y)
+void TOptionsPlayerLine::Draw(const Point2i& mouse)
 {
-	label->Draw(souris_x, souris_y);
-	allie->Draw(souris_x, souris_y);
-	recipr->Draw(souris_x, souris_y);
+	label->Draw(mouse);
+	allie->Draw(mouse);
+	recipr->Draw(mouse);
 	if(GiveMoneyButton)
-		GiveMoneyButton->Draw(souris_x, souris_y);
+		GiveMoneyButton->Draw(mouse);
 }
 
 /********************************************************************************************
@@ -2134,16 +2118,15 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 
 	try
 	{
-		bool eob = false;
 		chan->Map()->CreatePreview(300,300, P_POSITIONS);
 		LoadingForm = new TLoadingForm(Video::GetInstance()->Window(), chan);
 		LoadingForm->SetMutex(mutex);
+
 		do
 		{
 			LoadingForm->Actions();
 			LoadingForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() &&
-		        chan->State() == EChannel::SENDING);
+		} while(client->IsConnected() && client->Player() && chan->State() == EChannel::SENDING);
 
 	}
 	catch(TECExcept &e)
@@ -2200,7 +2183,7 @@ TLoadPlayerLine::TLoadPlayerLine(ECPlayer *_pl)
 	: label(0), ready(0)
 {
 	pl = _pl;
-	h = 20;
+	size.y = 20;
 }
 
 TLoadPlayerLine::~TLoadPlayerLine()
@@ -2217,17 +2200,17 @@ void TLoadPlayerLine::Init()
 	                                              pl->GetNick(),
 	                                              nations_str[pl->Nation()].name);
 
-	label = new TLabel(x+30, y, s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
-	ready = new TLabel(x, y, "OK", red_color, Font::GetInstance(Font::Normal));
+	label = new TLabel(X()+30, Y(), s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
+	ready = new TLabel(X(), Y(), "OK", red_color, Font::GetInstance(Font::Normal));
 	MyComponent(label);
 	MyComponent(ready);
 }
 
-void TLoadPlayerLine::Draw(int souris_x, int souris_y)
+void TLoadPlayerLine::Draw(const Point2i& mouse)
 {
-	label->Draw(souris_x, souris_y);
+	label->Draw(mouse);
 	if(pl->Ready() && pl->Channel()->GetMe()->Ready())
-		ready->Draw(souris_x, souris_y);
+		ready->Draw(mouse);
 }
 
 /********************************************************************************************
@@ -2247,57 +2230,11 @@ void MenAreAntsApp::PingingGame()
 
 	try
 	{
-		bool eob = false;
-		PingingForm = new TPingingForm(Video::GetInstance()->Window(), chan);
+		PingingForm = new TPingingForm(Video::GetInstance()->Window(), client, chan);
 
 		PingingForm->SetMutex(mutex);
 
-		SDL_Event event;
-		do
-		{
-			std::vector<TComponent*> list = PingingForm->Players->GetList();
-			for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
-			{
-				TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
-				if(!pll) continue;
-
-				pll->Progress->SetValue((long)pll->timer.time_elapsed(true));
-				if(pll->Progress->Value() >= pll->Progress->Max())
-				{
-					client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
-					pll->timer.reset();
-				}
-			}
-			while( SDL_PollEvent( &event) )
-			{
-				PingingForm->Actions(event);
-				switch(event.type)
-				{
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(PingingForm->LeaveButton->Test(event.button.x, event.button.y, event.button.button) &&
-						   TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, PingingForm).Show() == BT_YES)
-							client->sendrpl(client->rpl(EC_Client::LEAVE));
-
-						list = PingingForm->Players->GetList();
-						for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
-						{
-							TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
-							if(pll && pll->Voter->Test(event.button.x, event.button.y, event.button.button))
-							{
-								client->sendrpl(client->rpl(EC_Client::SET),
-								                ("+v " + pll->Player()->Nick()).c_str());
-								pll->Voter->SetEnabled(false);
-							}
-						}
-						break;
-					}
-					default: break;
-				}
-			}
-			PingingForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() &&
-		        chan->State() == EChannel::PINGING);
+		PingingForm->Run();
 
 	}
 	catch(TECExcept &e)
@@ -2310,8 +2247,48 @@ void MenAreAntsApp::PingingGame()
 	return;
 }
 
-TPingingForm::TPingingForm(ECImage* w, EChannel* ch)
-	: TForm(w), channel(ch)
+void TPingingForm::BeforeDraw()
+{
+	std::vector<TComponent*> list = Players->GetList();
+	for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+	{
+		TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
+		if(!pll) continue;
+
+		pll->Progress->SetValue((long)pll->timer.time_elapsed(true));
+		if(pll->Progress->Value() >= pll->Progress->Max())
+		{
+			client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
+			pll->timer.reset();
+		}
+	}
+}
+
+void TPingingForm::AfterDraw()
+{
+	if(!client->IsConnected() || !client->Player() || channel->State() != EChannel::PINGING)
+		want_quit = true;
+}
+
+void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
+{
+	if(LeaveButton->Test(mouse, button) && TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
+		client->sendrpl(client->rpl(EC_Client::LEAVE));
+
+	std::vector<TComponent*> list = Players->GetList();
+	for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+	{
+		TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
+		if(pll && pll->Voter->Test(mouse, button))
+		{
+			client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
+			pll->Voter->SetEnabled(false);
+		}
+	}
+}
+
+TPingingForm::TPingingForm(ECImage* w, EC_Client* cl, EChannel* ch)
+	: TForm(w), channel(ch), client(cl)
 {
 	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + " - Attente de reconnexion"), white_color,
 	                      Font::GetInstance(Font::Large)));
@@ -2463,7 +2440,7 @@ TScoresPlayerLine::TScoresPlayerLine(std::string n, Color col, std::string _k, s
                                      std::string _sc)
 	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
 {
-	h = 40;
+	size.y = 40;
 }
 
 TScoresPlayerLine::~TScoresPlayerLine()
@@ -2477,12 +2454,12 @@ TScoresPlayerLine::~TScoresPlayerLine()
 
 void TScoresPlayerLine::Init()
 {
-	Nick = new TLabel(x, y, nick, color, Font::GetInstance(Font::Big), true);
+	Nick = new TLabel(X(), Y(), nick, color, Font::GetInstance(Font::Big), true);
 
-	Killed = new TLabel(x+170, y, killed, color, Font::GetInstance(Font::Big), true);
-	Shooted = new TLabel(x+300, y, shooted, color, Font::GetInstance(Font::Big), true);
-	Created = new TLabel(x+420, y, created, color, Font::GetInstance(Font::Big), true);
-	Score = new TLabel(x+580, y, score, color, Font::GetInstance(Font::Big), true);
+	Killed = new TLabel(X()+170, Y(), killed, color, Font::GetInstance(Font::Big), true);
+	Shooted = new TLabel(X()+300, Y(), shooted, color, Font::GetInstance(Font::Big), true);
+	Created = new TLabel(X()+420, Y(), created, color, Font::GetInstance(Font::Big), true);
+	Score = new TLabel(X()+580, Y(), score, color, Font::GetInstance(Font::Big), true);
 	MyComponent(Nick);
 	MyComponent(Killed);
 	MyComponent(Shooted);
@@ -2490,11 +2467,11 @@ void TScoresPlayerLine::Init()
 	MyComponent(Created);
 }
 
-void TScoresPlayerLine::Draw(int souris_x, int souris_y)
+void TScoresPlayerLine::Draw(const Point2i& mouse)
 {
-	Nick->Draw(souris_x, souris_y);
-	Shooted->Draw(souris_x, souris_y);
-	Killed->Draw(souris_x, souris_y);
-	Created->Draw(souris_x, souris_y);
-	Score->Draw(souris_x, souris_y);
+	Nick->Draw(mouse);
+	Shooted->Draw(mouse);
+	Killed->Draw(mouse);
+	Created->Draw(mouse);
+	Score->Draw(mouse);
 }

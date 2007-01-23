@@ -272,6 +272,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
 			GameInfosForm->Hints->ClearItems();
 		}
+		GameInfosForm->SetMustRedraw();
 		me->UnlockScreen();
 	}
 	return 0;
@@ -291,10 +292,10 @@ int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			GameInfosForm->RecvMapList = true;
 			GameInfosForm->MapList->ClearItems();
 		}
-		uint i = GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color,
+		TListBoxItem* i = GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color,
 		                                         true);
 		if(parv.size() > 4)
-			GameInfosForm->MapList->SetItemHint(i, parv[4].c_str());
+			i->SetHint(parv[4].c_str());
 		me->UnlockScreen();
 	}
 	return 0;
@@ -891,11 +892,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
 							if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
-								GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), true);
+								GameInfosForm->MyNation->Item((*it)->Nation())->SetEnabled();
 							if(!(*it)->SetNation(StrToTyp<uint>(parv[j++])))
 								Debug(W_DESYNCH|W_SEND, "SET +n: couleur trop grande !?");
 							else if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
-								GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), false);
+								GameInfosForm->MyNation->Item((*it)->Nation())->SetEnabled(false);
 						}
 					else Debug(W_DESYNCH|W_SEND, "SET +n: sans couleur");
 				}
@@ -903,7 +904,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 					{
 						if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
-							GameInfosForm->MyNation->SetEnabledItem((*it)->Nation(), true);
+							GameInfosForm->MyNation->Item((*it)->Nation())->SetEnabled();
 						(*it)->SetNation(0);
 					}
 				break;
@@ -1059,7 +1060,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyColor->AddBadValue(*it);
 		if(GameInfosForm->MyNation)
 			for(std::vector<int>::iterator it = nat_badval.begin(); it != nat_badval.end(); ++it)
-				GameInfosForm->MyNation->SetEnabledItem(*it, false);
+				GameInfosForm->MyNation->Item(*it)->SetEnabled(false);
 		GameInfosForm->RecalcMemo();
 	}
 	JOINED = 1;
@@ -1156,7 +1157,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if((*playersi)->Position() && GameInfosForm->MyPosition)
 					GameInfosForm->MyPosition->DelBadValue((*playersi)->Position());
 				if((*playersi)->Nation() && GameInfosForm->MyNation)
-					GameInfosForm->MyNation->SetEnabledItem((*playersi)->Nation());
+					GameInfosForm->MyNation->Item((*playersi)->Nation())->SetEnabled();
 
 				GameInfosForm->Players->Hide();
 				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
@@ -1300,7 +1301,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	}
 
 	/* Déclaration membres fixes */
-	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), mission);
+	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), client, mission);
 	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
 	                                    std::string(cname), green_color);
 
@@ -1321,8 +1322,6 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		return false;
 	}
 
-	SDL_Event event;
-	bool eob = false;
 	EChannel *chan = NULL;
 	GameInfosForm->SetMutex(mutex);
 
@@ -1342,137 +1341,8 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			GameInfosForm->PretButton->SetText("Lancer la partie");
 
 		GameInfosForm->ChangeStatus(client->Player()->IsPriv());
-	    Timer listmapclick;
-		do
-		{
-			if(!GameInfosForm->MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
-				GameInfosForm->MapList->SetEnabled();
-			if(TGameInfosForm::ErrMessage.empty() == false)
-			{
-				TMessageBox(TGameInfosForm::ErrMessage, BT_OK, GameInfosForm).Show();
-				TGameInfosForm::ErrMessage.clear();
-			}
-			while( SDL_PollEvent( &event) )
-			{
-				GameInfosForm->Actions(event);
-				client->LockScreen();
-				switch(event.type)
-				{
-					case SDL_KEYUP:
-						switch (event.key.keysym.sym)
-						{
-							case SDLK_ESCAPE:
-								eob = true;
-								break;
-							case SDLK_RETURN:
-								if(GameInfosForm->SendMessage->Focused() && !GameInfosForm->SendMessage->Empty())
-								{
-									client->sendrpl(client->rpl(EC_Client::MSG),
-												FormatStr(GameInfosForm->SendMessage->GetString()).c_str());
-									GameInfosForm->Chat->AddItem("<" + client->GetNick() + "> " +
-												GameInfosForm->SendMessage->GetString(), black_color);
-									GameInfosForm->SendMessage->ClearString();
-								}
-								break;
-							default: break;
-						}
-						break;
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						if(client->Player()->IsPriv())
-						{
-							if(GameInfosForm->MapList->Test( event.button.x, event.button.y, event.button.button) &&
-							   GameInfosForm->MapList->GetSelectedItem() != -1)
-							{
-								client->sendrpl(client->rpl(EC_Client::SET),
-								                ("+m " + TypToStr(GameInfosForm->MapList->GetSelectedItem())).c_str());
-								listmapclick.reset();
-								GameInfosForm->MapList->SetEnabled(false);
-							}
 
-							if(client->Player()->IsOwner())
-							{
-								std::vector<TComponent*> list = GameInfosForm->Players->GetList();
-								for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
-								{
-									TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
-									if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
-									{
-										if(pll->OwnZone(event.button.x, event.button.y, event.button.button))
-										{
-											if(pll->Player()->IsOp())
-												client->sendrpl(client->rpl(EC_Client::SET),
-															("-o " + pll->Player()->Nick()).c_str());
-											else
-												client->sendrpl(client->rpl(EC_Client::SET),
-															("+o " + pll->Player()->Nick()).c_str());
-										}
-										else if(pll->Nick->Test(event.button.x, event.button.y, event.button.button))
-										{
-											TMessageBox mb("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
-											               "Veuillez entrer la raison :",
-											               HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
-											std::string name;
-											if(mb.Show() == BT_OK)
-											{
-												name = mb.EditText();
-												client->sendrpl(client->rpl(EC_Client::KICK), pll->Nick->Caption().c_str(),
-												                                              FormatStr(name).c_str());
-											}
-										}
-									}
-								}
-							}
-						}
-						bool tmp = GameInfosForm->MyNation->Opened();
-						if(GameInfosForm->MyPosition &&
-						   GameInfosForm->MyPosition->Clic(event.button.x, event.button.y, event.button.button))
-								client->sendrpl(client->rpl(EC_Client::SET),
-									("+p " + TypToStr(GameInfosForm->MyPosition->Value())).c_str());
-						else if(GameInfosForm->MyColor &&
-						   GameInfosForm->MyColor->Clic(event.button.x, event.button.y, event.button.button))
-								client->sendrpl(client->rpl(EC_Client::SET),
-									("+c " + TypToStr(GameInfosForm->MyColor->Value())).c_str());
-						else if(GameInfosForm->MyNation &&
-						   GameInfosForm->MyNation->Clic(event.button.x, event.button.y, event.button.button) &&
-						  tmp && !GameInfosForm->MyNation->Opened() && GameInfosForm->MyNation->GetSelectedItem() != -1)
-								client->sendrpl(client->rpl(EC_Client::SET),
-									("+n " + TypToStr(GameInfosForm->MyNation->GetSelectedItem())).c_str());
-/*						break;
-					case SDL_MOUSEBUTTONDOWN:*/
-						else if(GameInfosForm->RetourButton->Test(event.button.x, event.button.y, event.button.button))
-							eob = true;
-						else if(GameInfosForm->PretButton->Test(event.button.x, event.button.y, event.button.button))
-							client->sendrpl(client->rpl(EC_Client::SET), "+!");
-						else if(GameInfosForm->SpeedGame->Test(event.button.x, event.button.y, event.button.button))
-							client->sendrpl(client->rpl(EC_Client::SET), GameInfosForm->SpeedGame->Checked() ? "+r" : "-r");
-						else if(GameInfosForm->BeginMoney->Test(event.button.x, event.button.y, event.button.button))
-							client->sendrpl(client->rpl(EC_Client::SET),
-							   ("+b " + TypToStr(GameInfosForm->BeginMoney->Value())).c_str());
-						else if(GameInfosForm->TurnTime->Test(event.button.x, event.button.y, event.button.button))
-							client->sendrpl(client->rpl(EC_Client::SET),
-							   ("+t " + TypToStr(GameInfosForm->TurnTime->Value())).c_str());
-						else if(GameInfosForm->CreateIAButton->Test(event.button.x, event.button.y, event.button.button))
-						{
-							TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, GameInfosForm);
-							mb.Edit()->SetAvailChars(NICK_CHARS);
-							mb.Edit()->SetMaxLen(NICKLEN);
-							std::string name;
-							if(mb.Show() == BT_OK)
-								name = mb.EditText();
-							if(!name.empty())
-								client->sendrpl(client->rpl(EC_Client::JIA), FormatStr(name).c_str());
-						}
-						break;
-					}
-					default:
-						break;
-				}
-				client->UnlockScreen();
-			}
-			GameInfosForm->Update();
-		} while(!eob && client->IsConnected() && client->Player() &&
-		        client->Player()->Channel()->State() == EChannel::WAITING);
+		GameInfosForm->Run();
 
 	}
 	catch(TECExcept &e)
@@ -1512,6 +1382,125 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
  *                               TGameInfosForm                                             *
  ********************************************************************************************/
 
+void TGameInfosForm::OnKeyUp(SDL_keysym key)
+{
+	switch (key.sym)
+	{
+		case SDLK_ESCAPE:
+			want_quit = true;
+			break;
+		case SDLK_RETURN:
+			if(SendMessage->Focused() && !SendMessage->Empty())
+			{
+				client->sendrpl(client->rpl(EC_Client::MSG), FormatStr(SendMessage->GetString()).c_str());
+				Chat->AddItem("<" + client->GetNick() + "> " + SendMessage->GetString(), black_color);
+				SendMessage->ClearString();
+			}
+			break;
+		default: break;
+	}
+}
+
+void TGameInfosForm::AfterDraw()
+{
+	if(!client->IsConnected() || !client->Player() || client->Player()->Channel()->State() != EChannel::WAITING)
+	{
+		want_quit = true;
+		return;
+	}
+	if(!MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
+		MapList->SetEnabled();
+	if(TGameInfosForm::ErrMessage.empty() == false)
+	{
+		TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
+		TGameInfosForm::ErrMessage.clear();
+	}
+}
+
+void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
+{
+	client->LockScreen();
+	if(client->Player()->IsPriv())
+	{
+		if(MapList->Test(mouse, button) && MapList->Selected() != -1)
+		{
+			client->sendrpl(client->rpl(EC_Client::SET),
+					("+m " + TypToStr(MapList->Selected())).c_str());
+			listmapclick.reset();
+			MapList->SetEnabled(false);
+		}
+
+		if(client->Player()->IsOwner())
+		{
+			std::vector<TComponent*> list = Players->GetList();
+			for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+			{
+				TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
+				if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
+				{
+					if(pll->OwnZone(mouse, button))
+					{
+						if(pll->Player()->IsOp())
+							client->sendrpl(client->rpl(EC_Client::SET),
+										("-o " + pll->Player()->Nick()).c_str());
+						else
+							client->sendrpl(client->rpl(EC_Client::SET),
+										("+o " + pll->Player()->Nick()).c_str());
+					}
+					else if(pll->Nick->Test(mouse, button))
+					{
+						TMessageBox mb("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
+								"Veuillez entrer la raison :",
+								HAVE_EDIT|BT_OK|BT_CANCEL, this);
+						std::string name;
+						if(mb.Show() == BT_OK)
+						{
+							name = mb.EditText();
+							client->sendrpl(client->rpl(EC_Client::KICK), pll->Nick->Caption().c_str(),
+							                                              FormatStr(name).c_str());
+						}
+					}
+				}
+			}
+		}
+	}
+	bool tmp = MyNation->Opened();
+	if(MyPosition && MyPosition->Clic(mouse, button))
+		client->sendrpl(client->rpl(EC_Client::SET),
+		                ("+p " + TypToStr(MyPosition->Value())).c_str());
+	else if(MyColor && MyColor->Clic(mouse, button))
+			client->sendrpl(client->rpl(EC_Client::SET),
+				("+c " + TypToStr(MyColor->Value())).c_str());
+	else if(MyNation && MyNation->Clic(mouse, button) &&
+	        tmp && !MyNation->Opened() && MyNation->Selected() != -1)
+		client->sendrpl(client->rpl(EC_Client::SET),
+		                ("+n " + TypToStr(GameInfosForm->MyNation->Selected())).c_str());
+	else if(RetourButton->Test(mouse, button))
+		want_quit = true;
+	else if(PretButton->Test(mouse, button))
+		client->sendrpl(client->rpl(EC_Client::SET), "+!");
+	else if(SpeedGame->Test(mouse, button))
+		client->sendrpl(client->rpl(EC_Client::SET), SpeedGame->Checked() ? "+r" : "-r");
+	else if(BeginMoney->Test(mouse, button))
+		client->sendrpl(client->rpl(EC_Client::SET),
+		                ("+b " + TypToStr(BeginMoney->Value())).c_str());
+	else if(TurnTime->Test(mouse, button))
+		client->sendrpl(client->rpl(EC_Client::SET),
+		                ("+t " + TypToStr(TurnTime->Value())).c_str());
+	else if(CreateIAButton->Test(mouse, button))
+	{
+		TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		mb.Edit()->SetAvailChars(NICK_CHARS);
+		mb.Edit()->SetMaxLen(NICKLEN);
+		std::string name;
+		if(mb.Show() == BT_OK)
+			name = mb.EditText();
+		if(!name.empty())
+			client->sendrpl(client->rpl(EC_Client::JIA), FormatStr(name).c_str());
+	}
+	client->UnlockScreen();
+}
+
 void TGameInfosForm::ChangeStatus(bool add)
 {
 	MapList->SetVisible(add);
@@ -1524,8 +1513,8 @@ void TGameInfosForm::ChangeStatus(bool add)
 	CreateIAButton->SetVisible(add);
 }
 
-TGameInfosForm::TGameInfosForm(ECImage* w, bool _mission)
-	: TForm(w), RecvMapList(false), mission(_mission)
+TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
+	: TForm(w), RecvMapList(false), mission(_mission), client(cl)
 {
 	Title = AddComponent(new TLabel(6,"Jeu", white_color, Font::GetInstance(Font::Big)));
 
@@ -1542,7 +1531,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, bool _mission)
 
 	int right_x = Window()->GetWidth() - 175;
 
-	MapList = AddComponent(new TListBox(Font::GetInstance(Font::Small), right_x, 270, 150, 80));
+	MapList = AddComponent(new TListBox(Rectanglei(right_x, 270, 150, 80)));
 	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, "Partie rapide", white_color));
 	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
 	SpeedGame->Check();
@@ -1594,8 +1583,8 @@ void TGameInfosForm::RecalcMemo()
 TPlayerLine::TPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
-	h = 30;
-	w = 650;
+	size.y = 30;
+	size.x = 650;
 	position = 0;
 	couleur = 0;
 	nation = 0;
@@ -1627,18 +1616,15 @@ void TPlayerLine::SetXY (int px, int py)
 	if(Nick) Nick->SetXY(px+70, py);
 }
 
-bool TPlayerLine::OwnZone(int _x, int _y, int button)
+bool TPlayerLine::OwnZone(const Point2i& mouse, int button)
 {
-	if(button == SDL_BUTTON_LEFT && _x > x+75 && _x < x+95 && _y > y && _y < int(y+h))
-		return true;
-	else
-		return false;
+	return (button == SDL_BUTTON_LEFT && mouse.x > X()+75 && mouse.x < X()+95 && mouse.y > Y() && mouse.y < int(Y() + Height()));
 }
 
-bool TPlayerLine::Test (int souris_x, int souris_y, int button) const
+bool TPlayerLine::Test (const Point2i& mouse, int button) const
 {
-  return (visible && enabled && ((x <= souris_x) && (souris_x <= int(x+w)) && (y <= souris_y) &&
-         (souris_y <= int((nation && nation->Opened() ? nation->Y() + nation->Height() : y+h)))));
+  return (Visible() && Enabled() && ((X() <= mouse.x) && (mouse.x <= int(X()+Width())) && (Y() <= mouse.x) &&
+         (mouse.y <= int((nation && nation->Opened() ? nation->Y() + nation->Height() : Y() + Height())))));
 }
 
 void TPlayerLine::Init()
@@ -1646,18 +1632,18 @@ void TPlayerLine::Init()
 	assert(pl);
 	if(position) delete position;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  x+230, y, 50, 0, pl->Channel()->Limite(), 1,    0);
+	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  X()+230, Y(), 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
 	position->SetHint("Votre position sur la carte");
-	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  x+340, y, 50);
+	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  X()+340, Y(), 50);
 	MyComponent(couleur);
 	couleur->SetHint("La couleur de votre camp");
-	nation = new TComboBox(Font::GetInstance(Font::Small), x+440, y, 120);
+	nation = new TComboBox(Font::GetInstance(Font::Small), X()+440, Y(), 120);
 	MyComponent(nation);
 
-	Ready = new TLabel(x, y, "OK", gray_color, Font::GetInstance(Font::Big));
-	Status = new TLabel(x+75, y, pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
-	Nick = new TLabel(x+95, y, pl->GetNick(), white_color, Font::GetInstance(Font::Big));
+	Ready = new TLabel(X(), Y(), "OK", gray_color, Font::GetInstance(Font::Big));
+	Status = new TLabel(X()+75, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
+	Nick = new TLabel(X()+95, Y(), pl->GetNick(), white_color, Font::GetInstance(Font::Big));
 
 	MyComponent(Ready);
 	MyComponent(Status);
@@ -1665,35 +1651,35 @@ void TPlayerLine::Init()
 
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 	{
-		uint j = nation->AddItem(false, std::string(nations_str[i].name), "");
-		nation->SetItemHint(j, nations_str[i].infos);
+		TListBoxItem* j = nation->AddItem(false, std::string(nations_str[i].name), "");
+		j->SetHint(nations_str[i].infos);
   }
 }
 
-void TPlayerLine::Draw(int souris_x, int souris_y)
+void TPlayerLine::Draw(const Point2i& mouse)
 {
 	assert(pl);
 
 	if((int)pl->Position() != position->Value()) position->SetValue(pl->Position());
 	if((int)pl->Color() != couleur->Value()) couleur->SetValue(pl->Color());
-	if((int)pl->Nation() != nation->GetSelectedItem()) nation->Select(pl->Nation());
+	if((int)pl->Nation() != nation->Selected()) nation->Select(pl->Nation());
 	Status->SetCaption(pl->IsOp() ? "@" : pl->IsOwner() ? "*" : "");
 	Ready->SetColor(pl->Ready() ? red_color : gray_color);
 
-	Ready->Draw(souris_x, souris_y);
-	Status->Draw(souris_x, souris_y);
-	Nick->Draw(souris_x, souris_y);
-	position->Draw(souris_x, souris_y);
-	couleur->Draw(souris_x, souris_y);
-	nation->Draw(souris_x, souris_y);
+	Ready->Draw(mouse);
+	Status->Draw(mouse);
+	Nick->Draw(mouse);
+	position->Draw(mouse);
+	couleur->Draw(mouse);
+	nation->Draw(mouse);
 
-	if(position->Test(souris_x, souris_y))
+	if(position->Test(mouse))
 		SetHint(position->Hint());
-	else if(couleur->Test(souris_x, souris_y))
+	else if(couleur->Test(mouse))
 		SetHint(couleur->Hint());
-	else if(nation->Test(souris_x, souris_y))
+	else if(nation->Test(mouse))
 		SetHint(nation->Hint());
-	else if(Nick->Test(souris_x, souris_y))
+	else if(Nick->Test(mouse))
 		SetHint(Nick->Hint());
 	else
 		SetHint("");
@@ -1705,8 +1691,8 @@ void TPlayerLine::Draw(int souris_x, int souris_y)
 
 TPlayerLineHeader::TPlayerLineHeader()
 {
-	h = 30;
-	w = 550;
+	size.y = 30;
+	size.x = 550;
 	label = 0;
 }
 
@@ -1716,7 +1702,7 @@ void TPlayerLineHeader::Init()
 		delete label;
 
 	std::string s = "Pret   Pseudo      Pos.  Couleur  Nation";
-	label = new TLabel(x, y, s, white_color, Font::GetInstance(Font::Big));
+	label = new TLabel(X(), Y(), s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
 }
 
@@ -1733,7 +1719,7 @@ TPlayerLineHeader::~TPlayerLineHeader()
 		delete label;
 }
 
-void TPlayerLineHeader::Draw(int souris_x, int souris_y)
+void TPlayerLineHeader::Draw(const Point2i& mouse)
 {
-	label->Draw(souris_x, souris_y);
+	label->Draw(mouse);
 }

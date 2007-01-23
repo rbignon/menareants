@@ -41,17 +41,17 @@ public:
 
 	void Init();
 
-	void Draw(int x, int y);
+	void Draw(const Point2i&);
 
-	ECEntity* TestEntity(int mouse_x, int mouse_y);
-	ECase* TestCase(int mouse_x, int mouse_y);
+	ECEntity* TestEntity(const Point2i&);
+	ECase* TestCase(const Point2i&);
 
-	ECase* Pixel2Case(int x, int y);
-	std::vector<ECase*> Rect2Case(int x, int y, uint w, uint h);
+	ECase* Pixel2Case(const Point2i&);
+	std::vector<ECase*> Rect2Case(const Rectanglei&);
 
 	void ToRedraw(ECSprite*);
-	void ToRedraw(int x, int y);
-	void ToRedraw(int x, int y, int w, int h);
+	void ToRedraw(const Point2i&);
+	void ToRedraw(const Rectanglei&);
 	void ToRedraw(ECEntity*);
 	void ToRedraw(ECase*);
 	void ToRedraw(TComponent*);
@@ -61,13 +61,13 @@ public:
 	void SetPosition(int _x, int _y, bool force = false);
 
 	/* Centre sur un objet ou des coordonées (pixels) de la carte */
-	void CenterTo(ECase* e) { if(!e) return; CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
-	void CenterTo(ECEntity* e) { CenterTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void CenterTo(ECase* e) { if(!e) return; CenterTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
+	void CenterTo(ECEntity* e) { CenterTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void CenterTo(int _x, int _y);
 
 	/* Fait un déplacement progressif */
-	void ScrollTo(ECase* e) { ScrollTo(e->Image()->X() - x, e->Image()->Y() - y); }
-	void ScrollTo(ECEntity* e) { ScrollTo(e->Image()->X() - x, e->Image()->Y() - y); }
+	void ScrollTo(ECase* e) { ScrollTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
+	void ScrollTo(ECEntity* e) { ScrollTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void ScrollTo(int _x, int _y);
 
 	/* Le point (0,0) de l'écran coincide avec ce point */

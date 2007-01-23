@@ -191,7 +191,7 @@ public:
 
 /* Evenements */
 public:
-	static void RadarClick(TObject*, int, int);
+	static void RadarClick(TObject*, const Point2i&);
 	static void SelectUnit(TObject* o, void* e);
 
 protected:
@@ -205,7 +205,7 @@ class TInGameForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TInGameForm(ECImage*, ECPlayer*);
+	TInGameForm(ECImage*, EC_Client*);
 
 	enum Wants
 	{
@@ -266,10 +266,23 @@ public:
 	std::string ShowWaitMessage;
 	bool WantBalise;
 
+/* Evenements */
+private:
+
+	void OnMouseMotion(const Point2i& mouse);
+	void OnClic(const Point2i& mouse, int, bool&);
+	void OnKeyUp(SDL_keysym);
+	void OnKeyDown(SDL_keysym);
+	void AfterDraw();
+	void BeforeDraw();
+
 private:
 	Timer timer;
 	Timer elapsed_time;
 	ECPlayer* player;
+	EC_Client* client;
+	EChannel* chan;
+	Wants want;
 };
 
 /********************************************************************************************
@@ -281,7 +294,7 @@ class TOptionsForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TOptionsForm(ECImage*, ECPlayer*, EChannel*);
+	TOptionsForm(ECImage*, EC_Client*, EChannel*);
 
 /* Composants */
 public:
@@ -294,8 +307,14 @@ public:
 	TButtonText* OkButton;
 
 /* Evenements */
-public:
+private:
 
+	void OnClic(const Point2i&, int, bool&);
+	void AfterDraw();
+
+/* Variables privées */
+private:
+	EC_Client* client;
 };
 
 /********************************************************************************************
@@ -314,9 +333,9 @@ public:
 public:
 
 	void Init();
-	void Draw(int souris_x, int souris_y);              /**< Draw */
+	void Draw(const Point2i&);              /**< Draw */
 
-	bool AllieZone(int _x, int _y, int button);
+	bool AllieZone(const Point2i&, int button);
 
 /* Composants */
 public:
@@ -366,9 +385,6 @@ public:
 	TLabel*      Date;
 	TMemo*       MapInformations;
 
-/* Evenements */
-public:
-
 };
 
 /********************************************************************************************
@@ -387,7 +403,7 @@ public:
 public:
 
 	void Init();
-	void Draw(int souris_x, int souris_y);              /**< Draw */
+	void Draw(const Point2i&);              /**< Draw */
 
 /* Composants */
 public:
@@ -419,7 +435,7 @@ class TPingingForm : public TForm
 /* Constructeur/Destructeur */
 public:
 
-	TPingingForm(ECImage*, EChannel*);
+	TPingingForm(ECImage*, EC_Client* client, EChannel*);
 
 /* Composants */
 public:
@@ -437,9 +453,17 @@ public:
 public:
 	void UpdateList();
 
+/* Evenements */
+private:
+
+	void AfterDraw();
+	void BeforeDraw();
+	void OnClic(const Point2i& mouse, int button, bool& stop);
+
 /* Variables privées */
 private:
 	EChannel* channel;
+	EC_Client* client;
 };
 
 class TPingingPlayerLine : public TChildForm
@@ -509,7 +533,7 @@ public:
 public:
 
 	void Init();
-	void Draw(int souris_x, int souris_y);              /**< Draw */
+	void Draw(const Point2i&);              /**< Draw */
 
 /* Composants */
 public:

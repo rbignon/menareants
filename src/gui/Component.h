@@ -25,28 +25,29 @@
 #include <SDL_keyboard.h>
 #include <string>
 #include "Object.h"
+#include "tools/Rectangle.h"
 
 #define MyComponent(x) do { (x)->SetParent(this); (x)->SetWindow(Window()); (x)->Init(); } while(0)
 
 typedef unsigned int   uint;
 typedef void (*TOnClickFunction) (TObject* Object, void* Data);
-typedef void (*TOnClickPosFunction) (TObject* Object, int x, int y);
+typedef void (*TOnClickPosFunction) (TObject* Object, const Point2i& position);
 typedef void (*TOnMouseOnFunction) (TObject* Object, void* Data);
 
 /********************************************************************************************
  *                               TComponent                                                 *
  ********************************************************************************************/
 /** Base of components. */
-class TComponent : public TObject
+class TComponent : public TObject, public Rectanglei
 {
 /* Constructeur/Deconstructeur */
 public:
 
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
 	TComponent(ECImage* w = 0)
-		: TObject(w), x(0), y(0), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(false)
+		  want_redraw(false), always_redraw(false), dynamic_hint(false)
 	{}
 
 	/** Constructor with position
@@ -55,9 +56,9 @@ public:
 	 * @param w Window
 	 */
 	TComponent(int _x, int _y, ECImage* w = 0)
-		: TObject(w), x(_x), y(_y), h(0), w(0), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Rectanglei(_x, _y, 0, 0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(false)
+		  want_redraw(false), always_redraw(false), dynamic_hint(false)
 	{}
 
 	/** Constructor with position and size
@@ -68,9 +69,19 @@ public:
 	 * @param w Window
 	 */
 	TComponent(int _x, int _y, uint _w, uint _h, ECImage* w = 0)
-		: TObject(w), x(_x), y(_y), h(_h), w(_w), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Rectanglei(_x, _y, _w, _h), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  dynamic_hint(false)
+		  want_redraw(false), always_redraw(false), dynamic_hint(false)
+	{}
+
+	/** Constructor with position and size
+	 * @param _rect Position and size
+	 * @param w Window
+	 */
+	TComponent(const Rectanglei& _rect, ECImage* w = 0)
+		: TObject(w), Rectanglei(_rect), visible(true), enabled(true), focus(false), force_focus(false),
+		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
+		  want_redraw(false), always_redraw(false), dynamic_hint(false)
 	{}
 
 	virtual ~TComponent() {}
@@ -79,7 +90,7 @@ public:
 public:
 
 	/** Draw the object. */
-	virtual void Draw(int souris_x, int souris_y) = 0;
+	virtual void Draw(const Point2i&) = 0;
 
 	/** Initialization. */
 	virtual void Init() = 0;
@@ -87,42 +98,41 @@ public:
 /* Attributs */
 public:
 
-	/* Obtient la position, la hauteur ou la largeur */
-	int X() const { return x; }                           /**< Get \a x position. */
-	int Y() const { return y; }                           /**< Get \a y position. */
-	unsigned int Width() const { return w; }              /**< Get \a width position. */
-	unsigned int Height() const { return h; }             /**< Get \a height position. */
-
-	/* Définie la position, la hauteur ou la largeur */
-	virtual void SetXY (int _x, int _y) { x = _x; y = _y; } /**< Set \a x and \a y positions */
-	void SetX(int _x) { SetXY(_x, y); }
-	void SetY(int _y) { SetXY(x, _y); }
-	virtual void SetHeight (uint _h);                     /**< Set \a height */
-	virtual void SetWidth (uint _w);                      /**< Set \a width */
+	virtual void SetHeight (int ph);
+	virtual void SetWidth (int ph);
 
 	/* Visibilité */
 	bool Visible() const { return visible; }              /**< Is this object visible ? */
-	void Show() { visible = true; }                       /**< Set visible to true */
-	void Hide() { visible = false; }                      /**< Set visible to false */
-	void SetVisible(bool b = true) { visible = b; }
+	void Show() { SetVisible(true); }                     /**< Set visible to true */
+	void Hide() { SetVisible(false); }                    /**< Set visible to false */
+	void SetVisible(bool b = true) { SetWantRedraw(); visible = b; }
+
+	virtual void SetXY(int x, int y) { Rectanglei::SetXY(x,y); SetWantRedraw(); }
+
+	void SetSizePosition(const Rectanglei& rect)
+	{
+		SetXY(rect.X(), rect.Y());
+		SetHeight(rect.Height());
+		SetWidth(rect.Width());
+	}
 
 	bool Enabled() const { return enabled; }              /**< Is this object enabled ? */
 	virtual void SetEnabled(bool _en = true)              /**< Set or unset this objet as enabled */
-		{ enabled = _en; }
+		{ SetWantRedraw(); enabled = _en; }
 
 	/* Le composant a le focus ? */
 	bool Focused() const { return focus; }
-	virtual void SetFocus() { focus = true; }
-	virtual void DelFocus() { focus = false; }
+	virtual void SetFocus() { focus = true; SetWantRedraw(); }
+	virtual void DelFocus() { focus = false; SetWantRedraw(); }
 
-	virtual inline bool Mouse (int souris_x, int souris_y) const;
+	virtual inline bool Mouse (const Point2i& pos) const { return (visible && Contains(pos)); }
 
 	/* Pas terrible, mais pour éviter une dépendance, on ne met pas SDL_BUTTON_LEFT mais sa valeur qui est 1.
 	 * On considère donc que par défaut le boutton cliqué est le GAUCHE, et donc pour que le test réussisse il faut justement
 	 * que le bouton soit le GAUCHE.
 	 */
-	virtual bool Test (int souris_x, int souris_y, int button = 1) const { return (Mouse(souris_x, souris_y) && Enabled() && button == 1); }
-	virtual bool Clic (int mouse_x, int mouse_y, int button) { return Test(mouse_x, mouse_y, button); }
+	virtual bool Test (const Point2i& pos, int button = 1) const { return (Mouse(pos) && Enabled() && button == 1); }
+	virtual bool Clic (const Point2i& pos, int button) { return Test(pos, button); }
 
 	virtual void PressKey(SDL_keysym) { return; }         /**< Called when user press a key.. */
 
@@ -152,10 +162,16 @@ public:
 
 	int Tag;
 
+	void SetWantRedraw(bool b = true) { want_redraw = b; }
+	bool WantRedraw() const { return (want_redraw || always_redraw); }
+
+	void SetAlwaysRedraw(bool b = true) { always_redraw = b; }
+	bool AlwaysRedraw() const { return always_redraw; }
+
+	virtual bool RedrawBackground() const { return true; }
+
 /* Variables privées */
-protected:
-	int x, y;
-	uint h, w;
+private:
 	bool visible;
 	bool enabled;
 	bool focus;
@@ -166,15 +182,15 @@ protected:
 	TOnMouseOnFunction on_mouse_on_func;
 	void* on_mouse_on_param;
 	std::string hint;
+	bool want_redraw;
+	bool always_redraw;
+
+/* Variables protégées */
+protected:
+
 	bool dynamic_hint;
 };
 typedef std::vector<TComponent*> ComponentVector;
-
-bool TComponent::Mouse (int souris_x, int souris_y) const
-{
-	return (visible && ((x <= souris_x) && (souris_x < int(x+w))
-	        && (y <= souris_y) && (souris_y < int(y+h))));
-}
 
 /********************************************************************************************
  *                                 TList                                                    *
@@ -241,10 +257,11 @@ public:
 		list.push_back(c);
 		c->SetParent(this);
 		c->SetWindow(Window());
-		c->SetXY(x, y+h);
-		h += c->Height();
-		if(c->Width() > w) w = c->Width();
+		c->SetXY(X(), Y() + Height());
+		SetHeight(Height() + c->Height());
+		if(c->Width() > Width()) SetWidth(c->Width());
 		c->Init();
+		SetWantRedraw();
 	}
 
 	void Clear();
@@ -255,12 +272,12 @@ public:
 	bool RemoveLine(TComponent *c, bool use_delete = false);
 
 	/** Draw all components in list */
-	void Draw(int souris_x, int souris_y);
+	void Draw(const Point2i&);
 
 	/** Initialization not requiered... But it is a virtual function so i have to implemente this  */
 	void Init() {}
 
-	virtual bool Clic (int mouse_x, int mouse_y, int button);
+	virtual bool Clic (const Point2i&, int button);
 
 	virtual void DelFocus();
 

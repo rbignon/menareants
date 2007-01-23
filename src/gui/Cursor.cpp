@@ -35,6 +35,8 @@ TCursor::TCursor()
 	SetCursorImage(Radar, Resources::PointerRadar());
 	SetCursorImage(AddBP, Resources::PointerAddBP());
 	SetCursorImage(RemBP, Resources::PointerRemBP());
+
+	SetAlwaysRedraw();
 }
 
 TCursor::~TCursor()
@@ -47,9 +49,9 @@ void TCursor::Init()
 
 }
 
-void TCursor::Draw(int _x, int _y)
+void TCursor::Draw(const Point2i& pos)
 {
-	SetXY(_x, _y);
+	SetXY(pos.X(), pos.Y());
 	if (pointer == Standard)
 		return; // use standard SDL cursor
 
@@ -57,18 +59,18 @@ void TCursor::Draw(int _x, int _y)
 
 	if(!img) return;
 
+	Point2i p = pos;
+
 	if(pointer > MIDDLE_POINTERS)
 	{
-		_x = _x - img->GetWidth() /2;
-		_y = _y - img->GetHeight()/2;
+		p.x = pos.X() - img->GetWidth() /2;
+		p.y = pos.Y() - img->GetHeight()/2;
 	}
 
-	SDL_Rect rect = {_x, _y, img->GetWidth(), img->GetHeight()};
-
-	Window()->Blit(img, &rect);
+	Window()->Blit(img, p);
 
 	if(Map())
-		Map()->ToRedraw(_x, _y, img->GetWidth(), img->GetHeight());
+		Map()->ToRedraw(Rectanglei(p.X(), p.Y(), img->GetWidth(), img->GetHeight()));
 }
 
 void TCursor::SetCursor(cursors_t p)

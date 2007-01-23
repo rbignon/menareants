@@ -190,10 +190,10 @@ void ECEntity::Select(bool s)
 	selected = s;
 	Map()->ShowMap()->ToRedraw(this);
 	if(AttaquedCase())
-		Map()->ShowMap()->ToRedraw(
+		Map()->ShowMap()->ToRedraw(Rectanglei(
 		        AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2 : Image()->X()+CASE_WIDTH /2,
 		        AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2 : Image()->Y()+CASE_HEIGHT/2,
-		        trajectoire.GetWidth(), trajectoire.GetHeight());
+		        trajectoire.GetWidth(), trajectoire.GetHeight()));
 }
 
 void ECEntity::SetAttaquedCase(ECase* c)
@@ -278,7 +278,7 @@ void ECEntity::AfterDraw()
 			if(f >= 0.5) life.SetValueColor(green_color);
 			else if(f >= 0.3) life.SetValueColor(orange_color);
 			else life.SetValueColor(red_color);
-			life.Draw(0,0);
+			life.Draw(Point2i());
 		}
 		if(AttaquedCase() && (EventType() & ARM_ATTAQ))
 			trajectoire.Draw(
@@ -578,7 +578,7 @@ void TBarreCaseIcons::SetList()
 	Init();
 
 	int _x = X(), _y = 0;
-	uint _h = 0;
+	int _h = 0;
 	TBarreCase* parent = dynamic_cast<TBarreCase*>(Parent());
 	bool up = true;
 	for(uint _i = first; _i < ASIZE(case_img); ++_i, up = !up)

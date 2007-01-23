@@ -44,12 +44,14 @@ void TButtonText::SetText(const std::string &text)
 {
   label.SetCaption(text);
   label.SetXY(X()+Width()/2-label.Width()/2, Y()+Height()/2-label.Height()/2);
+  SetWantRedraw();
 }
 
 void TButtonText::SetEnabled(bool b)
 {
 	TComponent::SetEnabled(b);
 	label.SetColor(Enabled() ? white_color : gray_color);
+	SetWantRedraw();
 }
 
 void TButtonText::SetXY(int _x, int _y)
@@ -67,12 +69,12 @@ void TButtonText::SetImage (ECSprite *_image)
 
 //-----------------------------------------------------------------------------
 
-void TButtonText::Draw (int souris_x, int souris_y)
+void TButtonText::Draw (const Point2i& mouse)
 {
 	if(image)
-		DrawImage (souris_x, souris_y);
+		DrawImage (mouse);
 
-	label.Draw(souris_x, souris_y);
+	label.Draw(mouse);
 }
 
 //-----------------------------------------------------------------------------

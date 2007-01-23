@@ -23,7 +23,6 @@
 #include <assert.h>
 #include "ProgressBar.h"
 #include "tools/Maths.h"
-#include "tools/Video.h"
 
 TProgressBar::TProgressBar(int x, int y, uint w, uint h)
 	: TComponent(x, y, w, h), border_color(0, 0, 0, 255), value_color(255,255,255,255), background_color(100,100,100,255),
@@ -83,11 +82,12 @@ void TProgressBar::SetValue (long pval)
 {
   val = CalculeVal(pval);
   val_barre = CalculeValBarre(val);
+  SetWantRedraw();
 }
 
 uint TProgressBar::CalculeVal (long val) const
 {
-  return BorneLong(val, min, max); 
+  return BorneLong(val, min, max);
 }
 
 uint TProgressBar::CalculeValBarre (long val) const
@@ -95,7 +95,7 @@ uint TProgressBar::CalculeValBarre (long val) const
   return ( CalculeVal(val) -min)*(Width()-2)/(max-min);
 }
 
-void TProgressBar::Draw(int souris_x, int souris_y)
+void TProgressBar::Draw(const Point2i& pos)
 {
 	if(image.IsNull()) return;
 
@@ -105,7 +105,7 @@ void TProgressBar::Draw(int souris_x, int souris_y)
 	{
 		// Bordure
 		image.Fill(border_color);
-		
+
 		// Fond
 		SDL_Rect r_back = {1, 1, Width() - 2, Height() - 2};
 		image.FillRect(r_back, background_color);
@@ -115,7 +115,7 @@ void TProgressBar::Draw(int souris_x, int souris_y)
 		SDL_Rect r_back = {0, 0, Width(), Height()};
 		image.FillRect(r_back, image.MapRGBA(0,0,0,0));
 	}
-	
+
 	// Valeur
 	if (m_use_ref_val)
 	{
@@ -136,17 +136,17 @@ void TProgressBar::Draw(int souris_x, int souris_y)
 		left = 1;
 		right = 1+val_barre;
 	}
-	
+
 	SDL_Rect r_value = {left, 1, right - left, Height() - 2};
 	image.FillRect(r_value, value_color);
-	
+
 	if (m_use_ref_val)
 	{
 		int ref = CalculeValBarre (m_ref_val);
 		SDL_Rect r_ref = {1 + ref, 1, 1, Height() - 2 };
 		image.FillRect(r_ref, border_color);
 	}
-	
+
 	// Marqueurs
 	marqueur_it_const it=marqueur.begin(), fin=marqueur.end();
 	for (; it != fin; ++it)
@@ -155,7 +155,7 @@ void TProgressBar::Draw(int souris_x, int souris_y)
 		image.FillRect( r_marq, it->color);
 	}
 	SDL_Rect dst = { X(), Y(), Width(), Height() };
-	Video::GetInstance()->Window()->Blit(image, &dst);
+	Window()->Blit(image, &dst);
 }
 
 // Ajoute/supprime un marqueur

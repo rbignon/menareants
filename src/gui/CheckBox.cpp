@@ -48,13 +48,13 @@ void TCheckBox::Init()
 	MyComponent(&text);
 }
 
-void TCheckBox::Draw(int _x, int _y)
+void TCheckBox::Draw(const Point2i& mouse)
 {
-	unsigned int frame = Test(_x,_y) ? (checked ? 3 : 1) : (checked ? 2 : 0);
+	unsigned int frame = Test(mouse) ? (checked ? 3 : 1) : (checked ? 2 : 0);
 
 	image->SetFrame(frame);
 	image->draw();
-	text.Draw(_x, _y);
+	text.Draw(mouse);
 }
 
 void TCheckBox::SetXY (int _x, int _y)
@@ -64,9 +64,9 @@ void TCheckBox::SetXY (int _x, int _y)
 	text.SetXY(_x+20, _y);
 }
 
-bool TCheckBox::Clic(int _x, int _y, int button)
+bool TCheckBox::Clic(const Point2i& mouse, int button)
 {
-	if(!TComponent::Clic(_x, _y, button))
+	if(!TComponent::Clic(mouse, button))
 		return false;
 
 	checked = !checked;

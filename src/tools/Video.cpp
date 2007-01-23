@@ -51,7 +51,7 @@ Video* Video::GetInstance()
 {
 	if (singleton == NULL)
 		singleton = new Video();
-	
+
 	return singleton;
 }
 
@@ -92,15 +92,15 @@ bool Video::IsFullScreen(void) const
 	return fullscreen;
 }
 
-bool Video::SetConfig(uint width, uint height, bool _fullscreen)
+bool Video::SetConfig(int width, int height, bool _fullscreen)
 {
 #ifndef BUGUED_FULLSCREEN /** In win32, when you are in fullscreen mode there is a matter with the cursor */
 	_fullscreen = false;
 #endif
 
 	// initialize the main window
-	if( window.IsNull() || 
-			(width != window.GetWidth() || 
+	if( window.IsNull() ||
+			(width != window.GetWidth() ||
 			 height != window.GetHeight() )
 #ifdef WIN32
 		|| fullscreen != _fullscreen

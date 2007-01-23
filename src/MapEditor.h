@@ -216,7 +216,7 @@ public:
 
 /* Evenements */
 public:
-	static void RadarClick(TObject*, int, int);
+	static void RadarClick(TObject*, const Point2i&);
 
 protected:
 	static void SelectUnit(TObject* o, void* e);
@@ -226,7 +226,7 @@ class TMapEditor : public TForm
 {
 /* Constructeurs */
 public:
-	TMapEditor(ECImage* w, ECMap* m);
+	TMapEditor(ECImage* w, EMap* m);
 
 /* Methodes */
 public:
@@ -241,6 +241,15 @@ public:
 	TEditBarreLat* BarreLat;
 	TBarreEntity*  BarreEntity;
 	TBarreCase*    BarreCase;
+
+/* Evenements */
+private:
+
+	void OnKeyUp(SDL_keysym);
+	void OnClic(const Point2i&, int, bool&);
+	void BeforeDraw();
+
+	EMap* map;
 };
 
 /********************************************************************************************
@@ -288,6 +297,11 @@ public:
 
 	static void Options(TObject*, void* m);
 
+/* Evenements */
+private:
+
+	void OnClic(const Point2i&, int, bool&);
+
 /* Variables privées */
 private:
 	EMap* map;
@@ -313,6 +327,10 @@ public:
 	TButtonText* RetourButton;
 	TButtonText* NewButton;
 	TButtonText* LoadButton;
+
+/* Evenements */
+private:
+	void OnClic(const Point2i& mouse, int button, bool&);
 };
 
 #endif /* EC_MAPEDITOR_H */

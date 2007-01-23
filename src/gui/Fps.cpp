@@ -39,6 +39,10 @@ TFPS::TFPS(int x, int y, Font* f)
 
   time_in_second = 0;
   nb_valid_values = -1;
+
+  size.y = text.Height();
+
+  SetAlwaysRedraw();
 }
 
 void TFPS::Init()
@@ -51,10 +55,10 @@ void TFPS::Reset()
 {
   average = -1;
   nb_frames.clear();
-  
+
   for( uint i=0; i<=MIN_NB_VALUES; ++i )
     nb_frames.push_back (0);
-  
+
   time_in_second = SDL_GetTicks()+1000;
   nb_valid_values = -1;
   text.SetCaption("");
@@ -65,7 +69,7 @@ void TFPS::AddOneFrame()
   ++nb_frames.front();
 }
 
-void TFPS::Draw(int _x, int _y)
+void TFPS::Draw(const Point2i& mouse)
 {
 	AddOneFrame();
 	uint nv_temps = SDL_GetTicks();
@@ -82,7 +86,7 @@ void TFPS::Draw(int _x, int _y)
 			if (nb_valid_values < (int)nb_frames.size()-1)
 			nb_valid_values++;
 		}
-		
+
 		// Recalcule la average
 		if (0 < nb_valid_values)
 		{
@@ -100,9 +104,10 @@ void TFPS::Draw(int _x, int _y)
 		return;
 
 	char buffer[20];
-	
+
 	snprintf(buffer, sizeof(buffer)-1, "%.1f", average);
 	buffer[sizeof(buffer)-1] = '\0';
 	text.SetCaption(std::string(buffer) + " fps");
-	text.Draw(_x, _y);
+	text.Draw(mouse);
+	size.x = text.Width();
 }

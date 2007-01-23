@@ -91,7 +91,7 @@ public:
 	uint Height() const { return h; }
 
 /* Variables privées */
-protected:
+private:
 	int x, y;
 	uint w, h;
 	uint b;

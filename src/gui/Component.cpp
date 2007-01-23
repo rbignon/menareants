@@ -28,7 +28,8 @@ TList::TList(int _x, int _y)
 	: TComponent(_x, _y)
 {
 	list.clear();
- dynamic_hint = true;
+	dynamic_hint = true;
+	SetAlwaysRedraw();
 }
 
 TList::~TList()
@@ -50,7 +51,7 @@ bool TList::RemoveLine(TComponent *c, bool use_delete)
 	{
 		if (*it == c)
 		{
-			h -= c->Height();
+			SetHeight(Height() - c->Height());
 			if(use_delete)
 				delete c;
 			it = list.erase(it);
@@ -65,19 +66,20 @@ bool TList::RemoveLine(TComponent *c, bool use_delete)
 
 void TList::Rebuild()
 {
-	visible = false;
-	h = 0;
+	Hide();
+	SetHeight(0);
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 	{
-		(*it)->SetXY(x, y+h);
-		h += (*it)->Height();
-		if((*it)->Width() > w)
-			w = (*it)->Width();
+		(*it)->SetXY(X(), Y() + Height());
+		SetHeight(Height() + (*it)->Height());
+		if((*it)->Width() > Width())
+			SetWidth((*it)->Width());
 	}
-	visible = true;
+	SetWantRedraw();
+	Show();
 }
 
-void TList::Draw(int souris_x, int souris_y)
+void TList::Draw(const Point2i& pos)
 {
 	bool first = true, put_hint = false;
 	while(1)
@@ -85,10 +87,10 @@ void TList::Draw(int souris_x, int souris_y)
 		for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 			if((*it)->Visible() && (*it)->Focused() == (first ? false : true))
 			{ // Affiche seulement à la fin les composants selectionnés
-				(*it)->Draw(souris_x, souris_y);
-				if((*it)->OnMouseOn() && (*it)->Mouse(souris_x, souris_y))
+				(*it)->Draw(pos);
+				if((*it)->OnMouseOn() && (*it)->Mouse(pos))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Mouse(souris_x, souris_y))
+				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Mouse(pos))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;
@@ -101,18 +103,18 @@ void TList::Draw(int souris_x, int souris_y)
 		SetHint("");
 }
 
-bool TList::Clic (int mouse_x, int mouse_y, int button)
+bool TList::Clic (const Point2i& pos, int button)
 {
 	bool click = false;
 
 	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
-		if((*it)->Visible() && !click && (*it)->Clic(mouse_x, mouse_y, button))
+		if((*it)->Visible() && !click && (*it)->Clic(pos, button))
 		{
 			(*it)->SetFocus();
 			if((*it)->OnClick())
 				(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
 			if((*it)->OnClickPos())
-				(*(*it)->OnClickPos()) (*it, mouse_x, mouse_y);
+				(*(*it)->OnClickPos()) (*it, pos);
 			click = true;
 		}
 		else if(!(*it)->ForceFocus())
@@ -138,15 +140,17 @@ void TList::SetXY (int px, int py)
  *                                 TComponent                                               *
  ********************************************************************************************/
 
-void TComponent::SetHeight (uint ph)
+void TComponent::SetHeight (int ph)
 {
-	if(h == ph) return;
-	h = ph;
+	if(Height() == ph) return;
+	Rectanglei::SetHeight (ph);
 	Init();
+	SetWantRedraw();
 }
 
-void TComponent::SetWidth (uint pw) {
-	if(w == pw) return;
-	w = pw;
+void TComponent::SetWidth (int pw) {
+	if(Width() == pw) return;
+	Rectanglei::SetWidth (pw);
 	Init();
+	SetWantRedraw();
 }

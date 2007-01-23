@@ -74,7 +74,6 @@ uint TMessageBox::Show()
 	{
 		do
 		{
-			int x=0, y=0;
 			while( SDL_PollEvent( &event) )
 			{
 				switch(event.type)
@@ -92,22 +91,26 @@ uint TMessageBox::Show()
 						break;
 
 					case SDL_MOUSEBUTTONDOWN:
+					{
+						Point2i mouse(event.button.x, event.button.y);
 						if(edit)
-							edit->Clic(event.button.x, event.button.y, event.button.button);
+							edit->Clic(mouse, event.button.button);
 						for(uint i=0; i<boutons.size();i++)
-							if(boutons[i]->Clic(event.button.x, event.button.y, event.button.button))
+							if(boutons[i]->Clic(mouse, event.button.button))
 								return boutons[i]->Tag;
 						break;
+					}
 					default:
 						break;
 				}
 			}
+			int x, y;
 			SDL_GetMouseState( &x, &y);
 			if(realbg)
 				Window()->Blit(realbg);
 
 			if(Form)
-				Form->Update(x,y,false);
+				Form->Update(false);
 			Draw(x,y);
 			Window()->Flip();
 		} while(1);
@@ -127,7 +130,7 @@ void TMessageBox::Draw()
 	if(realbg)
 		Window()->Blit(realbg);
 	if(Form)
-		Form->Update(x,y,false);
+		Form->Update(false);
 	Draw(x,y);
 	Window()->Flip();
 }
@@ -139,24 +142,29 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 
 	uint vert = y;
 
+	Point2i mouse(mouse_x, mouse_y);
+
 	for (std::vector<TLabel>::iterator it = message.begin(); it != message.end(); ++it, vert += height_string)
 	{
 		it->SetXY(x+25, vert);
-		it->Draw(mouse_x, mouse_y);
+		it->Draw(mouse);
 		//Font::GetInstance(Font::Normal)->WriteLeft(x+25, vert, *it, black_color);
 	}
 
 	if(edit)
 	{
 		vert += 10;
-		edit->Draw(mouse_x, mouse_y);
+		edit->Draw(mouse);
 		vert += edit->Height();
 	}
 
 	vert += 20;
 
 	for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
-		(*it)->Draw(mouse_x, mouse_y);
+		(*it)->Draw(mouse);
+
+	if(Form)
+		Form->SetMustRedraw();
 
 	return;
 }
@@ -219,13 +227,13 @@ void TMessageBox::Init(std::string s, bool transparence)
 	{
 		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
 		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-		background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255*7/10));
+		background.FillRect(r_back, background.MapRGBA(172, 183, 255, 255*6/10));
 	}
 	else
 	{
 		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, w, h,
 		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-		background.FillRect(r_back, background.MapRGBA(255, 255, 255, 255));
+		background.FillRect(r_back, background.MapRGBA(172, 183, 255, 255));
 	}
 
 	if(x == -1 && y == -1)

@@ -26,6 +26,9 @@
 #include "gui/ListBox.h"
 #include "gui/Memo.h"
 #include "gui/Label.h"
+#include "Timer.h"
+
+class EC_Client;
 
 /** This is class based on TForm showed when I am connected */
 class TConnectedForm : public TForm
@@ -55,6 +58,15 @@ public:
 public:
 
 	std::string Rejoin;
+	bool refresh;
+
+	void SetClient(EC_Client* cl) { client = cl; }
+
+private:
+	EC_Client* client;
+	Timer timer;
+	void AfterDraw();
+	void OnClic(const Point2i& position, int button, bool& stop);
 };
 
 /** This is class based on TForm show a server list received from a meta-server */
@@ -82,5 +94,10 @@ public:
 	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers;
 
 	bool RecvSList;
+
+private:
+	Timer timer;
+	void AfterDraw();
+	void OnClic(const Point2i& position, int button, bool& stop);
 };
 #endif

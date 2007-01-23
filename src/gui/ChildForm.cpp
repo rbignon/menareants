@@ -44,20 +44,20 @@ void TChildForm::PressKey(SDL_keysym k)
 		(*it)->PressKey(k);
 }
 
-bool TChildForm::Clic(int _x, int _y, int _button)
+bool TChildForm::Clic(const Point2i& mouse, int _button)
 {
-	if(!Test(_x,_y,_button)) return false;
+	if(!Test(mouse,_button)) return false;
 
 	TComponent* clicked = 0;
 	/* Va dans l'ordre inverse */
 	for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-		if((*it)->Visible() && !clicked && (*it)->Clic(_x, _y, _button))
+		if((*it)->Visible() && !clicked && (*it)->Clic(mouse, _button))
 		{
 			(*it)->SetFocus();
 			if((*it)->OnClick())
 				(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
 			if((*it)->OnClickPos())
-				(*(*it)->OnClickPos()) (*it, _x, _y);
+				(*(*it)->OnClickPos()) (*it, mouse);
 			clicked = *it;
 			break;
 		}
@@ -68,7 +68,7 @@ bool TChildForm::Clic(int _x, int _y, int _button)
 	return true;
 }
 
-void TChildForm::Draw(int _x, int _y)
+void TChildForm::Draw(const Point2i& mouse)
 {
 	if(background)
 	{
@@ -81,20 +81,25 @@ void TChildForm::Draw(int _x, int _y)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
-			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
+			   (WantRedraw() || (*it)->WantRedraw() || lastmpos != mouse && (*it)->Mouse(mouse) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(mouse)))
 			{
-				if((*it)->OnMouseOn() && (*it)->Mouse(_x, _y))
+				if(background)
+					Window()->Blit(background, **it, (*it)->GetPosition());
+				if((*it)->OnMouseOn() && (*it)->Mouse(mouse))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				(*it)->Draw(_x, _y);
-				if(!put_hint && (*it)->Visible() && (*it)->HaveHint() && (*it)->Mouse(_x,_y))
+				(*it)->Draw(mouse);
+				if(!put_hint && (*it)->Visible() && (*it)->HaveHint() && (*it)->Mouse(mouse))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;
 				}
+				(*it)->SetWantRedraw(false);
 			}
 		if(first) first = false;
 		else break;
 	}
+	lastmpos = mouse;
 	if(!put_hint)
 		SetHint("");
 }
@@ -109,7 +114,6 @@ void TChildForm::Clear()
 void TChildForm::SetXY(int _x, int _y)
 {
 	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-		(*it)->SetXY(((*it)->X() - x) + _x, ((*it)->Y() - y) + _y);
-	x = _x;
-	y = _y;
+		(*it)->SetXY(((*it)->X() - X()) + _x, ((*it)->Y() - Y()) + _y);
+	TComponent::SetXY(_x, _y);
 }

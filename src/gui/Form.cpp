@@ -23,7 +23,7 @@
 #include <SDL.h>
 
 TForm::TForm(ECImage* w)
-	: background(0), focus_order(true), Hint(0), mutex(0), max_fps(50)
+	: want_quit(false), background(0), focus_order(true), Hint(0), mutex(0), max_fps(50), must_redraw(true)
 {
 	SetWindow(w);
 }
@@ -66,26 +66,20 @@ void TForm::Run(bool *(func)())
 {
 	if(!func) return;
 
-	while((*func)())
+	while((*func)() && !want_quit)
 	{
 		Actions();
 		Update();
 	}
 }
 
-void TForm::Update()
+void TForm::Run(uint a)
 {
-	Update(-1,-1,true);
-}
-
-void TForm::Update(int x, int y)
-{
-	Update(x,y,true);
-}
-
-void TForm::Update(bool flip)
-{
-	Update(-1,-1,flip);
+	while(!want_quit)
+	{
+		Actions(a);
+		Update();
+	}
 }
 
 void TForm::Actions(uint a)
@@ -106,23 +100,29 @@ void TForm::Actions(SDL_Event event, uint a)
 		case SDL_KEYDOWN:
 			if(!(a & ACTION_NOKEY))
 			{
+				OnKeyDown(event.key.keysym);
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 					(*it)->PressKey(event.key.keysym);
 			}
 			break;
+		case SDL_KEYUP:
+			if(!(a & ACTION_NOKEY))
+				OnKeyUp(event.key.keysym);
+			break;
 		case SDL_MOUSEMOTION:
 		{
+			Point2i mouse(event.button.x,event.button.y);
+			OnMouseMotion(mouse);
 			if(Hint)
 			{
 				Hint->ClearItems();
-				bool put_hint = false;
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 				{
-					if(!put_hint && Hint && (*it)->Visible() && (*it)->HaveHint() &&
-					   ((*it)->DynamicHint() || (*it)->Mouse(event.button.x,event.button.y)))
+					if((*it)->Visible() && (*it)->HaveHint() &&
+					   ((*it)->DynamicHint() || (*it)->Mouse(mouse)))
 					{
 						Hint->AddItem((*it)->Hint());
-						put_hint = true;
+						break;
 					}
 				}
 			}
@@ -131,22 +131,26 @@ void TForm::Actions(SDL_Event event, uint a)
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if(a & ACTION_NOMOUSE) break;
-			bool click = false;
+			bool click = false, stop = false;
+			Point2i mouse(event.button.x, event.button.y);
 			/* Va dans l'ordre inverse */
 			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				if((*it)->Visible() && !click && (a & ACTION_NOCLIC) ? (*it)->Test(event.button.x, event.button.y, event.button.button)
-				                                                     : (*it)->Clic(event.button.x, event.button.y, event.button.button))
+				if((*it)->Visible() && (a & ACTION_NOCLIC) ? (*it)->Test(mouse, event.button.button)
+				                                           : (*it)->Clic(mouse, event.button.button) && !click)
 				{
 					if(!(a & ACTION_NOFOCUS))
 						(*it)->SetFocus();
 					if((*it)->OnClick() && !(a & ACTION_NOCALL))
 						(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
 					if((*it)->OnClickPos() && !(a & ACTION_NOCALL))
-						(*(*it)->OnClickPos()) (*it, event.button.x, event.button.y);
+						(*(*it)->OnClickPos()) (*it, mouse);
 					click = true;
 				}
 				else if(!(*it)->ForceFocus())
 					(*it)->DelFocus();
+
+			OnClic(mouse, event.button.button, stop);
+			SetMustRedraw();
 			break;
 		}
 		default:
@@ -156,13 +160,18 @@ void TForm::Actions(SDL_Event event, uint a)
 		SDL_UnlockMutex(mutex);*/
 }
 
-void TForm::Update(int _x, int _y, bool flip)
+void TForm::Update(bool flip)
 {
-	if(background)
+	int _x, _y;
+
+	BeforeDraw();
+
+	if(background && MustRedraw())
 		Window()->Blit(background);
 
-	if(_x < 0 || _y < 0)
-		SDL_GetMouseState( &_x, &_y);
+	SDL_GetMouseState( &_x, &_y);
+
+	Point2i pos(_x, _y);
 
 	if(mutex)
 		SDL_LockMutex(mutex);
@@ -174,15 +183,21 @@ void TForm::Update(int _x, int _y, bool flip)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
-			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)))
+			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
+			   (MustRedraw() || (*it)->WantRedraw() || lastmpos != pos && (*it)->Mouse(pos) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)))
 			{
-				if((*it)->OnMouseOn() && (*it)->Mouse(_x, _y))
+				if(background && (*it)->RedrawBackground())
+					Window()->Blit(background, **it, (*it)->GetPosition());
+				if((*it)->OnMouseOn() && (*it)->Mouse(pos))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				(*it)->Draw(_x, _y);
+				(*it)->Draw(pos);
+				(*it)->SetWantRedraw(false);
 			}
 		if(first) first = false;
 		else break;
 	}
+
+	lastmpos = pos;
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);
@@ -197,6 +212,10 @@ void TForm::Update(int _x, int _y, bool flip)
 		sleep_fps = 0;
 	if(sleep_fps >= SDL_TIMESLICE)
 		SDL_Delay(sleep_fps);
+
+	SetMustRedraw(false);
+
+	AfterDraw();
 
 	//SDL_Delay(15);
 }

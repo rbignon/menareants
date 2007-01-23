@@ -34,8 +34,8 @@ class TLabel : public TComponent
 public:
 
 	TLabel();
-	TLabel(int x, int y, std::string s, Color new_color, Font* new_font, bool shadowed = false);
-	TLabel(int y, std::string s, Color new_color, Font* new_font, bool shadowed = false);
+	TLabel(int x, int y, const std::string& s, Color new_color, Font* new_font, bool shadowed = false);
+	TLabel(int y, const std::string& s, Color new_color, Font* new_font, bool shadowed = false);
 	TLabel(const TLabel&);
 
 /* Methodes */
@@ -45,20 +45,23 @@ public:
 	virtual void Init();
 
 	/** Draw */
-	void Draw(int m_x, int m_y);
+	void Draw(const Point2i&);
 
 /* Attributs */
 public:
 
+	void SetGrayDisable(bool b = true) { gray_disable = b; }
 	void SetColor(Color new_color);
 	void SetFont(Font*);
 	void SetFontColor(Font*, Color);
 	void SetCaption(std::string text);
-	std::string Caption() const { return caption; }
+	const std::string& Caption() const { return caption; }
 	bool Empty() const { return caption.empty(); }
 
+	virtual void SetEnabled(bool _en = true);
+
 /* Variables privées */
-protected:
+private:
 	std::string caption;
 	ECImage surf;
 	ECImage background;
@@ -67,6 +70,7 @@ protected:
 	bool shadowed;
 	uint bg_offset;
 	bool auto_set;
+	bool gray_disable;
 
 	void Reinit();
 };

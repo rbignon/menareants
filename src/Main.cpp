@@ -231,6 +231,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 				}
 #endif
 				MainForm->SetRelativePositions();
+				MainForm->SetMustRedraw();
 			}
 			MainForm->Update();
 		} while(!want_quit);

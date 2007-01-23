@@ -47,8 +47,8 @@ void TSpinEdit::Init()
   uint max_value_w = font->GetWidth(max_value_s.str());
   uint margin = 5;
 
-  m_plus.SetXY(x+w-10,y);
-  m_minus.SetXY(x+w-max_value_w-10-2*margin,y);
+  m_plus.SetXY(X()+Width()-10,Y());
+  m_minus.SetXY(X()+Width()-max_value_w-10-2*margin,Y());
   MyComponent(&m_plus);
   MyComponent(&m_minus);
   m_plus.SetImage (new ECSprite(Resources::UpButton(), Window()));
@@ -81,6 +81,8 @@ bool TSpinEdit::SetValue(int _value, bool first)
   uint center = (m_plus.X() +10 + m_minus.X() )/2 - font->GetWidth(s)/2;
   txt_value.SetX(center);
 
+  SetWantRedraw();
+
   return true;
 }
 
@@ -106,29 +108,29 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 	return false;
 }
 
-void TSpinEdit::Draw (int mouse_x, int mouse_y)
+void TSpinEdit::Draw (const Point2i& mouse)
 {
-	txt_label.Draw(mouse_x, mouse_y);
+	txt_label.Draw(mouse);
 
-	if(enabled)
+	if(Enabled())
 	{
-		m_minus.Draw (mouse_x, mouse_y);
-		m_plus.Draw (mouse_x, mouse_y);
+		m_minus.Draw (mouse);
+		m_plus.Draw (mouse);
 	}
 
-	txt_value.Draw(mouse_x, mouse_y);
+	txt_value.Draw(mouse);
 }
 
 //-----------------------------------------------------------------------------
 
-bool TSpinEdit::Clic (int mouse_x, int mouse_y, int button)
+bool TSpinEdit::Clic (const Point2i& mouse, int button)
 {
-  if(!enabled || !Mouse(mouse_x, mouse_y)) return false;
+  if(!Enabled() || !Mouse(mouse)) return false;
 
-  if(button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_RIGHT || m_plus.Test(mouse_x, mouse_y, button))
+  if(button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_RIGHT || m_plus.Test(mouse, button))
     return ChangeValueByClick(true);
   else if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT
-          /* inutile du coup, vu que Test() nécessite button == SDL_BUTTON_LEFT|| m_minus.Test(mouse_x, mouse_y, button) */
+          /* inutile du coup, vu que Test() nécessite button == SDL_BUTTON_LEFT|| m_minus.Test(mouse, button) */
          )
     return ChangeValueByClick(false);
 
@@ -142,7 +144,7 @@ void TSpinEdit::SetColorFont(Color new_color, Font* new_font)
 	Init();
 }
 
-void TSpinEdit::SetXY (int px, int py) { x = px; y = py; Init(); }
+void TSpinEdit::SetXY (int px, int py) { TComponent::SetXY(px, py); Init(); }
 
 void TSpinEdit::SetMax(int _max)
 {

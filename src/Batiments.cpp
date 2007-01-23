@@ -362,7 +362,7 @@ void ECDefenseTower::AfterDraw()
 			Map()->ShowMap()->CenterTo(cible);
 
 		// On fait assez large
-		Map()->ShowMap()->ToRedraw((int)x-CASE_WIDTH, (int)y-CASE_HEIGHT, 3*CASE_WIDTH, 3*CASE_HEIGHT);
+		Map()->ShowMap()->ToRedraw(Rectanglei((int)x-CASE_WIDTH, (int)y-CASE_HEIGHT, 3*CASE_WIDTH, 3*CASE_HEIGHT));
 	}
 	else
 	{
@@ -466,11 +466,11 @@ bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_C
 			victim = c;
 			SDL_Delay(1500);
 			victim = 0;
-			Map()->ShowMap()->ToRedraw(c->X() < Case()->X() ? c->Image()->X()+CASE_WIDTH /2
+			Map()->ShowMap()->ToRedraw(Rectanglei(c->X() < Case()->X() ? c->Image()->X()+CASE_WIDTH /2
 				                                            : Image()->X()+CASE_WIDTH /2,
 				                       c->Y() < Case()->Y() ? c->Image()->Y()+CASE_HEIGHT/2
 				                                            : Image()->Y()+CASE_HEIGHT/2,
-				                       img.GetWidth(), img.GetHeight());
+				                       img.GetWidth(), img.GetHeight()));
 			img.SetImage(0);
 			return true;
 		}

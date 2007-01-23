@@ -58,7 +58,7 @@ public:
 	void InitSDL(void);
 	void Flip(void);
 
-	bool SetConfig(uint width, uint height, bool fullscreen);
+	bool SetConfig(int width, int height, bool fullscreen);
 
 /* Attributs */
 public:
@@ -69,8 +69,8 @@ public:
 	uint MaxFps();
 	uint SleepMaxFps();
 	ECImage* Window() { return &window; }
-	uint Height() { return window.GetHeight(); }
-	uint Width() { return window.GetWidth(); }
+	int Height() { return window.GetHeight(); }
+	int Width() { return window.GetWidth(); }
 	bool IsFullScreen(void) const;
 
 /* Variables privées */
@@ -81,7 +81,7 @@ private:
 	bool fullscreen;
 
 	ECImage window;
-	
+
 public:
 
 	static Video* singleton;

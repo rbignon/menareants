@@ -47,10 +47,10 @@ public:
 	TFPS(int x, int y, Font*);
 
 	void Init();
-	
+
 	void Reset();
 	void AddOneFrame();
-	void Draw(int, int);
+	void Draw(const Point2i&);
 };
 
 #endif /* EC_FPS_H */

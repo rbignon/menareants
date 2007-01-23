@@ -49,7 +49,7 @@ public:
 	void Init ();
 
 	/* Affiche */
-	void Draw(int m_x, int m_y);
+	void Draw(const Point2i&);
 
 	void Redraw();
 

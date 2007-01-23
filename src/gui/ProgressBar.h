@@ -35,7 +35,7 @@ private:
 		Color color;
 		uint val;
 	} marqueur_t;
-	
+
 	typedef std::list<marqueur_t>::iterator marqueur_it;
 	typedef std::list<marqueur_t>::const_iterator marqueur_it_const;
 
@@ -50,7 +50,7 @@ public:
 	void Init() {}
 
 	/// Draw la barre de progresssion
-	void Draw(int souris_x, int souris_y);
+	void Draw(const Point2i&);
 
 /* Attributs */
 public:
@@ -73,7 +73,7 @@ public:
 	void InitVal (long val, long min, long max);
 
 	long Max() const { return max; }
-	
+
 	/** Set reference value
 	 * Use it after InitVal !
 	 */
@@ -91,17 +91,17 @@ public:
 private:
 	Color border_color, value_color, background_color;
 	ECImage image; // in order to pemit alpha blended progressbar
-	
+
 	long val, min, max; // Valeur
 	bool m_use_ref_val; // Valeur de référence
 	long m_ref_val; // Valeur de référence
 	uint val_barre; // Valeur dans la barre
-	
+
 	uint CalculeVal (long val) const;
 	uint CalculeValBarre (long val) const;
 
 	bool background;
-	
+
 	std::list<marqueur_t> marqueur;
 };
 

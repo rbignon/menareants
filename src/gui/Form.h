@@ -109,16 +109,10 @@ public:
 /* Methodes */
 public:
 
-	/* Dessine chaques composants */
-	void Update(); /**< Draw all components */
-	void Update(bool flip); /**< Draw all components @param flip If true, function calls SDL_Flip() */
-	void Update(int x, int y); /**< Draw all components @param x x position of mouse @param y y position of mouse */
 	/** Draw all components
-	 * @param x x position of mouse
-	 * @param y y position of mouse
 	 * @param flip If true, function calls SDL_Flip() and draw directly with SDL
 	 */
-	void Update(int x, int y, bool flip);
+	void Update(bool flip = true);
 
 	#define ACTION_NOFOCUS       0x001
 	#define ACTION_NOCLIC        0x002
@@ -134,7 +128,18 @@ public:
 	 */
 	void Actions(SDL_Event event, uint a = 0);
 
-	void Run(bool *(func)() = 0);
+	void Run(bool *(func)());
+	void Run(uint a = 0);
+
+/* Evenements */
+protected:
+
+	virtual void OnClic(const Point2i& mouse, int button, bool& stop) {}
+	virtual void BeforeDraw() {}
+	virtual void AfterDraw() {}
+	virtual void OnMouseMotion(const Point2i& mouse) {}
+	virtual void OnKeyDown(SDL_keysym key) {}
+	virtual void OnKeyUp(SDL_keysym key) {}
 
 /* Attributs */
 public:
@@ -157,6 +162,12 @@ public:
 	void SetMaxFPS(int mps) { max_fps = mps; }
 	int MaxFPS() const { return max_fps; }
 
+	bool MustRedraw() const { return must_redraw; }
+	void SetMustRedraw(bool b = true) { must_redraw = b; }
+
+	bool WantQuit() const { return want_quit; }
+	void SetWantQuit(bool b = true) { want_quit = b; }
+
 /* Variables protégées */
 protected:
 
@@ -176,6 +187,8 @@ protected:
 
 	void Clear();
 
+	bool want_quit;
+
 /* Variables privées */
 private:
 	std::vector<TComponent*> composants;
@@ -184,6 +197,8 @@ private:
 	TMemo* Hint;
 	SDL_mutex* mutex;
 	uint max_fps;
+	bool must_redraw;
+	Point2i lastmpos;
 };
 
 #endif /* EC_FORM_H */

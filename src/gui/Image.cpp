@@ -45,8 +45,10 @@ void TImage::Init()
 	if(!image)
 		return;
 
-	w = image->Img->w;
-	h = image->Img->h;
+	size.x = image->Img->w;
+	size.y = image->Img->h;
+
+	SetWantRedraw();
 }
 
 void TImage::SetImage(ECImage* _img, bool _wd)
@@ -61,9 +63,9 @@ void TImage::SetImage(ECImage* _img, bool _wd)
 	Show();
 }
 
-void TImage::Draw(int _x, int _y)
+void TImage::Draw(const Point2i& mouse)
 {
 	if(!image || image->IsNull() || !Window()) return;
-	SDL_Rect r_back = {x,y,w,h};
-	Window()->Blit(image, &r_back);
+
+	Window()->Blit(image, position);
 }
