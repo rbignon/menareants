@@ -21,5 +21,6 @@
 #ifndef ECMS_MAIN_H
 #define ECMS_MAIN_H
 
+extern int myproto;
 
 #endif /* ECMS_MAIN_H */

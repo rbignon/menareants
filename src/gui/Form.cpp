@@ -104,10 +104,12 @@ void TForm::Actions(SDL_Event event, uint a)
 				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 					(*it)->PressKey(event.key.keysym);
 			}
+			SetMustRedraw();
 			break;
 		case SDL_KEYUP:
 			if(!(a & ACTION_NOKEY))
 				OnKeyUp(event.key.keysym);
+			SetMustRedraw();
 			break;
 		case SDL_MOUSEMOTION:
 		{
@@ -162,9 +164,31 @@ void TForm::Actions(SDL_Event event, uint a)
 
 void TForm::Update(bool flip)
 {
-	int _x, _y;
-
 	BeforeDraw();
+
+	unsigned int start, delay, sleep_fps;
+	start = SDL_GetTicks();
+
+	Draw(flip);
+
+	delay = SDL_GetTicks()-start;
+	if (delay < max_fps)
+		sleep_fps = max_fps - delay;
+	else
+		sleep_fps = 0;
+	if(sleep_fps >= SDL_TIMESLICE)
+		SDL_Delay(sleep_fps);
+
+	SetMustRedraw(false);
+
+	AfterDraw();
+
+	//SDL_Delay(15);
+}
+
+void TForm::Draw(bool flip)
+{
+	int _x, _y;
 
 	if(background && MustRedraw())
 		Window()->Blit(background);
@@ -177,8 +201,6 @@ void TForm::Update(bool flip)
 		SDL_LockMutex(mutex);
 
 	bool first = focus_order ? true : false;
-	unsigned int start, delay, sleep_fps;
-	start = SDL_GetTicks();
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
@@ -204,18 +226,4 @@ void TForm::Update(bool flip)
 
 	if(flip)
 		Window()->Flip();
-
-	delay = SDL_GetTicks()-start;
-	if (delay < max_fps)
-		sleep_fps = max_fps - delay;
-	else
-		sleep_fps = 0;
-	if(sleep_fps >= SDL_TIMESLICE)
-		SDL_Delay(sleep_fps);
-
-	SetMustRedraw(false);
-
-	AfterDraw();
-
-	//SDL_Delay(15);
 }

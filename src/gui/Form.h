@@ -114,6 +114,8 @@ public:
 	 */
 	void Update(bool flip = true);
 
+	void Draw(bool flip = true);
+
 	#define ACTION_NOFOCUS       0x001
 	#define ACTION_NOCLIC        0x002
 	#define ACTION_NOCALL        0x004

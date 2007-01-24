@@ -104,15 +104,7 @@ uint TMessageBox::Show()
 						break;
 				}
 			}
-			int x, y;
-			SDL_GetMouseState( &x, &y);
-			if(realbg)
-				Window()->Blit(realbg);
-
-			if(Form)
-				Form->Update(false);
-			Draw(x,y);
-			Window()->Flip();
+			Draw();
 		} while(1);
 	}
 	catch(...)
@@ -130,7 +122,7 @@ void TMessageBox::Draw()
 	if(realbg)
 		Window()->Blit(realbg);
 	if(Form)
-		Form->Update(false);
+		Form->Draw(false);
 	Draw(x,y);
 	Window()->Flip();
 }

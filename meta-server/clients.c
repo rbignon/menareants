@@ -19,10 +19,14 @@
  */
 
 #include <string.h>
-#include "lib/Defines.h"
+#include <assert.h>
+#include "main.h"
 #include "clients.h"
 #include "servers.h"
 #include "sockets.h"
+#include "lib/Defines.h"
+
+struct User* user_head = 0;
 
 /* LSP <ip:port> <nom> <+/-> <nbjoueurs> <nbmax> <nbgames> <maxgames> <nbwgames> <proto> */
 static void list_servers(struct Client* cl)
@@ -34,7 +38,6 @@ static void list_servers(struct Client* cl)
 		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto);
 
 	sendrpl(cl, "EOL");
-	delclient(cl);
 	return;
 }
 
@@ -44,14 +47,29 @@ int m_login (struct Client* cl, int parc, char** parv)
 	if(cl->flags) return 0; /* Réidentification. */
 	if(parc < 4) return delclient(cl);
 
-	if(strcmp(parv[3], APP_MSPROTO)) /* Protocole différent, abort */
+	int proto = atoi(parv[3]);
+
+	if(proto > myproto || proto < 1)
 		return delclient(cl);
+
+	cl->proto = proto;
 
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
+		if(proto >= 2)
+		{
+			struct User* user = user_head;
+			for(; user; user = user->next)
+				if(!strcasecmp(user->name, parv[1]))
+					return sendrpl(cl, "NICKUSED");
+
+			add_user(cl, parv[1]);
+		}
 		cl->flags = CL_USER;
 		sendrpl(cl, "STAT %d %d", nb_tchan, nb_tusers);
 		list_servers(cl);
+		if(proto <= 1)
+			delclient(cl);
 	}
 	else if(!strcmp(parv[2], SERV_SMALLNAME))
 	{
@@ -65,3 +83,43 @@ int m_login (struct Client* cl, int parc, char** parv)
 	}
 	return 0;
 }
+
+struct User* add_user(struct Client* cl, const char* name)
+{
+	struct User *user = calloc(1, sizeof* user), *head = user_head;
+
+	if(!user)
+		return 0;
+
+	if(cl->user || cl->server)
+	{
+		free(user);
+		return 0;
+	}
+
+	strncpy(user->name, name, NICKLEN);
+	user->client = cl;
+
+	cl->user = user;
+
+	user_head = user;
+	user->next = head;
+	if(head)
+		head->last = user;
+
+	return user;
+}
+
+void remove_user(struct User* user)
+{
+	assert(user);
+
+	user->client->user = 0;
+
+	if(user->next) user->next->last = user->last;
+	if(user->last) user->last->next = user->next;
+	else user_head = user->next;
+
+	free(user);
+}
+

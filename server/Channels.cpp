@@ -115,7 +115,7 @@ int AMSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	static char buf[MAXBUFFER + 1];
 	int len;
 
-	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), cl->GetNick(), FormatStr("[private] " + parv[1]).c_str());
+	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), (cl->Nick() + ":private").c_str(), parv[1].c_str());
 
 	if(len < 0) len = sizeof buf -2;
 
@@ -1770,12 +1770,12 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 /** \attention Lors de rajouts de modes, modifier API paragraphe 4. Modes */
 std::string EChannel::ModesStr() const
 {
-	std::string     modes = "+", params = "";
-	if(Limite())    modes += "l", params = " " + TypToStr(Limite());
+	std::string     modes = "+",  params = "";
+	                modes += "l", params = " " + TypToStr(Limite());
 	if(Map())       modes += "m", params += " " + TypToStr(Map()->Num());
 	                modes += "b", params += " " + TypToStr(begin_money);
 	if(FastGame())  modes += "r";
-	if(TurnTime())  modes += "t", params += " " + TypToStr(TurnTime());
+	                modes += "t", params += " " + TypToStr(TurnTime());
 
 	switch(State())
 	{

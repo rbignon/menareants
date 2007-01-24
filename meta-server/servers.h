@@ -22,12 +22,11 @@
 #define ECMS_SERVERS_H
 
 #define SERVERLEN 50
-#define MAPLEN 30
 
 struct Server
 {
 	struct Client* client;
-	char name[SERVERLEN];
+	char name[SERVERLEN+1];
 	int proto;
 	int max_players;
 	int nb_players;

@@ -110,21 +110,21 @@ public:
 
 /* Variables privées */
 private:
-  bool always_one_selected;
-  bool no_item_hint;
+	bool always_one_selected;
+	bool no_item_hint;
 
 protected:
-  // what are the items ?
-  uint first_visible_item;
-  int selected_item;
-  std::vector<TListBoxItem*> m_items;
+	// what are the items ?
+	uint first_visible_item;
+	int selected_item;
+	std::vector<TListBoxItem*> m_items;
 
-  Color box_color;
+	Color box_color;
 
-  // Buttons
-  TButton m_up, m_down;
+	// Buttons
+	TButton m_up, m_down;
 
-  OnChangeFunc on_change;
+	OnChangeFunc on_change;
 };
 
 #endif

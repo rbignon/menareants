@@ -495,6 +495,7 @@ int ECServer::run_server(void)
 					char buf[MAXBUFFER];
 					if(recv(i, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
 					{
+						Debug(W_WARNING, "Error in recv(meta-server) (%d: %s)\n", errno, strerror(errno));
 						close(ms_sock);
 						ms_sock = 0;
 						ConnectMetaServer();

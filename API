@@ -250,3 +250,5 @@ Sommaire:
         > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste une partie
                      <nbmax> <nbgames> <maxgames> <proto>
         > EOL                                              :fin du listing
+
+        > NICKUSED                                         :pseudo déjà utilisé

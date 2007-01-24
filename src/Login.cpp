@@ -31,7 +31,7 @@
 #include "Config.h"
 #include "Timer.h"
 #include "JoinGame.h"
-
+#include <errno.h>
 #ifdef WIN32
 #include <winsock2.h>
 #else
@@ -283,7 +283,10 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
+	{
+		Debug(W_DEBUG, "Unable to connect to %s (%d: %s)", parv[2].c_str(), errno, strerror(errno));
 		return 0;
+	}
 
 	me->LockScreen();
 	ListServerForm->ServerList->AddItem(false,
@@ -473,16 +476,16 @@ TListServerForm::TListServerForm(ECImage* w)
 	Label2 = AddComponent(new TLabel(ServerList->X(), ServerList->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
 	Label2->SetCaption("Ping  Name                 Proto  Joueurs  Parties  En attente");
 
-	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2 - 100, Label1->Y()/2, 200,50));
+	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2 - 100, Label1->Y()/2, 220,50));
 	MissionButton->SetImage(new ECSprite(Resources::MissionButton(), Video::GetInstance()->Window()));
 
 	if(Label1->Y() - (MissionButton->Y()+MissionButton->Height()) <= 50)
 	{
 		MissionButton->SetX(MissionButton->X() - 200);
-		EscarmoucheButton = AddComponent(new TButton(MissionButton->X()+MissionButton->Width()+100, MissionButton->Y(), 200,50));
+		EscarmoucheButton = AddComponent(new TButton(MissionButton->X()+MissionButton->Width()+100, MissionButton->Y(), 220,50));
 	}
 	else
-		EscarmoucheButton = AddComponent(new TButton(MissionButton->X(), MissionButton->Y()+MissionButton->Height()+(Label1->Y() - (MissionButton->Y()+MissionButton->Height()))/2-25, 200,50));
+		EscarmoucheButton = AddComponent(new TButton(MissionButton->X(), MissionButton->Y()+MissionButton->Height()+(Label1->Y() - (MissionButton->Y()+MissionButton->Height()))/2-25, 220,50));
 
 	EscarmoucheButton->SetImage(new ECSprite(Resources::EscarmoucheButton(), Video::GetInstance()->Window()));
 
@@ -601,7 +604,7 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 {
 	if(EC_Client::GetInstance())
 	{
-		FDebug(W_SEND|W_ERR, "Appel en étant déjà connecté !");
+		FDebug(W_SEND|W_ERR, "We are already connected !");
 		return;
 	}
 
@@ -732,7 +735,7 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 }
 
 TConnectedForm::TConnectedForm(ECImage* w)
-	: TForm(w), refresh(false), client(0)
+	: TForm(w), refresh(true), client(0)
 {
 	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 0, 0, 400,350, 0));
 	Motd->SetXY(Window()->GetWidth()/2 - Motd->Width()/2 - (200+150+10+10)/2, Window()->GetHeight()/2 - Motd->Height()/2);
@@ -748,12 +751,12 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	int button_x = GList->X() + GList->Width() + 10;
 
-	CreerButton = AddComponent(new TButtonText(button_x, GList->Y(), 150,50, "Créer une partie",
-	                                            Font::GetInstance(Font::Normal)));
-	JoinButton = AddComponent(new TButtonText(button_x, CreerButton->Y()+CreerButton->Height(), 150,50, "Rejoindre",
+	JoinButton = AddComponent(new TButtonText(button_x, GList->Y(), 150,50, "Rejoindre",
 	                                            Font::GetInstance(Font::Normal)));
 	JoinButton->SetEnabled(false);
-	RefreshButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(),150,50, "Actualiser",
+	CreerButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(), 150,50, "Créer une partie",
+	                                            Font::GetInstance(Font::Normal)));
+	RefreshButton = AddComponent(new TButtonText(button_x,CreerButton->Y()+CreerButton->Height(),150,50, "Actualiser",
 	                                                Font::GetInstance(Font::Normal)));
 	DisconnectButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, "Se déconnecter",
 	                                                Font::GetInstance(Font::Normal)));

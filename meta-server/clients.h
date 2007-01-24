@@ -21,7 +21,23 @@
 #ifndef ECMS_CLIENTS_H
 #define ECMS_CLIENTS_H
 
+#include "lib/Defines.h"
+
 struct Client;
+
+struct User
+{
+	struct Client* client;
+	char name[NICKLEN+1];
+
+	struct User *last;
+	struct User *next;
+};
+
+extern struct User* user_head;
+
+struct User* add_user(struct Client* cl, const char* name);
+void remove_user(struct User* user);
 
 int m_login (struct Client*, int, char**);
 

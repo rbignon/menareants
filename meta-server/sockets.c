@@ -129,7 +129,10 @@ int parse_this(struct Client* cl)
 	int read;
 
 	if((read = recv(cl->fd, buf, sizeof buf -1, 0)) <= 0)
-		delclient(cl);
+	{
+		if(errno != EINTR)
+			delclient(cl);
+	}
 	else if(cl->flags & CL_FREE)
 		printf("Reading data from sock #%d, not registered ?\n", cl->fd);
 	else
@@ -181,6 +184,8 @@ struct Client *addclient(int fd, const char *ip)
 	newC->recvlen = 0;
 	newC->fd = fd;
 	newC->server = 0;
+	newC->user = 0;
+	newC->proto = 0;
 	strncpy(newC->ip, ip, IPLEN);
 
 	FD_SET(fd, &global_fd_set);
@@ -197,6 +202,8 @@ int delclient(struct Client *del)
 	del->flags = CL_FREE;
 	if(del->server)
 		remove_server(del->server);
+	if(del->user)
+		remove_user(del->user);
 
 	close(del->fd);
 	if(del->fd >= highsock)

@@ -85,6 +85,7 @@ void TEdit::SetString(std::string s)
 	chaine = s;
 	caret = s.size();
 	first_char = caret > visible_len ? caret - visible_len : 0;
+	have_redraw = true;
 	SetWantRedraw();
 }
 

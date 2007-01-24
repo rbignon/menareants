@@ -27,6 +27,9 @@
 #include <unistd.h>
 #include "main.h"
 #include "sockets.h"
+#include "lib/Defines.h"
+
+int myproto=0;
 
 int main(int argc, char **argv)
 {
@@ -63,6 +66,8 @@ int main(int argc, char **argv)
 		rlim.rlim_max = RLIM_INFINITY;
 		setrlimit(RLIMIT_CORE, &rlim);
 	}
+
+	myproto = atoi(APP_MSPROTO);
 
 	if(init_socket())
 		run_server();

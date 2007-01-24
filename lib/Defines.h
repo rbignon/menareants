@@ -63,6 +63,11 @@
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
 
+#else
+
+#define NICKLEN 10
+#define GAMELEN 20
+
 #endif /* __cplusplus */
 
 #endif /* ECLIB_Defines_h */

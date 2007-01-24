@@ -760,7 +760,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(InGameForm)
 				{
 					if(sender->IsMe())
+					{
 						InGameForm->AddInfo(I_SHIT, "*** VOUS AVEZ PERDU !!!");
+						// On enlève le brouillard pour que l'user puisse voir toute la partie
+						chan->Map()->SetBrouillard(false);
+						InGameForm->Map->SetBrouillard(false);
+					}
 					else
 						InGameForm->AddInfo(I_SHIT, "*** " + std::string(sender->GetNick()) + " a perdu.");
 					me->LockScreen();
@@ -1132,6 +1137,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	 *        départs ?) ou alors pour une eventuelle IA du serveur)
 	 */
 	me->LockScreen();
+	// PAS DE RETURN ICI
 	for(PlayerList::iterator playersi=players.begin(); playersi != players.end();)
 	{
 		if((*playersi)->IsMe())
@@ -1476,7 +1482,10 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 		client->sendrpl(client->rpl(EC_Client::SET),
 		                ("+n " + TypToStr(GameInfosForm->MyNation->Selected())).c_str());
 	else if(RetourButton->Test(mouse, button))
-		want_quit = true;
+	{
+		if(TMessageBox("Êtes vous sûr de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
+			want_quit = true;
+	}
 	else if(PretButton->Test(mouse, button))
 		client->sendrpl(client->rpl(EC_Client::SET), "+!");
 	else if(SpeedGame->Test(mouse, button))
@@ -1607,13 +1616,13 @@ void TPlayerLine::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
 
-	if(position) position->SetXY(px+210, py);
-	if(couleur) couleur->SetXY(px+320, py);
-	if(nation) nation->SetXY(px+430, py);
+	if(position) position->SetXY(px+230, py);
+	if(couleur) couleur->SetXY(px+340, py);
+	if(nation) nation->SetXY(px+440, py);
 
 	if(Ready) Ready->SetXY(px, py);
-	if(Status) Status->SetXY(px+45, py);
-	if(Nick) Nick->SetXY(px+70, py);
+	if(Status) Status->SetXY(px+75, py);
+	if(Nick) Nick->SetXY(px+95, py);
 }
 
 bool TPlayerLine::OwnZone(const Point2i& mouse, int button)
@@ -1630,7 +1639,12 @@ bool TPlayerLine::Test (const Point2i& mouse, int button) const
 void TPlayerLine::Init()
 {
 	assert(pl);
-	if(position) delete position;
+	delete position;
+	delete couleur;
+	delete nation;
+	delete Ready;
+	delete Status;
+	delete Nick;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
 	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  X()+230, Y(), 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
@@ -1653,7 +1667,7 @@ void TPlayerLine::Init()
 	{
 		TListBoxItem* j = nation->AddItem(false, std::string(nations_str[i].name), "");
 		j->SetHint(nations_str[i].infos);
-  }
+	}
 }
 
 void TPlayerLine::Draw(const Point2i& mouse)

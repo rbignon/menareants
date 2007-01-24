@@ -300,6 +300,7 @@ public:
 public:
 
 	TLabel*      Title;
+	TLabel*      Label1;
 
 	TList*       Players;
 

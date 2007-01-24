@@ -41,9 +41,11 @@ struct Server;
 struct Client
 {
 	struct Server* server;
+	struct User* user;
 
 	unsigned int fd;
 	int flags;
+	int proto;
 	char RecvBuf[MAXBUFFER+1];
 	char ip[IPLEN+1];
 	size_t recvlen;

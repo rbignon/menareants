@@ -89,8 +89,14 @@ struct Server* add_server(struct Client* cl, const char* name)
 {
 	struct Server *server = calloc(1, sizeof* server), *head = server_head;
 
-	if(!server || cl->server)
+	if(!server)
 		return 0;
+
+	if(cl->server || cl->user)
+	{
+		free(server);
+		return 0;
+	}
 
 	strncpy(server->name, name, SERVERLEN);
 	server->client = cl;

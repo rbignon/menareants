@@ -187,7 +187,7 @@ void EC_Client::Loop()
 		{
 			if(errno != EINTR)
 			{
-				printf("Erreur lors de select() (%d: %s)\n", errno, strerror(errno));
+				printf("We catch an error from select() (%d: %s)\n", errno, strerror(errno));
 				connected = false;
 				break;
 			}
@@ -199,7 +199,7 @@ void EC_Client::Loop()
 
 		if((r = recv(sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
 		{
-			Debug(W_DEBUG, "Erreur lors de recv() (%d: %s)", errno, strerror(errno));
+			Debug(W_DEBUG, "We catch an error from recv() (%d: %s)", errno, strerror(errno));
 			connected = false;
 			break;
 		}

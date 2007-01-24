@@ -668,6 +668,7 @@ void MenAreAntsApp::InGame()
 		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
 
 	EChannel* chan = client->Player()->Channel();
+	SDL_mutex *AltMutex = 0;
 
 	try
 	{
@@ -675,8 +676,8 @@ void MenAreAntsApp::InGame()
 		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client);
 		InGameForm->SetMutex(mutex);
 		InGameForm->Map->SetMutex(mutex);
-		SDL_mutex *Mutex = SDL_CreateMutex();
-		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, Mutex);
+		AltMutex = SDL_CreateMutex();
+		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, AltMutex);
 		if(!client->Player()->Entities()->empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Resources::SoundStart()->Play();
@@ -703,12 +704,14 @@ void MenAreAntsApp::InGame()
 
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
-		if(Mutex)
-			SDL_DestroyMutex(Mutex);
+		if(AltMutex)
+			SDL_DestroyMutex(AltMutex);
 	}
 	catch(TECExcept &e)
 	{
 		ECAltThread::Stop();
+		if(AltMutex)
+			SDL_DestroyMutex(AltMutex);
 		if(InGameForm && InGameForm->Thread)
 			SDL_WaitThread(InGameForm->Thread, 0);
 		MyFree(InGameForm);
@@ -758,48 +761,55 @@ void TInGameForm::AfterDraw()
 		}
 		timer.reset();
 	}
-	if(chan->State() == EChannel::PLAYING && BarreLat->ProgressBar)
+	switch(chan->State())
 	{
-		BarreLat->ProgressBar->SetValue((long)elapsed_time.time_elapsed(true));
-		if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
-		{
-			client->sendrpl(client->rpl(EC_Client::SET), "+!");
-			elapsed_time.reset();
-		}
-	}
-	else if(chan->State() == EChannel::ANIMING)
-	{
-		elapsed_time.reset();
-		if(ShowWaitMessage.empty() == false)
-		{
-			do
-			{
-				TMessageBox("Veuillez patienter...\n\nUne unité de " + ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
-				            0, InGameForm, false).Draw();
-				SDL_Delay(20);
-			} while(ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
-			Map->SetMustRedraw();
-		}
+		case EChannel::PLAYING:
+			if(!BarreLat->ProgressBar) break;
 
-		if(BarreAct->Select())
-		{
-			BarreAct->UnSelect();
-			want = TInGameForm::W_NONE;
-		}
-	}
-	else if(chan->State() == EChannel::PINGING)
-	{
-		elapsed_time.Pause(true);
-		MenAreAntsApp::GetInstance()->PingingGame();
-		elapsed_time.Pause(false);
-		Map->SetMustRedraw();
+			BarreLat->ProgressBar->SetValue((long)elapsed_time.time_elapsed(true));
+			if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
+			{
+				client->sendrpl(client->rpl(EC_Client::SET), "+!");
+				elapsed_time.reset();
+			}
+			break;
+		case EChannel::ANIMING:
+			elapsed_time.reset();
+			if(ShowWaitMessage.empty() == false)
+			{
+				do
+				{
+					TMessageBox("Veuillez patienter...\n\nUne unité de " + ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
+							0, InGameForm, false).Draw();
+					SDL_Delay(20);
+				} while(ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
+				Map->SetMustRedraw();
+			}
+
+			if(BarreAct->Select())
+			{
+				BarreAct->UnSelect();
+				want = TInGameForm::W_NONE;
+			}
+			break;
+		case EChannel::PINGING:
+			elapsed_time.Pause(true);
+			MenAreAntsApp::GetInstance()->PingingGame();
+			elapsed_time.Pause(false);
+			Map->SetMustRedraw();
+			break;
+		default:
+			break;
 	}
 }
 
 void TInGameForm::OnKeyDown(SDL_keysym key)
 {
 	if(SendMessage->Focused())
+	{
 		Map->ToRedraw(SendMessage);
+		return;
+	}
 
 	if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
 		SetCursor();
@@ -828,7 +838,8 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 	{
 		case SDLK_n:
 		{
-			Sound::NextMusic();
+			if(!SendMessage->Focused())
+				Sound::NextMusic();
 			break;
 		}
 		case SDLK_F1:
@@ -844,13 +855,29 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 			break;
 		}
 		case SDLK_TAB:
-			FindIdling();
+			if(SendMessage->Focused())
+			{
+				std::string text = SendMessage->Text();
+				if(text.find(' ') != std::string::npos)
+					break;
+
+				std::vector<ECBPlayer*> players = chan->Players();
+				for(std::vector<ECBPlayer*>::const_iterator it = players.begin(); it != players.end(); ++it)
+					if((*it)->Nick().find(text) == 0)
+					{
+						SendMessage->SetString((*it)->Nick() + ": ");
+						break;
+					}
+			}
+			else
+				FindIdling();
 			break;
 		case SDLK_ESCAPE:
-			BarreAct->UnSelect();
+			if(!SendMessage->Focused())
+				BarreAct->UnSelect();
 			break;
 		case SDLK_BACKSPACE:
-			if(BarreAct->Entity())
+			if(BarreAct->Entity() && !SendMessage->Focused())
 				client->sendrpl(client->rpl(EC_Client::ARM), (std::string(BarreAct->Entity()->ID()) + " C").c_str());
 			break;
 		case SDLK_RETURN:
@@ -862,7 +889,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					{
 						client->sendrpl(client->rpl(EC_Client::AMSG),
 									FormatStr(SendMessage->GetString()).c_str());
-						AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " + SendMessage->GetString(), client->Player());
+						AddInfo(I_CHAT, "<" + client->GetNick() + ":private> " + SendMessage->GetString(), client->Player());
 					}
 					else
 					{
@@ -981,7 +1008,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		if(IsPressed(SDLK_PLUS) || BarreAct->UpButton->Test(mouse, button))
 		{
 			client->sendrpl(client->rpl(EC_Client::ARM),
-					std::string(std::string(BarreAct->Entity()->ID()) + "+").c_str());
+					std::string(std::string(BarreAct->Entity()->ID()) + " +").c_str());
 			return;
 		}
 		if(BarreAct->DeployButton->Test(mouse, button))
@@ -2009,6 +2036,8 @@ TOptionsForm::TOptionsForm(ECImage* w, EC_Client* _me, EChannel* ch)
 {
 	Title = AddComponent(new TLabel(100, "Options", white_color, Font::GetInstance(Font::Big)));
 
+	Label1 = AddComponent(new TLabel(60, 160, "Pour vous allier avec un joueur, cliquez sur la case associée à gauche", white_color, Font::GetInstance(Font::Small)));
+
 	Players = AddComponent(new TList(60, 200));
 	BPlayerVector plvec = ch->Players();
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
@@ -2031,6 +2060,7 @@ TOptionsPlayerLine::TOptionsPlayerLine(ECPlayer* _me, ECPlayer *_pl)
 	: pl(_pl), me(_me)
 {
 	size.y = 30;
+	size.x = 550;
 }
 
 TOptionsPlayerLine::~TOptionsPlayerLine()
@@ -2184,6 +2214,7 @@ TLoadPlayerLine::TLoadPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
 	size.y = 20;
+	size.x = 300;
 }
 
 TLoadPlayerLine::~TLoadPlayerLine()
@@ -2441,6 +2472,7 @@ TScoresPlayerLine::TScoresPlayerLine(std::string n, Color col, std::string _k, s
 	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
 {
 	size.y = 40;
+	size.x = 550;
 }
 
 TScoresPlayerLine::~TScoresPlayerLine()
