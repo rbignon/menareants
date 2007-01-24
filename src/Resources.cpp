@@ -58,7 +58,7 @@
 	R_RESOURCE(Sound,        SoundEnd,         "end.wav");
 	R_RESOURCE(Sound,        SoundMitraillette,"bruits/machinegun.wav");
 	R_RESOURCE(Sound,        SoundObelisque,   "bruits/laserfire.wav");
-	R_RESOURCE(Sound,        SoundMcDo,        "units/Mcdo.ogg");
+	R_RESOURCE(Sound,        SoundMcDo,        "units/Gerbale.ogg");
 
 /* IMAGES*/
 	R_RESOURCE(ECSpriteBase, Intro,            "intro");
