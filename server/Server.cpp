@@ -265,6 +265,7 @@ TClient *ECServer::addclient(int fd, const char *ip)
 			return 0;
 		}
 		newC = new TRealClient(fd, ip);
+		newC->SetLastRead(CurrentTS);
 	}
 	else
 		newC = new TIA;

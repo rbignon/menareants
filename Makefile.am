@@ -13,7 +13,8 @@ update:
 	@echo "Updating.."
 	@svn update
 	@echo "Compilation.."
-	@./config.status --recheck > /dev/null && make > /dev/null
+	@./config.status --recheck > /dev/null > /dev/null
+	@make
 	@echo "MenAreAnts is Up-to-date !"
 	@echo "You have to reinstall (with make install) this game."
 
