@@ -6,6 +6,8 @@
 
 	* meta-server/clients.h, API: Ebauche du protocole 2 du meta-server, qui garde le client connecté en permanence, et probablement avec gestion d'accounts.
 
+	* src/Login.cpp: Affiche les serveurs où y a quelqu'un en vert.
+
 2007-01-23 Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Récupération de la ListBox de wormux, et amélioration pour avoir une scrollbar.

@@ -292,7 +292,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	ListServerForm->ServerList->AddItem(false,
 	                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 	                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-	                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? black_color : red_color,
+	                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? StrToTyp<int>(parv[4]) > 0 ? fgreen_color : black_color : red_color,
 	                               (parv[3][0] == '+' && parv[9] == APP_PVERSION));
 
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
