@@ -225,7 +225,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	EChannel *chan = me->Player()->Channel();
 	if(TGameInfosForm::RecvMap.empty())
 		Debug(W_DESYNCH|W_SEND, "EOSMAP: Reception d'une map vide !?");
-	else if(chan->IsInGame())
+	else if(chan->IsInGame() && chan->IsPinging() == false)
 	{
 		if(parv.size() < 2)
 			return Debug(W_DESYNCH|W_SEND, "EOSMAP: Dans le cas d'une sauvegarde, pas de nom de fichier");
@@ -884,7 +884,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 						dynamic_cast<ECEntity*>(*enti)->SetShowedCases(add, true);
 					me->LockScreen();
-					chan->Map()->CreatePreview(120,120, P_ENTITIES);
+					if(chan && chan->Map())
+						chan->Map()->CreatePreview(120,120, P_ENTITIES);
 					me->UnlockScreen();
 				}
 				break;

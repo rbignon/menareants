@@ -889,7 +889,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					{
 						client->sendrpl(client->rpl(EC_Client::AMSG),
 									FormatStr(SendMessage->GetString()).c_str());
-						AddInfo(I_CHAT, "<" + client->GetNick() + ":private> " + SendMessage->GetString(), client->Player());
+						AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " + SendMessage->GetString(), client->Player());
 					}
 					else
 					{

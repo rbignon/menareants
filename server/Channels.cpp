@@ -115,7 +115,7 @@ int AMSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	static char buf[MAXBUFFER + 1];
 	int len;
 
-	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), (cl->Nick() + ":private").c_str(), parv[1].c_str());
+	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), cl->GetNick(), FormatStr("[private] " + parv[1]).c_str());
 
 	if(len < 0) len = sizeof buf -2;
 
