@@ -18,8 +18,16 @@
  * $Id$
  */
 
+#include <errno.h>
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#endif
 #include "Commands.h"
-#include "Sockets.h"
 #include "Debug.h"
 #include "tools/Font.h"
 #include "tools/Video.h"
@@ -31,15 +39,7 @@
 #include "Config.h"
 #include "Timer.h"
 #include "JoinGame.h"
-#include <errno.h>
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
+#include "Sockets.h"
 
 TConnectedForm  *ConnectedForm  = NULL;
 TListServerForm *ListServerForm = NULL;
@@ -306,7 +306,11 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	ListServerForm->nb_wchans += StrToTyp<uint>(parv[8]);
 	ListServerForm->nb_users += StrToTyp<uint>(parv[4]);
 	me->UnlockScreen();
+#ifdef WIN32
+	closesocket(sock);
+#else
 	close(sock);
+#endif
 	return 0;
 }
 

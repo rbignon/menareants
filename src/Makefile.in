@@ -53,18 +53,19 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
 	Images.$(OBJEXT) Maths.$(OBJEXT) Video.$(OBJEXT) \
-	SDL_rotozoom.$(OBJEXT) Cursor.$(OBJEXT) Component.$(OBJEXT) \
-	Form.$(OBJEXT) ChildForm.$(OBJEXT) ListBox.$(OBJEXT) \
-	ComboBox.$(OBJEXT) CheckBox.$(OBJEXT) Boutton.$(OBJEXT) \
-	BouttonText.$(OBJEXT) Memo.$(OBJEXT) Edit.$(OBJEXT) \
-	MessageBox.$(OBJEXT) Label.$(OBJEXT) SpinEdit.$(OBJEXT) \
-	ColorEdit.$(OBJEXT) Image.$(OBJEXT) ShowMap.$(OBJEXT) \
-	ProgressBar.$(OBJEXT) Fps.$(OBJEXT) Main.$(OBJEXT) \
-	Timer.$(OBJEXT) Resources.$(OBJEXT) Sound.$(OBJEXT) \
-	AltThread.$(OBJEXT) Sockets.$(OBJEXT) Config.$(OBJEXT) \
-	Debug.$(OBJEXT) Login.$(OBJEXT) Channels.$(OBJEXT) \
-	Map.$(OBJEXT) Batiments.$(OBJEXT) Units.$(OBJEXT) \
-	MapEditor.$(OBJEXT) JoinGame.$(OBJEXT) InGame.$(OBJEXT)
+	SDL_rotozoom.$(OBJEXT) SDL_gfxPrimitives.$(OBJEXT) \
+	Cursor.$(OBJEXT) Component.$(OBJEXT) Form.$(OBJEXT) \
+	ChildForm.$(OBJEXT) ListBox.$(OBJEXT) ComboBox.$(OBJEXT) \
+	CheckBox.$(OBJEXT) Boutton.$(OBJEXT) BouttonText.$(OBJEXT) \
+	Memo.$(OBJEXT) Edit.$(OBJEXT) MessageBox.$(OBJEXT) \
+	Label.$(OBJEXT) SpinEdit.$(OBJEXT) ColorEdit.$(OBJEXT) \
+	Image.$(OBJEXT) ShowMap.$(OBJEXT) ProgressBar.$(OBJEXT) \
+	Fps.$(OBJEXT) Main.$(OBJEXT) Timer.$(OBJEXT) \
+	Resources.$(OBJEXT) Sound.$(OBJEXT) AltThread.$(OBJEXT) \
+	Sockets.$(OBJEXT) Config.$(OBJEXT) Debug.$(OBJEXT) \
+	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
+	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
+	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
 nodist_menareants_OBJECTS = Version.$(OBJEXT)
 menareants_OBJECTS = $(am_menareants_OBJECTS) \
 	$(nodist_menareants_OBJECTS)
@@ -209,6 +210,7 @@ menareants_SOURCES = \
 		tools/Maths.cpp \
 		tools/Video.cpp \
 		tools/SDL_rotozoom.c \
+		tools/SDL_gfxPrimitives.c \
 		gui/Cursor.cpp \
 		gui/Component.cpp \
 		gui/Form.cpp \
@@ -345,6 +347,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageBox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProgressBar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Resources.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_gfxPrimitives.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SDL_rotozoom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShowMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sockets.Po@am__quote@
@@ -382,6 +385,20 @@ SDL_rotozoom.obj: tools/SDL_rotozoom.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tools/SDL_rotozoom.c' object='SDL_rotozoom.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o SDL_rotozoom.obj `if test -f 'tools/SDL_rotozoom.c'; then $(CYGPATH_W) 'tools/SDL_rotozoom.c'; else $(CYGPATH_W) '$(srcdir)/tools/SDL_rotozoom.c'; fi`
+
+SDL_gfxPrimitives.o: tools/SDL_gfxPrimitives.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT SDL_gfxPrimitives.o -MD -MP -MF "$(DEPDIR)/SDL_gfxPrimitives.Tpo" -c -o SDL_gfxPrimitives.o `test -f 'tools/SDL_gfxPrimitives.c' || echo '$(srcdir)/'`tools/SDL_gfxPrimitives.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/SDL_gfxPrimitives.Tpo" "$(DEPDIR)/SDL_gfxPrimitives.Po"; else rm -f "$(DEPDIR)/SDL_gfxPrimitives.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tools/SDL_gfxPrimitives.c' object='SDL_gfxPrimitives.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o SDL_gfxPrimitives.o `test -f 'tools/SDL_gfxPrimitives.c' || echo '$(srcdir)/'`tools/SDL_gfxPrimitives.c
+
+SDL_gfxPrimitives.obj: tools/SDL_gfxPrimitives.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT SDL_gfxPrimitives.obj -MD -MP -MF "$(DEPDIR)/SDL_gfxPrimitives.Tpo" -c -o SDL_gfxPrimitives.obj `if test -f 'tools/SDL_gfxPrimitives.c'; then $(CYGPATH_W) 'tools/SDL_gfxPrimitives.c'; else $(CYGPATH_W) '$(srcdir)/tools/SDL_gfxPrimitives.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/SDL_gfxPrimitives.Tpo" "$(DEPDIR)/SDL_gfxPrimitives.Po"; else rm -f "$(DEPDIR)/SDL_gfxPrimitives.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tools/SDL_gfxPrimitives.c' object='SDL_gfxPrimitives.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o SDL_gfxPrimitives.obj `if test -f 'tools/SDL_gfxPrimitives.c'; then $(CYGPATH_W) 'tools/SDL_gfxPrimitives.c'; else $(CYGPATH_W) '$(srcdir)/tools/SDL_gfxPrimitives.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

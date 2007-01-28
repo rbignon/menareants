@@ -388,6 +388,7 @@ TCredits::TCredits(ECImage* w)
 	              "\n"
 	              "Merci à lodesi pour ses patchs.\n"
 	              "Merci à Anicée pour sa voix.\n"
+	              "Merci à Cesar pour ne pas avoir participé à la programmation du jeu.\n"
 	              "\n"
                   "Merci également à Zic, Spouize, Nico, Mathieu, et Thomas pour avoir testé le jeu.", white_color);
 	Memo->ScrollUp();
