@@ -1594,7 +1594,7 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
 	size.y = 30;
-	size.x = 650;
+	size.x = 560;
 	position = 0;
 	couleur = 0;
 	nation = 0;
@@ -1669,6 +1669,8 @@ void TPlayerLine::Init()
 		TListBoxItem* j = nation->AddItem(false, std::string(nations_str[i].name), "");
 		j->SetHint(nations_str[i].infos);
 	}
+
+	size.x = nation->X() + nation->Width();
 }
 
 void TPlayerLine::Draw(const Point2i& mouse)
@@ -1707,7 +1709,7 @@ void TPlayerLine::Draw(const Point2i& mouse)
 TPlayerLineHeader::TPlayerLineHeader()
 {
 	size.y = 30;
-	size.x = 550;
+	size.x = 560;
 	label = 0;
 }
 
@@ -1719,6 +1721,7 @@ void TPlayerLineHeader::Init()
 	std::string s = "Pret   Pseudo      Pos.  Couleur  Nation";
 	label = new TLabel(X(), Y(), s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
+	size.x = label->Width();
 }
 
 void TPlayerLineHeader::SetXY (int px, int py)

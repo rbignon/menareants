@@ -359,7 +359,7 @@ void Config::Configuration(bool first)
 	ConfigForm->Music->SetOnClick(Config::SetMusic, this);
 	ConfigForm->Effect->Check(effect);
 	ConfigForm->FullScreen->Check(fullscreen);
-#ifdef BUGUED_FULLSCREEN
+#ifndef BUGUED_FULLSCREEN
 	ConfigForm->FullScreen->SetEnabled(false);
 #else
 	ConfigForm->FullScreen->SetOnClick(Config::SetFullScreen, this);
