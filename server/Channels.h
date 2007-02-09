@@ -29,6 +29,7 @@ class TClient;
 class ECBPlayer;
 class ECBChannel;
 class EChannel;
+class ECEvent;
 
 /********************************************************************************************
  *                               ECPlayers                                                  *
@@ -110,12 +111,15 @@ public:
 	void AddBreakPoint(BreakPoint bp) { breakpoints.push_back(bp); }
 	bool RemoveBreakPoint(ECBCase *c);
 
+	ECList<ECEvent*>* Events() { return &events; }
+
 /* Variables privées */
 private:
 	TClient *client;
 	stats_t stats;
 	BPlayerVector votes;
 	std::vector<BreakPoint> breakpoints;
+	ECList<ECEvent*> events;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 
@@ -193,7 +197,7 @@ public:
 	 * <pre>
 	 * Flags: (Definition in lib/Map.h before ECBEntity)
 	 * ARM_MOVE        0x0001  (=id,x,r,[<>^v])
-	 * ARM_SPLIT       0x0002  (/nb)
+	 * ARM_UNUSED      0x0002  (UNUSED)
 	 * ARM_ATTAQ       0x0004  (*x,y)
 	 * ARM_REMOVE      0x0008  (-)
 	 * ARM_LOCK        0x0010  (.)
@@ -229,9 +233,14 @@ public:
 	void SendArm(std::vector<TClient*> cl, ECEntity* et, uint flags, uint x=0, uint y=0, ECData data = 0,
 	             std::vector<ECEvent*> events = std::vector<ECEvent*>(0));
 
+	/** Initialization of animations (sort, etc) */
 	void InitAnims();
 
+	/** Show next animation */
 	void NextAnim();
+
+	/** Show an animation */
+	bool ShowAnim(ECEvent* event);
 
 	/** Return a formated modes list.
 	 * It is used to send to client a mode list when it joined.
@@ -295,6 +304,7 @@ protected:
 	ECPlayer* owner;
 	bool fast_game;
 	int begin_money;
+	uint first_playing, playing;
 };
 
 typedef std::vector<EChannel*> ChannelVector;

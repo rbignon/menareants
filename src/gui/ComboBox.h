@@ -60,7 +60,7 @@ public:
 
 	int RealY() const { return real_y; }
 
-	virtual void SetXY (int _x, int _y);
+	virtual void SetXY (int x, int y);
 
 /* Variables privées */
 protected:

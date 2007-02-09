@@ -127,8 +127,6 @@ public:
 
 	ENTITY_CONSTRUCTOR(ECSilo) {}
 
-	ENTITY_CREATE_LAST(ECSilo);
-
 /* Methodes */
 public:
 
@@ -217,8 +215,6 @@ public:
 
 	ENTITY_CONSTRUCTOR(ECDefenseTower) {}
 
-	ENTITY_CREATE_LAST(ECDefenseTower);
-
 /* Methodes */
 public:
 
@@ -241,8 +237,6 @@ class ECObelisk : public ECEntity, public ECBObelisk
 public:
 
 	ENTITY_CONSTRUCTOR(ECObelisk) {}
-
-	ENTITY_CREATE_LAST(ECObelisk);
 
 /* Methodes */
 public:

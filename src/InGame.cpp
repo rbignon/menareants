@@ -157,10 +157,10 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				std::string owner = stringtok(entity, "!");
 				ECPlayer* pl = chan->GetPlayer(owner.c_str());
 				if(!pl)
-					{ Debug(W_DESYNCH|W_SEND, "ARM ): Nick %s inconnu", owner.c_str()); break; }
+					{ Debug(W_DESYNCH|W_SEND, "ARM ): Unable to find %s player", owner.c_str()); break; }
 				ECBEntity* et = pl->Entities()->Find(entity.c_str());
 				if(!et || !(container = dynamic_cast<EContainer*>(et)))
-					{ Debug(W_DESYNCH|W_SEND, "ARM %s: L'entité est introuvable ou inconnue", parv[i].c_str()); break; }
+					{ Debug(W_DESYNCH|W_SEND, "ARM %s: Unable to find entity", parv[i].c_str()); break; }
 				break;
 			}
 			case '&':
@@ -178,7 +178,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				flags |= ARM_INVEST;
 				break;
 			case '/':
-			default: Debug(W_DESYNCH|W_SEND, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
+			default: Debug(W_DESYNCH|W_SEND, "ARM: %c isn't a good flag (%s)", parv[i][0], parv[i].c_str());
 		}
 	}
 
@@ -195,7 +195,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			pl = chan->GetPlayer(nick.c_str());
 			if(!pl)
 			{
-				vDebug(W_DESYNCH|W_SEND, "ARM: Player Sender introuvable !!", VName(et_name) VName(nick));
+				vDebug(W_DESYNCH|W_SEND, "ARM: Unable to find player", VName(et_name) VName(nick));
 				continue;
 			}
 		}
@@ -215,12 +215,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				/* Si c'est pour supprimer on s'en fou un peu à vrai dire */
 				if(!(flags & ARM_REMOVE))
-					Debug(W_DESYNCH|W_SEND, "ARM: Entité introuvable et non créable");
+					Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Unable to find this entity and to create it.", nick.c_str(), et_name.c_str());
 				continue;
 			}
-			if(flags != ARM_CREATE || type >= ECEntity::E_END)
+			if(!(flags & ARM_CREATE) || type >= ECEntity::E_END || type < 1)
 			{
-				Debug(W_DESYNCH|W_SEND, "ARM: Création d'une entité incorrecte");
+				Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Unable to create this entity (type isn't between 1 and %d, or there isn't all parameters)",
+				                                                            nick.c_str(), et_name.c_str(), ECEntity::E_END-1);
 				continue;
 			}
 			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb, map);
@@ -228,7 +229,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		else if(flags & ARM_TYPE && (int)type != entity->Type())
 		{
-			Debug(W_DESYNCH|W_SEND|W_WARNING, "ARM: Création d'une unité qui existe déjà !?!?!?!?");
+			Debug(W_DESYNCH|W_SEND|W_WARNING, "ARM: This entity already exists !?!?!?!?");
 			L_SHIT("WARNING DEV: Création d'une unité qui existe déjà !!!");
 		}
 		if(!moves_str.empty())
@@ -260,7 +261,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								case '<': moves.push_back(ECMove::Left); break;
 								case 'v': moves.push_back(ECMove::Down); break;
 								case '^': moves.push_back(ECMove::Up); break;
-								default: Debug(W_DESYNCH|W_SEND, "ARM =: Reception d'un flag de mouvement inconnu: %c", *c);
+								default: Debug(W_DESYNCH|W_SEND, "ARM =: Receive an unknown movement flag: %c", *c);
 							}
 						entity->Move()->SetFirstCase(last);
 						entity->Move()->SetMoves(moves);
@@ -286,7 +287,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		if(flags == ARM_CREATE)
+		if(flags & ARM_CREATE)
 			(*it)->Created();
 		if(flags & ARM_NUMBER)
 		{
@@ -382,7 +383,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					(*it)->Lock();
 			}
 		}
-		if(flags == ARM_CREATE && InGameForm && !entities.empty() && entities.front()->CanBeSelected())
+		if(flags == ARM_CREATE && InGameForm && !entities.empty() && entities.front()->CanBeSelected() &&
+		   entities.front()->Owner() && entities.front()->Owner()->IsMe())
 			InGameForm->BarreAct->SetEntity(entities.front());
 	}
 
@@ -408,6 +410,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if((*it)->Selected() && InGameForm)
 				InGameForm->BarreAct->SetEntity(0);
 
+			ECAltThread::LockThread();
 			me->LockScreen();
 
 			EContainer* contain;
@@ -425,6 +428,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			it = entities.erase(it);
 
 			me->UnlockScreen();
+			ECAltThread::UnlockThread();
 		}
 	if(InGameForm && chan->State() == EChannel::PLAYING)
 	{
@@ -668,7 +672,6 @@ void MenAreAntsApp::InGame()
 		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
 
 	EChannel* chan = client->Player()->Channel();
-	SDL_mutex *AltMutex = 0;
 
 	try
 	{
@@ -676,9 +679,8 @@ void MenAreAntsApp::InGame()
 		InGameForm = new TInGameForm(Video::GetInstance()->Window(), client);
 		InGameForm->SetMutex(mutex);
 		InGameForm->Map->SetMutex(mutex);
-		AltMutex = SDL_CreateMutex();
-		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, AltMutex);
-		if(!client->Player()->Entities()->empty())
+		InGameForm->Thread = SDL_CreateThread(ECAltThread::Exec, 0);
+		if(!client->Player()->Entities()->Empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Resources::SoundStart()->Play();
 		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
@@ -704,14 +706,10 @@ void MenAreAntsApp::InGame()
 
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
-		if(AltMutex)
-			SDL_DestroyMutex(AltMutex);
 	}
 	catch(TECExcept &e)
 	{
 		ECAltThread::Stop();
-		if(AltMutex)
-			SDL_DestroyMutex(AltMutex);
 		if(InGameForm && InGameForm->Thread)
 			SDL_WaitThread(InGameForm->Thread, 0);
 		MyFree(InGameForm);

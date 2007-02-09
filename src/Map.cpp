@@ -127,49 +127,18 @@ bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
 }
 
 /********************************************************************************************
- *                                   ECMove                                                 *
- ********************************************************************************************/
-
-void ECMove::EstablishDest()
-{
-	ECBCase* c = first_case;
-	if(!c) return;
-
-	for(Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
-		switch(*it)
-		{
-			case Up: c = c->MoveUp(); break;
-			case Down: c = c->MoveDown(); break;
-			case Left: c = c->MoveLeft(); break;
-			case Right: c = c->MoveRight(); break;
-		}
-	dest = c;
-}
-
-void ECMove::AddMove(E_Move m)
-{
-	ECBMove::AddMove(m);
-	EstablishDest();
-}
-void ECMove::SetMoves(Vector _moves)
-{
-	ECBMove::SetMoves(_moves);
-	EstablishDest();
-}
-
-/********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
 
 ECEntity::ECEntity()
-	: Tag(0), image(0), attaq(0), life(0,0,CASE_WIDTH-4,10), selected(false), move(this), attaqued_case(0), max_nb(0)
+	: Tag(0), image(0), attaq(0), life(0,0,CASE_WIDTH-4,10), selected(false), attaqued_case(0), max_nb(0)
 {
 	life.SetBackground(false);
 }
 
 ECEntity::ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 	: ECBEntity(_name, _owner, _case), Tag(0), image(0), attaq(0), life(0,0,CASE_WIDTH-4,10), selected(false),
-	  move(this), attaqued_case(0), max_nb(0)
+	  attaqued_case(0), max_nb(0)
 {
 	life.SetBackground(false);
 }

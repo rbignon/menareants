@@ -130,7 +130,7 @@ template<class T> class rectangle
 		/**
 		 * Change the X size of the rectangle.
 		 *
-		 * @param x New size among x axe.
+		 * @param sizeX New size among x axe.
 		 */
 		virtual inline void SetWidth(T sizeX){
 			size.x = sizeX;
@@ -139,7 +139,7 @@ template<class T> class rectangle
 		/**
 		 * Change the Y size of the rectangle.
 		 *
-		 * @param y New size among y axe.
+		 * @param sizeY New size among y axe.
 		 */
 		virtual inline void SetHeight(T sizeY){
 			size.y = sizeY;

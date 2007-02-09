@@ -31,7 +31,7 @@
  ********************************************************************************************/
 
 ECBMove::ECBMove(ECBEntity* e)
-	: moves(), first_case(0), entity(e)
+	: moves(), first_case(0), entity(e), dest(0)
 {
 	if(e) first_case = e->Case();
 }
@@ -50,6 +50,31 @@ std::string ECBMove::MovesString(ECBCase* end)
 			case Right: s += '>'; c = c->MoveRight(); break;
 		}
 	return s;
+}
+
+
+void ECBMove::GoTo(ECBCase* end)
+{
+	if(end == first_case)
+		return;
+
+	ECBCase* c = first_case;
+	if(!c) return;
+
+	for(Vector::iterator it = moves.begin(); it != moves.end() && c != end;)
+	{
+		switch(*it)
+		{
+			case Up: c = c->MoveUp(); break;
+			case Down: c = c->MoveDown(); break;
+			case Left: c = c->MoveLeft(); break;
+			case Right: c = c->MoveRight(); break;
+		}
+		it = moves.erase(it);
+	}
+	first_case = end;
+
+	SetDest();
 }
 
 void ECBMove::Return(ECBCase* end)
@@ -82,7 +107,46 @@ void ECBMove::Return(ECBCase* end)
 			it = moves.erase(it);
 	}
 	if(moves.empty())
-		first_case = 0;
+		first_case = end;
+
+	SetDest();
+}
+
+ECBCase* ECBMove::EstablishDest() const
+{
+	ECBCase* c = first_case ? first_case : entity ? entity->Case() : 0;
+	if(!c) return 0;
+
+	for(Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
+		switch(*it)
+		{
+			case Up: c = c->MoveUp(); break;
+			case Down: c = c->MoveDown(); break;
+			case Left: c = c->MoveLeft(); break;
+			case Right: c = c->MoveRight(); break;
+		}
+	return c;
+}
+
+void ECBMove::SetDest()
+{
+	ECBCase* c = first_case ? first_case : entity ? entity->Case() : 0;
+	if(!c) return;
+
+	first_case = c;
+
+	dest = EstablishDest();
+}
+
+void ECBMove::AddMove(E_Move m)
+{
+	moves.push_back(m);
+	SetDest();
+}
+void ECBMove::SetMoves(Vector _moves)
+{
+	moves = _moves;
+	SetDest();
 }
 
 /********************************************************************************************
@@ -250,7 +314,7 @@ int ECBCase::SearchAroundType(int type, std::vector<ECBEntity*>& entities) const
 
 ECBEntity::ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 	: owner(_owner), acase(_case), nb(0), lock(false), deployed(false), myStep(0), restStep(0), event_type(0),
-	  parent(0), map(0)
+	  parent(0), map(0), move(this)
 {
 	if(strlen(_name) != (sizeof name)-1)
 		throw ECExcept(VIName(strlen(_name)) VSName(_name), "ID trop grand ou inexistant.");
@@ -304,7 +368,7 @@ bool ECBEntity::CanBeCreated(ECBPlayer* pl) const
 bool ECBEntity::CanBeCreated(ECBCase* c) const
 {
 	if(!c)
-		c = acase;
+		c = DestCase();
 	assert(c);
 
 	if(owner && !CanBeCreated(owner))

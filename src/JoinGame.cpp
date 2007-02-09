@@ -271,8 +271,8 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                               GameInfosForm->MapTitle->Width()/2,
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
 			GameInfosForm->Hints->ClearItems();
+			GameInfosForm->SetMustRedraw();
 		}
-		GameInfosForm->SetMustRedraw();
 		me->UnlockScreen();
 	}
 	return 0;
@@ -1378,8 +1378,6 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			client->Player()->Channel()->SetWantLeave();
 			client->sendrpl(client->rpl(EC_Client::LEAVE));
 		}
-
-		WAIT_EVENT(JOINED == 0, i);
 	}
 
 	return true;

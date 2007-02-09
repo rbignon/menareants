@@ -69,8 +69,8 @@ Sommaire:
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               LSM <nom> <nbmin> <nbmax> <infos> :envoie la liste des cartes
               EOMAP                             :fin de la liste des maps
-              :<nick> JOI <nom> <sets>          :un user join
-              :<nick> SET <mode(s)> <value>     :un user met un paramètre (voir section 4. Modes)
+              :<nick> JOI <nom>                 :un user join
+              :<nick> SET <mode(s)>             :un user met un paramètre (voir section 4. Modes)
               :<nick> LEA                       :un user part (ou a été kické)
               :<nick> MSG <message>             :message reçue
               :<nick> KICK <victime> [raison]   :un user est kické
@@ -112,11 +112,11 @@ Sommaire:
          <           :déplacement de un à gauche
          ^           :déplacement de un vers le haut
          *<pos>      :attaque une position
+         !           :lors d'une attaque, force la case
          +           :création d'une entité
          =<pos>      : |- position de départ
          %<type>     : `- définit le type
          #           :deploiement.
-         !           :lors d'une attaque, force la case
          )<entité>   :s'envoyer dans une unité conteneur (voir 8. Entités Conteneurs)
          (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
          °           :upgrader
@@ -241,6 +241,7 @@ Sommaire:
             +w <nb waiting games>                          :- nombre de jeux en attente
             +v <version>                                   :- version du protocole
             +i <port>                                      :- port
+            +r <nick>                                      :- tel user peut rejoindre tel chan
 
      c) Meta-server <-> Client
 
@@ -252,3 +253,4 @@ Sommaire:
         > EOL                                              :fin du listing
 
         > NICKUSED                                         :pseudo déjà utilisé
+        > REJOIN <ip:port> <game>                          :le joueur peut rejoindre une partie

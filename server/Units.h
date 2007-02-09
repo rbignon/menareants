@@ -73,8 +73,6 @@ class ECTrain : public EContainer, public ECBTrain
 public:
 
 	ENTITY_CONSTRUCTOR(ECTrain) {}
-
-	ENTITY_CREATE_LAST(ECTrain);
 };
 
 /********************************************************************************************
@@ -86,8 +84,6 @@ class ECBoat : public EContainer, public ECBBoat
 public:
 
 	ENTITY_CONSTRUCTOR(ECBoat) {}
-
-	ENTITY_CREATE_LAST(ECBoat);
 };
 
 /********************************************************************************************
@@ -99,8 +95,6 @@ class ECPlane : public EContainer, public ECBPlane
 public:
 
 	ENTITY_CONSTRUCTOR(ECPlane) {}
-
-	ENTITY_CREATE_LAST(ECPlane);
 
 	virtual bool WantDeploy();
 
@@ -118,8 +112,6 @@ class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 public:
 
 	ENTITY_CONSTRUCTOR(ECMissiLauncher) {}
-
-	ENTITY_CREATE_LAST(ECMissiLauncher);
 
 /* Methodes */
 public:
@@ -141,7 +133,6 @@ public:
 
 	ENTITY_CONSTRUCTOR(EChar) {}
 
-	ENTITY_CREATE_LAST(EChar);
 };
 
 /********************************************************************************************
@@ -153,8 +144,6 @@ class ECJouano : public ECUnit, public ECBJouano
 public:
 
 	ENTITY_CONSTRUCTOR(ECJouano) {}
-
-	ENTITY_CREATE_LAST(ECJouano);
 
 /* Methodes */
 public:
@@ -173,8 +162,6 @@ class ECMcDo : public ECUnit, public ECBMcDo
 public:
 
 	ENTITY_CONSTRUCTOR(ECMcDo), caserne(0), ex_owner(0) {}
-
-	ENTITY_CREATE_LAST(ECMcDo);
 
 /* Methodes */
 public:
@@ -209,8 +196,6 @@ public:
 
 	ENTITY_CONSTRUCTOR(ECTourist) {}
 
-	ENTITY_CREATE_LAST(ECTourist);
-
 /* Methodes */
 public:
 
@@ -226,8 +211,6 @@ class ECEnginer : public ECUnit, public ECBEnginer
 public:
 
 	ENTITY_CONSTRUCTOR(ECEnginer) {}
-
-	ENTITY_CREATE_LAST(ECEnginer);
 
 /* Methodes */
 public:
@@ -247,8 +230,6 @@ class ECArmy : public ECUnit, public ECBArmy
 public:
 
 	ENTITY_CONSTRUCTOR(ECArmy) {}
-
-	ENTITY_CREATE_LAST(ECArmy);
 };
 
 #endif /* ECD_UNITS_H */

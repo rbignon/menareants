@@ -22,7 +22,7 @@
 #include <assert.h>
 
 TLabel::TLabel()
-	: font(0), shadowed(0), bg_offset(0), auto_set(false)
+	: font(0), shadowed(0), bg_offset(0), auto_set(false), gray_disable(false)
 {
 	caption = "";
 }
@@ -102,9 +102,10 @@ void TLabel::SetFont(Font* f)
 
 void TLabel::SetEnabled(bool _en)
 {
-	if(gray_disable && _en != Enabled())
-		Reinit();
+	bool last = Enabled();
 	TComponent::SetEnabled(_en);
+	if(gray_disable && _en != last)
+		Reinit();
 }
 
 void TLabel::Reinit()

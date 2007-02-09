@@ -379,6 +379,7 @@ int ECServer::init_socket(void)
 		highsock = sock;
 	FD_SET(sock, &global_fd_set);
 
+	CurrentTS = time(NULL);
 	uptime = CurrentTS;
 
 	Debug(W_ECHO|W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
@@ -408,6 +409,45 @@ int ECServer::SendMetaServer(std::string s)
 int ECServer::MSet(std::string c, std::string s)
 {
 	return SendMetaServer("SET " + c + " " + s);
+}
+
+void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
+{
+	server->SendMetaServer("POG");
+}
+
+void ECServer::ParseMetaServer()
+{
+	char buf[MAXBUFFER];
+	if(recv(ms_sock, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
+	{
+		Debug(W_WARNING, "Error in recv(meta-server) (%d: %s)\n", errno, strerror(errno));
+		close(ms_sock);
+		ms_sock = 0;
+		ConnectMetaServer();
+		return;
+	}
+
+	static struct
+	{
+		std::string cmd;
+		void (*func) (ECServer*, std::vector<std::string>);
+	} cmds[] =
+	{
+		{ "PIG",  ms_ping }
+	};
+
+	std::string cmdname;
+	std::vector<std::string> parv;
+
+	SplitBuf(buf, &parv, &cmdname);
+
+	for(uint i = 0; i < ASIZE(cmds); ++i)
+		if(cmds[i].cmd == cmdname)
+		{
+			cmds[i].func (this, parv);
+			return;
+		}
 }
 
 bool ECServer::ConnectMetaServer()
@@ -465,12 +505,21 @@ bool ECServer::ConnectMetaServer()
 int ECServer::run_server(void)
 {
 	fd_set tmp_fdset;
+	time_t last_call = CurrentTS;
+	struct timeval timeout = {0,0};
 
 	while(running)
 	{
-		CurrentTS = time(NULL);
+		if(time_t(last_call + app.GetConf()->PingFreq()) < CurrentTS)
+		{
+			sig_alarm();
+			last_call = CurrentTS;
+		}
+
 		tmp_fdset = global_fd_set; /* save */
-		if(select(highsock + 1, &tmp_fdset, NULL, NULL, NULL) < 0)
+		if((timeout.tv_sec = last_call + app.GetConf()->PingFreq() - CurrentTS) < 0) timeout.tv_sec = 0;
+		timeout.tv_usec = 0;
+		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
 			{
@@ -480,6 +529,7 @@ int ECServer::run_server(void)
 		}
 		else
 		{
+			CurrentTS = time(NULL);
 			for(unsigned int i = 0;i <= highsock;++i)
 			{
 				if(!FD_ISSET(i, &tmp_fdset)) continue;
@@ -492,17 +542,7 @@ int ECServer::run_server(void)
 						if(!addclient(newfd, inet_ntoa(newcon.sin_addr))) close(newfd);
 				}
 				else if(i == (unsigned)ms_sock)
-				{
-					char buf[MAXBUFFER];
-					if(recv(i, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
-					{
-						Debug(W_WARNING, "Error in recv(meta-server) (%d: %s)\n", errno, strerror(errno));
-						close(ms_sock);
-						ms_sock = 0;
-						ConnectMetaServer();
-					}
-					/* On ne fait rien, car le serveur n'est rien censé nous dire */
-				}
+					ParseMetaServer();
 				else
 				{
 					RealClientList::iterator cl = myClients.find(i);

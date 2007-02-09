@@ -894,7 +894,7 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
 	{
-		if((*it)->IsMission()) continue;
+		if((*it)->IsMission() || (*it)->State() == EChannel::SCORING) continue;
 		cl->sendrpl(app.rpl(ECServer::GLIST), FormatStr((*it)->GetName()).c_str(), (*it)->Joinable() ? '+' : '-',
 		                                      (*it)->NbPlayers(), (*it)->Limite(),
 		                                      (*it)->Map() ? FormatStr((*it)->Map()->Name()).c_str() : "");
@@ -978,7 +978,7 @@ bool ECPlayer::RemoveBreakPoint(ECBCase* c)
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name, bool mission)
-	: ECBChannel(_name, mission), owner(0), fast_game(true), begin_money(20000)
+	: ECBChannel(_name, mission), owner(0), fast_game(true), begin_money(20000), first_playing(0), playing(0)
 {
 	ECBChannel::SetLimite(app.GetConf()->DefLimite()); /* Limite par default */
 	app.NBchan++;
@@ -1176,6 +1176,8 @@ void EChannel::CheckReadys()
 					dynamic_cast<ECPlayer*>(*pl)->SetMoney(BeginMoney());
 				}
 
+				first_playing = rand()%players.size();
+
 				NeedReady();
 
 				break;
@@ -1199,8 +1201,8 @@ void EChannel::CheckReadys()
 				/* Initialisation des animations */
 				InitAnims();
 
-				/* Envoie la prochaine animation programmée */
-				NextAnim();
+				/* InitAnims() envoie déjà les CREATE */
+				//NextAnim();
 
 				NeedReady();
 				break;
@@ -1215,7 +1217,7 @@ void EChannel::CheckReadys()
 					std::map<ECBPlayer*, int> money;
 					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 					{
-						if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
+						if(dynamic_cast<ECEntity*>(*enti)->IsZombie())
 						{
 							ECList<ECBEntity*>::iterator it = enti;
 							++it;
@@ -1233,6 +1235,13 @@ void EChannel::CheckReadys()
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
+						// Inutile en theorie, mais c'est vraiment une précaution.
+						if(dynamic_cast<ECPlayer*>(*it)->Events()->Empty() == false)
+						{
+							FDebug(W_WARNING, "Il reste des evenements dans un player !");
+							dynamic_cast<ECPlayer*>(*it)->Events()->Clear();
+						}
+
 						if((*it)->Lost()) continue;
 						int nb_units = 0;
 						entv = (*it)->Entities()->List();
@@ -1302,23 +1311,21 @@ bool EChannel::CheckEndOfGame()
 		{
 			if((*it2)->Lost()) continue;
 			if(*it != *it2 && !(*it)->IsAllie(*it2))
-				end_of_game = false;
+				return false;
 		}
 	}
-	if(end_of_game)
+
+	SetState(EChannel::SCORING);
+	SetName(".");
+	sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
+	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 	{
-		SetState(EChannel::SCORING);
-		sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
-		for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
-		{
-			ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
-			sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
-														pl->Stats()->shooted, pl->Stats()->created,
-														pl->Stats()->score);
-		}
-		return true;
+		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
+		sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
+				pl->Stats()->shooted, pl->Stats()->created,
+				pl->Stats()->score);
 	}
-	return false;
+	return true;
 }
 
 void EChannel::SendArm(TClient* cl, std::vector<ECEntity*> et, uint flag, uint x, uint y, ECData data,
@@ -1517,8 +1524,7 @@ const char* EChannel::FindEntityName(ECPlayer* pl)
 {
 	static Entity_ID num;
 
-	if(sizeof num != 3)
-		throw ECExcept(VIName(sizeof num), "La taille de Entity_ID n'est pas celle supportée par cette fonction");
+	assert(sizeof num == 3);
 
 	num[0] = 'A';
 	num[1] = 'A';

@@ -27,6 +27,10 @@ bool ECAltThread::want_quit = false;
 bool ECAltThread::running = false;
 ECAltThread::alt_list ECAltThread::functions;
 std::stack<void*> ECAltThread::args;
+SDL_mutex* ECAltThread::mutex = 0;
+
+void ECAltThread::LockThread() { if(mutex) SDL_LockMutex(mutex); }
+void ECAltThread::UnlockThread() { if(mutex) SDL_UnlockMutex(mutex); }
 
 int ECAltThread::Exec(void *data)
 {
@@ -34,11 +38,12 @@ int ECAltThread::Exec(void *data)
 
 	running = true;
 	want_quit = false;
+	mutex = SDL_CreateMutex();
 	while(!want_quit)
 	{
 		if(!functions.empty())
 		{
-			SDL_LockMutex((SDL_mutex*)data);
+			SDL_LockMutex(mutex);
 			while(!functions.empty())
 			{
 				if(args.empty())
@@ -47,10 +52,13 @@ int ECAltThread::Exec(void *data)
 				functions.pop();
 				args.pop();
 			}
-			SDL_UnlockMutex((SDL_mutex*)data);
+			SDL_UnlockMutex(mutex);
 		}
 		SDL_Delay(20);
 	}
+
+	SDL_DestroyMutex(mutex);
+	mutex = 0;
 
 	running = false;
 	return 0;

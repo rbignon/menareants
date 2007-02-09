@@ -41,6 +41,12 @@ static void list_servers(struct Client* cl)
 	return;
 }
 
+int m_pong (struct Client* cl, int parc, char** parv)
+{
+	cl->flags &= ~CL_PING;
+	return 0;
+}
+
 /* IAM <name> <prog> <version> */
 int m_login (struct Client* cl, int parc, char** parv)
 {

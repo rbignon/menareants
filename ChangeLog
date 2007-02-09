@@ -1,3 +1,23 @@
+2007-02-07 Romain Bignon <progs@headfucking.net>
+
+	* meta-server/sockets.c: Envoie d'un PING au client et détection du ping timeout.
+
+	* server/Server.cpp: Gestion des messages du serveur, et réponse au ping.
+
+	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Changement fondamental dans la gestion des évenements.
+
+	* server/Main.cpp, server/Server.cpp: Abandon du SIG_ALARM pour un système de timer dans la boucle principale.
+
+	* lib/Map.h, src/Map.h (ECBMove): Merge de ECBMove et ECMove dans ECBMove.
+
+	* src/gui/Label.cpp: Bugfix: si il y avait gray_disable d'actif, il mettait en gris quand enabled et en couleur quand disable.
+
+	* src/gui/ListBox.cpp: Attribut "GrayDisable" pour afficher les items en gris si le ListBox est !Enabled().
+
+2007-02-03 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp, src/Login.cpp: Utilisation d'un timeout pour la connexion.
+
 2007-01-24 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp: Utilisation de la touche "tab" lors de l'écriture d'un message pour l'auto-complétion.

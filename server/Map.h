@@ -42,24 +42,15 @@ class ECase;
 /********************************************************************************************
  *                                 ECEntity                                                 *
  ********************************************************************************************/
-#define ENTITY_CREATE_LAST(x) void CreateLast() { \
-                                   next = this; \
-                                   ECEntity* e = new (x) (*this); \
-                                   next = 0; \
-                                   e->SetShadowed(); \
-                                   SetLast(e); \
-                                   e->Case()->Entities()->Add(e); /* On rajoute cette entité locked à la nouvelle case */ \
-                              }
 class ECEntity : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
 public:
 
-	ECEntity() : Tag(0), last(0), next(0), move(this), shooted(0), shadow(false) {}
+	ECEntity() : Tag(0), shooted(0), zombie(false) {}
 
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
-		: ECBEntity(_name, _owner, _case), Tag(0), last(0), next(0), move(this), shooted(0),
-		  shadow(false)
+		: ECBEntity(_name, _owner, _case), Tag(0), shooted(0), zombie(false)
 	{}
 
 	virtual ~ECEntity();
@@ -68,10 +59,7 @@ public:
 public:
 
 	/** Use this function to cancel an action of this entity */
-	virtual bool Return(ECBCase* c = 0);
-
-	/** Use this function to create a last state of this entity (stocked in a variable) */
-	virtual void CreateLast() = 0;
+	virtual bool Return();
 
 	/** Use this function to make an union with an other entity */
 	virtual void Union(ECEntity*);
@@ -106,45 +94,32 @@ public:
 	void Shooted(uint n) { shooted += n; }
 	virtual void ReleaseShoot();
 
+	/** Cancel all events and send a message to client */
 	void CancelEvents();
 
+	/** Get an array of owners of there entities */
 	static std::nrvector<TClient*> EntitiesToClients(std::vector<ECEntity*>);
 
 /* Attributs */
 public:
 
-	/** Return last entity */
-	ECEntity* Last() const { return last; }
-	virtual void RemoveLast();
-
-	/** Search a last entity */
-	ECEntity* FindLast(ECBCase*);
-
-	/** Return the last next entity */
-	ECEntity* FindNext();
-
-	/** This is the next entity */
-	ECEntity* Next() const { return next; }
-
+	/** This is a temporary integer */
 	int Tag;
-
-	ECMove* Move() { return &move; }
 
 	EChannel* Channel() const;
 
 	ECPlayer* Owner() const;
 
-	void SetShadowed(bool b = true) { shadow = b; }
-	bool Shadowed() const { return shadow; }
+	void SetZombie(bool b = true) { zombie = b; }
+	bool IsZombie() const { return zombie; }
+
+	ECList<ECEvent*>* Events() { return &events; }
 
 /* Variables privées */
 protected:
-	ECEntity* last;
-	ECEntity* next;
-	bool SetLast(ECEntity* e) { return (last = e); }
-	ECMove move;
+	ECList<ECEvent*> events;
 	uint shooted;
-	bool shadow;
+	bool zombie;
 };
 
 /********************************************************************************************
@@ -160,17 +135,13 @@ class ECEvent
 /* Constructeur/Destructeur */
 public:
 
-	ECEvent(uint _f, ECBCase* _c = 0)
-		: acase(_c), flags(_f), nb(0), type(0)
+	ECEvent(uint _f, ECEntity* _entity, ECBCase* _c = 0)
+		: acase(_c), flags(_f), nb(0), type(0), entity(_entity)
 	{}
 
 /* Methodes */
 public:
 
-	/** This method will check if a player who leaves channel or event will change something to this event
-	 * \note this is a beautiful name !
-	 */
-	bool CheckRemoveBecauseOfPartOfAttaqEntity(ECEntity*);
 
 /* Attributs */
 public:
@@ -181,10 +152,10 @@ public:
 
 	/** Entitées associées. Il y en a qu'une seule *SAUF* pour les attaques */
 	ECList<ECEntity*> *Entities() { return &entities; }
-	ECEntity* Entity() const { return entities.First(); }
 
-	/** Permet de comparer la priorité */
-	bool operator<(const ECEvent& e) const;
+	/** Set entity owner */
+	ECEntity* Entity() const { return entity; }
+	void SetEntity(ECEntity* e) { entity = e; }
 
 	/** Case associée */
 	ECBCase* Case() const { return acase; }
@@ -202,7 +173,7 @@ public:
 	ECMove* Move() { return &move; }
 
 	/** C'est utilisé pour les ATTAQUES, on link les evenements de mouvement si il y a */
-	std::vector<ECEvent*> Linked() { return linked; }
+	std::vector<ECEvent*> Linked() const { return linked; }
 	void AddLinked(ECEvent* li) { linked.push_back(li); }
 	bool RemoveLinked(ECEvent* li, bool use_delete = false);
 
@@ -212,6 +183,7 @@ protected:
 	uint flags;
 	uint nb;
 	uint type;
+	ECEntity* entity;
 	ECList<ECEntity*> entities;
 	ECMove move;
 	std::vector<ECEvent*> linked;
@@ -312,7 +284,7 @@ public:
 	uint Num() { return i; }
 
 	/** All events of this map */
-	EventVector Events() const { return map_events; }
+	EventVector& Events() { return map_events; }
 	void AddEvent(ECEvent* _e) { map_events.push_back(_e); }
 	EventVector::iterator RemoveEvent(ECEvent* _e, bool use_delete = false);
 	ECEvent* FindEvent(ECBCase*, uint, ECEntity* = 0);
@@ -321,8 +293,6 @@ public:
 
 /* Méthodes */
 public:
-
-	void SortEvents();
 
 	static bool LoadMaps();
 

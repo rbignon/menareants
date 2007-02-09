@@ -47,6 +47,7 @@ extern struct case_img_t case_img[];
 typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
+typedef ECBMove        ECMove;
 
 class ECMissile
 {
@@ -84,33 +85,6 @@ private:
 	int step;
 
 	void SetMissile(ECSpriteBase* c);
-};
-
-/********************************************************************************************
- *                                   ECMove                                                 *
- ********************************************************************************************/
-class ECMove : public ECBMove
-{
-/* Constructeur/Destructeur */
-public:
-
-	ECMove(ECBEntity* e) : ECBMove(e), dest(0) {}
-
-/* Attributs */
-public:
-
-	void AddMove(E_Move m);
-	void SetMoves(Vector _moves);
-	void RemoveFirst() { if(!moves.empty()) moves.erase(moves.begin()); }
-	E_Move First() { return *(moves.begin()); }
-
-	ECBCase* Dest() { return dest; }
-	void EstablishDest();
-	void Clear(ECBCase* c) { ECBMove::Clear(c); dest = 0; }
-
-/* Variables protégées */
-protected:
-	ECBCase* dest;
 };
 
 /********************************************************************************************
@@ -196,8 +170,6 @@ public:
 	ECase* Case() const;
 	ECPlayer* Owner() const;
 
-	ECMove* Move() { return &move; }
-
 	ECase* AttaquedCase() const { return attaqued_case; }
 	void SetAttaquedCase(ECase* c);
 
@@ -218,7 +190,6 @@ private:
 
 protected:
 	bool selected;
-	ECMove move;
 	ECase* attaqued_case;
 	uint max_nb;
 };

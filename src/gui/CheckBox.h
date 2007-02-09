@@ -52,7 +52,7 @@ public:
 	bool Checked() const { return checked; }
 	void Check(bool b = true) { checked = b; }
 
-	void SetXY (int _x, int _y);
+	void SetXY (int x, int y);
 
 /* Variables privées */
 private:

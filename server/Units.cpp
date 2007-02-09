@@ -44,8 +44,6 @@ bool ECPlane::WantDeploy()
 			break;
 	}
 
-	CreateLast();
-
 	SetDeployed(!Deployed());
 	return true;
 }
@@ -85,7 +83,7 @@ void ECJouano::Invest(ECBEntity* entity)
 	 * va decrementer la variable.
 	 */
 
-	SetShadowed();
+	SetZombie();
 }
 
 /********************************************************************************************
@@ -94,7 +92,7 @@ void ECJouano::Invest(ECBEntity* entity)
 
 void ECMcDo::Invest(ECBEntity* entity)
 {
-	if(Shadowed()) return;
+	if(IsZombie()) return;
 
 	ECEntity* enti = dynamic_cast<ECEntity*>(entity);
 
@@ -158,7 +156,7 @@ void ECMcDo::Played()
 			Map()->AddAnEntity(caserne);
 			caserne->Create(false);
 
-			SetShadowed(); // Et on supprime notre brave McDo qui a rendu de mauvais services
+			SetZombie(); // Et on supprime notre brave McDo qui a rendu de mauvais services
 		}
 	}
 	ECEntity::Played();
@@ -205,9 +203,9 @@ void ECEnginer::Invest(ECBEntity* entity)
 	/* On a été tué mais bon faudrait quand même que le test ne se fasse pas ici, le problème est que la fonction
 	 * qui nous appelle ici est dans la lib (ECBCase::CheckInvests()). Elle n'est appelée que par le serveur,
 	 * et est dans la lib parce que la classe ECBCase n'est pas dérivée dans le serveur. Il faudrait trouver
-	 * une alternative
+	 * une alternative.
 	 */
-	if(Shadowed()) return;
+	if(IsZombie()) return;
 	if(entity->Owner() == Owner() && Owner()->Client())
 	{
 		if(entity->Nb() >= entity->InitNb()) return;
@@ -223,7 +221,7 @@ void ECEnginer::Invest(ECBEntity* entity)
 	}
 
 	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
-	SetShadowed();
+	SetZombie();
 	/* On attend de se faire purger */
 }
 
@@ -244,31 +242,32 @@ void EContainer::Union(ECEntity* entity)
 	else if(container->Containing())
 	{
 		dynamic_cast<ECEntity*>(Containing())->Union(dynamic_cast<ECEntity*>(container->Containing()));
-		dynamic_cast<ECEntity*>(container->Containing())->SetShadowed();
+		dynamic_cast<ECEntity*>(container->Containing())->SetZombie();
 	}
 }
 
 bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 {
-	if(Containing() || entity->Locked() || entity->Shadowed() || !CanContain(entity))
+	if(Containing() || entity->Locked() || entity->IsZombie() || !CanContain(entity))
 		return false;
 
 	ECMove::E_Move move;
+	ECBCase* c = DestCase();
 
-	if(entity->Case()->X() == Case()->X())
+	if(entity->DestCase()->X() == c->X())
 	{
-		if(entity->Case()->Y() == Case()->Y()-1)
+		if(entity->DestCase()->Y() == c->Y()-1)
 			move = ECMove::Down;
-		else if(entity->Case()->Y() == Case()->Y()+1)
+		else if(entity->DestCase()->Y() == c->Y()+1)
 			move = ECMove::Up;
 		else
 			return false;
 	}
-	else if(entity->Case()->Y() == Case()->Y())
+	else if(entity->DestCase()->Y() == c->Y())
 	{
-		if(entity->Case()->X() == Case()->X()-1)
+		if(entity->DestCase()->X() == c->X()-1)
 			move = ECMove::Right;
-		else if(entity->Case()->X() == Case()->X()+1)
+		else if(entity->DestCase()->X() == c->X()+1)
 			move = ECMove::Left;
 		else
 			return false;
@@ -279,9 +278,6 @@ bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 	if(!entity->WantMove(move, MOVE_FORCE))
 		return false;
 
-	entity->CreateLast();
-	CreateLast();
-	Contain(entity);
 	moves.push_back(move);
 
 	return true;
@@ -293,21 +289,22 @@ bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 		return false;
 
 	ECMove::E_Move move;
+	ECBCase* c = DestCase();
 
-	if(x == Case()->X())
+	if(x == c->X())
 	{
-		if(y == Case()->Y()-1)
+		if(y == c->Y()-1)
 			move = ECMove::Up;
-		else if(y == Case()->Y()+1)
+		else if(y == c->Y()+1)
 			move = ECMove::Down;
 		else
 			return false;
 	}
-	else if(y == Case()->Y())
+	else if(y == c->Y())
 	{
-		if(x == Case()->X()-1)
+		if(x == c->X()-1)
 			move = ECMove::Left;
-		else if(x == Case()->X()+1)
+		else if(x == c->X()+1)
 			move = ECMove::Right;
 		else
 			return false;
@@ -315,17 +312,9 @@ bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 	else
 		return false;
 
-	Containing()->SetCase(Case());
-	if(!Containing()->WantMove(move, MOVE_SIMULE))
+	Containing()->SetCase(c);
+	if(!Containing()->WantMove(move, MOVE_FORCE))
 		return false;
-
-	CreateLast();
-
-	ECBEntity* entity = Containing();
-	UnContain();
-
-	if(!entity->WantMove(move, MOVE_FORCE))
-		throw ECExcept(VIName(move) VIName(x) VIName(y) VIName(Case()->X()) VIName(Case()->Y()), "Gros problème là");
 
 	moves.push_back(move);
 
@@ -390,8 +379,6 @@ bool ECMissiLauncher::WantDeploy()
 			break;
 	}
 
-	CreateLast();
-
 	SetDeployed(!Deployed());
 	return true;
 }
@@ -407,12 +394,12 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 		return false;
 
 	/* On n'attaque pas sur notre case */
-	if(Case()->X() == mx && Case()->Y() == my)
+	if(DestCase()->X() == mx && DestCase()->Y() == my)
 		return false;
 
 	uint d = 0;
-	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
-	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
+	for(uint x=DestCase()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=DestCase()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	/* On ne tire que dans un rayon de quatre cases. */
 	if(d > Porty())
@@ -462,7 +449,10 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Shoot(*it, killed);
-			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			if(Owner())
+				Channel()->send_info(Owner(), EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			if((*it)->Owner())
+				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
 		}
 
 #if 0 // Uniquement si on veut qu'un lance-missile se reploie après avoir tiré
@@ -487,18 +477,20 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 
 bool ECUnit::WantAttaq(uint mx, uint my, bool force)
 {
+	ECBCase *here = DestCase();
+
 	/* On ne peut attaquer que si on est sur la case */
-	if(Case()->X() != mx || Case()->Y() != my)
+	if(here->X() != mx || here->Y() != my)
 		return false;
 
 	/* Si il n'y a personne à attaquer on n'attaque pas */
-	if(Case()->Entities()->size() <= 1) // <=1 car je suis forcément dans la liste vu que je suis sur la case
+	if(here->Entities()->Size() <= 1) // <=1 car je suis forcément dans la liste vu que je suis sur la case
 		return false;
 
-	std::vector<ECBEntity*> ents = Case()->Entities()->List();
+	std::vector<ECBEntity*> ents = here->Entities()->List();
 	std::vector<ECBEntity*>::iterator enti;
 	for(enti = ents.begin(); enti != ents.end() &&
-		(dynamic_cast<ECEntity*>(*enti)->Shadowed() || !CanAttaq(*enti) || Like(*enti));
+		(dynamic_cast<ECEntity*>(*enti)->IsZombie() || !CanAttaq(*enti) || Like(*enti));
 		++enti);
 
 	if(enti == ents.end())
@@ -511,18 +503,35 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() || !Case()) return false;
+	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() || !Case() || Locked() && !(flags & MOVE_FORCE))
+		return false;
 
-	ECBCase *c = 0;
-
+	ECBCase *c = 0, *here = DestCase();
+	ECBMove::E_Move last_move = Move()->Moves().back();
 	switch(move)
 	{
-		case ECBMove::Up: c = Case()->MoveUp(); break;
-		case ECBMove::Down: c = Case()->MoveDown(); break;
-		case ECBMove::Left: c = Case()->MoveLeft(); break;
-		case ECBMove::Right: c = Case()->MoveRight(); break;
+		case ECBMove::Up:
+			if(last_move == ECBMove::Down)
+				return false;
+			c = here->MoveUp();
+			break;
+		case ECBMove::Down:
+			if(last_move == ECBMove::Up)
+				return false;
+			c = here->MoveDown();
+			break;
+		case ECBMove::Left:
+			if(last_move == ECBMove::Right)
+				return false;
+			c = here->MoveLeft();
+			break;
+		case ECBMove::Right:
+			if(last_move == ECBMove::Left)
+				return false;
+			c = here->MoveRight();
+			break;
 	}
-	if(!c || c == Case() || last && last->Case() == c) return false;
+	if(!c || c == here) return false;
 
 	if(!(flags & MOVE_FORCE) && !CanWalkOn(c)) return false;
 
@@ -531,28 +540,9 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 
 	restStep--;
 
-	/* Si sur la case actuelle il y a une attaque, on ne bouge pas meme si on dit
-	 * que si au client.
-	 */
-	if(!(flags & MOVE_FORCE))
-	{
-		std::vector<ECBEntity*> ents = Case()->Entities()->List();
-		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-			if(((!dynamic_cast<ECEntity*>(*enti)->Shadowed() && !(*enti)->Last()) ||
-				(*enti)->MyStep() - (*enti)->RestStep() == this->MyStep() - this->RestStep())
-			&& ThereIsAttaq(*enti, this))
-			{
-				Move()->AddMove(move);
-				return true;
-			}
-	}
-
-	/* On ajout le move bien après le CreateLast() */
-	CreateLast();
 	if(Move()->Empty())
 		Move()->SetFirstCase(Case());
 	Move()->AddMove(move);
-	ChangeCase(c);
 
 	return true;
 }

@@ -87,16 +87,22 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 
 struct Server* add_server(struct Client* cl, const char* name)
 {
-	struct Server *server = calloc(1, sizeof* server), *head = server_head;
+	struct Server *server = 0, *head = server_head;
+
+	if(cl->server || cl->user)
+		return 0;
+
+	/* Si le serveur qui essaye de se connecter est manifestement le même qu'un de la liste,
+	 * c'est que ce dernier n'a pas été ping timeouté et donc on le vire.
+	 */
+	for(server = server_head; server; server = server->next)
+		if(!strcmp(server->name, name) && !strcmp(server->client->ip, cl->ip))
+			delclient(server->client);
+
+	server = calloc(1, sizeof* server);
 
 	if(!server)
 		return 0;
-
-	if(cl->server || cl->user)
-	{
-		free(server);
-		return 0;
-	}
 
 	strncpy(server->name, name, SERVERLEN);
 	server->client = cl;

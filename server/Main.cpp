@@ -49,12 +49,10 @@ void ECServer::CleanUp()
 }
 
 /** Check ping timeouts */
-void ECServer::sig_alarm(int c)
+void ECServer::sig_alarm()
 {
 #ifndef NOPINGCHECK
-	app.CurrentTS = time(NULL);
-	RealClientList lst = app.MyClients();
-	for(RealClientList::iterator it = lst.begin(); it != lst.end(); ++it)
+	for(RealClientList::iterator it = myClients.begin(); it != myClients.end(); ++it)
 	{
 		TClient *cl = it->second;
 		if(IsPing(cl))
@@ -62,15 +60,16 @@ void ECServer::sig_alarm(int c)
 			DelPing(cl);
 			cl->exit(app.rpl(ECServer::BYE));
 		}
-		else if(int(cl->GetLastRead() + app.GetConf()->PingFreq()) <= app.CurrentTS)
+		else if(int(cl->GetLastRead() + GetConf()->PingFreq()) <= CurrentTS)
 		{
 			cl->sendrpl(app.rpl(ECServer::PING));
 			SetPing(cl);
 		}
 	}
-
-	alarm(app.GetConf()->PingFreq());
 #endif
+
+	if(!ms_sock)
+		ConnectMetaServer();
 }
 
 int ECServer::main(int argc, char **argv)
@@ -140,7 +139,6 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new SAVECommand("SAVE",	ECD_AUTH,	1));
 
 		signal(SIGPIPE, SIG_IGN);
-		signal(SIGALRM, &sig_alarm);
 
 		if(background)
 		{
@@ -162,11 +160,7 @@ int ECServer::main(int argc, char **argv)
 		running = true;
 
 		if(init_socket())
-		{
-			alarm(GetConf()->PingFreq());
-
 			run_server();
-		}
 
 	}
 	catch (const TECExcept &e)

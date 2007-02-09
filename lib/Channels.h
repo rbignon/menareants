@@ -156,7 +156,10 @@ class ECBChannel
 /* Constructeurs/Deconstructeurs */
 public:
 
-	/** @param _name name of channel */
+	/** Constructor.
+	 * @param _name name of channel
+	 * @param mission is it a mission ?
+	 */
 	ECBChannel(std::string _name, bool mission);
 
 	virtual ~ECBChannel();
@@ -233,6 +236,7 @@ public:
 /* Variables privées */
 protected:
 	BPlayerVector players;
+	void SetName(std::string n) { name = n; }
 
 private:
 	std::string name;

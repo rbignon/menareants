@@ -100,12 +100,15 @@ public:
 	bool Empty() const { return moves.empty(); }                    ///< There isn't movements ?
 	Vector::size_type Size() const { return moves.size(); }         ///< Number of movements
 	Vector Moves() const { return moves; }                          ///< Get movements' vector
-	void AddMove(E_Move m) { moves.push_back(m); }                  ///< Add a movement as a E_Move enumerator
-	void SetMoves(Vector _moves) { moves = _moves; }                ///< Define a movement's vector. This remove actuals moves.
+	void AddMove(E_Move m);                                         ///< Add a movement as a E_Move enumerator
+	void SetMoves(Vector _moves);                                   ///< Define a movement's vector. This remove actuals moves.
 	void SetEntity(ECBEntity* et) { entity = et; }                  ///< Set an entity
 	ECBEntity* Entity() { return entity; }
 
-	ECBCase* FirstCase() { return first_case; }                     ///< This is the first case, where the movement begin
+	void RemoveFirst() { if(!moves.empty()) moves.erase(moves.begin()); }
+	E_Move First() { return *(moves.begin()); }
+
+	ECBCase* FirstCase() const { return first_case; }               ///< This is the first case, where the movement begin
 	void SetFirstCase(ECBCase* c) { first_case = c; }               ///< Define the first case
 
 	/** Put all movements in a string.
@@ -113,14 +116,26 @@ public:
 	 */
 	std::string MovesString(ECBCase* end = 0);
 
-	virtual void Clear(ECBCase* c = 0) { moves.clear(); first_case = c; }   ///< Clear all movements
-	void Return(ECBCase*);                                                  ///< Remove all movements after a case
+	/** Clear all movements */
+	virtual void Clear(ECBCase* c = 0) { moves.clear(); first_case = c; dest = 0; }
+
+	/** Remove all movements after a case */
+	void Return(ECBCase*);
+
+	/** Remove all movements before a case */
+	void GoTo(ECBCase*);
+
+	ECBCase* Dest() const { return dest ? dest : EstablishDest(); }
+	ECBCase* EstablishDest() const;
+
+	void SetDest();
 
 /* Variables privées */
 protected:
 	Vector moves;
 	ECBCase* first_case;
 	ECBEntity* entity;
+	ECBCase* dest;
 };
 
 /********************************************************************************************
@@ -130,8 +145,7 @@ protected:
 #define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
                             (b)->CanAttaq(a) && !(b)->Like(a))
 #define ARM_MOVE        0x0001
-/** \todo utiliser ou supprimer SPLIT */
-#define ARM_SPLIT       0x0002
+#define ARM_UNUSED      0x0002         /* ARM_UNUSED is unused */
 #define ARM_ATTAQ       0x0004
 #define ARM_REMOVE      0x0008
 #define ARM_LOCK        0x0010
@@ -202,7 +216,7 @@ public:
 
 	ECBEntity()
 		: owner(0), acase(0), nb(0), lock(false), deployed(false), myStep(0), restStep(0), event_type(0),
-		  parent(0), map(0)
+		  parent(0), map(0), move(this)
 	{}
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
@@ -321,6 +335,7 @@ public:
 	/** Find the fast path...
 	 * @param dest this is the destination of the target
 	 * @param moves a list of movements (usage of ECBMove::E_Move)
+	 * @param from set it to use an other case than entity's case
 	 * @return true if there is a path, and false if there isn't any solution.
 	 */
 	bool FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& moves, ECBCase* from = 0);
@@ -331,6 +346,9 @@ public:
 	/** This is the case where this entity is */
 	ECBCase* Case() const { return acase; }
 	void SetCase(ECBCase* _c) { acase = _c; }
+
+	/** My destination case if any, else my case */
+	ECBCase* DestCase() const { return move.Dest() ? move.Dest() : acase; }
 
 	/** Owner of this entity (return a \a player !) */
 	ECBPlayer* Owner() const { return owner; }
@@ -381,13 +399,15 @@ public:
 	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel à Shadowed(), qui ne sera utilisé que dans le serveur.
 	 * En effet ce dernier a que des instances de ECEntity qui eux contiennent bien Shadowed().
 	 */
-	virtual bool Shadowed() const { return false; }
+	virtual bool IsZombie() const { return false; }
 
 	ECBEntity* Parent() const { return parent; }
 	void SetParent(ECBEntity* e) { parent = e; }
 
 	ECBMap* Map() const { return map; }
 	void SetMap(ECBMap* m) { map = m; }
+
+	ECBMove* Move() { return &move; }
 
 /* Variables protégées */
 protected:
@@ -402,6 +422,7 @@ protected:
 	uint event_type;
 	ECBEntity* parent;
 	ECBMap* map;
+	ECBMove move;
 };
 
 /********************************************************************************************

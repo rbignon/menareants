@@ -40,5 +40,6 @@ struct User* add_user(struct Client* cl, const char* name);
 void remove_user(struct User* user);
 
 int m_login (struct Client*, int, char**);
+int m_pong (struct Client* cl, int parc, char** parv);
 
 #endif /* ECMS_CLIENTS_H */

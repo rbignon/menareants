@@ -33,12 +33,12 @@ bool ECObelisk::WantAttaq(uint mx, uint my, bool force)
 		return false;
 
 	/* On n'attaque pas sur notre case */
-	if(Case()->X() == mx && Case()->Y() == my)
+	if(DestCase()->X() == mx && DestCase()->Y() == my)
 		return false;
 
 	uint d = 0;
-	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
-	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
+	for(uint x=DestCase()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=DestCase()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	if(d > Porty())
 		return false;
@@ -100,12 +100,12 @@ bool ECDefenseTower::WantAttaq(uint mx, uint my, bool force)
 		return false;
 
 	/* On n'attaque pas sur notre case */
-	if(Case()->X() == mx && Case()->Y() == my)
+	if(DestCase()->X() == mx && DestCase()->Y() == my)
 		return false;
 
 	uint d = 0;
-	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
-	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
+	for(uint x=DestCase()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=DestCase()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	if(d > Porty())
 		return false;
@@ -238,12 +238,12 @@ bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 		return false;
 
 	/* On n'attaque pas sur notre case */
-	if(Case()->X() == mx && Case()->Y() == my)
+	if(DestCase()->X() == mx && DestCase()->Y() == my)
 		return false;
 
 	uint d = 0;
-	for(uint x=Case()->X(); x != mx; d++) x < mx ? ++x : --x;
-	for(uint y=Case()->Y(); y != my; d++) y < my ? ++y : --y;
+	for(uint x=DestCase()->X(); x != mx; d++) x < mx ? ++x : --x;
+	for(uint y=DestCase()->Y(); y != my; d++) y < my ? ++y : --y;
 
 	/* On ne tire que dans un rayon de SILO_PORTY (10?) cases. */
 	if(d > Porty())
@@ -289,7 +289,7 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 				std::vector<ECBEntity*> ents = c->Entities()->List();
 				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 				{
-					if((*enti)->IsCountryMaker() || (*enti)->Shadowed() || (*enti)->Type() == E_NUCLEARSEARCH)
+					if((*enti)->IsCountryMaker() || (*enti)->IsZombie() || (*enti)->Type() == E_NUCLEARSEARCH)
 						continue;
 					ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 					if(entity->IsBuilding())
@@ -300,7 +300,7 @@ bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 					entity->ReleaseShoot();
 					if(!entity->Nb())
 					{
-						entity->SetShadowed();
+						entity->SetZombie();
 						Channel()->SendArm(0, entity, ARM_REMOVE);
 					}
 					else

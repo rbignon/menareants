@@ -169,7 +169,10 @@ void TForm::Update(bool flip)
 	unsigned int start, delay, sleep_fps;
 	start = SDL_GetTicks();
 
-	Draw(flip);
+	Draw();
+
+	if(flip)
+		Window()->Flip();
 
 	delay = SDL_GetTicks()-start;
 	if (delay < max_fps)
@@ -186,9 +189,12 @@ void TForm::Update(bool flip)
 	//SDL_Delay(15);
 }
 
-void TForm::Draw(bool flip)
+void TForm::Draw()
 {
 	int _x, _y;
+
+	if(mutex)
+		SDL_LockMutex(mutex);
 
 	if(background && MustRedraw())
 		Window()->Blit(background);
@@ -196,9 +202,6 @@ void TForm::Draw(bool flip)
 	SDL_GetMouseState( &_x, &_y);
 
 	Point2i pos(_x, _y);
-
-	if(mutex)
-		SDL_LockMutex(mutex);
 
 	bool first = focus_order ? true : false;
 	while(1)
@@ -223,7 +226,4 @@ void TForm::Draw(bool flip)
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);
-
-	if(flip)
-		Window()->Flip();
 }

@@ -32,14 +32,29 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <time.h>
 
 int sock = 0;
 int running = 0;
+time_t Now = 0;
 fd_set global_fd_set;
 unsigned highsock = 0;
 unsigned nb_tchan = 0;
 unsigned nb_tusers = 0;
 static struct Client myClients[MAXCLIENTS];
+
+static void check_pings()
+{
+	unsigned int i = 0;
+	for(;i <= highsock;++i)
+		if(myClients[i].last_read + pingfreq > Now)
+		{
+			if(myClients[i].flags & CL_PING)
+				delclient(&myClients[i]);
+			else
+				sendrpl(&myClients[i], "PING");
+		}
+}
 
 int sendbuf(struct Client* cl, char* buf, int len)
 {
@@ -102,7 +117,8 @@ int parsemsg(struct Client* cl)
 	} cmds[] =
 	{
 		{"IAM", m_login},
-		{"SET", m_server_set}
+		{"SET", m_server_set},
+		{"POG", m_pong}
 	};
 
 	parc = SplitBuf(cl->RecvBuf, parv, MAXPARA);
@@ -186,6 +202,7 @@ struct Client *addclient(int fd, const char *ip)
 	newC->server = 0;
 	newC->user = 0;
 	newC->proto = 0;
+	newC->last_read = time(NULL);
 	strncpy(newC->ip, ip, IPLEN);
 
 	FD_SET(fd, &global_fd_set);
@@ -239,11 +256,11 @@ int init_socket(void)
 
 	localhost.sin_family = AF_INET;
 	localhost.sin_addr.s_addr = INADDR_ANY;
-	localhost.sin_port = htons(PORT);
+	localhost.sin_port = htons(port);
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		printf("Unable to listen port %d.\n", PORT);
+		printf("Unable to listen port %d.\n", port);
 		close(sock);
 		return 0;
 	}
@@ -260,17 +277,30 @@ int init_socket(void)
 
 	running = 1;
 
+	Now = time(NULL);
+
 	return 1;
 }
 
 int run_server(void)
 {
 	fd_set tmp_fdset;
+	time_t last_call = time(NULL);
+	struct timeval timeout = {0,0};
 
 	while(running)
 	{
+		if(last_call + pingfreq < Now)
+		{
+			check_pings();
+			last_call = Now;
+		}
+
 		tmp_fdset = global_fd_set; /* save */
-		if(select(highsock + 1, &tmp_fdset, NULL, NULL, NULL) < 0)
+		if((timeout.tv_sec = last_call + pingfreq - Now) < 0) timeout.tv_sec = 0;
+		timeout.tv_usec = 0;
+
+		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
 			{
@@ -281,6 +311,8 @@ int run_server(void)
 		else
 		{
 			unsigned int i = 0;
+			Now = time(NULL);
+
 			for(;i <= highsock;++i)
 			{
 				if(!FD_ISSET(i, &tmp_fdset)) continue;

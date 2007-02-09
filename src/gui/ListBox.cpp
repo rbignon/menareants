@@ -51,7 +51,7 @@ const std::string& TListBoxItem::Value() const
 // };
 
 TListBox::TListBox (const Rectanglei &rect, bool always_one_selected_b)
-	: TComponent(rect), no_item_hint(false), box_color(BoxColor), on_change(0)
+	: TComponent(rect), no_item_hint(false), box_color(BoxColor), on_change(0), gray_disable(true)
 {
 	first_visible_item = 0;
 	selected_item = -1;
@@ -170,7 +170,7 @@ void TListBox::Draw(const Point2i &mousePosition)
 		{
 			if(int(i) == selected_item)
 				Window()->BoxColor(rect, BoxColorSelected);
-			else if(i == uint(item))
+			else if(Enabled() && i == uint(item))
 			{
 				Window()->BoxColor(rect, BoxColorMoused);
 				if(!NoItemHint())
@@ -217,6 +217,7 @@ TListBoxItem* TListBox::AddItem (bool selected,
 	TListBoxItem * item = new TListBoxItem(label, font, value, color);
 	MyComponent(item);
 	item->SetEnabled(enabled);
+	item->SetGrayDisable();
 	m_items.push_back (item);
 
 	// Select it if selected
@@ -358,6 +359,13 @@ const std::string& TListBox::ReadValue (int index) const
 {
 	assert (index >= 0 && index < (int)m_items.size());
 	return m_items.at(index)->Value();
+}
+
+void TListBox::SetEnabled(bool _en)
+{
+	TComponent::SetEnabled(_en);
+	for(std::vector<TListBoxItem*>::iterator it = m_items.begin(); it != m_items.end(); ++it)
+		(*it)->SetEnabled((Enabled() || !gray_disable));
 }
 
 uint TListBox::Size() const

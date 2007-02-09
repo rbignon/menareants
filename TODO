@@ -2,6 +2,12 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 À faire:
 
+== FINIR NOUVELLE GESTION DES EVENEMENTS ==
+-> pour le moment, MOVE, ATTAQ, CONTAIN et DEPLOY ont l'air de marcher correctement
+-> UNCONTAIN ne marche pas
+-> tester UPGRADE et UNION, et autres si existants
+-> voir pour remanier SendArm()
+
 * En cours
 -améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
  la plus proche de la case d'arrivée.

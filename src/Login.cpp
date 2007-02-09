@@ -274,6 +274,13 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	std::string host = parv[1];
 
+	// Set the timeout
+	struct timeval timeout;
+	memset(&timeout, 0, sizeof(timeout));
+	timeout.tv_sec = 5; // 5seconds timeout
+	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+	setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_addr.s_addr = inet_addr(stringtok(host, ":").c_str());
 	fsocket.sin_port = htons(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
@@ -449,7 +456,12 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 	else if(MissionButton->Test(mouse, button) || EscarmoucheButton->Test(mouse, button))
 	{
 		int size = ServerList->Size();
-		if(!size) return;
+		if(!size)
+		{
+			TMessageBox("Il n'y a aucun serveur disponible.\n\nVeuillez réessayer plus tard.",
+			            BT_OK, this).Show();
+			return;
+		}
 		int r = 0, i = 0;
 		do
 		{
@@ -469,6 +481,8 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 				TMessageBox("Impossible de créer la partie.\n"
 				            "Il y a actuellement de trop de parties en cours sur le serveur. Réessayez.",
 				            BT_OK, ConnectedForm).Show();
+			if(!client->IsConnected())
+				TMessageBox("Vous avez été déconnecté.", BT_OK).Show();
 			client->SetWantDisconnect();
 			MenAreAntsApp::GetInstance()->Disconnect(client);
 			MenAreAntsApp::GetInstance()->RefreshList();
@@ -481,6 +495,7 @@ TListServerForm::TListServerForm(ECImage* w)
 {
 	ServerList = AddComponent(new TListBox(Rectanglei(0, 0, 500,350)));
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
+	ServerList->SetGrayDisable(false);
 
 	Label1 = AddComponent(new TLabel(ServerList->Y()-60,"Veuillez choisir un serveur dans la liste suivante :", white_color, Font::GetInstance(Font::Big)));
 
@@ -634,12 +649,7 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en tant que " +
 		                                               client->GetNick());
 
-		do
-		{
-			ConnectedForm->Actions();
-			ConnectedForm->Update();
-
-		} while(!ConnectedForm->WantQuit());
+		ConnectedForm->Run();
 	}
 	catch(const TECExcept &e)
 	{
@@ -755,6 +765,7 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	GList = AddComponent(new TListBox(Rectanglei(300,350,200,350)));
 	GList->SetXY(Motd->X()+Motd->Width()+10, Motd->Y());
+	GList->SetGrayDisable(false);
 
 	ListLabel = AddComponent(new TLabel(GList->X()+5, GList->Y()-20, "Liste des parties :", white_color, Font::GetInstance(Font::Normal)));
 

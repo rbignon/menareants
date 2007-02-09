@@ -98,8 +98,8 @@ public:
 /* Attributs */
 public:
 
-	virtual void SetHeight (int ph);
-	virtual void SetWidth (int ph);
+	virtual void SetHeight (int sizeY);
+	virtual void SetWidth (int sizeX);
 
 	/* Visibilité */
 	bool Visible() const { return visible; }              /**< Is this object visible ? */
@@ -134,7 +134,8 @@ public:
 	virtual bool Test (const Point2i& pos, int button = 1) const { return (Mouse(pos) && Enabled() && button == 1); }
 	virtual bool Clic (const Point2i& pos, int button) { return Test(pos, button); }
 
-	virtual void PressKey(SDL_keysym) { return; }         /**< Called when user press a key.. */
+	/** Called when user press a key... */
+	virtual void PressKey(SDL_keysym) { return; }
 
 	/** Call back when user clic on component */
 	void SetOnClick(TOnClickFunction c, void* param) { on_click_func = c; on_click_param = param; }
@@ -284,7 +285,7 @@ public:
 /* Attributs */
 public:
 
-	void SetXY (int _x, int _y); /** Reimplementation to affect all components in the list */
+	void SetXY (int x, int y); /** Reimplementation to affect all components in the list */
 
 	/** Get list of components as a vector */
 	ComponentVector GetList() const { return list; }

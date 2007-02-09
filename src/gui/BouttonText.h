@@ -47,7 +47,7 @@ public:
   virtual void Draw (const Point2i&);
   void SetText (const std::string &text);
   void SetEnabled(bool b = true);
-  virtual void SetXY(int, int);
+  virtual void SetXY(int x, int y);
 
   std::string GetText() const;
 };

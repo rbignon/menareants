@@ -226,7 +226,7 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Shadowed() && ((*it)->Like(t) || t->Like(*it)) && (*it)->Type() == t->Type())
+			if(t != *it && !(*it)->IsZombie() && ((*it)->Like(t) || t->Like(*it)) && (*it)->Type() == t->Type())
 				++i;
 		return i;
 	}
@@ -235,8 +235,8 @@ public:
 	{
 		uint i = 0;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(t != *it && !(*it)->Shadowed() && (!(*it)->Like(t) || !t->Like(*it)) &&
-			                                   ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
+			if(t != *it && !(*it)->IsZombie() && (!(*it)->Like(t) || !t->Like(*it)) &&
+			                                     ((*it)->CanAttaq(t) || t->CanAttaq(*it)))
 				++i;
 		return i;
 	}
@@ -245,19 +245,21 @@ public:
 	{
 		std::vector<T> l;
 		for(iterator it = list.begin(); it != list.end(); ++it)
-			if(!(*it)->Shadowed())
+			if(!(*it)->IsZombie())
 				l.push_back(*it);
 		return l;
 	}
 
-	T First() const { return list.front(); }
+	T First() const { return list.empty() ? 0 : list.front(); }
+
+	T Last() const { return list.empty() ? 0 : list.back(); }
 
 	std::vector<T> List() { return list; }
 
 /* Attributs */
 public:
-	size_type size() { return list.size(); }
-	bool empty() { return list.empty(); }
+	size_type Size() { return list.size(); }
+	bool Empty() { return list.empty(); }
 
 };
 

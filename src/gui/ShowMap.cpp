@@ -265,7 +265,7 @@ ECEntity* TMap::TestEntity(const Point2i& mouse)
 
 	ECase* c = TestCase(mouse);
 
-	if(c->Entities()->empty() || Map()->Channel() && !ECMap::CanSelect(c)) return 0;
+	if(c->Entities()->Empty() || Map()->Channel() && !ECMap::CanSelect(c)) return 0;
 
 	ECEntity* e = dynamic_cast<ECEntity*>(c->Entities()->First());
 
@@ -403,7 +403,7 @@ void TMap::Draw(const Point2i& mouse)
 
 			DrawFog(c);
 		}
-		if(!c->Entities()->empty())
+		if(!c->Entities()->Empty())
 		{
 			std::vector<ECBEntity*> ents = c->Entities()->List();
 			FOR(ECBEntity*, ents, entity)

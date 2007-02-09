@@ -30,6 +30,8 @@
 #include "lib/Defines.h"
 
 int myproto=0;
+int pingfreq = DEFPINGFREQ;
+int port = DEFPORT;
 
 int main(int argc, char **argv)
 {
@@ -37,14 +39,20 @@ int main(int argc, char **argv)
 	int tmp;
 	int background = 1;
 
-	while((tmp = getopt(argc, argv, "n")) != EOF)
+	while((tmp = getopt(argc, argv, "np:f:")) != EOF)
 		switch(tmp)
 		{
 			case 'n':
 				background = 0;
 				break;
+			case 'f':
+				pingfreq = atoi(optarg);
+				break;
+			case 'P':
+				port = atoi(optarg);
+				break;
 			default:
-				printf("Usage: %s [-n]", argv[0]);
+				printf("Usage: %s [-n] [-p <port>] [-f <ping freq>]", argv[0]);
 				exit(EXIT_FAILURE);
 		}
 

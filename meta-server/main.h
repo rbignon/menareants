@@ -22,5 +22,7 @@
 #define ECMS_MAIN_H
 
 extern int myproto;
+extern int pingfreq;
+extern int port;
 
 #endif /* ECMS_MAIN_H */

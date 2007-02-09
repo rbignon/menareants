@@ -93,6 +93,8 @@ public:
 
 	void RemoveSelected();
 
+	void SetEnabled(bool _en = true);
+
 	const std::string& ReadLabel() const;
 	const std::string& ReadValue() const;
 	const std::string& ReadValue(int index) const;
@@ -107,6 +109,8 @@ public:
 	bool NoItemHint() const { return no_item_hint; }
 
 	void SetBackgroundColor(Color c) { box_color = c; }
+
+	void SetGrayDisable(bool b  = true) { gray_disable = b; }
 
 /* Variables privées */
 private:
@@ -125,6 +129,8 @@ protected:
 	TButton m_up, m_down;
 
 	OnChangeFunc on_change;
+
+	bool gray_disable;
 };
 
 #endif

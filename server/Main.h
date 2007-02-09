@@ -134,7 +134,7 @@ protected:
 	int run_server(void);
 	int init_socket(void);
 
-	static void sig_alarm(int c);
+	void sig_alarm();
 
 	time_t uptime;
 	int sock, ms_sock;
@@ -150,6 +150,8 @@ protected:
 
 	bool ConnectMetaServer();
 	int SendMetaServer(std::string s);
+	void ParseMetaServer();
+	static void ms_ping(ECServer* server, std::vector<std::string> parv);
 };
 
 extern ECServer app;

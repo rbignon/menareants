@@ -30,223 +30,20 @@
 
 void EChannel::InitAnims()
 {
-	Map()->SortEvents();
-}
-
-#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
-void EChannel::NextAnim()
-{
-	assert(Map());
-	assert(State() == EChannel::ANIMING);
-
-	if(Map()->Events().empty()) return;
-
-	ECEvent* event = Map()->Events().front();
-
-	assert(event);
-
-#ifdef DEBUG
-{
-	Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT(event->Flags()), event->Case()->X(),
-									event->Case()->Y());
-
-	std::vector<ECEntity*> ents = event->Entities()->List();
-	for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	std::vector<ECEvent*> events = Map()->Events();
+	FORit(ECEvent*, events, eventit)
 	{
-		Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
-	}
-
-	if(ents.empty())
-	{
-		Map()->RemoveEvent(event, USE_DELETE);
-		return;
-	}
-}
-#endif
-
-	switch(event->Flags())
-	{
-		case ARM_ATTAQ:
+		ECEvent* event = *eventit;
+		if(event->Flags() == ARM_CREATE)
 		{
-			const char S_ATTAQ = 1;
-			const char S_REMOVE = 2;
-			const char S_END = 3;
-			const char T_CONTINUE = 1;
-			const char T_STOP = 0;
-			const char T_SLEEP = -1;
-			char state = S_ATTAQ;
-
-			/* On lock temporairement toutes les entités. Les vainqueurs seront délockés */
-			std::vector<ECEntity*> entv = event->Entities()->List();
-			bool someone_want_attaq = false;
-			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end();)
-			{
-				if((*it)->Shadowed())
-					it = entv.erase(it);
-				else
-				{
-					/* Si l'unité est hidden, il faut bien montrer son existance lors d'un combat, donc on créé l'unité.
-					   Les alliés du propriétaire ont déjà vu la création de l'unité, et vont donc recevoir une nouvelle
-					   ligne, mais theoriquement ils devraient l'ignorer. */
-					if((*it)->IsHidden())
-						SendArm(0, *it, ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, (*it)->Case()->X(), (*it)->Case()->Y());
-
-					(*it)->SetShadowed();
-					(*it)->Tag = T_CONTINUE;
-					if((*it)->EventType() & ARM_ATTAQ)
-						someone_want_attaq = true;
-					++it;
-				}
-			}
-			/* Si l'evenement ne contenait que des unités locked, on s'en va (genre elle a été supprimée précédemment) */
-			if(entv.empty())
-				break;
-
-			uint flags = ARM_ATTAQ;
-			if(!event->Linked().empty())
-				flags |= ARM_MOVE;
-			/* Si jamais il n'y a plus que des amis on envoie les mouvements puis on se barre, sauf si quelqu'un a
-			 * vraiment envie de se taper meme contre personne
-			 */
-			if(!someone_want_attaq && ECEntity::AreFriends(entv))
-				flags &= ~ARM_ATTAQ;
-			SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
-
-			if(!(flags & ARM_ATTAQ))
-			{
-				// Il n'y a que des amis (voir trois lignes plus haut) donc on se barre après avoir envoyé les moves
-				for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-					(*it)->SetShadowed(false);
-				break;
-			}
-
-			std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entv);
-
-			std::vector<ECEntity*>::size_type nb_entities = entv.size();
-			std::vector<ECEntity*> entities_save = entv;
-			for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
-			{
-				if(it == entv.end())
-				{
-					it = entv.begin();
-					if(state == S_REMOVE && nb_entities > 0) state = S_ATTAQ;
-					else state++;
-					continue;
-				}
-
-				if(state == S_ATTAQ)
-				{
-					if((*it)->Tag == T_CONTINUE)
-						(*it)->Tag = (*it)->Attaq(entv, event) ? T_CONTINUE : T_STOP;
-					++it;
-				}
-				else if(state == S_REMOVE)
-				{
-					(*it)->ReleaseShoot();
-					Debug(W_DEBUG, "- %s reste %d", (*it)->LongName().c_str(), (*it)->Nb());
-
-					if(!(*it)->Nb() || (*it)->Tag == T_STOP)
-					{
-						if(!(*it)->Nb())
-							it = entv.erase(it);
-						else
-						{
-							(*it)->Tag = T_SLEEP;
-							++it;
-						}
-						// Il est déjà arrivé, allez savoir pourquoi, que nb_entities soit décrémenté en dessous de 0.
-						if(nb_entities > 0)
-							nb_entities--;
-					}
-					else ++it;
-				}
-				else ++it;
-			}
-			entv = entities_save;
-			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-			{
-				if(!(*it)->Nb())
-				{
-					SendArm(NULL, *it, ARM_REMOVE);
-					/* On ne remove pas car il est shadowed et sera supprimé lors du
-						* passage de la boucle principale.
-						*/
-					//map->RemoveAnEntity(*it, USE_DELETE);
-				}
-				else
-				{
-					std::vector<ECBEntity*> fixed = event->Case()->Entities()->Fixed();
-					std::vector<ECBEntity*>::iterator fix = fixed.end();
-					if(!fixed.empty() && !dynamic_cast<EContainer*>(*it))
-						for(fix = fixed.begin(); fix != fixed.end() && (*fix == *it ||
-							(*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
-								++fix);
-
-					if(fix != fixed.end() && (*it)->Case() == (*fix)->Case())
-					{
-						ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
-						gobeur->Union(*it);
-						(*it)->Move()->Clear((*it)->Case());
-						SendArm(NULL, *it, ARM_INVEST|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
-						SendArm(receivers, gobeur, ARM_NUMBER);
-						/* Pas besoin de mettre shadow, il l'est déjà.
-							* (*it)->SetShadowed();
-							*/
-					}
-					else
-					{
-						if((*it)->EventType() & ARM_DEPLOY)
-							SendArm(NULL, *it, ARM_DEPLOY);
-						SendArm(receivers, *it, ARM_NUMBER);
-						EContainer* contain = dynamic_cast<EContainer*>(*it);
-						if(contain && contain->Containing())
-							SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
-						dynamic_cast<ECase*>((*it)->Case())->CheckInvests(*it);
-						(*it)->SetShadowed(false);
-					}
-				}
-			}
-			break;
-		}
-		case ARM_UNION:
-		{
-			SendArm(NULL, event->Entity(), ARM_MOVE|ARM_REMOVE, event->Case()->X(), event->Case()->Y(), 0,
-			        event->Linked());
-
-			std::vector<ECEntity*> entv = event->Entities()->List();
-			if(entv.size() != 2)
-				Debug(W_ERR, "Il faudrait qu'il y ait deux entités dans la liste de UNION et il y en a %d", entv.size());
-			else
-			{
-				SendArm(NULL, entv[1], ARM_NUMBER|ARM_HIDE);
-				EContainer* contain_r = dynamic_cast<EContainer*>(event->Entity());
-				EContainer* contain = dynamic_cast<EContainer*>(entv[1]);
-				if(contain_r && contain_r->Containing() && contain && contain_r->Containing() != contain->Containing())
-					SendArm(NULL, dynamic_cast<ECEntity*>(contain_r->Containing()), ARM_REMOVE);
-				if(contain && contain->Containing())
-				{
-					SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER|ARM_HIDE);
-					if(contain_r && contain_r->Containing() == contain->Containing())
-						SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_CONTENER);
-				}
-			}
-			break;
-		}
-		case ARM_DEPLOY:
-			if(!(event->Entity()->EventType() & ARM_ATTAQ))
-				SendArm(NULL, event->Entities()->List(), ARM_DEPLOY);
-			break;
-		case ARM_CREATE:
 			if(event->Entity()->IsHidden())
 			{
-				if(!event->Entity()->Owner() || event->Entity()->Owner()->NbAllies() == 0)
-					break;
-				SendArm(event->Entity()->Owner()->ClientAllies(), event->Entities()->List(),
-				        ARM_CREATE, event->Case()->X(), event->Case()->Y());
+				if(event->Entity()->Owner() && event->Entity()->Owner()->NbAllies() > 0)
+					SendArm(event->Entity()->Owner()->ClientAllies(), event->Entity(), ARM_CREATE, event->Case()->X(), event->Case()->Y());
 			}
 			else
-				SendArm(0, event->Entities()->List(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
-				                                                                           event->Case()->Y());
+				SendArm(0, event->Entity(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
+				                                                                 event->Case()->Y());
 
 			// false veut dire qu'on est dans un evenement, au moment où la création est propagée
 			/* Note: comme je viens de relire ce commentaire sans le comprendre du premier coup, je
@@ -255,48 +52,410 @@ void EChannel::NextAnim()
 			 * propage la création de l'unité.
 			 */
 			event->Entity()->Created(false);
-			break;
-		case ARM_CONTAIN:
-		case ARM_UNCONTAIN:
-		case ARM_MOVE:
-		{
-			std::vector<ECEvent*> ev;
-			ev.push_back(event);
-			SendArm(NULL, event->Entities()->List(), event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ev);
 
-			std::vector<ECEntity*> entv = event->Entities()->List();
-			for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
-				dynamic_cast<ECase*>(event->Case() ? event->Case() : (*it)->Case())->CheckInvests(*it);
-			break;
+			Debug(W_DEBUG|W_ECHO, "= envoie d'un CREATE =");
+
+			/* On ne cherche pas à supprimer dans la liste d'evenements de l'entité car,
+			 * par définition, un ARM_CREATE n'est pas listée à l'intérieur, à cause
+			 * de son status particulier.
+			 * On supprime donc juste directement dans ECMap et ECPlayer.
+			 */
+			if(event->Entity()->Owner())
+				event->Entity()->Owner()->Events()->Remove(event);
+			Map()->RemoveEvent(event, USE_DELETE);
 		}
-		case ARM_UPGRADE:
+		else if(event->Entity()->Owner() == 0)
+			ShowAnim(event);
+	}
+	playing = first_playing++;
+	if(first_playing >= players.size())
+		first_playing = 0;
+}
+
+#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
+void EChannel::NextAnim()
+{
+	assert(Map());
+	assert(State() == EChannel::ANIMING);
+	assert(playing < players.size());
+
+	ECEvent* event = 0;
+	while(!event && !Map()->Events().empty())
+	{
+		do
 		{
-			if(event->Entities()->empty())
+			if(!(event = dynamic_cast<ECPlayer*>(players[playing])->Events()->First()))
+				break;
+
+			/* Si l'evenement ne s'est pas produit (l'unité a été détruite ou autre), on passe à l'evenement
+			 * suivant pour éviter de faire perdre du temps.
+			 */
+			if(ShowAnim(event) == false)
+				event = 0;
+		}
+		while(!event);
+
+		playing++;
+		if(playing >= players.size())
+			playing = 0;
+	}
+}
+
+bool EChannel::ShowAnim(ECEvent* event)
+{
+#ifdef DEBUG
+	{
+		if(event->Entity())
+			Debug(W_DEBUG|W_ECHO, "=== event - %s %d,%d (%s - %s) ===", SHOW_EVENT(event->Flags()), event->Case()->X(),
+		              event->Case()->Y(), event->Entity()->LongName().c_str(), SHOW_EVENT(event->Entity()->EventType()));
+		else
+			Debug(W_DEBUG|W_ECHO, "=== event - %s %d,%d (no sender) ===", SHOW_EVENT(event->Flags()), event->Case()->X(),
+		              event->Case()->Y());
+
+		std::vector<ECEntity*> ents = event->Entities()->List();
+		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		{
+			Debug(W_DEBUG|W_ECHO, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
+		}
+	}
+#endif
+	bool ret = true;
+	if(event->Entity() && event->Entity()->IsZombie())
+		ret = false;
+	else
+		switch(event->Flags())
+		{
+			case ARM_ATTAQ:
 			{
-				Debug(W_WARNING, "Personne dans l'evenement");
+				/* Si il y a event->Entity(), ça veut dire que c'est quelqu'un qui a fait une attaque
+				 * explicite.
+				 * Et si la liste des entités n'est pas vide, c'est à dire que la première entité est la cible.
+				 */
+				if(event->Entities()->Empty() == false && event->Entity())
+				{
+					ECEntity* e = event->Entities()->First();
+					if(!e->Case() || e->IsZombie() || event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
+					{
+						ret = false;
+						Debug(W_DEBUG, "Pas de case ou trop loins");
+						break; // L'unité n'est pas atteignable, donc finalement on n'attaque pas
+					}
+
+					event->SetCase(e->Case());
+				}
+
+				enum
+				{
+					S_ATTAQ,
+					S_REMOVE,
+					S_END
+				};
+				enum
+				{
+					T_SLEEP = -1,
+					T_STOP = 0,
+					T_CONTINUE = 1
+				};
+				std::vector<ECEntity*> entv;
+				if(event->Entity())
+				{
+					entv.push_back(event->Entity());
+					event->Entity()->Tag = T_CONTINUE;
+				}
+				/* On rends zombie temporairement toutes les entités. Les vainqueurs seront délockés */
+				{
+					std::vector<ECBEntity*> case_entities = event->Case()->Entities()->List();
+					for(std::vector<ECBEntity*>::iterator it = case_entities.begin(); it != case_entities.end(); ++it)
+						if(!(*it)->IsZombie())
+						{
+							/* Si l'unité est hidden, il faut bien montrer son existance lors d'un combat, donc on créé l'unité.
+							Les alliés du propriétaire ont déjà vu la création de l'unité, et vont donc recevoir une nouvelle
+							ligne, mais theoriquement ils devraient l'ignorer. */
+							ECEntity *e = dynamic_cast<ECEntity*>(*it);
+							if(e->IsHidden())
+								SendArm(0, e, ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, e->Case()->X(), e->Case()->Y());
+
+							e->SetZombie();
+							e->Tag = T_CONTINUE;
+
+							if(e != event->Entity())
+								entv.push_back(e);
+						}
+				}
+				/* Si l'evenement ne contenait que des unités zombied, on s'en va (genre elle a été supprimée précédemment) */
+				if(entv.empty())
+				{
+					ret = false;
+					Debug(W_DEBUG, "Pas d'unités dans la liste.");
+					break;
+				}
+
+				uint flags = ARM_ATTAQ;
+				if(!event->Linked().empty())
+					flags |= ARM_MOVE;
+
+				/* Si jamais il n'y a plus que des amis on envoie les mouvements puis on se barre, sauf si quelqu'un a
+				* vraiment envie de se taper meme contre personne
+				*/
+				if(!event->Entity() && ECEntity::AreFriends(entv))
+					flags &= ~ARM_ATTAQ;
+
+				SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
+
+				if(!(flags & ARM_ATTAQ))
+				{
+					// Il n'y a que des amis (voir trois lignes plus haut) donc on se barre après avoir envoyé les moves
+					for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+						(*it)->SetZombie(false);
+					break;
+				}
+
+				std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entv);
+
+				int state = S_ATTAQ;
+				std::vector<ECEntity*>::size_type nb_entities = entv.size();
+				std::vector<ECEntity*> entities_save = entv;
+				for(std::vector<ECEntity*>::iterator it = entv.begin(); state != S_END && !entv.empty();)
+				{
+					if(it == entv.end())
+					{
+						it = entv.begin();
+						if(state == S_REMOVE && nb_entities > 0) state = S_ATTAQ;
+						else state++;
+						continue;
+					}
+
+					if(state == S_ATTAQ)
+					{
+						if((*it)->Tag == T_CONTINUE)
+							(*it)->Tag = (*it)->Attaq(entv, event) ? T_CONTINUE : T_STOP;
+						++it;
+					}
+					else if(state == S_REMOVE)
+					{
+						(*it)->ReleaseShoot();
+						Debug(W_DEBUG, "- %s reste %d", (*it)->LongName().c_str(), (*it)->Nb());
+
+						if(!(*it)->Nb() || (*it)->Tag == T_STOP)
+						{
+							if(!(*it)->Nb())
+								it = entv.erase(it);
+							else
+							{
+								(*it)->Tag = T_SLEEP;
+								++it;
+							}
+							// Il est déjà arrivé, allez savoir pourquoi, que nb_entities soit décrémenté en dessous de 0.
+							if(nb_entities > 0)
+								nb_entities--;
+						}
+						else ++it;
+					}
+					else ++it;
+				}
+				entv = entities_save;
+				for(std::vector<ECEntity*>::iterator it = entv.begin(); it != entv.end(); ++it)
+				{
+					if(!(*it)->Nb())
+					{
+						SendArm(NULL, *it, ARM_REMOVE);
+						/* On ne remove pas car il est shadowed et sera supprimé lors du
+							* passage de la boucle principale.
+							*/
+						//map->RemoveAnEntity(*it, USE_DELETE);
+					}
+					else
+					{
+						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->Fixed();
+						std::vector<ECBEntity*>::iterator fix = fixed.end();
+						if(!fixed.empty() && !dynamic_cast<EContainer*>(*it))
+							for(fix = fixed.begin();
+							        fix != fixed.end() && (*fix == *it || !(*fix)->Move()->Empty() ||
+							        (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
+							    ++fix);
+
+						if(fix != fixed.end() && (*it)->Move()->Empty())
+						{
+							ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
+							gobeur->Union(*it);
+							(*it)->Move()->Clear((*it)->Case());
+							SendArm(NULL, *it, ARM_INVEST|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
+							SendArm(receivers, gobeur, ARM_NUMBER);
+							/* Pas besoin de mettre shadow, il l'est déjà.
+								* (*it)->SetZombie();
+								*/
+						}
+						else
+						{
+							SendArm(receivers, *it, ARM_NUMBER);
+							EContainer* contain = dynamic_cast<EContainer*>(*it);
+							if(contain && contain->Containing())
+								SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
+							dynamic_cast<ECase*>((*it)->Case())->CheckInvests(*it);
+							(*it)->SetZombie(false);
+						}
+					}
+				}
 				break;
 			}
-			ECEntity* entity = event->Entities()->First();
-			if(entity->Shadowed())
-				break; // Cette unité s'est peut etre fait battre dans un combat d'une animation précédente
+			case ARM_DEPLOY:
+				SendArm(NULL, event->Entity(), ARM_DEPLOY);
+				break;
+			case ARM_CONTAIN:
+			case ARM_UNCONTAIN:
+			case ARM_MOVE:
+			{
+				if(event->Entity() == 0)
+				{
+					Debug(W_WARNING, "Nobody to do this movement");
+					ret = false;
+					break;
+				}
+				ECEntity* entity = event->Entity();
+				if(event->Flags() == ARM_UNCONTAIN)
+				{
+					EContainer* container = dynamic_cast<EContainer*>(entity->Parent());
+					if(!container)
+					{
+						Debug(W_WARNING, "ARM UNCONTAIN: Entity isn't in a container !");
+						break;
+					}
+					container->UnContain();
+				}
+				ECBMove::Vector moves = event->Move()->Moves();
+				ECBCase* c = entity->Case();
+				bool end = false;
+				FORit(ECBMove::E_Move, moves, m)
+				{
+					switch(*m)
+					{
+						case ECBMove::Up: c = c->MoveUp(); break;
+						case ECBMove::Down: c = c->MoveDown(); break;
+						case ECBMove::Left: c = c->MoveLeft(); break;
+						case ECBMove::Right: c = c->MoveRight(); break;
+					}
+					entity->ChangeCase(c);
+					std::vector<ECBEntity*> entities = c->Entities()->List();
+					bool attaq = false;
+					FORit(ECBEntity*, entities, e)
+						if(ThereIsAttaq(entity, *e))
+						{
+							attaq = true;
+							break;
+						}
+					if(attaq)
+					{
+						ECEvent* attaq_event = new ECEvent(ARM_ATTAQ, 0, c);
+						attaq_event->AddLinked(event);
 
-			SendArm(NULL, entity, ARM_REMOVE|ARM_UPGRADE);
+						ShowAnim(attaq_event);
 
-			ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
+						MyFree(attaq_event);
 
-			/* On remet le niveau de vie au plus haut */
-			upgrade->SetNb(upgrade->InitNb());
+						if(entity->IsZombie())
+						{
+							end = true;
+							break;
+						}
 
-			/* Elle se fera supprimer */
-			entity->SetShadowed();
-			Map()->AddAnEntity(upgrade);
+						event->Move()->GoTo(c);
+						entity->Move()->GoTo(c);
 
-			SendArm(NULL, upgrade, ARM_CREATE|ARM_HIDE, upgrade->Case()->X(), upgrade->Case()->Y());
-			break;
+						dynamic_cast<ECase*>(c)->CheckInvests(entity);
+					}
+				}
+				if(end)
+					break;
+
+				if(!event->Move()->Empty())
+				{
+					std::vector<ECEvent*> ev;
+					ev.push_back(event);
+
+					event->Entity()->ChangeCase(event->Move()->Dest());
+					if(event->Flags() == ARM_CONTAIN)
+					{
+						EContainer* container;
+						if(event->Entities()->Empty() || !(container = dynamic_cast<EContainer*>(event->Entities()->First())))
+						{
+							Debug(W_WARNING, "ARM CONTAIN: There isn't any container in event's entities !");
+							break;
+						}
+						container->Contain(entity);
+					}
+
+					SendArm(NULL, entity, event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ev);
+
+					event->Entity()->Move()->GoTo(entity->Case());
+					dynamic_cast<ECase*>(entity->Case())->CheckInvests(entity);
+				}
+
+				if(entity->Move()->Empty())
+				{
+					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->Fixed();
+					std::vector<ECBEntity*>::iterator fix = fixed.end();
+					if(!fixed.empty() && !dynamic_cast<EContainer*>(entity))
+						for(fix = fixed.begin();
+						    fix != fixed.end() && (*fix == entity || !(*fix)->Move()->Empty() ||
+						    (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner());
+						    ++fix);
+
+					if(fix != fixed.end())
+					{
+						ECEntity* gobeur = dynamic_cast<ECEntity*>(*fix);
+						gobeur->Union(entity);
+						entity->Move()->Clear(entity->Case());
+						SendArm(NULL, entity, ARM_INVEST|ARM_REMOVE, entity->Case()->X(), entity->Case()->Y());
+						if(entity->Owner())
+							SendArm(entity->Owner()->Client(), gobeur, ARM_NUMBER);
+						/* Pas besoin de le mettre zombie, il l'est déjà.
+						 * (*it)->SetZombie();
+						 */
+					}
+				}
+
+				break;
+			}
+			case ARM_UPGRADE:
+			{
+				if(event->Entity() == 0)
+				{
+					Debug(W_WARNING, "Nobody to do an upgrade");
+					ret = false;
+					break;
+				}
+				ECEntity* entity = event->Entity();
+
+				SendArm(NULL, entity, ARM_REMOVE|ARM_UPGRADE);
+
+				ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
+
+				/* On remet le niveau de vie au plus haut */
+				upgrade->SetNb(upgrade->InitNb());
+
+				/* Elle se fera supprimer */
+				entity->SetZombie();
+				Map()->AddAnEntity(upgrade);
+
+				SendArm(NULL, upgrade, ARM_CREATE|ARM_HIDE, upgrade->Case()->X(), upgrade->Case()->Y());
+				break;
+			}
+			default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
 		}
-		default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
+
+	/* On supprime l'evenement chez toutes les entités qui l'ont à priori */
+	if(event->Entity())
+	{
+		event->Entity()->Events()->Remove(event);
+		if(event->Entity()->Owner())
+			event->Entity()->Owner()->Events()->Remove(event);
 	}
+	std::vector<ECEntity*> ents;
+	FORit(ECEntity*, ents, it)
+		(*it)->Events()->Remove(event);
 	Map()->RemoveEvent(event, USE_DELETE);
+
+	return ret;
 }
 
 template<typename T>
@@ -342,14 +501,15 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
-		if(!entity || entity->Shadowed() || entity->Locked())
+		if(!entity || entity->IsZombie() || entity->Locked())
 			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1])
-			                          VBName(entity ? entity->Shadowed() : false) VIName(entity ? entity->Type() : 0));
+			                          VBName(entity ? entity->IsZombie() : false) VIName(entity ? entity->Type() : 0));
 	}
 
 	uint y = 0, x = 0, type = 0, nb = 0;
 	ECMove::Vector moves;
-	ECBCase* last_case = (entity ? entity->Case() : 0);
+	ECBCase* last_case = (entity ? entity->DestCase() : 0);
+	EContainer* container = 0;
 	for(uint i = 2; i<parv.size(); i++)
 	{
 		switch(parv[i][0])
@@ -436,7 +596,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			case ')':
 			{
-				EContainer* container = dynamic_cast<EContainer*>(cl->Player()->Entities()->Find(parv[i].substr(1).c_str()));
+				container = dynamic_cast<EContainer*>(cl->Player()->Entities()->Find(parv[i].substr(1).c_str()));
 				if(entity && container && container->WantContain(entity, moves))
 					flags |= ARM_CONTAIN;
 				break;
@@ -446,7 +606,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				std::string s = parv[i].substr(1);
 				uint _x = StrToTyp<uint>(stringtok(s, ","));
 				uint _y = StrToTyp<uint>(s);
-				EContainer* container = entity ? dynamic_cast<EContainer*>(entity) : 0;
+				container = entity ? dynamic_cast<EContainer*>(entity) : 0;
 				if(!container)
 					break;
 				ECEntity* contened = dynamic_cast<ECEntity*>(container->Containing());
@@ -491,7 +651,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			ECEntity *my_friend = 0, *creator = 0;
 			for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 			{
-				if(dynamic_cast<ECEntity*>(*enti)->Shadowed() || (*enti)->Owner() != entity->Owner()) continue;
+				if(dynamic_cast<ECEntity*>(*enti)->IsZombie() || (*enti)->Owner() != entity->Owner()) continue;
 				if((*enti)->CanCreate(entity) && (!creator || (*enti)->IsBuilding()))
 					creator = dynamic_cast<ECEntity*>(*enti);
 				if((*enti)->Type() == entity->Type())
@@ -509,12 +669,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				Debug(W_DEBUG, "On rajoute un ARM_CREATE");
 				cl->Player()->DownMoney(entity->Cost());
 				cl->Player()->Stats()->created += entity->Nb();
-				ECEvent* event = new ECEvent(ARM_CREATE, entity->Case());
-				event->Entities()->Add(entity);
+				ECEvent* event = new ECEvent(ARM_CREATE, entity, entity->Case());
 				event->SetNb(entity->Nb());
 				event->SetType(entity->Type());
 				chan->Map()->AddAnEntity(entity);
 				map->AddEvent(event);
+				if(entity->Owner())
+					entity->Owner()->Events()->Add(event);
 				nb = event->Nb();
 				entity->AddEvent(flags);
 				if(creator)
@@ -528,16 +689,25 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		std::vector<ECEvent*> events_sended;
 		if(flags == ARM_RETURN)
 		{
-			entity->CancelEvents();
-			flags = 0;
+			/*****************************
+			*     GESTION DES RETOURS    *
+			******************************/
+			if(entity->Case() == 0)
+				flags = 0;
+			else
+			{
+				entity->CancelEvents();
+				x = entity->Case()->X();
+				y = entity->Case()->Y();
+			}
 		}
 		if(flags == ARM_NUMBER)
 		{
 			if(entity->CanBeCreated() && int(entity->Cost()) <= cl->Player()->Money() && entity->AddUnits(entity->InitNb()))
 			{
 				/*****************************
-				*     GESTION DES AJOUTS    *
-				*****************************/
+				*     GESTION DES AJOUTS     *
+				******************************/
 				cl->Player()->Stats()->created += entity->InitNb();
 				cl->Player()->DownMoney(entity->Cost());
 				nb = entity->Nb();
@@ -558,10 +728,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				cl->Player()->Stats()->created += upgrade->InitNb();
 				cl->Player()->DownMoney(upgrade->Cost());
 				Debug(W_DEBUG, "Création d'un evenement d'UPGRADE");
-				ECEvent* event = new ECEvent(ARM_UPGRADE, entity->Case());
-				event->Entities()->Add(entity);
+				ECEvent* event = new ECEvent(ARM_UPGRADE, entity, entity->DestCase());
 				entity->Lock();
 				map->AddEvent(event);
+				if(entity->Owner())
+					entity->Owner()->Events()->Add(event);
 				flags |= ARM_LOCK;
 			}
 			/* On supprime l'entité qui a été générée pour vérifier le prix.
@@ -574,221 +745,57 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			 *  GESTION DES DÉPLOIEMENTS *
 			 *****************************/
 
-			EventVector evts = map->Events();
+			EventVector evts = entity->Events()->List();
 			bool can_create_event = true;
-			for(EventVector::iterator evti = evts.begin(); evti != evts.end();)
-			{
-				/* Si il y a déjà un evenement, c'est qu'il y a eu déploiement et reploiement
-				 * à la suite, donc on revient à la situation initiale et on le supprime
-				 */
-				if((*evti)->Flags() == ARM_DEPLOY && (*evti)->Entity() == entity)
+			for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
+				if((*evti)->Flags() == ARM_DEPLOY)
 				{
-					map->RemoveEvent(*evti, USE_DELETE);
-					evti = evts.erase(evti);
-					can_create_event = !can_create_event;
-					Debug(W_DEBUG, "Il y avait déjà un evenement de DEPLOY que je supprime");
+					can_create_event = false;
+					flags = 0;
+					break;
 				}
-				else
-					++evti;
-			}
 			if(can_create_event)
 			{
 				Debug(W_DEBUG, "Création d'un evenement de déploiement");
-				ECEvent* event = new ECEvent(ARM_DEPLOY, entity->Case());
-				event->Entities()->Add(entity);
+				ECEvent* event = new ECEvent(ARM_DEPLOY, entity, entity->DestCase());
+				entity->Events()->Add(event);
 				map->AddEvent(event);
+				if(entity->Owner())
+					entity->Owner()->Events()->Add(event);
 				entity->AddEvent(flags);
 			}
 		}
-		if(flags & ARM_MOVE)
+		if(flags & ARM_MOVE && flags != ARM_CREATE)
 		{
 			/*****************************
 			 *  GESTION DES DÉPLACEMENTS *
 			 *****************************/
 			entity->AddEvent(flags);
 
-			EventVector evts = map->Events();
-			ECEvent* event_found = 0;
-			ECEvent* attaq_event = 0;
-			ECEvent* union_event = 0;
-			for(EventVector::iterator evti = evts.begin(); evti != evts.end();)
+			ECEvent* event = entity->Events()->Last();
+			if(event && event->Flags() == ARM_MOVE && event->Case() == last_case)
+			{ /* On a trouvé un déplacement pour cette même entité alors on en profite */
+				for(ECMove::Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
+					event->Move()->AddMove(*it);
+				event->SetCase(entity->Move()->Dest());
+				event->SetFlags(flags);
+				Debug(W_DEBUG, "On a trouvé un déplacement continue au mien");
+			}
+			else
 			{
-				bool delete_event = false;
-				Debug(W_DEBUG, "%p(%d,%d) vs %p(%d,%d)", (*evti)->Case(), (*evti)->Case()->X(), (*evti)->Case()->Y(),
-				                                         entity->Case(), entity->Case()->X(), entity->Case()->Y());
-				/* Si evenement meme case, déplacement, entité c'est moi, et que c'est bien un déplacement continue.
-				 * - On vérifie donc last_case, c'est à dire la case de départ, soit la case d'arrivée du mouvement.
-				 * - On vérifie que c'est bien un movuement
-				 * - On vérifie que c'est bien *mon* entité qui fait ce mouvement
-				 * - On vérifie que l'entité "last" en position de la case d'origine n'a soit pas de last
-				 *   (impossible ? mais on évite les segfaults), soit le last de ce last n'est pas sur la
-				 *   meme case que ce last, donc que le déplacement est continue.
-				 */
-				ECEntity* last = 0;
-				if(last_case && (*evti)->Case() == last_case && (*evti)->Flags() == ARM_MOVE &&
-				   (*evti)->Entity() == entity && (last = entity->FindLast(last_case)) &&
-				   (!last->Last() || last->Last()->Case() != last->Case()))
-				{ /* On a trouvé un déplacement pour cette même entité alors on en profite */
-					if(event_found)
-						Debug(W_WARNING, "ARM(MOVE).MyMoveFound: Il y avait déjà un event trouvé de MOVE pour cet entité");
-					for(ECMove::Vector::const_iterator it = moves.begin(); it != moves.end(); ++it)
-						(*evti)->Move()->AddMove(*it);
-					event_found = *evti;
-					event_found->SetCase(entity->Case());
-					event_found->SetFlags(flags);
-					Debug(W_DEBUG, "On a trouvé un déplacement continue au mien");
-				}
-
-				/* On regarde si, sur la nouvelle case, il y a un evenement d'attaque.
-				 * Note: il n'y a pas besoin de vérifier tout le parcourt, en effet, c'est à chaque
-				 *       appel de ECEntity::WantMove() qu'il est censé le faire
-				 */
-				if((*evti)->Case() == entity->Case() && (*evti)->Flags() == ARM_ATTAQ && !union_event && !attaq_event)
-				{
-					std::vector<ECEntity*> ev_entities = (*evti)->Entities()->List();
-					std::vector<ECEntity*>::iterator et;
-					for(et = ev_entities.begin(); et != ev_entities.end() &&
-					    (!entity->CanAttaq(*et) || entity->Like(*et) && (!(*et)->CanAttaq(entity) || (*et)->Like(entity)));
-					    ++et);
-					if(et != ev_entities.end())
-					{
-						if(attaq_event)
-							Debug(W_WARNING, "ARM(MOVE).ATTAQ_FOUND: On a déjà trouvé un event d'attaque sur cette case.");
-						attaq_event = *evti;
-						Debug(W_DEBUG, "On a trouvé un evenement d'attaque");
-					}
-				}
-
-				if(entity->Case() == last_case)
-				{
-					++evti;
-					continue;
-				}
-
-				/* On quitte l'ancienne case et on regarde si il y avait pas une attaque. Si c'est le cas,
-				 * on supprime mon entité
-				 */
-				if(last_case && (*evti)->Case() == last_case && (*evti)->Flags() == ARM_ATTAQ &&
-				   (*evti)->Entities()->Find(entity))
-				{
-					/* On sous traite à la fonction dont le nom fait rêver */
-					delete_event = (*evti)->CheckRemoveBecauseOfPartOfAttaqEntity(entity);
-				}
-
-				if(delete_event)
-				{
-					map->RemoveEvent(*evti, USE_DELETE);
-					evti = evts.erase(evti);
-				}
-				else
-					++evti;
+				Debug(W_DEBUG, "On créé un nouvel event MOVE");
+				event = new ECEvent(flags, entity, entity->DestCase());
+				event->Move()->SetMoves(moves);
+				event->Move()->SetEntity(entity);
+				event->Move()->SetFirstCase(last_case);
+				map->AddEvent(event);
+				if(entity->Owner())
+					entity->Owner()->Events()->Add(event);
+				entity->Events()->Add(event);
 			}
-			/* On ne vérifie pas si last_case != 0, car si c'est le cas c'est une creation, et donc dans ce cas
-			 * là on vérifie bien si y a attaque (on peut considérer qu'il était pas sur la meme case avant)
-			 */
-			if(entity->Case() != last_case)
-			{ /* On ne fait ça que si y a eu un changement de case */
-				if(!event_found && last_case) // On vérifie bien que c'est pas un create
-				{
-					Debug(W_DEBUG, "On créé un nouvel event MOVE");
-					event_found = new ECEvent(flags, entity->Case());
-					event_found->Entities()->Add(entity);
-					event_found->Move()->SetMoves(moves);
-					event_found->Move()->SetEntity(entity);
-					event_found->Move()->SetFirstCase(last_case);
-					map->AddEvent(event_found);
-				}
+			if(flags & ARM_CONTENER && container)
+				event->Entities()->Add(container);
 
-				/* On regarde sur la case si il y a des entités à attaquer, ou à union */
-				std::vector<ECBEntity*> ents = entity->Case()->Entities()->List();
-				if(!attaq_event && !union_event)
-					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-					{
-						if(*enti == entity) continue;
-
-						if(ThereIsAttaq(entity, *enti) &&
-						   (!dynamic_cast<ECEntity*>(*enti)->Shadowed() ||
-						    (*enti)->MyStep() - (*enti)->RestStep() == entity->MyStep() - entity->RestStep()))
-						{
-							if(!attaq_event)
-							{
-								Debug(W_DEBUG, "On créé un evenement attaque");
-								attaq_event = new ECEvent(ARM_ATTAQ, entity->Case());
-								map->AddEvent(attaq_event);
-							}
-							ECEntity* entity2 = dynamic_cast<ECEntity*>(*enti)->FindNext();
-							attaq_event->Entities()->Add(entity2);
-
-							ECEvent* last_move_event = map->FindEvent(entity2->Case(), ARM_MOVE,
-							                                          entity2);
-							if(last_move_event)
-							{
-								attaq_event->AddLinked(last_move_event);
-								map->RemoveEvent(last_move_event);
-								Debug(W_DEBUG, "Mouvement d'un MOVE dans l'ATTAQ");
-							}
-							/* Si jamais on rencontre une entité locked (donc qui avait déjà bougé), et ben
-							 * on la fait retourner sur cette case
-							 */
-							if(dynamic_cast<ECEntity*>(*enti)->Shadowed())
-							{
-								Debug(W_DEBUG, "Il avait fait un déplacement qu'on annule pour revenir à la case du combat");
-								ECBCase* c = entity2->Case();
-								entity2->Return(entity->Case());
-								ECEvent* evnt = map->FindEvent(c, 0, entity2);
-								if(evnt && evnt->CheckRemoveBecauseOfPartOfAttaqEntity(entity2))
-								{
-									Debug(W_DEBUG, "On jarte un ancien event auquel j'assistais sur mon ancienne case (%d)",
-									               SHOW_EVENT(evnt->Flags()));
-									map->RemoveEvent(evnt, USE_DELETE);
-								}
-							}
-						}
-						/* L'union entre les conteneurs ne se fait que si au moins l'un des deux ne contient rien, ou alors
-						 * si les deux unités qu'ils contiennent sont du même type. */
-						else if(!union_event && !dynamic_cast<ECEntity*>(*enti)->Shadowed() &&
-						        (*enti)->Owner() == entity->Owner() && (*enti)->Type() == entity->Type())
-						{
-							EContainer* enti_container = dynamic_cast<EContainer*>(*enti);
-							EContainer* entity_container = dynamic_cast<EContainer*>(entity);
-							if(!enti_container || !entity_container || !enti_container->Containing() ||
-							   !entity_container->Containing() ||
-							   enti_container->Containing()->Type() == entity_container->Containing()->Type())
-							{
-								Debug(W_DEBUG, "On créé un evenement union");
-								dynamic_cast<ECEntity*>(*enti)->Union(entity);
-								union_event = new ECEvent(ARM_UNION, entity->Case());
-								map->AddEvent(union_event);
-								/* L'ordre est important dans l'evenement union :
-								* 1) Celui qui va disparaitre
-								* 2) Celui qui absorbe
-								*/
-								union_event->Entities()->Add(entity);
-								union_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
-								flags |= ARM_LOCK;
-								if(event_found)
-								{
-									union_event->AddLinked(event_found);
-									map->RemoveEvent(event_found);
-								}
-							}
-						}
-					}
-				if(attaq_event && !union_event)
-				{
-					Debug(W_DEBUG, "On se met dans un evenement attaq");
-					attaq_event->Entities()->Add(entity);
-					if(event_found)
-					{ /* On link dans attaq_event et on l'enlève de la boucle principale.
-					   * En effet, on affichera les déplacements en meme temps que l'attaque
-					   */
-						attaq_event->AddLinked(event_found);
-						map->RemoveEvent(event_found);
-					}
-					/*else  //ATTENTION: ça arrive lors de creations.
-						Debug(W_WARNING, "ARM(MOVE).ADD_IN_ATTAQ: Il n'y a pas d'evenement de mouvement"); */
-				}
-			}
 			/*if(event_found)
 				events_sended.push_back(event_found);*/
 		}
@@ -800,97 +807,35 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			 *****************************/
 
 			ECBCase* c = (*map)(x,y);
+			std::vector<ECBEntity*> entities = c->Entities()->List();
 
-			for(uint turn = 0; !(entity->EventType() & ARM_ATTAQ); ++turn)
-			{
-				Debug(W_DEBUG, "Recherche à (%d,%d)", c->X(), c->Y());
-				ECEvent* attaq_event = entity->Porty() ? 0 : map->FindEvent(c, ARM_ATTAQ, entity);
-				if(!attaq_event)
-				{
-					if(flags & ARM_FORCEATTAQ)
-					{
-						Debug(W_DEBUG, "Création d'un evenement ATTAQ");
-						attaq_event = new ECEvent(ARM_ATTAQ, c);
-						map->AddEvent(attaq_event);
-						attaq_event->Entities()->Add(entity);
-						entity->AddEvent(flags);
-					}
-					std::vector<ECBEntity*> entities = c->Entities()->List();
-					ECEntity* next_entity = 0;
-					bool want_move_attaq = false;
-					if(!attaq_event)
-						/* On fait un premier tour pour voir si on va bouger notre attaque, comme ça dans le second tour on ne
-						 * créé pas d'attaque si on trouve une unité avant de tomber sur l'unité qui a bougé.
-						 */
-						for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-						{
-							ECEntity* e = dynamic_cast<ECEntity*>(*enti)->FindNext();
-							if(dynamic_cast<ECEntity*>(*enti)->Shadowed() && dynamic_cast<ECEntity*>(*enti)->Move()->Empty() &&
-							   entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
-								want_move_attaq = true;
-						}
-					for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-					{
-						bool can_attaq = false;
-						/* La ligne "entity->Move()->Empty()" s'explique simplement par le fait que le client ne voit pas
-						* les déplacements faits par les autres. Donc il ne peut faire une attaque sur une case anticipée
-						* d'une autre entité. C'est pourquoi si jamais l'unité de cette case a déjà fait un mouvement, c'est
-						* que le client qui veut attaquer anticipe une case qui lui semble vide. En tous cas il n'y voit pas
-						* cette unité.
-						* Si jamais par contre il a cliqué sur la position de cette entité sur sa case d'origine, des
-						* dispositions sont là pour ramener l'attaque à la case d'arrivée.
-						* Note: si turn>=0, c'est qu'on a nous même recherché une unité qui a bougé, donc ne plus vérifier.
-						*/
-						ECEntity* e = dynamic_cast<ECEntity*>(*enti);
-						if(!want_move_attaq && !e->Shadowed() && *enti != entity && entity->CanAttaq(*enti) &&
-						   !entity->Like(*enti) && (turn || e->Move()->Empty()))
-							can_attaq = true;
-						else if(e->Shadowed() && e->Move()->Empty())
-						{
-							Debug(W_DEBUG, "On a trouvé une unité qui a bougé");
-							e = dynamic_cast<ECEntity*>(*enti)->FindNext();
-							if(entity->WantAttaq(e->Case()->X(), e->Case()->Y(), true))
-								next_entity = e;
-						}
+			Debug(W_DEBUG, "Création d'un evenement ATTAQ");
+			ECEvent* event = new ECEvent(ARM_ATTAQ, entity, c);
 
-						if(can_attaq)
-						{
-							if(!attaq_event)
-							{
-								Debug(W_DEBUG, "Création d'un evenement ATTAQ");
-								attaq_event = new ECEvent(ARM_ATTAQ, c);
-								map->AddEvent(attaq_event);
-								attaq_event->Entities()->Add(entity);
-								entity->AddEvent(flags);
-							}
-							attaq_event->Entities()->Add(dynamic_cast<ECEntity*>(*enti));
-						}
-					}
-					if(!attaq_event)
+			/* Si jamais on cherche pas à forcer la case, on recherche sur cette case une unité mobile
+			 * que l'on aimerait toucher coute que coute, et que donc, même si lors des animations
+			 * elle change de case, on attaquera.
+			 * Si il n'y a pas d'unité mobile sur la case, ben ça sera sur cette case qu'on tirera.
+			 */
+			if(!(flags & ARM_FORCEATTAQ))
+				for(std::vector<ECBEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+					if(entity->CanAttaq(*it) && !entity->Like(*it))
 					{
-						if(next_entity && c != next_entity->Case())
-						{
-							Debug(W_DEBUG, "On change de case !");
-							c = next_entity->Case();
-							continue;
-						}
-						Debug(W_DEBUG, "Finalement on ne fait pas d'attaque");
-						flags &= ~ARM_ATTAQ;
+						event->Entities()->Add(dynamic_cast<ECEntity*>(*it));
 						break;
 					}
-				}
-				else
-				{
-					Debug(W_DEBUG, "Il y a déjà une attaque, on ne prévient PAS les attaqués");
-					entity->AddEvent(flags);
-				}
-			}
+
+			map->AddEvent(event);
+			if(entity->Owner())
+				entity->Owner()->Events()->Add(event);
+			entity->AddEvent(flags);
+			entity->Events()->Add(event);
 		}
 		recvers.push_back(cl);
 		chan->SendArm(recvers, entity, flags, x, y, 0, events_sended);
 
 		if(flags == ARM_CREATE)
-			entity->Created(true); // true veut dire que ça a été créé tout de suite
+			entity->Created(true); // callback, et true veut dire que ça a été créé tout de suite
 
 	}
 #ifdef DEBUG
@@ -898,8 +843,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
 	{
-		Debug(W_DEBUG, "event - %s %d,%d", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
-		                             (*evti)->Case()->Y());
+		Debug(W_DEBUG, "=== event - %s %d,%d (%s - %s) ===", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
+		                             (*evti)->Case()->Y(), (*evti)->Entity()->LongName().c_str(), SHOW_EVENT((*evti)->Entity()->EventType()));
 		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
 		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{

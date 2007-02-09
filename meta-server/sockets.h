@@ -23,7 +23,8 @@
 
 #include <stdlib.h>
 
-#define PORT 5460
+#define DEFPORT 5460
+#define DEFPINGFREQ 360
 #define MAXCLIENTS 100
 
 #define CMDLEN 3
@@ -38,6 +39,7 @@ struct Server;
 #define CL_FREE   0x01
 #define CL_SERVER 0x02
 #define CL_USER   0x04
+#define CL_PING   0x08
 struct Client
 {
 	struct Server* server;
@@ -49,6 +51,7 @@ struct Client
 	char RecvBuf[MAXBUFFER+1];
 	char ip[IPLEN+1];
 	size_t recvlen;
+	time_t last_read;
 };
 
 struct Client *addclient(int fd, const char *ip);

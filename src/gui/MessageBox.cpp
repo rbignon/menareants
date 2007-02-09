@@ -122,7 +122,7 @@ void TMessageBox::Draw()
 	if(realbg)
 		Window()->Blit(realbg);
 	if(Form)
-		Form->Draw(false);
+		Form->Draw();
 	Draw(x,y);
 	Window()->Flip();
 }

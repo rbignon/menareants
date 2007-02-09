@@ -24,6 +24,8 @@
 
 #include <stack>
 
+struct SDL_mutex;
+
 typedef void (*ECAltFunction) (void* Data1);
 
 class ECAltThread
@@ -39,6 +41,9 @@ public:
 
 	static int Exec(void *data);
 
+	static void LockThread();
+	static void UnlockThread();
+
 /* Attributs */
 public:
 
@@ -53,6 +58,7 @@ private:
 	static std::stack<void*> args;
 	static bool want_quit;
 	static bool running;
+	static SDL_mutex* mutex;
 };
 
 #endif /* EC_ALTTHREAD_H */

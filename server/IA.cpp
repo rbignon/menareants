@@ -286,7 +286,7 @@ void TIA::FirstMovements()
 	ents = Player()->Channel()->Map()->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
-		if((*enti)->Shadowed() || (*enti)->Locked() || !(*enti)->Owner() ||
+		if((*enti)->IsZombie() || (*enti)->Locked() || !(*enti)->Owner() ||
 		   !(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner())
 			continue;
 		if((*enti)->IsBuilding())
@@ -627,7 +627,7 @@ int TIA::recv_one_msg(std::string msg)
 
 #ifdef DEBUG
 	if(strncmp(msg.c_str(), "PIG", 3) && strncmp(msg.c_str(), "POG", 3))
-		Debug(W_ECHO, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), msg.c_str());
+		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), msg.c_str());
 #endif
 
 	std::string cmdname;
