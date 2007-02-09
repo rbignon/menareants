@@ -174,8 +174,9 @@ if test "x$GCC" = "xyes"; then
 # en reserve: -Weffc++ (il fait bien mal aux variables non initialisées)
 #             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
-      GCC_FLAGS="-Wall -ansi"
-      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel"
+      GCC_FLAGS="-Wall"
+      CFLAGS="$CFLAGS -std=c99"
+      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel -ansi"
 
       dnl Enable *more* warnings
       if test "$gccvernum" -ge "400"; then

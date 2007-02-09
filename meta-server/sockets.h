@@ -22,6 +22,7 @@
 #define ECMS_SOCKETS_H
 
 #include <stdlib.h>
+#include <time.h>
 
 #define DEFPORT 5460
 #define DEFPINGFREQ 360
