@@ -52,8 +52,7 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return ECEntity::Attaq(entities, event);
 
-	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
 		{
 			uint dx = 0, dy = 0;
@@ -84,7 +83,7 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
-			Shoot(dynamic_cast<ECEntity*>(*it), killed);
+			Shoot(*it, killed);
 		}
 
 	return false;
@@ -117,10 +116,9 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case). */
 	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
-		return ECEntity::Attaq(entities, event);
+		return false;
 
-	std::vector<ECBEntity*> ents = event->Case()->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
 		{
 			uint dx = 0, dy = 0;
@@ -149,7 +147,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if(!killed) continue;
 
 			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
-			Shoot(dynamic_cast<ECEntity*>(*it), killed);
+			Shoot(*it, killed);
 		}
 
 
@@ -179,8 +177,9 @@ bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		if(*it == this || (*it)->Case() != Case()) continue;
-		Shoot(*it, 998);
+		if(*it == this) continue;
+		int a = rand()%2, i = rand()%100;
+		Shoot(*it, a ? (1000 + i) : (1000 - i));
 	}
 	/* Auto destruction */
 	Shoot(this, Nb());
@@ -255,73 +254,65 @@ bool ECSilo::WantAttaq(uint mx, uint my, bool force)
 	return true;
 }
 
-bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+std::vector<ECBEntity*> ECSilo::GetAttaquedEntities(ECBCase* c) const
 {
-	/* C'est une attaque contre moi (probablement sur la meme case). */
-	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
-		return ECEntity::Attaq(entities, event);
-
-	ECBCase* c = event->Case();
-	std::vector<ECBEntity*> ents = c->Entities()->List();
-	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-	{
-		if(*it == this) continue;
-		if((*it)->IsCountryMaker())
-			Shoot(dynamic_cast<ECEntity*>(*it), 1002);
-		else if((*it)->Type() == E_NUCLEARSEARCH)
-			Shoot(dynamic_cast<ECEntity*>(*it), 30);
-		else
-			Shoot(dynamic_cast<ECEntity*>(*it), (*it)->RealNb());
-	}
-
-	ECBCase* this_c = c;
-	c = c->MoveLeft(SILO_IMPACT)->MoveUp(SILO_IMPACT);
-
-	std::nrvector<TClient*> receivers = ECEntity::EntitiesToClients(entities);
-
+	std::vector<ECBEntity*> entities;
+	ECBCase* cc = c->MoveLeft(SILO_IMPACT)->MoveUp(SILO_IMPACT);
 	for(uint i=0; i <= 2*SILO_IMPACT; ++i)
 	{
 		uint j=0;
 		for(; j <= 2*SILO_IMPACT; ++j)
 		{
-			if(c != this_c)
-			{
-				std::vector<ECBEntity*> ents = c->Entities()->List();
-				for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-				{
-					if((*enti)->IsCountryMaker() || (*enti)->IsZombie() || (*enti)->Type() == E_NUCLEARSEARCH)
-						continue;
-					ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-					if(entity->IsBuilding())
-						Shoot(entity, entity->InitNb()/2+21);
-					else
-						Shoot(entity, entity->RealNb());
+			std::vector<ECBEntity*> ents = cc->Entities()->List();
+			printf("add %d entities of case %d,%d\n", ents.size(), cc->X(), cc->Y());
+			entities.insert(entities.end(), ents.begin(), ents.end());
 
-					entity->ReleaseShoot();
-					if(!entity->Nb())
-					{
-						entity->SetZombie();
-						Channel()->SendArm(0, entity, ARM_REMOVE);
-					}
-					else
-					{
-						if(entity->Owner() && entity->Owner()->Client())
-							receivers.push_back(entity->Owner()->Client());
-						Channel()->SendArm(receivers, entity, ARM_NUMBER);
-					}
-				}
-			}
-
-			if(c->X() == c->Map()->Width()-1)
+			if(cc->X() == cc->Map()->Width()-1)
 				break;
-			c = c->MoveRight();
+			cc = cc->MoveRight();
 		}
-		if(c->Y() == c->Map()->Height()-1)
+		if(cc->Y() == cc->Map()->Height()-1)
 			break;
-		c = c->MoveDown();
-		c = c->MoveLeft(j);
+		cc = cc->MoveDown();
+		cc = cc->MoveLeft(j);
+	}
+	return entities;
+}
+
+bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	printf("mr merdoku\n");
+	/* C'est une attaque contre moi (probablement sur la meme case). */
+	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
+	{
+		printf("hia\n");
+		return ECEntity::Attaq(entities, event);
+	}
+
+	ECBCase* c = event->Case();
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+	{
+		if(*it == this) continue;
+
+		if((*it)->Case() == c)
+		{
+			if((*it)->IsCountryMaker())
+				Shoot(*it, 1002);
+			else if((*it)->Type() == E_NUCLEARSEARCH)
+				Shoot(*it, 30);
+			else
+				Shoot(*it, (*it)->RealNb());
+		}
+		else
+		{
+			if((*it)->IsCountryMaker())
+				continue;
+			if((*it)->IsBuilding())
+				Shoot(*it, (*it)->InitNb()/2+21);
+			else
+				Shoot(*it, (*it)->RealNb());
+		}
 	}
 
 	return false;
 }
-

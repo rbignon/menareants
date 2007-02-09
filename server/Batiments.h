@@ -140,6 +140,11 @@ public:
 	virtual void Played();
 
 	virtual bool WantAttaq(uint x, uint y, bool);
+
+/* Attributs */
+public:
+
+	std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) const;
 };
 
 /********************************************************************************************

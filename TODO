@@ -2,13 +2,8 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 
 À faire:
 
-== FINIR NOUVELLE GESTION DES EVENEMENTS ==
--> pour le moment, MOVE, ATTAQ, CONTAIN et DEPLOY ont l'air de marcher correctement
--> UNCONTAIN ne marche pas
--> tester UPGRADE et UNION, et autres si existants
--> voir pour remanier SendArm()
-
 * En cours
+-de manière générale, faire en sorte que les alliés partagent un maximum d'infos
 -améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
  la plus proche de la case d'arrivée.
 -améliorer le proto2 du meta-server
@@ -30,7 +25,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -> Language de scripting opérationnel pour les missions
 -> Création de quelques missions
 -> Création d'un tutoriel, obligatoire au premier lancement du jeu
--> Modification fondamentale du système des attaques: permettre plusieurs attaques implicites d'affilé
+[DONE] Modification fondamentale du système des attaques: permettre plusieurs attaques implicites d'affilé
     (mon char avance de 3 cases, et rencontre d'abord une unité enemie. Il y a combat. Si mon unité gagne,
      elle continue son chemin. Il est possible qu'elle rencontre encore une unité enemie. Il y a recombat.
      Si je gagne, on continue encore).
@@ -42,21 +37,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 -permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
 -pouvoir définir une cible sur plusieurs tours
--afficher les deplacements anticipés de ses alliés (peut etre)
 -lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
 -ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
 
 * Bof
 -passer à de la 3d isometrique (à confirmer)
--lorsqu'il y a :
-  BA -> AA -> (mouvement de BA deux fois vers la droite en passant par AA (1))
- il y a donc un combat prévu entre BA et AA, et si AA bouge vers le haut (2), le mouvement original de
- BA est censé revenir, sauf qu'il va s'arreter sur l'ex-case de AA au lieu d'avancer de deux cases.
- Ceci est du que lorsque BA a voulu faire son déplacement il n'a jamais pu aller plus loins que AA,
- et on sait pas ce qui l'attend après donc on peut pas mettre arbitrairement à (2) la nouvelle position
- de BA dans la case finale de son mouvement. Il faudrait refaire les WantMove() pour les mouvements
- présents dans ses mouvements. Je proposerais une annulation du mouvement et un appel arbitraire à
- ARMCommand::Exec pour ne pas avoir à réécrire tout le code.
 
 ** Unités
 - Tout le monde
@@ -91,8 +76,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 -voir pour l'utilisation de fichiers xml plutot que des configurations pourries.
 -mot de passe éventuel pour accéder à un serveur
 -server: enrichissement de l'IA
--essayer d'utiliser au maximum std::string plutot que char*. Voir pour une fonction Format() qui prendrait %s comme une
- string et non un char*.
 -utilisation de gettext.
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)

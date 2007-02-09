@@ -97,6 +97,12 @@ public:
 	/** Cancel all events and send a message to client */
 	void CancelEvents();
 
+	/** This function return a vector of entities who will be attaqued by me if I want to attaq this case
+	 * @param c attaqued case
+	 * @return a vector of entities I will attaq
+	 */
+	virtual std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) const { return c->Entities()->List(); }
+
 	/** Get an array of owners of there entities */
 	static std::nrvector<TClient*> EntitiesToClients(std::vector<ECEntity*>);
 

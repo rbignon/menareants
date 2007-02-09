@@ -615,7 +615,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(!strcmp((*ci)->ID(), ident))
 					{
 						bool update = false;
-						if(InGameForm && (*ci)->Owner() && (*ci)->Owner()->Player() == me->Player())
+						ECBPlayer* last_owner = (*ci)->Owner() ? (*ci)->Owner()->Player() : 0;
+						if(InGameForm && last_owner == me->Player())
 						{
 							update = true;
 							if(add)
@@ -626,7 +627,8 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						}
 
 						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
-						if(InGameForm && !update)
+						if(InGameForm && !update &&
+						   (players[0]->IsMe() || players[0]->IsAllie(me->Player()) || last_owner && last_owner->IsAllie(me->Player())))
 						{
 							if(add)
 								InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +

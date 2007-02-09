@@ -134,10 +134,10 @@ bool EChannel::ShowAnim(ECEvent* event)
 				if(event->Entities()->Empty() == false && event->Entity())
 				{
 					ECEntity* e = event->Entities()->First();
-					if(!e->Case() || e->IsZombie() || event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
+					if(!e->Case() || !event->Entity()->CanAttaq(e) || e->IsZombie() ||
+					   event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
 					{
 						ret = false;
-						Debug(W_DEBUG, "Pas de case ou trop loins");
 						break; // L'unité n'est pas atteignable, donc finalement on n'attaque pas
 					}
 
@@ -164,7 +164,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 				}
 				/* On rends zombie temporairement toutes les entités. Les vainqueurs seront délockés */
 				{
-					std::vector<ECBEntity*> case_entities = event->Case()->Entities()->List();
+					std::vector<ECBEntity*> case_entities = event->Entity() ?
+					                                                event->Entity()->GetAttaquedEntities(event->Case())
+					                                              : event->Case()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator it = case_entities.begin(); it != case_entities.end(); ++it)
 						if(!(*it)->IsZombie())
 						{
@@ -186,7 +188,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 				if(entv.empty())
 				{
 					ret = false;
-					Debug(W_DEBUG, "Pas d'unités dans la liste.");
+					Debug(W_DEBUG, "ARM ATTAQ: List is empty.");
 					break;
 				}
 
@@ -200,7 +202,10 @@ bool EChannel::ShowAnim(ECEvent* event)
 				if(!event->Entity() && ECEntity::AreFriends(entv))
 					flags &= ~ARM_ATTAQ;
 
-				SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
+				if(event->Entity())
+					SendArm(NULL, event->Entity(), flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
+				else
+					SendArm(NULL, entv, flags, event->Case()->X(), event->Case()->Y(), 0, event->Linked());
 
 				if(!(flags & ARM_ATTAQ))
 				{
@@ -317,7 +322,17 @@ bool EChannel::ShowAnim(ECEvent* event)
 					EContainer* container = dynamic_cast<EContainer*>(entity->Parent());
 					if(!container)
 					{
-						Debug(W_WARNING, "ARM UNCONTAIN: Entity isn't in a container !");
+						Debug(W_WARNING, "ARM UNCONTAIN %s: Entity isn't in a container !", entity->LongName().c_str());
+						ret = false;
+						break;
+					}
+					if(container->IsZombie())
+					{ /* Le container a été supprimé, donc on ne bouge pas car on est forcément supprimé également.
+					   * Il est à noter qu'en theorie si le container est un zombie, moi aussi
+					   * et donc on aurait pas du arriver ici.
+					   */
+						Debug(W_WARNING, "ARM UNCONTAIN %s: My parent is a zombie, but not me !", entity->LongName().c_str());
+						ret = false;
 						break;
 					}
 					container->UnContain();
@@ -338,7 +353,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					std::vector<ECBEntity*> entities = c->Entities()->List();
 					bool attaq = false;
 					FORit(ECBEntity*, entities, e)
-						if(ThereIsAttaq(entity, *e))
+						if(!(*e)->IsZombie() && ThereIsAttaq(entity, *e))
 						{
 							attaq = true;
 							break;
@@ -372,7 +387,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					std::vector<ECEvent*> ev;
 					ev.push_back(event);
 
-					event->Entity()->ChangeCase(event->Move()->Dest());
+
 					if(event->Flags() == ARM_CONTAIN)
 					{
 						EContainer* container;
@@ -381,8 +396,21 @@ bool EChannel::ShowAnim(ECEvent* event)
 							Debug(W_WARNING, "ARM CONTAIN: There isn't any container in event's entities !");
 							break;
 						}
-						container->Contain(entity);
+						/* Si le conteneur est un zombie, c'est qu'il a été supprimé et donc on ne pénètre pas à l'interieur */
+						if(container->IsZombie())
+						{
+							event->Move()->Return(entity->Case());
+							entity->Move()->Return(entity->Case());
+							event->SetFlags(ARM_MOVE);
+						}
+						else
+						{
+							event->Entity()->ChangeCase(event->Move()->Dest());
+							container->Contain(entity);
+						}
 					}
+					else
+						event->Entity()->ChangeCase(event->Move()->Dest());
 
 					SendArm(NULL, entity, event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ev);
 
@@ -440,7 +468,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 				SendArm(NULL, upgrade, ARM_CREATE|ARM_HIDE, upgrade->Case()->X(), upgrade->Case()->Y());
 				break;
 			}
-			default: Debug(W_WARNING, "L'evenement '%s' n'est pas supporté", SHOW_EVENT(event->Flags())); break;
+			default: Debug(W_WARNING, "Event '%s' isn't supported", SHOW_EVENT(event->Flags())); break;
 		}
 
 	/* On supprime l'evenement chez toutes les entités qui l'ont à priori */
@@ -490,7 +518,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		              VPName(cl->Player()));
 
 	if(cl->Player()->Ready())
-		return Debug(W_DESYNCH, "ARM: Le joueur essaye de ARM alors qu'il est pret !");
+		return Debug(W_DESYNCH, "ARM: Played is ready !");
 
 	EChannel* chan = cl->Player()->Channel();
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
@@ -502,7 +530,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
 		if(!entity || entity->IsZombie() || entity->Locked())
-			return vDebug(W_DESYNCH, "ARM: Entité introuvable", VPName(entity) VName(parv[1])
+			return vDebug(W_DESYNCH, "ARM: Unable to find entity", VPName(entity) VName(parv[1])
 			                          VBName(entity ? entity->IsZombie() : false) VIName(entity ? entity->Type() : 0));
 	}
 
@@ -651,7 +679,9 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			ECEntity *my_friend = 0, *creator = 0;
 			for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 			{
-				if(dynamic_cast<ECEntity*>(*enti)->IsZombie() || (*enti)->Owner() != entity->Owner()) continue;
+				if(dynamic_cast<ECEntity*>(*enti)->IsZombie() || (*enti)->Owner() != entity->Owner() ||
+				   !(*enti)->Move()->Empty())
+					continue;
 				if((*enti)->CanCreate(entity) && (!creator || (*enti)->IsBuilding()))
 					creator = dynamic_cast<ECEntity*>(*enti);
 				if((*enti)->Type() == entity->Type())
@@ -831,6 +861,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			entity->AddEvent(flags);
 			entity->Events()->Add(event);
 		}
+		std::vector<ECBPlayer*> allies = cl->Player()->Allies();
+		FORit(ECBPlayer*, allies, a)
+			if(dynamic_cast<ECPlayer*>(*a)->Client())
+				recvers.push_back(dynamic_cast<ECPlayer*>(*a)->Client());
+
 		recvers.push_back(cl);
 		chan->SendArm(recvers, entity, flags, x, y, 0, events_sended);
 

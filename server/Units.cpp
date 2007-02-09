@@ -332,7 +332,7 @@ void EContainer::ReleaseShoot()
 		if(!contained->Nb())
 		{
 			Channel()->SendArm(NULL, contained, ARM_REMOVE);
-			Case()->Map()->RemoveAnEntity(contained, USE_DELETE);
+			contained->SetZombie();
 			SetContaining(0);
 		}
 		shooted = 0;

@@ -1,3 +1,15 @@
+2007-02-09 Romain Bignon <progs@headfucking.net>
+
+	* src/JoinGame.cpp: Lors du changement de propriétaire d'une country, anoncer uniquement aux joueurs concernés et à leurs alliés le changement.
+
+	* server/InGame.cpp (ShowAnim ARM_ATTAQ): Si l'unité visée n'est plus attaquable (par exemple, si l'unité visée par une tour défense est allée sur la même case
+	  que celle-ci), on n'attaque plus.
+	  (ShowAnim ARM_[UN]CONTAIN): Gestion du cas où le parent est devenu un zombie.
+	  (ARMCommand): Correction d'un bug lors de la création.
+	  (ShowAnim ARM_ATTAQ): Lors d'une attaque de la part d'une entité, on envoie en sendeur uniquement cet entité et plus celles qui sont concernées.
+
+	* server/Units.cpp, server/Batiments.cpp: On profite maintenant du nouveau système. Une fonction virtuelle permet d'obtenir la liste des entités attaquées.
+
 2007-02-07 Romain Bignon <progs@headfucking.net>
 
 	* meta-server/sockets.c: Envoie d'un PING au client et détection du ping timeout.
