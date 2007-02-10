@@ -123,7 +123,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 		if( item == -1 )
 			return false;
 
-		if(item != selected_item)
+		if(item != selected_item && m_items[item]->Enabled())
 			Select(item);
 		else if(!always_one_selected)
 			Deselect ();
@@ -298,8 +298,7 @@ void TListBox::RemoveSelected()
 void TListBox::Select (uint index)
 {
 	assert(index < m_items.size());
-	if(m_items.at(index)->Enabled())
-		selected_item = index;
+	selected_item = index;
 	SetWantRedraw();
 }
 

@@ -330,7 +330,6 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	                                      " serveurs, dont " + TypToStr(ListServerForm->nb_chans - ListServerForm->nb_wchans) + " en cours de jeu et " +
 	                                      TypToStr(ListServerForm->nb_wchans) + " en préparation.");
 	ListServerForm->nb_chans = ListServerForm->nb_wchans = ListServerForm->nb_users = ListServerForm->nb_tchans = ListServerForm->nb_tusers = 0;
-	ListServerForm->RefreshButton->SetEnabled(true);
 	return 0;
 }
 
@@ -352,6 +351,8 @@ void MenAreAntsApp::RefreshList()
 
 	ListServerForm->RecvSList = true;
 	ListServerForm->RefreshButton->SetEnabled(false);
+	ListServerForm->EscarmoucheButton->SetEnabled(false);
+	ListServerForm->MissionButton->SetEnabled(false);
 
 	mutex = SDL_CreateMutex();
 	EC_Client* client = EC_Client::GetInstance(true);
@@ -413,7 +414,9 @@ void MenAreAntsApp::ServerList()
 			EC_Client::singleton = NULL;
 			mutex = 0;
 			ListServerForm->SetMutex(0);
-			//ListServerForm->RecvSList = false;
+			ListServerForm->RefreshButton->SetEnabled(true);
+			ListServerForm->EscarmoucheButton->SetEnabled(true);
+			ListServerForm->MissionButton->SetEnabled(true);
 		}
 		ListServerForm->Actions();
 		ListServerForm->Update();

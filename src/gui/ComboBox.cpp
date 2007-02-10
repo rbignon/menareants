@@ -109,7 +109,7 @@ void TComboBox::ClearItems()
 
 void TComboBox::Select (uint index)
 {
-	if(index >= m_items.size() || !m_items[index]->Enabled()) return;
+	if(index >= m_items.size()) return;
 
 	selected_item = index;
 
