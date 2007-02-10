@@ -300,8 +300,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%3d  %-23s %2s   %3s/%-3s   %3s/%-3s     %-3s", SDL_GetTicks()-t0, parv[2].substr(0,23).c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], fgreen_color,
-		                      true, *Font::GetInstance(Font::Normal));
+		                      parv[1], fgreen_color, true, *Font::GetInstance(Font::Normal));
 	else
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),

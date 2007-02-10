@@ -55,6 +55,18 @@ void EChannel::InitAnims()
 
 			Debug(W_DEBUG|W_ECHO, "= envoie d'un CREATE =");
 
+			std::vector<ECBEntity*> entities = event->Entity()->Case()->Entities()->List();
+			FORit(ECBEntity*, entities, e)
+				if(!(*e)->IsZombie() && ThereIsAttaq(event->Entity(), *e))
+				{
+					ECEvent* attaq_event = new ECEvent(ARM_ATTAQ, 0, event->Entity()->Case());
+
+					ShowAnim(attaq_event);
+
+					MyFree(attaq_event);
+					break;
+				}
+
 			/* On ne cherche pas à supprimer dans la liste d'evenements de l'entité car,
 			 * par définition, un ARM_CREATE n'est pas listée à l'intérieur, à cause
 			 * de son status particulier.

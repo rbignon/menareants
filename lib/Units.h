@@ -406,7 +406,7 @@ public:
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
 
 	bool CanInvest(const ECBEntity* e) const { return false; }
-	bool CanAttaq(const ECBEntity* e) { return false; }
+	bool CanAttaq(const ECBEntity* e) { return (e->IsInfantry()); }
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }

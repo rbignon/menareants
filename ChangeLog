@@ -1,3 +1,15 @@
+2007-02-10 Romain Bignon <progs@headfucking.net>
+
+	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.
+
+	* server/InGame.cpp (InitAnim): Lors d'une création, vérification de si ça ne fait pas un combat avec d'autres unités sur la case.
+
+	* server/IA.cpp: Amélioration des probabilités que l'IA crée telle ou telle unité.
+
+	* lib/Units.h (ECBTourist): Elle peut se défendre face à une unité de type infantery, ce qui n'a aucun intérêt (il y a 1 homme à l'intérieur, donc il peut que perdre), mais
+	  qui est plus ou moins un hack pour que l'IA l'amène vers l'enemie.
+	  Après, comme les japonais sont des samouraï, on peut quand même leur laisser une chance de vaincre un combat contre un ou deux enemies.
+
 2007-02-09 Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Lors du changement de propriétaire d'une country, anoncer uniquement aux joueurs concernés et à leurs alliés le changement.

@@ -264,7 +264,6 @@ std::vector<ECBEntity*> ECSilo::GetAttaquedEntities(ECBCase* c) const
 		for(; j <= 2*SILO_IMPACT; ++j)
 		{
 			std::vector<ECBEntity*> ents = cc->Entities()->List();
-			printf("add %d entities of case %d,%d\n", ents.size(), cc->X(), cc->Y());
 			entities.insert(entities.end(), ents.begin(), ents.end());
 
 			if(cc->X() == cc->Map()->Width()-1)
@@ -281,13 +280,9 @@ std::vector<ECBEntity*> ECSilo::GetAttaquedEntities(ECBCase* c) const
 
 bool ECSilo::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
-	printf("mr merdoku\n");
 	/* C'est une attaque contre moi (probablement sur la meme case). */
 	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
-	{
-		printf("hia\n");
 		return ECEntity::Attaq(entities, event);
-	}
 
 	ECBCase* c = event->Case();
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)

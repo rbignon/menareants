@@ -295,20 +295,28 @@ void TIA::FirstMovements()
 			switch((*enti)->Type())
 			{
 				case ECEntity::E_CASERNE:
-					switch(rand()%5)
+					switch(rand()%15)
 					{
-						case 0: t = ECEntity::E_ARMY; break;
-						case 1: t = ECEntity::E_ENGINER; break;
-						case 2: t = ECEntity::E_TOURIST; break;
-						case 3: t = ECEntity::E_MCDO; break;
+						case 0:
+						case 1:
+						case 2:
+						case 3:
+						case 4: t = ECEntity::E_ARMY; break;
+						case 5: t = ECEntity::E_ENGINER; break;
+						case 6: t = ECEntity::E_TOURIST; break;
+						case 7: t = ECEntity::E_MCDO; break;
 					}
 					break;
 				case ECEntity::E_CHARFACT:
-					switch(rand()%4)
+					switch(rand()%7)
 					{
 						case 0:
-						case 1: t = ECEntity::E_CHAR; break;
-						case 2: t = ECEntity::E_MISSILAUNCHER; break;
+						case 1:
+						case 2:
+						case 3:
+						case 4:
+						case 5: t = ECEntity::E_CHAR; break;
+						case 6: t = ECEntity::E_MISSILAUNCHER; break;
 					}
 					break;
 				default:
@@ -350,7 +358,7 @@ void TIA::FirstMovements()
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
 				if(!(*e)->IsHidden() && !(*e)->IsTerrain() && !(*enti)->Like(*e) &&
-				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e)) &&
+				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e) && !(*enti)->Deployed()) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());

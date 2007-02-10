@@ -84,7 +84,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
 	uint flags = 0;
 
-	uint y = 0, x = 0, type = 0, nb = 0;
+	int y = -1, x = -1;
+	uint type = 0, nb = 0;
 	EContainer* container = 0;
 	bool deployed = false;
 	ECData data;
@@ -102,8 +103,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case '*':
 			{
 				std::string s = parv[i].substr(1);
-				x = StrToTyp<uint>(stringtok(s, ","));
-				y = StrToTyp<uint>(s);
+				x = StrToTyp<int>(stringtok(s, ","));
+				y = StrToTyp<int>(s);
 				flags |= ARM_ATTAQ;
 				break;
 			}
@@ -117,8 +118,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case '<':
 			{
 				std::string s = parv[i].substr(1);
-				x = StrToTyp<uint>(stringtok(s, ","));
-				y = StrToTyp<uint>(s);
+				x = StrToTyp<int>(stringtok(s, ","));
+				y = StrToTyp<int>(s);
 				flags |= ARM_RETURN;
 				break;
 			}
@@ -323,8 +324,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char IN_EVENT = 2;
 		const char AFTER_EVENT = 3;
 		char event_moment;
-		ECase* event_case = dynamic_cast<ECase*>((*map)(x,y));
-		if(InGameForm && (entities.size() > 1 ? event_case : entities.front()->Case())->Showed() > 0 &&
+		ECase* event_case = x < 0 ? 0 : dynamic_cast<ECase*>((*map)(x,y));
+		if(InGameForm && (event_case && event_case->Showed() > 0 || entities.front()->Case()->Showed() > 0) &&
 		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE && !entities.front()->IsHiddenOnCase())
 		{
 			InGameForm->ShowWaitMessage.clear();
@@ -371,7 +372,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			if(flags == ARM_RETURN)
 			{
-				(*it)->Move()->Return((*map)(x,y));
+				(*it)->Move()->Return(x >= 0 && y >= 0 ? (*map)(x,y) : 0);
 				(*it)->DelEvent(ARM_ATTAQ); // Il est certain que l'on perd *au moins* l'evenement d'attaque
 				if((*it)->Move()->Empty()) // Dans le cas où l'on est revenu au début, on a plus aucun evenement
 					(*it)->SetEvent(0);
