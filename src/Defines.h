@@ -29,6 +29,7 @@
 #define APP_NAME "Men Are Ants"
 
 #define APP_SITE "http://menareants.coderz.info/"
+#define MAIN_FONT "larabieb.ttf"
 
 /* Defines */
 #undef  BUGUED_INTRO
@@ -76,6 +77,7 @@ typedef unsigned int   uint;
 /* Définition des chemins */
 #define PKGDATADIR_PICS PKGDATADIR PATH_SEPARATOR "pics" PATH_SEPARATOR
 #define PKGDATADIR_FONTS PKGDATADIR PATH_SEPARATOR "font" PATH_SEPARATOR
+#define PKGDATADIR_FONTS_MAIN PKGDATADIR_FONTS MAIN_FONT
 #define PKGDATADIR_ANIMS PKGDATADIR PATH_SEPARATOR "anims" PATH_SEPARATOR
 #define PKGDATADIR_SOUND PKGDATADIR PATH_SEPARATOR "sound" PATH_SEPARATOR
 #define INGAME_MUSIC "ingame" PATH_SEPARATOR

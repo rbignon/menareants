@@ -22,7 +22,7 @@ menareants_server_LDADD =$(top_srcdir)/lib/libmenareants.a
 
 install-data-local:
 	@if test ! -f "$(DESTDIR)/${sysconfdir}/menareantsd.conf"; then \
-		if test ! -d "$(DESTDIR)/${sysconfdir}"; then mkdir $(DESTDIR)/${sysconfdir}; fi; \
+		if test ! -d "$(DESTDIR)/${sysconfdir}"; then mkdir -p $(DESTDIR)/${sysconfdir}; fi; \
 		echo "Installation de la configuration dans $(DESTDIR)/${sysconfdir}"; \
 	   $(INSTALL_DATA) menareantsd.conf $(DESTDIR)/${sysconfdir}/menareantsd.conf; \
 	fi;

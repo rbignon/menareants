@@ -82,7 +82,6 @@ bool Config::set_defaults(bool want_save)
 	nation = 0;
 	screen_width = 1024;
 	screen_height = 768;
-	ttf_file = PKGDATADIR_FONTS "larabieb.ttf";
 #ifdef WIN32
 	fullscreen = true;
 #else
@@ -127,10 +126,10 @@ bool Config::load()
 		else if(key == "SWIDTH") screen_width = StrToTyp<uint>(ligne);
 		else if(key == "SHEIGHT") screen_height = StrToTyp<uint>(ligne);
 		else if(key == "SERVERLIST" && version >= 2) server_list.push_back(ligne);
-		else if(key == "TTF" && version >= 2) ttf_file = ligne;
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
 		else if(key == "EFFECT") effect = (ligne == "1" || ligne == "true");
+		else if(key == "TTF" && version <= 2) { /* On conserve la compatibilité */ }
 		else
 		{
 			std::cerr << "Fichier incorrect: " << std::endl;
@@ -139,7 +138,7 @@ bool Config::load()
 			return set_defaults();
 		}
 	}
-	if(hostname.empty() || ttf_file.empty() || port < 1 || port > 65535 || color >= COLOR_MAX ||
+	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX ||
 	   nation >= ECPlayer::N_MAX || nick.empty())
 	{
 		std::cerr << "Lecture de la configuration invalide." << std::endl;
@@ -167,7 +166,6 @@ bool Config::save() const
     fp << "NATION " << nation << std::endl;
     fp << "SWIDTH " << screen_width << std::endl;
     fp << "SHEIGHT " << screen_height << std::endl;
-    fp << "TTF " << ttf_file << std::endl;
     fp << "FULLSCREEN " << fullscreen << std::endl;
     fp << "MUSIC " << music << std::endl;
     fp << "EFFECT " << effect << std::endl;

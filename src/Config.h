@@ -27,7 +27,7 @@
 class TObject;
 class TListBox;
 
-#define CLIENT_CONFVERSION 2
+#define CLIENT_CONFVERSION 3
 
 class Config
 {
@@ -56,7 +56,6 @@ public:
 	unsigned int screen_width;
 	unsigned int screen_height;
 	std::vector<std::string> server_list;
-	std::string ttf_file;
 	bool fullscreen;
 	bool music;
 	bool effect;

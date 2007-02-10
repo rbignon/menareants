@@ -70,7 +70,7 @@ Font* Font::GetInstance(int type)
 Font::Font(int size)
 {
   m_font = NULL;
-  bool ok = Load(Config::GetInstance()->ttf_file, size);
+  bool ok = Load(PKGDATADIR_FONTS "larabieb.ttf", size);
 
   if( !ok )
     throw ECExcept(VIName(size), "Error during initialisation of a font!");
