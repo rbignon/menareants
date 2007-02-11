@@ -23,6 +23,10 @@
 
 	* src/gui/Form.cpp, src/gui/MessageBox.cpp: Correction du FPS (limite augmentée à 30 FPS).
 
+	* server/InGame.cpp: Correction d'un bug concernant les actions à la sortie d'une unité d'un conteneur.
+	  Egalement, maintenant lorsqu'une unité passe par un batiment qu'il peut investir mais qu'il n'y a pas d'enemis dessus (donc pas de combat), on investis
+	  quand même et on continue le mouvement.
+
 2007-02-10 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.

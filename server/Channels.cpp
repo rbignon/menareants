@@ -1382,7 +1382,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 			{
 				if(!(*it)) continue; // Possible
 				if((*it)->Flags() != ARM_MOVE && (*it)->Flags() != flag)
-					SendArm(cl, (*it)->Entities()->List(), ((*it)->Flags()|ARM_NOPRINCIPAL) & ~ARM_MOVE);
+					SendArm(cl, (*it)->Entity(), ((*it)->Flags()|ARM_NOPRINCIPAL) & ~ARM_MOVE);
 				if(!(*it)->Move()->FirstCase())
 				{
 					FDebug(W_WARNING, "Il n'y a pas de FirstCase !?");

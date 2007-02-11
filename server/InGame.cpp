@@ -363,13 +363,18 @@ bool EChannel::ShowAnim(ECEvent* event)
 					}
 					entity->ChangeCase(c);
 					std::vector<ECBEntity*> entities = c->Entities()->List();
-					bool attaq = false;
+					bool attaq = false, invest = false;
 					FORit(ECBEntity*, entities, e)
-						if(!(*e)->IsZombie() && ThereIsAttaq(entity, *e))
+					{
+						if((*e)->IsZombie()) continue;
+						if(ThereIsAttaq(entity, *e))
 						{
 							attaq = true;
 							break;
 						}
+						if(entity->CanInvest(*e))
+							invest = true;
+					}
 					if(attaq)
 					{
 						ECEvent* attaq_event = new ECEvent(ARM_ATTAQ, 0, c);
@@ -378,6 +383,29 @@ bool EChannel::ShowAnim(ECEvent* event)
 						ShowAnim(attaq_event);
 
 						MyFree(attaq_event);
+
+						if(entity->IsZombie())
+						{
+							end = true;
+							break;
+						}
+
+						event->Move()->GoTo(c);
+						entity->Move()->GoTo(c);
+
+						dynamic_cast<ECase*>(c)->CheckInvests(entity);
+					}
+					else if(invest)
+					{
+						ECEvent* invest_event = new ECEvent(ARM_MOVE, entity, c);
+						invest_event->Move()->SetEntity(entity);
+						invest_event->Move()->SetFirstCase(event->Move()->FirstCase());
+						invest_event->Move()->SetMoves(event->Move()->Moves());
+						invest_event->Move()->Return(c);
+
+						ShowAnim(invest_event);
+
+						MyFree(invest_event);
 
 						if(entity->IsZombie())
 						{
@@ -654,7 +682,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					flags |= ARM_UNCONTAIN;
 					entity = contened;
-					last_case = container->Case();
+					last_case = container->DestCase();
 				}
 				break;
 			}
@@ -834,6 +862,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(entity->Owner())
 					entity->Owner()->Events()->Add(event);
 				entity->Events()->Add(event);
+				if(container)
+				{ /* On ajoute l'evenement au conteneur histoire qu'il y ait quelque chose
+				   * séparant son dernier mouvement et un éventuel nouveau mouvement.
+				   */
+					event->Entities()->Add(container);
+					container->Events()->Add(event);
+				}
 			}
 			if(flags & ARM_CONTENER && container)
 				event->Entities()->Add(container);
