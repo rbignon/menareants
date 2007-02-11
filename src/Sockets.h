@@ -119,11 +119,12 @@ public:
 
 	void SetHostName(std::string h) { hostname = h; }
 	std::string HostName() const { return hostname; }
+
 	void SetPort(unsigned p) { port = p; }
 	unsigned Port() const { return port; }
 
 /* Variables protégées */
-protected:
+private:
 	SOCKET sock;
 
 	std::vector<EC_ACommand*> Commands;
@@ -148,8 +149,6 @@ protected:
 	std::string hostname;
 	unsigned int port;
 
-/* Variables privées */
-private:
 	void Init();
 	void Loop();
 	void Disconnect();

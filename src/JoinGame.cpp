@@ -591,8 +591,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j])); // pas incr j ici, lire avant le break;
 						if(GameInfosForm->MyPosition && !chan->IsMission())
 							GameInfosForm->MyPosition->SetEnabled();
-						if(!me->Player()->IsOwner() || chan->IsMission())
-							GameInfosForm->PretButton->SetEnabled(true);
+						GameInfosForm->PretButton->SetEnabled(true);
 					}
 				}
 				else
@@ -676,17 +675,6 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							me->LockScreen();
 							chan->SetCurrentEvent(0);
 						}
-					}
-					if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready() && GameInfosForm)
-					{
-						BPlayerVector::iterator it;
-						BPlayerVector plv = chan->Players();
-						uint ok = 0;
-						for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
-						if((ok+1) >= chan->Map()->MinPlayers() || chan->IsMission()) /* +1 for me */
-							GameInfosForm->PretButton->SetEnabled(true);
-						else
-							GameInfosForm->PretButton->SetEnabled(false);
 					}
 					if(add && InGameForm && chan->State() == EChannel::PLAYING)
 						InGameForm->AddInfo(I_INFO, std::string((*it)->GetNick()) + " est pret.");
@@ -1168,7 +1156,6 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if((*playersi)->Nation() && GameInfosForm->MyNation)
 					GameInfosForm->MyNation->Item((*playersi)->Nation())->SetEnabled();
 
-				GameInfosForm->Players->Hide();
 				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
 				                             " quitte la partie", green_color);
 				std::vector<TComponent*> plrs = GameInfosForm->Players->GetList();
@@ -1185,19 +1172,6 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						GameInfosForm->RecalcMemo();
 						break;
 					}
-				}
-				GameInfosForm->Players->Show();
-				EChannel *chan = me->Player()->Channel();
-				if(chan->Map() && me->Player()->IsOwner() && !me->Player()->Ready())
-				{
-					BPlayerVector::iterator it;
-					BPlayerVector plv = chan->Players();
-					uint ok = 0;
-					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
-					if((ok+1) >= chan->Map()->MinPlayers() || chan->IsMission()) /* +1 for me */
-						GameInfosForm->PretButton->SetEnabled(true);
-					else
-						GameInfosForm->PretButton->SetEnabled(false);
 				}
 				GameInfosForm->SetMustRedraw();
 			}
@@ -1348,7 +1322,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 
 		GameInfosForm->Title->SetCaption(mission ? "Partie solo" : ("Jeu : " + std::string(chan->GetName())));
 		if(client->Player()->IsOwner())
+		{
 			GameInfosForm->PretButton->SetText("Lancer la partie");
+			GameInfosForm->PretButton->SetEnabled();
+		}
 
 		GameInfosForm->ChangeStatus(client->Player()->IsPriv());
 
@@ -1489,7 +1466,45 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 			want_quit = true;
 	}
 	else if(PretButton->Test(mouse, button))
-		client->sendrpl(client->rpl(EC_Client::SET), "+!");
+	{
+		bool ok = true;
+		if(client->Player()->IsOwner())
+		{
+			EChannel* chan = client->Player()->Channel();
+			if(!chan->Map())
+			{
+				TMessageBox("Veuillez sélectionner une carte de jeu !", BT_OK, this).Show();
+				ok = false;
+			}
+			else if(chan->NbPlayers() < chan->Map()->MinPlayers())
+			{
+				TMessageBox("Il n'y a pas suffisament de joueurs. Cette carte requiert entre " +
+				            TypToStr(chan->Map()->MinPlayers()) + " et " + TypToStr(chan->Map()->MaxPlayers()) +
+				            " joueurs.", BT_OK, this).Show();
+				ok = false;
+			}
+			else
+			{
+				BPlayerVector::iterator it;
+				BPlayerVector plv = chan->Players();
+				uint ok = 0;
+				for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
+				if((ok+1) < chan->Map()->MinPlayers() && !chan->IsMission()) /* +1 for me */
+				{
+					TMessageBox("Il faut qu'au moins " + TypToStr(chan->Map()->MinPlayers()) + " joueurs soient prêts.",
+					            BT_OK, this).Show();
+					ok = false;
+				}
+				else if((ok+1) != chan->NbPlayers() &&
+					TMessageBox("Tous les joueurs ne sont pas prêts. Etes vous sûr de vouloir lancer la partie ?\n"
+						"les joueurs non prêts seront éjectés du jeu",
+						BT_YES|BT_NO, this).Show() != BT_YES)
+					ok = false;
+			}
+		}
+		if(ok)
+			client->sendrpl(client->rpl(EC_Client::SET), "+!");
+	}
 	else if(SpeedGame->Test(mouse, button))
 		client->sendrpl(client->rpl(EC_Client::SET), SpeedGame->Checked() ? "+r" : "-r");
 	else if(BeginMoney->Test(mouse, button))

@@ -3,24 +3,20 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-nouvelle version du protocole, créer une nouvelle branche
+-améliorer le proto2 du meta-server (gestion d'une base de données d'users)
+
+* Urgent
 -de manière générale, faire en sorte que les alliés partagent un maximum d'infos
 -améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
  la plus proche de la case d'arrivée.
--améliorer le proto2 du meta-server
-
-* Urgent
--vérifier l'arme nucléaire (il avait pas l'air de supprimer toutes les unités de la case)
- -> il faut améliorer le système d'attaques pour vérifier *qui* est sur la case à ce moment là.
-    tout du moins, il faut voir pour gérer, coté serveur le fait que ça soit l'entité qui envoye les informations
-    de changement de nb ou de suppression.
 -pouvoir envoyer un changement de niveau via le protocole
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
--limiter le nombre d'unités à construire sur batiments
--pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 
 -contacter masami.ko@gmail.com pour lui demander pour sa musique http://yeknan.free.fr/wormux/musique/Komuro_Masami.-.Bussou_na_machi.ogg
 
 ** Objectifs pour la version 0.4
+-> pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
 -> Multiplier les unités
 -> Language de scripting opérationnel pour les missions
 -> Création de quelques missions
@@ -33,6 +29,7 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 [DONE] Pouvoir annuler les actions d'une unité
 
 * Après
+-limiter le nombre d'unités à construire sur batiments
 -à la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
 -bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
 -permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type

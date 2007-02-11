@@ -16,6 +16,11 @@
 
 	* lib/Outils.cpp: Correction d'un bug par rapport au caractère d'échappement.
 
+	* server/Units.cpp: Correction d'un crash.
+
+	* src/JoinGame.cpp: Avertis par message l'owner de la partie lors d'un clic sur "lancer la partie" de ce qu'il manque pour la lancer plutot que de
+	  la non possibilité de cliquer sur le boutton, ainsi qu'avertissement si il y a des joueurs non prets.
+
 2007-02-10 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.

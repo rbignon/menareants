@@ -507,26 +507,25 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 		return false;
 
 	ECBCase *c = 0, *here = DestCase();
-	ECBMove::E_Move last_move = Move()->Moves().back();
 	switch(move)
 	{
 		case ECBMove::Up:
-			if(last_move == ECBMove::Down)
+			if(!Move()->Empty() && Move()->Moves().back() == ECBMove::Down)
 				return false;
 			c = here->MoveUp();
 			break;
 		case ECBMove::Down:
-			if(last_move == ECBMove::Up)
+			if(!Move()->Empty() && Move()->Moves().back() == ECBMove::Up)
 				return false;
 			c = here->MoveDown();
 			break;
 		case ECBMove::Left:
-			if(last_move == ECBMove::Right)
+			if(!Move()->Empty() && Move()->Moves().back() == ECBMove::Right)
 				return false;
 			c = here->MoveLeft();
 			break;
 		case ECBMove::Right:
-			if(last_move == ECBMove::Left)
+			if(!Move()->Empty() && Move()->Moves().back() == ECBMove::Left)
 				return false;
 			c = here->MoveRight();
 			break;
