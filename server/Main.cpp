@@ -137,7 +137,8 @@ int ECServer::main(int argc, char **argv)
 			mkdir( path.c_str(), 0755 );
 		else closedir(d);
 
-		std::cout << "Logs in: " << path << std::endl;
+		if(!(flags & F_SILENT))
+			std::cout << "Logs in: " << path << std::endl;
 
 		conf = new Config(conf_file);
 		if(!conf->load())
@@ -200,6 +201,9 @@ int ECServer::main(int argc, char **argv)
 
 		if(init_socket())
 			run_server();
+
+		if(sock) close(sock);
+		if(ms_sock) close(ms_sock);
 
 	}
 	catch (const TECExcept &e)

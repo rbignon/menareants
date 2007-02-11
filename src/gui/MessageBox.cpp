@@ -87,7 +87,8 @@ uint TMessageBox::Show()
 								break;
 							default: break;
 						}
-						edit->PressKey(event.key.keysym);
+						if(edit)
+							edit->PressKey(event.key.keysym);
 						break;
 
 					case SDL_MOUSEBUTTONDOWN:
@@ -118,13 +119,27 @@ uint TMessageBox::Show()
 void TMessageBox::Draw()
 {
 	int x,y;
+	unsigned int start, delay, sleep_fps;
+	start = SDL_GetTicks();
+
 	SDL_GetMouseState( &x, &y);
 	if(realbg)
 		Window()->Blit(realbg);
 	if(Form)
+	{
+		Form->SetMustRedraw();
 		Form->Draw();
+	}
 	Draw(x,y);
 	Window()->Flip();
+
+	delay = SDL_GetTicks()-start;
+	if (delay < 35)
+		sleep_fps = 35 - delay;
+	else
+		sleep_fps = 0;
+	if(sleep_fps >= SDL_TIMESLICE)
+		SDL_Delay(sleep_fps);
 }
 
 void TMessageBox::Draw(uint mouse_x, uint mouse_y)
@@ -140,7 +155,6 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 	{
 		it->SetXY(x+25, vert);
 		it->Draw(mouse);
-		//Font::GetInstance(Font::Normal)->WriteLeft(x+25, vert, *it, black_color);
 	}
 
 	if(edit)

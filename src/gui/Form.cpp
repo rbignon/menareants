@@ -23,7 +23,7 @@
 #include <SDL.h>
 
 TForm::TForm(ECImage* w)
-	: want_quit(false), background(0), focus_order(true), Hint(0), mutex(0), max_fps(50), must_redraw(true)
+	: want_quit(false), background(0), focus_order(true), Hint(0), mutex(0), max_fps(35), must_redraw(true)
 {
 	SetWindow(w);
 }
