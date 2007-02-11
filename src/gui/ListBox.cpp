@@ -1,3 +1,22 @@
+/* src/gui/ListBox.cpp - A component to show a list of items
+ *
+ * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * $Id$
+ */
 /******************************************************************************
  *  Wormux is a convivial mass murder game.
  *  Copyright (C) 2001-2004 Lawrence Azzoug.
@@ -172,7 +191,8 @@ void TListBox::Draw(const Point2i &mousePosition)
 				Window()->BoxColor(rect, BoxColorSelected);
 			else if(Enabled() && i == uint(item))
 			{
-				Window()->BoxColor(rect, BoxColorMoused);
+				if(m_items.at(i)->Enabled())
+					Window()->BoxColor(rect, BoxColorMoused);
 				if(!NoItemHint())
 					SetHint(m_items.at(i)->Hint());
 			}

@@ -199,7 +199,7 @@ int PIGCommand::Exec(TClient *cl, std::vector<std::string> parv)
  */
 int POGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	if(IsPing(cl)) DelPing(cl);
+	DelPing(cl);
 
 	return 0;
 

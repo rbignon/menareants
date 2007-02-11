@@ -1,3 +1,11 @@
+2007-02-11 Romain Bignon <progs@headfucking.net>
+
+	* server/Main.cpp (sig_alarm): Correction d'un bug qui risquait de faire jarter tous les clients si l'un était victime d'un ping timeout.
+
+	* server/menareantsd.conf.in: Valeur par défault de server/fping est mise à 25 plutot que 50, pour diminuer par deux le temps de détection d'un ping timeout.
+
+	* Quelques corrections de bugs.
+
 2007-02-10 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.

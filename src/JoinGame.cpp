@@ -1199,6 +1199,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					else
 						GameInfosForm->PretButton->SetEnabled(false);
 				}
+				GameInfosForm->SetMustRedraw();
 			}
 			if(LoadingForm)
 			{

@@ -454,7 +454,11 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		MenAreAntsApp::GetInstance()->RefreshList();
 	}
 	else if(RetourButton->Test(mouse, button))
+	{
+		if(EC_Client::GetInstance())
+			WAIT_EVENT_T(EC_Client::GetInstance()->IsConnected() == false, i, 4);
 		want_quit = true;
+	}
 	else if(MissionButton->Test(mouse, button) || EscarmoucheButton->Test(mouse, button))
 	{
 		int size = ServerList->Size();

@@ -52,17 +52,15 @@ void ECServer::CleanUp()
 void ECServer::sig_alarm()
 {
 #ifndef NOPINGCHECK
-	for(RealClientList::iterator it = myClients.begin(); it != myClients.end(); ++it)
+	for(RealClientList::iterator it = myClients.begin(); it != myClients.end();)
 	{
 		TClient *cl = it->second;
+		++it;
 		if(IsPing(cl))
+			cl->exit(rpl(ECServer::BYE));
+		else if(time_t(cl->GetLastRead() + GetConf()->PingFreq()) <= CurrentTS)
 		{
-			DelPing(cl);
-			cl->exit(app.rpl(ECServer::BYE));
-		}
-		else if(int(cl->GetLastRead() + GetConf()->PingFreq()) <= CurrentTS)
-		{
-			cl->sendrpl(app.rpl(ECServer::PING));
+			cl->sendrpl(rpl(ECServer::PING));
 			SetPing(cl);
 		}
 	}
