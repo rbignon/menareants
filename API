@@ -30,6 +30,7 @@ Sommaire:
                                                  mettre '.' comme nom créé une mission
               STAT                              :request stats
               BYE                               :au revoir
+              ADMIN <LOGIN|REHASH|KILL> [arg]   :commande en temps qu'admin
          - Dans une pré-partie
               SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
               JIA <nom>                         :Créé une IA (par l'owner)
@@ -61,6 +62,7 @@ Sommaire:
               BYE [raison]                      :au revoir
               USED                              :pseudo déjà utilisé
               REJOIN <chan>                     :l'user est invité à rejoindre une partie à laquelle il a été déconnecté
+              ADMIN                             :l'user est bien loggé comme admin
          - Dans une pré-partie
               ER1                               :ne peut pas joindre
               ER2 <nick>                        :le pseudo de l'IA a déjà été pris ou il y a trop de monde

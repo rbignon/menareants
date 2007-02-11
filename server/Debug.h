@@ -31,6 +31,7 @@
 #define W_CLIENT        0x0020          /* Erreur en provenance du client */
 #define W_ECHO          0x0040          /* Affiche en echo */
 #define W_CONNS         0x0080          /* Logue dans le fichier des connexions */
+#define W_INFO          0x0100          /* Information */
 
 int Debug(unsigned int flags, const char* format, ...);
 int vDebug(unsigned int flags, std::string msg, std::string vars);

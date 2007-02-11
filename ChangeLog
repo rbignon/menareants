@@ -6,6 +6,16 @@
 
 	* Quelques corrections de bugs.
 
+	* server/Main.cpp: Ajout du support des signaux HUP, INT et TERM. Mise à jour des paramètres passés au programme.
+
+	* src/Login.cpp: Permet d'administrer un serveur (premiers outils).
+
+	* doc/ADMIN: Création d'une documentation pour les administrateurs.
+
+	* src/Login.cpp: Correction d'un crash.
+
+	* lib/Outils.cpp: Correction d'un bug par rapport au caractère d'échappement.
+
 2007-02-10 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.

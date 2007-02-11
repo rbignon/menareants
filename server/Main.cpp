@@ -33,7 +33,6 @@
 #endif
 #include <dirent.h>
 
-
 ECServer app;
 
 void ECServer::CleanUp()
@@ -70,6 +69,23 @@ void ECServer::sig_alarm()
 		ConnectMetaServer();
 }
 
+void ECServer::sig_reload(int c)
+{
+	app.flags |= F_RELOAD;
+}
+
+void ECServer::sig_restart(int c)
+{
+	Debug(W_INFO, "Received a INT signal... restarting...");
+	app.running = false;
+	app.flags |= F_RESTART;
+}
+
+void ECServer::sig_die(int c)
+{
+	app.running = false;
+}
+
 int ECServer::main(int argc, char **argv)
 {
 	struct rlimit rlim; /* used for core size */
@@ -77,8 +93,10 @@ int ECServer::main(int argc, char **argv)
 	std::string conf_file;
 	bool background = true;
 
+	CurrentTS = time(NULL);
+
 	conf_file = CONFIG_FILE;
-	while((tmp = getopt(argc, argv, "hnc:")) != EOF)
+	while((tmp = getopt(argc, argv, "shnvc:")) != EOF)
 		switch(tmp)
 		{
 			case 'n':
@@ -87,9 +105,27 @@ int ECServer::main(int argc, char **argv)
 			case 'c':
 				conf_file = optarg;
 				break;
+			case 's':
+				flags |= F_SILENT;
+				break;
 			case 'h':
+				std::cout << "Usage: " << argv[0] << " [-hnsv] [-c <configuration file>]" << std::endl;
+				std::cout << std::endl;
+				std::cout << "    -c <file path> use this configuration" << std::endl;
+				std::cout << "    -h             show this notice" << std::endl;
+				std::cout << "    -n             don't launch in background" << std::endl;
+				std::cout << "    -s             no output" << std::endl;
+				std::cout << "    -v             display menareants-server's version" << std::endl;
+				exit(EXIT_SUCCESS);
+				break;
+			case 'v':
+				std::cout << "MenAreAnts Daemon v" APP_VERSION " P" APP_PVERSION
+				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")" << std::endl;
+				exit(EXIT_SUCCESS);
+				break;
 			default:
-				std::cout << "Usage: " << argv[0] << " [-n] [-c <configuration file>]" << std::endl;
+				if(!(flags & F_SILENT))
+					std::cout << "Usage: " << argv[0] << " [-hnsv] [-c <configuration file>]" << std::endl;
 				exit(EXIT_FAILURE);
 		}
 
@@ -106,8 +142,9 @@ int ECServer::main(int argc, char **argv)
 		conf = new Config(conf_file);
 		if(!conf->load())
 		{
+			if(!(flags & F_SILENT))
 				std::cout << "Unable to read configuration" << std::endl;
-				exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);
 		}
 
 		if(!ECMap::LoadMaps()) /* L'output est géré par LoadMaps() */
@@ -137,12 +174,16 @@ int ECServer::main(int argc, char **argv)
 		Commands.push_back(new SAVECommand("SAVE",	ECD_AUTH,	1));
 
 		signal(SIGPIPE, SIG_IGN);
+		signal(SIGHUP,  &sig_reload);
+		signal(SIGINT,  &sig_restart);
+		signal(SIGTERM, &sig_die);
 
 		if(background)
 		{
 			if((tmp = fork()) == -1)
 			{
-				printf("Unable to run in backgroudn\n");
+				if(!(flags & F_SILENT))
+					std::cout << "Unable to run in background" << std::endl;
 				exit(0);
 			}
 			if(tmp > 1) exit(0);
@@ -171,6 +212,10 @@ int ECServer::main(int argc, char **argv)
 	}
 	CleanUp();
 	delete conf;
+
+	Debug(W_CONNS, "++ Server dies...");
+
+	if(flags & F_RESTART) execlp(argv[0], argv[0], "-s", NULL); /* restarting.. */
 
 	return 0;
 }

@@ -89,6 +89,8 @@ class EOMCommand : public EC_ACommand { public: EOMCommand(const std::string _Cm
 
 class STATCommand : public EC_ACommand { public: STATCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class ADMINCommand : public EC_ACommand { public: ADMINCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ADMINCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* JOINDRE PARTIES */
 
 class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

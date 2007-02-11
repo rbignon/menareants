@@ -46,6 +46,8 @@ public:
 	TButtonText* JoinButton;
 	TButtonText* RefreshButton;
 	TButtonText* DisconnectButton;
+	TButtonText* RehashButton;
+	TButtonText* KillButton;
 	TLabel*      Welcome;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;

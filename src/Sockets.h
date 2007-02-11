@@ -65,6 +65,7 @@ public:
 		ERRORN,      /**< ERR */
 		ERRORV,      /**< ERR */
 		STAT,        /**< STAT */
+		ADMIN,       /**< ADMIN */
 
 		LISTGAME,    /**< LSP */
 		JOIN,        /**< JOI */

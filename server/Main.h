@@ -51,6 +51,7 @@ public:
 		ENDOFMOTD,    /**< EOM */
 		STAT,         /**< STAT */
 		REJOIN,       /**< REJOIN */
+		ADMIN,        /**< ADMIN */
 
 		CANTJOIN,     /**< ER1 */
 		IACANTJOIN,   /**< ER2 */
@@ -116,7 +117,7 @@ public:
 
 	time_t Uptime() { return uptime; }
 
-	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0) {}
+	ECServer() : NBco(0), NBtot(0), NBchan(0), NBachan(0), NBwchan(0), conf(0), flags(0) {}
 
 	TClient* FindClient(int fd) { return myClients[fd]; }
 
@@ -129,18 +130,31 @@ public:
 
 	int MSet(std::string, std::string = "");
 
+	enum
+	{
+		F_RELOAD  = 1 << 0,
+		F_RESTART = 1 << 1,
+		F_SILENT  = 1 << 2
+	};
+	bool HasFlag(int i) { return flags & i; }
+
 protected:
 	Config *conf;
 	int run_server(void);
 	int init_socket(void);
 
 	void sig_alarm();
+	static void sig_reload(int);
+	static void sig_restart(int);
+	static void sig_die(int);
 
 	time_t uptime;
 	int sock, ms_sock;
 	unsigned int highsock;
 	fd_set global_fd_set;
 	std::string path;
+
+	int flags;
 
 	std::vector<EC_ACommand*> Commands;
 	void CleanUp();

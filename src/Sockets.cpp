@@ -44,6 +44,7 @@ const char* msgTab[] = {
 	"ERR %s",                                    /* ERR - Message d'erreur */
 	"ERR %s %s",                                 /* ERR - Message d'erreur avec vars */
 	"STAT",                                      /* STAT - Infos sur l'etat du serveur */
+	"ADMIN %s",                                  /* ADMIN - Envoie une commande administrateur au serveur */
 
 	"LSP",                                       /* LSP - Liste les jeux */
 	"JOI %s",                                    /* JOI - Joindre une partie */

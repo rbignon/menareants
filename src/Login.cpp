@@ -133,6 +133,20 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** It's a notification to my admin status.
+ *
+ * Syntax: ADMIN
+ */
+int ADMINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+{
+	if(ConnectedForm)
+	{
+		ConnectedForm->RehashButton->SetVisible(true);
+		ConnectedForm->KillButton->SetVisible(true);
+	}
+	return 0;
+}
+
 /** I've been disconnected from server when I was playing a game. It asks me if I want to rejoin this game.
  *
  * Syntax: REJOIN game
@@ -350,6 +364,7 @@ void MenAreAntsApp::RefreshList()
 	if(ListServerForm->RecvSList == true || EC_Client::GetInstance()) return;
 
 	ListServerForm->RecvSList = true;
+	ListServerForm->ConnectButton->SetEnabled(false);
 	ListServerForm->RefreshButton->SetEnabled(false);
 	ListServerForm->EscarmoucheButton->SetEnabled(false);
 	ListServerForm->MissionButton->SetEnabled(false);
@@ -546,7 +561,7 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->SetMutex(mutex);
 	client->SetHostName(stringtok(host, ":"));
 	client->SetPort(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
-	/* Ajout des commandes            CMDNAME FLAGS ARGS */
+	/* Ajout des commandes            CMDNAME	FLAGS	ARGS */
 	client->AddCommand(new ARMCommand("ARM",	0,	0));
 
 	client->AddCommand(new PIGCommand("PIG",	0,	0));
@@ -576,12 +591,13 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->AddCommand(new INFOCommand("INFO",	0,	1));
 
 	client->AddCommand(new LSMCommand("LSM",	0,	3));
-	client->AddCommand(new EOMAPCommand("EOMAP",0,	0));
+	client->AddCommand(new EOMAPCommand("EOMAP",	0,	0));
 	client->AddCommand(new SMAPCommand("SMAP",	0,	1));
-	client->AddCommand(new EOSMAPCommand("EOSMAP",0,0));
+	client->AddCommand(new EOSMAPCommand("EOSMAP",	0,	0));
 
 	client->AddCommand(new SCOCommand("SCO",	0,	4));
-	client->AddCommand(new REJOINCommand("REJOIN",0,1));
+	client->AddCommand(new REJOINCommand("REJOIN",	0,	1));
+	client->AddCommand(new ADMINCommand("ADMIN",	0,	0));
 
 	Thread = SDL_CreateThread(EC_Client::read_sock, client);
 
@@ -707,6 +723,7 @@ void TConnectedForm::AfterDraw()
 	}
 	if(timer.time_elapsed(true) > 60 || refresh)
 	{
+		JoinButton->SetEnabled(false);
 		GList->ClearItems();
 		EOL = false;
 		client->sendrpl(client->rpl(EC_Client::LISTGAME));
@@ -715,7 +732,6 @@ void TConnectedForm::AfterDraw()
 			return;
 
 		refresh = false;
-		JoinButton->SetEnabled(false);
 		timer.reset();
 	}
 }
@@ -758,7 +774,29 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 		timer.reset();
 		client->sendrpl(client->rpl(EC_Client::STAT));
 	}
-
+	else if(mouse.x < 10 && mouse.y < 10)
+	{
+		TMessageBox mb("Vous êtes sur le point de vous logger en temps qu'administrateur du serveur.\n\n"
+		               "Veuillez entrer le mot de passe :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		if(mb.Show() == BT_OK)
+			client->sendrpl(client->rpl(EC_Client::ADMIN), ("LOGIN " + mb.Edit()->Text()).c_str());
+	}
+	else if(RehashButton->Test(mouse, button))
+	{
+		client->sendrpl(client->rpl(EC_Client::ADMIN), "REHASH");
+		TMessageBox("Configuration mise à jour", BT_OK, this);
+	}
+	else if(KillButton->Test(mouse, button))
+	{
+		TMessageBox mb("Entrez le pseudo de la personne à déconnecter :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		if(mb.Show() == BT_OK)
+		{
+			client->sendrpl(client->rpl(EC_Client::ADMIN), ("KILL " + mb.Edit()->Text()).c_str());
+			TMessageBox("Si cette personne était connectée, elle a probablement été tuée.\n"
+			            "Il est à noter que pour le moment il n'y a pas de notification de la chose",
+			            BT_OK, this).Show();
+		}
+	}
 }
 
 TConnectedForm::TConnectedForm(ECImage* w)
@@ -788,6 +826,12 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	                                                Font::GetInstance(Font::Normal)));
 	DisconnectButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, "Se déconnecter",
 	                                                Font::GetInstance(Font::Normal)));
+	RehashButton = AddComponent(new TButtonText(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50, "Actu. Config.",
+	                                                Font::GetInstance(Font::Normal)));
+	RehashButton->SetVisible(false);
+	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, "Tuer un client",
+	                                                Font::GetInstance(Font::Normal)));
+	KillButton->SetVisible(false);
 
 	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90," ", white_color, Font::GetInstance(Font::Normal)));
 	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height()," ", white_color, Font::GetInstance(Font::Normal)));

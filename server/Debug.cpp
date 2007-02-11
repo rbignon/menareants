@@ -68,6 +68,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	else if(flags & W_DESYNCH) s ="[DESYNCH] ";
 	else if(flags & W_WARNING) s ="[WARNING] ";
 	else if(flags & W_DEBUG)   s ="[DEBUG]   ";
+	else if(flags & W_INFO)    s ="[INFO]    ";
 	else if(flags & W_CONNS)   s ="[CONNS]   ";
 	s += msg;
 
@@ -75,7 +76,7 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	{
 		const char* f;
 		if(flags & W_DEBUG) f = DEBUG_LOG;
-		else if(flags & W_CONNS) f = CONNS_LOG;
+		else if(flags & W_CONNS || flags & W_INFO) f = CONNS_LOG;
 		else f = ERROR_LOG;
 		std::ofstream file((app.GetPath() + f).c_str(), std::ios_base::app);
 		if(file)

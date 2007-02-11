@@ -43,7 +43,7 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			return cl->sendrpl(app.rpl(ECServer::ERR));
 		}
 		cl->SetFlag(ECD_ADMIN);
-		return 0;
+		return cl->sendrpl(app.rpl(ECServer::ADMIN));
 	}
 
 	if(!cl->HasFlag(ECD_ADMIN))
@@ -59,6 +59,8 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			Debug(W_WARNING, "ADMIN REHASH: Impossible de charger la configuration");
 			return cl->sendrpl(app.rpl(ECServer::ERR));
 		}
+		else
+			app.MSet("+PG", TypToStr(app.GetConf()->MaxConnexions()) + " " + TypToStr(app.GetConf()->MaxGames()));
 		return 0;
 	}
 

@@ -166,7 +166,7 @@ std::string FormatStr(std::string s)
 
 	for(j=0; s[j] && (j < size); ++j)
 	{
-		if(s[j] == '\\' && s[j+1] == ' ') ptr += '\\';
+		if(s[j] == '\\'/* && s[j+1] == ' '*/) ptr += '\\';
 		else if(s[j] == ' ') ptr+= '\\';
 		ptr += s[j];
 	}
@@ -179,7 +179,7 @@ std::string FormatStr(const char* s)
 
 	for(; *s; ++s)
 	{
-		if(*s == '\\' && *(s+1) == ' ') ptr += '\\';
+		if(*s == '\\'/* && *(s+1) == ' '*/) ptr += '\\';
 		else if(*s == ' ') ptr += '\\';
 		ptr += *s;
 	}

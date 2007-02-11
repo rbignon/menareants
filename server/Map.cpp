@@ -41,7 +41,8 @@ bool ECMap::LoadMaps()
 
 	if(!fp)
 	{
-		Debug(W_ERR|W_ECHO, "Unable to load map list files: %s", MAP_FILE);
+		if(!(app.HasFlag(ECServer::F_SILENT)))
+			Debug(W_ERR|W_ECHO, "Unable to load map list files: %s", MAP_FILE);
 		return false;
 	}
 
@@ -60,14 +61,18 @@ bool ECMap::LoadMaps()
 		catch(TECExcept &e)
 		{
 			delete map;
-			Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
-			vDebug(W_ERR|W_ECHO, e.Message(), e.Vars());
+			if(!(app.HasFlag(ECServer::F_SILENT)))
+			{
+				Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
+				vDebug(W_ERR|W_ECHO, e.Message(), e.Vars());
+			}
 			continue;
 		}
 		map->i = map->IsMission() ? nbmissions++ : nbmaps++;
 		(map->IsMission() ? MissionList : MapList).push_back(map);
 	}
-	Debug(W_ECHO|W_NOLOG, "%d maps and %d missions loaded !", nbmaps, nbmissions);
+	if(!(app.HasFlag(ECServer::F_SILENT)))
+		Debug(W_ECHO|W_NOLOG, "%d maps and %d missions loaded !", nbmaps, nbmissions);
 	return true;
 }
 

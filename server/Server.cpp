@@ -47,6 +47,7 @@ const char* msgTab[] = {
      "EOM",                                 /* EOM - Fin du motd */
      "STAT %d %d %d %d %d %d %d",           /* STAT - Stats du serveur */
      "REJOIN %s",                           /* REJOIN - L'user peut rejoindre une partie où il a été déconnecté */
+     "ADMIN",                               /* ADM - L'user est bien loggé en admin */
 
      "ER1",                                 /* ER1 - Ne peut pas joindre */
      "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris ou la partie est pleine */
@@ -354,7 +355,8 @@ int ECServer::init_socket(void)
 	sock = socket(AF_INET, SOCK_STREAM, 0); /* on demande un socket */
 	if(sock < 0)
 	{
-		std::cerr << "Unable to run server. (socket not found)" << std::endl;
+		if(!(flags & F_SILENT))
+			std::cerr << "Unable to run server. (socket not found)" << std::endl;
 		return 0;
 	}
 	fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -367,7 +369,8 @@ int ECServer::init_socket(void)
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		std::cerr << "Unable to listen port " << conf->Port() << "." << std::endl;
+		if(!(flags & F_SILENT))
+			std::cerr << "Unable to listen port " << conf->Port() << "." << std::endl;
 		close(sock);
 		return 0;
 	}
@@ -382,7 +385,11 @@ int ECServer::init_socket(void)
 	CurrentTS = time(NULL);
 	uptime = CurrentTS;
 
-	Debug(W_ECHO|W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
+#ifndef DEBUG /* Car si DEBUG, on echo avec Debug(), donc pas besoin d'afficher deux fois le message */
+	if(!(flags & F_SILENT))
+		std::cout << "Starting server (" APP_NAME ": " APP_VERSION ") on port " << conf->Port() << std::endl;
+#endif
+	Debug(W_CONNS, "++ Starting server (" APP_NAME ": " APP_VERSION ") on port %d", conf->Port());
 
 	myClients.clear();
 	for(std::vector<TClient*>::iterator it = Clients.begin(); it != Clients.end(); ++it)
@@ -473,7 +480,8 @@ bool ECServer::ConnectMetaServer()
 		struct hostent *hp = gethostbyname(hostname);
 		if(!hp)
 		{
-			std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ")" << std::endl;
+			if(!(flags & F_SILENT))
+				std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ")" << std::endl;
 			return false;
 		}
 
@@ -487,7 +495,8 @@ bool ECServer::ConnectMetaServer()
 	/* Connexion */
 	if(connect(ms_sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{
-		std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ") : " << strerror(errno) << std::endl;
+		if(!(flags & F_SILENT))
+			std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ") : " << strerror(errno) << std::endl;
 		return false;
 	}
 
@@ -514,6 +523,15 @@ int ECServer::run_server(void)
 		{
 			sig_alarm();
 			last_call = CurrentTS;
+		}
+		if(flags & F_RELOAD)
+		{
+			Debug(W_INFO, "Received a HUP signal, reloading...");
+			if(!app.GetConf()->load())
+				Debug(W_WARNING, "HUP Reload: Configuration isn't good, we continue to use our actual configuration.");
+			else
+				MSet("+PG", TypToStr(conf->MaxConnexions()) + " " + TypToStr(conf->MaxGames()));
+			flags &= ~F_RELOAD;
 		}
 
 		tmp_fdset = global_fd_set; /* save */
