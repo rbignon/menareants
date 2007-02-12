@@ -266,7 +266,8 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage *cmd)
 			else
 			{
 				if(!parv->size()) parv->push_back("");
-				*cmd = static_cast<ECMessage>(*s);
+				if(*(s+1) == 0)
+					*cmd = static_cast<ECMessage>(*s);
 			}
 		}
 		else

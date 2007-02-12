@@ -132,6 +132,9 @@ void EC_Client::parse_message(std::string buf)
 	{
 		vDebug(W_ERR|W_DESYNCH|W_SEND, "Commande incorrecte du serveur.", VSName(buf.c_str())
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
+		if(logging)
+			SetCantConnect("Le serveur auquel vous souhaitez vous connecter ne connait pas le même langage que moi !");
+
 		return;
 	}
 
@@ -269,7 +272,7 @@ EC_Client::EC_Client(const char *hostname, unsigned short port)
 
 bool EC_Client::Connect(const char *hostname, unsigned short port)
 {
-	if(connected) return false;
+	if(connected || sock) return false;
 
 	/* Création du socket
 	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
@@ -327,7 +330,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 void EC_Client::Disconnect()
 {
-	if(connected)
+	if(sock)
 	{
 #ifdef WIN32
 		closesocket(sock);

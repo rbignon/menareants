@@ -444,6 +444,7 @@ void MenAreAntsApp::RefreshList()
 			mutex = 0;
 		}
 		ListServerForm->RecvSList = false;
+		ListServerForm->SetWantQuit();
 		return;
 	}
 
@@ -654,9 +655,9 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 			client->SetWantDisconnect();
 
 		if(!client)
-			msg = "Connexion impossible à " + host;
+			msg = "Connexion impossible";
 		else
-			msg = "Connexion impossible à " + host + " :\n\n" + client->CantConnect();
+			msg = "Connexion impossible :\n\n" + client->CantConnect();
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
 		SDL_WaitThread(Thread, 0);
