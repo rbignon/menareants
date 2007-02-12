@@ -22,22 +22,24 @@
 #define ECD_SERVER_H
 
 #include "Defines.h"
-//#include "Main.h"
+#include "lib/Messages.h"
 #include <string>
 
 /* - Client */
 #define SetFlush(x) 	(x)->SetFlag(ECD_FLUSH)
 #define SetPing(x)		(x)->SetFlag(ECD_PING)
 #define SetAuth(x)		(x)->SetFlag(ECD_AUTH)
-#define DelFlush(x) 	(x)->DelFlag(ECD_FLUSH)
+#define DelFlush(x)		(x)->DelFlag(ECD_FLUSH)
 #define DelPing(x)		(x)->DelFlag(ECD_PING)
 #define IsFlush(x)		((x)->HasFlag(ECD_FLUSH))
 #define IsPing(x)		((x)->HasFlag(ECD_PING))
 #define IsAuth(x)		((x)->HasFlag(ECD_AUTH))
 
 class ECPlayer;
+class ECBPlayer;
 class TIA;
 class ECBEntity;
+class ECEntity;
 
 class TClient
 {
@@ -55,16 +57,23 @@ public:
 	/** Send a reply to client.
 	 * @return systematicaly 0.
 	 */
-	virtual int sendrpl(const char *pattern, ...);
-
-	/** Send an unformated message. */
-	virtual int sendbuf(char* buf, int len) = 0;
+	virtual int sendrpl(const ECPacket&) = 0;
+	int sendrpl(const std::string& s, const ECMessage&, ECArgs = ECArgs());
+	int sendrpl(const ECMessage&, ECArgs = ECArgs());
+	int sendrpl(const std::vector<ECBPlayer*>&, const ECMessage&, ECArgs = ECArgs());
+	int sendrpl(const std::vector<ECPlayer*>&, const ECMessage&, ECArgs = ECArgs());
+	int sendrpl(const ECBPlayer*, const ECMessage&, ECArgs = ECArgs());
+	int sendrpl(const std::vector<ECEntity*>&, const ECMessage&, ECArgs = ECArgs());
+	virtual int sendrpl(const ECError&, ECArgs = ECArgs()) { return 0; }
 
 	/** Close connexion with client and send a formated message. */
-	virtual int exit(const char *, ...);
+	virtual int exit(const ECMessage&, ECArgs = ECArgs());
+	virtual int exit(const ECError&, ECArgs = ECArgs());
 
 	int parsemsg(std::string buf);
-	
+	int parsemsg(const ECPacket&);
+	int parsemsg(const ECMessage& cmdname, const std::vector<std::string>& parv);
+
 	virtual void Free();
 
 	virtual void RemoveEntity(ECBEntity* e) {}
@@ -108,7 +117,7 @@ public:
 
 	/** Remove player struct */
 	void ClrPlayer() { pl = NULL; }
-	
+
 	bool IsHuman() const { return (fd >= 0); }
 	bool IsIA() const { return (fd < 0); }
 
@@ -153,10 +162,15 @@ public:
 	int parse_this();
 
 	/** Send an unformated message. */
-	int sendbuf(char* buf, int len);
+	int sendbuf(std::string);
+
+	virtual int sendrpl(const ECError&, ECArgs = ECArgs());
+	virtual int sendrpl(const ECPacket&);
+
 
 	/** Close connexion with client and send a formated message. */
-	int exit(const char *, ...);
+	int exit(const ECMessage&, ECArgs = ECArgs());
+	int exit(const ECError&, ECArgs = ECArgs());
 
 /* Attributs */
 public:

@@ -312,42 +312,6 @@ int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/** We can't rejoin channel.
- *
- * Syntax: ER1
- */
-int ER1Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	JOINED = -1;
-	TGameInfosForm::ErrMessage = "Impossible de joindre la partie, elle n'existe peut être plus, elle est pleine "
-	                             "ou a démarrée.";
-	return 0;
-}
-
-/** We can't create this IA because his nickname is already taken.
- *
- * Syntax: ER2 nick
- */
-int ER2Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	TGameInfosForm::ErrMessage = "Impossible de créer cette IA pour une des raisons suivantes:\n"
-	                             "- Le pseudo choisi est incorrect.\n"
-	                             "- Le pseudo choisi est déjà utilisé par une autre IA (pas forcément dans votre partie).\n"
-	                             "- Il n'y a plus de place pour un joueur supplémentaire.";
-	return 0;
-}
-
-/** We can't create a game because there is too much games.
- *
- * Syntax: ER4
- */
-int ER4Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	JOINED = -1;
-	TGameInfosForm::ErrMessage = "Impossible de créer la partie, il y a trop de parties sur ce serveur.";
-	return 0;
-}
-
 /** We received a message in channel.
  *
  * Syntax: nick MSG message
@@ -654,7 +618,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						if(GameInfosForm)
 							GameInfosForm->PretButton->SetEnabled(!add);
 						if(!add && (chan->State() == EChannel::SENDING || chan->State() == EChannel::ANIMING))
-							me->sendrpl(me->rpl(EC_Client::SET), "+!");
+							me->sendrpl(MSG_SET, "+!");
 						if(InGameForm)
 						{
 							if(!(*it)->Lost())
@@ -1084,7 +1048,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			 * Dans ce cas on prévient quand même le serveur qu'on part.
 			 */
 			if(!GameInfosForm && !RECOVERING)
-				me->sendrpl(EC_Client::rpl(EC_Client::LEAVE));
+				me->sendrpl(MSG_LEAVE);
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
@@ -1221,7 +1185,7 @@ bool MenAreAntsApp::RecoverGame(std::string chan)
 
 	RECOVERING = true;
 
-	client->sendrpl(EC_Client::rpl(EC_Client::JOIN), FormatStr(chan).c_str());
+	client->sendrpl(MSG_JOIN, chan);
 
 	{ WAIT_EVENT_T(JOINED != 0, i, 2); }
 
@@ -1241,7 +1205,7 @@ bool MenAreAntsApp::RecoverGame(std::string chan)
 	if(client->Player())
 	{
 		client->Player()->Channel()->SetWantLeave();
-		client->sendrpl(client->rpl(EC_Client::LEAVE));
+		client->sendrpl(MSG_LEAVE);
 	}
 	return true;
 }
@@ -1290,7 +1254,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	                                    std::string(cname), green_color);
 
 	JOINED = 0;
-	client->sendrpl(create ? EC_Client::rpl(EC_Client::CREATE) : EC_Client::rpl(EC_Client::JOIN), FormatStr(cname).c_str());
+	if(create)
+		client->sendrpl(MSG_JOIN, ECArgs(cname, "$"));
+	else
+		client->sendrpl(MSG_JOIN, cname);
 
 	/* On attend 2 secondes de lag, mais si jamais on a reçu une erreur on y partira avant */
 	WAIT_EVENT_T(JOINED != 0, i, 2);
@@ -1299,7 +1266,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(client->Player())
 		{
 			client->Player()->Channel()->SetWantLeave();
-			client->sendrpl(EC_Client::rpl(EC_Client::LEAVE));
+			client->sendrpl(MSG_LEAVE);
 		}
 		else
 			MyFree(GameInfosForm);
@@ -1316,9 +1283,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		chan = client->Player()->Channel();
 
 		if(Config::GetInstance()->color)
-			client->sendrpl(client->rpl(EC_Client::SET), std::string("+c " + TypToStr(Config::GetInstance()->color)).c_str());
+			client->sendrpl(MSG_SET, ECArgs("+c", TypToStr(Config::GetInstance()->color)));
 		if(Config::GetInstance()->nation)
-			client->sendrpl(client->rpl(EC_Client::SET), std::string("+n " +TypToStr(Config::GetInstance()->nation)).c_str());
+			client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(Config::GetInstance()->nation)));
 
 		GameInfosForm->Title->SetCaption(mission ? "Partie solo" : ("Jeu : " + std::string(chan->GetName())));
 		if(client->Player()->IsOwner())
@@ -1337,7 +1304,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(client && client->Player())
 		{
 			client->Player()->Channel()->SetWantLeave();
-			client->sendrpl(client->rpl(EC_Client::LEAVE));
+			client->sendrpl(MSG_LEAVE);
 		}
 		else
 			MyFree(GameInfosForm);
@@ -1356,7 +1323,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(client->Player())
 		{
 			client->Player()->Channel()->SetWantLeave();
-			client->sendrpl(client->rpl(EC_Client::LEAVE));
+			client->sendrpl(MSG_LEAVE);
 		}
 	}
 
@@ -1377,7 +1344,7 @@ void TGameInfosForm::OnKeyUp(SDL_keysym key)
 		case SDLK_RETURN:
 			if(SendMessage->Focused() && !SendMessage->Empty())
 			{
-				client->sendrpl(client->rpl(EC_Client::MSG), FormatStr(SendMessage->GetString()).c_str());
+				client->sendrpl(MSG_MSG, SendMessage->GetString());
 				Chat->AddItem("<" + client->GetNick() + "> " + SendMessage->GetString(), black_color);
 				SendMessage->ClearString();
 			}
@@ -1409,8 +1376,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 	{
 		if(MapList->Test(mouse, button) && MapList->Selected() != -1)
 		{
-			client->sendrpl(client->rpl(EC_Client::SET),
-					("+m " + TypToStr(MapList->Selected())).c_str());
+			client->sendrpl(MSG_SET, ECArgs("+m", TypToStr(MapList->Selected())));
 			listmapclick.reset();
 			MapList->SetEnabled(false);
 		}
@@ -1426,11 +1392,9 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 					if(pll->OwnZone(mouse, button))
 					{
 						if(pll->Player()->IsOp())
-							client->sendrpl(client->rpl(EC_Client::SET),
-										("-o " + pll->Player()->Nick()).c_str());
+							client->sendrpl(MSG_SET, ECArgs("-o", pll->Player()->Nick()));
 						else
-							client->sendrpl(client->rpl(EC_Client::SET),
-										("+o " + pll->Player()->Nick()).c_str());
+							client->sendrpl(MSG_SET, ECArgs("+o", pll->Player()->Nick()));
 					}
 					else if(pll->Nick->Test(mouse, button))
 					{
@@ -1441,8 +1405,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 						if(mb.Show() == BT_OK)
 						{
 							name = mb.EditText();
-							client->sendrpl(client->rpl(EC_Client::KICK), pll->Nick->Caption().c_str(),
-							                                              FormatStr(name).c_str());
+							client->sendrpl(MSG_KICK, ECArgs(pll->Nick->Caption(), name));
 						}
 					}
 				}
@@ -1451,15 +1414,11 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	bool tmp = MyNation->Opened();
 	if(MyPosition && MyPosition->Clic(mouse, button))
-		client->sendrpl(client->rpl(EC_Client::SET),
-		                ("+p " + TypToStr(MyPosition->Value())).c_str());
+		client->sendrpl(MSG_SET, ECArgs("+p", TypToStr(MyPosition->Value())));
 	else if(MyColor && MyColor->Clic(mouse, button))
-			client->sendrpl(client->rpl(EC_Client::SET),
-				("+c " + TypToStr(MyColor->Value())).c_str());
-	else if(MyNation && MyNation->Clic(mouse, button) &&
-	        tmp && !MyNation->Opened() && MyNation->Selected() != -1)
-		client->sendrpl(client->rpl(EC_Client::SET),
-		                ("+n " + TypToStr(GameInfosForm->MyNation->Selected())).c_str());
+		client->sendrpl(MSG_SET, ECArgs("+c", TypToStr(MyColor->Value())));
+	else if(MyNation && MyNation->Clic(mouse, button) && tmp && !MyNation->Opened() && MyNation->Selected() != -1)
+		client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(GameInfosForm->MyNation->Selected())));
 	else if(RetourButton->Test(mouse, button))
 	{
 		if(TMessageBox("Êtes vous sûr de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
@@ -1503,16 +1462,14 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 			}
 		}
 		if(ok)
-			client->sendrpl(client->rpl(EC_Client::SET), "+!");
+			client->sendrpl(MSG_SET, "+!");
 	}
 	else if(SpeedGame->Test(mouse, button))
-		client->sendrpl(client->rpl(EC_Client::SET), SpeedGame->Checked() ? "+r" : "-r");
+		client->sendrpl(MSG_SET, SpeedGame->Checked() ? "+r" : "-r");
 	else if(BeginMoney->Test(mouse, button))
-		client->sendrpl(client->rpl(EC_Client::SET),
-		                ("+b " + TypToStr(BeginMoney->Value())).c_str());
+		client->sendrpl(MSG_SET, ECArgs("+b", TypToStr(BeginMoney->Value())));
 	else if(TurnTime->Test(mouse, button))
-		client->sendrpl(client->rpl(EC_Client::SET),
-		                ("+t " + TypToStr(TurnTime->Value())).c_str());
+		client->sendrpl(MSG_SET, ECArgs("+t", TypToStr(TurnTime->Value())));
 	else if(CreateIAButton->Test(mouse, button))
 	{
 		TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
@@ -1522,7 +1479,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 		if(mb.Show() == BT_OK)
 			name = mb.EditText();
 		if(!name.empty())
-			client->sendrpl(client->rpl(EC_Client::JIA), FormatStr(name).c_str());
+			client->sendrpl(MSG_IA_JOIN, name);
 	}
 	client->UnlockScreen();
 }

@@ -156,23 +156,23 @@ int ECServer::main(int argc, char **argv)
 
 		/* Déclarations des commandes */
 		/*                                 NOM		flag		args */
-		Commands.push_back(new IAMCommand("IAM",	0,		0)); /* Args vérifié dans IAMCommand::Exec */
-		Commands.push_back(new PIGCommand("PIG",	0,		0));
-		Commands.push_back(new POGCommand("POG",	0,		0));
-		Commands.push_back(new ARMCommand("ARM",	ECD_AUTH,	2));
-		Commands.push_back(new SETCommand("SET",	ECD_AUTH,	1));
-		Commands.push_back(new MSGCommand("MSG",	ECD_AUTH,	1));
-		Commands.push_back(new AMSGCommand("AMSG",	ECD_AUTH,	1));
-		Commands.push_back(new BPCommand("BP",		ECD_AUTH,	1));
-		Commands.push_back(new JOICommand("JOI",	ECD_AUTH,	1));
-		Commands.push_back(new JIACommand("JIA",	ECD_AUTH,	1));
-		Commands.push_back(new LEACommand("LEA",	ECD_AUTH,	0));
-		Commands.push_back(new KICKCommand("KICK",	ECD_AUTH,	1));
-		Commands.push_back(new LSPCommand("LSP",	ECD_AUTH,	0));
-		Commands.push_back(new ERRCommand("ERR",	0,		1));
-		Commands.push_back(new STATCommand("STAT",	ECD_AUTH,	0));
-		Commands.push_back(new ADMINCommand("ADMIN",	ECD_AUTH,	1));
-		Commands.push_back(new SAVECommand("SAVE",	ECD_AUTH,	1));
+		Commands.push_back(new IAMCommand(MSG_IAM,	0,		0)); /* Args vérifié dans IAMCommand::Exec */
+		Commands.push_back(new PIGCommand(MSG_PING,	0,		0));
+		Commands.push_back(new POGCommand(MSG_PONG,	0,		0));
+		Commands.push_back(new ARMCommand(MSG_ARM,	ECD_AUTH,	2));
+		Commands.push_back(new SETCommand(MSG_SET,	ECD_AUTH,	1));
+		Commands.push_back(new MSGCommand(MSG_MSG,	ECD_AUTH,	1));
+		Commands.push_back(new AMSGCommand(MSG_AMSG,	ECD_AUTH,	1));
+		Commands.push_back(new BPCommand(MSG_BREAKPOINT,ECD_AUTH,	1));
+		Commands.push_back(new JOICommand(MSG_JOIN,	ECD_AUTH,	1));
+		Commands.push_back(new JIACommand(MSG_IA_JOIN,	ECD_AUTH,	1));
+		Commands.push_back(new LEACommand(MSG_LEAVE,	ECD_AUTH,	0));
+		Commands.push_back(new KICKCommand(MSG_KICK,	ECD_AUTH,	1));
+		Commands.push_back(new LSPCommand(MSG_GLIST,	ECD_AUTH,	0));
+		Commands.push_back(new ERRCommand(MSG_ERROR,	0,		1));
+		Commands.push_back(new STATCommand(MSG_STAT,	ECD_AUTH,	0));
+		Commands.push_back(new ADMINCommand(MSG_ADMIN,	ECD_AUTH,	1));
+		Commands.push_back(new SAVECommand(MSG_SAVE,	ECD_AUTH,	1));
 
 		signal(SIGPIPE, SIG_IGN);
 		signal(SIGHUP,  &sig_reload);

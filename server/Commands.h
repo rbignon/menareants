@@ -25,69 +25,73 @@
 #include <vector>
 
 #include "Server.h"
+#include "lib/Messages.h"
 
 class EC_ACommand
 {
-friend int TClient::parsemsg(std::string);
 public:
-	EC_ACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)
-		: CmdName(_CmdName), flags(_flags), args(_args)
+	EC_ACommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)
+		: cmd(_CmdName), flags(_flags), args(_args)
 	{}
 
 	virtual ~EC_ACommand() {}
 
 	virtual int Exec(TClient *cl, std::vector<std::string> string_list) = 0;
 
+	const ECMessage& CmdName() const { return cmd; }
+	const unsigned int& Flags() const { return flags; }
+	const unsigned int& Args() const { return args; }
+
 private:
-	std::string CmdName;
-	unsigned short flags;
-	unsigned short args;
+	ECMessage cmd;
+	unsigned int flags;
+	unsigned int args;
 };
 
 #define DECLARE_CMD(commName) \
 class commName##Command : public EC_ACommand \
 { \
 public: \
-	commName##Command(const std::string _CmdName, unsigned short _flags, unsigned short _args) \
+	commName##Command(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args) \
 		: EC_ACommand(_CmdName, _flags, _args) \
 	{} \
 	virtual ~commName##Command() {} \
 	virtual int Exec(TClient *cl, std::vector<std::string> string_list); \
 }
 
-class ERRCommand : public EC_ACommand { public: ERRCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ERRCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class ERRCommand : public EC_ACommand { public: ERRCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ERRCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class IAMCommand : public EC_ACommand { public: IAMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~IAMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class IAMCommand : public EC_ACommand { public: IAMCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~IAMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class STATCommand : public EC_ACommand { public: STATCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class STATCommand : public EC_ACommand { public: STATCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~STATCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class PIGCommand : public EC_ACommand { public: PIGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class PIGCommand : public EC_ACommand { public: PIGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~PIGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class POGCommand : public EC_ACommand { public: POGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~POGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class POGCommand : public EC_ACommand { public: POGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~POGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class JOICommand : public EC_ACommand { public: JOICommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class JOICommand : public EC_ACommand { public: JOICommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JOICommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class JIACommand : public EC_ACommand { public: JIACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JIACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class JIACommand : public EC_ACommand { public: JIACommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~JIACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class LEACommand : public EC_ACommand { public: LEACommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class LEACommand : public EC_ACommand { public: LEACommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LEACommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class KICKCommand : public EC_ACommand { public: KICKCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~KICKCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class KICKCommand : public EC_ACommand { public: KICKCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~KICKCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class LSPCommand : public EC_ACommand { public: LSPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class LSPCommand : public EC_ACommand { public: LSPCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~LSPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class MSGCommand : public EC_ACommand { public: MSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class MSGCommand : public EC_ACommand { public: MSGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class AMSGCommand : public EC_ACommand { public: AMSGCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~AMSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class AMSGCommand : public EC_ACommand { public: AMSGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~AMSGCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class SETCommand : public EC_ACommand { public: SETCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class SETCommand : public EC_ACommand { public: SETCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class ARMCommand : public EC_ACommand { public: ARMCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class ARMCommand : public EC_ACommand { public: ARMCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ARMCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class ADMINCommand : public EC_ACommand { public: ADMINCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ADMINCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class ADMINCommand : public EC_ACommand { public: ADMINCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~ADMINCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class BPCommand : public EC_ACommand { public: BPCommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class BPCommand : public EC_ACommand { public: BPCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~BPCommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
-class SAVECommand : public EC_ACommand { public: SAVECommand(const std::string _CmdName, unsigned short _flags, unsigned short _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SAVECommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
+class SAVECommand : public EC_ACommand { public: SAVECommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SAVECommand() {} virtual int Exec(TClient *cl, std::vector<std::string> string_list); };
 
 /*
 DECLARE_CMD ( ERR );

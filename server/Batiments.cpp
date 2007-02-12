@@ -82,7 +82,10 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			if(Owner())
+				Channel()->send_info(Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
+			if((*it)->Owner())
+				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
 			Shoot(*it, killed);
 		}
 
@@ -146,7 +149,10 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			}
 			if(!killed) continue;
 
-			Channel()->send_info(0, EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+			if(Owner())
+				Channel()->send_info(Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
+			if((*it)->Owner())
+				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
 			Shoot(*it, killed);
 		}
 

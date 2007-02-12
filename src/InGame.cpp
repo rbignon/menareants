@@ -768,7 +768,7 @@ void TInGameForm::AfterDraw()
 			BarreLat->ProgressBar->SetValue((long)elapsed_time.time_elapsed(true));
 			if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
 			{
-				client->sendrpl(client->rpl(EC_Client::SET), "+!");
+				client->sendrpl(MSG_SET, "+!");
 				elapsed_time.reset();
 			}
 			break;
@@ -877,7 +877,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 			break;
 		case SDLK_BACKSPACE:
 			if(BarreAct->Entity() && !SendMessage->Focused())
-				client->sendrpl(client->rpl(EC_Client::ARM), (std::string(BarreAct->Entity()->ID()) + " C").c_str());
+				client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "C"));
 			break;
 		case SDLK_RETURN:
 			if(SendMessage->Focused())
@@ -886,14 +886,12 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 				{
 					if(IsPressed(SDLK_LCTRL))
 					{
-						client->sendrpl(client->rpl(EC_Client::AMSG),
-									FormatStr(SendMessage->GetString()).c_str());
+						client->sendrpl(MSG_AMSG, SendMessage->GetString());
 						AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " + SendMessage->GetString(), client->Player());
 					}
 					else
 					{
-						client->sendrpl(client->rpl(EC_Client::MSG),
-						                FormatStr(InGameForm->SendMessage->GetString()).c_str());
+						client->sendrpl(MSG_MSG, SendMessage->GetString());
 						AddInfo(I_CHAT, "<" + client->GetNick() + "> " + SendMessage->GetString(), client->Player());
 					}
 				}
@@ -930,7 +928,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		 * ainsi de suite, ce qui conduirait à un +! automatique en début de prochaine partie.
 		 */
 		BarreLat->PretButton->SetEnabled(false);
-		client->sendrpl(client->rpl(EC_Client::SET), "+!");
+		client->sendrpl(MSG_SET, "+!");
 	}
 	if(BarreLat->SchemaButton->Test(mouse, button))
 		Map->ToggleSchema();
@@ -969,11 +967,10 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		else if(!BarreLat->Test(mouse, button) && !BarreAct->Test(mouse, button) &&
 		        (acase = Map->TestCase(mouse)) && entity->CanBeCreated(acase))
 		{
-			std::string s = "-";
-			s += " %" + TypToStr(entity->Type());
-			s += " =" + TypToStr(acase->X()) + "," + TypToStr(acase->Y());
-			s += " +";
-			client->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
+			client->sendrpl(MSG_ARM, ECArgs("-",
+			                                "%" + TypToStr(entity->Type()),
+			                                "=" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()),
+			                                "+"));
 			entity->SetOwner(0);
 			Map->SetCreateEntity(0);
 		}
@@ -998,28 +995,24 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 				if(!chan->GetPlayer(mb.EditText().c_str()))
 					TMessageBox("Le joueur est introuvable", BT_OK, this, false).Show();
 				else
-					client->sendrpl(client->rpl(EC_Client::SET),
-					                ("+e " + mb.EditText() + ":" + BarreAct->Entity()->Case()->Country()->ID()).c_str());
+					client->sendrpl(MSG_SET, ECArgs("+e", mb.EditText() + ":" + BarreAct->Entity()->Case()->Country()->ID()));
 			}
 			Map->SetMustRedraw();
 			return;
 		}
 		if(IsPressed(SDLK_PLUS) || BarreAct->UpButton->Test(mouse, button))
 		{
-			client->sendrpl(client->rpl(EC_Client::ARM),
-					std::string(std::string(BarreAct->Entity()->ID()) + " +").c_str());
+			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "+"));
 			return;
 		}
 		if(BarreAct->DeployButton->Test(mouse, button))
 		{
-			client->sendrpl(client->rpl(EC_Client::ARM),
-			                std::string(std::string(BarreAct->Entity()->ID()) + " #").c_str());
+			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "#"));
 			return;
 		}
 		if(BarreAct->UpgradeButton->Test(mouse, button))
 		{
-			client->sendrpl(client->rpl(EC_Client::ARM),
-					std::string(std::string(BarreAct->Entity()->ID()) + " °").c_str());
+			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "°"));
 			return;
 		}
 	}
@@ -1057,8 +1050,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 						'+', acase->X(), acase->Y(), msg.c_str());
 			}
 		#else
-			client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
-					'+', acase->X(), acase->Y(), "");
+			client->sendrpl(MSG_BREAKPOINT, "+" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()));
 		#endif
 			want = TInGameForm::W_NONE;
 			WantBalise = false;
@@ -1066,7 +1058,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		if(mywant == TInGameForm::W_REMBP)
 		{
-			client->sendrpl(client->rpl(EC_Client::BREAKPOINT), '-', acase->X(), acase->Y(), "");
+			client->sendrpl(MSG_BREAKPOINT, "-" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()));
 			want = TInGameForm::W_NONE;
 			WantBalise = false;
 		}
@@ -1091,7 +1083,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 				std::stack<ECBMove::E_Move> moves;
 				if(selected_entity->FindFastPath(acase, moves, init_case))
 				{
-					std::string move;
+					ECArgs args(selected_entity->ID());
 					while(moves.empty() == false)
 					{
 						ECBMove::E_Move m = moves.top();
@@ -1099,26 +1091,24 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 						if(contener && moves.empty()) break;
 						switch(m)
 						{
-							case ECBMove::Up: move += " ^"; break;
-							case ECBMove::Down: move += " v"; break;
-							case ECBMove::Left: move += " <"; break;
-							case ECBMove::Right: move += " >"; break;
+							case ECBMove::Up: args += "^"; break;
+							case ECBMove::Down: args += "v"; break;
+							case ECBMove::Left: args += "<"; break;
+							case ECBMove::Right: args += ">"; break;
 						}
 					}
-					if(!move.empty())
+					if(args.Size() > 1)
 					{
 						if(selected_entity->MyStep() == 0)
 							AddInfo(I_SHIT, "Cette unité ne peut avancer.");
 						else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
 							AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une journée !");
 						else
-							client->sendrpl(client->rpl(EC_Client::ARM),
-							                std::string(std::string(selected_entity->ID()) + move).c_str());
+							client->sendrpl(MSG_ARM, args);
 					}
 					if(contener)
 					{
-						client->sendrpl(client->rpl(EC_Client::ARM), (std::string(selected_entity->ID()) +
-						                " )" + std::string(contener->ID())).c_str());
+						client->sendrpl(MSG_ARM, ECArgs(selected_entity->ID(), std::string(")") + contener->ID()));
 						SetCursor();
 						return;
 					}
@@ -1126,19 +1116,15 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 			}
 			else if(mywant == TInGameForm::W_ATTAQ || mywant == TInGameForm::W_MATTAQ)
 			{
-				client->sendrpl(client->rpl(EC_Client::ARM),
-								std::string(std::string(selected_entity->ID())
-							+ " *" + TypToStr(acase->X()) + "," +
-							TypToStr(acase->Y()) +
-							(mywant == TInGameForm::W_MATTAQ ? " !" : "")).c_str());
+				client->sendrpl(MSG_ARM, ECArgs(selected_entity->ID(),
+				                                "*" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()),
+				                                (mywant == TInGameForm::W_MATTAQ ? "!" : "")));
 				want = TInGameForm::W_NONE;
 			}
 			else if(mywant == TInGameForm::W_EXTRACT)
 			{
-				client->sendrpl(client->rpl(EC_Client::ARM),
-								std::string(std::string(selected_entity->ID())
-							+ " (" + TypToStr(acase->X()) + "," +
-							TypToStr(acase->Y())).c_str());
+				client->sendrpl(MSG_ARM, ECArgs(selected_entity->ID(),
+				                                "(" + TypToStr(acase->X()) + "," + TypToStr(acase->Y())));
 				want = TInGameForm::W_NONE;
 			}
 		}
@@ -1480,11 +1466,11 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	}
 	int x = thiss->entity ? thiss->entity->Case()->X() : 0;
 	int y = thiss->entity ? thiss->entity->Case()->Y() : 0;
-	std::string s = "-";
-	s += " %" + TypToStr(entity->Type());
-	s += " =" + TypToStr(x) + "," + TypToStr(y);
-	s += " +";
-	EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ARM), s.c_str());
+	ECArgs args("-");
+	args += "%" + TypToStr(entity->Type());
+	args += "=" + TypToStr(x) + "," + TypToStr(y);
+	args += "+";
+	EC_Client::GetInstance()->sendrpl(MSG_ARM, args);
 }
 
 void TBarreAct::UnSelect()
@@ -1982,7 +1968,7 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 				TMessageBox("Une sauvegarde contient le même nom. Voulez vous la remplacer ?", BT_YES|BT_NO, this).Show() == BT_NO)
 				return;
 
-			client->sendrpl(client->rpl(EC_Client::SAVE), m.EditText().c_str());
+			client->sendrpl(MSG_SAVE, m.EditText());
 			//chan->Map()->Save(filename);
 			TMessageBox("Sauvegarde effectuée.\nVous pourrez la recharger en créant une partie et en utilisant la map de ce nom.",
 					BT_OK, this).Show();
@@ -2000,11 +1986,9 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 			if(pll->AllieZone(mouse, button) && !pll->Player()->IsMe())
 			{
 				if(client->Player()->IsAllie(pll->Player()))
-					client->sendrpl(client->rpl(EC_Client::SET),
-								("-a " + std::string(pll->Player()->GetNick())).c_str());
+					client->sendrpl(MSG_SET, ECArgs("-a", pll->Player()->GetNick()));
 				else
-					client->sendrpl(client->rpl(EC_Client::SET),
-								("+a " + std::string(pll->Player()->GetNick())).c_str());
+					client->sendrpl(MSG_SET, ECArgs("+a", pll->Player()->GetNick()));
 			}
 			else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(mouse, button))
 			{
@@ -2019,8 +2003,7 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 						TMessageBox("Vous ne possédez pas autant d'argent !", BT_OK, this).Show();
 					else
 					{
-						client->sendrpl(client->rpl(EC_Client::SET),
-									("+d " + std::string(pll->Player()->Nick() + ":" + m.EditText())).c_str());
+						client->sendrpl(MSG_SET, ECArgs("+d", pll->Player()->Nick() + ":" + m.EditText()));
 						TMessageBox("Vous avez bien donné " + m.EditText() + " $ à " + pll->Player()->Nick(),
 								BT_OK, this).Show();
 					}
@@ -2288,7 +2271,7 @@ void TPingingForm::BeforeDraw()
 		pll->Progress->SetValue((long)pll->timer.time_elapsed(true));
 		if(pll->Progress->Value() >= pll->Progress->Max())
 		{
-			client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
+			client->sendrpl(MSG_SET, ECArgs("+v", pll->Player()->Nick()));
 			pll->timer.reset();
 		}
 	}
@@ -2303,7 +2286,7 @@ void TPingingForm::AfterDraw()
 void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 {
 	if(LeaveButton->Test(mouse, button) && TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
-		client->sendrpl(client->rpl(EC_Client::LEAVE));
+		client->sendrpl(MSG_LEAVE);
 
 	std::vector<TComponent*> list = Players->GetList();
 	for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
@@ -2311,7 +2294,7 @@ void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 		TPingingPlayerLine* pll = dynamic_cast<TPingingPlayerLine*>(*it);
 		if(pll && pll->Voter->Test(mouse, button))
 		{
-			client->sendrpl(client->rpl(EC_Client::SET), ("+v " + pll->Player()->Nick()).c_str());
+			client->sendrpl(MSG_SET, ECArgs("+v", pll->Player()->Nick()));
 			pll->Voter->SetEnabled(false);
 		}
 	}
@@ -2397,7 +2380,7 @@ void TScoresForm::WantLeave(TObject* o, void* cl)
 	EC_Client* client = static_cast<EC_Client*>(cl);
 	if(!client) return;
 
-	client->sendrpl(client->rpl(EC_Client::LEAVE));
+	client->sendrpl(MSG_LEAVE);
 }
 
 void MenAreAntsApp::Scores(EChannel* chan)

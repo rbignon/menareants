@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include "lib/Messages.h"
 
 #define DEFPORT 5460
 #define DEFPINGFREQ 360
@@ -57,7 +58,9 @@ struct Client
 
 struct Client *addclient(int fd, const char *ip);
 int delclient(struct Client *del);
-int sendrpl(struct Client* cl, const char *pattern, ...);
+int senderr(struct Client* cl, enum ECError err);
+int sendcmd(struct Client* cl, enum ECMessage cmd);
+int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...);
 int run_server(void);
 int init_socket(void);
 

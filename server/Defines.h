@@ -54,11 +54,6 @@ const int COMLEN=10;
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/
-#ifdef APP_VERSION_PATCH
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
-#else
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
-#endif
 
 /* Macro */
 #define ASIZE(x) 				(sizeof (x) / sizeof *(x))

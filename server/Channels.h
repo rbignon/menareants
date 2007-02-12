@@ -22,7 +22,8 @@
 #ifndef ECD_CHANNELS_H
 #define ECD_CHANNELS_H
 
-#include "../lib/Channels.h"
+#include "lib/Channels.h"
+#include "lib/Messages.h"
 #include "Map.h"
 
 class TClient;
@@ -155,21 +156,27 @@ public:
 	/** Send a message to all players.
 	 *
 	 * @param one if not null, we will not send message to \b this player.
+	 * @param from this is the sender of this message (it can be null).
+	 * @param command command
+	 * @param args arguments
 	 * @return always 0.
 	 */
-	int sendto_players(ECPlayer* one, const char*, ...);
+	int sendto_players(ECPlayer* one, ECBPlayer* from, ECMessage command, ECArgs args = ECArgs());
+	int sendto_players(ECPlayer* one, PlayerVector from, ECMessage, ECArgs = ECArgs());
+	int sendto_players(ECPlayer* one, std::vector<ECEntity*> from, ECMessage, ECArgs = ECArgs());
+	int sendto_players(ECPlayer* one, std::string from, ECMessage, ECArgs = ECArgs());
 
 	/** Send an INFO message to someone
 	 * @param pl player will receive message. if null, all players will receive message.
 	 * @param id \b info_messages enumerator to identificate message
 	 * @param args arguments used to format message
 	 */
-	void send_info(ECPlayer* pl, info_messages id, std::string args);
+	void send_info(ECPlayer* pl, info_messages id, ECArgs args);
 
 	/** Send modes to all players from \a sender
 	 * \warning this will only send modes, no set them in channel or on player.
 	 */
-	void send_modes(ECPlayer *sender, const char* msg);
+	void send_modes(ECPlayer *sender, std::string modes, ECArgs = ECArgs());
 
 	/** Send modes to all players from \a senders
 	 * @param senders this will a player vector of senders.
@@ -177,7 +184,7 @@ public:
 	 *
 	 * \warning this will only send modes, no set them in channel or on players.
 	 */
-	void send_modes(PlayerVector senders, const char* msg);
+	void send_modes(PlayerVector senders, std::string modes, ECArgs = ECArgs());
 
 	/** This function will return a name doesn't used before */
 	const char* FindEntityName(ECPlayer*);

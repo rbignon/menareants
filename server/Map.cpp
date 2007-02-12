@@ -213,14 +213,12 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 		if(owner && owner->Player())
 		{
 			EChannel* chan = dynamic_cast<EChannel*>(owner->Player()->Channel());
-			chan->sendto_players(0, app.rpl(ECServer::SET), owner->Player()->GetNick(),
-									std::string(std::string("+@ ") + ident).c_str());
+			chan->sendto_players(0, owner->Player(), MSG_SET, ECArgs("+@", ident));
 		}
 		else if(last_owner && last_owner->Player())
 		{
 			EChannel* chan = dynamic_cast<EChannel*>(last_owner->Player()->Channel());
-			chan->sendto_players(0, app.rpl(ECServer::SET), last_owner->Player()->GetNick(),
-									std::string(std::string("-@ ") + ident).c_str());
+			chan->sendto_players(0, last_owner->Player(), MSG_SET, ECArgs("-@", ident));
 		}
 		return true;
 	}

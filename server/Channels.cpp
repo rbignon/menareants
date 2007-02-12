@@ -56,9 +56,9 @@ int SAVECommand::Exec(TClient* cl, std::vector<std::string> parv)
 	cl->Player()->Channel()->Map()->Save(map_file);
 
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
-		cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+		cl->sendrpl(MSG_SENDMAP, *it);
 
-	cl->sendrpl((std::string(app.rpl(ECServer::ENDOFSMAP)) + " " + parv[1]).c_str());
+	cl->sendrpl(MSG_ENDOFSMAP, parv[1]);
 
 	return 0;
 }
@@ -88,17 +88,16 @@ int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
 
 	if(pl->Client())
 	{
-		pl->Client()->sendrpl(app.rpl(ECServer::KICK), cl->GetNick(), pl->GetNick(),
-		                                               parv.size() > 2 ? FormatStr(parv[2]).c_str() : "");
+		pl->Client()->sendrpl(cl->Player(), MSG_KICK, ECArgs(pl->Nick(), parv.size() > 2 ? parv[2] : ""));
 
 		pl->Client()->ClrPlayer();
 	}
 
-	pl->Channel()->RemovePlayer(pl, USE_DELETE);
 	TClient* victim = pl->Client();
+	pl->Channel()->RemovePlayer(pl, USE_DELETE);
 
 	if(victim)
-		victim->sendrpl(app.rpl(ECServer::LEAVE), victim->GetNick());
+		victim->sendrpl(MSG_LEAVE, victim->Nick());
 
 	return 0;
 }
@@ -112,21 +111,14 @@ int AMSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(!cl->Player())
 		return vDebug(W_DESYNCH, "AMSG en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
-	static char buf[MAXBUFFER + 1];
-	int len;
-
-	len = snprintf(buf, sizeof buf - 2, app.rpl(ECServer::MSG), cl->GetNick(), FormatStr("[private] " + parv[1]).c_str());
-
-	if(len < 0) len = sizeof buf -2;
-
-	buf[len] = 0;
+	ECArgs args(parv[1]);
 
 	BPlayerVector pls = cl->Player()->Allies();
 	for(BPlayerVector::const_iterator it=pls.begin(); it != pls.end(); ++it)
 	{
 		if(!(dynamic_cast<ECPlayer*> (*it))->Client()) continue;
 
-		(dynamic_cast<ECPlayer*> (*it))->Client()->sendbuf(buf, len);
+		(dynamic_cast<ECPlayer*> (*it))->Client()->sendrpl(cl->Nick(), MSG_AMSG, args);
 	}
 	return 0;
 }
@@ -140,8 +132,7 @@ int MSGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(!cl->Player())
 		return vDebug(W_DESYNCH, "MSG en dehors d'un salon", VSName(cl->GetNick()) VPName(cl->Player()));
 
-	cl->Player()->Channel()->sendto_players(cl->Player(),
-			app.rpl(ECServer::MSG), cl->GetNick(), FormatStr(parv[1]).c_str());
+	cl->Player()->Channel()->sendto_players(cl->Player(), ToVec(cl->Player()), MSG_MSG, parv[1]);
 	return 0;
 }
 
@@ -165,7 +156,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	ECMap* map = 0;
 	uint mapi = 0;
 
-	std::string modes, params;
+	std::string modes;
+	ECArgs params;
 	bool last_add = true;
 
 	{
@@ -285,7 +277,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				/* Comme on a pas reçu un nombre en argument, on ne le fait pas envoyer plus bas mais tout de suite.
 				 * Comme ça ça apparait avant l'expulsion éventuelle */
-				sender->Channel()->send_modes(pl, ("+v " + TypToStr(pl->Votes())).c_str());
+				sender->Channel()->send_modes(pl, "+v", TypToStr(pl->Votes()));
 				uint h = sender->Channel()->NbHumains();
 				uint r =   (h == 1) ? 1                // Il n'y a qu'un humain donc son seul vote compte
 				                    : !(h%2) ? h/2     // Nombre pair d'humains donc la moitier doit voter pour
@@ -597,7 +589,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			last_add = add;
 			modes += parv[1][i];
 			if(changed == YES_WITHPARAM)
-				params += " " + parv[(j-1)];
+				params += parv[(j-1)];
 		}
 	}
 
@@ -611,19 +603,22 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			last_add = true;
 		}
 		modes += 'm';
-		params += " " + TypToStr(mapi);
+		params += TypToStr(mapi);
 		if(map->MaxPlayers() > app.GetConf()->DefLimite())
 			map->MaxPlayers() = app.GetConf()->DefLimite();
 		if(sender->Channel()->Limite() != map->MaxPlayers())
 		{
 			modes += 'l';
-			params += " " + TypToStr(map->MaxPlayers());
+			params += TypToStr(map->MaxPlayers());
 		}
 	}
 
 	if(!modes.empty())
-		sender->Channel()->sendto_players(0, app.rpl(ECServer::SET), cl->GetNick(),
-		                                 (modes + params).c_str());
+	{
+		ECArgs args(modes);
+		args += params;
+		sender->Channel()->sendto_players(0, ToVec(cl->Player()), MSG_SET, args);
+	}
 
 	if(map && sender->Channel()->Limite() != map->MaxPlayers())
 		sender->Channel()->SetLimite(map->MaxPlayers());
@@ -687,14 +682,14 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 		/* Il y a trop de parties */
 		if(ChanList.size() >= app.GetConf()->MaxGames())
-			return cl->sendrpl(app.rpl(ECServer::CANTCREATE));
+			return cl->sendrpl(ERR_CANT_CREATE);
 
 		if(!mission)
 			for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 				if(!strchr(CHAN_CHARS, *c))
 				{
 					vDebug(W_WARNING, "JOI: Le nom donné est incorrect", parv[1]);
-					return cl->sendrpl(app.rpl(ECServer::ERR));
+					return cl->sendrpl(ERR_CANT_CREATE);
 				}
 
 		chan = new EChannel(parv[1], mission);
@@ -705,7 +700,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	else
 	{ /* Rejoins un salon existant */
 		if(mission || create || !chan)
-			return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
+			return cl->sendrpl(ERR_CANT_JOIN);
 
 		if(chan->State() == EChannel::PINGING)
 		{
@@ -715,7 +710,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 			/* Il n'est pas parmis ceux qu'on attend */
 			if(ppl == pls.end())
-				return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
+				return cl->sendrpl(ERR_CANT_JOIN);
 
 			pl = dynamic_cast<ECPlayer*>(*ppl);
 			pl->SetDisconnected(false);
@@ -727,10 +722,10 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			{
 				vDebug(W_WARNING, "JOI: Le client essaye de joindre un salon en jeu ou une mission", VSName(chan->GetName())
 								VSName(cl->GetNick()) VIName(chan->State()) VName(chan->Name()));
-				return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
+				return cl->sendrpl(ERR_CANT_JOIN);
 			}
 			if(chan->Limite() && chan->NbPlayers() >= chan->Limite())
-				return cl->sendrpl(app.rpl(ECServer::CANTJOIN));
+				return cl->sendrpl(ERR_CANT_JOIN);
 			pl = new ECPlayer(cl, chan, false, false);
 		}
 	}
@@ -755,21 +750,21 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(chan->State() == EChannel::PINGING)
 	{
-		chan->sendto_players(pl, app.rpl(ECServer::SET), cl->GetNick(), "-w");
-		cl->sendrpl(app.rpl(ECServer::JOIN), cl->GetNick(), FormatStr(chan->GetName()).c_str(), "");
+		chan->sendto_players(pl, ToVec(pl), MSG_SET, "-w");
+		cl->sendrpl(cl->Player(), MSG_JOIN, chan->GetName());
 	}
 	else
-		chan->sendto_players(0, app.rpl(ECServer::JOIN), cl->GetNick(), FormatStr(chan->GetName()).c_str(), "");
+		chan->sendto_players(0, ToVec(cl->Player()), MSG_JOIN, chan->GetName());
 
 	for(MapVector::iterator it = (mission?MissionList:MapList).begin(); it != (mission?MissionList:MapList).end(); ++it)
-		cl->sendrpl(app.rpl(ECServer::LISTMAP), FormatStr((*it)->Name()).c_str(),
-		                                        (*it)->MinPlayers(), (*it)->MaxPlayers(),
-		                                        ((*it)->MapInfos().empty() ? "" :
-		                                         FormatStr((*it)->MapInfos().front()).c_str()));
+		cl->sendrpl(MSG_LISTMAPS, ECArgs((*it)->Name(),
+		                                 TypToStr((*it)->MinPlayers()),
+		                                 TypToStr((*it)->MaxPlayers()),
+		                                 (*it)->MapInfos().empty() ? "" : (*it)->MapInfos().front()));
 
-	cl->sendrpl(app.rpl(ECServer::ENDOFMAP));
+	cl->sendrpl(MSG_ENDOFMAPS);
 
-	cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
+	cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, ECArgs(chan->ModesStr()).DontSplit());
 
 	if(chan->Map())
 	{ /* Si la map existe on l'envoie */
@@ -779,18 +774,18 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			const char* c = (*it).c_str();
 			// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
 			if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
-			cl->sendrpl(app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+			cl->sendrpl(MSG_SENDMAP, *it);
 		}
 
-		cl->sendrpl(app.rpl(ECServer::ENDOFSMAP));
+		cl->sendrpl(MSG_ENDOFSMAP);
 	}
 
-	cl->sendrpl(app.rpl(ECServer::PLIST), chan->PlayerList().c_str());
+	cl->sendrpl(MSG_PLIST, ECArgs(chan->PlayerList()).DontSplit());
 
 	if(chan->IsMission())
 	{
 		pl->SetPosition(1);
-		chan->send_modes(ToVec(pl), "+p 1");
+		chan->send_modes(ToVec(pl), "+p", "1");
 	}
 
 	if(chan->IsPinging())
@@ -801,17 +796,17 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 		{
 			if((*it)->CanRejoin())
-				cl->sendrpl(app.rpl(ECServer::SET), (*it)->GetNick(), "+w");
+				cl->sendrpl(*it, MSG_SET, "+w");
 			if((*it)->IsAllie(pl))
-				cl->sendrpl(app.rpl(ECServer::SET), (*it)->GetNick(), ("+a " + pl->Nick()).c_str());
+				cl->sendrpl(*it, MSG_SET, ECArgs("+a", pl->Nick()));
 		}
 		/* Et ceux avec qui vous etes alliés */
 		players = pl->Allies();
 		for(BPlayerVector::const_iterator it = players.begin(); it != players.end(); ++it)
-			cl->sendrpl(app.rpl(ECServer::SET), pl->GetNick(), ("+a " + (*it)->Nick()).c_str());
+			cl->sendrpl(pl, MSG_SET, ECArgs("+a", (*it)->Nick()));
 
 		/* On se met en mode +S pour que le joueur se synch */
-		cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), "-Q+S");
+		cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, "-Q+S");
 
 		/* On envoie les entitées */
 		chan->SendEntities(pl);
@@ -820,10 +815,10 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		std::vector<ECBCountry*> cntys = chan->Map()->Countries();
 		FORit(ECBCountry*, cntys, cnty)
 			if((*cnty)->Owner() && (*cnty)->Owner()->Player())
-				cl->sendrpl(app.rpl(ECServer::SET), (*cnty)->Owner()->Player()->GetNick(), (std::string("+@ ") + (*cnty)->ID()).c_str());
+				cl->sendrpl((*cnty)->Owner()->Player(), MSG_SET, ECArgs("+@", (*cnty)->ID()));
 
 		/* Et l'argent */
-		cl->sendrpl(app.rpl(ECServer::SET), cl->GetNick(), std::string("+$ " + TypToStr(pl->Money())).c_str());
+		cl->sendrpl(cl->Player(), MSG_SET, ECArgs("+$", TypToStr(pl->Money())));
 
 		/* On repasse en mode +Q dans le cas où y a encore pinging.
 		 * Le problème provient si CheckPinging() retourne true. En effet, ça enverrait :
@@ -834,7 +829,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		 * que le client s'en branle. Simplement c'est par conformité au protocole et par cohérence.
 		 */
 
-		cl->sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), "-S+Q");
+		cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, "-S+Q");
 		chan->CheckPinging();
 	}
 
@@ -876,7 +871,7 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 		  */
 		chan->RemovePlayer(cl->Player(), USE_DELETE);
 		// Note: le sendto_players est dans RemovePlayer, mais on envoie quand meme le LEA à cl qui n'a rien reçu
-		cl->sendrpl(app.rpl(ECServer::LEAVE), cl->GetNick());
+		cl->sendrpl(cl->Nick(), MSG_LEAVE);
 		if(!chan->NbPlayers())
 			delete chan;
 
@@ -895,12 +890,14 @@ int LSPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
 	{
 		if((*it)->IsMission() || (*it)->State() == EChannel::SCORING) continue;
-		cl->sendrpl(app.rpl(ECServer::GLIST), FormatStr((*it)->GetName()).c_str(), (*it)->Joinable() ? '+' : '-',
-		                                      (*it)->NbPlayers(), (*it)->Limite(),
-		                                      (*it)->Map() ? FormatStr((*it)->Map()->Name()).c_str() : "");
+		cl->sendrpl(MSG_GLIST, ECArgs((*it)->Name(),
+		                              (*it)->Joinable() ? "+" : "-",
+		                              TypToStr((*it)->NbPlayers()),
+		                              TypToStr((*it)->Limite()),
+		                              (*it)->Map() ? (*it)->Map()->Name() : ""));
 	}
 
-	return cl->sendrpl(app.rpl(ECServer::EOGLIST));
+	return cl->sendrpl(MSG_ENDOFGLIST);
 }
 
 /********************************************************************************************
@@ -927,7 +924,7 @@ void ECPlayer::SetMoney(int m)
 {
 	ECBPlayer::SetMoney(m);
 	if(Client())
-		client->sendrpl(app.rpl(ECServer::SET), GetNick(), std::string("+$ " + TypToStr(m)).c_str());
+		client->sendrpl(Nick(), MSG_SET, ECArgs("+$", TypToStr(m)));
 }
 
 bool ECPlayer::IsIA() const
@@ -984,7 +981,7 @@ EChannel::EChannel(std::string _name, bool mission)
 	app.NBchan++;
 	app.NBwchan++;
 	app.NBtotchan++;
-	app.MSet("+wg", TypToStr(app.NBwchan) + " " + TypToStr(app.NBchan));
+	app.MSet("+wg", ECArgs(TypToStr(app.NBwchan), TypToStr(app.NBchan)));
 }
 
 EChannel::~EChannel()
@@ -993,7 +990,7 @@ EChannel::~EChannel()
 	if(State() == EChannel::WAITING) app.NBwchan--;
 	else app.NBachan--;
 
-	app.MSet("+wg", TypToStr(app.NBwchan) + " " + TypToStr(app.NBchan));
+	app.MSet("+wg", ECArgs(TypToStr(app.NBwchan), TypToStr(app.NBchan)));
 
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
@@ -1061,7 +1058,7 @@ void EChannel::CheckReadys()
 					if(!(*it)->Ready())
 					{
 						TClient* cl = (dynamic_cast<ECPlayer*>(*it))->Client();
-						sendto_players(0, app.rpl(ECServer::LEAVE), (*it)->GetNick());
+						sendto_players(0, *it, MSG_LEAVE);
 
 						delete *it;
 						it = players.erase(it);
@@ -1091,9 +1088,7 @@ void EChannel::CheckReadys()
 							(*it)->SetPosition(*pos);
 						else
 							throw ECExcept(0, "Impossible d'attribuer une position aleatoirement !?");
-						sendto_players(0, app.rpl(ECServer::SET),
-												(*it)->GetNick(),
-												std::string("+p " + TypToStr(*pos)).c_str());
+						sendto_players(0, *it, MSG_SET, ECArgs("+p", TypToStr(*pos)));
 						positions.erase(pos);
 					}
 					if(!(*it)->Color())
@@ -1105,9 +1100,7 @@ void EChannel::CheckReadys()
 							(*it)->SetColor(*col);
 						else
 							throw ECExcept(0, "Impossible d'attribuer une couleur aleatoirement !?");
-						sendto_players(0, app.rpl(ECServer::SET),
-												(*it)->GetNick(),
-												std::string("+c " + TypToStr(*col)).c_str());
+						sendto_players(0, *it, MSG_SET, ECArgs("+c", TypToStr(*col)));
 						colors.erase(col);
 					}
 					if(!(*it)->Nation())
@@ -1119,9 +1112,7 @@ void EChannel::CheckReadys()
 							(*it)->SetNation(*nat);
 						else
 							throw ECExcept(0, "Impossible d'attribuer une nation aleatoirement !?");
-						sendto_players(0, app.rpl(ECServer::SET),
-												(*it)->GetNick(),
-												std::string("+n " + TypToStr(*nat)).c_str());
+						sendto_players(0, *it, MSG_SET, ECArgs("+n", TypToStr(*nat)));
 						nations.erase(nat);
 					}
 					BMapPlayersVector::iterator mpi;
@@ -1135,7 +1126,7 @@ void EChannel::CheckReadys()
 
 				Debug(W_CONNS, "-- Lancement de la partie %s sur la map %s", GetName(), Map()->Name().c_str());
 				SetState(EChannel::SENDING);
-				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-W+S");
+				sendto_players(0, app.ServerName(), MSG_SET, "-W+S");
 				app.NBwchan--;
 				app.NBachan++;
 
@@ -1188,7 +1179,7 @@ void EChannel::CheckReadys()
 					* commence en PLAYING.
 					*/
 				SetState(EChannel::PLAYING);
-				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-S+P");
+				sendto_players(0, app.ServerName(), MSG_SET, "-S+P");
 				NeedReady();
 				break;
 			}
@@ -1196,7 +1187,7 @@ void EChannel::CheckReadys()
 			{
 				/* Tous les clients ont fini de jouer. On va maintenant passer aux animations */
 				SetState(EChannel::ANIMING);
-				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-P+A");
+				sendto_players(0, app.ServerName(), MSG_SET, "-P+A");
 
 				/* Initialisation des animations */
 				InitAnims();
@@ -1255,7 +1246,7 @@ void EChannel::CheckReadys()
 						}
 						if(!nb_units)
 						{
-							sendto_players(0, app.rpl(ECServer::SET), (*it)->GetNick(), "+£");
+							sendto_players(0, *it, MSG_SET, "+£");
 							(*it)->SetLost();
 							for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 							{
@@ -1276,7 +1267,7 @@ void EChannel::CheckReadys()
 						if(!CheckPinging())
 						{
 							SetState(EChannel::PLAYING);
-							sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+P");
+							sendto_players(0, app.ServerName(), MSG_SET, "-A+P");
 						}
 						Map()->NextDay();
 					}
@@ -1317,13 +1308,14 @@ bool EChannel::CheckEndOfGame()
 
 	SetState(EChannel::SCORING);
 	SetName(".");
-	sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-A+E");
+	sendto_players(0, app.ServerName(), MSG_SET, "-A+E");
 	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 	{
 		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
-		sendto_players(0, app.rpl(ECServer::SCORE), pl->GetNick(), pl->Stats()->killed,
-				pl->Stats()->shooted, pl->Stats()->created,
-				pl->Stats()->score);
+		sendto_players(0, pl, MSG_SCORE, ECArgs(TypToStr(pl->Stats()->killed),
+		                                        TypToStr(pl->Stats()->shooted),
+		                                        TypToStr(pl->Stats()->created),
+		                                        TypToStr(pl->Stats()->score)));
 	}
 	return true;
 }
@@ -1371,7 +1363,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 	    ARM_CONTENER|ARM_UNCONTENER|ARM_DATA)))
 		return;
 
-	std::string to_send;
+	ECArgs to_send;
 	std::string senders;
 
 	if(flag & ARM_MOVE)
@@ -1389,79 +1381,74 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 					continue;
 				}
 				ECEntity* entity = (*it)->Entity();
-				to_send += " =" + entity->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
-				                                       "," + TypToStr((*it)->Move()->FirstCase()->Y());
+				std::string s = "=" + entity->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
+				                                           "," + TypToStr((*it)->Move()->FirstCase()->Y());
 				if(!(*it)->Move()->Empty())
-					to_send += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*Map())(x,y) : (*it)->Case());
+					s += "," + (*it)->Move()->MovesString(flag & ARM_ATTAQ ? (*Map())(x,y) : (*it)->Case());
+				to_send += s;
 			}
 		}
 		else
 			for(std::vector<ECEntity*>::const_iterator it = et.begin(); it != et.end(); ++it)
 				if(!(flag & ARM_TYPE) && !(*it)->Move()->Empty() && (*it)->Move()->FirstCase())
-					to_send += " =" + (*it)->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
-					                                      "," + TypToStr((*it)->Move()->FirstCase()->Y()) +
-					                                      "," + (*it)->Move()->MovesString(0);
+					to_send += "=" + (*it)->LongName() + "," + TypToStr((*it)->Move()->FirstCase()->X()) +
+					                                     "," + TypToStr((*it)->Move()->FirstCase()->Y()) +
+					                                     "," + (*it)->Move()->MovesString(0);
 				else
-					to_send += " =" + (*it)->LongName() + "," + TypToStr(x) +
-					                                      "," + TypToStr(y);
+					to_send += "=" + (*it)->LongName() + "," + TypToStr(x) +
+					                                     "," + TypToStr(y);
 	}
 	if(flag & ARM_ATTAQ)
-		to_send += " *" + TypToStr(x) + "," + TypToStr(y);
+		to_send += "*" + TypToStr(x) + "," + TypToStr(y);
 	else if(flag & ARM_RETURN)
-		to_send += " <" + TypToStr(x) + "," + TypToStr(y);
+		to_send += "<" + TypToStr(x) + "," + TypToStr(y);
 
 	if(flag & ARM_TYPE)
 	{
 		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_TYPE): Il n'y a pas d'entité");
 		else
-			to_send += " %" + TypToStr(et.front()->Type());
+			to_send += "%" + TypToStr(et.front()->Type());
 	}
 	if(flag & ARM_NUMBER)
 	{
 		if(flag & ARM_HIDE)
-			to_send += " +";
+			to_send += "+";
 		else if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_NUMER): Il n'y a pas d'entité");
 		else
-			to_send += " +" + TypToStr(et.front()->Nb());
+			to_send += "+" + TypToStr(et.front()->Nb());
 	}
 	if(flag & ARM_LOCK)
-		to_send += " .";
+		to_send += ".";
 	if(flag & ARM_REMOVE)
-		to_send += " -";
+		to_send += "-";
 	if(flag & ARM_NOPRINCIPAL)
-		to_send += " &";
+		to_send += "&";
 	if(flag & ARM_DEPLOY)
 	{
 		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
 		else
-			to_send += (et.front()->Deployed()) ? " {" : " }";
+			to_send += (et.front()->Deployed()) ? "{" : "}";
 	}
 	if(flag & ARM_CONTENER && !et.empty())
 	{
 		if(!et.front()->Parent()) FDebug(W_WARNING, "SendArm(ARM_CONTENER): L'entité n'est pas membre d'un contener");
 		else
-			to_send += " )" + et.front()->Parent()->LongName();
+			to_send += ")" + et.front()->Parent()->LongName();
 	}
 	if(flag & ARM_UNCONTENER)
-		to_send += " (";
+		to_send += "(";
 	if(flag & ARM_DATA)
-		to_send += " ~" + TypToStr(data.type) + "," + data.data;
+		to_send += "~" + TypToStr(data.type) + "," + data.data;
 	if(flag & ARM_UPGRADE)
-		to_send += " °";
+		to_send += "°";
 	if(flag & ARM_INVEST)
-		to_send += " @";
+		to_send += "@";
 
 	/* Si c'est le joueur neutre qui envoie, c'est '*' le nom du player */
-	for(std::vector<ECEntity*>::iterator it = et.begin(); it != et.end(); ++it)
-	{
-		if(!senders.empty()) senders += ",";
-		senders += (*it)->LongName();
-	}
-
 	if(!cl.empty())
 	{
 		for(std::vector<TClient*>::iterator it = cl.begin(); it != cl.end(); ++it)
-			(*it)->sendrpl(app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+			(*it)->sendrpl(et, MSG_ARM, to_send);
 	}
 	else
 	{
@@ -1475,8 +1462,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 				for(it = et.begin();
 				    it != et.end() && (*it)->Owner() != *pl; ++it);
 				if(it != et.end())
-					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
-					                                                                        to_send.c_str());
+					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(et, MSG_ARM, to_send);
 			}
 		}
 		else if(flag & ARM_HIDE)
@@ -1489,8 +1475,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 				for(it = et.begin();
 				    it != et.end() && (*it)->Owner() != *pl; ++it);
 				if(it == et.end())
-					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(app.rpl(ECServer::ARM), senders.c_str(),
-					                                                                        to_send.c_str());
+					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(et, MSG_ARM, to_send);
 			}
 			if(!(flag & ARM_NOCONCERNED))
 			{
@@ -1499,7 +1484,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 			}
 		}
 		else
-			sendto_players(NULL, app.rpl(ECServer::ARM), senders.c_str(), to_send.c_str());
+			sendto_players(NULL, et, MSG_ARM, to_send);
 	}
 }
 
@@ -1514,7 +1499,7 @@ void EChannel::ByeEveryBody(ECBPlayer* exception)
 			app.delclient(p->Client());
 		else
 		{
-			p->Client()->sendrpl(app.rpl(ECServer::LEAVE), p->Client()->GetNick());
+			p->Client()->sendrpl(p, MSG_LEAVE);
 			p->Client()->ClrPlayer();
 		}
 	}
@@ -1604,9 +1589,9 @@ void EChannel::SetMap(ECBMap *m)
 		const char* c = (*it).c_str();
 		// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
 		if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
-		sendto_players(NULL, app.rpl(ECServer::SENDMAP), FormatStr(*it).c_str());
+		sendto_players(NULL, 0, MSG_SENDMAP, *it);
 	}
-	sendto_players(NULL, app.rpl(ECServer::ENDOFSMAP));
+	sendto_players(NULL, 0, MSG_ENDOFSMAP);
 	return;
 }
 
@@ -1668,49 +1653,63 @@ ECPlayer *EChannel::GetPlayer(TClient *cl)
 	return NULL;
 }
 
-void EChannel::send_modes(ECPlayer *sender, const char* msg)
+void EChannel::send_modes(ECPlayer *sender, std::string modes, ECArgs args)
 {
 	PlayerVector plv;
 	plv.push_back(sender);
 
-	send_modes(plv, msg);
+	send_modes(plv, modes, args);
 	return;
 }
 
-void EChannel::send_modes(PlayerVector senders, const char* msg)
+void EChannel::send_modes(PlayerVector senders, std::string modes, ECArgs a)
 {
 	if(senders.empty()) return;
 
-	std::string snds;
+	ECArgs args;
+	args.Push(modes);
+	args += a;
 
-	for(PlayerVector::const_iterator it = senders.begin(); it != senders.end(); ++it)
-	{
-		if(!snds.empty())
-			snds += ",";
-		snds += (*it)->GetNick();
-	}
-	sendto_players(NULL, app.rpl(ECServer::SET), snds.c_str(), msg);
+	sendto_players(NULL, senders, MSG_SET, args);
 	return;
 }
 
-int EChannel::sendto_players(ECPlayer* one, const char* pattern, ...)
+int EChannel::sendto_players(ECPlayer* one, ECBPlayer* pl, ECMessage cmd, ECArgs args)
 {
-	static char buf[MAXBUFFER + 1];
-	va_list vl;
-	size_t len;
+	return sendto_players(one, pl ? pl->Nick() : "", cmd, args);
+}
 
-	va_start(vl, pattern);
-	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len > sizeof buf - 2) len = sizeof buf -2;
+int EChannel::sendto_players(ECPlayer* one, std::vector<ECEntity*> from, ECMessage cmd, ECArgs args)
+{
+	std::string buf;
 
-	buf[len] = 0;
-	va_end(vl);
+	for(std::vector<ECEntity*>::const_iterator it = from.begin(); it != from.end(); ++it)
+	{
+		if(it != from.begin()) buf += ",";
+		buf += (*it)->LongName();
+	}
+	return sendto_players(one, buf, cmd, args);
+}
 
+int EChannel::sendto_players(ECPlayer* one, PlayerVector from, ECMessage cmd, ECArgs args)
+{
+	std::string buf;
+
+	for(PlayerVector::const_iterator it = from.begin(); it != from.end(); ++it)
+	{
+		if(it != from.begin()) buf += ",";
+		buf += (*it)->Nick();
+	}
+	return sendto_players(one, buf, cmd, args);
+}
+
+int EChannel::sendto_players(ECPlayer* one, std::string from, ECMessage cmd, ECArgs args)
+{
 	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
 	{
 		if(!(dynamic_cast<ECPlayer*> (*it))->Client() || *it == one) continue;
 
-		(dynamic_cast<ECPlayer*> (*it))->Client()->sendbuf(buf, len);
+		(dynamic_cast<ECPlayer*> (*it))->Client()->sendrpl(from, cmd, args);
 	}
 	return 0;
 }
@@ -1743,8 +1742,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 			for(BCountriesVector::iterator conti = conts.begin(); conti != conts.end(); ++conti)
 			{
 				(*conti)->SetOwner(0);
-				sendto_players(0, app.rpl(ECServer::SET), pl->GetNick(),
-		                        std::string(std::string("-@ ") + (*conti)->ID()).c_str());
+				send_modes(pl, "-@", (*conti)->ID());
 			}
 		}
 	}
@@ -1753,7 +1751,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 	if(!IsInGame())
 	{
 		if(pl->Client())
-			sendto_players(0, app.rpl(ECServer::LEAVE), pl->Client()->GetNick());
+			sendto_players(0, pl, MSG_LEAVE);
 
 		if(!IsInGame() && use_delete)
 			delete pl;
@@ -1796,15 +1794,19 @@ std::string EChannel::ModesStr() const
 	return (modes + params);
 }
 
-void EChannel::send_info (ECPlayer* pl, info_messages id, std::string args)
+void EChannel::send_info (ECPlayer* pl, info_messages id, ECArgs args)
 {
+	ECArgs real_args;
+	real_args += TypToStr(id);
+	real_args += args;
+
 	if(pl)
 	{
 		assert(pl->Client());
-		pl->Client()->sendrpl(app.rpl(ECServer::INFO), id, args.c_str());
+		pl->Client()->sendrpl(MSG_INFO, real_args);
 	}
 	else
-		sendto_players(0, app.rpl(ECServer::INFO), id, args.c_str());
+		sendto_players(0, "", MSG_INFO, real_args);
 }
 
 void EChannel::SendEntities(ECPlayer* pl)
@@ -1832,7 +1834,7 @@ bool EChannel::CheckPinging()
 			if(State() == PLAYING)
 			{
 				SetState(EChannel::PINGING);
-				sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-P+Q");
+				sendto_players(0, app.ServerName(), MSG_SET, "-P+Q");
 			}
 			return (State() == PINGING);
 		}
@@ -1840,7 +1842,7 @@ bool EChannel::CheckPinging()
 	if(State() == PINGING)
 	{
 		SetState(EChannel::PLAYING);
-		sendto_players(0, app.rpl(ECServer::SET), app.ServerName(), "-Q+P");
+		sendto_players(0, app.ServerName(), MSG_SET, "-Q+P");
 		if(!CheckEndOfGame())
 			CheckReadys();
 	}

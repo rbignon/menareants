@@ -37,55 +37,6 @@ class EC_ACommand;
 class ECServer
 {
 public:
-	/** Message to send to clients.
-	 *
-	 * \attention mettre à jour systematiquement msgTab[] dans Server.cpp
-	 */
-	enum msg {
-		HELLO,        /**< HEL */
-		MAJ,          /**< MAJ */
-		ERR,          /**< ERR */
-		BYE,          /**< BYE */
-		AIM,          /**< AIM */
-		MOTD,         /**< MOTD */
-		ENDOFMOTD,    /**< EOM */
-		STAT,         /**< STAT */
-		REJOIN,       /**< REJOIN */
-		ADMIN,        /**< ADMIN */
-
-		CANTJOIN,     /**< ER1 */
-		IACANTJOIN,   /**< ER2 */
-		SERVFULL,     /**< ER3 */
-		CANTCREATE,   /**< ER4 */
-
-		PING,         /**< PIG */
-		PONG,         /**< POG */
-
-		USED,         /**< USED */
-
-		JOIN,         /**< JOI */
-		SET,          /**< SET */
-		PLIST,        /**< PLS */
-		LEAVE,        /**< LEA */
-		KICK,         /**< KICK */
-		GLIST,        /**< LSP */
-		EOGLIST,      /**< EOL */
-		MSG,          /**< MSG */
-		INFO,         /**< INFO */
-		BREAKPOINT,   /**< BP */
-
-
-		LISTMAP,      /**< LSM */
-		ENDOFMAP,     /**< EOMAP */
-		SENDMAP,      /**< SMAP */
-		ENDOFSMAP,    /**< EOSMAP */
-
-		ARM,          /**< ARM */
-
-		SCORE,        /**< SCO */
-
-		NONE
-	};
 
 	typedef std::map<int, TClient*> RealClientList;
 
@@ -96,7 +47,6 @@ public:
 	bool running;
 
 	time_t get_uptime() const { return uptime; }
-	char *rpl(ECServer::msg t);
 
 	uint NBco;
 	uint NBtot;
@@ -128,7 +78,7 @@ public:
 	TClient *addclient(int fd, const char *ip);
 	void delclient(TClient *del);
 
-	int MSet(std::string, std::string = "");
+	int MSet(std::string, ECArgs = ECArgs());
 
 	enum
 	{
@@ -163,7 +113,7 @@ protected:
 	std::vector<TClient*> Clients;
 
 	bool ConnectMetaServer();
-	int SendMetaServer(std::string s);
+	int SendMetaServer(ECMessage s, ECArgs = ECArgs());
 	void ParseMetaServer();
 	static void ms_ping(ECServer* server, std::vector<std::string> parv);
 };

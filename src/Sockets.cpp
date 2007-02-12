@@ -71,35 +71,42 @@ EC_Client* EC_Client::GetInstance(bool create)
 	return singleton;
 }
 
-char *EC_Client::rpl(EC_Client::msg t)
+int EC_Client::sendrpl(const ECError& err, ECArgs args)
 {
-  if(t<0 || t>EC_Client::NONE)
-    throw ECExcept(VIName(t) VIName(EC_Client::NONE), "Sort de la table");
-  return (char *)msgTab[t];
+	std::string buf;
+
+	buf += static_cast<char>(MSG_ERROR);
+	buf += " ";
+	buf += static_cast<char>(err);
+	if(!args.Empty())
+		buf += " " + args.String();
+
+	return sendbuf(buf);
 }
 
-int EC_Client::sendrpl(const char *pattern, ...)
+int EC_Client::sendrpl(const ECMessage& cmd, ECArgs args)
 {
 	if(!sock || !connected && !logging) return -1;
 
-	static char buf[MAXBUFFER + 20];
-	va_list vl;
-	size_t len;
+	std::string buf;
 
-	va_start(vl, pattern);
-	len = vsnprintf(buf, sizeof buf -2, pattern, vl);
-	if(len > sizeof buf - 2) len = sizeof buf -2;
+	buf += static_cast<char>(cmd);
 
-	buf[len++] = '\r';
-	buf[len++] = '\n';
-	buf[len] = 0;
-	va_end(vl);
+	if(!args.Empty())
+		buf += " " + args.String();
+
+	return sendbuf(buf);
+}
+
+int EC_Client::sendbuf(std::string buf)
+{
+	buf += "\r\n";
 
 #ifdef DEBUG
-	if(strncmp(buf, "ERR", 3))
-		std::cout << "S - " << buf;
+	std::cout << "S - " << buf;
 #endif
-	send(sock, buf, len, 0);
+
+	send(sock, buf.c_str(), buf.size(), 0);
 
 	return 0;
 }
@@ -111,20 +118,20 @@ void EC_Client::parse_message(std::string buf)
 	std::cout << "R - " << buf << std::endl;
 #endif
 
-	std::string cmdname;
+	ECMessage cmdname;
 	std::vector<std::string> parv;
 
 	SplitBuf(buf, &parv, &cmdname);
 
 	EC_ACommand *cmd = NULL;
 	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end() && !cmd; ++it)
-		if((*it)->CmdName == cmdname)
+		if((*it)->CmdName() == cmdname)
 			cmd = *it;
 
-	if(!cmd || (parv.size()-1) < cmd->args)
+	if(!cmd || (parv.size()-1) < cmd->Args())
 	{
 		vDebug(W_ERR|W_DESYNCH|W_SEND, "Commande incorrecte du serveur.", VSName(buf.c_str())
-		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
+		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
 		return;
 	}
 

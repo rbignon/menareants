@@ -1,6 +1,6 @@
 /* lib/Defines.h - A lot of defines
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
 /* Version protocolaire
  * �incr�enter en cas de modification du protocole
  */
-#define APP_PVERSION	"11"
+#define APP_PVERSION	"12"
 #define APP_MSPROTO	"1"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
@@ -55,6 +55,12 @@
 #define	APP_VERSION_PATCH	"pre1"	/* premi�e pr�release */
 #define	APP_VERSION_PATCH	"pre2"	/* seconde pr�release */
 #define	APP_VERSION_PATCH	"pre3"	/* troisi�e pr�release */
+#endif
+
+#ifdef APP_VERSION_PATCH
+#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
+#else
+#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
 #endif
 
 #ifdef __cplusplus

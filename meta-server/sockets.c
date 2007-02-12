@@ -19,6 +19,7 @@
  */
 
 #include "lib/Defines.h" /* Pour le APP_MSPROTO */
+#include "lib/Messages.h" /* Pour la liste des commandes */
 #include "sockets.h"
 #include "servers.h"
 #include "clients.h"
@@ -52,7 +53,7 @@ static void check_pings()
 			if(myClients[i].flags & CL_PING)
 				delclient(&myClients[i]);
 			else
-				sendrpl(&myClients[i], "PING");
+				sendcmd(&myClients[i], MSG_PING);
 		}
 }
 
@@ -67,11 +68,34 @@ int sendbuf(struct Client* cl, char* buf, int len)
 	return 0;
 }
 
-int sendrpl(struct Client* cl, const char *pattern, ...)
+int senderr(struct Client* cl, enum ECError err)
+{
+	char buf[] = {(char)MSG_ERROR, ' ', (char)err, '\r', '\n', '\0' };
+
+	send(cl->fd, buf, 5, 0);
+
+	return 0;
+}
+
+int sendcmd(struct Client* cl, enum ECMessage cmd)
+{
+	char buf[] = {(char)cmd, '\r', '\n', '\0' };
+
+	send(cl->fd, buf, 3, 0);
+
+	return 0;
+}
+
+int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...)
 {
 	static char buf[MAXBUFFER + 1];
 	va_list vl;
 	size_t len;
+
+	send(cl->fd, (char*)&cmd, 1, 0);
+	send(cl->fd, " ", 1, 0);
+
+	//snprintf(buf, sizeof buf - 2, "%c %s", cmd, pattern);
 
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
@@ -107,28 +131,28 @@ int SplitBuf(char* buf, char **parv, int size)
 
 int parsemsg(struct Client* cl)
 {
-	const char* cmdname;
+	enum ECMessage cmdname;
 	char *parv[MAXPARA];
 	int parc;
 	unsigned int i;
 	static struct {
-		const char* cmd;
+		enum ECMessage cmd;
 		int (*func) (struct Client*, int, char**);
 	} cmds[] =
 	{
-		{"IAM", m_login},
-		{"SET", m_server_set},
-		{"POG", m_pong}
+		{MSG_IAM,   m_login},
+		{MSG_SET,   m_server_set},
+		{MSG_PONG,  m_pong}
 	};
 
 	parc = SplitBuf(cl->RecvBuf, parv, MAXPARA);
 
 	if(!parc) return 0;
 
-	cmdname = parv[0];
+	cmdname = parv[0][0];
 
 	for(i = 0; i < ASIZE(cmds); ++i)
-		if(!strcmp(cmds[i].cmd, cmdname))
+		if(cmds[i].cmd == cmdname)
 		{
 			cmds[i].func (cl, parc, parv);
 			return 1;
@@ -208,7 +232,7 @@ struct Client *addclient(int fd, const char *ip)
 	FD_SET(fd, &global_fd_set);
 	if((unsigned)fd > highsock) highsock = fd;
 
-	sendrpl(newC, "HEL " MS_SMALLNAME " " APP_MSPROTO);
+	sendrpl(newC, MSG_HELLO, MS_SMALLNAME " " APP_MSPROTO);
 
 	return newC;
 }

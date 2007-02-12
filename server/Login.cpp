@@ -40,16 +40,16 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if(parv.size() < 3 || parv[2].empty() || parv[2] == " " || parv[2] != app.GetConf()->AdminPass())
 		{
 			Debug(W_WARNING, "ADMIN LOGIN: Identification échouée de %s", cl->GetNick());
-			return cl->sendrpl(app.rpl(ECServer::ERR));
+			return cl->sendrpl(ERR_ADMIN_LOGFAIL);
 		}
 		cl->SetFlag(ECD_ADMIN);
-		return cl->sendrpl(app.rpl(ECServer::ADMIN));
+		return cl->sendrpl(ERR_ADMIN_SUCCESS);
 	}
 
 	if(!cl->HasFlag(ECD_ADMIN))
 	{
 		Debug(W_WARNING, "ADMIN %s: Utilisation par un non admin %s", parv[1].c_str(), cl->GetNick());
-		return cl->sendrpl(app.rpl(ECServer::ERR));
+		return cl->sendrpl(ERR_UNKNOWN);
 	}
 
 	if(parv[1] == "REHASH")
@@ -57,23 +57,27 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if(!app.GetConf()->load())
 		{
 			Debug(W_WARNING, "ADMIN REHASH: Impossible de charger la configuration");
-			return cl->sendrpl(app.rpl(ECServer::ERR));
+			return cl->sendrpl(ERR_ADMIN_CANT_REHASH);
 		}
 		else
-			app.MSet("+PG", TypToStr(app.GetConf()->MaxConnexions()) + " " + TypToStr(app.GetConf()->MaxGames()));
-		return 0;
+			app.MSet("+PG", ECArgs(TypToStr(app.GetConf()->MaxConnexions()), TypToStr(app.GetConf()->MaxGames())));
+		return cl->sendrpl(ERR_ADMIN_SUCCESS);
 	}
 
 	if(parv[1] == "KILL")
 	{
 		TClient* victim = 0;
-		if(parv.size() < 3 || !(victim = app.FindClient(parv[2].c_str())))
-			return cl->sendrpl(app.rpl(ECServer::ERR));
+		if(parv.size() < 3)
+			return cl->sendrpl(ERR_CMDS);
+		if(!(victim = app.FindClient(parv[2].c_str())))
+			return cl->sendrpl(ERR_ADMIN_NOSUCHVICTIM, parv[2]);
 
-		return victim->exit(app.rpl(ECServer::BYE));
+		victim->exit(MSG_BYE);
+		cl->sendrpl(ERR_ADMIN_SUCCESS);
+		return 0;
 	}
 
-	cl->sendrpl(app.rpl(ECServer::ERR));
+	cl->sendrpl(ERR_UNKNOWN);
 
 	return 0;
 }
@@ -87,9 +91,9 @@ static void send_motd(TClient *cl)
 	std::vector<std::string> motd = app.GetConf()->Motd();
 
 	for(std::vector<std::string>::iterator it = motd.begin(); it != motd.end(); ++it)
-		cl->sendrpl(app.rpl(ECServer::MOTD), FormatStr(*it).c_str());
+		cl->sendrpl(MSG_MOTD, *it);
 
-	cl->sendrpl(app.rpl(ECServer::ENDOFMOTD));
+	cl->sendrpl(MSG_ENDOFMOTD);
 	return;
 }
 
@@ -115,8 +119,15 @@ static char *correct_nick(const char *nick)
 
 static void send_stats(TClient *cl)
 {
-	cl->sendrpl(app.rpl(ECServer::STAT), app.NBco, app.NBtot, app.NBchan, app.NBwchan, app.NBachan, app.NBtotchan,
-	                                     app.Uptime());
+	ECArgs args;
+	args += TypToStr(app.NBco);
+	args += TypToStr(app.NBtot);
+	args += TypToStr(app.NBchan);
+	args += TypToStr(app.NBwchan);
+	args += TypToStr(app.NBachan);
+	args += TypToStr(app.NBtotchan);
+	args += TypToStr(app.Uptime());
+	cl->sendrpl(MSG_STAT, args);
 }
 
 /** Client send me several informations about him.
@@ -132,20 +143,20 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	 *       meilleur controle par rapport à la version
 	 */
 	if(parv.size() < 4 || parv[2] != CLIENT_SMALLNAME)
-		return cl->exit(app.rpl(ECServer::MAJ), '0');
+		return cl->exit(MSG_MAJ, "0");
 
 	int pversion = 0;
 	pversion = StrToTyp<int>(parv[3]);
 
 	if(parv[3] != APP_PVERSION)
-		return cl->exit(app.rpl(ECServer::MAJ), pversion < atol(APP_PVERSION) ? '-' : '+');
+		return cl->exit(MSG_MAJ, (pversion < atol(APP_PVERSION) ? "-" : "+"));
 
 	char *nick = correct_nick(parv[1].c_str());
 
-	if(*nick == '\0') return cl->exit(app.rpl(ECServer::ERR));
+	if(*nick == '\0') return cl->exit(ERR_CMDS);
 
 	if(app.FindClient(nick))
-		return cl->exit(app.rpl(ECServer::USED));
+		return cl->exit(ERR_NICK_USED);
 
 	cl->SetNick(nick);
 	SetAuth(cl);
@@ -154,9 +165,9 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	app.NBco++;
 	app.NBtot++;
-	app.MSet("+p " + TypToStr(app.NBco));
+	app.MSet("+p" + TypToStr(app.NBco));
 
-	cl->sendrpl(app.rpl(ECServer::AIM), cl->GetNick());
+	cl->sendrpl(MSG_LOGGED, cl->Nick());
 
 	send_motd(cl);
 	send_stats(cl);
@@ -168,7 +179,7 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			for(BPlayerVector::const_iterator pl = pls.begin(); pl != pls.end(); ++pl)
 				if((*pl)->CanRejoin() && (*pl)->Nick() == cl->Nick())
 				{
-					cl->sendrpl(app.rpl(ECServer::REJOIN), FormatStr((*chan)->Name()).c_str());
+					cl->sendrpl(MSG_REJOIN, (*chan)->Name());
 					break;
 				}
 		}
@@ -192,7 +203,7 @@ int STATCommand::Exec(TClient *cl, std::vector<std::string> parv)
  */
 int PIGCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	return cl->sendrpl(app.rpl(ECServer::PONG));
+	return cl->sendrpl(MSG_PONG);
 }
 
 /** Received a PONG message from client.

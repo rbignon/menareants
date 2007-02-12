@@ -239,11 +239,12 @@ bool FichierExiste(const std::string &nom)
   return existe;
 }
 
-void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdname)
+void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage *cmd)
 {
 	char s[1024 + 20];
 	unsigned int j;
 
+	*cmd = MSG_NONE;
 	for(std::string::const_iterator it = buf.begin(); it != buf.end(); )
 	{
 		bool slash;
@@ -255,7 +256,7 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdn
 				s[j++]=*it, slash=false;
 		s[j]='\0';
 		if(!j) continue;
-		if(cmdname->empty())
+		if(*cmd == MSG_NONE)
 		{
 			if(s[0] == ':')
 			{
@@ -265,7 +266,7 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdn
 			else
 			{
 				if(!parv->size()) parv->push_back("");
-				*cmdname = s;
+				*cmd = static_cast<ECMessage>(*s);
 			}
 		}
 		else

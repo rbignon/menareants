@@ -95,16 +95,16 @@ public:
 
 					/* On créé un ShipYard, et aussi un bateau sur la même case dans le cas où le shipyard a
 					 * bien été construit */
-					IA()->ia_send("ARM - =" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()) +
-					              " + %" + TypToStr(ECEntity::E_SHIPYARD));
-					IA()->ia_send("ARM - =" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()) +
-					              " + %" + TypToStr(ECEntity::E_BOAT));
+					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()),
+					                                       "+", "%" + TypToStr(ECEntity::E_SHIPYARD))));
+					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()),
+					                                       "+", "%" + TypToStr(ECEntity::E_BOAT))));
 					return true; /* On attend le prochain tour pour faire quelque chose avec */
 				}
 				else
 				{ /* On construit un bateau à partir du chantier naval le plus proche */
-					IA()->ia_send("ARM - =" + TypToStr(shipyard->Case()->X()) + "," + TypToStr(shipyard->Case()->Y()) +
-					              " + %" + TypToStr(ECEntity::E_BOAT));
+					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(shipyard->Case()->X()) + "," + TypToStr(shipyard->Case()->Y()),
+					                                       "+", "%" + TypToStr(ECEntity::E_BOAT))));
 					return true; /* On attends le prochain tour pour s'en servir */
 				}
 			}
@@ -133,7 +133,7 @@ public:
 				return false;
 			}
 			if(unit->Case()->Delta(boat->Case()) == 1)
-				IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+				IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 			else
 			{
 				bool in_boat = false;
@@ -142,7 +142,7 @@ public:
 					IA()->WantMoveTo(boat, unit->Case(), 1);
 					if(unit->Case()->Delta(boat->Case()) == 1)
 					{
-						IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 						in_boat = true;
 						break;
 					}
@@ -154,7 +154,7 @@ public:
 						IA()->WantMoveTo(unit, boat->Case(), 0, false);
 						if(unit->Case()->Delta(boat->Case()) == 1)
 						{
-							IA()->ia_send("ARM " + std::string(unit->ID()) + " )" + boat->ID());
+							IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 							break;
 						}
 					}
@@ -183,23 +183,19 @@ public:
 					if(boat->Case()->MoveLeft() != last_case && boat->Case()->X()-1 >= victim->Case()->X() &&
 					   !boat->WantMove(ECMove::Left, MOVE_SIMULE) &&
 					   boat->Case()->X() > 0 && boat->Case()->MoveLeft()->Flags() & C_TERRE)
-						IA()->ia_send("ARM " + std::string(boat->ID()) +
-									" (" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()));
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()))));
 					else if(boat->Case()->MoveRight() != last_case && boat->Case()->X()+1 <= victim->Case()->X() &&
-					        !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
-					        boat->Case()->X() < boat->Map()->Width()-1 && boat->Case()->MoveRight()->Flags() & C_TERRE)
-						IA()->ia_send("ARM " + std::string(boat->ID()) +
-									" (" + TypToStr(boat->Case()->X()+1) + "," + TypToStr(boat->Case()->Y()));
+					   !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
+					   boat->Case()->X() < boat->Map()->Width()-1 && boat->Case()->MoveRight()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()+1) + "," + TypToStr(boat->Case()->Y()))));
 					else if(boat->Case()->MoveUp() != last_case && boat->Case()->Y()-1 >= victim->Case()->Y() &&
-					       !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
-					        boat->Case()->Y() > 0 && boat->Case()->MoveUp()->Flags() & C_TERRE)
-						IA()->ia_send("ARM " + std::string(boat->ID()) +
-									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()-1));
+					   !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
+					   boat->Case()->Y() > 0 && boat->Case()->MoveUp()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()-1))));
 					else if(boat->Case()->MoveDown() != last_case && boat->Case()->Y()+1 <= victim->Case()->Y() &&
-					        !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
-					        boat->Case()->Y() < boat->Map()->Height()-1 && boat->Case()->MoveDown()->Flags() & C_TERRE)
-						IA()->ia_send("ARM " + std::string(boat->ID()) +
-									" (" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()+1));
+					   !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
+					   boat->Case()->Y() < boat->Map()->Height()-1 && boat->Case()->MoveDown()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()+1))));
 					else
 					{
 						IA()->WantMoveTo(boat, victim->Case(), 1);
@@ -246,22 +242,24 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_s
 #ifdef DEBUG
 	gettimeofday(&tv, NULL);
 	double tt = (tv.tv_usec - burst) / 1000000.0;
-	dynamic_cast<ECEntity*>(enti)->Channel()->send_info(0, EChannel::I_DEBUG, FormatStr("Pour " + TypToStr(enti->Case()->Delta(dest)) + " cases, l'algorithme met: " + StringF("%.6f", tt) + "s"));
+	dynamic_cast<ECEntity*>(enti)->Channel()->send_info(0, EChannel::I_DEBUG, "Pour " + TypToStr(enti->Case()->Delta(dest)) + " cases, l'algorithme met: " + StringF("%.6f", tt) + "s");
 #endif
 
+	ECArgs args;
+	args += enti->ID();
 	for(uint i = 0; moves.empty() == false && i < nb_cases; ++i)
 	{
 		ECBMove::E_Move m = moves.top();
 		moves.pop();
 		switch(m)
 		{
-			case ECBMove::Up: msg += " ^"; break;
-			case ECBMove::Down: msg += " v"; break;
-			case ECBMove::Left: msg += " <"; break;
-			case ECBMove::Right: msg += " >"; break;
+			case ECBMove::Up: args += "^"; break;
+			case ECBMove::Down: args += "v"; break;
+			case ECBMove::Left: args += "<"; break;
+			case ECBMove::Right: args += ">"; break;
 		}
 	}
-	ia_send("ARM " + std::string(enti->ID()) + msg);
+	ia_send(ECPacket(MSG_ARM, args));
 }
 
 void TIA::FirstMovements()
@@ -325,20 +323,20 @@ void TIA::FirstMovements()
 			}
 			if(t)
 			{
-				ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()) + " + %" +
-								TypToStr(t));
+				ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
+				                                 "+", "%" + TypToStr(t))));
 				/* HACK pour que les armées ne soient pas de 100 */
 				if(t == ECEntity::E_ARMY)
 					for(int j = 12; j >= 0; --j)
-						ia_send("ARM - =" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y())
-						                  + " + %" + TypToStr(t));
+						ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
+				                                                 "+", "%" + TypToStr(t))));
 			}
 		}
 		if((*enti)->Owner() != Player())
 			continue;
 
 		if((*enti)->MyUpgrade() != ECEntity::E_NONE && !(rand()%2))
-			ia_send("ARM " + std::string((*enti)->ID()) + " °");
+			ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "°")));
 		if((*enti)->MyStep() > 0 || (*enti)->Porty() > 0)
 		{
 			if((*enti)->AddUnits(0))
@@ -347,7 +345,7 @@ void TIA::FirstMovements()
 				for(std::vector<ECBEntity*>::iterator e = es.begin(); e != es.end(); ++e)
 					if((*e)->CanCreate(*enti))
 						for(int i = 0; !i ;i = rand()% ((*enti)->Nb() < 1000 ? 2 : 3))
-							ia_send("ARM " + std::string((*enti)->ID()) + " +");
+							ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "+")));
 			}
 
 			if(recruted[*enti]) continue; /* Il est recruté, donc tout ce qu'on peut lui faire faire là sera fait par la
@@ -371,13 +369,13 @@ void TIA::FirstMovements()
 				 * pas se déployer c'est pas génant.
 				 */
 				if(!(*enti)->Deployed())
-					ia_send("ARM " + std::string((*enti)->ID()) + " #");
-				ia_send("ARM " + std::string((*enti)->ID()) + " *" + TypToStr(victim->Case()->X()) + "," +
-																		TypToStr(victim->Case()->Y()));
+					ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "#")));
+				ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "*" + TypToStr(victim->Case()->X()) + "," +
+				                                                      TypToStr(victim->Case()->Y()))));
 				continue;
 			}
 			else if((*enti)->Deployed())
-				ia_send("ARM " + std::string((*enti)->ID()) + " #");
+				ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "#")));
 
 			if(!(*enti)->MyStep()) continue; /* Il n'y a pas d'attaque, donc on continue */
 
@@ -418,7 +416,7 @@ void TIA::CheckIfIReady()
 					counter++;
 			}
 		if(counter == humans)
-			ia_send("SET +!");
+			ia_send(ECPacket(MSG_SET, "!"));
 	}
 }
 
@@ -441,10 +439,10 @@ void TIA::MakeAllies()
 		if(have_ia)
 		{
 			if(!Player()->IsAllie(*it))
-				ia_send("SET +a " + std::string((*it)->GetNick()));
+				ia_send(ECPacket(MSG_SET, ECArgs("+a", (*it)->Nick())));
 		}
 		else if(Player()->IsAllie(*it))
-			ia_send("SET -a " + std::string((*it)->GetNick()));
+			ia_send(ECPacket(MSG_SET, ECArgs("-a", (*it)->Nick())));
 	}
 
 	/*for(std::vector<std::string>::iterator it = to_send.begin(); it != to_send.end(); ++it)
@@ -459,7 +457,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 
 	bool add = true, want_make_allies = false;
 
-	std::vector<std::string> to_send;
+	std::vector<ECPacket> to_send;
 
 	for(uint i=0, j=2; i<parv[1].size(); i++)
 		switch(parv[1][i])
@@ -486,9 +484,9 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				{
 					bool is_allie = me->Player()->IsAllie(sender);
 					if(!add && is_allie)
-						to_send.push_back("SET -a " + std::string(sender->GetNick()));
+						to_send.push_back(ECPacket(MSG_SET, ECArgs("-a", sender->Nick())));
 					else if(add && !is_allie)
-						to_send.push_back("SET +a " + std::string(sender->GetNick()));
+						to_send.push_back(ECPacket(MSG_SET, ECArgs("+a", sender->Nick())));
 					break;
 				}
 
@@ -497,7 +495,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				for(BPlayerVector::iterator pl = pls.begin(); pl != pls.end(); ++pl)
 				{
 					if(add && (*pl)->IsIA())
-						to_send.push_back("SET -a " + std::string((*pl)->GetNick()));
+						to_send.push_back(ECPacket(MSG_SET, ECArgs("-a", (*pl)->Nick())));
 					else if(!add && !(*pl)->IsIA() && *pl != sender) ia_allies = false;
 				}
 				if(!add && ia_allies)
@@ -507,15 +505,15 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 					pls = sender->Allies();
 					FORit(ECBPlayer*, pls, pl)
 						if(*pl != me->Player())
-							to_send.push_back("SET +a " + std::string((*pl)->GetNick()));
+							to_send.push_back(ECPacket(MSG_SET, ECArgs("+a", (*pl)->Nick())));
 				}
 
-				to_send.push_back("SET " + std::string(add ? "+" : "-") + "a " + sender->GetNick());
+				to_send.push_back(ECPacket(MSG_SET, ECArgs(std::string(add ? "+" : "-") + "a", sender->Nick())));
 				break;
 			}
 			case 'm':
 				if(add && !me->Player()->Ready())
-				    me->ia_send("SET +!");
+				    me->ia_send(ECPacket(MSG_SET, "+!"));
 				break;
 			case '!':
 			    /* Si on met -!, on remet l'IA prete */
@@ -524,7 +522,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 					for(std::vector<ECPlayer*>::iterator it=players.begin(); it != players.end(); ++it)
 					    if(*it == me->Player())
 					    {
-							me->ia_send("SET +!");
+							me->ia_send(ECPacket(MSG_SET, "+!"));
 							break;
 						}
 				}
@@ -534,7 +532,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				break;
 		}
 
-	for(std::vector<std::string>::iterator it = to_send.begin(); it != to_send.end(); ++it)
+	for(std::vector<ECPacket>::iterator it = to_send.begin(); it != to_send.end(); ++it)
 		me->ia_send(*it);
 
 	if(want_make_allies)
@@ -587,26 +585,26 @@ bool TIA::Join(EChannel* chan)
 	}
 
 	SetPlayer(new ECPlayer(this, chan, false, false));
-	chan->sendto_players(0, app.rpl(ECServer::JOIN), GetNick(), FormatStr(chan->Name()).c_str(), "");
+	chan->sendto_players(0, GetNick(), MSG_JOIN, chan->Name());
 
 	/* Ça me l'envoie à moi même */
-	sendrpl(app.rpl(ECServer::SET), app.GetConf()->ServerName().c_str(), chan->ModesStr().c_str());
+	sendrpl(ECPacket(app.GetConf()->ServerName(), MSG_SET, ECArgs(chan->ModesStr()).DontSplit()));
 
 	return true;
 }
 
 void TIA::recv_msgs()
 {
-	for(std::vector<std::string>::iterator it = msgs.begin(); it != msgs.end();)
+	for(std::vector<ECPacket>::iterator it = msgs.begin(); it != msgs.end();)
 	{
-		std::string s = *it;
+		ECPacket s = *it;
 		msgs.erase(it);
 		recv_one_msg(s);
 		it = msgs.begin();
 	}
 }
 
-int TIA::ia_recv(std::string msg)
+int TIA::ia_recv(const ECPacket& msg)
 {
 	if(Locked())
 		msgs.push_back(msg);
@@ -619,33 +617,20 @@ int TIA::ia_recv(std::string msg)
 	return 0;
 }
 
-int TIA::recv_one_msg(std::string msg)
+int TIA::recv_one_msg(const ECPacket& msg)
 {
 	static struct cmds_t {
-		char cmd[COMLEN + 1];
+		ECMessage cmd;
 		int (*func) (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 		uint args;
 	} cmds[] = {
-		{"SET",                TIA::SETCommand,             1},
-		{"LEA",                TIA::LEACommand,             0}
+		{MSG_SET,                TIA::SETCommand,             1},
+		{MSG_LEAVE,              TIA::LEACommand,             0}
 	};
-
-	while(msg[msg.size()-1] == '\n' || msg[msg.size()-1] == '\r')
-		msg = msg.substr(0, msg.size()-2);
-
-#ifdef DEBUG
-	if(strncmp(msg.c_str(), "PIG", 3) && strncmp(msg.c_str(), "POG", 3))
-		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), msg.c_str());
-#endif
-
-	std::string cmdname;
-	std::vector<std::string> parv;
-
-	SplitBuf(msg, &parv, &cmdname);
 
 	cmds_t* cmd = 0;
 	for(uint i = 0; i < ASIZE(cmds) && !cmd; ++i)
-		if(!strcmp(cmds[i].cmd, cmdname.c_str()))
+		if(cmds[i].cmd == msg.Command())
 			cmd = &cmds[i];
 
 	/* Ce n'est pas forcément grave que la commande ne soit pas reconnue, dans le sens
@@ -653,10 +638,15 @@ int TIA::recv_one_msg(std::string msg)
 	 * fou par exemple)
 	 */
 	if(!cmd) return 0;
-	if((parv.size()-1) < cmd->args)
-	    return vDebug(W_WARNING, "TIA::ia_recv(): Réception d'un message anormal", VName(msg));
+	if(msg.Args().Size() < cmd->args)
+	    return Debug(W_WARNING, "TIA::ia_recv(): Réception d'un message anormal");
 
 	std::vector<ECPlayer*> players;
+
+	std::vector<std::string> parv, temp = msg.Args().List();
+	parv.push_back(msg.From());
+	parv.insert(parv.end(), temp.begin(), temp.end());
+
 	if(Player() && !parv[0].empty())
 	{
 		std::string line = parv[0];
@@ -674,11 +664,11 @@ int TIA::recv_one_msg(std::string msg)
 
 	try
 	{
-	    cmd->func(players, this, parv);
+		cmd->func(players, this, parv);
 	}
 	catch(TECExcept &e)
 	{
-        vDebug(W_ERR, e.Message(), e.Vars());
+		vDebug(W_ERR, e.Message(), e.Vars());
 	}
 	return 0;
 }
@@ -695,14 +685,14 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(!cl->Player() || cl->IsIA() || cl->Player()->Channel()->IsMission())
 	{
-	    vDebug(cl->IsIA() ? W_WARNING : W_DESYNCH, "JIA: Appel incorrect", VPName(cl->Player()) VBName(cl->IsIA())
-	                                                                       VName(cl->Player()->Channel()->Name()));
-	    return cl->sendrpl(app.rpl(ECServer::ERR));
+		vDebug(cl->IsIA() ? W_WARNING : W_DESYNCH, "JIA: Appel incorrect", VPName(cl->Player()) VBName(cl->IsIA())
+		                                           VName(cl->Player()->Channel()->Name()));
+		return cl->sendrpl(ERR_UNKNOWN);
 	}
 	if(!cl->Player()->IsPriv())
 	{
 	    Debug(W_DESYNCH, "JIA: L'appelant n'est ni owner ni op");
-	    return cl->sendrpl(app.rpl(ECServer::ERR));
+	    return cl->sendrpl(ERR_UNKNOWN);
 	}
 	EChannel* chan = cl->Player()->Channel();
 
@@ -710,20 +700,20 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		vDebug(W_WARNING, "JIA: Le client essaye de faire joindre une IA dans un salon en jeu", VSName(chan->GetName())
 		                  VSName(cl->GetNick()) VIName(chan->State()));
-		return cl->sendrpl(app.rpl(ECServer::ERR));
+		return cl->sendrpl(ERR_UNKNOWN);
 	}
 	if(chan->NbPlayers() >= chan->Limite())
-		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
+		return cl->sendrpl(ERR_IA_CANT_JOIN, parv[1]);
 
 	for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 	{
 		if(*c == ' ') *c = '_';
 		else if(!strchr(NICK_CHARS, *c))
-			return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
+			return cl->sendrpl(ERR_IA_CANT_JOIN, parv[1]);
 	}
 
 	if(app.FindClient((IA_CHAR + parv[1]).c_str()))
-		return cl->sendrpl(app.rpl(ECServer::IACANTJOIN), parv[1].c_str());
+		return cl->sendrpl(ERR_IA_CANT_JOIN, parv[1]);
 
 	TIA* IA = dynamic_cast<TIA*>(app.addclient(-1, ""));
 	IA->SetNick(IA_CHAR + parv[1]);

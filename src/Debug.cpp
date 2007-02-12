@@ -63,10 +63,9 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	if(flags & W_SEND && EC_Client::GetInstance())
 	{
 		if(vars.empty())
-			EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ERRORN), FormatStr(s).c_str());
+			EC_Client::GetInstance()->sendrpl(MSG_ERROR, ECArgs(s));
 		else
-			EC_Client::GetInstance()->sendrpl(EC_Client::rpl(EC_Client::ERRORV), FormatStr(s).c_str(),
-			                                                                     FormatStr(vars).c_str());
+			EC_Client::GetInstance()->sendrpl(MSG_ERROR, ECArgs(s, vars));
 	}
 
 	std::cout << s << std::endl;

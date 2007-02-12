@@ -1,3 +1,7 @@
+2007-02-12 Romain Bignon <progs@headfucking.net>
+
+	* src/, meta-server/, server/: Changement complet du protocole ! Utilisation d'enumerateurs, changement dans les fonctions, etc.
+
 2007-02-11 Romain Bignon <progs@headfucking.net>
 
 	* server/Main.cpp (sig_alarm): Correction d'un bug qui risquait de faire jarter tous les clients si l'un était victime d'un ping timeout.
@@ -26,6 +30,8 @@
 	* server/InGame.cpp: Correction d'un bug concernant les actions à la sortie d'une unité d'un conteneur.
 	  Egalement, maintenant lorsqu'une unité passe par un batiment qu'il peut investir mais qu'il n'y a pas d'enemis dessus (donc pas de combat), on investis
 	  quand même et on continue le mouvement.
+
+	* Création d'une branche 0.4alpha P11
 
 2007-02-10 Romain Bignon <progs@headfucking.net>
 

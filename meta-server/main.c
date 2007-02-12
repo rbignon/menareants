@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	int tmp;
 	int background = 1;
 
-	while((tmp = getopt(argc, argv, "np:f:")) != EOF)
+	while((tmp = getopt(argc, argv, "nvhp:f:")) != EOF)
 		switch(tmp)
 		{
 			case 'n':
@@ -51,8 +51,14 @@ int main(int argc, char **argv)
 			case 'P':
 				port = atoi(optarg);
 				break;
+			case 'v':
+				printf("MenAreAnts Meta Server v" APP_VERSION " P" APP_PVERSION
+				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")\n");
+				exit(EXIT_SUCCESS);
+				break;
+			case 'h':
 			default:
-				printf("Usage: %s [-n] [-p <port>] [-f <ping freq>]", argv[0]);
+				printf("Usage: %s [-n] [-p <port>] [-f <ping freq>]\n", argv[0]);
 				exit(EXIT_FAILURE);
 		}
 

@@ -71,7 +71,7 @@ void ECJouano::Invest(ECBEntity* entity)
 
 	assert(mcdo);
 
-	Channel()->send_info(0, EChannel::I_JOUANO, LongName() + " " + mcdo->ExOwner()->Nick() + " " + mcdo->LongName() + " " + TypToStr(JOUANO_DESTROYTURN));
+	Channel()->send_info(0, EChannel::I_JOUANO, ECArgs(LongName(), mcdo->ExOwner()->Nick(), mcdo->LongName(), TypToStr(JOUANO_DESTROYTURN)));
 
 	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
 
@@ -450,9 +450,9 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 
 			Shoot(*it, killed);
 			if(Owner())
-				Channel()->send_info(Owner(), EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+				Channel()->send_info(Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
 			if((*it)->Owner())
-				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, LongName() + " " + (*it)->LongName() + " " + TypToStr(killed));
+				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
 		}
 
 #if 0 // Uniquement si on veut qu'un lance-missile se reploie après avoir tiré

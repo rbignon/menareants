@@ -965,7 +965,7 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	catch(TECExcept &e)
 	{
 		Debug(W_DESYNCH, "BP: %s a voulu faire un breakpoint hors de la map (%d,%d)", cl->GetNick(), x, y);
-		return cl->sendrpl(app.rpl(ECServer::ERR));
+		return cl->sendrpl(ERR_UNKNOWN);
 	}
 
 	std::string message = parv.size() > 2 ? parv[2] : "";
@@ -977,7 +977,7 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			std::vector<ECPlayer::BreakPoint> bp = cl->Player()->BreakPoints();
 			for(std::vector<ECPlayer::BreakPoint>::iterator it = bp.begin(); it != bp.end(); ++it)
 				if(it->c == c)
-					return cl->sendrpl(app.rpl(ECServer::ERR));
+					return cl->sendrpl(ERR_UNKNOWN);
 
 			cl->Player()->AddBreakPoint(ECPlayer::BreakPoint(c, message));
 
@@ -986,18 +986,18 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		case '-':
 		{
 			if(!cl->Player()->RemoveBreakPoint(c))
-				return cl->sendrpl(app.rpl(ECServer::ERR));
+				return cl->sendrpl(ERR_UNKNOWN);
 
 			break;
 		}
 		default: return vDebug(W_WARNING, "BP: Invalide identifiant", VCName(ch) VName(parv[1]));
 	}
 
-	cl->sendrpl(app.rpl(ECServer::BREAKPOINT), cl->GetNick(), ch, c->X(), c->Y(), message.c_str());
+	cl->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
 
 	std::vector<TClient*> allies = cl->Player()->ClientAllies();
 	for(std::vector<TClient*>::iterator it = allies.begin(); it != allies.end(); ++it)
-		(*it)->sendrpl(app.rpl(ECServer::BREAKPOINT), cl->GetNick(), ch, c->X(), c->Y(), message.c_str());
+		cl->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
 
 	return 0;
 }

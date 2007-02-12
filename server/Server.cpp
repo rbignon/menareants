@@ -36,124 +36,177 @@
 #include <cstdarg>
 #include <netdb.h>
 
-/* Messages à envoyer */
-const char* msgTab[] = {
-     "HEL " SERV_SMALLNAME " " APP_PVERSION, /* HEL - Hello */
-     "MAJ %c",                              /* MAJ - Nécessite une mise à jour du client */
-     "ERR",                                 /* ERR - Erreur en provenance theorique du client */
-     "BYE",                                 /* BYE - Dis adieu à un client */
-     "AIM %s",                              /* AIM - Logué */
-     "MOTD %s",                             /* MOTD - Message Of The Day */
-     "EOM",                                 /* EOM - Fin du motd */
-     "STAT %d %d %d %d %d %d %d",           /* STAT - Stats du serveur */
-     "REJOIN %s",                           /* REJOIN - L'user peut rejoindre une partie où il a été déconnecté */
-     "ADMIN",                               /* ADM - L'user est bien loggé en admin */
+/********************************************************************************************
+ *                               TRealClient                                                *
+ ********************************************************************************************/
 
-     "ER1",                                 /* ER1 - Ne peut pas joindre */
-     "ER2 %s",                              /* ER2 - (réponse à un JIA) le pseudo est déjà pris ou la partie est pleine */
-     "ER3\n",                               /* ER3 - Serveur plein, impossible de connecter */
-     "ER4",                                 /* ER4 - Impossible de créer la partie */
-
-     "PIG",                                 /* PIG - Envoie un ping */
-     "POG",                                 /* POG - Reçoit un pong */
-     "USED",                                /* USED - Pseudo déjà utilisé */
-
-     ":%s JOI %s %s",                       /* JOI - Envoie d'un join */
-     ":%s SET %s",                          /* SET - Définit ou informe les paramètres d'un jeu */
-     "PLS %s",                              /* PLS - Liste de joueurs lors d'un join */
-     ":%s LEA",                             /* LEA - Un user part du saon */
-     ":%s KICK %s %s",                      /* KICK - On éjecte quelqu'un du salon */
-     "LSP %s %c %d %d %s",                  /* LSP - Liste les parties */
-     "EOL",                                 /* EOL - Fin de la liste */
-     ":%s MSG %s",                          /* MSG - Envoie un message dans le chan */
-     "INFO %d %s",                          /* INFO - Envoie des messages à afficher dans le jeu des joueurs.
-                                             *        Contient l'ID ainsi que les arguments, pour que le client puisse traiter
-                                             */
-     ":%s BP %c%d,%d %s",                   /* BP - Envoie des infos aux alliés sur un breakpoint de stratégie */
-
-     "LSM %s %d %d %s",                     /* LSM - Liste les maps disponibles (nom, min, max, info) */
-     "EOMAP",                               /* EOMAP - Fin de la liste des maps */
-     "SMAP %s",                             /* SMAP - Envoie une ligne d'une map */
-     "EOSMAP",                              /* EOSMAP - Fin de l'envoie d'une map */
-
-     ":%s ARM%s",                           /* ARM - Envoie des infos sur une armée.
-                                             *       C'est normal qu'il n'y ait pas d'espace après ARM.
-                                             *       Utiliser la fonction EChannel::SendArm().
-                                             */
-
-     ":%s SCO %d %d %d %d",                 /* SCO - Affiche les scores (nick, killed, shooted, created, score) */
-     0
-};
-
-int TClient::exit(const char* pattern, ...)
+int TRealClient::exit(const ECMessage& cmd, ECArgs args)
 {
-	app.delclient(this);
-	return 0;
-}
-
-int TRealClient::exit(const char *pattern, ...)
-{
-	static char buf[MAXBUFFER + 1];
-	va_list vl;
-	size_t len;
-
-	va_start(vl, pattern);
-	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len > sizeof buf - 2) len = sizeof buf -2;
-
-	buf[len] = 0;
-	va_end(vl);
-
-	this->sendbuf(buf, len);
+	TClient::sendrpl(cmd, args);
 
 	app.delclient(this);
 	return 0;
 }
 
-int TRealClient::sendbuf(char* buf, int len)
+int TRealClient::exit(const ECError& err, ECArgs args)
+{
+	sendrpl(err, args);
+
+	app.delclient(this);
+	return 0;
+}
+
+
+int TRealClient::sendbuf(std::string buf)
 {
 #ifdef DEBUG
-	if(strncmp(buf, "PIG", 3) && strncmp(buf, "POG", 3))
-		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", this->GetNick(), this->GetIp(), buf);
+	if(buf != "PIG" && buf != "POG")
+		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
 #endif
 
-	buf[len++] = '\r';
-	buf[len++] = '\n';
-	buf[len] = 0;
+	buf += "\r\n";
 
-	send(this->GetFd(), buf, len, 0);
+	send(GetFd(), buf.c_str(), buf.size(), 0);
 
 	return 0;
 }
 
-int TClient::sendrpl(const char *pattern, ...)
+int TRealClient::sendrpl(const ECPacket& packet)
 {
-	static char buf[MAXBUFFER + 1];
-	va_list vl;
-	size_t len;
-
-	va_start(vl, pattern);
-	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
-	if(len > sizeof buf - 2) len = sizeof buf -2;
-
-	buf[len] = 0;
-	va_end(vl);
-
-	this->sendbuf(buf, len);
+	sendbuf(packet.Buffer());
 
 	return 0;
 }
 
-char *ECServer::rpl(ECServer::msg t)
+int TRealClient::sendrpl(const ECError& err, ECArgs args)
 {
-  if(t<0 || t>ECServer::NONE)
-    throw ECExcept(VIName(t) VIName(ECServer::NONE), "Sort de la table");
-  return (char *)msgTab[t];
+	std::string s;
+	s += static_cast<char>(MSG_ERROR);
+	s += " ";
+	s += static_cast<char>(err);
+
+	if(!args.Empty())
+		s += " " + args.String();
+
+	return sendbuf(s);
+}
+
+/********************************************************************************************
+ *                               TClient                                                    *
+ ********************************************************************************************/
+
+int TClient::exit(const ECMessage&, ECArgs)
+{
+	app.delclient(this);
+	return 0;
+}
+
+int TClient::exit(const ECError&, ECArgs)
+{
+	app.delclient(this);
+	return 0;
+}
+
+int TClient::sendrpl(const ECMessage& cmd, ECArgs args)
+{
+	return sendrpl(ECPacket(cmd, args));
+}
+
+int TClient::sendrpl(const std::string& s, const ECMessage& cmd, ECArgs args)
+{
+	return sendrpl(ECPacket(s, cmd, args));
+}
+
+
+int TClient::sendrpl(const ECBPlayer* player, const ECMessage& cmd, ECArgs args)
+{
+	return sendrpl(ECPacket(player->Nick(), cmd, args));
+}
+
+int TClient::sendrpl(const std::vector<ECPlayer*>& players, const ECMessage& cmd, ECArgs args)
+{
+	std::string buf;
+
+	for(std::vector<ECPlayer*>::const_iterator it = players.begin(); it != players.end(); ++it)
+	{
+		if(it != players.begin()) buf += ",";
+		buf += (*it)->Nick();
+	}
+
+	return sendrpl(ECPacket(buf, cmd, args));
+}
+
+int TClient::sendrpl(const std::vector<ECBPlayer*>& players, const ECMessage& cmd, ECArgs args)
+{
+	std::string buf;
+
+	for(std::vector<ECBPlayer*>::const_iterator it = players.begin(); it != players.end(); ++it)
+	{
+		if(it != players.begin()) buf += ",";
+		buf += (*it)->Nick();
+	}
+
+	return sendrpl(ECPacket(buf, cmd, args));
+}
+
+int TClient::sendrpl(const std::vector<ECEntity*>& entities, const ECMessage& cmd, ECArgs args)
+{
+	std::string buf;
+
+	for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
+	{
+		if(it != entities.begin()) buf += ",";
+		buf += (*it)->LongName();
+	}
+
+	return sendrpl(ECPacket(buf, cmd, args));
+}
+
+int TClient::parsemsg(const ECMessage& cmdname, const std::vector<std::string>& parv)
+{
+	EC_ACommand *cmd = NULL;
+	std::vector<EC_ACommand*> cmds = app.GetCommands();
+	for(std::vector<EC_ACommand*>::const_iterator it = cmds.begin(); it != cmds.end() && !cmd; ++it)
+		if((*it)->CmdName() == cmdname)
+			cmd = *it;
+
+	if(!cmd || (parv.size()-1) < cmd->Args())
+	{
+		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick())
+		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
+		if(!IsAuth(this))
+			exit(MSG_MAJ, "-");
+		return 0;
+	}
+
+	if(cmd->Flags() && !(flag & cmd->Flags()))
+		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriés.", VSName(GetNick())
+		                         VPName(cmd));
+
+	try
+	{
+		cmd->Exec(this, parv);
+	}
+	catch(TECExcept &e)
+	{
+		vDebug(W_ERR, e.Message(), e.Vars());
+		exit(ERR_CMDS);
+	}
+	return 0;
+}
+
+int TClient::parsemsg(const ECPacket& pack)
+{
+	std::vector<std::string> parv, temp = pack.Args().List();
+	parv.push_back(pack.From());
+	parv.insert(parv.end(), temp.begin(), temp.end());
+
+	return parsemsg(pack.Command(), parv);
 }
 
 int TClient::parsemsg(std::string buf)
 {
-	std::string cmdname;
+	ECMessage cmdname;
 	std::vector<std::string> parv;
 
 #ifdef DEBUG
@@ -163,36 +216,7 @@ int TClient::parsemsg(std::string buf)
 
 	SplitBuf(buf, &parv, &cmdname);
 
-	EC_ACommand *cmd = NULL;
-	std::vector<EC_ACommand*> cmds = app.GetCommands();
-	for(std::vector<EC_ACommand*>::const_iterator it = cmds.begin(); it != cmds.end() && !cmd; ++it)
-		if((*it)->CmdName == cmdname)
-			cmd = *it;
-
-	if(!cmd || (parv.size()-1) < cmd->args)
-	{
-		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VName(buf)
-		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->args : 0)));
-		if(!IsAuth(this))
-			exit(app.rpl(ECServer::ERR));
-		return 0;
-	}
-
-	if(cmd->flags && !(flag & cmd->flags))
-		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriés.", VSName(GetNick())
-		                         VName(buf) VPName(cmd));
-
-	try
-	{
-		cmd->Exec(this, parv);
-	}
-	catch(TECExcept &e)
-	{
-		vDebug(W_ERR, e.Message(), e.Vars());
-		sendrpl(app.rpl(ECServer::ERR));
-	}
-
-	return 0;
+	return parsemsg(cmdname, parv);
 }
 
 int TRealClient::parse_this()
@@ -256,7 +280,11 @@ TClient *ECServer::addclient(int fd, const char *ip)
 	{
 		if(myClients.size() >= GetConf()->MaxConnexions())
 		{
-			send(fd, app.rpl(ECServer::SERVFULL), strlen(app.rpl(ECServer::SERVFULL)), 0);
+			std::string buf;
+			buf += static_cast<char>(MSG_ERROR);
+			buf += " ";
+			buf += static_cast<char>(ERR_SERV_FULL);
+			send(fd, buf.c_str(), buf.size(), 0);
 			return 0;
 		}
 		if(myClients[fd])
@@ -277,7 +305,7 @@ TClient *ECServer::addclient(int fd, const char *ip)
 		myClients[fd] = newC;
 		if((unsigned)fd > highsock) highsock = fd;
 
-		newC->sendrpl(rpl(ECServer::HELLO));
+		newC->sendrpl(MSG_HELLO, ECArgs(SERV_SMALLNAME, APP_PVERSION));
 	}
 	Clients.push_back(newC);
 
@@ -402,25 +430,33 @@ int ECServer::init_socket(void)
 	return 1;
 }
 
-int ECServer::SendMetaServer(std::string s)
+int ECServer::SendMetaServer(ECMessage s, ECArgs args)
 {
 	if(ms_sock == 0) return -1;
 
-	s = s + "\r\n";
+	std::string buf;
+	buf += static_cast<char>(s);
+	if(!args.Empty())
+		buf += " " + args.String();
 
-	send(ms_sock, s.c_str(), s.size(), 0);
+	buf += "\r\n";
+
+	send(ms_sock, buf.c_str(), buf.size(), 0);
 
 	return 0;
 }
 
-int ECServer::MSet(std::string c, std::string s)
+int ECServer::MSet(std::string c, ECArgs args)
 {
-	return SendMetaServer("SET " + c + " " + s);
+	ECArgs s(c);
+	s += args;
+
+	return SendMetaServer(MSG_SET, s);
 }
 
 void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
 {
-	server->SendMetaServer("POG");
+	server->SendMetaServer(MSG_PONG);
 }
 
 void ECServer::ParseMetaServer()
@@ -437,14 +473,14 @@ void ECServer::ParseMetaServer()
 
 	static struct
 	{
-		std::string cmd;
+		ECMessage cmd;
 		void (*func) (ECServer*, std::vector<std::string>);
 	} cmds[] =
 	{
-		{ "PIG",  ms_ping }
+		{ MSG_PING,  ms_ping }
 	};
 
-	std::string cmdname;
+	ECMessage cmdname;
 	std::vector<std::string> parv;
 
 	SplitBuf(buf, &parv, &cmdname);
@@ -505,8 +541,8 @@ bool ECServer::ConnectMetaServer()
 	if((unsigned)ms_sock > highsock)
 		highsock = ms_sock;
 
-	SendMetaServer("IAM " + conf->ServerName() + " " SERV_SMALLNAME " " APP_MSPROTO);
-	MSet("+iPGv", TypToStr(conf->Port()) + " " + TypToStr(conf->MaxConnexions()) + " " + TypToStr(conf->MaxGames()) + " " APP_PVERSION);
+	SendMetaServer(MSG_IAM, ECArgs(conf->ServerName(), SERV_SMALLNAME, APP_MSPROTO));
+	MSet("+iPGv", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION));
 
 	return true;
 }
@@ -530,7 +566,7 @@ int ECServer::run_server(void)
 			if(!app.GetConf()->load())
 				Debug(W_WARNING, "HUP Reload: Configuration isn't good, we continue to use our actual configuration.");
 			else
-				MSet("+PG", TypToStr(conf->MaxConnexions()) + " " + TypToStr(conf->MaxGames()));
+				MSet("+PG", ECArgs(TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames())));
 			flags &= ~F_RELOAD;
 		}
 

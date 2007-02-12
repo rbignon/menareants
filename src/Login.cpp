@@ -44,6 +44,7 @@
 TConnectedForm  *ConnectedForm  = NULL;
 TListServerForm *ListServerForm = NULL;
 static bool RC_MOTD = false;
+extern bool JOINED;
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 
 /** We are connected to server.
@@ -52,7 +53,7 @@ bool EOL = false;                     /**< EOL is setted to \a true by thread wh
  */
 int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->sendrpl(me->rpl(EC_Client::IAM), Config::GetInstance()->nick.c_str());
+	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_PVERSION));
 	return 0;
 }
 
@@ -74,28 +75,63 @@ int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->sendrpl(me->rpl(EC_Client::PONG));
+	me->sendrpl(MSG_PONG);
 
 	return 0;
 }
 
-/** My nickname is already used by another user.
+/** This is a handler for errors messages.
  *
- * Syntax: USED
+ * Syntax: ERROR number [args]
  */
-int USEDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->SetCantConnect("Le pseudo " + Config::GetInstance()->nick + " est pris");
-	return 0;
-}
+	ECError err = static_cast<ECError>(parv[1][0]);
+	std::string ErrMessage;
 
-/** This server rejects me because it is full.
- *
- * Syntax: ER3
- */
-int ER3Command::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	me->SetCantConnect("Le serveur est plein");
+	switch(err)
+	{
+		case ERR_UNKNOWN:
+			break;
+		case ERR_NICK_USED:
+			me->SetCantConnect("Le pseudo " + Config::GetInstance()->nick + " est pris");
+			break;
+		case ERR_CANT_JOIN:
+			JOINED = -1;
+			ErrMessage = "Impossible de joindre la partie, elle n'existe peut être plus, elle est pleine "
+			             "ou a démarrée.";
+			break;
+		case ERR_IA_CANT_JOIN:
+			ErrMessage = "Impossible de créer cette IA pour une des raisons suivantes:\n"
+			             "- Le pseudo choisi est incorrect.\n"
+			             "- Le pseudo choisi est déjà utilisé par une autre IA (pas forcément dans votre partie).\n"
+			             "- Il n'y a plus de place pour un joueur supplémentaire.";
+			break;
+		case ERR_SERV_FULL:
+			me->SetCantConnect("Le serveur est plein");
+			break;
+		case ERR_CANT_CREATE:
+			JOINED = -1;
+			ErrMessage = "Impossible de créer la partie, il y a trop de parties sur ce serveur.";
+			break;
+		case ERR_CMDS:
+			ErrMessage = "Le serveur a émit une erreur concernant le traitement d'une commande que nous lui avons transféré.";
+			break;
+		case ERR_ADMIN_LOGFAIL:
+			ErrMessage = "Mot de passe incorrect.";
+			break;
+		case ERR_ADMIN_NOSUCHVICTIM:
+			ErrMessage = "Personne ne possède le pseudo " + parv[2];
+			break;
+		case ERR_ADMIN_CANT_REHASH:
+			ErrMessage = "Il y a eu une erreur lors du rechargement de la configuration. Veuillez vérifier.";
+			break;
+		case ERR_ADMIN_SUCCESS:
+			ErrMessage = "Opération accomplie avec succès.";
+			break;
+	}
+	if(!ErrMessage.empty())
+		TForm::Message = ErrMessage;
 	return 0;
 }
 
@@ -258,7 +294,7 @@ int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int HELmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	me->SetConnected();
-	me->sendrpl("IAM %s " CLIENT_SMALLNAME " " APP_MSPROTO, Config::GetInstance()->nick.c_str());
+	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_MSPROTO));
 	me->UnsetLogging();
 	return 0;
 }
@@ -376,10 +412,10 @@ void MenAreAntsApp::RefreshList()
 	client->SetHostName(Config::GetInstance()->hostname);
 	client->SetPort(Config::GetInstance()->port);
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
-	client->AddCommand(new HELmsCommand("HEL",	0,	1));
-	client->AddCommand(new LSPmsCommand("LSP",	0,	1));
-	client->AddCommand(new EOLmsCommand("EOL",	0,	0));
-	client->AddCommand(new STATmsCommand("STAT",	0,	2));
+	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
+	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
+	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
+	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
 
 	Thread = SDL_CreateThread(EC_Client::read_sock, client);
 
@@ -561,43 +597,39 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->SetMutex(mutex);
 	client->SetHostName(stringtok(host, ":"));
 	client->SetPort(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
-	/* Ajout des commandes            CMDNAME	FLAGS	ARGS */
-	client->AddCommand(new ARMCommand("ARM",	0,	0));
+	/* Ajout des commandes            CMDNAME		FLAGS	ARGS */
+	client->AddCommand(new ARMCommand(MSG_ARM,		0,	0));
 
-	client->AddCommand(new PIGCommand("PIG",	0,	0));
-	client->AddCommand(new HELCommand("HEL",	0,	1));
-	client->AddCommand(new AIMCommand("AIM",	0,	1));
-	client->AddCommand(new USEDCommand("USED",	0,	0));
-	client->AddCommand(new MAJCommand("MAJ",	0,	1));
-	client->AddCommand(new MOTDCommand("MOTD",	0,	0));
-	client->AddCommand(new EOMCommand("EOM",	0,	0));
-	client->AddCommand(new STATCommand("STAT",	0,	7));
-	client->AddCommand(new ER1Command("ER1",	0,	0));
-	client->AddCommand(new ER2Command("ER2",	0,	1));
-	client->AddCommand(new ER3Command("ER3",	0,	0));
-	client->AddCommand(new ER4Command("ER4",	0,	0));
+	client->AddCommand(new PIGCommand(MSG_PING,		0,	0));
+	client->AddCommand(new HELCommand(MSG_HELLO,		0,	1));
+	client->AddCommand(new AIMCommand(MSG_LOGGED,		0,	1));
+	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
+	client->AddCommand(new MAJCommand(MSG_MAJ,		0,	1));
+	client->AddCommand(new MOTDCommand(MSG_MOTD,		0,	0));
+	client->AddCommand(new EOMCommand(MSG_ENDOFMOTD,	0,	0));
+	client->AddCommand(new STATCommand(MSG_STAT,		0,	7));
 
-	client->AddCommand(new LSPCommand("LSP",	0,	3));
-	client->AddCommand(new EOLCommand("EOL",	0,	0));
+	client->AddCommand(new LSPCommand(MSG_GLIST,		0,	3));
+	client->AddCommand(new EOLCommand(MSG_ENDOFGLIST,	0,	0));
 
-	client->AddCommand(new BPCommand("BP",		0,	1));
+	client->AddCommand(new BPCommand(MSG_BREAKPOINT,	0,	1));
 
-	client->AddCommand(new JOICommand("JOI",	0,	1));
-	client->AddCommand(new SETCommand("SET",	0,	1));
-	client->AddCommand(new PLSCommand("PLS",	0,	1));
-	client->AddCommand(new LEACommand("LEA",	0,	0));
-	client->AddCommand(new KICKCommand("KICK",	0,	1));
-	client->AddCommand(new MSGCommand("MSG",	0,	1));
-	client->AddCommand(new INFOCommand("INFO",	0,	1));
+	client->AddCommand(new JOICommand(MSG_JOIN,		0,	1));
+	client->AddCommand(new SETCommand(MSG_SET,		0,	1));
+	client->AddCommand(new PLSCommand(MSG_PLIST,		0,	1));
+	client->AddCommand(new LEACommand(MSG_LEAVE,		0,	0));
+	client->AddCommand(new KICKCommand(MSG_KICK,		0,	1));
+	client->AddCommand(new MSGCommand(MSG_MSG,		0,	1));
+	client->AddCommand(new INFOCommand(MSG_INFO,		0,	1));
 
-	client->AddCommand(new LSMCommand("LSM",	0,	3));
-	client->AddCommand(new EOMAPCommand("EOMAP",	0,	0));
-	client->AddCommand(new SMAPCommand("SMAP",	0,	1));
-	client->AddCommand(new EOSMAPCommand("EOSMAP",	0,	0));
+	client->AddCommand(new LSMCommand(MSG_LISTMAPS,		0,	3));
+	client->AddCommand(new EOMAPCommand(MSG_ENDOFMAPS,	0,	0));
+	client->AddCommand(new SMAPCommand(MSG_SENDMAP,		0,	1));
+	client->AddCommand(new EOSMAPCommand(MSG_ENDOFSMAP,	0,	0));
 
-	client->AddCommand(new SCOCommand("SCO",	0,	4));
-	client->AddCommand(new REJOINCommand("REJOIN",	0,	1));
-	client->AddCommand(new ADMINCommand("ADMIN",	0,	0));
+	client->AddCommand(new SCOCommand(MSG_SCORE,		0,	4));
+	client->AddCommand(new REJOINCommand(MSG_REJOIN,	0,	1));
+	client->AddCommand(new ADMINCommand(MSG_ADMIN,		0,	0));
 
 	Thread = SDL_CreateThread(EC_Client::read_sock, client);
 
@@ -726,7 +758,7 @@ void TConnectedForm::AfterDraw()
 		JoinButton->SetEnabled(false);
 		GList->ClearItems();
 		EOL = false;
-		client->sendrpl(client->rpl(EC_Client::LISTGAME));
+		client->sendrpl(MSG_GLIST);
 		WAIT_EVENT(EOL, j);
 		if(!EOL)
 			return;
@@ -759,7 +791,7 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		refresh = true;
 		timer.reset();
-		client->sendrpl(client->rpl(EC_Client::STAT));
+		client->sendrpl(MSG_STAT);
 	}
 	else if(RefreshButton->Test(mouse, button))
 		refresh = true;
@@ -772,18 +804,18 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		refresh = true;
 		timer.reset();
-		client->sendrpl(client->rpl(EC_Client::STAT));
+		client->sendrpl(MSG_STAT);
 	}
 	else if(mouse.x < 10 && mouse.y < 10)
 	{
 		TMessageBox mb("Vous êtes sur le point de vous logger en temps qu'administrateur du serveur.\n\n"
 		               "Veuillez entrer le mot de passe :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
 		if(mb.Show() == BT_OK)
-			client->sendrpl(client->rpl(EC_Client::ADMIN), ("LOGIN " + mb.Edit()->Text()).c_str());
+			client->sendrpl(MSG_ADMIN, ECArgs("LOGIN", mb.Edit()->Text()));
 	}
 	else if(RehashButton->Test(mouse, button))
 	{
-		client->sendrpl(client->rpl(EC_Client::ADMIN), "REHASH");
+		client->sendrpl(MSG_ADMIN, "REHASH");
 		TMessageBox("Configuration mise à jour", BT_OK, this);
 	}
 	else if(KillButton->Test(mouse, button))
@@ -791,7 +823,7 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 		TMessageBox mb("Entrez le pseudo de la personne à déconnecter :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
 		if(mb.Show() == BT_OK)
 		{
-			client->sendrpl(client->rpl(EC_Client::ADMIN), ("KILL " + mb.Edit()->Text()).c_str());
+			client->sendrpl(MSG_ADMIN, ECArgs("KILL", mb.Edit()->Text()));
 			TMessageBox("Si cette personne était connectée, elle a probablement été tuée.\n"
 			            "Il est à noter que pour le moment il n'y a pas de notification de la chose",
 			            BT_OK, this).Show();

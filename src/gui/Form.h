@@ -170,6 +170,8 @@ public:
 	bool WantQuit() const { return want_quit; }
 	void SetWantQuit(bool b = true) { want_quit = b; }
 
+	static std::string Message;
+
 /* Variables protégées */
 protected:
 

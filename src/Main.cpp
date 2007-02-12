@@ -55,10 +55,10 @@
 
 extern const char* SVNVERSION;
 #ifdef APP_VERSION_PATCH
-std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
+std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
                           std::string("-") + APP_VERSION_PATCH;
 #else
-std::string APP_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA);
+std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA);
 #endif
 
 class TMainForm : public TForm
@@ -303,7 +303,7 @@ TMainForm::TMainForm(ECImage* w)
 	QuitterButton = AddComponent(new TButton(300,470, 150,50));
 	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), Video::GetInstance()->Window()));
 
-	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
+	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_CLIENT_VERSION, white_color, Font::GetInstance(Font::Big)));
 
 	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
 

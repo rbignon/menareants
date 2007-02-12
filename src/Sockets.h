@@ -34,6 +34,7 @@ typedef struct fd_set {
 const int MAXBUFFER=1024;
 
 #include "Commands.h"
+#include "lib/Messages.h"
 
 class EC_ACommand;
 class ECPlayer;
@@ -88,8 +89,9 @@ public:
 
 	bool Connect(const char *hostname, unsigned short port);
 
-	int sendrpl(const char *pattern, ...);
-	static char *rpl(msg t);
+	int sendrpl(const ECMessage& cmd, ECArgs args = ECArgs());
+	int sendrpl(const ECError& err, ECArgs args = ECArgs());
+	int sendbuf(std::string s);
 
 	bool IsConnected() const { return connected; }
 	void SetConnected() { connected = true; }

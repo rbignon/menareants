@@ -49,13 +49,14 @@ public:
 	virtual void RemoveEntity(ECBEntity* e);
 
 	/** Send an unformated message. */
-	int sendbuf(char* buf, int len) { return ia_recv(buf); }
+	virtual int sendrpl(const ECPacket& pack) { return ia_recv(pack); }
+	virtual int sendrpl(const ECError&, ECArgs = ECArgs()) { return 0; }
 
-	int ia_recv(std::string msg);
+	int ia_recv(const ECPacket&);
 	void recv_msgs();
-	int recv_one_msg(std::string msg);
+	int recv_one_msg(const ECPacket& msg);
 
-	int ia_send(std::string msg) { return parsemsg(msg); }
+	int ia_send(const ECPacket& msg) { return parsemsg(msg); }
 
 	bool Join(EChannel* chan);
 
@@ -125,7 +126,7 @@ private:
 /* Variables privées */
 private:
 	bool lock;
-	std::vector<std::string> msgs;
+	std::vector<ECPacket> msgs;
 
 	std::map<int, uint> units;
 

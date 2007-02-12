@@ -33,11 +33,11 @@ static void list_servers(struct Client* cl)
 {
 	struct Server* s = server_head;
 	for(; s; s = s->next)
-		sendrpl(cl, "LSP %s:%d %s %c %d %d %d %d %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
+		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
 		                   ((s->nb_games - s->nb_wait_games) >= s->max_games || s->nb_players >= s->max_players) ? '-' : '+',
 		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto);
 
-	sendrpl(cl, "EOL");
+	sendcmd(cl, MSG_ENDOFSLIST);
 	return;
 }
 
@@ -67,12 +67,12 @@ int m_login (struct Client* cl, int parc, char** parv)
 			struct User* user = user_head;
 			for(; user; user = user->next)
 				if(!strcasecmp(user->name, parv[1]))
-					return sendrpl(cl, "NICKUSED");
+					return senderr(cl, ERR_NICK_USED);
 
 			add_user(cl, parv[1]);
 		}
 		cl->flags = CL_USER;
-		sendrpl(cl, "STAT %d %d", nb_tchan, nb_tusers);
+		sendrpl(cl, MSG_STAT, "%d %d", nb_tchan, nb_tusers);
 		list_servers(cl);
 		if(proto <= 1)
 			delclient(cl);

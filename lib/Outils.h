@@ -22,6 +22,7 @@
 #define Outils_hpp
 #include <sstream>
 #include <vector>
+#include "Messages.h"
 
 typedef unsigned int   uint;
 
@@ -45,7 +46,7 @@ bool is_ip(const char *ip);
 std::string StringF(const char* format, ...);
 
 /** Mets une chaine dans un tableau de chaines */
-void SplitBuf(std::string buf, std::vector<std::string> *parv, std::string *cmdname);
+void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage* cmd);
 
 /** Retourne si le fichier existe ou non */
 bool FichierExiste(const std::string &nom);
