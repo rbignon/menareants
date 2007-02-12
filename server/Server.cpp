@@ -465,6 +465,7 @@ void ECServer::ParseMetaServer()
 	if(recv(ms_sock, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
 	{
 		Debug(W_WARNING, "Error in recv(meta-server) (%d: %s)\n", errno, strerror(errno));
+		FD_CLR(ms_sock, &global_fd_set);
 		close(ms_sock);
 		ms_sock = 0;
 		ConnectMetaServer();

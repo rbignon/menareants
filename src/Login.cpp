@@ -504,6 +504,16 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		MenAreAntsApp::GetInstance()->ConnectedTo(ServerList->SelectedItem()->Value());
 		MenAreAntsApp::GetInstance()->RefreshList();
 	}
+	else if(ConnectToButton->Test(mouse, button))
+	{
+		TMessageBox msg("Veuillez entrer l'hostname d'un serveur ainsi qu'éventuellement le port, sous forme :\n"
+		                "  hostname[:port]", BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		if(msg.Show() == BT_OK)
+		{
+			MenAreAntsApp::GetInstance()->ConnectedTo(msg.Edit()->Text());
+			MenAreAntsApp::GetInstance()->RefreshList();
+		}
+	}
 	else if(RetourButton->Test(mouse, button))
 	{
 		if(EC_Client::GetInstance())
@@ -581,7 +591,9 @@ TListServerForm::TListServerForm(ECImage* w)
 	ConnectButton = AddComponent(new TButtonText(button_x, ServerList->Y(), 150,50, "Se connecter",
 	                                            Font::GetInstance(Font::Normal)));
 	ConnectButton->SetEnabled(false);
-	RefreshButton = AddComponent(new TButtonText(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50, "Actualiser",
+	ConnectToButton = AddComponent(new TButtonText(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50, "Entrer un serveur",
+	                                            Font::GetInstance(Font::Normal)));
+	RefreshButton = AddComponent(new TButtonText(button_x, ConnectToButton->Y()+ConnectToButton->Height(), 150,50, "Actualiser",
 	                                            Font::GetInstance(Font::Normal)));
 	RetourButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, "Retour",
 	                                          Font::GetInstance(Font::Normal)));

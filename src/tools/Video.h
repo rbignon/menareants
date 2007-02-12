@@ -81,6 +81,7 @@ private:
 	bool fullscreen;
 
 	ECImage window;
+	SDL_Surface* icon;
 
 public:
 

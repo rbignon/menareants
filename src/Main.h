@@ -72,7 +72,7 @@ public:
 	int main(int argc, char** argv);
 	char *get_title();
 
-	void quit_app();
+	void UnLoad();
 
 	std::string GetPath() const { return path; }
 

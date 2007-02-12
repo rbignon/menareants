@@ -32,6 +32,12 @@
 int myproto=0;
 int pingfreq = DEFPINGFREQ;
 int port = DEFPORT;
+extern int running;
+
+void sig_die(int c)
+{
+	running = 0;
+}
 
 int main(int argc, char **argv)
 {
@@ -48,7 +54,7 @@ int main(int argc, char **argv)
 			case 'f':
 				pingfreq = atoi(optarg);
 				break;
-			case 'P':
+			case 'p':
 				port = atoi(optarg);
 				break;
 			case 'v':
@@ -63,6 +69,7 @@ int main(int argc, char **argv)
 		}
 
 	signal(SIGPIPE, SIG_IGN);
+	signal(SIGTERM, &sig_die);
 
 	if(background)
 	{
@@ -85,6 +92,8 @@ int main(int argc, char **argv)
 
 	if(init_socket())
 		run_server();
+
+	clean_up();
 
 	exit(EXIT_SUCCESS);
 }

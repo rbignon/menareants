@@ -37,6 +37,7 @@
 #define ASIZE(x) (sizeof (x) / sizeof *(x))
 
 struct Server;
+struct in_addr;
 
 #define CL_FREE   0x01
 #define CL_SERVER 0x02
@@ -56,13 +57,14 @@ struct Client
 	time_t last_read;
 };
 
-struct Client *addclient(int fd, const char *ip);
+struct Client *addclient(int fd, struct in_addr *addr);
 int delclient(struct Client *del);
 int senderr(struct Client* cl, enum ECError err);
 int sendcmd(struct Client* cl, enum ECMessage cmd);
 int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...);
 int run_server(void);
 int init_socket(void);
+void clean_up(void);
 
 extern unsigned nb_tchan;
 extern unsigned nb_tusers;

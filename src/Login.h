@@ -86,6 +86,7 @@ public:
 	TButtonText* RetourButton;
 	TButtonText* RefreshButton;
 	TButtonText* ConnectButton;
+	TButtonText* ConnectToButton;
 	TButton*     MissionButton;
 	TButton*     EscarmoucheButton;
 	TLabel*      Label1;

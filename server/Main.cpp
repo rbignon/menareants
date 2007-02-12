@@ -43,6 +43,9 @@ void ECServer::CleanUp()
 	for(MapVector::iterator it = MapList.begin(); it != MapList.end(); ++it)
 		delete *it;
 
+	for(MapVector::iterator it = MissionList.begin(); it != MissionList.end(); ++it)
+		delete *it;
+
 	for(std::vector<EC_ACommand*>::iterator it = Commands.begin(); it != Commands.end(); ++it)
 		delete *it;
 }
@@ -56,10 +59,10 @@ void ECServer::sig_alarm()
 		TClient *cl = it->second;
 		++it;
 		if(IsPing(cl))
-			cl->exit(rpl(ECServer::BYE));
+			cl->exit(MSG_BYE);
 		else if(time_t(cl->GetLastRead() + GetConf()->PingFreq()) <= CurrentTS)
 		{
-			cl->sendrpl(rpl(ECServer::PING));
+			cl->sendrpl(MSG_PING);
 			SetPing(cl);
 		}
 	}

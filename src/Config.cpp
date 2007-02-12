@@ -229,7 +229,7 @@ void Config::WantAddServer(TObject* OkButton, void* configinst)
 	}
 	std::string host = stringtok(port, ":");
 	if(port.empty())
-		port = "5461";
+		port = "5460";
 	else if(!is_num(port.c_str()))
 	{
 		TMessageBox("Le port doit être une valeur numerique.", BT_OK, form).Show();

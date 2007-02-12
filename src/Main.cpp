@@ -122,7 +122,7 @@ void MenAreAntsApp::WantConfig(TObject*, void* b)
 	TMainForm::enter_in_main = true;
 }
 
-void MenAreAntsApp::quit_app()
+void MenAreAntsApp::UnLoad()
 {
 #ifdef WIN32
 	WSACleanup();
@@ -245,18 +245,16 @@ int MenAreAntsApp::main(int argc, char **argv)
 #ifdef DEBUG
 		std::cout << e.Vars() << std::endl;
 #endif
-		quit_app();
 	}
 #ifndef DEBUG
 	catch (const std::exception &err)
 	{
 		std::cout << std::endl << "Exception caught from STL:" << std::endl;
 		std::cout << err.what() << std::endl;
-		quit_app();
 	}
 #endif
 
-	quit_app();
+	UnLoad();
 	return 0;
 
 }

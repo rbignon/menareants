@@ -95,8 +95,6 @@ int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...)
 	send(cl->fd, (char*)&cmd, 1, 0);
 	send(cl->fd, " ", 1, 0);
 
-	//snprintf(buf, sizeof buf - 2, "%c %s", cmd, pattern);
-
 	va_start(vl, pattern);
 	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
 	if(len > sizeof buf - 2) len = sizeof buf -2;
@@ -207,9 +205,10 @@ int parse_this(struct Client* cl)
 }
 
 
-struct Client *addclient(int fd, const char *ip)
+struct Client *addclient(int fd, struct in_addr *addr)
 {
 	struct Client *newC = NULL;
+	const char* ip = inet_ntoa(*addr);
 
 	if(fd >= MAXCLIENTS)
 		return 0;
@@ -239,15 +238,18 @@ struct Client *addclient(int fd, const char *ip)
 
 int delclient(struct Client *del)
 {
+	unsigned int fd = del->fd;
+
 	FD_CLR(del->fd, &global_fd_set);
-	del->flags = CL_FREE;
 	if(del->server)
 		remove_server(del->server);
 	if(del->user)
 		remove_user(del->user);
+	del->flags = CL_FREE;
+	del->fd = 0;
 
-	close(del->fd);
-	if(del->fd >= highsock)
+	close(fd);
+	if(fd >= highsock)
 	{
 		unsigned int i;
 		highsock = sock;
@@ -306,6 +308,26 @@ int init_socket(void)
 	return 1;
 }
 
+void clean_up(void)
+{
+	unsigned int i;
+	for(i = 0; i < ASIZE(myClients); ++i)
+		if(myClients[i].flags != CL_FREE)
+		{
+			struct Client* del = &myClients[i];
+
+			FD_CLR(del->fd, &global_fd_set);
+			if(del->server)
+				remove_server(del->server);
+			if(del->user)
+				remove_user(del->user);
+			del->flags = CL_FREE;
+			del->fd = 0;
+
+			close(del->fd);
+		}
+}
+
 int run_server(void)
 {
 	fd_set tmp_fdset;
@@ -346,7 +368,7 @@ int run_server(void)
 					unsigned int addrlen = sizeof newcon;
 					int newfd = accept(sock, (struct sockaddr *) &newcon, &addrlen);
 					if(newfd > 0)
-						if(!addclient(newfd, inet_ntoa(newcon.sin_addr))) close(newfd);
+						if(!addclient(newfd, &newcon.sin_addr)) close(newfd);
 				}
 				else
 				{
