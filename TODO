@@ -3,7 +3,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--nouvelle version du protocole, créer une nouvelle branche
 -améliorer le proto2 du meta-server (gestion d'une base de données d'users)
 
 * Urgent
