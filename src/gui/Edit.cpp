@@ -102,7 +102,11 @@ void TEdit::Redraw()
 	if(chaine.size() > visible_len)
 		substring = chaine.substr(first_char, first_char+visible_len);
 	else
+	{
 		substring = chaine;
+		first_char = 0;
+		caret = chaine.size();
+	}
 
 	/* Le " " est nécessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
 	edit = font->CreateSurface(substring + " ", color);
@@ -126,35 +130,29 @@ void TEdit::PressKey(SDL_keysym key)
 		case SDLK_BACKSPACE:
 			if(chaine.size() > 0 && caret > 0)
 			{
-				if(caret == first_char)
-					first_char--;
-				caret--;
-				chaine.erase(chaine.begin() + caret);
-				have_redraw = true;
-			}
-			break;
-		case SDLK_DELETE:
-			if(chaine.size() > 0 && caret < chaine.size())
-			{
-				chaine.erase(chaine.begin() + caret);
+				while(caret && (chaine[--caret] & 0xc0) == 0x80)
+					chaine.erase(caret, 1);
+				chaine.erase(caret, 1);
+				if(first_char > 0)
+					while(first_char && (chaine[--first_char] & 0xc0) == 0x80);
 				have_redraw = true;
 			}
 			break;
 		case SDLK_LEFT:
 			if(caret > 0)
 			{
-				if(caret == first_char)
-					first_char--;
-				caret--;
+				while(caret && (chaine[--caret] & 0xc0) == 0x80);
+				if(caret < first_char)
+					first_char = caret;
 				have_redraw = true;
 			}
 			break;
 		case SDLK_RIGHT:
 			if(caret < chaine.size())
 			{
-				if(caret == visible_len + first_char)
-					first_char++;
-				caret++;
+				while((chaine[++caret] & 0xc0) == 0x80);
+				if(caret > visible_len + first_char)
+					first_char = caret - visible_len;
 				have_redraw = true;
 			}
 			break;
@@ -168,11 +166,14 @@ void TEdit::PressKey(SDL_keysym key)
 			first_char = caret > visible_len ? caret - visible_len : 0;
 			have_redraw = true;
 			break;
+		case SDLK_DELETE:
 		case SDLK_RETURN: break; /* On ne prend pas "entrée" comme un caractère */
 		default:
 		{
 			if(maxlen && chaine.size() >= maxlen)
 				return;
+			if(key.unicode < '!' && key.unicode != ' ') return;
+
 			std::string new_txt = chaine;
 			if(key.unicode > 0)
 			{
@@ -214,8 +215,11 @@ void TEdit::PressKey(SDL_keysym key)
 
 			chaine = new_txt;
 
-			while(caret > visible_len + first_char)
-				first_char++;
+			if(caret > visible_len + first_char)
+			{
+				first_char = caret - visible_len;
+				while((chaine[first_char] & 0xc0) == 0x80) ++first_char;
+			}
 			have_redraw = true;
 			break;
 		}
