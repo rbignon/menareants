@@ -27,7 +27,7 @@
 
 #include "Component.h"
 
-#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN1234567890 .+-*/,;:!?()[]={}'\"&<>$éèâ`_çàê"
+#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN1234567890 .+-*/,;:!?()[]={}'\"&<>$"
 
 struct ECImage;
 class Font;
@@ -85,7 +85,7 @@ private:
 	uint first_char;
 	std::string chaine;
 	bool show_background;
-	uint caret;
+	std::string::size_type caret;
 	char* avail_chars;
 	bool have_redraw;
 	uint EDIT_HEIGHT;

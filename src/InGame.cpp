@@ -1212,7 +1212,7 @@ TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
 	BarreAct = AddComponent(new TBarreAct(player));
 	BarreLat = AddComponent(new TBarreLat(player));
 
-	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 30,20,400, MAXBUFFER-20, EDIT_CHARS, false));
+	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 30,20,400, MAXBUFFER-20, 0, false));
 	SendMessage->SetColor(white_color);
 	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 30, 20 + SendMessage->Height() + 20,
 	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30,

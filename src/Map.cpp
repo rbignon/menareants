@@ -765,7 +765,7 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 					}
 				}
 			}
-			SDL_Surface *txtsurf = TTF_RenderText_Blended(&(Font::GetInstance(Font::Small)->GetTTF()),
+			SDL_Surface *txtsurf = TTF_RenderUTF8_Blended(&(Font::GetInstance(Font::Small)->GetTTF()),
 			                                  TypToStr((*it)->Num()).c_str(), white_color.GetSDLColor());
 			SDL_Rect dst_rect;
 			dst_rect.x = (begin_x+max_x)/2 * size_x;

@@ -113,6 +113,8 @@ class KICKCommand : public EC_ACommand { public: KICKCommand(const ECMessage& _C
 
 class MSGCommand : public EC_ACommand { public: MSGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~MSGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class AMSGCommand : public EC_ACommand { public: AMSGCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~AMSGCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 class INFOCommand : public EC_ACommand { public: INFOCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~INFOCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
 class SETCommand : public EC_ACommand { public: SETCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args) : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SETCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

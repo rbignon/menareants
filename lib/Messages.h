@@ -26,45 +26,45 @@ enum ECMessage
 {
 	MSG_NONE,
 
-	MSG_HELLO = 'A',
-	MSG_IAM,
-	MSG_MAJ,
-	MSG_PING,
-	MSG_PONG,
-	MSG_REJOIN,
-	MSG_MOTD,
-	MSG_ENDOFMOTD,
-	MSG_LOGGED,
-	MSG_BYE,
-	MSG_ADMIN,
-	MSG_ERROR,
-	MSG_STAT,
+	MSG_HELLO =      'A',
+	MSG_IAM,       // B
+	MSG_MAJ,       // C
+	MSG_PING,      // D
+	MSG_PONG,      // E
+	MSG_REJOIN,    // F
+	MSG_MOTD,      // G
+	MSG_ENDOFMOTD, // H
+	MSG_LOGGED,    // I
+	MSG_BYE,       // J
+	MSG_ADMIN,     // K
+	MSG_ERROR,     // L
+	MSG_STAT,      // M
 
-	MSG_GLIST,
-	MSG_ENDOFGLIST,
+	MSG_GLIST,     // N
+	MSG_ENDOFGLIST,// O
 
-	MSG_JOIN,
-	MSG_LEAVE,
-	MSG_KICK,
-	MSG_SET,
-	MSG_IA_JOIN,
-	MSG_LISTMAPS,
-	MSG_ENDOFMAPS,
-	MSG_SENDMAP,
-	MSG_ENDOFSMAP,
-	MSG_PLIST,
+	MSG_JOIN,      // P
+	MSG_LEAVE,     // Q
+	MSG_KICK,      // R
+	MSG_SET,       // S
+	MSG_IA_JOIN,   // T
+	MSG_LISTMAPS,  // U
+	MSG_ENDOFMAPS, // V
+	MSG_SENDMAP,   // W
+	MSG_ENDOFSMAP, // X
+	MSG_PLIST,     // Y
 
-	MSG_ARM,
-	MSG_BREAKPOINT,
-	MSG_MSG,
-	MSG_AMSG,
-	MSG_INFO,
-	MSG_SAVE,
+	MSG_ARM,       // Z
+	MSG_BREAKPOINT = 'a',
+	MSG_MSG,       // b
+	MSG_AMSG,      // c
+	MSG_INFO,      // d
+	MSG_SAVE,      // e
 
-	MSG_SCORE,
+	MSG_SCORE,     // f
 
-	MSG_SERVLIST,
-	MSG_ENDOFSLIST
+	MSG_SERVLIST,  // g
+	MSG_ENDOFSLIST // h
 
 };
 

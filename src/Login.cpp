@@ -646,6 +646,7 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->AddCommand(new LEACommand(MSG_LEAVE,		0,	0));
 	client->AddCommand(new KICKCommand(MSG_KICK,		0,	1));
 	client->AddCommand(new MSGCommand(MSG_MSG,		0,	1));
+	client->AddCommand(new AMSGCommand(MSG_AMSG,		0,	1));
 	client->AddCommand(new INFOCommand(MSG_INFO,		0,	1));
 
 	client->AddCommand(new LSMCommand(MSG_LISTMAPS,		0,	3));

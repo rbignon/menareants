@@ -170,8 +170,6 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		srand( (long)time(NULL) );
 
-		printf("sodomisé à sec\n");
-
 		InitI18N(INSTALL_LOCALEDIR);
 
 		Config* conf = Config::GetInstance();

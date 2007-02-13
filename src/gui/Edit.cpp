@@ -173,28 +173,50 @@ void TEdit::PressKey(SDL_keysym key)
 		{
 			if(maxlen && chaine.size() >= maxlen)
 				return;
-			char c = 0;
-
-			if(key.unicode && key.unicode > 0)
-				c = (char)key.unicode;
-			else if(key.sym >= SDLK_a && key.sym <= SDLK_z)
+			std::string new_txt = chaine;
+			if(key.unicode > 0)
 			{
-				if(key.mod & KMOD_SHIFT)
-					c = 'A' + key.sym - SDLK_a;
+				if(key.unicode < 0x80 && (!avail_chars || strchr(avail_chars, (char)key.unicode))) // 1 byte char
+					new_txt.insert(caret++, 1, (char)key.unicode);
+				else if(avail_chars)
+					break;
+				else if (key.unicode < 0x800) // 2 byte char
+				{
+					new_txt.insert(caret++, 1, (char)(((key.unicode & 0x7c0) >> 6) | 0xc0));
+					new_txt.insert(caret++, 1, (char)((key.unicode & 0x3f) | 0x80));
+				}
+				else // if (key.unicode < 0x10000) // 3 byte char
+				{
+					new_txt.insert(caret++, 1, (char)(((key.unicode & 0xf000) >> 12) | 0xe0));
+					new_txt.insert(caret++, 1, (char)(((key.unicode & 0xfc0) >> 6) | 0x80));
+					new_txt.insert(caret++, 1, (char)((key.unicode & 0x3f) | 0x80));
+				}
+			}
+			else
+			{
+				char c;
+				if(key.sym >= SDLK_a && key.sym <= SDLK_z)
+				{
+					if(key.mod & KMOD_SHIFT)
+						c = 'A' + key.sym - SDLK_a;
+					else
+						c = 'a' + key.sym - SDLK_a;
+				}
+				else if(key.sym >= SDLK_0 && key.sym <= SDLK_9)
+					c = '0' + key.sym - SDLK_0;
 				else
-					c = 'a' + key.sym - SDLK_a;
-			}
-			else if(key.sym >= SDLK_0 && key.sym <= SDLK_9)
-				c = '0' + key.sym - SDLK_0;
+					break;
+				if(avail_chars && !strchr(avail_chars, c))
+					break;
 
-			if(c && (!avail_chars || strchr(avail_chars, c)))
-			{
-				chaine.insert(chaine.begin() + caret, c);
-				if(caret == visible_len + first_char)
-					first_char++;
-				caret++;
-				have_redraw = true;
+				new_txt.insert(caret++, 1, c);
 			}
+
+			chaine = new_txt;
+
+			while(caret > visible_len + first_char)
+				first_char++;
+			have_redraw = true;
 			break;
 		}
 	}

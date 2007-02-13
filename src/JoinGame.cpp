@@ -309,6 +309,26 @@ int EOMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** We received a private message in channel.
+ *
+ * Syntax: nick AMSG message
+ */
+int AMSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(InGameForm) // AddInfo lock lui même l'écran
+		InGameForm->AddInfo(I_CHAT, "[private] <" + parv[0] + "> " + parv[1],
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? 0 : *(players.begin()));
+	else if(GameInfosForm)
+	{
+		me->LockScreen();
+		GameInfosForm->Chat->AddItem("[private] <" + parv[0] + "> " + parv[1],
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+		me->UnlockScreen();
+	}
+
+	return 0;
+}
+
 /** We received a message in channel.
  *
  * Syntax: nick MSG message

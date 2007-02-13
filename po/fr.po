@@ -6,7 +6,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: progs@coderz.info\n"
-"POT-Creation-Date: 2007-02-13 20:16+0100\n"
 "PO-Revision-Date: 2007-02-13 20:42+0100\n"
 "Last-Translator: Romain Bignon <progs@headfucking.net>\n"
 "Language-Team:  <en@li.org>\n"
@@ -105,8 +104,8 @@ msgid ""
 "%0Eo's %0Et invests %1s's McPuke installed in %2Eo's barracks!! He's going "
 "to eat everything! That will take %3s days for him!"
 msgstr ""
-"%0Et de %0Eo vient d'investir le McGerbale de %1s installé dans la caserne de %"
-"2Eo !! Il va tout bouffer ! Il lui faudra %3s jours !"
+"%0Et de %0Eo vient d'investir le McGerbale de %1s installé dans la caserne "
+"de %2Eo !! Il va tout bouffer ! Il lui faudra %3s jours !"
 
 #: src/JoinGame.cpp:78
 #, c-format
@@ -596,7 +595,8 @@ msgstr "Entrez le nom de la partie à créer"
 
 #: src/InGame.cpp:990
 msgid "Enter nickname of player you want to give this country to"
-msgstr "Entrez le pseudonyme de la personne à qui vous souhaitez donner ce territoire"
+msgstr ""
+"Entrez le pseudonyme de la personne à qui vous souhaitez donner ce territoire"
 
 #: src/Login.cpp:836
 msgid "Enter user's nickname you want to kill:"
@@ -775,8 +775,10 @@ msgstr "Jouano"
 #, c-format
 msgid "Jouano is eating all Big Mac ! He will finish it in %d day"
 msgid_plural "Jouano is eating all Big Mac ! He will finish it in %d days"
-msgstr[0] "Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jour"
-msgstr[1] "Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jours"
+msgstr[0] ""
+"Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jour"
+msgstr[1] ""
+"Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jours"
 
 #: src/Login.cpp:872
 msgid "Kill an user"
@@ -937,8 +939,11 @@ msgid ""
 "attacks.\n"
 "The NOD's obelisk is a reference to a cult game."
 msgstr ""
-"L'obélisque du NOD multiplie considérablement la puissance contre les véhicules et l'infanterie, et peut maintenant toucher les bâtiments (hormis le centre ville) !\n"
-"Elle a une portée plus importante que la tour de défense, et sera beaucoup plus résistante aux attaques contre elle.\n"
+"L'obélisque du NOD multiplie considérablement la puissance contre les "
+"véhicules et l'infanterie, et peut maintenant toucher les bâtiments (hormis "
+"le centre ville) !\n"
+"Elle a une portée plus importante que la tour de défense, et sera beaucoup "
+"plus résistante aux attaques contre elle.\n"
 "L'obélisque du NOD est un clin d'oeil à un jeu culte."
 
 #: src/InGame.cpp:1533
@@ -1170,7 +1175,8 @@ msgstr ""
 
 #: src/Login.cpp:146
 msgid "Server can't rehash configuration. Please verify it."
-msgstr "Le serveur ne peut pas recharger la configuration. Veuillez la vérifier."
+msgstr ""
+"Le serveur ne peut pas recharger la configuration. Veuillez la vérifier."
 
 #: src/Login.cpp:137
 msgid "Server doesn't understand a command we have sended"
@@ -1275,40 +1281,58 @@ msgid ""
 "The business center earns you money each turn, two times more than the city "
 "center. Whoever takes your business center becomes the owner of all the "
 "districts of the city."
-msgstr "Le centre d'affaires rapporte de l'argent chaque tour, deux fois plus que le centre ville. Celui qui prend votre centre d'affaire devient possesseur de tous les quartiers de la ville."
-
-#: src/Batiments.h:329
-msgid ""
-"The business center earns you money each turn. Whoever takes your business "
-"center becomes the owner of all the districts of the city."
-msgstr "Le centre ville rapporte de l'argent chaque tour. Celui qui prend votre centre ville devient possesseur de tous les quartiers de la ville."
+msgstr ""
+"Le centre d'affaires rapporte de l'argent chaque tour, deux fois plus que le "
+"centre ville. Celui qui prend votre centre d'affaire devient possesseur de "
+"tous les quartiers de la ville."
 
 #: src/Batiments.h:186
 msgid ""
 "The center regularly builds a missile which can be launched from the nuclear "
 "silo."
-msgstr "Le centre fabrique des missiles nucléaires fréquemment et peuvent être lancés depuis le Silo de lancement."
+msgstr ""
+"Le centre fabrique des missiles nucléaires fréquemment et peuvent être "
+"lancés depuis le Silo de lancement."
+
+#: src/Batiments.h:329
+#, fuzzy
+msgid ""
+"The city center earns you money each turn. Whoever takes your business "
+"center becomes the owner of all the districts of the city."
+msgstr ""
+"Le centre ville rapporte de l'argent chaque tour. Celui qui prend votre "
+"centre ville devient possesseur de tous les quartiers de la ville."
 
 #: src/Batiments.h:362
 msgid ""
 "The defense tower is originally located in cities. It provides a non-"
 "negligible defense, even if it has a short reach. Use missile launchers to "
 "destroy it."
-msgstr "La tour de défense se trouve dès l'origine dans les villes. Elle fournit une défense non négligeable, même si elle a une porté plutôt faible. Comptez sur les lance-missiles pour la détruire."
+msgstr ""
+"La tour de défense se trouve dès l'origine dans les villes. Elle fournit une "
+"défense non négligeable, même si elle a une porté plutôt faible. Comptez sur "
+"les lance-missiles pour la détruire."
 
 #: src/Batiments.h:223
 msgid ""
 "The launching silo can launch the nuclear missile avalaible in the nuclear "
 "research center stock. The damages caused by a H bomb are very important (6 "
 "squares around impact). Your units are not immunized."
-msgstr "Le Silo de lancement peut lancer les missiles en stock dans le Centre de recherches nucléaire. Les dégâts causés par une bombe H sont d'une importance très grande (sur 6 cases avec pour centre la zone d'impact). Vos unités ne sont pas à l'abris de vos propres tirs !!"
+msgstr ""
+"Le Silo de lancement peut lancer les missiles en stock dans le Centre de "
+"recherches nucléaire. Les dégâts causés par une bombe H sont d'une "
+"importance très grande (sur 6 cases avec pour centre la zone d'impact). Vos "
+"unités ne sont pas à l'abris de vos propres tirs !!"
 
 #: src/Batiments.h:273
 msgid ""
 "The megalopolis earns you money each turn, FIVE times more than the city "
 "center, and 2,5 times more than the business center. Whoever takes your "
 "megalopolis becomes the owner of all the districts of the city."
-msgstr "La mégalopole rapporte de l'argent chaque tour, CINQ fois plus que le centre ville, et 2,5 fois plus que le centre d'affaires. Celui qui prend votre mégalopole devient possesseur de tous les quartiers de la ville."
+msgstr ""
+"La mégalopole rapporte de l'argent chaque tour, CINQ fois plus que le centre "
+"ville, et 2,5 fois plus que le centre d'affaires. Celui qui prend votre "
+"mégalopole devient possesseur de tous les quartiers de la ville."
 
 #: src/Batiments.h:148
 msgid "The mine explodes when an unit passes on it."
@@ -1362,7 +1386,8 @@ msgstr "L'usine de chars peut construire des véhicules."
 
 #: src/Login.cpp:395
 #, c-format
-msgid "There are %d game(s) on %d servers, with %d in game and %d in preparation"
+msgid ""
+"There are %d game(s) on %d servers, with %d in game and %d in preparation"
 msgstr ""
 "Il y a %d parties sur %d serveurs, dont %d en cours de jeu et %d en "
 "préparation"
@@ -1532,7 +1557,8 @@ msgstr ""
 "et cliquer sur une case frontalière à celle où se trouve le conteneur."
 
 #: src/InGame.cpp:2022
-msgid "To make an alliance with a player, click on the box associated on the left"
+msgid ""
+"To make an alliance with a player, click on the box associated on the left"
 msgstr ""
 "Pour créer une alliance avec un joueur, cliquez sur la case associée sur la "
 "gauche"
@@ -1691,7 +1717,9 @@ msgstr ""
 
 #: src/Batiments.h:113
 msgid "Under a forest, infantry units become invisible for enemies."
-msgstr "Quand de l'infanterie passe sous une forêt elle disparait aux yeux de l'ennemie."
+msgstr ""
+"Quand de l'infanterie passe sous une forêt elle disparait aux yeux de "
+"l'ennemie."
 
 #: src/Batiments.h:146
 msgid "Underground mine"
@@ -1727,7 +1755,8 @@ msgstr ""
 
 #: src/Batiments.h:399
 msgid "Way more powerful than defense towers, C&C fans will recognize it."
-msgstr "Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
+msgstr ""
+"Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
 
 #: src/Login.cpp:729
 #, c-format
@@ -1985,4 +2014,3 @@ msgstr "l'usine de chars"
 #: src/Units.h:166
 msgid "train"
 msgstr "le train de transport"
-
