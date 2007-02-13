@@ -151,15 +151,15 @@ int ECServer::main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if(!ECMap::LoadMaps()) /* L'output est géré par LoadMaps() */
+		if(!ECMap::LoadMaps()) /* L'output est gÃ©rÃ© par LoadMaps() */
 			exit(EXIT_FAILURE);
 
 		CurrentTS = time(NULL);
 		srand( (long)CurrentTS );
 
-		/* Déclarations des commandes */
+		/* DÃ©clarations des commandes */
 		/*                                 NOM		flag		args */
-		Commands.push_back(new IAMCommand(MSG_IAM,	0,		0)); /* Args vérifié dans IAMCommand::Exec */
+		Commands.push_back(new IAMCommand(MSG_IAM,	0,		0)); /* Args vÃ©rifiÃ© dans IAMCommand::Exec */
 		Commands.push_back(new PIGCommand(MSG_PING,	0,		0));
 		Commands.push_back(new POGCommand(MSG_PONG,	0,		0));
 		Commands.push_back(new ARMCommand(MSG_ARM,	ECD_AUTH,	2));

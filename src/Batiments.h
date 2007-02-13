@@ -25,6 +25,7 @@
 #include "src/Map.h"
 #include "lib/Batiments.h"
 #include "Resources.h"
+#include "i18n.h"
 #include <assert.h>
 
 class Color;
@@ -83,9 +84,9 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Rail"; }
-	virtual const char* Infos() const { return "Les trains peuvent rouler uniquement sur les rails."; }
-	virtual const char* Qual() const { return "le rail"; }
+	virtual const char* Name() const { return _("Rail"); }
+	virtual const char* Infos() const { return _("Trains are only able to move on rails."); }
+	virtual const char* Qual() const { return _("rail"); }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Rail_Icon(); }
 	virtual bool CanBeSelected() const { return false; }
@@ -107,9 +108,9 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Forêt"; }
-	virtual const char* Qual() const { return "la forêt"; }
-	virtual const char* Infos() const { return "Quand une unité passe sous une forêt elle disparait aux yeux de l'enemie."; }
+	virtual const char* Name() const { return _("Forest"); }
+	virtual const char* Qual() const { return _("forest"); }
+	virtual const char* Infos() const { return _("Under a forest, infantry units become invisible for enemies."); }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Trees_Icon(); }
 	virtual bool CanBeSelected() const { return false; }
@@ -142,9 +143,9 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Mine sous-terraine"; }
-	virtual const char* Qual() const { return "la mine"; }
-	virtual const char* Infos() const { return "La mine explose au passage d'une unité enemie."; }
+	virtual const char* Name() const { return _("Underground mine"); }
+	virtual const char* Qual() const { return _("mine"); }
+	virtual const char* Infos() const { return _("The mine explodes when an unit passes on it."); }
 	virtual const char* Description() const { return Infos(); }
 	virtual ECImage* Icon() const { return Resources::Mine_Icon(); }
 
@@ -177,12 +178,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Centre de recherches nucléaire"; }
-	virtual const char* Qual() const { return "le centre de recherches nucléaire"; }
-	virtual const char* Infos() const { return "Fabrication de missiles nucléaires"; }
+	virtual const char* Name() const { return _("Nuclear research center"); }
+	virtual const char* Qual() const { return _("nuclear research center"); }
+	virtual const char* Infos() const { return _("Nuclear missile manufacturing."); }
 	virtual const char* Description() const
 	{
-		return "Le centre fabrique des missiles nucléaires fréquements et peuvent être lancés depuis le Silo de lancement.";
+		return _("The center regularly builds a missile which can be launched from the nuclear silo.");
 	}
 	virtual ECImage* Icon() const { return Resources::NuclearSearch_Icon(); }
 
@@ -214,18 +215,16 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Silo de lancement"; }
-	virtual const char* Qual() const { return "le silo de lancement"; }
-	virtual const char* Infos() const { return "Silo de lancement de missile nucléaire"; }
+	virtual const char* Name() const { return _("Launching silo"); }
+	virtual const char* Qual() const { return _("launching silo"); }
+	virtual const char* Infos() const { return _("Nuclear missile launching silo"); }
 	virtual const char* Description() const
 	{
-		return "Le Silo de lancement peut lancer les missiles en stock dans le Centre de recherches nucléaire. Les dégats "
-		       "causés par une bombe H sont d'une importance très grande (sur 6 cases avec pour centre la zone d'impact). "
-		       "Vos unités ne sont pas à l'abris de vos propres tirs !!";
+		return _("The launching silo can launch the nuclear missile avalaible in the nuclear research center stock. The damages caused by a H bomb are very important (6 squares around impact). Your units are not immunized.");
 	}
 	virtual ECImage* Icon() const { return Resources::Silo_Icon(); }
 
-/* Méthodes */
+/* Mï¿½hodes */
 public:
 
 	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
@@ -238,7 +237,7 @@ public:
 
 	virtual void RecvData(ECData);
 
-/* Variables privées */
+/* Variables privï¿½s */
 private:
 	ECMissile missile;
 };
@@ -266,13 +265,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Megalopole"; }
-	virtual const char* Qual() const { return "la megalopole"; }
-	virtual const char* Infos() const { return "Rapporte cinq fois plus d'argent que le centre ville"; }
+	virtual const char* Name() const { return _("Megalopolis"); }
+	virtual const char* Qual() const { return _("megalopolis"); }
+	virtual const char* Infos() const { return _("Five times more income than the city center."); }
 	virtual const char* Description() const
 	{
-		return "La megalopole rapporte de l'argent chaques tours, CINQ fois plus que le centre ville, et 2,5 fois plus que "
-		       "le centre d'affaires. Celui qui prend votre megalopole devient possesseur de tous les quartiers de la ville";
+		return _("The megalopolis earns you money each turn, FIVE times more than the city center, and 2,5 times more than the business center. Whoever takes your megalopolis becomes the owner of all the districts of the city.");
 	}
 	virtual ECImage* Icon() const { return Resources::Megalopole_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
@@ -295,13 +293,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Centre d'affaires"; }
-	virtual const char* Qual() const { return "le centre d'affaires"; }
-	virtual const char* Infos() const { return "Rapporte deux fois plus d'argent que le centre ville"; }
+	virtual const char* Name() const { return _("Business center"); }
+	virtual const char* Qual() const { return _("business center"); }
+	virtual const char* Infos() const { return _("Two times more income than the city center."); }
 	virtual const char* Description() const
 	{
-		return "Le centre d'affaires rapporte de l'argent chaques tours, deux fois plus que le centre ville. Celui qui "
-		       "prend votre centre d'affaire devient possesseur de tous les quartiers de la ville";
+		return _("The business center earns you money each turn, two times more than the city center. Whoever takes your business center becomes the owner of all the districts of the city.");
 	}
 	virtual ECImage* Icon() const { return Resources::Capitale_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNEDead(); }
@@ -324,13 +321,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Centre ville"; }
-	virtual const char* Qual() const { return "le centre ville"; }
-	virtual const char* Infos() const { return "Rapporte une certaine somme par tours"; }
+	virtual const char* Name() const { return _("City center"); }
+	virtual const char* Qual() const { return _("city center"); }
+	virtual const char* Infos() const { return _("Earns you some money each turn"); }
 	virtual const char* Description() const
 	{
-		return "Le centre ville rapporte de l'argent chaques tours. Celui qui prend votre centre ville devient possesseur de "
-		       "tous les quartiers de la ville.";
+		return _("The city center earns you money each turn. Whoever takes your business center becomes the owner of all the districts of the city.");
 	}
 	virtual ECImage* Icon() const { return Resources::City_Icon(); }
 	virtual std::string SpecialInfo();
@@ -358,13 +354,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Tour de défense"; }
-	virtual const char* Qual() const { return "la tour défense"; }
-	virtual const char* Infos() const { return "Peut tirer pour defendre la ville."; }
+	virtual const char* Name() const { return _("Defense tower"); }
+	virtual const char* Qual() const { return _("defense tower"); }
+	virtual const char* Infos() const { return _("Can fire to defend your city."); }
 	virtual const char* Description() const
 	{
-		return "La tour de défense se trouve dès l'origine dans les villes. Elle fournit une défense non négligeable, meme si "
-		       "elle a une porté plutot faible. Comptez sur les lances-missiles pour la détruire.";
+		return _("The defense tower is originally located in cities. It provides a non-negligible defense, even if it has a short reach. Use missile launchers to destroy it.");
 	}
 	virtual ECImage* Icon() const { return Resources::DefenseTower_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
@@ -377,7 +372,7 @@ public:
 	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-/* Variables privées */
+/* Variables privï¿½s */
 private:
 	ECMissile missile;
 	unsigned int miss;
@@ -399,17 +394,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Obélisque du NOD"; }
-	virtual const char* Qual() const { return "l'obélisque"; }
-	virtual const char* Infos() const { return "Bien plus puissantes que la tour de défense, les fans de C&C "
-	                                           "reconnaitront."; }
+	virtual const char* Name() const { return _("NOD's obelisk"); }
+	virtual const char* Qual() const { return _("obelisk"); }
+	virtual const char* Infos() const { return _("Way more powerful than defense towers, C&C fans will recognize it."); }
 	virtual const char* Description() const
 	{
-		return "L'Obélisque du NOD multiplie considérablement la puissance contre les vehicules et l'infanterie, et peut "
-		       "maintenant toucher les batiments (hormis centre ville) !\n"
-		       "Elle a une portée plus importante que la tour de défense, et sera beaucoup plus résistante aux attaques "
-		       "contre elle.\n"
-		       "L'obélisque du NOD est un clin d'oeil à un jeu culte.";
+		return _("NOD's obelisk considerably multiplies your attack power against vehicles and infantry, and can now attack buildings (except the city centers)!\nIt has a better reach than the defense towers, and is more resistant to attacks.\nThe NOD's obelisk is a reference to a cult game.");
 	}
 	virtual ECImage* Icon() const { return Resources::Obelisk_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCityNODead(); }
@@ -449,12 +439,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Usine de chars"; }
-	virtual const char* Qual() const { return "l'usine de chars"; }
-	virtual const char* Infos() const { return "Construit des vehicules."; }
+	virtual const char* Name() const { return _("Tank factory"); }
+	virtual const char* Qual() const { return _("tank factory"); }
+	virtual const char* Infos() const { return _("Builds vehicles."); }
 	virtual const char* Description() const
 	{
-		return "L'usine de chars peut construire les vehicules de base.";
+		return _("The tank factory can build basic vehicles.");
 	}
 	virtual ECImage* Icon() const { return Resources::CharFact_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySEDead(); }
@@ -476,12 +466,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Caserne"; }
-	virtual const char* Qual() const { return "la caserne"; }
-	virtual const char* Infos() const { return "Caserne pour entraîner des hommes"; }
+	virtual const char* Name() const { return _("Barracks"); }
+	virtual const char* Qual() const { return _("barracks"); }
+	virtual const char* Infos() const { return _("Used to train men."); }
 	virtual const char* Description() const
 	{
-		return "La caserne construit l'infanterie de base.";
+		return _("The barracks builds basic infantry.");
 	}
 	virtual ECImage* Icon() const { return Resources::Caserne_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySODead(); }
@@ -503,15 +493,14 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Chantier naval"; }
-	virtual const char* Qual() const { return "le chantier naval"; }
-	virtual const char* Infos() const { return "Construit des bateaux"; }
+	virtual const char* Name() const { return _("Shipyard"); }
+	virtual const char* Qual() const { return _("shipyard"); }
+	virtual const char* Infos() const { return _("Builds ships."); }
 	virtual const char* Description() const
 	{
-		return "Le chantier naval construit les unités navales.";
+		return _("The shipyard is able to build ships.");
 	}
 	virtual ECImage* Icon() const { return Resources::Shipyard_Icon(); }
 };
-
 
 #endif /* EC_BATIMENTS_H */

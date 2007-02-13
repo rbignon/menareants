@@ -76,10 +76,6 @@ public:
 	bool RecvMapList, mission;
 	static std::vector<std::string> RecvMap;
 
-	static std::string ErrMessage;
-
-	std::string Kicked;
-
 /* Fonctions */
 public:
 
@@ -95,7 +91,7 @@ private:
 	void OnKeyUp(SDL_keysym key);
 	void AfterDraw();
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 
 	Timer listmapclick;
@@ -140,10 +136,10 @@ public:
 public:
 	ECPlayer* Player() { return pl; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 
-	/* Privatisation de constructeurs à rendre inaccessibles */
+	/* Privatisation de constructeurs Ã  rendre inaccessibles */
 	TPlayerLine();
 	TPlayerLine(int _x, int _y);
 	TPlayerLine(int _x, int _y, uint _w, uint _h);

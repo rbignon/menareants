@@ -36,7 +36,7 @@
 #define MSERV_DEFPORT 5460
 
 /* Version protocolaire
- * �incr�enter en cas de modification du protocole
+ * ï¿œincrï¿œenter en cas de modification du protocole
  */
 #define APP_PVERSION	"12"
 #define APP_MSPROTO	"1"
@@ -48,13 +48,13 @@
 /* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
 #undef UNSTABLE
 
-/* D�inir un (seul) des "patch" suivant (ou aucun) */
+/* Dï¿œinir un (seul) des "patch" suivant (ou aucun) */
 #if 1
 #define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
 #else
-#define	APP_VERSION_PATCH	"pre1"	/* premi�e pr�release */
-#define	APP_VERSION_PATCH	"pre2"	/* seconde pr�release */
-#define	APP_VERSION_PATCH	"pre3"	/* troisi�e pr�release */
+#define	APP_VERSION_PATCH	"pre1"	/* premiï¿œe prï¿œrelease */
+#define	APP_VERSION_PATCH	"pre2"	/* seconde prï¿œrelease */
+#define	APP_VERSION_PATCH	"pre3"	/* troisiï¿œe prï¿œrelease */
 #endif
 
 #ifdef APP_VERSION_PATCH

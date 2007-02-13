@@ -39,7 +39,7 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		if(parv.size() < 3 || parv[2].empty() || parv[2] == " " || parv[2] != app.GetConf()->AdminPass())
 		{
-			Debug(W_WARNING, "ADMIN LOGIN: Identification échouée de %s", cl->GetNick());
+			Debug(W_WARNING, "ADMIN LOGIN: Identification Ã©chouÃ©e de %s", cl->GetNick());
 			return cl->sendrpl(ERR_ADMIN_LOGFAIL);
 		}
 		cl->SetFlag(ECD_ADMIN);
@@ -137,10 +137,10 @@ static void send_stats(TClient *cl)
 int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
 	if(IsAuth(cl))
-		return vDebug(W_DESYNCH, "IAM: User déjà logué", VSName(cl->GetNick()));
+		return vDebug(W_DESYNCH, "IAM: User dÃ©jÃ  loguÃ©", VSName(cl->GetNick()));
 
-	/** \note il est normal de vérifier ici seulement le nombre d'arguments: ça permet un
-	 *       meilleur controle par rapport à la version
+	/** \note il est normal de vÃ©rifier ici seulement le nombre d'arguments: Ã§a permet un
+	 *       meilleur controle par rapport Ã  la version
 	 */
 	if(parv.size() < 4 || parv[2] != CLIENT_SMALLNAME)
 		return cl->exit(MSG_MAJ, "0");

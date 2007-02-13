@@ -47,8 +47,8 @@ bool Config::set_defaults()
 	maxconnexions = 10;
 	maxgames = 3;
 	motd.clear();
-	// Ne *PAS* définir adminpass. Lors du premier chargement il sera nul si la conf est illisible, et donc
-	// ça empechera le login en admin. Et dans le cas d'un REHASH foiré, le pass admin restera.
+	// Ne *PAS* dÃ©finir adminpass. Lors du premier chargement il sera nul si la conf est illisible, et donc
+	// Ã§a empechera le login en admin. Et dans le cas d'un REHASH foirÃ©, le pass admin restera.
 	return true;
 }
 #endif

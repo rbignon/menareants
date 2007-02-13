@@ -159,7 +159,7 @@ void Font::WriteCenterTop(int x, int y, const std::string &txt, const Color &col
 
 ECImage Font::CreateSurface(const std::string &txt, const Color &color)
 {
-  return ECImage( TTF_RenderText_Blended(m_font, txt.c_str(), color.GetSDLColor()) );
+  return ECImage( TTF_RenderUTF8_Blended(m_font, txt.c_str(), color.GetSDLColor()) );
 }
 
 ECImage Font::Render(const std::string &txt, const Color &color, bool cache)
@@ -194,7 +194,7 @@ int Font::GetWidth (const std::string &txt)
 {
   int width=-1;
 
-  TTF_SizeText(m_font, txt.c_str(), &width, NULL);
+  TTF_SizeUTF8(m_font, txt.c_str(), &width, NULL);
 
   return width;
 }
@@ -208,7 +208,7 @@ int Font::GetHeight (const std::string &str)
 {
   int height=-1;
 
-  TTF_SizeText(m_font, str.c_str(), NULL, &height);
+  TTF_SizeUTF8(m_font, str.c_str(), NULL, &height);
 
   return height;
 }

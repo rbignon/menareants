@@ -52,7 +52,7 @@ const int COMLEN=10;
 #define MAP_FILE PKGDATADIR "maps.list"
 
 /*********************************************************************************************
- *           Il n'est pas nécessaire d'éditer la suite                                       *
+ *           Il n'est pas nÃ©cessaire d'Ã©diter la suite                                       *
  *********************************************************************************************/
 
 /* Macro */

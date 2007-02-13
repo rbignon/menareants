@@ -3,38 +3,38 @@
                    *******************
                         [ INSTALL ]
 
-Dernière modification:
+DerniÃ¨re modification:
 $Id$
 
 Sommaire:
-1) Nécessite
+1) NÃ©cessite
 2) ./configure
 3) make
 4) sudo make install
 5) Jouer
 
-1) Nécessite
-	Pour compiler il est nécessaire d'avoir :
+1) NÃ©cessite
+	Pour compiler il est nÃ©cessaire d'avoir :
 	- un compilateur (gcc ou autre)
 	En plus, pour le jeu MenAreAnts, il est requis d'avoir les librairies SDL suivantes :
 	- SDL_image
 	- SDL_ttf
 	- lSDL_gfx
-	Et le serveur MenAreAntsServer, si activé, nécessite d'avoir tout de même une
-	bonne connexion à internet.
+	Et le serveur MenAreAntsServer, si activÃ©, nÃ©cessite d'avoir tout de mÃªme une
+	bonne connexion Ã  internet.
 
-	Il est d'ailleurs à noter que vous pouvez compiler et installer soit le jeu, soit le
+	Il est d'ailleurs Ã  noter que vous pouvez compiler et installer soit le jeu, soit le
 	serveur, soit les deux. Voir les options du script configure (./configure --help).
 
 2) ./configure
 	Veuillez lancer la commande suivante:
 	$ ./configure
-	Vous pouvez utiliser --help pour voir les différentes options proposées:
+	Vous pouvez utiliser --help pour voir les diffÃ©rentes options proposÃ©es:
 	$ ./configure --help
-	Et vous pouvez les mettre d'affilés dans la ligne de commande, par exemple:
+	Et vous pouvez les mettre d'affilÃ©s dans la ligne de commande, par exemple:
 	$ ./configure --enable-debug --enable-server
-	Le script risque de s'arrêter si jamais il ne trouve pas sur votre système un programme
-	auquel Men Are Ants est dépendant pour fonctionner. Dans ce cas veuillez l'installer
+	Le script risque de s'arrÃªter si jamais il ne trouve pas sur votre systÃ¨me un programme
+	auquel Men Are Ants est dÃ©pendant pour fonctionner. Dans ce cas veuillez l'installer
 	et relancer le script.
 
 3) make
@@ -45,10 +45,10 @@ Sommaire:
 4) sudo make install
 	Pour finir d'installer le jeu, veuillez tapez:
 	$ sudo make install
-	Il risque de vous être demandé un mot de passe, veuillez entrer celui du root (administrateur).
+	Il risque de vous Ãªtre demandÃ© un mot de passe, veuillez entrer celui du root (administrateur).
 
 5) Jouer
-	Maintenant vous pouvez jouer tout simplement en tapant à n'importe quelle moment en console:
+	Maintenant vous pouvez jouer tout simplement en tapant Ã  n'importe quelle moment en console:
 	$ menareants
 
 

@@ -60,7 +60,7 @@ public:
 
 	virtual void SetEnabled(bool _en = true);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::string caption;
 	ECImage surf;

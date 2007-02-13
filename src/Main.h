@@ -45,7 +45,7 @@ private:
 public:
 	void ServerList();
 	void RefreshList();
-	void ConnectedTo(std::string host);
+	void ConnectedTo(std::string name, std::string host);
 	EC_Client* Connect(std::string host);
 	void Disconnect(EC_Client*);
 	void ListGames();

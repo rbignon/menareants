@@ -105,7 +105,7 @@ void Sound::StopMusic()
 {
 	playing_music = false;
 	Mix_HaltMusic();
-	EndMusic(); /* En effet, le callback n'est appelé que si la musique s'arrete naturellement */
+	EndMusic(); /* En effet, le callback n'est appelÃ© que si la musique s'arrete naturellement */
 }
 
 void Sound::EndMusic()
@@ -159,7 +159,7 @@ void Sound::PlayMusic()
 	int r = rand()%musics.size();
 	musics[r]->Play();
 	if(!musics[r]->Playing())
-		PlayMusic(); // Si on arrive pas à lire on réexecute la fonction en reprenant un autre nombre aléatoire.
+		PlayMusic(); // Si on arrive pas Ã  lire on rÃ©execute la fonction en reprenant un autre nombre alÃ©atoire.
 }
 
 void Sound::EraseMusicList()

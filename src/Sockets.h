@@ -21,7 +21,7 @@
 #ifndef EC_Sockets_h
 #define EC_Sockets_h
 
-/* Ça peut parraitre bizare mais c'est pour éviter une inclusion de winsock2.h qui cause des merdes */
+/* Ã‡a peut parraitre bizare mais c'est pour Ã©viter une inclusion de winsock2.h qui cause des merdes */
 typedef unsigned int SOCKET;
 #if defined(WIN32) && !defined(WINSOCK2_H) && !defined(FD_SETSIZE)
 #define FD_SETSIZE      64
@@ -56,9 +56,9 @@ public:
 /* Fonctions publiques */
 public:
 
-	/** Messages à utiliser dans les reply
+	/** Messages Ã  utiliser dans les reply
 	 *
-	 * \attention mettre à jour systematiquement msgTab[] dans Sockets.cpp
+	 * \attention mettre Ã  jour systematiquement msgTab[] dans Sockets.cpp
 	 */
 	enum msg {
 		IAM,         /**< IAM */
@@ -125,7 +125,7 @@ public:
 	void SetPort(unsigned p) { port = p; }
 	unsigned Port() const { return port; }
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 private:
 	SOCKET sock;
 

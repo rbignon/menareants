@@ -54,7 +54,7 @@ public:
 
 	void SetXY (int x, int y);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	TLabel    text;
 	ECSprite* image;

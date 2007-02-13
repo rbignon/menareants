@@ -1,5 +1,5 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Veuillez ne pas Ã©diter le fichier map Ã  la main.
+# Utilisez plutÃ´t l'Ã©diteur de carte intÃ©grÃ© au jeu.
 NAME A big proot
 PLAYER A
 PLAYER B
@@ -37,20 +37,20 @@ DATE 13/8/1988
 INFO Map de test, ne pas s'en servir
 INFO 
 INFO Cette map sent la moule fraiche.
-INFO En effet elle présente une petite ile de merde
-INFO où il n'y a que deux joueurs.
-INFO Oui, elle ne sert à rien !
+INFO En effet elle prÃ©sente une petite ile de merde
+INFO oÃ¹ il n'y a que deux joueurs.
+INFO Oui, elle ne sert Ã  rien !
 INFO 
 INFO En effet, c'est une map de test !
 INFO 
 INFO Bon encore quelques lignes,
 INFO juste histoire de faire un
-INFO peu déborder le TMemo !!
+INFO peu dÃ©border le TMemo !!
 INFO 
-INFO Ça detrait être bon là, non ?
+INFO Ã‡a detrait Ãªtre bon lÃ , non ?
 INFO Allez, stop !!!
 INFO 
-INFO Note: ça pue
+INFO Note: Ã§a pue
 UNIT 6 A 8,10 1000
 UNIT 1 A 8,10 1000
 UNIT 1 A 9,11 1000

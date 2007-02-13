@@ -77,7 +77,7 @@ private:
 	static int SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 	static int LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::string> parv);
 
-/* Classes privées */
+/* Classes privÃ©es */
 private:
 
 	class UseTransportBoat;
@@ -116,14 +116,14 @@ private:
 		ECList<ECBEntity*> entities;
 	};
 
-/* Methodes privées */
+/* Methodes privÃ©es */
 private:
 
 	void UseStrategy(Strategy* s, ECBEntity* e);
 	void AddStrategy(Strategy* s) { strategies.push_back(s); }
 	bool RemoveStrategy(Strategy*, bool use_delete = false);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool lock;
 	std::vector<ECPacket> msgs;

@@ -1,7 +1,7 @@
 #include <math.h>
 #include "Maths.h"
 
-// Modèle pour borner une valeur entre min et max
+// ModÃ¨le pour borner une valeur entre min et max
 template <class T>
 T BorneTpl (const T &valeur, const T &min, const T &max)
 {

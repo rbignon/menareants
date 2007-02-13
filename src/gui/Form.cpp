@@ -216,7 +216,7 @@ void TForm::Draw()
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-			// Affiche seulement à la fin les composants sélectionnés
+			// Affiche seulement Ã  la fin les composants sÃ©lectionnÃ©s
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
 			   (MustRedraw() || (*it)->WantRedraw() || lastmpos != pos && (*it)->Mouse(pos) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)))
 			{

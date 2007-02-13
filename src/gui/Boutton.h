@@ -50,7 +50,7 @@ public:
 
 	virtual void SetImage (ECSprite *image);
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 protected:
 
 	ECSprite *image;

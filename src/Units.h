@@ -22,6 +22,7 @@
 #ifndef EC_UNITS_H
 #define EC_UNITS_H
 
+#include "i18n.h"
 #include "src/Map.h"
 #include "lib/Units.h"
 #include "Resources.h"
@@ -66,7 +67,7 @@ public:
 
 	void RefreshColor(Color last);
 
-/* Mathodes protégées */
+/* Mathodes protï¿½ï¿½s */
 protected:
 	bool MoveEffect(const std::vector<ECEntity*>&);
 
@@ -74,7 +75,7 @@ protected:
 
 	ECSpriteBase* GetSprite(imgs_t t) { return images[t]; }
 
-/* Variables protégées */
+/* Variables protï¿½ï¿½s */
 private:
 	bool move_anim;
 	uint visual_step;
@@ -111,15 +112,14 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Lance-missiles"; }
-	virtual const char* Qual() const { return "le lance-missiles"; }
+	virtual const char* Name() const { return _("Missile launcher"); }
+	virtual const char* Qual() const { return _("missile launcher"); }
 	virtual const char* Infos() const
-		{ return "Véhicule lanceur de missiles à portée de 8 cases une fois déployé."; }
+		{ return _("Missile launcher vehicle whith 8 square range once deployed."); }
 	virtual const char* Description() const
 	{
-		return "Le lance missiles est une activité avec très peu de défense mais très efficace avec ses tirs à distance.\n"
-		       "Il est très efficace contre les batiments, moyennement contre les vehicules et peu efficace contre "
-		       "l'infanterie.";
+		return _("The missile launcher unit has very few defences but is very efficient with ranged fire.\n"
+		       "It is very efficient against buildings, average against vehicles and few agains infantry.");
 	}
 	virtual ECImage* Icon() const { return Resources::MissiLauncher_Icon(); }
 	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
@@ -134,7 +134,7 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-/* Variables privées */
+/* Variables privï¿½s */
 private:
 	ECMissile missile;
 };
@@ -162,12 +162,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Train"; }
-	virtual const char* Qual() const { return "le train"; }
-	virtual const char* Infos() const { return "Transporteur de troupes et de vehicules terrestre"; }
+	virtual const char* Name() const { return _("Train"); }
+	virtual const char* Qual() const { return _("train"); }
+	virtual const char* Infos() const { return _("Ground vehicles and infantry troups carrier"); }
 	virtual const char* Description() const
 	{
-		return "Ce train de transport d'infantrie et de vehicules ne peut avancer que sur des rails.";
+		return _("This infantry and vehicle carrier train needs rails to move on.");
 	}
 	virtual ECImage* Icon() const { return Resources::Train_Icon(); }
 
@@ -197,12 +197,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Bateau"; }
-	virtual const char* Qual() const { return "le bateau"; }
-	virtual const char* Infos() const { return "Bateau de transport"; }
+	virtual const char* Name() const { return _("Ship"); }
+	virtual const char* Qual() const { return _("ship"); }
+	virtual const char* Infos() const { return _("Carrier boat"); }
 	virtual const char* Description() const
 	{
-		return "Ce bateau de transport peut contenir des unités d'infanterie.";
+		return _("This carrier ship can transport infantry.");
 	}
 	virtual ECImage* Icon() const { return Resources::Boat_Icon(); }
 
@@ -233,13 +233,13 @@ public:
 	}
 
 public:
-	virtual const char *Name() const { return "Avion-cargot"; }
-	virtual const char* Qual() const { return "l'avion-cargot"; }
-	virtual const char *Infos() const { return "Avion de transport"; }
-	virtual const char *Description() const { return "Cet avion permet transporter tout et n'importe quoi."; }
+	virtual const char *Name() const { return _("Freighter"); }
+	virtual const char* Qual() const { return _("freighter"); }
+	virtual const char *Infos() const { return _("Carrier plane (cargo plane)"); }
+	virtual const char *Description() const { return _("This plane is able to carrier everything."); }
 	virtual ECImage *Icon() const { return Resources::Plane_Icon(); }
 	virtual std::string SpecialInfo();
-	virtual std::string DeployButton() { return Deployed() ? "Décoller" : "Atterir"; }
+	virtual std::string DeployButton() { return Deployed() ? _("Taking off") : _("Landing"); }
 };
 
 /********************************************************************************************
@@ -265,13 +265,13 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Char"; }
-	virtual const char* Qual() const { return "le char"; }
-	virtual const char* Infos() const { return "Char d'assaut"; }
+	virtual const char* Name() const { return _("Tank"); }
+	virtual const char* Qual() const { return _("tank"); }
+	virtual const char* Infos() const { return _("A classical tank"); }
 	virtual const char* Description() const
 	{
-		return "Le char est le vehicule de base et a la particularité d'être plus rapide qu'une armée, et coute moins cher "
-		       "pour la même puissance. Cependant il ne peut traverser les ponts.";
+		return _("Tank is a basic vehicle which has the particularity to be faster and cheapper than infantry "
+		       "for the same fire power. However it is unable to cross over bridges.");
 	}
 	virtual ECImage* Icon() const { return Resources::Char_Icon(); }
 };
@@ -298,12 +298,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Jouano"; }
-	virtual const char* Qual() const { return "le Jouano"; }
-	virtual const char* Infos() const { return "Mal habillé et gros ventre, il peut détruire un Mc Gerbale installé dans votre caserne."; }
+	virtual const char* Name() const { return _("Jouano"); }
+	virtual const char* Qual() const { return _("Jouano"); }
+	virtual const char* Infos() const { return _("Bad dressed with a beer belly, he's able to destroy an McPuke installed on your barrack."); }
 	virtual const char* Description() const
 	{
-		return "Envoyez votre gros Jouano sur une de vos casernes investies d'un Mc Gerbale, il mangera tout et fera exploser celui-ci.";
+		return _("Send your fat Jouano on one of your McPuke occupied barrack, he'll eat everything and ruin it.");
 	}
 	virtual ECImage* Icon() const { return Resources::Jouano_Icon(); }
 };
@@ -335,25 +335,23 @@ public:
 
 	virtual const char* Name() const
 	{
-		return Deployed() ? "Caserne + McGerbale" : "Donald de McGerbale";
+		return Deployed() ? _("Barrack + McPuke") : _("McPuke Donald");
 	}
-	virtual const char* Qual() const { return Deployed() ? "la caserne+mcgerbale" : "le donald de McGerbale"; }
+	virtual const char* Qual() const { return Deployed() ? _("barracks+McPuke") : _("McPuke Donald"); }
 	virtual const char* Infos() const
 	{
-		return Deployed() ? "" : "Emmenez-le sur une caserne pour qu'il y installe un McGerbale.";
+		return Deployed() ? "" : _("Send him to a barrack, i'll install a McPuke.");
 	}
 	virtual const char* Description() const
 	{
 		if(Deployed())
-			return "Cette caserne est envahie par un McGerbale !!!";
+			return _("This barrack is populated by a McPuke !!!");
 		else
-			return "Le Donald de McGerbale doit investir une caserne enemie pour y installer un McGerbale. Dès lors, "
-			       "toute unité crée par cette caserne avancera deux fois moins vite, et les unités n'avançant initialement "
-			       "que d'une case par tours seront (définitivement!) immobilisées, à cause de leur consommation de "
-			       "nourriture abondante et lourde.\n"
-			       "En outre, le propriétaire de la caserne infectée donnera chaque tours de l'argent à celui qui a posé "
-			       "le McGerbale pour ce qui a été consommé.\n"
-			       "Le seul moyen de virer le McGerbale est d'y envoyer un Jouano.";
+			return _("The MkPuke Donald must take over an ennemi barrack to build a McPuke. Then, any units "
+			       "created by this barrack will have his movment divided by two, units with only one square initial movment"
+			       "will be definitely trapped because of their fat and profuse food.\n"
+			       "Furthemore, the barrack owner will given money every turn to MkPuke builder to pay all this food.\n"
+			       "The only way to destroy a McPuke is to send a Jouano");
 	}
 	virtual ECImage* Icon() const { return Deployed() ? Resources::Caserne_Icon() : Resources::McDo_Icon(); }
 
@@ -366,7 +364,7 @@ public:
 	std::string SpecialInfo();
 	bool CanCreate(const ECBEntity* entity);
 
-/* Variables privées */
+/* Variables privï¿½s */
 public:
 	ECEntity::e_type invested;
 	ECPlayer* ex_owner;
@@ -394,14 +392,13 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Touriste japonais"; }
-	virtual const char* Qual() const { return "le touriste japonais"; }
-	virtual const char* Infos() const { return "Il a un champs de vision élevé, et le terrain où il passe reste visible "
-	                                           "en permanence."; }
+	virtual const char* Name() const { return _("Japan tourist"); }
+	virtual const char* Qual() const { return _("japan tourist"); }
+	virtual const char* Infos() const { return _("He has a high range vision and ground stay visible after his transit."); }
 	virtual const char* Description() const
 	{
-		return "Le touriste avance très vite et est munis d'un appareil photo spécial qui fait que partout où il passe "
-		       "la zone restera pleinement visible même quand plus aucune unité ne sera présente sur place.";
+		return _("With his very special camera, this very fast tourist let the ground visible after his transit even if "
+		       "any unit stay on this place.");
 	}
 	virtual ECImage* Icon() const { return Resources::Tourist_Icon(); }
 
@@ -433,13 +430,12 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Ingénieur"; }
-	virtual const char* Qual() const { return "l'ingénieur"; }
-	virtual const char* Infos() const { return "Il peut capturer les batiments enemies ou réparer les votres."; }
+	virtual const char* Name() const { return _("Engineer"); }
+	virtual const char* Qual() const { return _("engineer"); }
+	virtual const char* Infos() const { return _("He is able to repair buildings or capture new ones."); }
 	virtual const char* Description() const
 	{
-		return "Envoyez l'ingenieur sur un batiment enemie pour le capturer, ou sur un de vos batiment endomagé pour "
-		       "le réparer.";
+		return _("Send the engineer to an ennemy building to capture it, or to one of yours damaged to repair it");
 	}
 	virtual ECImage* Icon() const { return Resources::Enginer_Icon(); }
 };
@@ -467,14 +463,13 @@ public:
 /* Infos */
 public:
 
-	virtual const char* Name() const { return "Armée"; }
-	virtual const char* Qual() const { return "l'armée"; }
-	virtual const char* Infos() const { return "Armée de base"; }
+	virtual const char* Name() const { return _("Army"); }
+	virtual const char* Qual() const { return _("army"); }
+	virtual const char* Infos() const { return _("Basic army"); }
 	virtual const char* Description() const
 	{
-		return "C'est l'armée de base, que vous achetez par tranches de 100 hommes. Elle avance pas spécialement vite, mais "
-		       "a l'avantage d'être très efficace dans les combats au corps à corps, et de pouvoir engager d'autres hommes "
-		       "par groupes de 100 à faibles coût.";
+		return _("This represent basic army buyd by 100 mens a time. Not very fast but very efficient in hand-to-hand fights "
+		         "easily upgradable by 100 soldiers in a cheap way.");
 	}
 	virtual ECImage* Icon() const { return Resources::Army_Icon(); }
 };

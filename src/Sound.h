@@ -72,7 +72,7 @@ public:
 	bool IsMusic() const { return is_music; }
 	bool Playing() const { return playing; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool is_music;
 	std::string path;

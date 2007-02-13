@@ -92,8 +92,8 @@ struct Server* add_server(struct Client* cl, const char* name)
 	if(cl->server || cl->user)
 		return 0;
 
-	/* Si le serveur qui essaye de se connecter est manifestement le même qu'un de la liste,
-	 * c'est que ce dernier n'a pas été ping timeouté et donc on le vire.
+	/* Si le serveur qui essaye de se connecter est manifestement le mÃªme qu'un de la liste,
+	 * c'est que ce dernier n'a pas Ã©tÃ© ping timeoutÃ© et donc on le vire.
 	 */
 	for(server = server_head; server; server = server->next)
 		if(!strcmp(server->name, name) && !strcmp(server->client->ip, cl->ip))

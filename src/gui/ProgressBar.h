@@ -87,14 +87,14 @@ public:
 	bool Background() const { return background; }
 
 
-/* variables privées */
+/* variables privÃ©es */
 private:
 	Color border_color, value_color, background_color;
 	ECImage image; // in order to pemit alpha blended progressbar
 
 	long val, min, max; // Valeur
-	bool m_use_ref_val; // Valeur de référence
-	long m_ref_val; // Valeur de référence
+	bool m_use_ref_val; // Valeur de rÃ©fÃ©rence
+	long m_ref_val; // Valeur de rÃ©fÃ©rence
 	uint val_barre; // Valeur dans la barre
 
 	uint CalculeVal (long val) const;

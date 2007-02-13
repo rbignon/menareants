@@ -75,11 +75,11 @@ void EMap::VirtualAddUnit(std::string line)
 	y = StrToTyp<uint>(acaca);
 	std::string number = line;
 	if(type.empty() || owner.empty() || acaca.empty() || number.empty())
-		vDebug(W_ERR, "La déclaration d'une unité sur la map est invalide.",
+		vDebug(W_ERR, "La dÃ©claration d'une unitÃ© sur la map est invalide.",
 						VName(type) VName(owner) VName(acaca) VName(number));
 
 	if (x >= Width() || y >= Height())
-		throw ECExcept(VIName(Width()) VIName(Height()) VIName(x) VIName(y), "Access à un element hors du tableau");
+		throw ECExcept(VIName(Width()) VIName(Height()) VIName(x) VIName(y), "Access Ã  un element hors du tableau");
 
 	ECBPlayer* pl = 0;
 	if(owner[0] != '*')
@@ -216,7 +216,7 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 			map.push_back(c);
 		}
 
-	map_infos.push_back("Map créée par " + Config::GetInstance()->nick);
+	map_infos.push_back(StringF(_("Map created by %s"), Config::GetInstance()->nick.c_str()));
 	initialised = true;
 }
 
@@ -246,7 +246,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 	{
 		create = true;
 		{
-			TMessageBox mb("Entrez le nom du fichier de la carte",
+			TMessageBox mb(_("Enter filename for this map"),
 							HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars(MAPFILE_CHARS);
 			mb.Edit()->SetMaxLen(20);
@@ -260,7 +260,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		name = MenAreAntsApp::GetInstance()->GetPath() + name + ".map";
 
 		{
-			TMessageBox mb("Combien de cases en abscisse\n(horizontales) ?", HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			TMessageBox mb(_("How many X-coordinate cells?"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
 			if(mb.Show() == BT_OK)
@@ -268,7 +268,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 			else return true;
 		}
 		{
-			TMessageBox mb("Combien de cases en ordonnée\n(vertical) ?", HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			TMessageBox mb(_("How many Y-coordinate cells?"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
 			if(mb.Show() == BT_OK)
@@ -276,7 +276,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 			else return true;
 		}
 		{
-			TMessageBox mb("Quelle est la date en début de partie ?\n('xx xx xxxx' ou 'xx/xx/xxxx')",
+			TMessageBox mb(_("What date is it at the begin of a game?\n('xx xx xxxx' ou 'xx/xx/xxxx')"),
 			               HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789/ ");
 			mb.Edit()->SetMaxLen(10);
@@ -301,7 +301,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 
 		try
 		{
-			TMessageBox("Chargement de la map en cours...", 0, form).Draw();
+			TMessageBox(_("Map file is loading..."), 0, form).Draw();
 			map = new EMap(path);
 			map->Init();
 			map->SetCanSave();
@@ -405,18 +405,18 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 	{
 		if(!map->CanSave())
 		{
-			TMessageBox("Vous ne pouvez pas sauvegarder tant que vous n'avez pas configuré la carte.",
+			TMessageBox(_("You haven't configure your map: you can't save it"),
 					BT_OK, this).Show();
 			return;
 		}
 		try
 		{
 			map->Save();
-			TMessageBox("Sauvegarde effectuée", BT_OK, this).Show();
+			TMessageBox(_("Map saved"), BT_OK, this).Show();
 		}
 		catch(const TECExcept &e)
 		{
-			TMessageBox(std::string("Impossible de sauvegarder la carte :\n\n") + e.Message(),
+			TMessageBox(std::string(_("Unable to save this map:\n\n")) + e.Message(),
 					BT_OK, this).Show();
 		}
 	}
@@ -425,14 +425,13 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		uint result = 0;
 		if(map->CanSave())
 		{
-			TMessageBox mb("Voulez-vous sauvegarder la carte ?", BT_YES|BT_NO|BT_CANCEL, this);
+			TMessageBox mb(_("Do you want to save this map ?"), BT_YES|BT_NO|BT_CANCEL, this);
 			result = mb.Show();
 		}
 		else
 		{
-			TMessageBox mb("Vous n'avez pas configuré la carte, vous ne pouvez donc pas la sauvegarder.\n"
-					"Voulez-vous quand même fermer sans sauvegarder ?", BT_OK|BT_CANCEL,
-					this);
+			TMessageBox mb(_("You haven't configure this map, so you can't save it.\nDo you want to close without saving ?"),
+			               BT_OK|BT_CANCEL, this);
 			result = mb.Show();
 		}
 		if(result != BT_CANCEL)
@@ -445,7 +444,7 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 			}
 			catch(const TECExcept &e)
 			{
-				TMessageBox(std::string("Impossible de sauvegarder la carte :\n\n") +
+				TMessageBox(std::string(_("Unable to save this map:\n\n")) +
 						e.Message(), BT_OK, this).Show();
 			}
 		}
@@ -692,7 +691,7 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 
 	if(!country)
 	{
-		Debug(W_WARNING, "La country %s n'a pas été trouvée", id);
+		Debug(W_WARNING, "La country %s n'a pas Ã©tÃ© trouvÃ©e", id);
 		return;
 	}
 
@@ -778,13 +777,13 @@ void TBarreEntity::SetEntity(ECEntity* e)
 	{
 		if(Nb->Text().empty())
 		{
-			TMessageBox mb("Veuillez mettre un nombre dans l'unité", BT_OK, dynamic_cast<TForm*>(Parent()));
+			TMessageBox mb(_("Please put a number in this unit."), BT_OK, dynamic_cast<TForm*>(Parent()));
 			mb.Show();
 			return;
 		}
 		if(Owner->Selected() < 0)
 		{
-			TMessageBox mb ("Veuillez sélectionner un propriétaire", BT_OK, dynamic_cast<TForm*>(Parent()));
+			TMessageBox mb (_("Please select an owner"), BT_OK, dynamic_cast<TForm*>(Parent()));
 			mb.Show();
 			return;
 		}
@@ -841,7 +840,7 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		Icon->SetImage(e->Icon(), false);
 
 		Owner->ClearItems();
-		Owner->AddItem(!e->Owner(), "Neutre", "*");
+		Owner->AddItem(!e->Owner(), _("Neutral"), "*");
 		BMapPlayersVector mps = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->MapPlayers();
 		for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
 			Owner->AddItem(e->Owner() == dynamic_cast<EMapPlayer*>(*it), TypToStr((*it)->ID()), TypToStr((*it)->ID()));
@@ -883,7 +882,7 @@ void TBarreEntity::Init()
 {
 	Name = AddComponent(new TLabel(60,15, "", black_color, Font::GetInstance(Font::Big)));
 
-	RemoveButton = AddComponent(new TButtonText(Width()-150,15,100,30, "Supprimer", Font::GetInstance(Font::Small)));
+	RemoveButton = AddComponent(new TButtonText(Width()-150,15,100,30, _("Delete"), Font::GetInstance(Font::Small)));
 	RemoveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 
 	Owner = AddComponent(new TListBox(Rectanglei(RemoveButton->X()-105, 15, 100, Height()-40)));
@@ -925,7 +924,7 @@ void TEditBarreLat::RadarClick(TObject* m, const Point2i& mouse)
 	TMapEditor* editor = dynamic_cast<TMapEditor*>(m->Parent()->Parent());
 
 	if(!map)
-		throw ECExcept(VPName(map), "Appel incorrect");
+		throw ECExcept(VPName(map), "Incorrect call");
 
 	int size_x = map->Width() / editor->Map->Map()->Width();
 	int size_y = map->Height() / editor->Map->Map()->Height();
@@ -946,13 +945,13 @@ TEditBarreLat::TEditBarreLat()
 
 void TEditBarreLat::Init()
 {
-	QuitButton = AddComponent(new TButtonText(30,240,100,30, "Fermer", Font::GetInstance(Font::Small)));
+	QuitButton = AddComponent(new TButtonText(30,240,100,30, _("Close"), Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
-	OptionsButton = AddComponent(new TButtonText(30,270,100,30, "Configuration", Font::GetInstance(Font::Small)));
+	OptionsButton = AddComponent(new TButtonText(30,270,100,30, _("Configuration"), Font::GetInstance(Font::Small)));
 	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 	OptionsButton->SetX(X() + Width()/2 - OptionsButton->Width()/2);
-	SaveButton = AddComponent(new TButtonText(30,300,100,30, "Sauvegarder", Font::GetInstance(Font::Small)));
+	SaveButton = AddComponent(new TButtonText(30,300,100,30, _("Save"), Font::GetInstance(Font::Small)));
 	SaveButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 	SaveButton->SetX(X() + Width()/2 - SaveButton->Width()/2);
 
@@ -998,7 +997,7 @@ void TOptionsMap::Options(TObject*, void* m)
 		OptionsMap = new TOptionsMap(Video::GetInstance()->Window(), map);
 		OptionsMap->Refresh();
 
-		/* Mettre les valeurs qui ne seront enregistrées qu'à la fermeture */
+		/* Mettre les valeurs qui ne seront enregistrÃ©es qu'Ã  la fermeture */
 		OptionsMap->Name->SetString(map->Name());
 		OptionsMap->MinPlayers->SetValue(map->MinPlayers());
 		OptionsMap->MaxPlayers->SetValue(map->MaxPlayers());
@@ -1028,22 +1027,21 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 	if(OkButton->Test(mouse, button))
 	{
 		if(Name->Text().empty())
-			TMessageBox("Veuillez donner un nom à la carte !", BT_OK, this).Show();
+			TMessageBox(_("Please give a name to this map!"), BT_OK, this).Show();
 		else if(Players->Size() < 2)
-			TMessageBox("Il doit y avoir au moins deux joueur", BT_OK, this).Show();
+			TMessageBox(_("This map might have at least two players"), BT_OK, this).Show();
 		else if(Countries->Empty())
-			TMessageBox("Il doit y avoir au moins une country", BT_OK, this).Show();
+			TMessageBox(_("This map might have at least one country"), BT_OK, this).Show();
 		else if(City->Empty())
-			TMessageBox("Vous devez mettre l'argent des villes",
+			TMessageBox(_("You have to put how many give cities"),
 					BT_OK, this).Show();
 		else if(MinPlayers->Value() < 2)
-			TMessageBox("Le nombre minimal de joueurs doit être d'au moins deux joueurs", BT_OK,
+			TMessageBox(_("It might have at least two players"), BT_OK,
 					this).Show();
 		else if(MaxPlayers->Value() < MinPlayers->Value())
-			TMessageBox("Le nombre maximal de joueurs doit être égal ou supérieur au nombre de "
-					"joueurs minimal", BT_OK, this).Show();
+			TMessageBox(_("Maximal number of players has to be superior or equal than minimal number of players"), BT_OK, this).Show();
 		else if(StrToTyp<int>(City->Text()) < 1)
-			TMessageBox("Il faut qu'il y ait de l'argent pour chaque ville par tour",
+			TMessageBox(_("You can't give $0 to cities each turn!"),
 					BT_OK, this).Show();
 		else
 		{
@@ -1074,12 +1072,12 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 		std::string c_id = AddCountryEdit->Text();
 		if(c_id.empty() || c_id.size() != 2)
 		{
-			TMessageBox mb("L'identifiant doit faire 2 caractères", BT_OK, this);
+			TMessageBox mb(_("ID might have 2 characters"), BT_OK, this);
 			mb.Show();
 		}
 		else if(map->GetCountry(c_id.c_str()))
 		{
-			TMessageBox mb("L'identifiant est déjà utilisé", BT_OK, this);
+			TMessageBox mb(_("This ID is already used"), BT_OK, this);
 			mb.Show();
 		}
 		else
@@ -1111,7 +1109,7 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 
 		CountryPlayer->SetEnabled();
 		CountryPlayer->ClearItems();
-		CountryPlayer->AddItem(true, "Neutre", "*");
+		CountryPlayer->AddItem(true, _("Neutral"), "*");
 		BMapPlayersVector mps = map->MapPlayers();
 		for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
 			CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
@@ -1165,57 +1163,56 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 {
 	map = m;
 
-	OkButton = AddComponent(new TButtonText(600,500,150,50, "OK", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(600,500,150,50, _("OK"), Font::GetInstance(Font::Normal)));
 
-	PlayersLabel = AddComponent(new TLabel(100, 130, "Joueurs :", white_color, Font::GetInstance(Font::Normal)));
+	PlayersLabel = AddComponent(new TLabel(100, 130, _("Players:"), white_color, Font::GetInstance(Font::Normal)));
 	Players = AddComponent(new TListBox(Rectanglei(100,150,150,200)));
 	Players->SetNoItemHint();
-	Players->SetHint("Ce sont les différents joueurs susceptibles d'être joués.\nChaque territoire et unité peut être lié à "
-	                 " un joueur.");
+	Players->SetHint(_("These are players played.\nEach countries and unities can be linked to a player."));
 
-	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, "Ajouter", Font::GetInstance(Font::Normal)));
+	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, _("Add"), Font::GetInstance(Font::Normal)));
 	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, "Supprimer", Font::GetInstance(Font::Normal)));
+	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, _("Delete"), Font::GetInstance(Font::Normal)));
 	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	CountriesLabel = AddComponent(new TLabel(400, 130, "Territoires :", white_color, Font::GetInstance(Font::Normal)));
+	CountriesLabel = AddComponent(new TLabel(400, 130, _("Countries:"), white_color, Font::GetInstance(Font::Normal)));
 	Countries = AddComponent(new TListBox(Rectanglei(400,150,150,200)));
 	Countries->SetNoItemHint();
-	Countries->SetHint("Liste des différents territoires. Vous pouvez assigner chaque case à un territoire.\n"
-	                   "Vous ne pouvez supprimer que les territoires en vert, qui ne sont assignés à aucune case.");
+	Countries->SetHint(_("List of countries. You can assign a cell to a country.\n"
+	                     "You only can delete green countries, no cell are linked to them"));
 
 	AddCountryEdit = AddComponent(new TEdit(Font::GetInstance(Font::Small), 400,360,150, 2, COUNTRY_CHARS));
 
-	AddCountryButton = AddComponent(new TButtonText(555, 350, 100, 30, "Ajouter", Font::GetInstance(Font::Normal)));
+	AddCountryButton = AddComponent(new TButtonText(555, 350, 100, 30, _("Add"), Font::GetInstance(Font::Normal)));
 	AddCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, "Supprimer", Font::GetInstance(Font::Normal)));
+	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, _("Delete"), Font::GetInstance(Font::Normal)));
 	DelCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
-	CountryPlayerLabel = AddComponent(new TLabel(560, 150, "Appartient à :", white_color, Font::GetInstance(Font::Small)));
+	CountryPlayerLabel = AddComponent(new TLabel(560, 150, _("Owned by:"), white_color, Font::GetInstance(Font::Small)));
 	CountryPlayer = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 560 + CountryPlayerLabel->Width(), 150, 70));
 	CountryPlayer->SetEnabled(false);
 	CountryPlayer->SetNoItemHint();
-	CountryPlayer->SetHint("Propriétaire du territoire sélectionné.\n"
-	                       "Un territoire neutre n'appartiendra à personne au début de la partie.");
+	CountryPlayer->SetHint(_("Owner of selected country.\n"
+	                       "A neutral country isn't owner at begin of the game."));
 
-	NameLabel = AddComponent(new TLabel(50,380, "Nom de la carte", white_color, Font::GetInstance(Font::Normal)));
+	NameLabel = AddComponent(new TLabel(50,380, _("Map name"), white_color, Font::GetInstance(Font::Normal)));
 	Name = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 400, 150, 50, EDIT_CHARS));
 
 	                                                                           // label    x  y  width min
 	                                                                                        // max                step def
-	MinPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),"Min players", 50,420,150,1,
-	                                                                                      map->MapPlayers().size(),1,1));
-	MaxPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),"Max players", 50, 440, 150, 1,
-	                                                                                      map->MapPlayers().size(), 1, 1));
+	MinPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Min players"), 50,420,150,1,
+	                                                                                         map->MapPlayers().size(),1,1));
+	MaxPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Max players"), 50, 440, 150, 1,
+	                                                                                         map->MapPlayers().size(), 1, 1));
 
-	CityLabel = AddComponent(new TLabel(50,460, "Argent par villes", white_color, Font::GetInstance(Font::Normal)));
+	CityLabel = AddComponent(new TLabel(50,460, _("Money for cities"), white_color, Font::GetInstance(Font::Normal)));
 	City = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 480, 150, 5, "0123456789"));
 
-	Mission = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 50, 500, "Mission", white_color));
-	Mission->SetHint("Si actif, cette carte est une mission et le joueur sera le premier dans la liste.\n"
-	                 "Cet editeur ne permet pas de configurer les paramètres spéciaux des missions");
+	Mission = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 50, 500, _("Mission"), white_color));
+	Mission->SetHint(_("If checked, this map is a mission and the player will be the first in the list.\n"
+	                  "This editor can't configure special characteristics of missions"));
 
 	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 300, 480, 290, 100));
 	SetHint(Hints);
@@ -1259,9 +1256,8 @@ void TLoadMapFile::OnClic(const Point2i& mouse, int button, bool&)
 	{
 		if(!TMapEditor::Editor(NULL, this))
 		{
-			TMessageBox mb("Impossible de créer la carte.\n"
-					"Son nom est peut être déjà utilisé, ou alors les informations "
-					"que vous avez fournis sont invalides.",
+			TMessageBox mb(_("Unable to create map.\n"
+					"It name can be already used, or informations are incorrect."),
 					BT_OK, this);
 			mb.Show();
 		}
@@ -1271,8 +1267,7 @@ void TLoadMapFile::OnClic(const Point2i& mouse, int button, bool&)
 	{
 		if(MapsList->Selected() >= 0 && !TMapEditor::Editor(MapsList->SelectedItem()->Value().c_str()))
 		{
-			TMessageBox mb("Impossible d'ouvrir la map " + MapsList->SelectedItem()->Value() +
-			               ".\nVeuillez reessayer", BT_OK, this);
+			TMessageBox mb(StringF(_("Unable to open %s map file.\nPlease retry."), MapsList->SelectedItem()->Value().c_str()), BT_OK, this);
 			mb.Show();
 		}
 		Refresh();
@@ -1300,10 +1295,10 @@ TLoadMapFile::TLoadMapFile(ECImage* w)
 	MapsList = AddComponent(new TListBox(Rectanglei(300,200,200,300)));
 	Refresh();
 
-	NewButton = AddComponent(new TButtonText(550,250,150,50, "Nouveau", Font::GetInstance(Font::Normal)));
-	LoadButton = AddComponent(new TButtonText(550,300,150,50, "Charger", Font::GetInstance(Font::Normal)));
+	NewButton = AddComponent(new TButtonText(550,250,150,50, _("New map"), Font::GetInstance(Font::Normal)));
+	LoadButton = AddComponent(new TButtonText(550,300,150,50, _("Load a file"), Font::GetInstance(Font::Normal)));
 	LoadButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(550,350,150,50, "Retour", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(550,350,150,50, _("Back"), Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

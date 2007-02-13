@@ -180,7 +180,7 @@ int TClient::parsemsg(const ECMessage& cmdname, const std::vector<std::string>& 
 	}
 
 	if(cmd->Flags() && !(flag & cmd->Flags()))
-		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriés.", VSName(GetNick())
+		return vDebug(W_DESYNCH, "Commande incorrecte du client, flags non appropriÃ©s.", VSName(GetNick())
 		                         VPName(cmd));
 
 	try
@@ -284,12 +284,13 @@ TClient *ECServer::addclient(int fd, const char *ip)
 			buf += static_cast<char>(MSG_ERROR);
 			buf += " ";
 			buf += static_cast<char>(ERR_SERV_FULL);
+			buf += "\r\n";
 			send(fd, buf.c_str(), buf.size(), 0);
 			return 0;
 		}
 		if(myClients[fd])
 		{
-			Debug(W_WARNING, "Connexion sur un slot déjà occupé!? (%s -> %d[%s])",
+			Debug(W_WARNING, "Connexion sur un slot dÃ©jÃ  occupÃ©!? (%s -> %d[%s])",
 							ip, fd, myClients[fd]->GetIp());
 			return 0;
 		}
@@ -340,7 +341,7 @@ void TClient::Free()
 				c->SetOwner(0);
 			c->RemovePlayer(pl, USE_DELETE);
 			/* c->sendto_players(0, app.rpl(ECServer::LEAVE), nick.c_str())
-			 * > envoyé dans RemovePlayer */
+			 * > envoyÃ© dans RemovePlayer */
 		}
 	}
 }
@@ -501,7 +502,7 @@ bool ECServer::ConnectMetaServer()
 	const char *hostname = conf->MSHost().c_str();
 	unsigned short port = conf->MSPort();
 
-	/* Création du socket
+	/* CrÃ©ation du socket
 	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
 	 * valeur d'une variable statique qui s'initialise elle toute seule.
 	 */
@@ -511,7 +512,7 @@ bool ECServer::ConnectMetaServer()
 
 	const char* ip = hostname;
 
-	/* Si c'est une host, on la résoud */
+	/* Si c'est une host, on la rÃ©soud */
 	if(!is_ip(hostname))
 	{
 		struct hostent *hp = gethostbyname(hostname);

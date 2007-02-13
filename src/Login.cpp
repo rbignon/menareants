@@ -47,6 +47,26 @@ static bool RC_MOTD = false;
 extern bool JOINED;
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 
+char *duration(int s)
+{
+        static char dur[44 /* 3 + 7 + 2 + 8 + 2 + 9 + 2 + 9 + 1 */];
+        int i = 0;
+
+        if(s >= 86400)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/86400),
+                                s %= 86400, strcpy(dur + i, _(" days ")), i += 7;
+        if(s >= 3600)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/3600),
+                                s %= 3600, strcpy(dur + i, _(" hours ")), i += 8;
+        if(s >= 60)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/60),
+                                s %= 60, strcpy(dur + i, _(" minutes ")), i += 9;
+        if(s) i += snprintf(dur + i, sizeof dur - i, _("%d seconds"),s);
+        else dur[i-2]= 0;
+
+        return dur;
+}
+
 /** We are connected to server.
  *
  * Syntax: HEL prog version
@@ -94,40 +114,39 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		case ERR_UNKNOWN:
 			break;
 		case ERR_NICK_USED:
-			me->SetCantConnect("Le pseudo " + Config::GetInstance()->nick + " est pris");
+			me->SetCantConnect(StringF(_("%s is already used"), Config::GetInstance()->nick.c_str()));
 			break;
 		case ERR_CANT_JOIN:
 			JOINED = -1;
-			ErrMessage = "Impossible de joindre la partie, elle n'existe peut être plus, elle est pleine "
-			             "ou a démarrée.";
+			ErrMessage = _("Unable to join this game. It doesn't exist anymore, or it is full, or it had started");
 			break;
 		case ERR_IA_CANT_JOIN:
-			ErrMessage = "Impossible de créer cette IA pour une des raisons suivantes:\n"
-			             "- Le pseudo choisi est incorrect.\n"
-			             "- Le pseudo choisi est déjà utilisé par une autre IA (pas forcément dans votre partie).\n"
-			             "- Il n'y a plus de place pour un joueur supplémentaire.";
+			ErrMessage = _("Unable to create this AI because of one of these reasons:\n"
+			             "- Nickname specified is incorrect.\n"
+			             "- Nickname specified is alreayd used by an other AI (here or in an other game).\n"
+			             "- This game is full.");
 			break;
 		case ERR_SERV_FULL:
-			me->SetCantConnect("Le serveur est plein");
+			me->SetCantConnect(_("This server is full."));
 			break;
 		case ERR_CANT_CREATE:
 			JOINED = -1;
-			ErrMessage = "Impossible de créer la partie, il y a trop de parties sur ce serveur.";
+			ErrMessage = _("Unable to create a game, there are too games on this server");
 			break;
 		case ERR_CMDS:
-			ErrMessage = "Le serveur a émit une erreur concernant le traitement d'une commande que nous lui avons transféré.";
+			ErrMessage = _("Server doesn't understand a command we have sended");
 			break;
 		case ERR_ADMIN_LOGFAIL:
-			ErrMessage = "Mot de passe incorrect.";
+			ErrMessage = _("Incorrect password.");
 			break;
 		case ERR_ADMIN_NOSUCHVICTIM:
-			ErrMessage = "Personne ne possède le pseudo " + parv[2];
+			ErrMessage = StringF(_("No such %s nickname"), parv[2].c_str());
 			break;
 		case ERR_ADMIN_CANT_REHASH:
-			ErrMessage = "Il y a eu une erreur lors du rechargement de la configuration. Veuillez vérifier.";
+			ErrMessage = _("Server can't rehash configuration. Please verify it.");
 			break;
 		case ERR_ADMIN_SUCCESS:
-			ErrMessage = "Opération accomplie avec succès.";
+			ErrMessage = ("Done.");
 			break;
 	}
 	if(!ErrMessage.empty())
@@ -144,24 +163,22 @@ int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	switch(parv[1][0])
 	{
 		case '0':
-			me->SetCantConnect("Ce jeu n'est pas compatible avec ce serveur !?");
+			me->SetCantConnect(_("This game isn't compatible with this server!?"));
 			break;
 		case '+':
-			me->SetCantConnect("Vous utilisez une version du jeu plus récente que celle "
-			                   "supportée par le serveur");
+			me->SetCantConnect(_("You use a version more recent than that of the server"));
 			break;
 		case '-':
-			me->SetCantConnect("Vous devez mettre à jour Men Are Ants pour jouer "
-			                   "sur ce serveur.\n\n"
+			me->SetCantConnect(std::string(_("You have to update Men Are Ants to play on this server.\n\n")) +
 #ifndef WIN32
-			                   "Tapez en console \"make update && sudo make install\".\n"
+			                     _("Type \"make update && sudo make install\".\n")
 #else
-			                   "Téléchargez MenAreAnts.zip sur le site.\n"
+			                     _("Download MenAreAnts.zip on website.\n")
 #endif
-			                   "Allez sur " APP_SITE " pour plus d'informations.");
+			                     + StringF(_("Go on %s to get more informations."), APP_SITE));
 			break;
 		default:
-			me->SetCantConnect("Impossible de se connecter");
+			me->SetCantConnect(_("Unable to connect to this server."));
 			vDebug(W_DESYNCH|W_SEND, "Reception d'un MAJ bizarre !",
 		                                VName(parv[1]));
 			break;
@@ -234,12 +251,11 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(ConnectedForm)
 	{
-		ConnectedForm->Uptime->SetCaption("Ce serveur a été lancé il y a " +
-		                                  std::string(duration(time(NULL) - StrToTyp<time_t>(parv[7]))) + ".");
-		ConnectedForm->UserStats->SetCaption("Il y a " + parv[1] + " personnes connectées, avec " + parv[2] +
-		                                     " connexions totales et " + parv[6] + " parties jouées.");
-		ConnectedForm->ChanStats->SetCaption("Il y a actuellement " + parv[3] + " partie(s), dont " + parv[5] +
-		                                     " en cours de jeu et " + parv[4] + " en préparation.");
+		ConnectedForm->Uptime->SetCaption(StringF(_("This server is running from %s."), duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
+		ConnectedForm->UserStats->SetCaption(StringF(_("There are %s users, with %s total connections and %s played games"),
+		                                               parv[1].c_str(), parv[2].c_str(), parv[6].c_str()));
+		ConnectedForm->ChanStats->SetCaption(StringF(_("There are %s game(s), with %s in game and %s in preparation."),
+		                                               parv[3].c_str(), parv[5].c_str(), parv[4].c_str()));
 	}
 	return 0;
 }
@@ -251,7 +267,7 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!ConnectedForm)
-		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ConnectedForm));
+		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenÃªtre de liste des chans", VPName(ConnectedForm));
 
 	me->LockScreen();
 	if(parv[2][0] == '+')
@@ -271,7 +287,7 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
 	}
 	else
-		ConnectedForm->GList->AddItem(false, StringF("%-8s  Playing: %s", parv[1].c_str(), parv[5].c_str()), parv[1],
+		ConnectedForm->GList->AddItem(false, StringF(_("%-8s  Playing: %s"), parv[1].c_str(), parv[5].c_str()), parv[1],
 		                             red_color, false);
 	me->UnlockScreen();
 	return 0;
@@ -350,13 +366,13 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%3d  %-23s %2s   %3s/%-3s   %3s/%-3s     %-3s", SDL_GetTicks()-t0, parv[2].substr(0,23).c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], fgreen_color, true, *Font::GetInstance(Font::Normal));
+		                      parv[1], fgreen_color, true, *Font::GetInstance(Font::Normal), parv[2]);
 	else
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
 		                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? black_color : red_color,
-		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION));
+		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION), *Font::GetInstance(Font::Small), parv[2]);
 
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
 	ListServerForm->nb_wchans += StrToTyp<uint>(parv[8]);
@@ -374,11 +390,11 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
 	assert(ListServerForm);
 	ListServerForm->RecvSList = false;
-	ListServerForm->UserStats->SetCaption("Il y a " + TypToStr(ListServerForm->nb_users) + " utilisateur(s), avec " + TypToStr(ListServerForm->nb_tusers) + " connexions totales et " +
-	                                     TypToStr(ListServerForm->nb_tchans) + " parties jouées.");
-	ListServerForm->ChanStats->SetCaption("Il y a actuellement " + TypToStr(ListServerForm->nb_chans) + " partie(s) sur " + TypToStr(ListServerForm->ServerList->Size()) +
-	                                      " serveurs, dont " + TypToStr(ListServerForm->nb_chans - ListServerForm->nb_wchans) + " en cours de jeu et " +
-	                                      TypToStr(ListServerForm->nb_wchans) + " en préparation.");
+	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s), with %d total connections and %d played games"),
+	                                                ListServerForm->nb_users, ListServerForm->nb_tusers, ListServerForm->nb_tchans));
+	ListServerForm->ChanStats->SetCaption(StringF(_("There are %d game(s) on %d servers, with %d in game and %d in preparation"),
+	                                               ListServerForm->nb_chans, ListServerForm->ServerList->Size(), ListServerForm->nb_chans - ListServerForm->nb_wchans,
+	                                               ListServerForm->nb_wchans));
 	ListServerForm->nb_chans = ListServerForm->nb_wchans = ListServerForm->nb_users = ListServerForm->nb_tchans = ListServerForm->nb_tusers = 0;
 	return 0;
 }
@@ -430,9 +446,9 @@ void MenAreAntsApp::RefreshList()
 			client->SetWantDisconnect();
 
 		if(!client)
-			msg = "Connexion impossible au meta-serveur";
+			msg = _("Unable to connect to meta-server");
 		else
-			msg = "Connexion impossible au meta-serveur :\n\n" + client->CantConnect();
+			msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
 		SDL_WaitThread(Thread, 0);
@@ -502,16 +518,15 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		MenAreAntsApp::GetInstance()->RefreshList();
 	else if(ConnectButton->Test(mouse, button))
 	{
-		MenAreAntsApp::GetInstance()->ConnectedTo(ServerList->SelectedItem()->Value());
+		MenAreAntsApp::GetInstance()->ConnectedTo(ServerList->SelectedItem()->Name(), ServerList->SelectedItem()->Value());
 		MenAreAntsApp::GetInstance()->RefreshList();
 	}
 	else if(ConnectToButton->Test(mouse, button))
 	{
-		TMessageBox msg("Veuillez entrer l'hostname d'un serveur ainsi qu'éventuellement le port, sous forme :\n"
-		                "  hostname[:port]", BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		TMessageBox msg(_("Please enter a server hostname and a port, in form hostname[:port]"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
 		if(msg.Show() == BT_OK)
 		{
-			MenAreAntsApp::GetInstance()->ConnectedTo(msg.Edit()->Text());
+			MenAreAntsApp::GetInstance()->ConnectedTo(msg.Edit()->Text(), msg.Edit()->Text());
 			MenAreAntsApp::GetInstance()->RefreshList();
 		}
 	}
@@ -526,7 +541,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		int size = ServerList->Size();
 		if(!size)
 		{
-			TMessageBox("Il n'y a aucun serveur disponible.\n\nVeuillez réessayer plus tard.",
+			TMessageBox(_("There isn't any disponible server\n\nPlease retry later."),
 			            BT_OK, this).Show();
 			return;
 		}
@@ -537,8 +552,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 			i++;
 		} while(i < 20 && ServerList->Item(r)->Enabled() == false);
 		if(i >= 20)
-			TMessageBox("Il n'y a aucun serveur pour heberger votre partie.\n\n"
-					"Veuillez réessayez plus tard.",
+			TMessageBox(_("There isn't any server to host your game.\n\nPlease retry later."),
 						BT_OK, this).Show();
 		else
 		{
@@ -546,11 +560,10 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 			if(!client)
 				return;
 			if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, ConnectedForm, MissionButton->Test(mouse, button)))
-				TMessageBox("Impossible de créer la partie.\n"
-				            "Il y a actuellement de trop de parties en cours sur le serveur. Réessayez.",
+				TMessageBox(_("Unable to create this game.\n There are too games on this server. Please retry."),
 				            BT_OK, ConnectedForm).Show();
 			if(!client->IsConnected())
-				TMessageBox("Vous avez été déconnecté.", BT_OK).Show();
+				TMessageBox(_("You have been disconnected"), BT_OK).Show();
 			client->SetWantDisconnect();
 			MenAreAntsApp::GetInstance()->Disconnect(client);
 			MenAreAntsApp::GetInstance()->RefreshList();
@@ -565,10 +578,10 @@ TListServerForm::TListServerForm(ECImage* w)
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
 	ServerList->SetGrayDisable(false);
 
-	Label1 = AddComponent(new TLabel(ServerList->Y()-60,"Veuillez choisir un serveur dans la liste suivante :", white_color, Font::GetInstance(Font::Big)));
+	Label1 = AddComponent(new TLabel(ServerList->Y()-60, _("Please select a server in this list:"), white_color, Font::GetInstance(Font::Big)));
 
 	Label2 = AddComponent(new TLabel(ServerList->X(), ServerList->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
-	Label2->SetCaption("Ping  Name                 Proto  Joueurs  Parties  En attente");
+	Label2->SetCaption(_("Ping  Name                 Proto   Players   Games  On Standby"));
 
 	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2 - 100, Label1->Y()/2, 220,50));
 	MissionButton->SetImage(new ECSprite(Resources::MissionButton(), Video::GetInstance()->Window()));
@@ -589,14 +602,14 @@ TListServerForm::TListServerForm(ECImage* w)
 
 	int button_x = ServerList->X() + ServerList->Width() + 15;
 
-	ConnectButton = AddComponent(new TButtonText(button_x, ServerList->Y(), 150,50, "Se connecter",
+	ConnectButton = AddComponent(new TButtonText(button_x, ServerList->Y(), 150,50, _("Connect"),
 	                                            Font::GetInstance(Font::Normal)));
 	ConnectButton->SetEnabled(false);
-	ConnectToButton = AddComponent(new TButtonText(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50, "Entrer un serveur",
+	ConnectToButton = AddComponent(new TButtonText(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50, _("Enter a server"),
 	                                            Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(button_x, ConnectToButton->Y()+ConnectToButton->Height(), 150,50, "Actualiser",
+	RefreshButton = AddComponent(new TButtonText(button_x, ConnectToButton->Y()+ConnectToButton->Height(), 150,50, _("Refresh"),
 	                                            Font::GetInstance(Font::Normal)));
-	RetourButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, "Retour",
+	RetourButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, _("Back"),
 	                                          Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
@@ -655,9 +668,9 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 			client->SetWantDisconnect();
 
 		if(!client)
-			msg = "Connexion impossible";
+			msg = _("Unable to connect.");
 		else
-			msg = "Connexion impossible :\n\n" + client->CantConnect();
+			msg = _("Unable to connect:\n\n") + client->CantConnect();
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
 		SDL_WaitThread(Thread, 0);
@@ -693,7 +706,7 @@ void MenAreAntsApp::Disconnect(EC_Client* client)
 	}
 }
 
-void MenAreAntsApp::ConnectedTo(std::string host)
+void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
 {
 	if(EC_Client::GetInstance())
 	{
@@ -713,8 +726,7 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 
 		ConnectedForm->SetMutex(mutex);
 		ConnectedForm->SetClient(client);
-		ConnectedForm->Welcome->SetCaption("Vous êtes bien connecté en tant que " +
-		                                               client->GetNick());
+		ConnectedForm->Welcome->SetCaption(StringF(_("Welcome to %s, %s !"), name.c_str(), client->GetNick().c_str()));
 
 		ConnectedForm->Run();
 	}
@@ -722,10 +734,9 @@ void MenAreAntsApp::ConnectedTo(std::string host)
 	{
 		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
 		EC_Client::GetInstance()->SetWantDisconnect();
-		TMessageBox mb("Une erreur s'est produite dans le jeu !!\n\n"
-		               "Elle a été envoyée aux programmeurs du jeu qui feront leur "
-		               "possible pour le corriger.\n\n"
-		               "Veuillez nous excuser de la gêne occasionée", BT_OK, NULL);
+		TMessageBox mb(_("An error was occured in game!!\n\n"
+		                 "It has been send to MenAreAnts' coders, and they are going to fix it.\n\n"
+		                 "Sorry for obstruct caused"), BT_OK, NULL);
 				mb.SetBackGround(Resources::Titlescreen());
 				mb.Show();
 #ifdef DEBUG
@@ -749,9 +760,7 @@ void TConnectedForm::AfterDraw()
 {
 	if(Rejoin.empty() == false)
 	{
-		if(TMessageBox("Vous avez été déconnecté pendant que vous jouiez à la partie " +
-		               Rejoin + ".\n\n"
-		               "Souhaitez-vous rejoindre la partie ?",
+		if(TMessageBox(StringF(_("You have been disconnected while playing to the %s game. Do you want to rejoin it ?"), Rejoin.c_str()),
 				BT_YES|BT_NO, this).Show() == BT_YES)
 		{
 			MenAreAntsApp::GetInstance()->RecoverGame(Rejoin);
@@ -760,7 +769,7 @@ void TConnectedForm::AfterDraw()
 	}
 	if(!client || !client->IsConnected())
 	{
-		TMessageBox mb("Vous avez été déconnecté.", BT_OK, NULL);
+		TMessageBox mb(_("You have been disconnected."), BT_OK, NULL);
 		mb.SetBackGround(Resources::Titlescreen());
 		mb.Show();
 		want_quit = true;
@@ -797,11 +806,7 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	else if(JoinButton->Enabled() && JoinButton->Test(mouse, button))
 	{
-		if(!MenAreAntsApp::GetInstance()->GameInfos(GList->SelectedItem()->Value().c_str(), this))
-		{
-			TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
-			TGameInfosForm::ErrMessage.clear();
-		}
+		MenAreAntsApp::GetInstance()->GameInfos(GList->SelectedItem()->Value().c_str(), this);
 		refresh = true;
 		timer.reset();
 		client->sendrpl(MSG_STAT);
@@ -810,37 +815,27 @@ void TConnectedForm::OnClic(const Point2i& mouse, int button, bool&)
 		refresh = true;
 	else if(CreerButton->Test(mouse, button))
 	{
-		if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, this))
-		{
-			TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
-			TGameInfosForm::ErrMessage.clear();
-		}
+		MenAreAntsApp::GetInstance()->GameInfos(NULL, this);
 		refresh = true;
 		timer.reset();
 		client->sendrpl(MSG_STAT);
 	}
 	else if(mouse.x < 10 && mouse.y < 10)
 	{
-		TMessageBox mb("Vous êtes sur le point de vous logger en temps qu'administrateur du serveur.\n\n"
-		               "Veuillez entrer le mot de passe :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		TMessageBox mb(_("You are in an administration login proccess.\n\n"
+		                 "Enter the password:"), HAVE_EDIT|BT_OK|BT_CANCEL, this);
 		if(mb.Show() == BT_OK)
 			client->sendrpl(MSG_ADMIN, ECArgs("LOGIN", mb.Edit()->Text()));
 	}
 	else if(RehashButton->Test(mouse, button))
 	{
 		client->sendrpl(MSG_ADMIN, "REHASH");
-		TMessageBox("Configuration mise à jour", BT_OK, this);
 	}
 	else if(KillButton->Test(mouse, button))
 	{
-		TMessageBox mb("Entrez le pseudo de la personne à déconnecter :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		TMessageBox mb(_("Enter user's nickname you want to kill:"), HAVE_EDIT|BT_OK|BT_CANCEL, this);
 		if(mb.Show() == BT_OK)
-		{
 			client->sendrpl(MSG_ADMIN, ECArgs("KILL", mb.Edit()->Text()));
-			TMessageBox("Si cette personne était connectée, elle a probablement été tuée.\n"
-			            "Il est à noter que pour le moment il n'y a pas de notification de la chose",
-			            BT_OK, this).Show();
-		}
 	}
 }
 
@@ -850,31 +845,31 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	Motd = AddComponent(new TMemo(Font::GetInstance(Font::Small), 0, 0, 400,350, 0));
 	Motd->SetXY(Window()->GetWidth()/2 - Motd->Width()/2 - (200+150+10+10)/2, Window()->GetHeight()/2 - Motd->Height()/2);
 
-	MOTDLabel = AddComponent(new TLabel(Motd->X()+5, Motd->Y()-20, "Message du jour du serveur :", white_color, Font::GetInstance(Font::Normal)));
+	MOTDLabel = AddComponent(new TLabel(Motd->X()+5, Motd->Y()-20, _("Message of the day"), white_color, Font::GetInstance(Font::Normal)));
 
 	GList = AddComponent(new TListBox(Rectanglei(300,350,200,350)));
 	GList->SetXY(Motd->X()+Motd->Width()+10, Motd->Y());
 	GList->SetGrayDisable(false);
 
-	ListLabel = AddComponent(new TLabel(GList->X()+5, GList->Y()-20, "Liste des parties :", white_color, Font::GetInstance(Font::Normal)));
+	ListLabel = AddComponent(new TLabel(GList->X()+5, GList->Y()-20, _("Game list:"), white_color, Font::GetInstance(Font::Normal)));
 
-	Welcome = AddComponent(new TLabel(Motd->Y()/2,"Vous êtes bien connecté", white_color, Font::GetInstance(Font::Big)));
+	Welcome = AddComponent(new TLabel(Motd->Y()/2,"You are connected", white_color, Font::GetInstance(Font::Big)));
 
 	int button_x = GList->X() + GList->Width() + 10;
 
-	JoinButton = AddComponent(new TButtonText(button_x, GList->Y(), 150,50, "Rejoindre",
+	JoinButton = AddComponent(new TButtonText(button_x, GList->Y(), 150,50, _("Join game"),
 	                                            Font::GetInstance(Font::Normal)));
 	JoinButton->SetEnabled(false);
-	CreerButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(), 150,50, "Créer une partie",
+	CreerButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(), 150,50, _("Create a game"),
 	                                            Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(button_x,CreerButton->Y()+CreerButton->Height(),150,50, "Actualiser",
+	RefreshButton = AddComponent(new TButtonText(button_x,CreerButton->Y()+CreerButton->Height(),150,50, _("Refresh"),
 	                                                Font::GetInstance(Font::Normal)));
-	DisconnectButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, "Se déconnecter",
+	DisconnectButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, _("Disconnect"),
 	                                                Font::GetInstance(Font::Normal)));
-	RehashButton = AddComponent(new TButtonText(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50, "Actu. Config.",
+	RehashButton = AddComponent(new TButtonText(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50, _("Rehash config."),
 	                                                Font::GetInstance(Font::Normal)));
 	RehashButton->SetVisible(false);
-	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, "Tuer un client",
+	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, _("Kill an user"),
 	                                                Font::GetInstance(Font::Normal)));
 	KillButton->SetVisible(false);
 

@@ -3,18 +3,18 @@
                    *******************
                          [ API ]
 
-Dernière modification:
+DerniÃ¨re modification:
 $Id$
 
 Sommaire:
 1) Principe du jeu
 2) Protocole
-3) Particularités des commandes de positions
+3) ParticularitÃ©s des commandes de positions
 4) Modes
 5) PLS
 6) Etat d'une partie
 7) Intelligence Artificielle
-8) Entités Conteneurs
+8) EntitÃ©s Conteneurs
 9) Meta serveur
 
 1) Principe du jeu
@@ -22,33 +22,33 @@ Sommaire:
 
 2) Protocole
       a) Client -> Server
-         - Général
-              IAM <nick> <prog> <version>       :je me présente
+         - GÃ©nÃ©ral
+              IAM <nick> <prog> <version>       :je me prÃ©sente
               LSP                               :lister les parties
-              CRE <nom>                         :créé une partie
-              JOI [<nom>|.] [$]                 :joindre une partie ('$' signifie "créer le chan")
-                                                 mettre '.' comme nom créé une mission
+              CRE <nom>                         :crÃ©Ã© une partie
+              JOI [<nom>|.] [$]                 :joindre une partie ('$' signifie "crÃ©er le chan")
+                                                 mettre '.' comme nom crÃ©Ã© une mission
               STAT                              :request stats
               BYE                               :au revoir
               ADMIN <LOGIN|REHASH|KILL> [arg]   :commande en temps qu'admin
-         - Dans une pré-partie
-              SET <mode(s)> [params]            :met un paramètre (voir section 4. Modes)
-              JIA <nom>                         :Créé une IA (par l'owner)
+         - Dans une prÃ©-partie
+              SET <mode(s)> [params]            :met un paramÃ¨tre (voir section 4. Modes)
+              JIA <nom>                         :CrÃ©Ã© une IA (par l'owner)
               KICK <nick> [raison]              :l'owner peut kicker
               LEA                               :partir
               GO!                               :l'owner lance le jeu
-              MSG <message>                     :envoie un message à tous les joueurs
-              AMSG <message>                    :envoie un message à ses alliés
+              MSG <message>                     :envoie un message Ã  tous les joueurs
+              AMSG <message>                    :envoie un message Ã  ses alliÃ©s
               SMAP <map>                        :envoie une map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
-              ARM <nom> [+<nb>] [%<type>]       :modifier le status d'une armée
-                  [/<nb>] [>] [^] [v] [<] [*<pos>]
-              BP <+|-><pos> [message]           :rajoute un breakpoint sur la carte, montré uniquement à ses alliés
+              ARM <nom> [+<nb>]Â [%<type>]       :modifier le status d'une armÃ©e
+                  [/<nb>] [>] [^] [v]Â [<] [*<pos>]
+              BP <+|-><pos> [message]           :rajoute un breakpoint sur la carte, montrÃ© uniquement Ã  ses alliÃ©s
               SAVE <name>                       :faire une sauvegarde (reception d'un fichier)
 
       b) Serveur -> Client
-         - Général
+         - GÃ©nÃ©ral
               HEL <prog> <version>              :welcome
               AIM <nick>                        :confirmation du IAM
               MOTD  <ligne>                     :motd
@@ -58,29 +58,29 @@ Sommaire:
               LSP <nom> <+/-> <nbjoueurs>       :liste une partie
                   <nbmax> [map]
               EOL                               :fin de la liste
-              MAJ <+|->                         :le client (ou le serveur) n'est pas à jour
+              MAJ <+|->                         :le client (ou le serveur) n'est pas Ã  jour
               BYE [raison]                      :au revoir
-              USED                              :pseudo déjà utilisé
-              REJOIN <chan>                     :l'user est invité à rejoindre une partie à laquelle il a été déconnecté
-              ADMIN                             :l'user est bien loggé comme admin
-         - Dans une pré-partie
+              USED                              :pseudo dÃ©jÃ  utilisÃ©
+              REJOIN <chan>                     :l'user est invitÃ© Ã  rejoindre une partie Ã  laquelle il a Ã©tÃ© dÃ©connectÃ©
+              ADMIN                             :l'user est bien loggÃ© comme admin
+         - Dans une prÃ©-partie
               ER1                               :ne peut pas joindre
-              ER2 <nick>                        :le pseudo de l'IA a déjà été pris ou il y a trop de monde
+              ER2 <nick>                        :le pseudo de l'IA a dÃ©jÃ  Ã©tÃ© pris ou il y a trop de monde
               ER3                               :trop de connexions sur ce serveur
-              ER4                               :impossible de créer la partie car il y en a déjà trop
+              ER4                               :impossible de crÃ©er la partie car il y en a dÃ©jÃ  trop
               PLS <params> [...]                :liste des joueurs (voir 5. PLS)
               LSM <nom> <nbmin> <nbmax> <infos> :envoie la liste des cartes
               EOMAP                             :fin de la liste des maps
               :<nick> JOI <nom>                 :un user join
-              :<nick> SET <mode(s)>             :un user met un paramètre (voir section 4. Modes)
-              :<nick> LEA                       :un user part (ou a été kické)
-              :<nick> MSG <message>             :message reçue
-              :<nick> KICK <victime> [raison]   :un user est kické
+              :<nick> SET <mode(s)>             :un user met un paramÃ¨tre (voir section 4. Modes)
+              :<nick> LEA                       :un user part (ou a Ã©tÃ© kickÃ©)
+              :<nick> MSG <message>             :message reÃ§ue
+              :<nick> KICK <victime> [raison]   :un user est kickÃ©
               SMAP <map>                        :envoie la map
               EOSMAP                            :fin du SMAP
          - En cours de jeu
-              INFO <ID> <args>                  :message envoyé par le serveur qui s'affiche à l'écran des joueurs
-              :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armée
+              INFO <ID> <args>                  :message envoyÃ© par le serveur qui s'affiche Ã  l'Ã©cran des joueurs
+              :<nick>!<arm> ARM [+<nb>] [*<pos>]:montre le changement d'une armÃ©e
                           [%<type>] [<] [-] [.]
                           [=<arm>,<pos>,<movs>]
               :<nick> BP <+|-><pos> [message]   :montre un nouveau breakpoint
@@ -88,52 +88,52 @@ Sommaire:
               :<nick> SCO <killed> <shooted>    :score d'un joueur
                          <created> <score>
 
-3) Particularités des commandes de positions
+3) ParticularitÃ©s des commandes de positions
       Voici les arguments server -> client :
-         +<nb>       :ajoute des unités (donne le nombre final)
-         %<type>     :définit le type de l'armée
+         +<nb>       :ajoute des unitÃ©s (donne le nombre final)
+         %<type>     :dÃ©finit le type de l'armÃ©e
          =<O!E>,<x>, :change la position (on indique l'user dans le cas d'un * qui prendrait plusieurs senders)
           <y>,<[>][v][<][^]>
          *<pos>      :attaque
          <           :retour
-         -           :suppression de l'armée
+         -           :suppression de l'armÃ©e
          .           :lock
          {           :deploiement
          }           :reploiement
-         )<entité>   :s'envoyer dans une unité de conteneur (voir 8. Entités Conteneurs)
-         (<entité>   :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
-         &           :la ligne n'est pas l'action principale (bien qu'elle soit la première envoyée)
-         ~<type>,    :envoie une donnée particulière à l'entité, et qui doit donc etre interprétée par elle (RecvData).
+         )<entitÃ©>   :s'envoyer dans une unitÃ© de conteneur (voir 8. EntitÃ©s Conteneurs)
+         (<entitÃ©>   :sortir d'une unitÃ© conteneur (voir 8. EntitÃ©s Conteneurs)
+         &           :la ligne n'est pas l'action principale (bien qu'elle soit la premiÃ¨re envoyÃ©e)
+         ~<type>,    :envoie une donnÃ©e particuliÃ¨re Ã  l'entitÃ©, et qui doit donc etre interprÃ©tÃ©e par elle (RecvData).
           <data>
-         °           :upgrade
+         U           :upgrade
          @           :investit
-         |<niveau>   :changement de niveau de l'unité
+         |<niveau>   :changement de niveau de l'unitÃ©
       Et client -> server :
-         >           :déplacement de un à droite
-         v           :déplacement de un vers le bas
-         <           :déplacement de un à gauche
-         ^           :déplacement de un vers le haut
+         >           :dÃ©placement de un Ã  droite
+         v           :dÃ©placement de un vers le bas
+         <           :dÃ©placement de un Ã  gauche
+         ^           :dÃ©placement de un vers le haut
          *<pos>      :attaque une position
          !           :lors d'une attaque, force la case
-         +           :création d'une entité
-         =<pos>      : |- position de départ
-         %<type>     : `- définit le type
+         +           :crÃ©ation d'une entitÃ©
+         =<pos>      : |- position de dÃ©part
+         %<type>     : `- dÃ©finit le type
          #           :deploiement.
-         )<entité>   :s'envoyer dans une unité conteneur (voir 8. Entités Conteneurs)
-         (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
-         °           :upgrader
-         C           :annuler les déplacements
+         )<entitÃ©>   :s'envoyer dans une unitÃ© conteneur (voir 8. EntitÃ©s Conteneurs)
+         (<pos>      :sortir d'une unitÃ© conteneur (voir 8. EntitÃ©s Conteneurs)
+         U           :upgrader
+         C           :annuler les dÃ©placements
 
 4) Modes
-      La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
+      La commande SET nÃ©cessite l'utilisation de modes, semblables Ã  l'IRC.
       Voici la liste :
         Mode pour le chan:
-         +l <limite>         :paramètre la limite (serveur -> user uniquement)
+         +l <limite>         :paramÃ¨tre la limite (serveur -> user uniquement)
          +o <user>           :met op un user
-         +m <map>            :définie la map du jeu
-         +b <money>          :l'argent de départ pour chaque joueur
+         +m <map>            :dÃ©finie la map du jeu
+         +b <money>          :l'argent de dÃ©part pour chaque joueur
          +r                  :partie rapide
-         +W                  :pré-partie (WAITING)
+         +W                  :prÃ©-partie (WAITING)
          +S                  :envoie des infos (SENDING)
          +P                  :jeu (PLAYING)
          +A                  :animation (ANIMING)
@@ -141,22 +141,22 @@ Sommaire:
          +E                  :fin du jeu (SCORING)
          +t <temps>          :temps par tours maximum pour jouer
         Mode pour un user:
-         +c <couleur>        :l'user se définie sa couleur
-         +p <position>       :l'user définie sa position
-         +n <nation>         :l'user définie sa nation
+         +c <couleur>        :l'user se dÃ©finie sa couleur
+         +p <position>       :l'user dÃ©finie sa position
+         +n <nation>         :l'user dÃ©finie sa nation
          +!                  :le joueur est READY
-         +£                  :le joueur a perdu
+         +_                  :le joueur a perdu
          +$                  :l'argent du joueur (serveur -> user uniquement)
-         +@ <country>        :l'user possède maintenant la terre <country>
-         +a <nick>           :définie un user comme allié de lui
-         +w                  :ce joueur a été déconnecté et on attend qu'il se reconnecte
+         +@ <country>        :l'user possÃ¨de maintenant la terre <country>
+         +a <nick>           :dÃ©finie un user comme alliÃ© de lui
+         +w                  :ce joueur a Ã©tÃ© dÃ©connectÃ© et on attend qu'il se reconnecte
          +v [nb]             :vote pour virer un user, pas besoin de nombre pour cl->serv, mais pour serv->cl
-         +d <nb:user>        :donner de l'argent à un de ses alliés
-         +e <country:user>   :donner une country à un de ses alliés
+         +d <nb:user>        :donner de l'argent Ã  un de ses alliÃ©s
+         +e <country:user>   :donner une country Ã  un de ses alliÃ©s
 
 5) PLS
-     La commande PLS a la particularité d'avoir une syntaxe plutot complexe et pas compréhensible
-     sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la détailler:
+     La commande PLS a la particularitÃ© d'avoir une syntaxe plutot complexe et pas comprÃ©hensible
+     sans document. C'est pourquoi je consacre ce cours paragraphe dans l'unique but de la dÃ©tailler:
 
      PLS [@][!]<position>,<couleur>,<nation>,<pseudo> [...]
      [*]               :le joueur est owner
@@ -167,67 +167,67 @@ Sommaire:
      <nation>          :la nation
      <pseudo>          :le pseudo du joueur
 
-6) Êtat d'une partie
-     WAITING           :c'est la pré-partie
-     SENDING           :le client créé la map physiquement et prépare toutes les données
-     PLAYING           :les joueurs doivent jouer jusqu'à ce que tout le monde soit READY
-     ANIMING           :animations commandées par le serveur
+6) ÃŠtat d'une partie
+     WAITING           :c'est la prÃ©-partie
+     SENDING           :le client crÃ©Ã© la map physiquement et prÃ©pare toutes les donnÃ©es
+     PLAYING           :les joueurs doivent jouer jusqu'Ã  ce que tout le monde soit READY
+     ANIMING           :animations commandÃ©es par le serveur
 
 7) Intelligence Artificielle
-     L'intelligence artificielle est implémentée dans le serveur de la manière suivante :
-     - Son pseudo commence, pour la distinction, par IA_CHAR, définie dans lib/Channels.h, par default '&', étant un
-       caractère non inclus dans NICK_CHARS.
-     - Elle est considérée comme un client normal par le serveur qui ne fait quasiment pas la distinction
-     - Chaque sendrpl() vers ce client est interprété ensuite par l'IA qui parse le message et le traite.
-     - Chaque message que l'IA veut envoyer est en fait redirigé vers son parsemsg().
-     - Maintenant, les IA s'allient entre elles au début de la partie, et quand un des joueurs humain
-       s'allie avec une IA, celle ci se des-allie avec ses alliées IA, puis s'allie avec l'humain. Ensuite donc un nombre
-       variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est allié avec l'IA, celle ci s'allie
-       avec toutes les IA qui n'ont pas d'alliés humains.
+     L'intelligence artificielle est implÃ©mentÃ©e dans le serveur de la maniÃ¨re suivante :
+     - Son pseudo commence, pour la distinction, par IA_CHAR, dÃ©finie dans lib/Channels.h, par default '&', Ã©tant un
+       caractÃ¨re non inclus dans NICK_CHARS.
+     - Elle est considÃ©rÃ©e comme un client normal par le serveur qui ne fait quasiment pas la distinction
+     - Chaque sendrpl() vers ce client est interprÃ©tÃ© ensuite par l'IA qui parse le message et le traite.
+     - Chaque message que l'IA veut envoyer est en fait redirigÃ© vers son parsemsg().
+     - Maintenant, les IA s'allient entre elles au dÃ©but de la partie, et quand un des joueurs humain
+       s'allie avec une IA, celle ci se des-allie avec ses alliÃ©es IA, puis s'allie avec l'humain. Ensuite donc un nombre
+       variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est alliÃ© avec l'IA, celle ci s'allie
+       avec toutes les IA qui n'ont pas d'alliÃ©s humains.
 
      La problematique est la suivante:
-     * Dans plusieurs fonctions ???Command::Exec() executées par une commande d'un client, il y a des messages envoyés aux
-       joueurs en prenant en compte le fait qu'aucun traitement d'un éventuel message de retour ne sera effectué avant
-       la fin de cette fonction. Le problème est que l'IA elle, lorsqu'elle reçoit le message qui a été envoyé
-       avant la fin de la fonction en question, peut interagire et répondre tout de suite, ce qui entraine un autre
+     * Dans plusieurs fonctions ???Command::Exec() executÃ©es par une commande d'un client, il y a des messages envoyÃ©s aux
+       joueurs en prenant en compte le fait qu'aucun traitement d'un Ã©ventuel message de retour ne sera effectuÃ© avant
+       la fin de cette fonction. Le problÃ¨me est que l'IA elle, lorsqu'elle reÃ§oit le message qui a Ã©tÃ© envoyÃ©
+       avant la fin de la fonction en question, peut interagire et rÃ©pondre tout de suite, ce qui entraine un autre
        traitement qui coupe le traitement en cours.
-     * Pour remédier à ce problème, un système de "lock" a été trouvé du coté de l'IA. Ainsi, lorsqu'elle est positionée
-       comme étant "locké", tous les messages reçus sont ajoutés dans une queue qui, une fois "delocké", sera traité
+     * Pour remÃ©dier Ã  ce problÃ¨me, un systÃ¨me de "lock" a Ã©tÃ© trouvÃ© du cotÃ© de l'IA. Ainsi, lorsqu'elle est positionÃ©e
+       comme Ã©tant "lockÃ©", tous les messages reÃ§us sont ajoutÃ©s dans une queue qui, une fois "delockÃ©", sera traitÃ©
        d'un coup.
 
-8) Entités Conteneurs
-     Les unités conteneurs peuvent transporter une autre unité.
-     * Le protocole pour la mise dans une unité est le suivant :
+8) EntitÃ©s Conteneurs
+     Les unitÃ©s conteneurs peuvent transporter une autre unitÃ©.
+     * Le protocole pour la mise dans une unitÃ© est le suivant :
          - PLAYING:
          > ARM AA )AB
          < :NICK!AA ARM )NICK!AB =NICK!AA,x,y,<
          - ANIMING:
          < :NICK!AA ARM )NICK!AB =NICK!AA,x,y,<
-     * Le protocole pour extraire une unité est le suivant:
+     * Le protocole pour extraire une unitÃ© est le suivant:
          - PLAYING:
          > ARM AB (x+1,y
          < :NICK!AA ARM (NICK!AB =NICK!AA,x,y,>
          - ANIMING:
          < :NICK!AA ARM (NICK!AB =NICK!AA,x,y,>
 
-     Concrètement, une classe de base EConteneur aurrait une variable avec un pointeur vers l'entité.
-     * Lorsqu'on met dans le conteneur, l'unité est supprimée de la liste globale des unités et de celle des joueurs,
-       et stockée dans l'unité ECounteneur. Les clients en font de même et stockent également dans EConteneur.
-     * Lors d'une attaque d'un conteneur avec une unité, l'unité conteneur appelle celle contenue pour se battre.
-     * Lors de l'extraction, l'unité est remise en bien commun et vidé du conteneur, et les clients la ressortent également.
+     ConcrÃ¨tement, une classe de base EConteneur aurrait une variable avec un pointeur vers l'entitÃ©.
+     * Lorsqu'on met dans le conteneur, l'unitÃ© est supprimÃ©e de la liste globale des unitÃ©s et de celle des joueurs,
+       et stockÃ©e dans l'unitÃ© ECounteneur. Les clients en font de mÃªme et stockent Ã©galement dans EConteneur.
+     * Lors d'une attaque d'un conteneur avec une unitÃ©, l'unitÃ© conteneur appelle celle contenue pour se battre.
+     * Lors de l'extraction, l'unitÃ© est remise en bien commun et vidÃ© du conteneur, et les clients la ressortent Ã©galement.
 
-     Il faut que le conteneur gère le fait que si celui ci bouge il faut que son contenu bouge aussi (seulement son pointeur
-     case et non se mettre dans la liste des entités d'une case, vu qu'elle ne doit plsu exister).
+     Il faut que le conteneur gÃ¨re le fait que si celui ci bouge il faut que son contenu bouge aussi (seulement son pointeur
+     case et non se mettre dans la liste des entitÃ©s d'une case, vu qu'elle ne doit plsu exister).
 
-     Il faut également que la taille maximale à contenir soit proportionnel au "nombre" du conteneur.
+     Il faut Ã©galement que la taille maximale Ã  contenir soit proportionnel au "nombre" du conteneur.
 
 9) Meta serveur
 
-     Le meta-server permet de constituer une liste des serveurs lancés. Chaque serveur au démarrage se connecte au meta-serveur et
-     le restera jusqu'à son extinction. A chaque evenement il envoie des informations, tels que le nombre de joueurs connectés, le
+     Le meta-server permet de constituer une liste des serveurs lancÃ©s. Chaque serveur au dÃ©marrage se connecte au meta-serveur et
+     le restera jusqu'Ã  son extinction. A chaque evenement il envoie des informations, tels que le nombre de joueurs connectÃ©s, le
      nom de la carte, etc.
 
-     Le client, quant à lui, se connecte au meta-serveur pour obtenir cette liste.
+     Le client, quant Ã  lui, se connecte au meta-serveur pour obtenir cette liste.
 
      a) Meta-server -> Serveur
          HEL <prog> <version>                              :Dit bonjour, s'informe sur son type et sa version de protocole
@@ -235,7 +235,7 @@ Sommaire:
      b) Serveur -> Meta-server
 
         IAM <name> <prog> <version>                        :Donne son nom, son prog et sa version
-        SET <modes> [<args> ..]                            :Change un paramètre
+        SET <modes> [<args> ..]                            :Change un paramÃ¨tre
             +p <nb players>                                :- nombre de players actuellement
             +P <max players>                               :- max players
             +g <nb games>                                  :- nombre de jeux
@@ -254,5 +254,5 @@ Sommaire:
                      <nbmax> <nbgames> <maxgames> <proto>
         > EOL                                              :fin du listing
 
-        > NICKUSED                                         :pseudo déjà utilisé
+        > NICKUSED                                         :pseudo dÃ©jÃ  utilisÃ©
         > REJOIN <ip:port> <game>                          :le joueur peut rejoindre une partie

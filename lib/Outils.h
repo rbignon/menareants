@@ -26,13 +26,13 @@
 
 typedef unsigned int   uint;
 
-/** Récupère le path du home */
+/** RÃ©cupÃ¨re le path du home */
 std::string GetHome();
 
-/** Récupère la liste des fichiers contenus dans le path */
+/** RÃ©cupÃ¨re la liste des fichiers contenus dans le path */
 std::vector<std::string> GetFileList(std::string path, std::string ext = "");
 
-/** Récupère le premier mot de la chaine */
+/** RÃ©cupÃ¨re le premier mot de la chaine */
 std::string stringtok(std::string &, const char * const);
 
 /** Formate la chaine avec des \ devant les espaces */
@@ -51,12 +51,12 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage* cmd);
 /** Retourne si le fichier existe ou non */
 bool FichierExiste(const std::string &nom);
 
-/** Retourne la date formatée */
+/** Retourne la date formatÃ©e */
 char *get_time(time_t mytime);
 #define TIMELEN 20
 
 /** Retourne le temps que forme cette date */
-char *duration(int s);
+//char *duration(int s);
 
 /** Check if the string is a number */
 bool is_num(const char *num);
@@ -96,7 +96,7 @@ template<typename T>
 T StrToTyp(const std::string & Str)
 {
 	T Dest;
-    // créer un flux à partir de la chaîne donnée
+    // crÃ©er un flux Ã  partir de la chaÃ®ne donnÃ©e
     std::istringstream iss( Str );
     // tenter la conversion vers Dest
     iss >> Dest;
@@ -107,9 +107,9 @@ T StrToTyp(const std::string & Str)
 template<typename T>
 std::string TypToStr( const T & Value )
 {
-    // utiliser un flux de sortie pour créer la chaîne
+    // utiliser un flux de sortie pour crÃ©er la chaÃ®ne
     std::ostringstream oss;
-    // écrire la valeur dans le flux
+    // Ã©crire la valeur dans le flux
     oss << Value;
     // renvoyer une string
     return oss.str();
@@ -156,7 +156,7 @@ namespace _GLIBCXX_STD
 template <class T>
 class ECList
 {
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::vector<T> list;
 

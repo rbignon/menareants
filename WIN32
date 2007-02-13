@@ -3,18 +3,18 @@
                    *******************
                         [ WIN32 ]
 
-Dernière modification:
+DerniÃ¨re modification:
 $Id$
 
 Sommaire:
-1) Pré-requis
+1) PrÃ©-requis
 2) Compilation
 3) Installation
 
-1) Pré-requis
+1) PrÃ©-requis
 	Ce jeu est theoriquement compatible avec windows. Vous pouvez compiler
-	depuis linux si vous avez installé mingw avec tous les composants
-	nécessaires, qui se composent de :
+	depuis linux si vous avez installÃ© mingw avec tous les composants
+	nÃ©cessaires, qui se composent de :
 	- mingw
 	- libsdl
 	- SDL_gfx
@@ -23,30 +23,30 @@ Sommaire:
 	Theoriquement cela devrait suffire.
 
 2) Compilation
-	Vous constaterez la présence des deux scripts "cross-configure.sh" et
-	"cross-make.sh". Veuillez les éditer et remplacer préalablement si
-	nécessaire le chemin vers le répertoire du cross-compilateur ainsi que
+	Vous constaterez la prÃ©sence des deux scripts "cross-configure.sh" et
+	"cross-make.sh". Veuillez les Ã©diter et remplacer prÃ©alablement si
+	nÃ©cessaire le chemin vers le rÃ©pertoire du cross-compilateur ainsi que
 	le nom de l'executable.
 
-	Cela fait, executez cross-configure.sh de façon similaire à configure :
+	Cela fait, executez cross-configure.sh de faÃ§on similaire Ã  configure :
 	$ ./cross-configure.sh [arguments]
 	Par exemple :
 	$ ./cross-configure.sh --enable-debug --enable-warnings
-	Note: ne vous étonnez pas si le script ne trouve pas les librairies
-	sdl_gfx, sdl_ttf et sdl_image, cela ne pose aucun problème pour la suite.
+	Note: ne vous Ã©tonnez pas si le script ne trouve pas les librairies
+	sdl_gfx, sdl_ttf et sdl_image, cela ne pose aucun problÃ¨me pour la suite.
 
 	Maintenant vous pouvez compiler avec le script cross-make.sh :
 	$ ./cross-make.sh
 
-	Note: Si vous obtenez des erreurs de compilation, n'hesitez pas à nous prévenir.
-	Toutefois, vérifiez tout de même si le cross-compilateur et les librairies
-	sont bien installées et au bon endroit. La non présence de libs à l'endroit
-	voulu (bien que les headers aient été trouvés) provoque des erreurs de liaison.
+	Note: Si vous obtenez des erreurs de compilation, n'hesitez pas Ã  nous prÃ©venir.
+	Toutefois, vÃ©rifiez tout de mÃªme si le cross-compilateur et les librairies
+	sont bien installÃ©es et au bon endroit. La non prÃ©sence de libs Ã  l'endroit
+	voulu (bien que les headers aient Ã©tÃ© trouvÃ©s) provoque des erreurs de liaison.
 
 3) Installation
-	Vous avez maintenant un fichier intitulé menareants.exe dans le répertoire src/.
+	Vous avez maintenant un fichier intitulÃ© menareants.exe dans le rÃ©pertoire src/.
 
-	Pour que le jeu puisse s'executer, vous devez déplacer dans un répertoire ce fichier,
+	Pour que le jeu puisse s'executer, vous devez dÃ©placer dans un rÃ©pertoire ce fichier,
 	le dossier "src/data" ainsi (et surtout) que les librairies windows suivantes :
 	- SDL.dll
 	- libpng13.dll
@@ -56,4 +56,4 @@ Sommaire:
 	(note: vous ne les trouverez pas ici, cherchez les sur internet (http://www.libsdl.org etc)
 
 	Il suffit maintenant juste de lancer menareants.exe sous windows et tout devrait passer
-	sans problème.
+	sans problÃ¨me.

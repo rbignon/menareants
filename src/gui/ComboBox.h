@@ -53,7 +53,8 @@ public:
 	                       const std::string &value,
 	                       const Color& _color = black_color,
 	                       bool _enabled = true,
-	                       Font& font = *Font::GetInstance(Font::Small));
+	                       Font& font = *Font::GetInstance(Font::Small),
+	                       const std::string& name = "");
 	void ClearItems();
 	virtual void Deselect (uint index);
 	virtual void Select(uint index);
@@ -62,7 +63,7 @@ public:
 
 	virtual void SetXY (int x, int y);
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	TButton m_open;
 	int real_y;

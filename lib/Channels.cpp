@@ -147,7 +147,7 @@ ECBChannel::ECBChannel(std::string _name, bool _mission)
 
 ECBChannel::~ECBChannel()
 {
-	/* Libération des players */
+	/* LibÃ©ration des players */
 	FOR(ECBPlayer*, players, pl)
 		delete pl;
 
@@ -182,9 +182,9 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 }
 
 
-/** \attention En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
- * \note il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas
- * où il y en a une, d'incrémenter le protocole
+/** \attention En cas de modification de la syntaxe, modifier Ã  tout prix API paragraphe 5. PLS
+ * \note il faut Ã©viter les incompatibilitÃ©s Ã  tous prix, et ne pas oublier, dans le cas
+ * oÃ¹ il y en a une, d'incrÃ©menter le protocole
  */
 std::string ECBChannel::PlayerList()
 {

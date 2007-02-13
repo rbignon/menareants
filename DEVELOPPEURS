@@ -3,28 +3,28 @@
                    *******************
                 [ Notes aux developpeurs ]
 
-Dernière modification:
+DerniÃ¨re modification:
 $Id$
 
-But: Ce fichier devrait contenir des notes écrites des développeurs, des reflexions,
-des petits trucs, classés par date.
+But: Ce fichier devrait contenir des notes Ã©crites des dÃ©veloppeurs, des reflexions,
+des petits trucs, classÃ©s par date.
 
 2006-01-01   Romain Bignon
 
-	Utiliser le répertoire test/ pour tester la librairie autrement qu'en faisant une implémentation sur le
+	Utiliser le rÃ©pertoire test/ pour tester la librairie autrement qu'en faisant une implÃ©mentation sur le
 	serveur ou le jeu. Lire README pour plus d'infos. Voir l'exemple de map.cpp qui fait un petit
-	programme pour tester la validité d'une map et donne des infos sur celle-ci.
+	programme pour tester la validitÃ© d'une map et donne des infos sur celle-ci.
 
 2006-01-01   Romain Bignon
 
-	Lors de la modification d'un fichier, pour des modifs plus ou moins importantes qui nécessiteront
+	Lors de la modification d'un fichier, pour des modifs plus ou moins importantes qui nÃ©cessiteront
 	un commit, passer, si ce n'est pas encore fait, le copyright en "2005-2006".
 	Pour les modifs plus importantes (plus que de simples petites correction, mais des ajouts
-	de fonctions, de concepts, etc), mettre, si ce n'est pas déjà le cas, son nom dans le
-	copyright de l'en-tête du fichier.
+	de fonctions, de concepts, etc), mettre, si ce n'est pas dÃ©jÃ  le cas, son nom dans le
+	copyright de l'en-tÃªte du fichier.
 
-	Bien sur, lors de la création du fichier, prendre l'en-tête type, mettre le bon copyright avec
-	*uniquement* son propre nom. Chaque fichier devrait avoir comme date la periode jusqu'à laquelle
-	il a été modifié (genre un fichier qu'on touche pas depuis deux ans garderait, en 2008, le
+	Bien sur, lors de la crÃ©ation du fichier, prendre l'en-tÃªte type, mettre le bon copyright avec
+	*uniquement* son propre nom. Chaque fichier devrait avoir comme date la periode jusqu'Ã  laquelle
+	il a Ã©tÃ© modifiÃ© (genre un fichier qu'on touche pas depuis deux ans garderait, en 2008, le
 	copyright sur "2005-2006"), ainsi que dans le copyright uniquement le nom des auteurs du
 	contenu de ce fichier.

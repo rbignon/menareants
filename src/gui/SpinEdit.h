@@ -79,7 +79,7 @@ public:
 	void AddBadValue(int i);                                      /**< Add a bad value */
 	void DelBadValue(int i);                                      /**< Remove a bad value */
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	TButton m_plus, m_minus;
 	TLabel txt_label, txt_value;

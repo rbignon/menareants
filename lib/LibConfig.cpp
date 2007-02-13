@@ -23,7 +23,7 @@
 #include <iostream>
 #include "LibConfig.h"
 
-/* Définition de quelques macros utiles */
+/* DÃ©finition de quelques macros utiles */
 #undef FOR
 #define FOR(T, v, x) \
                           T (x); \
@@ -181,8 +181,8 @@ bool MyConfig::Load()
 	}
 
 	if(section)
-		Error("in «" + section->Label() + (section->Name().empty() ? "" : ("(" + section->Name() + ")")) +
-		      "»: '}' not found to close section !");
+		Error("in Â«" + section->Label() + (section->Name().empty() ? "" : ("(" + section->Name() + ")")) +
+		      "Â»: '}' not found to close section !");
 
 	FindEmpty(); // Find empty sections
 
@@ -317,9 +317,9 @@ std::vector<ConfigSection*> ConfigSection::GetSectionClones(std::string label)
 
 bool ConfigSection::FindEmpty()
 {
-	std::string begin = "in «" + Label() + (Name().empty() ? "" : ("(" + Name() + ")")) + "»: ";
+	std::string begin = "in Â«" + Label() + (Name().empty() ? "" : ("(" + Name() + ")")) + "Â»: ";
 	bool error = false; // Error() macro change this value
-	int line = config->NbLines();      /* Récuperation des informations de MyConfig */
+	int line = config->NbLines();      /* RÃ©cuperation des informations de MyConfig */
 	std::string path = config->Path(); /* pour pouvoir utiliser la macro Error()    */
 
 	FORit(ItemMap, items, it)

@@ -1,5 +1,5 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Veuillez ne pas Ã©diter le fichier map Ã  la main.
+# Utilisez plutÃ´t l'Ã©diteur de carte intÃ©grÃ© au jeu.
 NAME Caraibes
 PLAYER A A
 PLAYER B B
@@ -43,7 +43,7 @@ CITY 1000
 MIN 2
 MAX 4
 DATE 20/8/2006
-INFO Carte représentant un groupement d'iles, probablement situé dans les caraïbes...
+INFO Carte reprÃ©sentant un groupement d'iles, probablement situÃ© dans les caraÃ¯bes...
 UNIT 3 A 3,3 1000
 UNIT 2 A 2,3 500
 UNIT 3 A 7,3 1000

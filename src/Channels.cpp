@@ -30,15 +30,15 @@
  ********************************************************************************************/
 
 const struct nations_str_t nations_str[] = {
-	/* N_NONE     */   { "Aléatoire",  "Votre nation sera choisie aléatoirement." },
-	/* N_NOISY    */   { "Noisy",      "La contrée de Noisy et ses cavernes." },
-	/* N_USA      */   { "Etats-Unis", "Les Etats-Unis investissent le monde avec des McDonalds." },
-	/* N_FRANCE   */   { "France",     "La france de Dominique de Villepin." },
-	/* N_URSS     */   { "URSS",       "L'URSS et ses goulags..." },
-	/* N_ALQUAIDA */   { "Al-Quaïda",  "Le réseau Al-Quaïda et ses boïngs détournés." },
-	/* N_ESPAGNE  */   { "Espagne",    "La prof d'espagnol qui impose des règles débiles et nous emmerde." },
-	/* N_JAPON    */   { "Japon",      "Les touristes japonais et l'avantage de la photographie." },
-	/* N_COLOMBIE */   { "Colombie",   "La Colombie productrive de cocaïne." },
+	/* N_NONE     */   { gettext_noop("Random"),     gettext_noop("Your nation will be selected by random.") },
+	/* N_NOISY    */   { gettext_noop("Noisy"),      gettext_noop("Region of Noisy and its caves.") },
+	/* N_USA      */   { gettext_noop("USA"),        gettext_noop("The United States invests the world with of McDonalds.") },
+	/* N_FRANCE   */   { gettext_noop("France"),     gettext_noop("France of Dominique de Villepin.") },
+	/* N_URSS     */   { gettext_noop("URSS"),       gettext_noop("The USSR and its goulags...") },
+	/* N_ALQUAIDA */   { gettext_noop("Al-QuaÃ¯da"),  gettext_noop("Al-QuaÃ¯da network and its diverted boÃ¯ngs.") },
+	/* N_ESPAGNE  */   { gettext_noop("Spain"),    gettext_noop("The Spanish teacher who impose weak rules and fuck us .") },
+	/* N_JAPON    */   { gettext_noop("Japan"),      gettext_noop("Japanese tourists and the advantage of photography.") },
+	/* N_COLOMBIE */   { gettext_noop("Colombia"),   gettext_noop("Colombia producing cocaine.") },
 	/* N_MAX      */   { "",           "" }
 };
 

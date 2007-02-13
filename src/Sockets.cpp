@@ -37,31 +37,6 @@
 #include "Debug.h"
 #include "Config.h"
 
-/* Messages à envoyer */
-const char* msgTab[] = {
-	"IAM %s " CLIENT_SMALLNAME " " APP_PVERSION, /* IAM - Présentation */
-	"POG",                                       /* POG - PONG */
-	"ERR %s",                                    /* ERR - Message d'erreur */
-	"ERR %s %s",                                 /* ERR - Message d'erreur avec vars */
-	"STAT",                                      /* STAT - Infos sur l'etat du serveur */
-	"ADMIN %s",                                  /* ADMIN - Envoie une commande administrateur au serveur */
-
-	"LSP",                                       /* LSP - Liste les jeux */
-	"JOI %s",                                    /* JOI - Joindre une partie */
-	"JOI %s $",                                  /* JOI $ - Crée une partie */
-	"LEA",                                       /* LEA - Partir d'une partie */
-	"KICK %s %s",                                /* KICK - Éjecter quelqu'un du jeu */
-	"MSG %s",                                    /* MSG - Message dans une partie */
-	"AMSG %s",                                   /* AMSG - Envoie un message à ses alliés */
-	"SET %s",                                    /* SET - Définit un paramètre dans le chan */
-	"JIA %s",                                    /* JIA - Créer une IA dans le jeu */
-
-	"ARM %s",                                    /* ARM - Envoie des infos sur une armée */
-	"BP %c%d,%d %s",                             /* BP - Pose une balise sur la carte pour ses alliés */
-	"SAVE %s",                                   /* SAVE - Sauvegarde la partie */
-     0
-};
-
 EC_Client* EC_Client::singleton = NULL;
 EC_Client* EC_Client::GetInstance(bool create)
 {
@@ -111,7 +86,7 @@ int EC_Client::sendbuf(std::string buf)
 	return 0;
 }
 
-/* [:parv[0]] CMD [parv[1] [parv[2] ... [parv[parv.size()-1]]]] */
+/* [:parv[0]] CMD [parv[1]Â [parv[2] ... [parv[parv.size()-1]]]] */
 void EC_Client::parse_message(std::string buf)
 {
 #ifdef DEBUG
@@ -130,10 +105,10 @@ void EC_Client::parse_message(std::string buf)
 
 	if(!cmd || (parv.size()-1) < cmd->Args())
 	{
-		vDebug(W_ERR|W_DESYNCH|W_SEND, "Commande incorrecte du serveur.", VSName(buf.c_str())
+		vDebug(W_ERR|W_DESYNCH|W_SEND, "Incorrect command from server", VSName(buf.c_str())
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
 		if(logging)
-			SetCantConnect("Le serveur auquel vous souhaitez vous connecter ne connait pas le même langage que moi !");
+			SetCantConnect(_("The server where your want to connect to doesn't know the same language than me!"));
 
 		return;
 	}
@@ -149,7 +124,7 @@ void EC_Client::parse_message(std::string buf)
 			if(tmp.find('!') != std::string::npos) tmp = stringtok(tmp, "!");
 			ECPlayer* tmpl = pl->Channel()->GetPlayer(tmp.c_str());
 			if(tmpl) players.push_back(tmpl);
-			/* Il est tout à fait possible que le player ne soit pas trouvé,
+			/* Il est tout Ã  fait possible que le player ne soit pas trouvÃ©,
 			   genre si c'est un join... */
 		}
 	}
@@ -191,8 +166,8 @@ void EC_Client::Loop()
 
 		tmp_fdset = global_fd_set;
 
-		timeout.tv_sec = 1; /*  Nécessaire pour être au courant du WantDisconnect() */
-		timeout.tv_usec = 0; /* quand il y a une inactivité au niveau des sockets */
+		timeout.tv_sec = 1; /*  NÃ©cessaire pour Ãªtre au courant du WantDisconnect() */
+		timeout.tv_usec = 0; /* quand il y a une inactivitÃ© au niveau des sockets */
 
 		if(select(sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
@@ -274,7 +249,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 {
 	if(connected || sock) return false;
 
-	/* Création du socket
+	/* CrÃ©ation du socket
 	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
 	 * valeur d'une variable statique qui s'initialise elle toute seule.
 	 */
@@ -288,13 +263,13 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	logging = true;
 	want_disconnect = false;
 
-	/* Si c'est une host, on la résoud */
+	/* Si c'est une host, on la rÃ©soud */
 	if(!is_ip(hostname))
 	{
 		struct hostent *hp = gethostbyname(hostname);
 		if(!hp)
 		{
-			SetCantConnect("L'hostname est inaccessible.");
+			SetCantConnect(_("Hostname is unreachable"));
 			return false;
 		}
 

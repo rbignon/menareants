@@ -90,9 +90,10 @@ TListBoxItem* TComboBox::AddItem (bool selected,
                          const std::string &value,
                          const Color& color,
                          bool enabled,
-                         Font& font)
+                         Font& font,
+                         const std::string& name)
 {
-	TListBoxItem* item = TListBox::AddItem(selected, label, value, color, enabled, font);
+	TListBoxItem* item = TListBox::AddItem(selected, label, value, color, enabled, font, name);
 	item->SetGrayDisable();
 	if(opened)
 		size.y = CalculateHeight();

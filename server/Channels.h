@@ -114,7 +114,7 @@ public:
 
 	ECList<ECEvent*>* Events() { return &events; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	TClient *client;
 	stats_t stats;
@@ -142,7 +142,7 @@ public:
 	enum info_messages
 	{
 		I_NONE,
-		I_SHOOT,  // attaquant, attaqué, domage
+		I_SHOOT,  // attaquant, attaquÃ©, domage
 		I_JOUANO,  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
 		I_DEBUG,
 	};
@@ -220,7 +220,7 @@ public:
 	 * ARM_UNCONTENER  0x4000  ( ( )
 	 * ARM_NOPRINCIPAL 0x8000  (&)
 	 * ARM_DATA        0x10000 (~id,data)
-	 * ARM_UPGRADE     0x20000 (°)
+	 * ARM_UPGRADE     0x20000 (U)
 	 * ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 	 * ARM_UNION       (ARM_MOVE|ARM_NUMBER)
 	 * ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -306,7 +306,7 @@ public:
 
 	int& BeginMoney() { return begin_money; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECPlayer* owner;
 	bool fast_game;

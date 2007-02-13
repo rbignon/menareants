@@ -60,7 +60,7 @@ public:
 	bool music;
 	bool effect;
 
-/* Variable privées */
+/* Variable privÃ©es */
 private:
 	std::string filename;
 	bool set_defaults(bool want_save = true);

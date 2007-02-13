@@ -67,11 +67,13 @@ std::string ECMcDo::SpecialInfo()
 	if(!invested || !ex_owner)
 		return "";
 	else if(restDestroy > 0)
-		return "Jouano est en train de bouffer tous les Big Mac ! Il aurra fini dans " + TypToStr(restDestroy) + " jours !";
+		return StringF(ngettext("Jouano is eating all Big Mac ! He will finish it in %d day",
+		                        "Jouano is eating all Big Mac ! He will finish it in %d days", restDestroy),
+		                        restDestroy);
 	else if(ex_owner == Owner())
-		return "Consommations de McGerbale gratuites pour " + ex_owner->Nick() + " !";
+		return StringF(_("Free orders of McPuke for %s"), ex_owner->GetNick());
 	else
-		return "1000 $ consommations payés chaque tour à " + ex_owner->Nick();
+		return StringF(_("You pay $1000 for orders to %s"), ex_owner->GetNick());
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)
@@ -87,9 +89,9 @@ bool ECMcDo::CanCreate(const ECBEntity* entity)
 
 void ECTourist::ChangeCase(ECBCase* newcase)
 {
-	/* Le touriste ne permet pas aux cases par lesquelles il est passé de se remettre en Showed == 0.
-	 * Elles sont donc visibles en permanence. Pour cela, il va incrémenter deux fois Showed quand il arrive,
-	 * comme ça meme quand il partira ça décrémentera qu'une fois et la valeur sera au minimum de 1.
+	/* Le touriste ne permet pas aux cases par lesquelles il est passÃ© de se remettre en Showed == 0.
+	 * Elles sont donc visibles en permanence. Pour cela, il va incrÃ©menter deux fois Showed quand il arrive,
+	 * comme Ã§a meme quand il partira Ã§a dÃ©crÃ©mentera qu'une fois et la valeur sera au minimum de 1.
 	 */
 	ECEntity::ChangeCase(newcase);
 	SetShowedCases(true);
@@ -100,21 +102,21 @@ void ECTourist::ChangeCase(ECBCase* newcase)
  ********************************************************************************************/
 std::string ECPlane::SpecialInfo()
 {
-	std::string s = !Deployed() ? "En plein vol" : "Au sol";
+	std::string s = !Deployed() ? _("Flying") : _("On ground");
 
 	if(Owner()->IsMe())
 	{
 		if(Containing())
 		{
 			if(!Deployed())
-				s = "Vous payez " + TypToStr(Containing()->Nb() * VolCost()) + " $/tours";
+				s = StringF(_("You pay $%d each turn"), Containing()->Nb() * VolCost());
 			else
-				s += " - Contient :";
+				s += _(" - Contain:");
 		}
-		else s += " - Capacité : " + TypToStr(100 * Nb());
+		else s += StringF(_(" - Capacity: %d"),100 * Nb());
 	}
 	else if(Containing())
-		s += " - Contient :";
+		s += _(" - Contain:");
 
 	return s;
 }
@@ -124,8 +126,8 @@ std::string ECPlane::SpecialInfo()
  ********************************************************************************************/
 std::string ECTrain::SpecialInfo()
 {
-	if(Containing()) return "Contient :";
-	else if(!Owner()->IsMe()) return "Capacité : " + TypToStr(100 * Nb());
+	if(Containing()) return _(" - Contain:");
+	else if(!Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
 	else return "";
 }
 
@@ -134,8 +136,8 @@ std::string ECTrain::SpecialInfo()
  ********************************************************************************************/
 std::string ECBoat::SpecialInfo()
 {
-	if(Containing()) return "Contient :";
-	else if(!Owner()->IsMe()) return "Capacité : " + TypToStr(100 * Nb());
+	if(Containing()) return _(" - Contain:");
+	else if(!Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
 	else return "";
 }
 
@@ -312,7 +314,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 				}
 				SetImage(images[I_Right]);
 			}
-			/* C'est un reploiement sans tirer, donc on utilise l'image du déploiement avec missile, mais dans l'ordre
+			/* C'est un reploiement sans tirer, donc on utilise l'image du dÃ©ploiement avec missile, mais dans l'ordre
 			 * inverse */
 			else
 			{

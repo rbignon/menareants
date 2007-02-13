@@ -52,7 +52,7 @@ public:
 			return false;
 
 		if((entities = Entities()->Find(ECEntity::E_BOAT)).empty())
-		{ /* On a pas de bateau encore d'assignÈ, on en cherche un */
+		{ /* On a pas de bateau encore d'assign√©, on en cherche un */
 
 			entities = IA()->Player()->Entities()->Find(ECEntity::E_BOAT);
 			if(!entities.empty())
@@ -66,7 +66,7 @@ public:
 
 				if(boat)
 					AddEntity(boat);
-				// Sinon, si jamais il n'y a que des bateaux recrutÈs ou qui contiennent dÈj‡ quelqu'un,
+				// Sinon, si jamais il n'y a que des bateaux recrut√©s ou qui contiennent d√©j√† quelqu'un,
 				// on en construit un autre
 			}
 			if(!boat)
@@ -93,8 +93,8 @@ public:
 					if(!cc || d > 8)
 						{ FDebug(W_WARNING, "Pas de mer ou trop loins"); return false; }
 
-					/* On crÈÈ un ShipYard, et aussi un bateau sur la mÍme case dans le cas o˘ le shipyard a
-					 * bien ÈtÈ construit */
+					/* On cr√©√© un ShipYard, et aussi un bateau sur la m√™me case dans le cas o√π le shipyard a
+					 * bien √©t√© construit */
 					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()),
 					                                       "+", "%" + TypToStr(ECEntity::E_SHIPYARD))));
 					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(cc->X()) + "," + TypToStr(cc->Y()),
@@ -102,7 +102,7 @@ public:
 					return true; /* On attend le prochain tour pour faire quelque chose avec */
 				}
 				else
-				{ /* On construit un bateau ‡ partir du chantier naval le plus proche */
+				{ /* On construit un bateau √† partir du chantier naval le plus proche */
 					IA()->ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr(shipyard->Case()->X()) + "," + TypToStr(shipyard->Case()->Y()),
 					                                       "+", "%" + TypToStr(ECEntity::E_BOAT))));
 					return true; /* On attends le prochain tour pour s'en servir */
@@ -116,9 +116,9 @@ public:
 			{ FDebug(W_WARNING, "Pas de bateau !?"); return false; }
 
 		if(!boat->Containing())
-		{ /* Le code quand le bateau et l'armÈe cherchent ‡ se rapprocher */
-			/* Si le bateau ne peut contenir l'unitÈ, on triche discretement en ajoutant le nombre nÈcessaire
-			 * au bateau pour avoir la capacitÈ de contenir cette armÈe
+		{ /* Le code quand le bateau et l'arm√©e cherchent √† se rapprocher */
+			/* Si le bateau ne peut contenir l'unit√©, on triche discretement en ajoutant le nombre n√©cessaire
+			 * au bateau pour avoir la capacit√© de contenir cette arm√©e
 			 */
 			if(!boat->CanContain(unit))
 				boat->SetNb(unit->Nb()/100 + 10);
@@ -126,9 +126,9 @@ public:
 			if(!boat->CanContain(unit))
 			{
 				if(boat->Containing())
-					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau contient dÈj‡ quelqu'un !?");
+					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau contient d√©j√† quelqu'un !?");
 				else
-					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a ÈtÈ augmentÈ ‡ %d mais ne peut toujours pas contenir"
+					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a √©t√© augment√© √† %d mais ne peut toujours pas contenir"
 									" les %d hommes", boat->Nb(), unit->Nb());
 				return false;
 			}
@@ -162,7 +162,7 @@ public:
 			}
 		}
 		else
-		{ /* Le code du bateau qui se dÈplace vers la cible */
+		{ /* Le code du bateau qui se d√©place vers la cible */
 			std::vector<ECBEntity*> all_entities = unit->Map()->Entities()->List();
 			ECBEntity* victim = 0;
 			uint d = 0;
@@ -202,7 +202,7 @@ public:
 						continue;
 					}
 
-					/*  HACK On file une petite aide ‡ l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
+					/*  HACK On file une petite aide √† l'IA pour qu'elle puisse avoir de l'avenir en terre conquise */
 					if(unit->Type() == ECEntity::E_ARMY && unit->Nb() <= 1000)
 						unit->SetNb(1000 + rand()%10 * 100);
 					return false;
@@ -325,7 +325,7 @@ void TIA::FirstMovements()
 			{
 				ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
 				                                 "+", "%" + TypToStr(t))));
-				/* HACK pour que les armÈes ne soient pas de 100 */
+				/* HACK pour que les arm√©es ne soient pas de 100 */
 				if(t == ECEntity::E_ARMY)
 					for(int j = 12; j >= 0; --j)
 						ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
@@ -336,7 +336,7 @@ void TIA::FirstMovements()
 			continue;
 
 		if((*enti)->MyUpgrade() != ECEntity::E_NONE && !(rand()%2))
-			ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "∞")));
+			ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "U")));
 		if((*enti)->MyStep() > 0 || (*enti)->Porty() > 0)
 		{
 			if((*enti)->AddUnits(0))
@@ -348,7 +348,7 @@ void TIA::FirstMovements()
 							ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "+")));
 			}
 
-			if(recruted[*enti]) continue; /* Il est recrutÈ, donc tout ce qu'on peut lui faire faire l‡ sera fait par la
+			if(recruted[*enti]) continue; /* Il est recrut√©, donc tout ce qu'on peut lui faire faire l√† sera fait par la
 			                               * fonction de l'action */
 
 			std::vector<ECBEntity*> all_entities = (*enti)->Map()->Entities()->List();
@@ -361,12 +361,12 @@ void TIA::FirstMovements()
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
 
-			if(!victim) continue; // Ètonnant !
+			if(!victim) continue; // √©tonnant !
 
 			if((*enti)->Case()->Delta(victim->Case()) <= (*enti)->Porty())
 			{
-				/* On sait pas si il peut se dÈployer ou non, alors on Ècrit Áa car on sait jamais, et si il ne peut
-				 * pas se dÈployer c'est pas gÈnant.
+				/* On sait pas si il peut se d√©ployer ou non, alors on √©crit √ßa car on sait jamais, et si il ne peut
+				 * pas se d√©ployer c'est pas g√©nant.
 				 */
 				if(!(*enti)->Deployed())
 					ia_send(ECPacket(MSG_ARM, ECArgs((*enti)->ID(), "#")));
@@ -465,7 +465,7 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 			case '+': add = true; break;
 			case '-': add = false; break;
 			case 'S':
-				if(!add) /* On vient pour la premiËre fois en Playing */
+				if(!add) /* On vient pour la premi√®re fois en Playing */
 				{
 					/* On s'allie avec toutes les IA */
 					want_make_allies = true;
@@ -587,7 +587,7 @@ bool TIA::Join(EChannel* chan)
 	SetPlayer(new ECPlayer(this, chan, false, false));
 	chan->sendto_players(0, GetNick(), MSG_JOIN, chan->Name());
 
-	/* «a me l'envoie ‡ moi mÍme */
+	/* √áa me l'envoie √† moi m√™me */
 	sendrpl(ECPacket(app.GetConf()->ServerName(), MSG_SET, ECArgs(chan->ModesStr()).DontSplit()));
 
 	return true;
@@ -633,13 +633,13 @@ int TIA::recv_one_msg(const ECPacket& msg)
 		if(cmds[i].cmd == msg.Command())
 			cmd = &cmds[i];
 
-	/* Ce n'est pas forcÈment grave que la commande ne soit pas reconnue, dans le sens
-	 * o˘ on ne supporte pas tout ce qui est envoyÈ par le serveur (les joins etc on s'en
+	/* Ce n'est pas forc√©ment grave que la commande ne soit pas reconnue, dans le sens
+	 * o√π on ne supporte pas tout ce qui est envoy√© par le serveur (les joins etc on s'en
 	 * fou par exemple)
 	 */
 	if(!cmd) return 0;
 	if(msg.Args().Size() < cmd->args)
-	    return Debug(W_WARNING, "TIA::ia_recv(): RÈception d'un message anormal");
+	    return Debug(W_WARNING, "TIA::ia_recv(): R√©ception d'un message anormal");
 
 	std::vector<ECPlayer*> players;
 
@@ -657,7 +657,7 @@ int TIA::recv_one_msg(const ECPacket& msg)
 			if(tmp.find('!') != std::string::npos) tmp = stringtok(tmp, "!");
 			ECPlayer* tmpl = Player()->Channel()->GetPlayer(tmp.c_str());
 			if(tmpl) players.push_back(tmpl);
-			/* Il est tout ‡ fait possible que le player ne soit pas trouvÈ,
+			/* Il est tout √† fait possible que le player ne soit pas trouv√©,
 			   genre si c'est un join... */
 		}
 	}
@@ -721,7 +721,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	IA->Join(chan);
 
-	/* A partir de l‡ le serveur le gere comme un client normal */
+	/* A partir de l√† le serveur le gere comme un client normal */
 
 	return 0;
 }

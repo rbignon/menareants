@@ -73,7 +73,7 @@ public:
 	int Width() { return window.GetWidth(); }
 	bool IsFullScreen(void) const;
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	uint m_max_fps;     // If equals to zero, it means no limit
 	uint m_sleep_max_fps;

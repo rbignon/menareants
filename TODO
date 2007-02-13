@@ -1,88 +1,86 @@
-Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
+Note: Lire le fichier DEVELOPPEURS pour participer Ã  des discussions.
 
-À faire:
+Ã€ faire:
 
 * En cours
--améliorer le proto2 du meta-server (gestion d'une base de données d'users)
+-amÃ©liorer le proto2 du meta-server (gestion d'une base de donnÃ©es d'users)
 
 * Urgent
--de manière générale, faire en sorte que les alliés partagent un maximum d'infos
--améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
- la plus proche de la case d'arrivée.
+-de maniÃ¨re gÃ©nÃ©rale, faire en sorte que les alliÃ©s partagent un maximum d'infos
+-amÃ©liorer le find fast path pour, si la case d'arrivÃ©e est inacessible, aller jusqu'Ã  la case accessible
+ la plus proche de la case d'arrivÃ©e.
 -pouvoir envoyer un changement de niveau via le protocole
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 
 -contacter masami.ko@gmail.com pour lui demander pour sa musique http://yeknan.free.fr/wormux/musique/Komuro_Masami.-.Bussou_na_machi.ogg
 
 ** Objectifs pour la version 0.4
--> pouvoir envoyer de ses propres maps au serveur pendant la création de la partie
--> Multiplier les unités
--> Language de scripting opérationnel pour les missions
--> Création de quelques missions
--> Création d'un tutoriel, obligatoire au premier lancement du jeu
-[DONE] Modification fondamentale du système des attaques: permettre plusieurs attaques implicites d'affilé
-    (mon char avance de 3 cases, et rencontre d'abord une unité enemie. Il y a combat. Si mon unité gagne,
-     elle continue son chemin. Il est possible qu'elle rencontre encore une unité enemie. Il y a recombat.
+-> pouvoir envoyer de ses propres maps au serveur pendant la crÃ©ation de la partie
+-> Multiplier les unitÃ©s
+-> Language de scripting opÃ©rationnel pour les missions
+-> CrÃ©ation de quelques missions
+-> CrÃ©ation d'un tutoriel, obligatoire au premier lancement du jeu
+[DONE] Modification fondamentale du systÃ¨me des attaques: permettre plusieurs attaques implicites d'affilÃ©
+    (mon char avance de 3 cases, et rencontre d'abord une unitÃ© enemie. Il y a combat. Si mon unitÃ© gagne,
+     elle continue son chemin. Il est possible qu'elle rencontre encore une unitÃ© enemie. Il y a recombat.
      Si je gagne, on continue encore).
 [DONE] Un Fast Find Path qui marche avec une recherche de la case accessible la plus proche de la case voulue (si non accessible)
-[DONE] Pouvoir annuler les actions d'une unité
+[DONE] Pouvoir annuler les actions d'une unitÃ©
 
-* Après
--limiter le nombre d'unités à construire sur batiments
--à la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
--bug qui fait qu'en plein écran sous windows on ne voye pas la souris.
--permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
--pouvoir définir une cible sur plusieurs tours
--lier par fleche deux cases, affiché chez les alliés, pour faire des strategies
--ordre des animations (important pour MOVE -> CONTAINING -> MOVE, et les unions)
+* AprÃ¨s
+-limiter le nombre d'unitÃ©s Ã  construire sur batiments
+-Ã  la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
+-bug qui fait qu'en plein Ã©cran sous windows on ne voye pas la souris.
+-permettre d'ajouter de l'infanterie dans un bateau qui contient dÃ©jÃ  de l'infanterie du mÃªme type
+-pouvoir dÃ©finir une cible sur plusieurs tours
 
 * Bof
--passer à de la 3d isometrique (à confirmer)
+-passer Ã  de la 3d isometrique (Ã  confirmer)
 
-** Unités
+** UnitÃ©s
 - Tout le monde
-  - char qui permet de tirer à une ou deux cases d'interval..
+  - char qui permet de tirer Ã  une ou deux cases d'interval..
   - batiment qui permet de ne pas avoir le semi brouillard (premiere version, toutes les cases -1 passent en 0, et upgrade pour tout tout voir)
   - upgrades de la caserne et de l'usine d'armement
-  - unité Dorian qui vend de l'alcool: les unités touchées se dirigent n'importe comment !
-  - unité Gay
-  - unité Zidane qui fou des coups de boule
-  - unité Handicap International qui permet de déminer
-  - batiment ou unité ou upgrade du lance missile qui tire un champ electrique
-  - barbelés
-  - déchets radioactifs après une bombe nucléaire
+  - unitÃ© Dorian qui vend de l'alcool: les unitÃ©s touchÃ©es se dirigent n'importe comment !
+  - unitÃ© Gay
+  - unitÃ© Zidane qui fou des coups de boule
+  - unitÃ© Handicap International qui permet de dÃ©miner
+  - batiment ou unitÃ© ou upgrade du lance missile qui tire un champ electrique
+  - barbelÃ©s
+  - dÃ©chets radioactifs aprÃ¨s une bombe nuclÃ©aire
   - sous marins
   - lance missile marin
 - URSS
-  - Goulags où il est possible de mettre les prisoniers et qui font rapporter de l'argent
+  - Goulags oÃ¹ il est possible de mettre les prisoniers et qui font rapporter de l'argent
 - France
   - De Villepin ?
 - Noisy
-  - Réseau de cavernes
+  - RÃ©seau de cavernes
 - Espagne
   - Goetz ?
-- Al Quaïda
+- Al QuaÃ¯da
   - Avions suicides
 - Colombie
   - Drogue
 
-** En parallèle (on s'en fou un peu de quand on les fait)
--voir pour d'autres paramètres dans les fichiers MAPS (genre interdire certaines unités, etc).
--voir pour la création de fichiers de configuration des unités.
+** En parallÃ¨le (on s'en fou un peu de quand on les fait)
+-voir pour d'autres paramÃ¨tres dans les fichiers MAPS (genre interdire certaines unitÃ©s, etc).
+-voir pour la crÃ©ation de fichiers de configuration des unitÃ©s.
 -voir pour l'utilisation de fichiers xml plutot que des configurations pourries.
--mot de passe éventuel pour accéder à un serveur
+-mot de passe Ã©ventuel pour accÃ©der Ã  un serveur
 -server: enrichissement de l'IA
 -utilisation de gettext.
 
 ** Plus tard (objectifs par la suite de celui actuel, dans l'ordre)
 -??
 
-** Idées
--client: utilisation d'objets en 3d (peut etre) chargés directements (voir dans ~/tmp/3ds)
--introduction de la ressource petrolière pour les vehicules
--système de guerilla de Spouize
--mode de jeu qui permet d'utiliser que certaines unités (genre le mode que vehicules, que naval (plus tard), etc)
+** IdÃ©es
+-client: utilisation d'objets en 3d (peut etre) chargÃ©s directements (voir dans ~/tmp/3ds)
+-introduction de la ressource petroliÃ¨re pour les vehicules
+-systÃ¨me de guerilla de Spouize
+-mode de jeu qui permet d'utiliser que certaines unitÃ©s (genre le mode que vehicules, que naval (plus tard), etc)
 
 
-** Sur le très long terme
+** Sur le trÃ¨s long terme
 -Bosser.

@@ -31,7 +31,7 @@ TSpinEdit::TSpinEdit(Font* f, std::string _label, int _x, int _y, uint _width, i
 	  txt_label(_x, _y, _label, white_color, f), txt_value(_x,_y,"", white_color, f),
 	  min(_min), max(_max), step(_step), color(white_color), font(f)
 {
-	/* Sécurités */
+	/* SÃ©curitÃ©s */
 	if(max < min) max = min;
 	if(_defvalue < min) _defvalue = min;
 	else if(_defvalue > max) _defvalue = max;
@@ -130,7 +130,7 @@ bool TSpinEdit::Clic (const Point2i& mouse, int button)
   if(button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_RIGHT || m_plus.Test(mouse, button))
     return ChangeValueByClick(true);
   else if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT
-          /* inutile du coup, vu que Test() nécessite button == SDL_BUTTON_LEFT|| m_minus.Test(mouse, button) */
+          /* inutile du coup, vu que Test() nÃ©cessite button == SDL_BUTTON_LEFT|| m_minus.Test(mouse, button) */
          )
     return ChangeValueByClick(false);
 

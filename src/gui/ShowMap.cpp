@@ -24,6 +24,8 @@
 #include "Channels.h"
 #include "Debug.h"
 #include "tools/Font.h"
+#include "Form.h"
+#include "Units.h"
 #include <SDL_gfxPrimitives.h>
 
 #undef SCREEN_HEIGHT
@@ -364,31 +366,51 @@ void TMap::Draw(const Point2i& mouse)
 			c->Draw();
 			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe())
 			{
-				if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
-				   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
+				bool move, invest;
+				if(dynamic_cast<TForm*>(Parent()) && dynamic_cast<TForm*>(Parent())->IsPressed(SDLK_SPACE) &&
+				   dynamic_cast<EContainer*>(SelectedEntity()) &&
+				   dynamic_cast<EContainer*>(SelectedEntity())->Containing())
 				{
-					bool move, invest;
-					if(SelectedEntity()->CanWalkTo(c, move, invest))
+					if((SelectedEntity()->DestCase()->X() == c->X() && (SelectedEntity()->DestCase()->Y() == c->Y()+1 || SelectedEntity()->DestCase()->Y() == c->Y()-1) ||
+					    SelectedEntity()->DestCase()->Y() == c->Y() && (SelectedEntity()->DestCase()->X() == c->X()+1 || SelectedEntity()->DestCase()->X() == c->X()-1))
+					   && dynamic_cast<EContainer*>(SelectedEntity())->Containing()->CanWalkOn(c))
 					{
 						ECImage background;
 						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
 						background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-						background.FillRect(r_back, background.MapRGBA(255, 249, 126, 255*3/10));
+						background.FillRect(r_back, background.MapRGBA(0x89, 0x74, 0xff, 255*3/10));
 						SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
 						Window()->Blit(background, &r_back2);
 					}
 				}
-				if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
-				   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
+				else
 				{
-					ECImage background;
-					SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
-					background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
-										32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-					background.FillRect(r_back, background.MapRGBA(255, 0, 0, 255*3/10));
-					SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
-					Window()->Blit(background, &r_back2);
+					if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
+					   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
+					{
+						if(SelectedEntity()->CanWalkTo(c, move, invest))
+						{
+							ECImage background;
+							SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
+							background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+												32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+							background.FillRect(r_back, background.MapRGBA(255, 249, 126, 255*3/10));
+							SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+							Window()->Blit(background, &r_back2);
+						}
+					}
+					if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
+					   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
+					{
+						ECImage background;
+						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
+						background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+						background.FillRect(r_back, background.MapRGBA(255, 0, 0, 255*3/10));
+						SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+						Window()->Blit(background, &r_back2);
+					}
 				}
 			}
 			if(CreateEntity() && c->Test(mouse.x, mouse.y))
@@ -398,7 +420,7 @@ void TMap::Draw(const Point2i& mouse)
 			if(schema)
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
 
-			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
+			if(map->Channel()) // Si il n'y a pas de channel, c'est l'Ã©diteur de map et on n'utilise pas Ã§a dans ce cas.
 				c->SetMustRedraw(false);
 
 			DrawFog(c);
@@ -482,7 +504,7 @@ void TMap::Draw(const Point2i& mouse)
 				{
 					ECase* c = dynamic_cast<ECase*>((*enti)->Case());
 					if(c != entity->Move()->FirstCase())
-						FDebug(W_WARNING|W_SEND, "La case de l'entité et le départ du mouvement ne sont pas identiques");
+						FDebug(W_WARNING|W_SEND, "La case de l'entitÃ© et le dÃ©part du mouvement ne sont pas identiques");
 
 					ECMove::Vector moves = entity->Move()->Moves();
 					ECase* next_c = 0;

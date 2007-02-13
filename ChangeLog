@@ -1,71 +1,83 @@
+2007-02-13 Romain Bignon <progs@headfucking.net>
+
+	* src/: Traduction intÃ©grale en anglais.
+
+	* po/, src/i18n.h: Support de gettext.
+
+	* po/fr.po: Traduction franÃ§aise.
+
+	* Passage de tout le code source en UTF-8.
+
+	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Changement des messages Â£ et Â° qui sont trop gros pour un char en UTF-8.
+
 2007-02-12 Romain Bignon <progs@headfucking.net>
 
 	* src/, meta-server/, server/: Changement complet du protocole ! Utilisation d'enumerateurs, changement dans les fonctions, etc.
 
 2007-02-11 Romain Bignon <progs@headfucking.net>
 
-	* server/Main.cpp (sig_alarm): Correction d'un bug qui risquait de faire jarter tous les clients si l'un était victime d'un ping timeout.
+	* server/Main.cpp (sig_alarm): Correction d'un bug qui risquait de faire jarter tous les clients si l'un Ã©tait victime d'un ping timeout.
 
-	* server/menareantsd.conf.in: Valeur par défault de server/fping est mise à 25 plutot que 50, pour diminuer par deux le temps de détection d'un ping timeout.
+	* server/menareantsd.conf.in: Valeur par dÃ©fault de server/fping est mise Ã  25 plutot que 50, pour diminuer par deux le temps de dÃ©tection d'un ping timeout.
 
 	* Quelques corrections de bugs.
 
-	* server/Main.cpp: Ajout du support des signaux HUP, INT et TERM. Mise à jour des paramètres passés au programme.
+	* server/Main.cpp: Ajout du support des signaux HUP, INT et TERM. Mise Ã  jour des paramÃ¨tres passÃ©s au programme.
 
 	* src/Login.cpp: Permet d'administrer un serveur (premiers outils).
 
-	* doc/ADMIN: Création d'une documentation pour les administrateurs.
+	* doc/ADMIN: CrÃ©ation d'une documentation pour les administrateurs.
 
 	* src/Login.cpp: Correction d'un crash.
 
-	* lib/Outils.cpp: Correction d'un bug par rapport au caractère d'échappement.
+	* lib/Outils.cpp: Correction d'un bug par rapport au caractÃ¨re d'Ã©chappement.
 
 	* server/Units.cpp: Correction d'un crash.
 
 	* src/JoinGame.cpp: Avertis par message l'owner de la partie lors d'un clic sur "lancer la partie" de ce qu'il manque pour la lancer plutot que de
-	  la non possibilité de cliquer sur le boutton, ainsi qu'avertissement si il y a des joueurs non prets.
+	  la non possibilitÃ© de cliquer sur le boutton, ainsi qu'avertissement si il y a des joueurs non prets.
 
-	* src/gui/Form.cpp, src/gui/MessageBox.cpp: Correction du FPS (limite augmentée à 30 FPS).
+	* src/gui/Form.cpp, src/gui/MessageBox.cpp: Correction du FPS (limite augmentÃ©e Ã  30 FPS).
 
-	* server/InGame.cpp: Correction d'un bug concernant les actions à la sortie d'une unité d'un conteneur.
-	  Egalement, maintenant lorsqu'une unité passe par un batiment qu'il peut investir mais qu'il n'y a pas d'enemis dessus (donc pas de combat), on investis
-	  quand même et on continue le mouvement.
+	* server/InGame.cpp: Correction d'un bug concernant les actions Ã  la sortie d'une unitÃ© d'un conteneur.
+	  Egalement, maintenant lorsqu'une unitÃ© passe par un batiment qu'il peut investir mais qu'il n'y a pas d'enemis dessus (donc pas de combat), on investis
+	  quand mÃªme et on continue le mouvement.
 
-	* Création d'une branche 0.4alpha P11
+	* CrÃ©ation d'une branche 0.4alpha P11
 
 2007-02-10 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp (ARMCommand): Vérifie ET la case visée ET la case de l'unité sendeuse pour voir si l'event est visible ou non.
+	* src/InGame.cpp (ARMCommand): VÃ©rifie ET la case visÃ©e ET la case de l'unitÃ© sendeuse pour voir si l'event est visible ou non.
 
-	* server/InGame.cpp (InitAnim): Lors d'une création, vérification de si ça ne fait pas un combat avec d'autres unités sur la case.
+	* server/InGame.cpp (InitAnim): Lors d'une crÃ©ation, vÃ©rification de si Ã§a ne fait pas un combat avec d'autres unitÃ©s sur la case.
 
-	* server/IA.cpp: Amélioration des probabilités que l'IA crée telle ou telle unité.
+	* server/IA.cpp: AmÃ©lioration des probabilitÃ©s que l'IA crÃ©e telle ou telle unitÃ©.
 
-	* lib/Units.h (ECBTourist): Elle peut se défendre face à une unité de type infantery, ce qui n'a aucun intérêt (il y a 1 homme à l'intérieur, donc il peut que perdre), mais
-	  qui est plus ou moins un hack pour que l'IA l'amène vers l'enemie.
-	  Après, comme les japonais sont des samouraï, on peut quand même leur laisser une chance de vaincre un combat contre un ou deux enemies.
+	* lib/Units.h (ECBTourist): Elle peut se dÃ©fendre face Ã  une unitÃ© de type infantery, ce qui n'a aucun intÃ©rÃªt (il y a 1 homme Ã  l'intÃ©rieur, donc il peut que perdre), mais
+	  qui est plus ou moins un hack pour que l'IA l'amÃ¨ne vers l'enemie.
+	  AprÃ¨s, comme les japonais sont des samouraÃ¯, on peut quand mÃªme leur laisser une chance de vaincre un combat contre un ou deux enemies.
 
 2007-02-09 Romain Bignon <progs@headfucking.net>
 
-	* src/JoinGame.cpp: Lors du changement de propriétaire d'une country, anoncer uniquement aux joueurs concernés et à leurs alliés le changement.
+	* src/JoinGame.cpp: Lors du changement de propriÃ©taire d'une country, anoncer uniquement aux joueurs concernÃ©s et Ã  leurs alliÃ©s le changement.
 
-	* server/InGame.cpp (ShowAnim ARM_ATTAQ): Si l'unité visée n'est plus attaquable (par exemple, si l'unité visée par une tour défense est allée sur la même case
+	* server/InGame.cpp (ShowAnim ARM_ATTAQ): Si l'unitÃ© visÃ©e n'est plus attaquable (par exemple, si l'unitÃ© visÃ©e par une tour dÃ©fense est allÃ©e sur la mÃªme case
 	  que celle-ci), on n'attaque plus.
-	  (ShowAnim ARM_[UN]CONTAIN): Gestion du cas où le parent est devenu un zombie.
-	  (ARMCommand): Correction d'un bug lors de la création.
-	  (ShowAnim ARM_ATTAQ): Lors d'une attaque de la part d'une entité, on envoie en sendeur uniquement cet entité et plus celles qui sont concernées.
+	  (ShowAnim ARM_[UN]CONTAIN): Gestion du cas oÃ¹ le parent est devenu un zombie.
+	  (ARMCommand): Correction d'un bug lors de la crÃ©ation.
+	  (ShowAnim ARM_ATTAQ): Lors d'une attaque de la part d'une entitÃ©, on envoie en sendeur uniquement cet entitÃ© et plus celles qui sont concernÃ©es.
 
-	* server/Units.cpp, server/Batiments.cpp: On profite maintenant du nouveau système. Une fonction virtuelle permet d'obtenir la liste des entités attaquées.
+	* server/Units.cpp, server/Batiments.cpp: On profite maintenant du nouveau systÃ¨me. Une fonction virtuelle permet d'obtenir la liste des entitÃ©s attaquÃ©es.
 
 2007-02-07 Romain Bignon <progs@headfucking.net>
 
-	* meta-server/sockets.c: Envoie d'un PING au client et détection du ping timeout.
+	* meta-server/sockets.c: Envoie d'un PING au client et dÃ©tection du ping timeout.
 
-	* server/Server.cpp: Gestion des messages du serveur, et réponse au ping.
+	* server/Server.cpp: Gestion des messages du serveur, et rÃ©ponse au ping.
 
-	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Changement fondamental dans la gestion des évenements.
+	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Changement fondamental dans la gestion des Ã©venements.
 
-	* server/Main.cpp, server/Server.cpp: Abandon du SIG_ALARM pour un système de timer dans la boucle principale.
+	* server/Main.cpp, server/Server.cpp: Abandon du SIG_ALARM pour un systÃ¨me de timer dans la boucle principale.
 
 	* lib/Map.h, src/Map.h (ECBMove): Merge de ECBMove et ECMove dans ECBMove.
 
@@ -79,57 +91,57 @@
 
 2007-01-24 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp: Utilisation de la touche "tab" lors de l'écriture d'un message pour l'auto-complétion.
+	* src/InGame.cpp: Utilisation de la touche "tab" lors de l'Ã©criture d'un message pour l'auto-complÃ©tion.
 
 	* src/*: Correction d'une foultitude de bugs (freeze en cours de jeu, etc).
 
-	* meta-server/clients.h, API: Ebauche du protocole 2 du meta-server, qui garde le client connecté en permanence, et probablement avec gestion d'accounts.
+	* meta-server/clients.h, API: Ebauche du protocole 2 du meta-server, qui garde le client connectÃ© en permanence, et probablement avec gestion d'accounts.
 
-	* src/Login.cpp: Affiche les serveurs où y a quelqu'un en vert.
+	* src/Login.cpp: Affiche les serveurs oÃ¹ y a quelqu'un en vert.
 
 2007-01-23 Romain Bignon <progs@headfucking.net>
 
-	* src/gui/ListBox.cpp: Récupération de la ListBox de wormux, et amélioration pour avoir une scrollbar.
+	* src/gui/ListBox.cpp: RÃ©cupÃ©ration de la ListBox de wormux, et amÃ©lioration pour avoir une scrollbar.
 
 2007-01-21 Romain Bignon <progs@headfucking.net>
 
-	* src/tools/Rectangle.h, src/tools/Vector2.h: Importation de ces classes de Wormux pour pouvoir représenter des couples de 2 ou 4 entiers dans un seul type.
+	* src/tools/Rectangle.h, src/tools/Vector2.h: Importation de ces classes de Wormux pour pouvoir reprÃ©senter des couples de 2 ou 4 entiers dans un seul type.
 
 	* src/gui/*, src/*: - Utilisation de Vector2i pour prendre en compte les couples x,y, et de Rectanglei pour les couples x,y,w,h (pour les widgets et les ECImage).
 	- On ne redessine plus que les composants qui le demandent ou qui inter-agissent avec l'utilisateur (si le curseur est au dessus, etc.)
 
-	* src/gui/Form.h, src/Main.h, src/Config.h, src/InGame.h, src/JoinGame.h, src/Login.h, src/MapEditor.h: La classe TForm met à disposition des fonctions virtuelles
-	de callback pour que les dérivées puissent réagir à un evenement, plutôt que de gérer nous même dans la boucle principale. Ceci permet d'éviter justement
-	l'utilisation de ces boucles, et ainsi les objets s'auto-gèrent. On peut noter les evenements types OnClic(), OnMouseMotion(), OnKeyDown(), BeforeDraw(), etc.
+	* src/gui/Form.h, src/Main.h, src/Config.h, src/InGame.h, src/JoinGame.h, src/Login.h, src/MapEditor.h: La classe TForm met Ã  disposition des fonctions virtuelles
+	de callback pour que les dÃ©rivÃ©es puissent rÃ©agir Ã  un evenement, plutÃ´t que de gÃ©rer nous mÃªme dans la boucle principale. Ceci permet d'Ã©viter justement
+	l'utilisation de ces boucles, et ainsi les objets s'auto-gÃ¨rent. On peut noter les evenements types OnClic(), OnMouseMotion(), OnKeyDown(), BeforeDraw(), etc.
 
 	* src/Color.h, src/gui/*: Utilisation d'une couleur dans les teintes bleu/violet pour toutes les box (semi transparent).
 
-	* src/gui/ComboBox.cpp: La liste n'est plus transparente (pour éviter les problèmes), mais sa couleur bleuté est plus jolie que blanche.
+	* src/gui/ComboBox.cpp: La liste n'est plus transparente (pour Ã©viter les problÃ¨mes), mais sa couleur bleutÃ© est plus jolie que blanche.
 
 2007-01-13 Romain Bignon <progs@headfucking.net>
 
-	* src/data/sound/units/McDo.ogg, src/Resources.cpp, src/Units.cpp: Lors de la création d'un McGerbale, diffusion d'un son.
+	* src/data/sound/units/McDo.ogg, src/Resources.cpp, src/Units.cpp: Lors de la crÃ©ation d'un McGerbale, diffusion d'un son.
 
-	* lib/Defines.h: La macro UNSTABLE est desactivée...
+	* lib/Defines.h: La macro UNSTABLE est desactivÃ©e...
 
 2007-01-05 Romain Bignon <progs@headfucking.net>
 
-	* src/data/anims/escarmouchebutton: Bouton pour créer une escarmouche à partir de la liste des serveurs.
+	* src/data/anims/escarmouchebutton: Bouton pour crÃ©er une escarmouche Ã  partir de la liste des serveurs.
 
 	* src/data/anims/missionbutton: Pareil pour les missions.
 
-	* src/Login.cpp (TListServerForm): Maintenant, en plus de la liste des serveurs, se trouvent des statistiques données par le meta-server
-	  et basées sur la liste donnée. En outre, se trouve également deux boutons, "Mission solo" et "Escarmouche", qui choisissent un serveur
-	  au hasard parmis ceux présents accessibles, s'y connectent et créent respectivement une mission ou une escarmouche.
-	(TConnectedForm): La liste des parties se trouve maintenant dans cette fenêtre.
+	* src/Login.cpp (TListServerForm): Maintenant, en plus de la liste des serveurs, se trouvent des statistiques donnÃ©es par le meta-server
+	  et basÃ©es sur la liste donnÃ©e. En outre, se trouve Ã©galement deux boutons, "Mission solo" et "Escarmouche", qui choisissent un serveur
+	  au hasard parmis ceux prÃ©sents accessibles, s'y connectent et crÃ©ent respectivement une mission ou une escarmouche.
+	(TConnectedForm): La liste des parties se trouve maintenant dans cette fenÃªtre.
 
-	* src/JoinGame.cpp (TListGameForm): Suppression de cette fenêtre.
+	* src/JoinGame.cpp (TListGameForm): Suppression de cette fenÃªtre.
 
-	* meta-server/clients.c, meta-server/servers.c: Création de statistiques sur le nombre de joueurs et de parties crées.
+	* meta-server/clients.c, meta-server/servers.c: CrÃ©ation de statistiques sur le nombre de joueurs et de parties crÃ©es.
 
-	* src/Config.cpp: Rajout de la résolution 1680x1050.
+	* src/Config.cpp: Rajout de la rÃ©solution 1680x1050.
 
-	* src/gui/MessageBox.cpp: On peut maintenir appuyer sur "entrée" pour faire OK.
+	* src/gui/MessageBox.cpp: On peut maintenir appuyer sur "entrÃ©e" pour faire OK.
 
 	* src/data/anims/escarmouchebutton, src/data/anims/missionbutton: Modification des images des boutons
 
@@ -137,13 +149,13 @@
 
 	* server/Units.cpp (ECMcDo): Correction d'un crash.
 
-	* src/data/anims/units/nuclearsearch: Changement de l'image pour une animation (que m'a envoyé thomas y a plusieurs mois..).
+	* src/data/anims/units/nuclearsearch: Changement de l'image pour une animation (que m'a envoyÃ© thomas y a plusieurs mois..).
 
 2007-01-03 Romain Bignon <progs@headfucking.net>
 
-	* src/gui/*, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp: Support des différences de boutons de la souris (gauche/droit/molette).
+	* src/gui/*, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp: Support des diffÃ©rences de boutons de la souris (gauche/droit/molette).
 
-	* src/InGame.cpp, lib/Channels.cpp: Dans une mission solo, par défaut le temps de reflexion est de 0 secondes, donc illimité.
+	* src/InGame.cpp, lib/Channels.cpp: Dans une mission solo, par dÃ©faut le temps de reflexion est de 0 secondes, donc illimitÃ©.
 
 	* lib/Batiments.h (ECBMine): Correction: elle remarche maintenant.
 
@@ -151,7 +163,7 @@
 
 2007-01-02 Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp, server/Channels.cpp, src/InGame.cpp: Création des sauvegardes.
+	* lib/Map.cpp, server/Channels.cpp, src/InGame.cpp: CrÃ©ation des sauvegardes.
 
 2007-01-01 Romain Bignon <progs@headfucking.net>
 
@@ -159,7 +171,7 @@
 
 2006-12-25 Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp: Le FindFastPath accepte aussi les cases où l'entité trouve une unité à investir.
+	* lib/Map.cpp: Le FindFastPath accepte aussi les cases oÃ¹ l'entitÃ© trouve une unitÃ© Ã  investir.
 
 	* src/InGame.cpp: Modification du message d'attente.
 
@@ -167,31 +179,31 @@
 
 	* src/Sockets.cpp: EC_Client est maintenant utilisable pour plusieurs fins (meta-server et menareantsd).
 
-	* src/Login.cpp (TListServerForm): Récupération et affichage d'une liste de serveurs depuis un meta-serveur, spécifié dans la conf.
+	* src/Login.cpp (TListServerForm): RÃ©cupÃ©ration et affichage d'une liste de serveurs depuis un meta-serveur, spÃ©cifiÃ© dans la conf.
 
 2006-12-22 Romain Bignon <progs@headfucking.net>
 
 	* src/data/fonts/: Changement pour une font fixed.
 
-	* meta-server: Création d'un daemon meta-serveur qui permet de recenser tous les serveurs lancés. Le client se connecte dessus d'abord pour obtenir une liste avec des informations, puis
+	* meta-server: CrÃ©ation d'un daemon meta-serveur qui permet de recenser tous les serveurs lancÃ©s. Le client se connecte dessus d'abord pour obtenir une liste avec des informations, puis
 	choisis le serveur.
 
 	* server/*: Utilisation du meta-serveur.
 
 2006-12-08 Romain Bignon <progs@headfucking.net>
 
-	* src/Sockets.cpp: Résolution du problème qui faisait crasher lorsqu'il ne trouvait pas une dns.
+	* src/Sockets.cpp: RÃ©solution du problÃ¨me qui faisait crasher lorsqu'il ne trouvait pas une dns.
 
-	* server/Map.cpp, server/Channels.cpp: Récupération de la partie de la fonction EChannel::RemovePlayer() qui supprimait les evenements des entités, création
+	* server/Map.cpp, server/Channels.cpp: RÃ©cupÃ©ration de la partie de la fonction EChannel::RemovePlayer() qui supprimait les evenements des entitÃ©s, crÃ©ation
 	de la fonction ECEntity::CancelEvents().
 
-	* API, server/InGame.cpp, src/InGame.cpp: Gestion de l'annulation pour les unités.
+	* API, server/InGame.cpp, src/InGame.cpp: Gestion de l'annulation pour les unitÃ©s.
 
 2006-12-05 Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.h: Implémentation d'un algorithme de recherche du chemin le plus court (A*).
+	* lib/Map.h: ImplÃ©mentation d'un algorithme de recherche du chemin le plus court (A*).
 
-	* server/IA.cpp: Application dans la fonction TIA::WantMoveTo(), qui passe de 150 lignes à 25 lignes !
+	* server/IA.cpp: Application dans la fonction TIA::WantMoveTo(), qui passe de 150 lignes Ã  25 lignes !
 
 	* src/InGame.cpp: Application lors du clique, permettant un clique direct en diagonale.
 
@@ -205,34 +217,34 @@
 
 2006-12-02 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp: Utilisation de la touche TAB pour chercher les unités inactives.
+	* src/InGame.cpp: Utilisation de la touche TAB pour chercher les unitÃ©s inactives.
 
-	* src/data/units/anims/char: Les chars sont (enfin!) marqués de la couleur du propriétaire.
+	* src/data/units/anims/char: Les chars sont (enfin!) marquÃ©s de la couleur du propriÃ©taire.
 
 	* lib/Colors.h, src/gui/ColorEdit.h: Suppression couleur blanche, rajout du violet, bleu ciel et noir.
 
 	* src/InGame.cpp (TLoadPlayerLine): Affichage d'un "OK" devant un user quand il est pret (lors du chargement).
 
-	* server/maps/europa_conquest.map: Rajout de rails sur les ponts pour les joueurs un peu éloignés.
+	* server/maps/europa_conquest.map: Rajout de rails sur les ponts pour les joueurs un peu Ã©loignÃ©s.
 
-	* lib/Units.h, lib/Batiments.h: Réduction du prix d'un rail (500$) et d'un train (2000$ pour une capacité de 500)
+	* lib/Units.h, lib/Batiments.h: RÃ©duction du prix d'un rail (500$) et d'un train (2000$ pour une capacitÃ© de 500)
 
-	* lib/Map.h: Possibilité de créer un rail sur un pont.
+	* lib/Map.h: PossibilitÃ© de crÃ©er un rail sur un pont.
 
-	* lib/Units.h, lib/Batiments.h: Ajustement des prix en général.
+	* lib/Units.h, lib/Batiments.h: Ajustement des prix en gÃ©nÃ©ral.
 
-	* lib/Units.h, server/Units.cpp, src/Units.cpp (ECBAvion): Quand l'avion est en vol et contient des unités, on paye un certain prix proportionnel au nombre d'unités contenues.
+	* lib/Units.h, server/Units.cpp, src/Units.cpp (ECBAvion): Quand l'avion est en vol et contient des unitÃ©s, on paye un certain prix proportionnel au nombre d'unitÃ©s contenues.
 
 	* src/Resources.cpp, src/Units.cpp (ECMcDo): Image pour la caserne investie du McDo investie du Jouano.
 
 2006-12-01 Romain Bignon <progs@headfucking.net>
 
-	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Possibilité de donner de l'argent à un autre joueur (par le menu des options), ou un territoire à un autre joueur (en
-	sélectionnant la ville en question, en cliquant sur le bouton "Don. Territoire", puis en donnant le pseudo du joueur).
+	* API, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: PossibilitÃ© de donner de l'argent Ã  un autre joueur (par le menu des options), ou un territoire Ã  un autre joueur (en
+	sÃ©lectionnant la ville en question, en cliquant sur le bouton "Don. Territoire", puis en donnant le pseudo du joueur).
 
 2006-11-30 Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.cpp (JOICommand): En cas de recover, on envoie les informations concernant la propriété des countries.
+	* server/Channels.cpp (JOICommand): En cas de recover, on envoie les informations concernant la propriÃ©tÃ© des countries.
 
 2006-11-27 Romain Bignon <progs@headfucking.net>
 
@@ -240,39 +252,39 @@
 
 2006-11-26 Romain Bignon <progs@headfucking.net>
 
-	* src/gui/ShowMap.cpp: Lorsqu'une unité est selectionnée, affichage en jaune des cases où elle peut aller, et en rouge des cases où elle peut tirer.
+	* src/gui/ShowMap.cpp: Lorsqu'une unitÃ© est selectionnÃ©e, affichage en jaune des cases oÃ¹ elle peut aller, et en rouge des cases oÃ¹ elle peut tirer.
 
-	* server/Channels.cpp (JOICommand): Lors d'un recover d'une partie par un user, on envoie bien les personnes avec qui il est allié.
+	* server/Channels.cpp (JOICommand): Lors d'un recover d'une partie par un user, on envoie bien les personnes avec qui il est alliÃ©.
 
 2006-11-24 Romain Bignon <progs@headfucking.net>
 
-	* Units.h: Création de l'unité Jouano qui permet de bouffer les mcdonalds.
+	* Units.h: CrÃ©ation de l'unitÃ© Jouano qui permet de bouffer les mcdonalds.
 
 2006-11-23 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp: Bouton qui permet de trouver les unités inactives.
+	* src/InGame.cpp: Bouton qui permet de trouver les unitÃ©s inactives.
 
-	* API, src/JoinGame.cpp: Modification du protocole pour la commande INFO. Ça permet la traduction du client en attribuant les messages à celui-ci avec un formatage spécial.
-	Le serveur n'a plus qu'à transmettre l'ID du message et les arguments nécessaires.
+	* API, src/JoinGame.cpp: Modification du protocole pour la commande INFO. Ã‡a permet la traduction du client en attribuant les messages Ã  celui-ci avec un formatage spÃ©cial.
+	Le serveur n'a plus qu'Ã  transmettre l'ID du message et les arguments nÃ©cessaires.
 
-	* server/Channels.cpp, server/Batiments.cpp, server/Units.cpp (EChannel::send_info): Fonction pour envoyer une info à un client.
+	* server/Channels.cpp, server/Batiments.cpp, server/Units.cpp (EChannel::send_info): Fonction pour envoyer une info Ã  un client.
 
 2006-11-04 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp (ARMCommand): Le timer pour éviter qu'une animation marche plus de 10 secondes marche maintenant.
+	* src/InGame.cpp (ARMCommand): Le timer pour Ã©viter qu'une animation marche plus de 10 secondes marche maintenant.
 
 2006-10-27 Romain Bignon <progs@headfucking.net>
 
 	* server/maps/*: Correction du bug du crash lors de la lecture de la liste de maps par le client alors qu'il join
-	une partie. En fait le soucis réside dans le fait que la chaine du nom contenait un 'Î'. Je ne sais pas pourquoi
-	ça crash pour ça mais bon il suffit de ne jamais mettre d'accents dans les noms et ça ne devrait plus poser
-	de problèmes.
+	une partie. En fait le soucis rÃ©side dans le fait que la chaine du nom contenait un 'ÃŽ'. Je ne sais pas pourquoi
+	Ã§a crash pour Ã§a mais bon il suffit de ne jamais mettre d'accents dans les noms et Ã§a ne devrait plus poser
+	de problÃ¨mes.
 
 2006-10-24 Romain Bignon <progs@headfucking.net>
 
 	* src/data/pics/MAA.ico: Icone du jeu.
 
-	* src/Main.cpp: Utilisation de l'icone du jeu dans la fenêtre.
+	* src/Main.cpp: Utilisation de l'icone du jeu dans la fenÃªtre.
 
 	* lib/LibConfig.h: Librairie de lecture (et bientot de sauvegarde) de configuration.
 
@@ -282,7 +294,7 @@
 
 	* Units.h: Avion de transport.
 
-	* lib/Map.h, ...: Gestion de niveaux en hauteur d'une unité.
+	* lib/Map.h, ...: Gestion de niveaux en hauteur d'une unitÃ©.
 
 2006-10-04 Romain Bignon <progs@headfucking.net>
 
@@ -291,9 +303,9 @@
 	* src/InGame.cpp (int BPCommand::Exec): Commande de breakpoints.
 	 (TInGameForm::Wants TInGameForm::GetWant): Utilisation d'un enumerateur pour les wants, et un want pour poser une balise.
 	 (void MenAreAntsApp::InGame): Pose d'une balise.
-	 (void MenAreAntsApp::Options): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
-	 (void MenAreAntsApp::PingingGame): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
-	 (void TScoresForm::WantLeave): Utilisation d'une ombre derrière les pseudos pour y voir plus clair.
+	 (void MenAreAntsApp::Options): Utilisation d'une ombre derriÃ¨re les pseudos pour y voir plus clair.
+	 (void MenAreAntsApp::PingingGame): Utilisation d'une ombre derriÃ¨re les pseudos pour y voir plus clair.
+	 (void TScoresForm::WantLeave): Utilisation d'une ombre derriÃ¨re les pseudos pour y voir plus clair.
 
 	* src/Resources.cpp: Images de balises.
 
@@ -310,11 +322,11 @@
 
 	* src/Channels.cpp: Structures de breakpoints.
 
-	* src/gui/Form.cpp (void TForm::Actions): Gestion des touches appuyées directement de SDL.
+	* src/gui/Form.cpp (void TForm::Actions): Gestion des touches appuyÃ©es directement de SDL.
 
 	* src/gui/Cursor.h: Ajout des curseurs pour poser ou enlever une balise.
 
-	* src/gui/Form.h: Gestion des touches appuyées directement de SDL.
+	* src/gui/Form.h: Gestion des touches appuyÃ©es directement de SDL.
 
 	* src/gui/Cursor.cpp (TCursor::TCursor): Ajout des curseurs pour poser ou enlever une balise.
 
@@ -324,13 +336,13 @@
 
 	* src/Commands.h: Commande BP.
 
-	* src/Login.cpp (int MAJCommand::Exec): Changement du texte, adapté suivant l'OS.
+	* src/Login.cpp (int MAJCommand::Exec): Changement du texte, adaptÃ© suivant l'OS.
 
 	* src/Resources.h: Images de balise.
 
 	* src/Sockets.h: Message BP.
 
-	* src/Defines.h: Début de migration à OpenGL.
+	* src/Defines.h: DÃ©but de migration Ã  OpenGL.
 
 	* src/Main.cpp: Modification credits.
 
@@ -348,15 +360,15 @@
 
 2006-09-27 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp: Le bouton "Voter" se grisait dès que n'importe qui votait.
+	* src/InGame.cpp: Le bouton "Voter" se grisait dÃ¨s que n'importe qui votait.
 
-	* server/Config.cpp (bool Config::load): Chargement du paramètre ADMINPASS.
+	* server/Config.cpp (bool Config::load): Chargement du paramÃ¨tre ADMINPASS.
 
 	* server/Commands.h: Ajout de la commande ADMIN
 
 	* server/Login.cpp: Commande ADMIN qui permet de se loguer, de rehash ou de killer quelqu'un.
 
-	* server/menareantsd.conf.in: Ajout du paramètre ADMINPASS.
+	* server/menareantsd.conf.in: Ajout du paramÃ¨tre ADMINPASS.
 
 	* server/Config.h: Variable AdminPass.
 
@@ -369,53 +381,53 @@
 	* src/InGame.cpp: Anticipation sur un bug qui n'affiche pas dans certain cas AttaqImg, et qui faisait une boucle
 	infinie. On met un timer qui empeche dans la boucle du ARMCommand de faire plus de 10 secondes.
 
-	* src/Sockets.cpp, src/tools/Images.h: Modifications qui assure le portage à MacOS.
+	* src/Sockets.cpp, src/tools/Images.h: Modifications qui assure le portage Ã  MacOS.
 
 2006-09-24 Romain Bignon <progs@headfucking.net>
 
-	* Version 0.3.2 releasée !!
+	* Version 0.3.2 releasÃ©e !!
 
 2006-09-23 Romain Bignon <progs@headfucking.net>
 
-	* server/Units.cpp (void ECEnginer::Invest): Vérification que Client() ne soit pas nul.
+	* server/Units.cpp (void ECEnginer::Invest): VÃ©rification que Client() ne soit pas nul.
 
-	* server/Map.cpp (void ECMap::RemoveAnEntity): Vérification que Client() ne soit pas nul.
-	 (bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): Vérification que Client() ne soit pas nul.
+	* server/Map.cpp (void ECMap::RemoveAnEntity): VÃ©rification que Client() ne soit pas nul.
+	 (bool ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): VÃ©rification que Client() ne soit pas nul.
 
-	* server/maps/europa_conquest.map: Modifications essayant de rapprocher l'égalité.
+	* server/maps/europa_conquest.map: Modifications essayant de rapprocher l'Ã©galitÃ©.
 
-	* server/Channels.cpp (void EChannel::operator<< ): Vérification que Client() ne soit pas nul.
+	* server/Channels.cpp (void EChannel::operator<< ): VÃ©rification que Client() ne soit pas nul.
 
 2006-09-22 Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp (int ARMCommand::Exec): Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
-	 (const char TInGameForm::GetWant): Affichage de fleches pour un ingénieur pour réparer.
-	 (void MenAreAntsApp::InGame): Correction d'un bug qui ne faisait pas avancer sur la case quand une unité ne pouvait
+	* src/InGame.cpp (int ARMCommand::Exec): Ne pas dÃ©placer la camera pour une unitÃ© enemie cachÃ©e dans les arbres.
+	 (const char TInGameForm::GetWant): Affichage de fleches pour un ingÃ©nieur pour rÃ©parer.
+	 (void MenAreAntsApp::InGame): Correction d'un bug qui ne faisait pas avancer sur la case quand une unitÃ© ne pouvait
 	 pas entrer dans un conteneur sur la case cible.
 
-	* src/Units.cpp: Ne pas déplacer la camera pour une unité enemie cachée dans les arbres.
+	* src/Units.cpp: Ne pas dÃ©placer la camera pour une unitÃ© enemie cachÃ©e dans les arbres.
 
 	* src/data/anims/units/mcdo/caserne/1.png: Actualisation de l'image avec la caserne actuelle.
 	* src/data/anims/units/train/dos/1.png: Mise du train vu de face.
 	* src/data/anims/units/train/left/1.png: Mise du train vu de face.
 	* src/data/anims/units/train/right/1.png: Mise du train vu de face.
-	* lib/Units.h: Le mcdo possède 300 pour se défendre, histoire de lui laisser une chance d'arriver à destination.
+	* lib/Units.h: Le mcdo possÃ¨de 300 pour se dÃ©fendre, histoire de lui laisser une chance d'arriver Ã  destination.
 
 	* lib/Defines.h: Passage en version 3.2-pre1
 
 	* server/Server.cpp (void TClient::Free): N'affiche pas le message "Deconnexion de x" pour les IA.
 
-	* server/Units.h: Le McDo ne se bat pas si on l'attaque, ses 300 ne sont que défensifs contre la tour défense.
+	* server/Units.h: Le McDo ne se bat pas si on l'attaque, ses 300 ne sont que dÃ©fensifs contre la tour dÃ©fense.
 
 	* server/maps/first.map: Modification un peu du terrain avec rajout de quelques mines.
 	* server/maps/three.map: Rajout de quelques mines.
 	* server/maps/ia.map: Modification du nom de l'IA.
 
-	* server/maps/caraibes.map: Rajout d'une mine pomée.
+	* server/maps/caraibes.map: Rajout d'une mine pomÃ©e.
 
-	* server/maps/europa_conquest.map: Rajout de mines, et enlève la position de facilité de la Russie.
+	* server/maps/europa_conquest.map: Rajout de mines, et enlÃ¨ve la position de facilitÃ© de la Russie.
 
-	* server/IA.cpp (void TIA::FirstMovements): Ne créé plus les unités n'importe comment, et ne créé plus de batiments au pif.
+	* server/IA.cpp (void TIA::FirstMovements): Ne crÃ©Ã© plus les unitÃ©s n'importe comment, et ne crÃ©Ã© plus de batiments au pif.
 
 2006-09-22 Romain Bignon <progs@headfucking.net>
 
@@ -423,15 +435,15 @@
 
 2006-09-19 Romain Bignon <progs@headfucking.net>
 
-	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait économiser de la mémoire,
+	* lib/Channels.h (ECBPlayer): Utilisation de flags dans un int plutot que de bools, ce qui fait Ã©conomiser de la mÃ©moire,
 	(5 bools = 5 * 8 bits = 40 bits, 1 int = 4 * 8 bits = 32 bits)
 
-	* lib/Map (ECBCountry): Suppression des flags inutilisés.
+	* lib/Map (ECBCountry): Suppression des flags inutilisÃ©s.
 
-	* lib/Debug.h: assert() ne fait plus d'exception. C'est juste que si DEBUG n'est pas déclaré, il fait comme si y
-	avait NDEBUG de déclaré. Donc quand il n'y a pas le debugage, il fait plus les vérifications.
+	* lib/Debug.h: assert() ne fait plus d'exception. C'est juste que si DEBUG n'est pas dÃ©clarÃ©, il fait comme si y
+	avait NDEBUG de dÃ©clarÃ©. Donc quand il n'y a pas le debugage, il fait plus les vÃ©rifications.
 
-	* src/Main.cpp: Mise du core size limit à infinie pour générer un core.
+	* src/Main.cpp: Mise du core size limit Ã  infinie pour gÃ©nÃ©rer un core.
 
 2006-09-18 Romain Bignon <progs@headfucking.net>
 
@@ -443,30 +455,30 @@
 
 	* server/Main.cpp: Utilisation du PINGFREQ de la conf.
 
-	* server/Server.cpp: Utilisation du MAXCONNEXIONS de la conf avec un message d'erreur spécial.
+	* server/Server.cpp: Utilisation du MAXCONNEXIONS de la conf avec un message d'erreur spÃ©cial.
 
 	* src/Login.cpp: Traitement de l'erreur ER3(SERVFULL).
 
-	* server/Channels.cpp: Utilisation de MAXGAMES de la conf avec un message d'erreur spécial.
+	* server/Channels.cpp: Utilisation de MAXGAMES de la conf avec un message d'erreur spÃ©cial.
 
 	* src/JoinGame.cpp: Gestion des messages d'erreurs ER2(IACANTJOIN) et ER4(TOOMUCHGAMES).
-	(TGameInfosForm): Système pour les messages d'erreurs avec une variable string statique.
+	(TGameInfosForm): SystÃ¨me pour les messages d'erreurs avec une variable string statique.
 
 2006-09-17 Romain Bignon <progs@headfucking.net>
 
-	* src/gui/ShowMap.cpp (void TMap::ScrollTo): Implémentation de la fonction.
+	* src/gui/ShowMap.cpp (void TMap::ScrollTo): ImplÃ©mentation de la fonction.
 
 	* src/InGame.cpp (ARMCommand): Lors des animations, quand la camera bouge, elle scroll, c'est beau !
 
 	* src/InGame.cpp (MenAreAntsApp::InGame): Utilisation des touches UP/DOWN/LEFT/RIGHT pour scroller la map.
 
-	* src/InGame.cpp (MenAreAntsApp::InGame): Affichage d'un message dans le cas où il y a une animation qu'on ne peut pas
+	* src/InGame.cpp (MenAreAntsApp::InGame): Affichage d'un message dans le cas oÃ¹ il y a une animation qu'on ne peut pas
 	voir.
 
-	* src/InGame.cpp (MenAreAntsApp::InGame): Le bouton "Pret" se desactive dès le clic, pour éviter une succession de clics
+	* src/InGame.cpp (MenAreAntsApp::InGame): Le bouton "Pret" se desactive dÃ¨s le clic, pour Ã©viter une succession de clics
 	en cas de lag, risquant de fausser la partie.
 
-	* src/data/pics/help.png: Recréation de l'image mise au gout du jour.
+	* src/data/pics/help.png: RecrÃ©ation de l'image mise au gout du jour.
 
 	* src/Batiments.cpp: Affiche pour le centre-ville et ses upgrades combien elles rapportent par tours.
 
@@ -474,11 +486,11 @@
 
 2006-09-16 Romain Bignon <progs@headfucking.net>
 
-	* Correction des assert.h manquants (alors que bizarement sur la majorité des compilateurs ça compile sans).
+	* Correction des assert.h manquants (alors que bizarement sur la majoritÃ© des compilateurs Ã§a compile sans).
 
-	* changelog.sh: Script qui génère à partir du svn diff le changelog.
+	* changelog.sh: Script qui gÃ©nÃ¨re Ã  partir du svn diff le changelog.
 
-	* Batiments.h (ECSilo): Le silo n'est actif que deux jours après la création.
+	* Batiments.h (ECSilo): Le silo n'est actif que deux jours aprÃ¨s la crÃ©ation.
 
 	* src/Channels.h (ECPlayer): Ajout du compte des votes.
 
@@ -488,19 +500,19 @@
 
 	* src/JoinGame.cpp (int SETCommand::Exec): Gestion des votes.
 
-	* src/gui/Component.cpp (void TList::Clear): Correction d'un bug qui ne reparamétrait pas les infos.
+	* src/gui/Component.cpp (void TList::Clear): Correction d'un bug qui ne reparamÃ©trait pas les infos.
 
 	* server/Channels.cpp (int SETCommand::Exec):
-	 (bool EChannel::RemovePlayer): Ne delete pas même si demandé dans le cas où on est InGame.
-	 (bool EChannel::CheckPinging): Vérifie si on est en fin de partie.
+	 (bool EChannel::RemovePlayer): Ne delete pas mÃªme si demandÃ© dans le cas oÃ¹ on est InGame.
+	 (bool EChannel::CheckPinging): VÃ©rifie si on est en fin de partie.
 
-	* API: Le protocole gère les votes.
+	* API: Le protocole gÃ¨re les votes.
 
 2006-09-11  Romain Bignon <progs@headfucking.net>
 
-	* src/Timer.h: Système qui permet de mettre le timer sur pause.
+	* src/Timer.h: SystÃ¨me qui permet de mettre le timer sur pause.
 
-	* src/InGame.cpp, src/JoinGame.cpp (TPingingForm): Affichage d'un écran lors du mode +Q (PINGING).
+	* src/InGame.cpp, src/JoinGame.cpp (TPingingForm): Affichage d'un Ã©cran lors du mode +Q (PINGING).
 
 	* lib/Defines.h: Passage protocole 9 et version 3.2.
 
@@ -508,7 +520,7 @@
 
 	* lib/Map.h: Correction du bug du cp de l'id dans nick du MapPlayer.
 
-	* API, lib/Channels.h, server/Server.cpp, server/Channels.cpp: Système pour que le client puisse se reconnecter en
+	* API, lib/Channels.h, server/Server.cpp, server/Channels.cpp: SystÃ¨me pour que le client puisse se reconnecter en
 	cas de perte de connexion.
 
 2006-09-08  Romain Bignon <progs@headfucking.net>
@@ -519,12 +531,12 @@
 
 	* lib/Channels.h (ECBPlayer): Passage du nick comme une chaine dans la classe de base.
 
-	* server/Channels.cpp: Un joueur qui part pendant le jeu n'est pas supprimé et est juste noté comme ayant perdu. Ça
+	* server/Channels.cpp: Un joueur qui part pendant le jeu n'est pas supprimÃ© et est juste notÃ© comme ayant perdu. Ã‡a
 	permet de garder ses stats.
 
 2006-09-04  Romain Bignon <progs@headfucking.net>
 
-	* src/Edit.cpp: Correction du putain de bug super simple à corriger en fait qui empechait d'utiliser d'accents !
+	* src/Edit.cpp: Correction du putain de bug super simple Ã  corriger en fait qui empechait d'utiliser d'accents !
 
 2006-09-03  Romain Bignon <progs@headfucking.net>
 
@@ -534,71 +546,71 @@
 	suffisament puis ensuite entrer.
 
 	* lib/Map.h, server/Units.h, server/Units.cpp, src/InGame.cpp: Utilisation d'un fonction CanWalkOn() plutot que d'une
-	variable coté serveur. Ça permet de généraliser l'endroit où l'unité peut marcher d'une part (utilité pour le train),
+	variable cotÃ© serveur. Ã‡a permet de gÃ©nÃ©raliser l'endroit oÃ¹ l'unitÃ© peut marcher d'une part (utilitÃ© pour le train),
 	et d'autre part que le client soit au courant.
 
-	* src/JoinGame.cpp: Le nom du salon est mis par défaut (temporairement, voir), sur "nick's game".
+	* src/JoinGame.cpp: Le nom du salon est mis par dÃ©faut (temporairement, voir), sur "nick's game".
 
-	* lib/Batiments.h (ECBCapitale): Peut créer des armées.
+	* lib/Batiments.h (ECBCapitale): Peut crÃ©er des armÃ©es.
 
-	* lib/Batiments.h (ECBMegalopole): Peut créer des armées et des chars.
+	* lib/Batiments.h (ECBMegalopole): Peut crÃ©er des armÃ©es et des chars.
 
-	* Batiments.h (ECRail): Rail où peut transiter un train.
+	* Batiments.h (ECRail): Rail oÃ¹ peut transiter un train.
 
-	* Units.h (ECTrain): Train pouvant transporter de l'infanterie et des vehicules légers.
+	* Units.h (ECTrain): Train pouvant transporter de l'infanterie et des vehicules lÃ©gers.
 
-	* Units.h (ECBoat): Le bateau commence à partir de 5 et il a une capacité de 100 fois plus de son nombre, ce qui simplifie
+	* Units.h (ECBoat): Le bateau commence Ã  partir de 5 et il a une capacitÃ© de 100 fois plus de son nombre, ce qui simplifie
 	fortement le calcul.
 
-	* src/Units.h (ECTrain&ECBoat): Affichage de la capacité dans la barre de status.
+	* src/Units.h (ECTrain&ECBoat): Affichage de la capacitÃ© dans la barre de status.
 
 	* src/JoinGame.cpp (LEACommand): Correction du bug qui desactivait le bouton "Pret" si un joueur partait.
 
-	* lib/Map.cpp: Il est maintenant permis de mettre des terrains ensembles du moment qu'ils ne sont pas du même type.
+	* lib/Map.cpp: Il est maintenant permis de mettre des terrains ensembles du moment qu'ils ne sont pas du mÃªme type.
 
 2006-09-02  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp, server/Map.cpp: Création de classes ECase et dérivées coté serveur (plutot que typdef), et mise de la
-	fonction CheckInvests de ce côté.
+	* lib/Map.cpp, server/Map.cpp: CrÃ©ation de classes ECase et dÃ©rivÃ©es cotÃ© serveur (plutot que typdef), et mise de la
+	fonction CheckInvests de ce cÃ´tÃ©.
 
-	* server/IA.cpp (TIA::WantMoveTo): Au lieu d'avancer droitement sans reflechir quand l'unité est recruté, paramètre
-	de la fonction qui définit si oui ou non on fait ça.
+	* server/IA.cpp (TIA::WantMoveTo): Au lieu d'avancer droitement sans reflechir quand l'unitÃ© est recrutÃ©, paramÃ¨tre
+	de la fonction qui dÃ©finit si oui ou non on fait Ã§a.
 
-	* lib/Batiments.h (ECDefenseTower): On peut maintenant acheter et poser n'importe où sur un de ses territoires une tour
-	défense pour 10 000 $.
+	* lib/Batiments.h (ECDefenseTower): On peut maintenant acheter et poser n'importe oÃ¹ sur un de ses territoires une tour
+	dÃ©fense pour 10 000 $.
 
 2006-09-01  Romain Bignon <progs@headfucking.net>
 
-	* lib/Debug.cpp: Correction d'un bug qui ne mettait pas les Vars en mémoire.
+	* lib/Debug.cpp: Correction d'un bug qui ne mettait pas les Vars en mÃ©moire.
 
 2006-08-30  Romain Bignon <progs@headfucking.net>
 
 	* src/MapEditor.cpp, src/Map.cpp, src/gui/ShowMap.cpp: Utilisation d'une mise en cache de la version de la case "noircie"
-	(pour le brouillard), afin d'éviter que ça rame avec la transparence lors du défilement. D'autre part, réduction des
-	icones des cases dans l'éditeur de maps, ainsi que d'utilisation de deux lignes, afin que l'affichage soit plus clair.
+	(pour le brouillard), afin d'Ã©viter que Ã§a rame avec la transparence lors du dÃ©filement. D'autre part, rÃ©duction des
+	icones des cases dans l'Ã©diteur de maps, ainsi que d'utilisation de deux lignes, afin que l'affichage soit plus clair.
 
 2006-08-30  Romain Bignon <progs@headfucking.net>
 
-	* src/MapEditor.cpp: Petites corrections pour que ça soit plus facile à utiliser...
+	* src/MapEditor.cpp: Petites corrections pour que Ã§a soit plus facile Ã  utiliser...
 
-	* server/maps/europa_conquest: Nouvelle carte représentant l'Europe, de zorkis, corrigée par moi même !!
-	Première carte à six joueurs. Première carte à représenter un environnement réel.
+	* server/maps/europa_conquest: Nouvelle carte reprÃ©sentant l'Europe, de zorkis, corrigÃ©e par moi mÃªme !!
+	PremiÃ¨re carte Ã  six joueurs. PremiÃ¨re carte Ã  reprÃ©senter un environnement rÃ©el.
 
 2006-08-26  Romain Bignon <progs@headfucking.net>
 
-	* server/InGame.cpp (ARMCommand): Correction d'un crash, si on voulait extraire une unité d'un non conteneur.
+	* server/InGame.cpp (ARMCommand): Correction d'un crash, si on voulait extraire une unitÃ© d'un non conteneur.
 
-	* server/Map.cpp (Union): Correction, met bien la bonne valeur au RestStep de l'unité receptrice.
+	* server/Map.cpp (Union): Correction, met bien la bonne valeur au RestStep de l'unitÃ© receptrice.
 
-	* server/IA.cpp: Amélioration.
+	* server/IA.cpp: AmÃ©lioration.
 
-	* server/InGame.cpp (NextAnim): Dans l'evenement ARM_MOVE|ARM_CONTENER|ARM_UNCONTENER, vérifier les investissions(!) sur
-	la case de l'evenement, et non sur la case de l'entité, car celle-ci pourrait bien avoir un autre mouvement après (lors
+	* server/InGame.cpp (NextAnim): Dans l'evenement ARM_MOVE|ARM_CONTENER|ARM_UNCONTENER, vÃ©rifier les investissions(!) sur
+	la case de l'evenement, et non sur la case de l'entitÃ©, car celle-ci pourrait bien avoir un autre mouvement aprÃ¨s (lors
 	d'une attaque par exemple).
 
 2006-08-25  Romain Bignon <progs@headfucking.net>
 
-	* src/Sound.cpp: Correction (enfin!) du bug qui rendait un son bizarre sous windows. La fréquence était trop élevée.
+	* src/Sound.cpp: Correction (enfin!) du bug qui rendait un son bizarre sous windows. La frÃ©quence Ã©tait trop Ã©levÃ©e.
 
 	* src/data/pics/fog*: Mise de transparence dans les bords du brouillard.
 
@@ -606,16 +618,16 @@
 
 2006-08-24  Romain Bignon <progs@headfucking.net>
 
-	* server/IA.cpp: Système de gestion de strategies.
+	* server/IA.cpp: SystÃ¨me de gestion de strategies.
 
-	* server/IA.cpp (UseTransportBoat): Stratégie permettant à l'IA d'utiliser les bateaux de transport.
+	* server/IA.cpp (UseTransportBoat): StratÃ©gie permettant Ã  l'IA d'utiliser les bateaux de transport.
 
 	* server/InGame.cpp: Correction d'une boucle infinie.
 
 	* server/maps/: Modification des maps.
 
-	* src/Units.cpp: Ne fait plus bouger les unités lentement quand on ne les voit pas, les faire passer à la case suivante
-	directement. Ça evite d'attendre trois plombes quand on joue contre des IA.
+	* src/Units.cpp: Ne fait plus bouger les unitÃ©s lentement quand on ne les voit pas, les faire passer Ã  la case suivante
+	directement. Ã‡a evite d'attendre trois plombes quand on joue contre des IA.
 
 	* src/data/anims/normalbutton/: Nouvelles images du boutton.
 
@@ -627,50 +639,50 @@
 
 	* Map.h (ECMontain): Case "montagne".
 
-	* src/Resources.h, src/Batiments.cpp, src/Units.cpp: Sons pour les mitraillettes et pour le tir de l'obélisque.
+	* src/Resources.h, src/Batiments.cpp, src/Units.cpp: Sons pour les mitraillettes et pour le tir de l'obÃ©lisque.
 
-	* src/InGame.cpp: Correction d'un bug bizare, que quand SDL_Cursor() est appelé depuis le thread, il y a une sorte de
+	* src/InGame.cpp: Correction d'un bug bizare, que quand SDL_Cursor() est appelÃ© depuis le thread, il y a une sorte de
 	boucle infinie.
 
 2006-08-22  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp: Restructuration un peu de FirstMovements() avec gestion de strategies que veut faire l'IA.
 
-	* Makefile.am: Mettre à jour avec "make update" dorénavant, pour ne pas avoir à faire ./config.status --recheck.
+	* Makefile.am: Mettre Ã  jour avec "make update" dorÃ©navant, pour ne pas avoir Ã  faire ./config.status --recheck.
 
-	* Batiments.h (ECTrees): Arbres qui permettent de se cacher derrière.
+	* Batiments.h (ECTrees): Arbres qui permettent de se cacher derriÃ¨re.
 
 	* src/data/anims/units: Nouvelles images pour les membres de la ville.
 
 2006-08-21  Romain Bignon <progs@headfucking.net>
 
 	* server/IA.cpp: Correction d'un bug qui faisait que si un joueur partait en pleine partie, et que tous les autres joueurs
-	étaient prets, l'animation ne se lançait pas car les IA attendent que tout le monde soit pret pour se mettre pretes.
+	Ã©taient prets, l'animation ne se lanÃ§ait pas car les IA attendent que tout le monde soit pret pour se mettre pretes.
 
-	* src/MapEditor.cpp: Possibilité d'utiliser MAJ pour faire une selection d'un rectangle (première case selectionnée, puis
-	MAJ + case du coin opposé du rectangle de selection formé).
+	* src/MapEditor.cpp: PossibilitÃ© d'utiliser MAJ pour faire une selection d'un rectangle (premiÃ¨re case selectionnÃ©e, puis
+	MAJ + case du coin opposÃ© du rectangle de selection formÃ©).
 
 	* server/maps/caraibes.map: Nouvelle map.
 
 2006-08-19  Romain Bignon <progs@headfucking.net>
 
-	* src/Units.h (ECMcDo): Quand un mcgerbale se fait détruire, si il était deployé, mettre la bonne case de destruction de
+	* src/Units.h (ECMcDo): Quand un mcgerbale se fait dÃ©truire, si il Ã©tait deployÃ©, mettre la bonne case de destruction de
 	ville.
 
 	* src/InGame.cpp: Changement des boutons de la souris, clic gauche pour bouger, clic droit pour deselectionner.
 
-	* server/Batiments.cpp (ECMine::Attaq): N'attaque que les unités sur la même case.
+	* server/Batiments.cpp (ECMine::Attaq): N'attaque que les unitÃ©s sur la mÃªme case.
 
-	* server/InGame.cpp (ARMCommand): Même si il reste des unités qui ont pas bougés, si y en a une qui a déjà bougé, bouger
+	* server/InGame.cpp (ARMCommand): MÃªme si il reste des unitÃ©s qui ont pas bougÃ©s, si y en a une qui a dÃ©jÃ  bougÃ©, bouger
 	l'attaque.
 
-	* src/data/pics/cursors/left.png: Utilisation d'un nouveau curseur unique pour le déplacement.
+	* src/data/pics/cursors/left.png: Utilisation d'un nouveau curseur unique pour le dÃ©placement.
 
 2006-08-18  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.cpp, src/MapEditor.cpp:
-	- On se souvient des lignes cachées pour les réafficher quand on écrit la map.
-	- On peut paramétrer si c'est une mission ou pas dans les options de l'editeur de maps.
+	- On se souvient des lignes cachÃ©es pour les rÃ©afficher quand on Ã©crit la map.
+	- On peut paramÃ©trer si c'est une mission ou pas dans les options de l'editeur de maps.
 
 	* src/InGame.cpp, server/Channels.cpp (SETCommand): Dans une mission, on ne peut plus s'allier
 
@@ -678,16 +690,16 @@
 
 	* lib/Channels.h, server/Channels.cpp, API: Si on join le chan '.', c'est une mission solo que personne ne peut joindre.
 
-	* lib/Map.cpp, server/Map.cpp: Si "_Mission" spécifié, la map est une mission.
+	* lib/Map.cpp, server/Map.cpp: Si "_Mission" spÃ©cifiÃ©, la map est une mission.
 
-	* server/IA.cpp (TIA::Join): Fonction pour joindre un salon plutot que de faire envoyer JOI à l'IA, ça evite déjà de
-	devoir recevoir et traiter tous les messages de join (liste des maps et map), et ensuite de faire joindre une IA à
+	* server/IA.cpp (TIA::Join): Fonction pour joindre un salon plutot que de faire envoyer JOI Ã  l'IA, Ã§a evite dÃ©jÃ  de
+	devoir recevoir et traiter tous les messages de join (liste des maps et map), et ensuite de faire joindre une IA Ã 
 	une mission.
 
 	* src/JoinGame.cpp (GameInfos): Modification pour utiliser TGameInfosForm pour les missions.
 
-	* src/InGame.cpp, src/MapEditor.cpp: Utilisation d'un scroll pour chercher dans la liste des unités (barrelat et barreact).
-	En outre, utilisation du même composant TBarreLatIcons de InGame.h pour MapEditor.cpp
+	* src/InGame.cpp, src/MapEditor.cpp: Utilisation d'un scroll pour chercher dans la liste des unitÃ©s (barrelat et barreact).
+	En outre, utilisation du mÃªme composant TBarreLatIcons de InGame.h pour MapEditor.cpp
 
 	* server/Map.cpp (ECEvent::CheckRemoveBecauseOfPartOfAttaqEntity): Correction d'un bug.
 
@@ -697,42 +709,42 @@
 
 2006-08-04  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp (ECBEntity::CanBeCreated): On peut créer une unité sur un batiment d'un de ses allié.
+	* lib/Map.cpp (ECBEntity::CanBeCreated): On peut crÃ©er une unitÃ© sur un batiment d'un de ses alliÃ©.
 
 	* src/gui/Component.h, src/gui/ChildForm.cpp, src/gui/Form.cpp: Correction avec les hints, fonction
 	TComponent::HaveHint().
 
-	* server/InGame.cpp (EChannel::NextAnim): Correction d'un bug qui purgeait les unités qui étaient dans un evenement
-	d'attaque mais dont ce dernier était supprimé.
+	* server/InGame.cpp (EChannel::NextAnim): Correction d'un bug qui purgeait les unitÃ©s qui Ã©taient dans un evenement
+	d'attaque mais dont ce dernier Ã©tait supprimÃ©.
 
 	* lib/Outils.cpp (GetFileList): Correction d'un plantage si le rep n'existe pas.
 
 2006-08-03  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.h (ECEntity::Create): Fonction qui est appelée quand une unité en créer une autre.
+	* lib/Map.h (ECEntity::Create): Fonction qui est appelÃ©e quand une unitÃ© en crÃ©er une autre.
 
 	* server/Units.cpp (ECMcDo::Invest): Tout un principe pour que la caserne puisse avoir un mcdo et effectuer ses taches.
 
-	* src/InGame.cpp: Bouton "Infos" qui permet d'avoir pleins d'infos sur une unité dans la BarreAct.
+	* src/InGame.cpp: Bouton "Infos" qui permet d'avoir pleins d'infos sur une unitÃ© dans la BarreAct.
 
-	* src/Batiments.h, src/Units.h (Description): Fonction virtuelle pure qui retourne une chaine avec une description très
-	complète de l'unité qui sera sortie dans les infos d'une unité.
+	* src/Batiments.h, src/Units.h (Description): Fonction virtuelle pure qui retourne une chaine avec une description trÃ¨s
+	complÃ¨te de l'unitÃ© qui sera sortie dans les infos d'une unitÃ©.
 
-	* src/Map.h (ECEntityList): Fonctions CanAttaq() et CanInvest() qui retournent la liste des entités que l'unité
+	* src/Map.h (ECEntityList): Fonctions CanAttaq() et CanInvest() qui retournent la liste des entitÃ©s que l'unitÃ©
 	peut attaquer et investir.
 
 2006-08-01  Romain Bignon <progs@headfucking.net>
 
-	* Units.h (ECMcDo): Unité Donald De McGerbale qui ne fait pour le moment.. rien.
+	* Units.h (ECMcDo): UnitÃ© Donald De McGerbale qui ne fait pour le moment.. rien.
 
-	* lib/Map.cpp (CheckChangingOwner): Fonction renomée en CheckInvests().
-	(CheckInvests): Maintenant vérifie aussi si une quelconque unité de la case peut investir l'unité en question.
+	* lib/Map.cpp (CheckChangingOwner): Fonction renomÃ©e en CheckInvests().
+	(CheckInvests): Maintenant vÃ©rifie aussi si une quelconque unitÃ© de la case peut investir l'unitÃ© en question.
 
 	* server/InGame.cpp (EChannel::NextAnim): On envoie plus le ARM_ATTAQ si il y a que des amis.
 
 2006-08-01  Laurent Defert <lodesi2@yahoo.fr>
 
-	* src/Batiments.cpp (ECDefenseTower::AfterDraw): Envoie d'un boulet de manière parabolique.
+	* src/Batiments.cpp (ECDefenseTower::AfterDraw): Envoie d'un boulet de maniÃ¨re parabolique.
 
 2006-07-31  Romain Bignon <progs@headfucking.net>
 
@@ -740,75 +752,75 @@
 
 2006-07-30  Romain Bignon <progs@headfucking.net>
 
-	* AVERTISSEMENT AVEC LE SON: Je me suis apperçu qu'avec gdb il y avait quelques problèmes avec la musique ou le son.
-	Si jamais ça vous arrive, coupez la musique voir les effets dans les options, ou alors lancez sans gdb pour en
-	profiter même si ça empeche de trouver les crashs.
-	Ça m'a l'air d'être un problème avec gdb par rapport aux threads, je sais pas trop pourquoi, gdb merde un peu.
+	* AVERTISSEMENT AVEC LE SON: Je me suis apperÃ§u qu'avec gdb il y avait quelques problÃ¨mes avec la musique ou le son.
+	Si jamais Ã§a vous arrive, coupez la musique voir les effets dans les options, ou alors lancez sans gdb pour en
+	profiter mÃªme si Ã§a empeche de trouver les crashs.
+	Ã‡a m'a l'air d'Ãªtre un problÃ¨me avec gdb par rapport aux threads, je sais pas trop pourquoi, gdb merde un peu.
 
-	* lib/Outils.h (GetFileList): Création d'une fonction qui permet d'obtenir la liste des fichiers à partir d'un
+	* lib/Outils.h (GetFileList): CrÃ©ation d'une fonction qui permet d'obtenir la liste des fichiers Ã  partir d'un
 	nom de repertoire.
 
-	* src/Sound.cpp: Gestion d'une liste de musique, pour lire tous les fichiers audio inclus dans un répertoire.
+	* src/Sound.cpp: Gestion d'une liste de musique, pour lire tous les fichiers audio inclus dans un rÃ©pertoire.
 
-	* server/Map.cpp (ECEvent::operator<): Afficher en premier les evenements qui ont d'autres evenements liés, pour les
-	attaques, histoire d'éviter par exemple un tir de lance missile sur la case où va aller l'unité toucher mais qui n'y
-	est pas encore car son evenement de mouvement est lié à une evenement d'attaque qu'on va avoir plus tard.
+	* server/Map.cpp (ECEvent::operator<): Afficher en premier les evenements qui ont d'autres evenements liÃ©s, pour les
+	attaques, histoire d'Ã©viter par exemple un tir de lance missile sur la case oÃ¹ va aller l'unitÃ© toucher mais qui n'y
+	est pas encore car son evenement de mouvement est liÃ© Ã  une evenement d'attaque qu'on va avoir plus tard.
 	(CheckRemoveBecauseOfPartOfAttaqEntity): On ne rejoint pas une attaque existante quand notre attaque bouge, on en
-	créer forcément une.
+	crÃ©er forcÃ©ment une.
 
-	* server/Channels.cpp (CheckReadys): Même dans les parties longues, ne pas avoir à trouver les mines pour gagner.
+	* server/Channels.cpp (CheckReadys): MÃªme dans les parties longues, ne pas avoir Ã  trouver les mines pour gagner.
 
-	* src/Batiments.h: Variable explosion pour gérer les sprites à afficher lors de l'explosion d'un batiment. Application
+	* src/Batiments.h: Variable explosion pour gÃ©rer les sprites Ã  afficher lors de l'explosion d'un batiment. Application
 	sur la mine.
 
 2006-07-29  Romain Bignon <progs@headfucking.net>
 
-	* server/IA.cpp (JIACommand): N'envoie plus le +! inutile car il réagit au SET +m lors du join.
+	* server/IA.cpp (JIACommand): N'envoie plus le +! inutile car il rÃ©agit au SET +m lors du join.
 
 2006-07-27  Romain Bignon <progs@headfucking.net>
 
-	* src/Sound.cpp (Sound): Système de gestion sonore, d'un coté il y a les fonctions statiques pour l'initialisation
-	et la gestion globale, de l'autre coté il y a l'instanciation unique pour chaque fichier sonore.
+	* src/Sound.cpp (Sound): SystÃ¨me de gestion sonore, d'un cotÃ© il y a les fonctions statiques pour l'initialisation
+	et la gestion globale, de l'autre cotÃ© il y a l'instanciation unique pour chaque fichier sonore.
 
-	* src/Resources.h: L'implémentation de la fonction d'instanciation d'une ressource passe dans le .cpp, comme ça on
-	évite d'inclure Images.h, Sound.h et Defines.h dans les en-tetes, et donc de devoir recompiler tous les fichiers
+	* src/Resources.h: L'implÃ©mentation de la fonction d'instanciation d'une ressource passe dans le .cpp, comme Ã§a on
+	Ã©vite d'inclure Images.h, Sound.h et Defines.h dans les en-tetes, et donc de devoir recompiler tous les fichiers
 	utilisant des images pour la modification de Sound.h !
 
-	* src/data/sound/dingdong.wav: "Hoo, you touch my tralala... Hmm, my ding ding dong", écran des scores.
-	* src/data/sound/start.wav: "Controle de la bataille activée", début d'une partie.
+	* src/data/sound/dingdong.wav: "Hoo, you touch my tralala... Hmm, my ding ding dong", Ã©cran des scores.
+	* src/data/sound/start.wav: "Controle de la bataille activÃ©e", dÃ©but d'une partie.
 	* src/data/sound/begin.wav: "Nouveau tour", nouveau tour.
 	* src/data/sound/end.wav: "Fin du tour", fin d'un tour.
 	* src/data/sound/resources.wav: "Ressources insuffisantes", pas assez d'argent pour construire.
 
 	* src/JoinGame.cpp, src/InGame.cpp: Utilisation des sons.
 
-	* src/gui/Form.cpp (TForm::Update): Mise de la limite FPS là pour que ça soit effectif partout.
+	* src/gui/Form.cpp (TForm::Update): Mise de la limite FPS lÃ  pour que Ã§a soit effectif partout.
 
-	* src/MapEditor.cpp (MenAreAntsApp::MapEditor): Correction d'un bug qui ne permettait pas d'ouvrir la première
+	* src/MapEditor.cpp (MenAreAntsApp::MapEditor): Correction d'un bug qui ne permettait pas d'ouvrir la premiÃ¨re
 	map de la liste.
 	(TLoadMapFile::Refresh): Marche maintenant sous windows.
 
 	* src/Config.cpp: Permet de ne pas avoir la musique.
 
-	* lib/Map.cpp (ECBMap::Destruct): Correction d'un plantage quand on ferme une map à partir de l'éditeur de maps.
+	* lib/Map.cpp (ECBMap::Destruct): Correction d'un plantage quand on ferme une map Ã  partir de l'Ã©diteur de maps.
 
 	* configure.ac: Utilisation de SDL_mixer pour linux et en dur d'un lien direct vers la lib de mon pc (et oui) pour
 	pouvoir compiler.
 
-	* server/maps/ia.map: Nouvelle map où on est censé se battre contre une IA forte dès le début.
+	* server/maps/ia.map: Nouvelle map oÃ¹ on est censÃ© se battre contre une IA forte dÃ¨s le dÃ©but.
 
-	* server/IA.cpp: Maintenant, les IA s'allient entre elles au début de la partie, et quand un des joueurs humain
-	s'allie avec une IA, celle ci se des-allie avec ses alliées IA, puis s'allie avec l'humain. Ensuite donc un nombre
-	variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est allié avec l'IA, celle ci s'allie
-	avec toutes les IA qui n'ont pas d'alliés humains.
+	* server/IA.cpp: Maintenant, les IA s'allient entre elles au dÃ©but de la partie, et quand un des joueurs humain
+	s'allie avec une IA, celle ci se des-allie avec ses alliÃ©es IA, puis s'allie avec l'humain. Ensuite donc un nombre
+	variable d'humains peuvent s'allier avec l'IA, mais quand plus aucun humain n'est alliÃ© avec l'IA, celle ci s'allie
+	avec toutes les IA qui n'ont pas d'alliÃ©s humains.
 
-	* src/gui/Cursor.cpp (TCursor::~TCursor): Réaffiche le curseur.
+	* src/gui/Cursor.cpp (TCursor::~TCursor): RÃ©affiche le curseur.
 
 2006-07-26  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp, lib/Units.h, server/Units.cpp: Les ingénieurs peuvent réparer les batiments endomagés.
+	* lib/Map.cpp, lib/Units.h, server/Units.cpp: Les ingÃ©nieurs peuvent rÃ©parer les batiments endomagÃ©s.
 
-	* lib/Map.cpp: On peut maintenant construire sur les territoires de ses alliés.
+	* lib/Map.cpp: On peut maintenant construire sur les territoires de ses alliÃ©s.
 
 2006-07-25  Romain Bignon <progs@headfucking.net>
 
@@ -816,65 +828,65 @@
 
 	* src/tools/SDL_rotozoom.c: Comme la compilation pour windows ne marche pas avec cette librairie, je l'ai inclus.
 
-	* src/tools/Video.cpp: On peut mettre le plein écran sous windows, mais il faut admettre que ça merde un peu.
+	* src/tools/Video.cpp: On peut mettre le plein Ã©cran sous windows, mais il faut admettre que Ã§a merde un peu.
 
 2006-07-23  Romain Bignon <progs@headfucking.net>
 
-	* lib/Batiments.h (ECObelisk): Création de l'Obélisque du NOD.
+	* lib/Batiments.h (ECObelisk): CrÃ©ation de l'ObÃ©lisque du NOD.
 
 	* src/tools/Images.h (DrawLargeLine): Fonction pour dessiner une ligne large de 3x3 pixels.
 
-	* src/Map.cpp, src/Batiments.cpp: Utilisation générique de la terre sale, et utilisation d'un "dead case" quand un
-	batiment de la ville est détruit, pour pas que ça fasse cassure.
+	* src/Map.cpp, src/Batiments.cpp: Utilisation gÃ©nÃ©rique de la terre sale, et utilisation d'un "dead case" quand un
+	batiment de la ville est dÃ©truit, pour pas que Ã§a fasse cassure.
 
 2006-07-22  Romain Bignon <progs@headfucking.net>
 
-	* Passage à la version 0.3(P7)(SVN-801)-dev
+	* Passage Ã  la version 0.3(P7)(SVN-801)-dev
 
-	* lib/Batiments.h (ECDefenseTower): Récupération de ECityBuilding pour créer la Tour de défense.
+	* lib/Batiments.h (ECDefenseTower): RÃ©cupÃ©ration de ECityBuilding pour crÃ©er la Tour de dÃ©fense.
 
-	* src/gui/ShowMap.h: Utilisation d'un système de callback pour afficher des sprites après les entités.
+	* src/gui/ShowMap.h: Utilisation d'un systÃ¨me de callback pour afficher des sprites aprÃ¨s les entitÃ©s.
 
-	* server/Channels.cpp: En mode "partie rapide", les batiments cachés ou d'eau ne comptent plus pour être maintenu en
+	* server/Channels.cpp: En mode "partie rapide", les batiments cachÃ©s ou d'eau ne comptent plus pour Ãªtre maintenu en
 	vie.
 
 2006-07-20  Romain Bignon <progs@headfucking.net>
 
-	* src/Batiments.h (ECMine): Création des mines.
+	* src/Batiments.h (ECMine): CrÃ©ation des mines.
 
-	* src/Map.h, server/InGame.cpp: Fonction constante "IsHidden" qui n'affiche l'unité concernée qu'aux alliées, et à tout
+	* src/Map.h, server/InGame.cpp: Fonction constante "IsHidden" qui n'affiche l'unitÃ© concernÃ©e qu'aux alliÃ©es, et Ã  tout
 	le monde lors d'un combat.
 
-	* src/data/pics/barrelat.png: Intégration d'une nouvelle barre laterale.
+	* src/data/pics/barrelat.png: IntÃ©gration d'une nouvelle barre laterale.
 
 	* src/gui/ProgressBar.cpp: Flag "background" qui permet de le cacher.
 
 2006-07-19  Romain Bignon <progs@headfucking.net>
 
-	* Units.h (ECTouriste): Touriste Japonais, première unité spéciale d'une nation.
+	* Units.h (ECTouriste): Touriste Japonais, premiÃ¨re unitÃ© spÃ©ciale d'une nation.
 
-	* lib/Map.h, lib/Units.h: La fonction CanBeCreated(ECPlayer* pl) redirive vers CanBeCreated(pl->Nation()) qui est créée
-	et qui renvoie "true" par défaut pour toutes les unités, et les unités spéciales surchargent la fonction en renvoyant
-	"true" que pour la nation qui peut la créer.
+	* lib/Map.h, lib/Units.h: La fonction CanBeCreated(ECPlayer* pl) redirive vers CanBeCreated(pl->Nation()) qui est crÃ©Ã©e
+	et qui renvoie "true" par dÃ©faut pour toutes les unitÃ©s, et les unitÃ©s spÃ©ciales surchargent la fonction en renvoyant
+	"true" que pour la nation qui peut la crÃ©er.
 
-	* src/Map.cpp (SetShadowedCases): Correction du bug qui mettait un champs de vision trop gros si l'unité était trop
-	près du bord de la map.
+	* src/Map.cpp (SetShadowedCases): Correction du bug qui mettait un champs de vision trop gros si l'unitÃ© Ã©tait trop
+	prÃ¨s du bord de la map.
 
 	* src/gui/Cursors.cpp, src/InGame.cpp: Curseur de selection sur le radar.
 
 2006-07-18  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/Cursor.cpp (TCursor): Création du composant qui gère les curseurs.
+	* src/gui/Cursor.cpp (TCursor): CrÃ©ation du composant qui gÃ¨re les curseurs.
 
 	* src/InGame.cpp: Utilisation du TCursor dans le jeu.
 
-	* src/data/pics/cursors: Ajout de plusieurs curseurs (à titre experimentaux).
+	* src/data/pics/cursors: Ajout de plusieurs curseurs (Ã  titre experimentaux).
 
-	* lib/Map.h, lib/Batiments.h: ECBEntity::IsCity() pour différencier les CountryMaker des autres batiments de la ville.
+	* lib/Map.h, lib/Batiments.h: ECBEntity::IsCity() pour diffÃ©rencier les CountryMaker des autres batiments de la ville.
 
-	* server/InGame.cpp: Même quand on a pas bougé on vérifie quand même qu'il y a pas attaque.
+	* server/InGame.cpp: MÃªme quand on a pas bougÃ© on vÃ©rifie quand mÃªme qu'il y a pas attaque.
 
-	* server/Map.cpp: Tous les batiments de la ville sont changés d'owner.
+	* server/Map.cpp: Tous les batiments de la ville sont changÃ©s d'owner.
 
 	* server/Units.cpp: Affaiblissement de la puissance des lance-missiles.
 
@@ -882,9 +894,9 @@
 
 	* server/Channels.cpp (KICKCommand): Correction d'un bug avec les IA.
 
-	* src/JoinGame.cpp (LEACommand): Met à jour le bouton "Lancer la partie".
+	* src/JoinGame.cpp (LEACommand): Met Ã  jour le bouton "Lancer la partie".
 
-	* src/gui/Component.h (Mouse): Fonction qui détecte la présence de la souris sans inclure le fait que le composant
+	* src/gui/Component.h (Mouse): Fonction qui dÃ©tecte la prÃ©sence de la souris sans inclure le fait que le composant
 	soit ou non Enabled.
 
 	* server/maps/: Remodelage des maps en utilisant les "nouvelles villes" de 4 cases (enfin trois pour le moment).
@@ -893,26 +905,26 @@
 	- La caserne et l'usine de chars ne sont plus constructibles.
 	- Le centre d'affaire (ex Capitale) est l'upgrade du centre ville (ex Ville).
 
-	* src/gui/ShowMap.cpp (Draw): Les batiments sont dessinés en même temps que les cases, ce qui fait que dans tous les cas
-	les unités sont au dessus des batiments.
+	* src/gui/ShowMap.cpp (Draw): Les batiments sont dessinÃ©s en mÃªme temps que les cases, ce qui fait que dans tous les cas
+	les unitÃ©s sont au dessus des batiments.
 
 2006-07-16  Romain Bignon <progs@headfucking.net>
 
 	* src/Images.h (ECSpriteBase): Reprogrammation de la fonction d'ouverture pour l'adapter un peu plus au c++.
-	(ECImage): Gère maintenant le canal alpha des images.
+	(ECImage): GÃ¨re maintenant le canal alpha des images.
 
-	* src/Resources.h, src/data/pics/fleches/: Recréation des fleches en utilisant le canal alpha.
+	* src/Resources.h, src/data/pics/fleches/: RecrÃ©ation des fleches en utilisant le canal alpha.
 
-	* server/IA.cpp: Modifications rapides de l'IA qui n'améliorent pas encore vraiment le problème des côtes.
+	* server/IA.cpp: Modifications rapides de l'IA qui n'amÃ©liorent pas encore vraiment le problÃ¨me des cÃ´tes.
 
-	* src/data/anims/cases/terre/2.png: Autre image pour le cratère.
+	* src/data/anims/cases/terre/2.png: Autre image pour le cratÃ¨re.
 
 	* src/JoinGame.cpp: Petit timer pour voir la fin des combats.
 
 2006-07-15  Romain Bignon <progs@headfucking.net>
 
-	* server/IA.cpp (FirstMovements): Amélioration importante: l'IA cherche à aller vers l'enemie (bien que le code soit pas
-	encore très beau).
+	* server/IA.cpp (FirstMovements): AmÃ©lioration importante: l'IA cherche Ã  aller vers l'enemie (bien que le code soit pas
+	encore trÃ¨s beau).
 
 2006-07-14  Laurent Defert <lodesi2@yahoo.fr>
 
@@ -920,16 +932,16 @@
 
 2006-07-14  Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.cpp, src/JoinGame.cpp: Implémentation du KICK.
+	* server/Channels.cpp, src/JoinGame.cpp: ImplÃ©mentation du KICK.
 
 	* server/IA.cpp (LEACommand): Il s'autosupprime bien.
 
 2006-07-13  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.h, server/InGame.cpp, src/InGame.cpp: Système d'upgrade programmé, fonctionnel et disponible pour plus tard.
+	* lib/Map.h, server/InGame.cpp, src/InGame.cpp: SystÃ¨me d'upgrade programmÃ©, fonctionnel et disponible pour plus tard.
 
-	* lib/Units.cpp (UnContain): Correction d'un bug très vicieux qui a nécessité du temps de recherche et qui pouvait causer
-	une crash (juste parce qu'on a ajouté deux fois l'unité dans la liste d'une ville).
+	* lib/Units.cpp (UnContain): Correction d'un bug trÃ¨s vicieux qui a nÃ©cessitÃ© du temps de recherche et qui pouvait causer
+	une crash (juste parce qu'on a ajoutÃ© deux fois l'unitÃ© dans la liste d'une ville).
 
 2006-07-12  Laurent Defert <lodesi2@yahoo.fr>
 
@@ -942,155 +954,155 @@
 
 	* src/data/anims/brouillard, src/Units.cpp, src/Map.h:
 	- Support des animations lors des attaques.
-	- Première animation: brouillard.
+	- PremiÃ¨re animation: brouillard.
 
 2006-07-11  Romain Bignon <progs@headfucking.net>
 
 	* src/v.sh, src/Version.cpp, src/Main.cpp: Affichage de la version svn.
 
-	* src/data/, src/Resources.h, lib/Units.h, server/Units.h, src/Units.h (ECEnginer): Création de l'ingénieur.
+	* src/data/, src/Resources.h, lib/Units.h, server/Units.h, src/Units.h (ECEnginer): CrÃ©ation de l'ingÃ©nieur.
 
-	* lib/Map.cpp, lib/Batiments.h, lib/Units.h, server/Map.cpp, server/Units.cpp: Principe de l'investissement, étendue
-	à la capture des villes.
+	* lib/Map.cpp, lib/Batiments.h, lib/Units.h, server/Map.cpp, server/Units.cpp: Principe de l'investissement, Ã©tendue
+	Ã  la capture des villes.
 
-	* src/Defines.h, src/data/anims/cases/*: Intégration de nouvelles images pour les cases, format 100x100
+	* src/Defines.h, src/data/anims/cases/*: IntÃ©gration de nouvelles images pour les cases, format 100x100
 
-	* src/v.sh, src/Version.cpp, src/Main.cpp, src/Makefile.am: Affichage de la révision svn.
+	* src/v.sh, src/Version.cpp, src/Main.cpp, src/Makefile.am: Affichage de la rÃ©vision svn.
 
 	* src/Map.cpp, src/InGame.cpp, src/JoinGame.cpp, src/MapEditor.cpp (CreatePreview):
-	- Utilisation de flags plutot que d'un booléen "ingame" arbitraire.
+	- Utilisation de flags plutot que d'un boolÃ©en "ingame" arbitraire.
 	- Affichage des limites des countries meme sur la meme dans l'editeur de map.
-	- Affichage des unités neutres en blanc.
+	- Affichage des unitÃ©s neutres en blanc.
 
 2006-07-10  Romain Bignon <progs@headfucking.net>
 
 	* src/Main.cpp, src/Login.cpp, src/Config.cpp, src/JoinGame.cpp, src/InGame.cpp, src/MapEditor.cpp: Optimisation du jeu
 	pour choisir une autre resolution.
 
-	* server/IA.cpp: Amélioration de l'IA: peut créer des batiments.
+	* server/IA.cpp: AmÃ©lioration de l'IA: peut crÃ©er des batiments.
 
 2006-07-08  Romain Bignon <progs@headfucking.net>
 
 	* lib/Outils.h (ECList): Suppression des fonctions inutiles Moved() et Available().
 
-	* lib/Defines.h (FOR): Macro sous la forme "FOR(type, vecteur, pointé par iterateur)",
+	* lib/Defines.h (FOR): Macro sous la forme "FOR(type, vecteur, pointÃ© par iterateur)",
 	genre "FOR(ECEntity*, entities, entity)". Voir la documentation dans lib/Defines.h.
 
 	* server/Server.h, server/IA.cpp: Utilisation de std::string...
 
-	* src/Main.h, src/InGame.cpp: Affiche un message lors de la première partie.
+	* src/Main.h, src/InGame.cpp: Affiche un message lors de la premiÃ¨re partie.
 
 	* src/gui/ShowMap.cpp: Quelques corrections..
 
 2006-07-05  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.h (ECBEntity): Sauvegarde de la map associée.
+	* lib/Map.h (ECBEntity): Sauvegarde de la map associÃ©e.
 
-	* src/gui/ShowMap.cpp, src/InGame.cpp, src/Map.cpp: Utilisation de MustRedraw() pour ne réafficher les cases que si
-	nécessaire.
+	* src/gui/ShowMap.cpp, src/InGame.cpp, src/Map.cpp: Utilisation de MustRedraw() pour ne rÃ©afficher les cases que si
+	nÃ©cessaire.
 
-	* src/gui/Fps.cpp (TFPS): Création de la classe qui calcule les frames par secondes.
+	* src/gui/Fps.cpp (TFPS): CrÃ©ation de la classe qui calcule les frames par secondes.
 
 	* src/InGame.cpp: Utilisation d'un TFPS.
 
 2006-07-04  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/ProgressBar.h (TProgressBar): Récupération du composant TProgressBar de wormux.
+	* src/gui/ProgressBar.h (TProgressBar): RÃ©cupÃ©ration du composant TProgressBar de wormux.
 
 	* lib/Channels.h, server/Channels.cpp, src/JoinGame.cpp, src/InGame.cpp: Programmation du temps maximum de reflexion
 	par tours.
 
-	* server/Batiments.cpp (ECNuclearSearch): Envoie à tout le monde du nombre de missile d'un batiment.
+	* server/Batiments.cpp (ECNuclearSearch): Envoie Ã  tout le monde du nombre de missile d'un batiment.
 
 	* src/Batiments.cpp (ECNuclearSearch): Affichage d'un message d'avertissement lors de la creation d'un centre de recherches
-	nucléaire.
+	nuclÃ©aire.
 
-	* server/Channels.cpp, lib/Channels.cpp: Supprime bien la map dans le destructeur du channel, après avoir détruit les
-	players. En outre, dans le destructeur de ECBPlayer, paramètre l'owner à 0 de chacunes de ses entités.
+	* server/Channels.cpp, lib/Channels.cpp: Supprime bien la map dans le destructeur du channel, aprÃ¨s avoir dÃ©truit les
+	players. En outre, dans le destructeur de ECBPlayer, paramÃ¨tre l'owner Ã  0 de chacunes de ses entitÃ©s.
 
 2006-07-03  Romain Bignon <progs@headfucking.net>
 
 	* Obtention du bac.
 
-	* server/Channels.cpp (RemovePlayer): Suppression des entités de la liste des players, pour satisfaire au destructeur
+	* server/Channels.cpp (RemovePlayer): Suppression des entitÃ©s de la liste des players, pour satisfaire au destructeur
 	de ECBNuclearSearch qui regarde la liste des players.
 
 	* src/Config.cpp: Correction d'un bug de lecture de la configuration.
 
-	* src/ListBox.cpp: Décolorie bien les lignes déselectionnées.
+	* src/ListBox.cpp: DÃ©colorie bien les lignes dÃ©selectionnÃ©es.
 
 2006-07-02  Romain Bignon <progs@headfucking.net>
 
 	* server/Map.h, server/Units.cpp, server/Batiments.cpp, server/InGame.cpp (ECEntity/Attaq()): Passage en argument
-	de l'event, comme ça ECSilo::Attaq() connait la case plutot que de chercher chez les attaqués.
+	de l'event, comme Ã§a ECSilo::Attaq() connait la case plutot que de chercher chez les attaquÃ©s.
 
 2006-06-30  Romain Bignon <progs@headfucking.net>
 
 	* server/Batiments.cpp, server/InGame.cpp: Corrections...
 
 	* lib/Map.h, src/Map.h, src/InGame.cpp: Passage du ECDate en temps que variable et non de pointeur, et utilisation d'une
-	mémorisation de la date initiale ainsi que du nombre de tours écoulés pour les stats de fin de partie.
+	mÃ©morisation de la date initiale ainsi que du nombre de tours Ã©coulÃ©s pour les stats de fin de partie.
 
 	* src/gui/Label.cpp, src/Login.cpp, src/JoinGame.cpp, src/InGame.cpp (TLabel): Ne pas donner de position X place le
-	composant automatiquement centré (horizontalement) à l'écran.
+	composant automatiquement centrÃ© (horizontalement) Ã  l'Ã©cran.
 
 2006-06-29  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp, server/Map.h, server/InGame.cpp, server/Batiments.cpp: N'envoie les informations du nombre des
-	unités encore vivantes après un combat qu'aux joueurs concernés par le combat.
+	unitÃ©s encore vivantes aprÃ¨s un combat qu'aux joueurs concernÃ©s par le combat.
 
-	* src/*: Énorme travail de réécriture, notament avec un nouveau système de gestion de l'affichage à l'écran (Video.h),
-	une imposition de ECImage en substitution de SDL_Surface* dans les composants, décentralisation de MenAreAntsApp.
+	* src/*: Ã‰norme travail de rÃ©Ã©criture, notament avec un nouveau systÃ¨me de gestion de l'affichage Ã  l'Ã©cran (Video.h),
+	une imposition de ECImage en substitution de SDL_Surface* dans les composants, dÃ©centralisation de MenAreAntsApp.
 
 2006-06-28  Romain Bignon <progs@headfucking.net>
 
-	* server/Batiments.cpp: Le silo peut attaquer tout ça c'est operationnel.
+	* server/Batiments.cpp: Le silo peut attaquer tout Ã§a c'est operationnel.
 
-	* lib/Batiments.cpp: Le silo ne peut être créé que si il y a un centre de recherches, et le centre de recherches ne peut
-	être créé qu'une fois.
+	* lib/Batiments.cpp: Le silo ne peut Ãªtre crÃ©Ã© que si il y a un centre de recherches, et le centre de recherches ne peut
+	Ãªtre crÃ©Ã© qu'une fois.
 
-	* src/JoinGame.cpp: Recréation de la liste latérale lors d'un nouveau tour.
+	* src/JoinGame.cpp: RecrÃ©ation de la liste latÃ©rale lors d'un nouveau tour.
 
 	* src/Resources.h, data/*, src/Batiments.h: Mise en place graphiquement de l'utilisation du silo.
 
-	* src/Map.h, src/Batiments.h, src/Units.h (ECMissile): Création d'une classe auxiliaire ECMissile à utiliser pour les
-	unités qui lancent un missile de manière verticale (première étape avec le missile qui va vers le haut à partir de
-	la zone de lancement, seconde étape où il va vers le bas jusqu'à sa cible).
+	* src/Map.h, src/Batiments.h, src/Units.h (ECMissile): CrÃ©ation d'une classe auxiliaire ECMissile Ã  utiliser pour les
+	unitÃ©s qui lancent un missile de maniÃ¨re verticale (premiÃ¨re Ã©tape avec le missile qui va vers le haut Ã  partir de
+	la zone de lancement, seconde Ã©tape oÃ¹ il va vers le bas jusqu'Ã  sa cible).
 
 2006-06-27  Romain Bignon <progs@headfucking.net>
 
 	* src/Units.cpp (ECMissiLauncher): Correction d'un bug quand on fait une attaque SUR MOI (donc je ne lance pas de missile).
 
-	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECNuclearSearch): Création du centre de recherches nucléaire.
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECNuclearSearch): CrÃ©ation du centre de recherches nuclÃ©aire.
 
-	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECSilo): Création du silo de missile nucléaire.
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h (ECSilo): CrÃ©ation du silo de missile nuclÃ©aire.
 
-	* server/Channels.cpp, server/Batiments.cpp (SendArm): Support du flag '~' pour l'envoie de données (voir API).
+	* server/Channels.cpp, server/Batiments.cpp (SendArm): Support du flag '~' pour l'envoie de donnÃ©es (voir API).
 
-	* src/Batiments.h, src/InGame.cpp, src/Map.h: Utilisation d'une information spécifique à une unité (fonction virtuelle)
+	* src/Batiments.h, src/InGame.cpp, src/Map.h: Utilisation d'une information spÃ©cifique Ã  une unitÃ© (fonction virtuelle)
 	pour s'afficher dans la BarreAct.
 
 2006-06-25  Romain Bignon <progs@headfucking.net>
 
-	* lib/Units.h (ECBBoat): Limiter à 50*Nb() le nombre d'hommes maximum qu'une armée puisse contenir pour pouvoir entrer.
+	* lib/Units.h (ECBBoat): Limiter Ã  50*Nb() le nombre d'hommes maximum qu'une armÃ©e puisse contenir pour pouvoir entrer.
 
-	* src/InGame.cpp: Rajout de messages lorsqu'on ne peut pas envoyer dans un conteneur, on qu'on ne peut pas créer une
-	unité/batiment.
+	* src/InGame.cpp: Rajout de messages lorsqu'on ne peut pas envoyer dans un conteneur, on qu'on ne peut pas crÃ©er une
+	unitÃ©/batiment.
 
 	* src/Units.cpp (WantMove): Correction d'un bug.
 
 	* server/InGame.cpp, src/InGame.cpp: Gestion des uncontenings (out).
 
-	* lib/Map.cpp, src/Map.cpp: Correction de plusieurs problèmes.
+	* lib/Map.cpp, src/Map.cpp: Correction de plusieurs problÃ¨mes.
 
 	* lib/Map.h, server/Channels.cpp: Utilisation d'un flags (&) qui dit qu'un evenement n'est pas le principal.
 
-	* server/Channels.cpp (SendArm): Dans les évenements liés, dans le cas d'une attaque (en particulier) envoyer une ligne
+	* server/Channels.cpp (SendArm): Dans les Ã©venements liÃ©s, dans le cas d'une attaque (en particulier) envoyer une ligne
 	avant si jamais ce n'est pas un ARM_MOVE (pour faire ARM_MOVE|ARM_CONTAINING) en enlevant le ARM_MOVE.
 
 2006-06-24  Romain Bignon <progs@headfucking.net>
 
-	* src/Units.cpp (ECMissiLauncher): Lors d'une attaque composée d'un mouvement, le lance-missile réagissait anormalement
+	* src/Units.cpp (ECMissiLauncher): Lors d'une attaque composÃ©e d'un mouvement, le lance-missile rÃ©agissait anormalement
 	en se reployant...
 
 	* src/InGame.cpp (ARMCommand): Support du containing (in).
@@ -1103,7 +1115,7 @@
 
 2006-06-22  Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp (Options): Si jamais le jeu se met brusquement à passer en ANIMING ou autre, fermer cet écran.
+	* src/InGame.cpp (Options): Si jamais le jeu se met brusquement Ã  passer en ANIMING ou autre, fermer cet Ã©cran.
 
 	* src/data/pics/help.png: Image d'aide lorsqu'on appuie sur F1.
 
@@ -1111,28 +1123,28 @@
 
 	* server/InGame.cpp, server/Channels.cpp, API: Programmation du ')' (contenir).
 
-	* lib/Units.h, server/Units.h (EC[B]Container): Classe de base pour les unités conteneurs.
+	* lib/Units.h, server/Units.h (EC[B]Container): Classe de base pour les unitÃ©s conteneurs.
 
 	* lib/Map.h, server/Map.h, server/InGame.cpp: Remplacement de l'utilisation dans le serveur des Locked() par des Shadowed()
-	pour pouvoir se servir de Locked() dans le cas d'une unité verouillée MAIS NON A SUPPRIMER.
+	pour pouvoir se servir de Locked() dans le cas d'une unitÃ© verouillÃ©e MAIS NON A SUPPRIMER.
 
 2006-06-20  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp:
-	- Support des attaques sur la case de départ d'une unité qui a bougé.
-	- Correction d'un bug qui faisait inclure dans un combat toutes les unités d'une case lors des resultats et qui pouvaient
-	  faire revivre une unité disparue lors d'une union, soit resupprimer une unité lors d'un double combat.
+	- Support des attaques sur la case de dÃ©part d'une unitÃ© qui a bougÃ©.
+	- Correction d'un bug qui faisait inclure dans un combat toutes les unitÃ©s d'une case lors des resultats et qui pouvaient
+	  faire revivre une unitÃ© disparue lors d'une union, soit resupprimer une unitÃ© lors d'un double combat.
 
 	* server/Channels.cpp: Corrections concernant les fins de jeux.
 
-	* src/Map.cpp: Petite correction, on ne voyait pas le trait si il était vertical.
+	* src/Map.cpp: Petite correction, on ne voyait pas le trait si il Ã©tait vertical.
 
-	* server/Channels.cpp (SendArm): En cas de mouvement, n'afficher les déplacements que jusqu'à la case actuel du joueur
-	pour eviter les desynch. Note que ça ne résouds tout de même pas le problème qui fait que lorsqu'un attaquant s'enlève
-	d'une attaque, les autres attaquants "passifs" qui récupèrent leur mouvement vont avancer au maximum jusqu'à la case
-	de l'attaque, et pas plus loins comme le mec l'avait prévu.
+	* server/Channels.cpp (SendArm): En cas de mouvement, n'afficher les dÃ©placements que jusqu'Ã  la case actuel du joueur
+	pour eviter les desynch. Note que Ã§a ne rÃ©souds tout de mÃªme pas le problÃ¨me qui fait que lorsqu'un attaquant s'enlÃ¨ve
+	d'une attaque, les autres attaquants "passifs" qui rÃ©cupÃ¨rent leur mouvement vont avancer au maximum jusqu'Ã  la case
+	de l'attaque, et pas plus loins comme le mec l'avait prÃ©vu.
 
-	* API, server/Channels.cpp, src/JoinGame.cpp: Mode +b pour définir l'argent de début de partie.
+	* API, server/Channels.cpp, src/JoinGame.cpp: Mode +b pour dÃ©finir l'argent de dÃ©but de partie.
 
 	* lib/Map.cpp, src/MapEditor.cpp: Suppression du BEGIN des maps.
 
@@ -1142,11 +1154,11 @@
 
 	* lib/UnitsList.h, lib/Units.h, server/Units.h, src/Units.h, src/data/anims/units/boat: Bateau de transport.
 
-	* server/IA.cpp: L'IA sait construire avec les batiments, ainsi que "recharger" ses unités.
+	* server/IA.cpp: L'IA sait construire avec les batiments, ainsi que "recharger" ses unitÃ©s.
 
-	* src/InGame.cpp: Correction d'un soucis qui faisait une desynch lors d'une attaque, si jamais une unité (à moi) de
+	* src/InGame.cpp: Correction d'un soucis qui faisait une desynch lors d'une attaque, si jamais une unitÃ© (Ã  moi) de
 	l'attaque n'a plus de mouvement dans la commande, parce que l'attaque l'en empeche, mais qu'elle avait un mouvement
-	anticipé, le client le faisait bouger car il ne supprimait pas le contenu de ECEntity::Move().
+	anticipÃ©, le client le faisait bouger car il ne supprimait pas le contenu de ECEntity::Move().
 
 2006-06-19  Romain Bignon <progs@headfucking.net>
 
@@ -1159,16 +1171,16 @@
 
 	* lib/Map.h, server/Map.h: Passage de "shooted" et du ReleaseShoot() dans le serveur.
 
-	* server/Channels.cpp: Détermination, grace notament au +r(partie rapide), si un joueur a perdu, et quand on passe en +E.
+	* server/Channels.cpp: DÃ©termination, grace notament au +r(partie rapide), si un joueur a perdu, et quand on passe en +E.
 
-	* API, src/JoinGame.cpp, server/Channels.cpp: Mode +£ pour indiquer qu'un joueur a perdu, et +E pour les scores.
+	* API, src/JoinGame.cpp, server/Channels.cpp: Mode +Â£ pour indiquer qu'un joueur a perdu, et +E pour les scores.
 
 2006-06-17  Romain Bignon <progs@headfucking.net>
 
-	* server/Map.cpp (ECEvent/operator<): Le "reploiement" se fait maintenant avant un déplacement.
+	* server/Map.cpp (ECEvent/operator<): Le "reploiement" se fait maintenant avant un dÃ©placement.
 
-	* src/Map.cpp, src/ShowMap.cpp: Stockage de l'image de la trajectoire d'une attaque dans l'entité même qui l'affiche lui
-	même sur l'écran. Ça évite de tout redessiner à chaques fois et surtout les plantages.
+	* src/Map.cpp, src/ShowMap.cpp: Stockage de l'image de la trajectoire d'une attaque dans l'entitÃ© mÃªme qui l'affiche lui
+	mÃªme sur l'Ã©cran. Ã‡a Ã©vite de tout redessiner Ã  chaques fois et surtout les plantages.
 
 	* src/gui/CheckBox.cpp, src/data/anims/checkbox (TCheckBox): Programmation d'un nouveau composant TCheckBox.
 
@@ -1182,22 +1194,22 @@
 
 	* servers/maps/three.map: Map pour trois joueurs
 
-	* src/gui/*: Petites modifs rapides à faire et longues à retrouver.
+	* src/gui/*: Petites modifs rapides Ã  faire et longues Ã  retrouver.
 
 2006-06-01  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Label.cpp: Utilisation d'une variable "shadowed" pour afficher un petit fond qui permet de bien voir.
 
-	* src/gui/Memo.cpp: Utilisations de TLabels plutot que de la classe exotique propre à TMemo. Ceci permet d'utiliser
-	le shadowed du Label, et surtout d'éviter les nombreux TFont::WriteLeft() qui bouffent à mort.
+	* src/gui/Memo.cpp: Utilisations de TLabels plutot que de la classe exotique propre Ã  TMemo. Ceci permet d'utiliser
+	le shadowed du Label, et surtout d'Ã©viter les nombreux TFont::WriteLeft() qui bouffent Ã  mort.
 
 2006-05-31  Romain Bignon <progs@headfucking.net>
 
-	* server/Units.cpp, server/Units.cpp: Délégation de la détection d'unité sur la case cible à ARMCommand::Exec.
+	* server/Units.cpp, server/Units.cpp: DÃ©lÃ©gation de la dÃ©tection d'unitÃ© sur la case cible Ã  ARMCommand::Exec.
 
 	* src/MapEditor.cpp: INFO par defaut.
 
-	* API, server/Channels.cpp, src/JoinGame.cpp: Affichage dans le Hint de la première ligne d'infos des maps.
+	* API, server/Channels.cpp, src/JoinGame.cpp: Affichage dans le Hint de la premiÃ¨re ligne d'infos des maps.
 
 	* server/maps: Modification des titres et des infos.
 
@@ -1209,66 +1221,66 @@
 	* server/InGame.cpp: Correction d'un bug, si jamais un evenement d'une attaque contient des locked, surtout ne pas
 	envoyer le ARM* et surtout supprimer l'evenement, sinon boucle infinie !
 
-	* src/InGame.cpp: Correction d'un bug qui faisait apparaitre un mouvement non réel si jamais le serveur envoyait un
-	ARM*= pour une unité qui finalement ne bougeait pas (mais qui avait quand meme un évenement lié, cf attaque en chemin).
+	* src/InGame.cpp: Correction d'un bug qui faisait apparaitre un mouvement non rÃ©el si jamais le serveur envoyait un
+	ARM*= pour une unitÃ© qui finalement ne bougeait pas (mais qui avait quand meme un Ã©venement liÃ©, cf attaque en chemin).
 
 2006-05-27  Romain Bignon <progs@headfucking.net>
 
-	* API, server/Map.cpp, server/InGame.cpp, src/InGame.cpp: Possibilité d'attaques "maintenues" ou "volatiles". Dans le
-	premier cas, il faut maintenir ctrl enfoncé lors du clic pour l'attaque. L'attaque volatile permet que si une unité de
-	la case visée bouge, il y ait un déplacement de la cible de l'attaque.
+	* API, server/Map.cpp, server/InGame.cpp, src/InGame.cpp: PossibilitÃ© d'attaques "maintenues" ou "volatiles". Dans le
+	premier cas, il faut maintenir ctrl enfoncÃ© lors du clic pour l'attaque. L'attaque volatile permet que si une unitÃ© de
+	la case visÃ©e bouge, il y ait un dÃ©placement de la cible de l'attaque.
 
-	* src/Map.cpp, src/InGame.cpp, src/MapEditor.cpp: Modification de la preview pour que chaque pixel soit uniformisé,
-	ça fait plus beau.
+	* src/Map.cpp, src/InGame.cpp, src/MapEditor.cpp: Modification de la preview pour que chaque pixel soit uniformisÃ©,
+	Ã§a fait plus beau.
 
 2006-05-25  Romain Bignon <progs@headfucking.net>
 
-	* src/Map.cpp, src/data/ShowMap.cpp, src/Units.cpp: Corrections pour les attaques du lance missile ou déploiement hors
+	* src/Map.cpp, src/data/ShowMap.cpp, src/Units.cpp: Corrections pour les attaques du lance missile ou dÃ©ploiement hors
 	champ de vision.
 
-	* server/InGame.cpp: Correction pour les combats qui ne sont pas "jusqu'à la mort".
+	* server/InGame.cpp: Correction pour les combats qui ne sont pas "jusqu'Ã  la mort".
 
-	* server/Config.cpp, server/Login.cpp: Stockage du motd dès le début.
+	* server/Config.cpp, server/Login.cpp: Stockage du motd dÃ¨s le dÃ©but.
 
 	* src/Doxyfile, server/Doxyfile: Affiche la doc de lib/ dans les deux, ce qui devient plus interressant.
 
 2006-05-24  Romain Bignon <progs@headfucking.net>
 
-	* src/Resources.h, src/data/anims/cases/terre/2.png, src/Units.cpp: Affichage d'un "cratère" quand y a eu un combat.
+	* src/Resources.h, src/data/anims/cases/terre/2.png, src/Units.cpp: Affichage d'un "cratÃ¨re" quand y a eu un combat.
 
 	* src/Resources.h, src/data/anims/units/missilauncher, src/Units.cpp: Propres images au lance-missile.
 
-	* src/Images.cpp: Rajout d'un système de selection de l'ordre de lecture, de répétition ou non, quelques corrections.
+	* src/Images.cpp: Rajout d'un systÃ¨me de selection de l'ordre de lecture, de rÃ©pÃ©tition ou non, quelques corrections.
 
-	* server/InGame.cpp: Correction d'un bug sur les attaques (lors d'une attaque en cours de chemin d'un autre type, vérifier
+	* server/InGame.cpp: Correction d'un bug sur les attaques (lors d'une attaque en cours de chemin d'un autre type, vÃ©rifier
 	si il n'avait pas une attaque plus loins, et si oui se barrer).
 
 	* src/Map.h, src/JoinGame.cpp: Corrections pour le lance missile dans la barreact, pour les boutons, et affichage d'un
-	label en bas pour des infos (déployé, en instance de déploiement et locked).
+	label en bas pour des infos (dÃ©ployÃ©, en instance de dÃ©ploiement et locked).
 
 	* src/gui/Label.cpp: Correction d'un crash en cas de chaine vide.
 
-	* src/gui/ShowMap.cpp: Affichage d'un trait rouge lors d'une attaque à distance.
+	* src/gui/ShowMap.cpp: Affichage d'un trait rouge lors d'une attaque Ã  distance.
 
-	* server/Channels.cpp: On voit les infos cachées de ses alliés.
+	* server/Channels.cpp: On voit les infos cachÃ©es de ses alliÃ©s.
 
 	* src/Map.cpp: Affiche un rayon.
 
 2006-05-23  Romain Bignon <progs@headfucking.net>
 
-	* src/MapEditor.cpp: Ne permet pas la sauvegarde tant qu'on n'a pas configuré la map. En outre, faire toutes les
-	vérifications minimum.
+	* src/MapEditor.cpp: Ne permet pas la sauvegarde tant qu'on n'a pas configurÃ© la map. En outre, faire toutes les
+	vÃ©rifications minimum.
 
-	* src/Map.cpp, src/gui/ShowMap.cpp: Actualisation des images des cases uniquement quand c'est nécessaire.
+	* src/Map.cpp, src/gui/ShowMap.cpp: Actualisation des images des cases uniquement quand c'est nÃ©cessaire.
 
 2006-05-22  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp: Visibilité.
+	* lib/Map.cpp: VisibilitÃ©.
 
 	* src/Map.cpp, src/InGame.cpp, src/gui/ShowMap.cpp, src/MapEditor.cpp: Affichage d'un brouillard de guerre.
 
-	* server/InGame.cpp: Correction d'un bug qui ne faisait pas d'attaques lorsqu'on créait une unité sur une ville et
-	que quelqu'un avait commencé à bouger dessus (le pire c'est que je l'avais déjà corrigé, et je l'ai recréé).
+	* server/InGame.cpp: Correction d'un bug qui ne faisait pas d'attaques lorsqu'on crÃ©ait une unitÃ© sur une ville et
+	que quelqu'un avait commencÃ© Ã  bouger dessus (le pire c'est que je l'avais dÃ©jÃ  corrigÃ©, et je l'ai recrÃ©Ã©).
 
 2006-05-21  Romain Bignon <progs@headfucking.net>
 
@@ -1276,9 +1288,9 @@
 
 	* server/Login.cpp: Tentative de correction d'un bug.
 
-	* src/MapEditor.cpp (OptionsMap): Rajouts de labels et de hints pour que ça soit plus explicite.
+	* src/MapEditor.cpp (OptionsMap): Rajouts de labels et de hints pour que Ã§a soit plus explicite.
 
-	* src/data/anims/cases/pont*, src/Resources.h, src/Map.cpp: Implémentation des ponts.
+	* src/data/anims/cases/pont*, src/Resources.h, src/Map.cpp: ImplÃ©mentation des ponts.
 
 	* server/maps: Utilisations des ponts.
 
@@ -1286,38 +1298,38 @@
 
 	* server/Channels.cpp (SetMap): N'envoie plus les lignes UNIT qui sont inutiles au client.
 
-	* src/Map.cpp: Affichage sans l'aide des villes des numeros des joueurs à des positions satisfaisantes. Affichage de
-	couleurs dans la preview dans la pré-partie pour savoir quels territoires appartiennent à qui.
+	* src/Map.cpp: Affichage sans l'aide des villes des numeros des joueurs Ã  des positions satisfaisantes. Affichage de
+	couleurs dans la preview dans la prÃ©-partie pour savoir quels territoires appartiennent Ã  qui.
 
-	* server/IA.cpp: Accepte les alliances, corrige le bug des \r\n non supprimés et fait pour le moment des déplacements
+	* server/IA.cpp: Accepte les alliances, corrige le bug des \r\n non supprimÃ©s et fait pour le moment des dÃ©placements
 	bateaux.
 
-	* lib/Map.cpp: Lors de la vérification de si on change d'owner, on ne peut plus piquer les countries de ses alliés !
+	* lib/Map.cpp: Lors de la vÃ©rification de si on change d'owner, on ne peut plus piquer les countries de ses alliÃ©s !
 
-	* src/MapEditor.cpp: L'éditeur de maps est fini.
+	* src/MapEditor.cpp: L'Ã©diteur de maps est fini.
 
-2006-05-18  Romain Bignon <progø@headfucking.net>
+2006-05-18  Romain Bignon <progÃ¸@headfucking.net>
 
 	* server/IA.cpp (SETCommand): En PLAYING, ne se +! que quand tous les humains sont +!.
 
 2006-05-17  Romain Bignon <progs@headfucking.net>
 
-	* src/Map.h, src/Units.h, src/Batiments.h (RefreshColor): Permet de modifier la couleur attribuée à une unité.
+	* src/Map.h, src/Units.h, src/Batiments.h (RefreshColor): Permet de modifier la couleur attribuÃ©e Ã  une unitÃ©.
 
-	* src/Map.cpp: Correction pour l'affichage des unités sur la preview.
+	* src/Map.cpp: Correction pour l'affichage des unitÃ©s sur la preview.
 
 2006-05-14  Romain Bignon <progs@headfucking.net>
 
-	* lib/Batiments.h, server/Batiments.h, src/Batiments.h: Passage des villes en unités à part entières.
+	* lib/Batiments.h, server/Batiments.h, src/Batiments.h: Passage des villes en unitÃ©s Ã  part entiÃ¨res.
 
 	* lib/Map.h, server/Map.h, server/InGame.cpp, src/InGame.cpp, src/Map.h: Suppression des cases ville et capitale.
 
 2006-05-13  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp, server/Channels.cpp: Programmation du support d'UNIT dans les fichiers maps pour décider à l'avance
-	des unités présentent sur la carte au lancement. Suppression de SOLDATS.
+	* lib/Map.cpp, server/Channels.cpp: Programmation du support d'UNIT dans les fichiers maps pour dÃ©cider Ã  l'avance
+	des unitÃ©s prÃ©sentent sur la carte au lancement. Suppression de SOLDATS.
 
-	* src/Main.cpp, src/MapEditor.cpp, src/ShowMap.cpp: Création d'un éditeur de maps.
+	* src/Main.cpp, src/MapEditor.cpp, src/ShowMap.cpp: CrÃ©ation d'un Ã©diteur de maps.
 
 	* server/InGame.cpp: Correction d'un bug lors des animations des unions.
 
@@ -1327,37 +1339,37 @@
 
 	* API, lib/Channels.h, server/Channels.cpp, src/InGame.cpp, src/JoinGame.cpp: Gestion des alliances. Menu "Options".
 
-	* lib/Map.h (ECBEntity): Fonction CanBeCreated(ECBPlayer*) pour vérifier si un player peu globalement créer l'unité (avec
+	* lib/Map.h (ECBEntity): Fonction CanBeCreated(ECBPlayer*) pour vÃ©rifier si un player peu globalement crÃ©er l'unitÃ© (avec
 	les nations).
 
 	* src/InGame.cpp: On ne peut plus cliquer sur l'icone d'un batiment si on a pas assez d'argent.
 
-	* src/Map.h: Vérification si un batiment peut etre construit par le player.
+	* src/Map.h: VÃ©rification si un batiment peut etre construit par le player.
 
 2006-05-09  Romain Bignon <progs@headfucking.net>
 
 	* lib/Map.h, lib/Units.h, lib/Batiments.h: Utilisation d'une fonction Qual() qui retourne un qualificatif pour
-	une entité ("l'armée", "la caserne", etc) utilisé dans un message au joueur.
+	une entitÃ© ("l'armÃ©e", "la caserne", etc) utilisÃ© dans un message au joueur.
 
-	* server/Units.cpp (ECMissiLauncher): Le lance missile peut louper sa cible si la distance est trop élevée, et la distance
+	* server/Units.cpp (ECMissiLauncher): Le lance missile peut louper sa cible si la distance est trop Ã©levÃ©e, et la distance
 	influe sur les degats.
 
-	* src/InGame.cpp: Modification des messages en réponse à ARM.
+	* src/InGame.cpp: Modification des messages en rÃ©ponse Ã  ARM.
 
 2006-05-08  Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.h: Opérateur << sur EChannel& qui envoie un message INFO à ses users.
+	* server/Channels.h: OpÃ©rateur << sur EChannel& qui envoie un message INFO Ã  ses users.
 
-	* API, server/Server.h: Message INFO qui affiche une info sur l'écran du joueur.
+	* API, server/Server.h: Message INFO qui affiche une info sur l'Ã©cran du joueur.
 
-	* src/InGame.cpp: Réception des INFO et modification du TMemo des messages.
+	* src/InGame.cpp: RÃ©ception des INFO et modification du TMemo des messages.
 
-	* API, server/Channels.cpp, src/InGame.cpp: Changement du protocole sur les déploiements, utilisation de '{' et '}'
-	pour que ça soit plus explicite niveau client.
+	* API, server/Channels.cpp, src/InGame.cpp: Changement du protocole sur les dÃ©ploiements, utilisation de '{' et '}'
+	pour que Ã§a soit plus explicite niveau client.
 
 2006-05-07  Romain Bignon <progs@headfucking.net>
 
-	* lib/Units.h, server/Units.cpp, src/Units.cpp (EC[B]MissiLauncher): Support des attaques uniquement en déployé.
+	* lib/Units.h, server/Units.cpp, src/Units.cpp (EC[B]MissiLauncher): Support des attaques uniquement en dÃ©ployÃ©.
 
 	* API, server/InGame.cpp, server/Channels.cpp, src/InGame.cpp: Support du deploiement ('#').
 
@@ -1367,22 +1379,22 @@
 
 	* src/gui/BouttonText.cpp, src/tools/Images.cpp, src/gui/MessageBox.cpp: Corrections.
 
-	* src/gui/Images.cpp: Correction d'un bug assez fondamental qui ne libérait pas les ressources.
+	* src/gui/Images.cpp: Correction d'un bug assez fondamental qui ne libÃ©rait pas les ressources.
 
-	* data/pics/units/missilauncher_pics.png, lib/Units.h, server/Units.h, src/Units.h: Création du lanceur de missiles.
+	* data/pics/units/missilauncher_pics.png, lib/Units.h, server/Units.h, src/Units.h: CrÃ©ation du lanceur de missiles.
 
 	* server/IA.cpp: Remplace les ' ' par des '_' dans le pseudo de l'IA.
 
 2006-05-03  Romain Bignon <progs@headfucking.net>
 
-	* src/Config.cpp: Possibilité d'ajouter ou de supprimer un serveur à la liste.
+	* src/Config.cpp: PossibilitÃ© d'ajouter ou de supprimer un serveur Ã  la liste.
 
-	* src/gui/ListBox.cpp: Possibilité de retirer un item.
+	* src/gui/ListBox.cpp: PossibilitÃ© de retirer un item.
 
 	* src/Main.cpp: Affichage des Credits.
 
-	* src/gui/ShowMap.cpp: Possibilité de selectionner plusieurs entités qui sont sur la meme case
-	(répétition du clic sur la case).
+	* src/gui/ShowMap.cpp: PossibilitÃ© de selectionner plusieurs entitÃ©s qui sont sur la meme case
+	(rÃ©pÃ©tition du clic sur la case).
 
 	* server/Units.cpp, server/InGame.cpp: Gestion des attaques en cours de chemin.
 
@@ -1394,63 +1406,63 @@
 
 	* src/Main.cpp: Affichage du numero de version.
 
-	* lib/Map.cpp: Correction du bug de la création des entités.
+	* lib/Map.cpp: Correction du bug de la crÃ©ation des entitÃ©s.
 
-	* server/InGame.cpp: Correction du bug des attaques tuaient des entités qui devaient vivre.
+	* server/InGame.cpp: Correction du bug des attaques tuaient des entitÃ©s qui devaient vivre.
 
 2006-05-01  Romain Bignon <progs@headfucking.net>
 
-	* src/Units.h, server/Units.h: Création indépendament coté serveur et coté client de ECUnit qui réunit le code
-	utilisé par EChar et ECArmy.
+	* src/Units.h, server/Units.h: CrÃ©ation indÃ©pendament cotÃ© serveur et cotÃ© client de ECUnit qui rÃ©unit le code
+	utilisÃ© par EChar et ECArmy.
 
 	* server/InGame.cpp: Correction de bugs.
 
 	* src/tools/Images.cpp: Fonctions pour copier des SpriteBase et pour utiliser une coloriage de toutes images.
 
 	* src/Units.cpp: Utilisation dans ECUnit d'une liste d'images suivant la position et coloriage de la couleur
-	du propriétaire.
+	du propriÃ©taire.
 
 2006-04-30  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp: Pas deux batiments, ou pas deux unités sur la meme case.
+	* lib/Map.cpp: Pas deux batiments, ou pas deux unitÃ©s sur la meme case.
 
-	* src/Defines.h, src/data: Modification de la taille des cases à 80x80
+	* src/Defines.h, src/data: Modification de la taille des cases Ã  80x80
 
 	* lib/Batiments.h, lib/Units.h, src/Batiments.h, src/Units.h, server/Batiments.h, server/Units.h:
 	Ajout de la caserne, du charfact et du char.
 
-	* src/InGame.cpp, src/gui/ShowMap.cpp: Création de batiments et affichage de la position de l'écran sur le radar.
+	* src/InGame.cpp, src/gui/ShowMap.cpp: CrÃ©ation de batiments et affichage de la position de l'Ã©cran sur le radar.
 
 	* src/tools/Images.cpp (DrawRect): Fonction pour dessiner un rectangle.
 
 2006-04-29  Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.cpp: Vérification des +! lors du quit.
+	* server/Channels.cpp: VÃ©rification des +! lors du quit.
 
 	* src/Sockets.cpp, src/gui/Form.cpp, src/JoinGame.cpp: Utilisation des mutex pour ne pas buguer.
 
 	* src/gui/ComboBox.cpp, src/JoinGame.cpp: Correction du bug de la position des nations dans GameInfos.
 
-	* server/Map.cpp: Correction du bug qui, lorsque le client veut bouger et qu'il est en conflit déjà avec un mec
-	(sans le savoir), fait disparaitre le client. Utilisation d'une mémorisation des mouvements.
+	* server/Map.cpp: Correction du bug qui, lorsque le client veut bouger et qu'il est en conflit dÃ©jÃ  avec un mec
+	(sans le savoir), fait disparaitre le client. Utilisation d'une mÃ©morisation des mouvements.
 
-	* src/InGame.cpp: - On est prévenu quand un joueur veut faire une attaque explicite.
-	- Mise en "lock" lorsque l'armée a join une autre.
+	* src/InGame.cpp: - On est prÃ©venu quand un joueur veut faire une attaque explicite.
+	- Mise en "lock" lorsque l'armÃ©e a join une autre.
 	- N'ajoute rien si pas sur une bonne case.
 	- Enlevage de bugs
 
 	* src/gui/ShowMap.cpp: Elevage d'un bug concernant les mutex.
 
-	* src/Defines.h, src/data: Modification de la taille des cases à 100*100 avec de nouvelles images.
+	* src/Defines.h, src/data: Modification de la taille des cases Ã  100*100 avec de nouvelles images.
 
-	* API, server/InGame.cpp: Envoie d'un '.' pour LOCK une armée quand elle union.
+	* API, server/InGame.cpp: Envoie d'un '.' pour LOCK une armÃ©e quand elle union.
 
 2006-04-27  Romain Bignon <progs@headfucking.net>
 
-	* server/InGame.cpp: Correction d'un bug qui ne vérifiait pas les attaques dans un create, et qui envoie *tous* les
-	déplacements d'un joueur
+	* server/InGame.cpp: Correction d'un bug qui ne vÃ©rifiait pas les attaques dans un create, et qui envoie *tous* les
+	dÃ©placements d'un joueur
 
-	* server/Map.h (ECEntity): Il stock maintenant tous ses déplacements.
+	* server/Map.h (ECEntity): Il stock maintenant tous ses dÃ©placements.
 
 2006-04-26  Romain Bignon <progs@headfucking.net>
 
@@ -1460,48 +1472,48 @@
 
 	* server/Channels.cpp: Corrections pour le portage.
 
-	* lib/Channels.h, src/JoinGame.cpp, server/IA.cpp: Caractère ajouté devant le pseudo de l'IA poru la reconnaitre.
+	* lib/Channels.h, src/JoinGame.cpp, server/IA.cpp: CaractÃ¨re ajoutÃ© devant le pseudo de l'IA poru la reconnaitre.
 
-	* src/JoinGame.cpp, src/Channels.h, lib/Channels.h: Fonction ECPlayer::IsIA(), et coté client il y a un argument
+	* src/JoinGame.cpp, src/Channels.h, lib/Channels.h: Fonction ECPlayer::IsIA(), et cotÃ© client il y a un argument
 	au constructeur.
 
 	* src/InGame.cpp: Modification de l'utilisation des boutons de la souris.
 
 	* lib/Debug.h: Ajout de assert()
 
-	* lib/Outils.h: - Fonction MyFree() (plutot que macro) avec une sécurité
+	* lib/Outils.h: - Fonction MyFree() (plutot que macro) avec une sÃ©curitÃ©
 	- Portage si la std est trop vieille.
 
 2006-04-25  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/Component.cpp, src/gui/Form.cpp: Rajout d'un paramètre "dynamic_hint" qui donne la priorité et qui fait
+	* src/gui/Component.cpp, src/gui/Form.cpp: Rajout d'un paramÃ¨tre "dynamic_hint" qui donne la prioritÃ© et qui fait
 	fonctionner les hints du GameInfosForm sur la combobox des nations.
 
 2006-04-23  Romain Bignon <progs@headfucking.net>
 
-	* server/IA.cpp: Utilisation d'un système de Lock pour ne pas traiter les messages tout de suite.
+	* server/IA.cpp: Utilisation d'un systÃ¨me de Lock pour ne pas traiter les messages tout de suite.
 
 	* server/Channels.cpp (ByeEveryBody): Cette fonction peut avoir une exception.
 
 	* server/Server.cpp: Correction d'un bug concernant l'IA.
 
-	* src/JoinGame.cpp: Utilisation d'un Hint et réorganisation de la Form.
+	* src/JoinGame.cpp: Utilisation d'un Hint et rÃ©organisation de la Form.
 
 	* src/gui/Components.cpp, src/gui/ChildForm.cpp: Modifs concernant les Hints.
 
 2006-04-20  Romain Bignon <progs@headfucking.net>
 
-	* server/IA.cpp (JIACommand): Commande pour créer une IA dans un chan.
+	* server/IA.cpp (JIACommand): Commande pour crÃ©er une IA dans un chan.
 	(TIA): Classe de l'Intelligence Artificielle
 
-	* src/JoinGame.cpp: - La MapList n'est affichée que lorsque l'user est op ou owner.
-	                    - Délais pour eviter les clics abusifs dans la liste des maps.
+	* src/JoinGame.cpp: - La MapList n'est affichÃ©e que lorsque l'user est op ou owner.
+	                    - DÃ©lais pour eviter les clics abusifs dans la liste des maps.
 
 	* lib/Outils.cpp, src/Sockets.cpp, server/Server.cpp: Utilisation d'une fonction SplitBuf().
 
 2006-04-19  Romain Bignon <progs@headfucking.net>
 
-	* server/Server.cpp: Système des clients revisités pour accueillir l'intelligence artificielle...
+	* server/Server.cpp: SystÃ¨me des clients revisitÃ©s pour accueillir l'intelligence artificielle...
 
 	* src/InGame.cpp: Affichage un peu partout d'hints...
 
@@ -1513,15 +1525,15 @@
 
 	* server/Makefile.am: Installation de la configuration dans $prefix/etc/.
 
-	* configure.ac, server/menareants.conf.in: Le path du motd dans la conf dépend du rep d'installation.
+	* configure.ac, server/menareants.conf.in: Le path du motd dans la conf dÃ©pend du rep d'installation.
 
-	* src/JoinGame.cpp: Correction d'un bug qui posait problème lors du lancement du jeu quand c'était trop lent (desynch).
+	* src/JoinGame.cpp: Correction d'un bug qui posait problÃ¨me lors du lancement du jeu quand c'Ã©tait trop lent (desynch).
 
 	* src/Component.h, src/Form.cpp, src/ChildForm.cpp: OnMouseOn() et Hint().
 
 	* src/Main.cpp, src/Config.cpp: Nouveau nom pour On*.
 
-	* src/InGame.cpp: Affichage des icones à droite, utilisation d'un TChildForm et affichage du Hint.
+	* src/InGame.cpp: Affichage des icones Ã  droite, utilisation d'un TChildForm et affichage du Hint.
 
 	* src/Map.cpp: N'affiche plus les contours sur la mer (preview).
 
@@ -1531,34 +1543,34 @@
 
 	* src/tools/Images.cpp: Nouvelles fonctions, modifications...
 
-	* gui/Edit.cpp: Nouvelle version du composant beaucoup plus elaborée.
+	* gui/Edit.cpp: Nouvelle version du composant beaucoup plus elaborÃ©e.
 
-	* gui/: Passage à des composants qui sont indépendants de MenAreAntsApp.
+	* gui/: Passage Ã  des composants qui sont indÃ©pendants de MenAreAntsApp.
 
 	* gui/Components.h (ForceFocus): Force le focus, pour T*Form.
-	(ClickedFuncPos): Fonction qui connait les coordonnées de la souris lors du click.
+	(ClickedFuncPos): Fonction qui connait les coordonnÃ©es de la souris lors du click.
 
 	* src/InGame.cpp (BarreLat): Le clic sur le radar fait bouger la camera.
 
 	* server/Channels.cpp, src/Config.cpp, src/JoinGame.cpp: Utilisation de macros NICK_CHARS et CHAN_CHARS pour limiter
-	les chars autorisés.
+	les chars autorisÃ©s.
 
-	* src/gui/MessageBox.h: Lorsqu'on ne spécifie pas de position, l'afficher au centre.
+	* src/gui/MessageBox.h: Lorsqu'on ne spÃ©cifie pas de position, l'afficher au centre.
 
-	* lib/UnitsList.h, server/InGame.cpp, src/Map.cpp, src/InGame.cpp: Liste des unités qui permet de n'avoir à mettre
-	  à jour qu'ici lors d'ajout d'unités.
+	* lib/UnitsList.h, server/InGame.cpp, src/Map.cpp, src/InGame.cpp: Liste des unitÃ©s qui permet de n'avoir Ã  mettre
+	  Ã  jour qu'ici lors d'ajout d'unitÃ©s.
 
-	* configure.ac: Paramètre --enable-full-warnings
+	* configure.ac: ParamÃ¨tre --enable-full-warnings
 
 2006-04-11  Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.cpp (RemovePlayer): Gestion du départ d'un joueur pendant une partie.
+	* server/Channels.cpp (RemovePlayer): Gestion du dÃ©part d'un joueur pendant une partie.
 
 	* server/Map.cpp (CheckRemoveBecauseOfPartOfAttaqEntity): Fonction dont le nom est explicite :p.
 
 2006-04-10  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.cpp (CheckChaningOwner): Fonction de ECBCase pour vérifier si sa prise créé un changement d'owner.
+	* lib/Map.cpp (CheckChaningOwner): Fonction de ECBCase pour vÃ©rifier si sa prise crÃ©Ã© un changement d'owner.
 
 	* lib/Channels.cpp, server/Channels.cpp: Passage de ModesStr() dans le serveur avec affichage de la map dans les modes.
 
@@ -1569,31 +1581,31 @@
 	* src/JoinGame.cpp: Messages...
 
 	* src/gui/Object.h, src/gui/Component.h, src/gui/Form.h, src/gui/ChildForm.h:
-	  Création de TObject mère de toutes les classes graphiques (T*), avec gestion des parents.
+	  CrÃ©ation de TObject mÃ¨re de toutes les classes graphiques (T*), avec gestion des parents.
 
-	* src/gui/ShowMap.cpp (CenterOn): Méthode pour centrer la camera sur un point particulier.
+	* src/gui/ShowMap.cpp (CenterOn): MÃ©thode pour centrer la camera sur un point particulier.
 
-	* server/InGame.cpp (SendArm): Quand il n'y a pas d'evenement de mouvement lié, utiliser x et y plutot que les
-	coordonnées de l'entité, car il est possible qu'on veuille envoyer un CREATE avant un MOVE.
+	* server/InGame.cpp (SendArm): Quand il n'y a pas d'evenement de mouvement liÃ©, utiliser x et y plutot que les
+	coordonnÃ©es de l'entitÃ©, car il est possible qu'on veuille envoyer un CREATE avant un MOVE.
 
-	* src/Map.cpp (ECEntityList): Liste des entitées qui peut etre utilisée pour récupérer la liste des entitées
-	pouvant etre créée par une case ou une autre entité (batiment).
+	* src/Map.cpp (ECEntityList): Liste des entitÃ©es qui peut etre utilisÃ©e pour rÃ©cupÃ©rer la liste des entitÃ©es
+	pouvant etre crÃ©Ã©e par une case ou une autre entitÃ© (batiment).
 
-	* src/InGame.cpp (BarreAct): Possibilité de selectionner une case et de créer des unités.
+	* src/InGame.cpp (BarreAct): PossibilitÃ© de selectionner une case et de crÃ©er des unitÃ©s.
 
-	* src/data/pics/units: Boutons des unités.
+	* src/data/pics/units: Boutons des unitÃ©s.
 
 	* src/data/barrelat.png: Nouvelle version un peu plus belle.
 
 2006-04-09  Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp: Gestion de l'ajout d'unités, des messages d'information, et quelques corrections.
+	* src/InGame.cpp: Gestion de l'ajout d'unitÃ©s, des messages d'information, et quelques corrections.
 
 	* server/InGame.cpp (ARM_NUMBER): Gestion, et n'en fait plus un evenement lors du ANIMING (les autres s'en foutent).
 
-	* src/gui/Memo.cpp: Taille maximum de caractère par ligne adapté à la chaine elle meme (meilleur resultat).
+	* src/gui/Memo.cpp: Taille maximum de caractÃ¨re par ligne adaptÃ© Ã  la chaine elle meme (meilleur resultat).
 
-	* src/, WIN32: Portabilité du code du jeu pour windows.
+	* src/, WIN32: PortabilitÃ© du code du jeu pour windows.
 
 2006-04-08  Romain Bignon <progs@headfucking.net>
 
@@ -1603,31 +1615,31 @@
 
 	* src/Resources.h, src/data/pics, src/InGame.cpp: Barre d'actions.
 
-	* src/AltThread.cpp: Thread alternatif qui peut recevoir des instructions à executer.
+	* src/AltThread.cpp: Thread alternatif qui peut recevoir des instructions Ã  executer.
 
 2006-04-05  Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Suppression de l'ancien code.
 
-	* src/Units.cpp: Gestion des déplacements en mode ANIMING.
+	* src/Units.cpp: Gestion des dÃ©placements en mode ANIMING.
 
-	* src/InGame.cpp: Amélioration de la gestion des déplacements.
+	* src/InGame.cpp: AmÃ©lioration de la gestion des dÃ©placements.
 
 	* src/Main.cpp, server/Main.cpp: Un peu plus beau.
 
-	* src/Config.cpp, src/JoinGame.cpp: Nation par défaut.
+	* src/Config.cpp, src/JoinGame.cpp: Nation par dÃ©faut.
 
-	* lib/Outils.cpp (GetHome): Fonction pour récupérer le $HOME.
+	* lib/Outils.cpp (GetHome): Fonction pour rÃ©cupÃ©rer le $HOME.
 
 2006-04-01  Romain Bignon <progs@headfucking.net>
 
-	* src/InGame.cpp, src/gui/ShowMap.cpp: Gestion des déplacements anticipés.
+	* src/InGame.cpp, src/gui/ShowMap.cpp: Gestion des dÃ©placements anticipÃ©s.
 
-	* lib/Map.h, server/Map.h, src/Map.h: Passage de ECBMove dans lib/ et dérivée dans src/Map.h (ECMove)
+	* lib/Map.h, server/Map.h, src/Map.h: Passage de ECBMove dans lib/ et dÃ©rivÃ©e dans src/Map.h (ECMove)
 
-	* src/JoinGame.cpp: Amélioration de l'ergonomie.
+	* src/JoinGame.cpp: AmÃ©lioration de l'ergonomie.
 
-	* server/Channels.cpp (SETCommand): Gestion de problèmes liés au READY.
+	* server/Channels.cpp (SETCommand): Gestion de problÃ¨mes liÃ©s au READY.
 
 	* src/data/anims/cases/mer: Animation de la mer.
 
@@ -1637,19 +1649,19 @@
 
 2006-03-31  Romain Bignon <progs@headfucking.net>
 
-	* lib/Channels.h: Gestion des nations (enumérateur, tableau d'équivalence de chaine, etc)
+	* lib/Channels.h: Gestion des nations (enumÃ©rateur, tableau d'Ã©quivalence de chaine, etc)
 
 	* server/Channels.cpp: Gestion des nations.
 
 	* src/JoinGame.cpp: Gestion des nations
 
-	* src/InGame.cpp: Evite d'appeler TFont::Write* à chaque Draw() du TPlayer*.
+	* src/InGame.cpp: Evite d'appeler TFont::Write* Ã  chaque Draw() du TPlayer*.
 
-	* src/gui/ListBox.cpp: Améliorations...
+	* src/gui/ListBox.cpp: AmÃ©liorations...
 
-	* src/gui/ComboBox.cpp: Améliorations...
+	* src/gui/ComboBox.cpp: AmÃ©liorations...
 
-	* src/gui/Component.cpp, src/gui/Form.cpp: Maintenant l'affichage en tete du composant focusé est fonctionnel.
+	* src/gui/Component.cpp, src/gui/Form.cpp: Maintenant l'affichage en tete du composant focusÃ© est fonctionnel.
 
 	* server/InGame.cpp: Gestion des unions.
 
@@ -1659,20 +1671,20 @@
 
 2006-03-29  Romain Bignon <progs@headfucking.net>
 
-	* lib/Outils.h (nrvector): Vecteur dérivé de std::vector sans répétitions.
+	* lib/Outils.h (nrvector): Vecteur dÃ©rivÃ© de std::vector sans rÃ©pÃ©titions.
 	Retour de std::string plutot que de chaines dans FormatStr().
 
 	* src/gui/SpinEdit.cpp: Correction d'un petit bug.
 
-	* src/gui/ShowMap.cpp: Ne redimentionne pas quand la carte est plus petite que l'écran.
+	* src/gui/ShowMap.cpp: Ne redimentionne pas quand la carte est plus petite que l'Ã©cran.
 
-	* src/gui/Label.h: Peut paramétrer la couleur du label.
+	* src/gui/Label.h: Peut paramÃ©trer la couleur du label.
 
-	* src/gui/Component.h, src/gui/Form.cpp: Pour les evenements, donne en argument le Form et un paramètre arbitraire.
+	* src/gui/Component.h, src/gui/Form.cpp: Pour les evenements, donne en argument le Form et un paramÃ¨tre arbitraire.
 
 	* src/data: Nouvelles images plus belles (nouveau style).
 
-	* src/Map.cpp (CreatePreview): Paramètre pour ne pas afficher les numeros.
+	* src/Map.cpp (CreatePreview): ParamÃ¨tre pour ne pas afficher les numeros.
 
 	* src/gui/Menu.cpp: Suppression du menu.
 
@@ -1682,14 +1694,14 @@
 
 	* src/InGame.cpp: Application nouveau style, affichage dans la BarreLat de la date, l'heure et l'argent par tour.
 
-	* server/Units.cpp, server/InGame.cpp: FONDAMENTALE: Passage à un mode de déplacement pas à pas.
+	* server/Units.cpp, server/InGame.cpp: FONDAMENTALE: Passage Ã  un mode de dÃ©placement pas Ã  pas.
 
-	* server/Server.cpp, server/Channels.cpp: Le départ de l'owner supprime le jeu.
+	* server/Server.cpp, server/Channels.cpp: Le dÃ©part de l'owner supprime le jeu.
 
 	* server/Map.h (ECMove): Cette classe compatibilise les mouvements (et passera sous peu dans lib/).
 
-	* server/Channels.cpp: Application au principe de déplacement pas-à-pas à SendArm(), support de la couleur et de la
-	position aléatoire.
+	* server/Channels.cpp: Application au principe de dÃ©placement pas-Ã -pas Ã  SendArm(), support de la couleur et de la
+	position alÃ©atoire.
 
 2006-03-25  Romain Bignon <progs@headfucking.net>
 
@@ -1701,26 +1713,26 @@
 
 	* src/gui/ColorEdit.cpp: Correction d'un bug qui n'affichait pas le label.
 
-	* src/JoinGame.cpp, server/Channels.cpp: Affiche le nom de la map et les parties jouées dans la liste.
+	* src/JoinGame.cpp, server/Channels.cpp: Affiche le nom de la map et les parties jouÃ©es dans la liste.
 
 	* lib/Outils.cpp: Rajout de is_ip().
 
 2006-03-19  Romain Bignon <progs@headfucking.net>
 
-	* lib/Map.h, server/Map.h (EC*Entity): Passage du system de last de lib à server, et passage de event_type de server à
+	* lib/Map.h, server/Map.h (EC*Entity): Passage du system de last de lib Ã  server, et passage de event_type de server Ã 
 	lib.
 
 	* src/data/pics/fleches: Fleches d'attaque.
 
-	* src/Units.cpp: Gestion des déplacements.
+	* src/Units.cpp: Gestion des dÃ©placements.
 
 	* src/gui/ShowMap.cpp: Utilisation des fleches d'attaque, et ne bouge plus quand le composant est !Enabled().
 
 	* src/gui/Components.h, src/gui/*.h: Fonctions Test(), Clic() et Focused().
-	Rajout en outre d'un pointeur vers un TClickedFunction, pour appeler une fonction dédiée lorsqu'on le clique.
+	Rajout en outre d'un pointeur vers un TClickedFunction, pour appeler une fonction dÃ©diÃ©e lorsqu'on le clique.
 
-	* src/gui/Form.h: Fonction Actions() à appeler dans la boucle d'une fenetre. Met le focus lui même et appel la
-	fonction Clic() par default de TComponent(), ainsi que l'appel de la ClickedFunc si définie.
+	* src/gui/Form.h: Fonction Actions() Ã  appeler dans la boucle d'une fenetre. Met le focus lui mÃªme et appel la
+	fonction Clic() par default de TComponent(), ainsi que l'appel de la ClickedFunc si dÃ©finie.
 
 	* src/InGame.cpp: Composants TEdit et TMemo pour l'affichag du chat.
 
@@ -1728,17 +1740,17 @@
 
 	* src/InGame.cpp, src/Login.cpp, src/JoinGame.cpp: Utilisation de TForm::Actions().
 
-	* src/gui/Edit.h: N'affiche pas forcément le background.
+	* src/gui/Edit.h: N'affiche pas forcÃ©ment le background.
 
 	* src/Timer.cpp, src/gui/Menu.cpp: Correction d'un bug.
 
 2006-03-18  Romain Bignon <progs@headfucking.net>
 
-	* lib/Outils.h (is_num): Fonction pour vérifier si une chaine est un entier.
+	* lib/Outils.h (is_num): Fonction pour vÃ©rifier si une chaine est un entier.
 
-	* lib/Map.cpp, lib/Units.h: Prise en compte du prix d'une entité.
+	* lib/Map.cpp, lib/Units.h: Prise en compte du prix d'une entitÃ©.
 
-	* server/Map.cpp, lib/Map.cpp: Passage de server à lib des fonctions ECMap::AddAnEntity() et ECMap::RemoveAnEntity().
+	* server/Map.cpp, lib/Map.cpp: Passage de server Ã  lib des fonctions ECMap::AddAnEntity() et ECMap::RemoveAnEntity().
 
 	* src/gui/ShowMap.h (TShowMap): Composant qui affiche la carte.
 
@@ -1746,17 +1758,17 @@
 
 	* src/data/: Rajout des fleches, de la barre laterale, du curseur de selection et d'animation (de merde) pour la mer.
 
-	* src/gui/Component.h, src/gui/*: Passage des variables x et y de uint à int ainsi que quelques autres changements.
+	* src/gui/Component.h, src/gui/*: Passage des variables x et y de uint Ã  int ainsi que quelques autres changements.
 
-	* src/InGame.cpp: Gestion de la carte, ébauche de la gestion des déplacements et des animations.
+	* src/InGame.cpp: Gestion de la carte, Ã©bauche de la gestion des dÃ©placements et des animations.
 
 	* src/JoinGame.cpp: Support du LEA, et des changements de modes pour le mode PLAYING.
 
 	* src/Sockets.cpp: Commande ARM.
 
-	* src/Map.cpp, src/Units.h: Dérivation des cases et entitées avec leur image, fonctions pour afficher, gérer, etc.
+	* src/Map.cpp, src/Units.h: DÃ©rivation des cases et entitÃ©es avec leur image, fonctions pour afficher, gÃ©rer, etc.
 
-	* src/Defines.h: Constantes pour la résolution de l'écran plutot que des valeurs magiques.
+	* src/Defines.h: Constantes pour la rÃ©solution de l'Ã©cran plutot que des valeurs magiques.
 
 	* src/tools/Images.cpp: Correction de bugs.
 
@@ -1764,11 +1776,11 @@
 
 2006-03-17  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/: Réorganisation en utilisant int plutot que uint pour X et Y.
+	* src/gui/: RÃ©organisation en utilisant int plutot que uint pour X et Y.
 
 2006-03-17  Romain Bignon <progs@headfucking.net>
 
-	* lib/Channels.h: Petites améliorations.
+	* lib/Channels.h: Petites amÃ©liorations.
 
 	* lib/Map.cpp: Support pour le type des cases du client, fonction ECBCountry::ChangeOwner() et autres...
 
@@ -1788,13 +1800,13 @@
 
 2006-03-15  Romain Bignon <progs@headfucking.net>
 
-	* src/Map.cpp: Dérivation des cases avec chargement des sprites des cases.
+	* src/Map.cpp: DÃ©rivation des cases avec chargement des sprites des cases.
 
-	* src/gui/MessageBox.h: Rajout de la possibilité de mettre un Edit dans le MessageBox.
+	* src/gui/MessageBox.h: Rajout de la possibilitÃ© de mettre un Edit dans le MessageBox.
 
-	* server/Main.cpp: Fonction CleanUp() pour libérer la mémoire.
+	* server/Main.cpp: Fonction CleanUp() pour libÃ©rer la mÃ©moire.
 
-	* server/: Un certain nombre de corrections de fuites de mémoire.
+	* server/: Un certain nombre de corrections de fuites de mÃ©moire.
 
 	* src/data/anims/cases: Images des cases
 
@@ -1804,14 +1816,14 @@
 
 	* src/JoinGame.cpp,src/Login.cpp: Redimension des boutons
 
-	* src/tools/Image.cpp: Correction d'un bug quand il y a plusieurs images non animées
+	* src/tools/Image.cpp: Correction d'un bug quand il y a plusieurs images non animÃ©es
 
-	* src/Resources.h: Rajout de normalbutton et de toutes les images des cases, mise en place d'un nouveau système
-	avec les macros qui déchire.
+	* src/Resources.h: Rajout de normalbutton et de toutes les images des cases, mise en place d'un nouveau systÃ¨me
+	avec les macros qui dÃ©chire.
 
 2006-03-12  Romain Bignon <progs@headfucking.net>
 
-	* server/InGame.cpp: Gestion des créations et amélioration des animations.
+	* server/InGame.cpp: Gestion des crÃ©ations et amÃ©lioration des animations.
 
 	* server/Map.h (ECEvent): Type et nombre.
 
@@ -1827,32 +1839,32 @@
 
 	* server/Channels.cpp, server/InGame.cpp: Premier support de l'animation.
 
-	* server/Map.cpp: Fonctions pour ajouter ou supprimer une entity de tous les endroits où il faut.
+	* server/Map.cpp: Fonctions pour ajouter ou supprimer une entity de tous les endroits oÃ¹ il faut.
 
 	* server/Server.cpp: Ne s'arrete plus sur les messages vides.
 
 2006-03-11  Romain Bignon <progs@headfucking.net>
 
 	* server/Channels.cpp (SendArm): Fonction pour envoyer un message ARM.
-	- Envoie de l'argent, des unités crées au début de la partie.
+	- Envoie de l'argent, des unitÃ©s crÃ©es au dÃ©but de la partie.
 
 	* server/Main.h, server/Commands.h, server/InGame.cpp (ARMCommand): Commande ARM
 
 	* server/Map.h (ECEvent): Support des evenements.
 
-	* server/Server.cpp: Commande ARM, et vérifie bien les flags des commandes.
+	* server/Server.cpp: Commande ARM, et vÃ©rifie bien les flags des commandes.
 
-	* server/Units.h: Conforme aux définitions de ses ancetres.
+	* server/Units.h: Conforme aux dÃ©finitions de ses ancetres.
 
-	* src/Sockets.cpp: Variable "error" pour éviter d'attendre quand il y a eu une erreur à la connexion.
+	* src/Sockets.cpp: Variable "error" pour Ã©viter d'attendre quand il y a eu une erreur Ã  la connexion.
 
 	* src/JoinGame.cpp: Support du mode +$
 
-	* lib/Outils.h (ECList): Mise à jour.
+	* lib/Outils.h (ECList): Mise Ã  jour.
 
 	* lib/Map.h: Modifs importantes dans plusieurs classes.
 
-	* lib/Units.cpp (ECArmy): Implémentation de fonctions élémentaires (mouvement, attaque, retour, etc).
+	* lib/Units.cpp (ECArmy): ImplÃ©mentation de fonctions Ã©lÃ©mentaires (mouvement, attaque, retour, etc).
 
 2006-03-04  Romain Bignon <progs@headfucking.net>
 
@@ -1864,22 +1876,22 @@
 
 	* lib/Outils.h (ECList): Liste.
 
-	* lib/Map.h: Rajout des entités, et de leur liste dans la map.
-	Rajout du nombre de soldats dans les premières armées.
+	* lib/Map.h: Rajout des entitÃ©s, et de leur liste dans la map.
+	Rajout du nombre de soldats dans les premiÃ¨res armÃ©es.
 	Rajout de typedef pour les IDs (char ou char[3]).
 
-	* lib/Channels.h: Rajout de la liste des entitées d'un player.
+	* lib/Channels.h: Rajout de la liste des entitÃ©es d'un player.
 
-	* lib/Units.h (ECBArmee): Armée de base dérivée de ECBEntity.
+	* lib/Units.h (ECBArmee): ArmÃ©e de base dÃ©rivÃ©e de ECBEntity.
 
-	* server/Channels.cpp: - Envoie lors du mode SENDING des armées de chaques villes
-	- Réorganisation de la propagation des modes plus simple et plus performante.
-	- Fonction EChannel::SendArm() pour envoyer un message ARM par rapport aux différents arguments de la fonction.
-	- Fonction EChannel::FindEntityName() pour trouver un nom d'entité non pris dans une liste.
+	* server/Channels.cpp: - Envoie lors du mode SENDING des armÃ©es de chaques villes
+	- RÃ©organisation de la propagation des modes plus simple et plus performante.
+	- Fonction EChannel::SendArm() pour envoyer un message ARM par rapport aux diffÃ©rents arguments de la fonction.
+	- Fonction EChannel::FindEntityName() pour trouver un nom d'entitÃ© non pris dans une liste.
 
 	* server/Main.h, server/Server.cpp: Commande ARM.
 
-	* server/maps: Mise à jour des maps.
+	* server/maps: Mise Ã  jour des maps.
 
 	* src/InGame.cpp: Affichage de la date dans le Loading.
 
@@ -1887,18 +1899,18 @@
 
 	* src/Outils.cpp (duration): Fonction pour avoir le temps d'une heure unix.
 
-	* src/Login.cpp, server/Login.cpp, server/Server.cpp, API: Affiche l'uptime à la connexion.
+	* src/Login.cpp, server/Login.cpp, server/Server.cpp, API: Affiche l'uptime Ã  la connexion.
 
-	* src/Map.cpp: Affichage de la preview qui couvre toute une surface définie (ou paramétrable), avec donc la taille
-	des cases variables suivant la taille de la carte. Affichage également des frontières, et coloriage des
-	propriétés des joueurs quand ils en ont.
+	* src/Map.cpp: Affichage de la preview qui couvre toute une surface dÃ©finie (ou paramÃ©trable), avec donc la taille
+	des cases variables suivant la taille de la carte. Affichage Ã©galement des frontiÃ¨res, et coloriage des
+	propriÃ©tÃ©s des joueurs quand ils en ont.
 
 	* src/gui/Memo.h: Variable pour afficher ou non le background transparent.
 
-	* lib/Batiments.h, lib/Units.h: Création des fichiers et classes de base.
+	* lib/Batiments.h, lib/Units.h: CrÃ©ation des fichiers et classes de base.
 
 	* lib/Colors.h, src/tools/Font.h, src/gui/ColorEdit.cpp: Suppression du noir dans les couleurs des joueurs, et rajout
-	pour ces memes joueurs de couleurs "foncées" du bleu, du rouge, du marron et du blanc.
+	pour ces memes joueurs de couleurs "foncÃ©es" du bleu, du rouge, du marron et du blanc.
 
 	* lib/Map.h: Rajout du map_infos qui contient quelques lignes d'informations un peu superflues.
 
@@ -1908,21 +1920,21 @@
 	* src/JoinGame.cpp: Quand l'etat est SENDING, afficher LoadingForm.
 
 	* src/Sockets.cpp, server/Channels.cpp, src/JoinGame.cpp: Utilisation d'un indicateur '$' dans JOI pour dire qu'on
-	veut *créer* un chan. Evite, quand on veut créer un chan, d'en rejoindre un existant ou d'essayer de joindre
-	une partie déjà lancée (et que le serveur s'étonne).
+	veut *crÃ©er* un chan. Evite, quand on veut crÃ©er un chan, d'en rejoindre un existant ou d'essayer de joindre
+	une partie dÃ©jÃ  lancÃ©e (et que le serveur s'Ã©tonne).
 
 2006-02-22  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/ColorEdit.cpp: Création du composant ColorEdit.
+	* src/gui/ColorEdit.cpp: CrÃ©ation du composant ColorEdit.
 
 	* src/JoinGame.cpp: Rajout de la couleur.
 
 2006-02-20  Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp server/Server.cpp, server/Login.cpp, server/Map.coo: Petit formatage des messages des Debug
-	pour plus de compréhension.
+	pour plus de comprÃ©hension.
 
-	* server/Channels.cpp: Support du passage de SENDING à PLAYING.
+	* server/Channels.cpp: Support du passage de SENDING Ã  PLAYING.
 
 2006-02-19  Romain Bignon <progs@headfucking.net>
 
@@ -1931,8 +1943,8 @@
 
 	* Changement des it++ en ++it (plus rapide).
 
-	* src/gui/Images.cpp: Pour corriger un bug avec ECMap::preview, il y a un paramètre dans le TImage pour dire ou non
-	si on veut que l'image soit supprimée à la suppression du composant.
+	* src/gui/Images.cpp: Pour corriger un bug avec ECMap::preview, il y a un paramÃ¨tre dans le TImage pour dire ou non
+	si on veut que l'image soit supprimÃ©e Ã  la suppression du composant.
 
 	* Outils.cpp (get_time): Correction, il n'affichait pas l'heure.
 
@@ -1946,36 +1958,36 @@
 
 	* server/Channels.cpp: Le salon se met en mode SENDING quand tous les joueurs sont READY.
 
-	* server/Debug.cpp: Le fichier errors.log devient plus clair car mieux structuré.
+	* server/Debug.cpp: Le fichier errors.log devient plus clair car mieux structurÃ©.
 
 2006-02-18  Romain Bignon <progs@headfucking.net>
 
-	* test/map.cpp: Petite mise à jour avec prise en compte de la date et test du ++ dessus.
+	* test/map.cpp: Petite mise Ã  jour avec prise en compte de la date et test du ++ dessus.
 
 	* lib/Map.cpp: Ajout de ECBDate.
 
-	* API: Section "6. Êtat de la partie"
+	* API: Section "6. ÃŠtat de la partie"
 
 	* src/JoinGame.cpp, server/Channels.c: Ne peut se mettre Ready que si il a une position et une couleur.
 
 	* src/JoinGame.cpp: Affichage de la preview.
 
-	* src/Map.cpp: Fonction pour créer la preview.
+	* src/Map.cpp: Fonction pour crÃ©er la preview.
 
-	* src/gui/Image.cpp: Création d'un composant TImage.
+	* src/gui/Image.cpp: CrÃ©ation d'un composant TImage.
 
 	* lib/Channels.cpp, src/Channels.cpp, server/Channels.c: Rajout du status de "Op" pour le +o. Il ne peut y avoir qu'un
 	seul owner.
 
 	* src/tools/Font.cpp: Correction (enfin!) du bug du cpu et memoire full, en reprenant le code de wormux pour ce fichier.
 
-	* src/tools/Images.cpp: Petite amélioration.
+	* src/tools/Images.cpp: Petite amÃ©lioration.
 
 	* src/Main.cpp, ...: Mise du membre EuroConqApp::fonts et application partout.
 
 2006-02-17  Romain Bignon <progs@headfucking.net>
 
-	* src/JoinGame.cpp: Reception de la liste des maps et de la map paramétrée.
+	* src/JoinGame.cpp: Reception de la liste des maps et de la map paramÃ©trÃ©e.
 
 	* lib/Map.cpp: Utilisation d'une fonction virtuelle pour le Z d'une case, ainsi que quelques petites modifs.
 
@@ -1986,11 +1998,11 @@
 2006-02-16  Romain Bignon <progs@headfucking.net>
 
 	* test/map.cpp: Outil permettant d'ouvrir une map (genre gna.map) et d'avoir des infos sur elle une fois qu'on a
-	vérifié qu'elle ne comportait pas d'erreurs.
+	vÃ©rifiÃ© qu'elle ne comportait pas d'erreurs.
 
-	* src/Map.cpp: Création des différentes classes ainsi que de diverses fonctions. Le chargement de la map MARCHE !
+	* src/Map.cpp: CrÃ©ation des diffÃ©rentes classes ainsi que de diverses fonctions. Le chargement de la map MARCHE !
 
-	* src/Commands.h (ER1): Prise en charge (enfin) de l'ER1 (CANTJOIN) même si elle est inutile !!
+	* src/Commands.h (ER1): Prise en charge (enfin) de l'ER1 (CANTJOIN) mÃªme si elle est inutile !!
 
 	* lib/Debug.h (VCName): macro pour les char.
 
@@ -2002,7 +2014,7 @@
 
 2006-02-13  Romain Bignon <progs@headfucking.net>
 
-	* src/Map.cpp, lib/Map.cpp, server/Map.cpp: Création des fichiers.
+	* src/Map.cpp, lib/Map.cpp, server/Map.cpp: CrÃ©ation des fichiers.
 
 	* src/JoinGame.cpp: Utilisation des valeurs interdites pour les "position" (TSpinEdit) des players.
 
@@ -2010,7 +2022,7 @@
 
 	* lib/Channels.h: Renomage des ECBChannel::*Place() en ECBChannel::*Position().
 
-	* server/Channels.cpp (EChannel-send_modes()): Fonction qui envoie les modes aux players à partir d'un ou de
+	* server/Channels.cpp (EChannel-send_modes()): Fonction qui envoie les modes aux players Ã  partir d'un ou de
 	plusieurs senders.
 
 	* src/JoinGame.cpp: Utilise comme position maximale la limite et non plus le nombre de joueurs. En outre, actualise
@@ -2022,26 +2034,26 @@
 
 2006-02-08  Romain Bignon <progs@headfucking.net>
 
-	* lib/Outils.h (MyFree): Macro qui utilise delete sur un pointeur et qui l'assigne à 0.
+	* lib/Outils.h (MyFree): Macro qui utilise delete sur un pointeur et qui l'assigne Ã  0.
 
 	* Utilisation de Doxygen.
 
 2006-01-15  Romain Bignon <progs@headfucking.net>
 
-	* src/JoinGame.cpp (TPlayerLine): Composant utilisé dans un TList pour la liste des players dans
+	* src/JoinGame.cpp (TPlayerLine): Composant utilisÃ© dans un TList pour la liste des players dans
 	TGameInfos.
 
-	* src/gui/Component.h (TList): Création du composant TList, conteneur de composants.
+	* src/gui/Component.h (TList): CrÃ©ation du composant TList, conteneur de composants.
 
-	* Utilisation d'iterateurs un peu partout plutot que de boucles à index.
+	* Utilisation d'iterateurs un peu partout plutot que de boucles Ã  index.
 
-	* server/Channels.cpp: Interdiction d'utiliser une place ou une couleur déjà prise.
+	* server/Channels.cpp: Interdiction d'utiliser une place ou une couleur dÃ©jÃ  prise.
 
 2006-01-14  Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Menu.cpp: Correction de Menu::EnterString().
 
-	* src/Login.cpp, src/Main.cpp: request_game() a bougé dans Login.cpp et a été entièrement remodelé
+	* src/Login.cpp, src/Main.cpp: request_game() a bougÃ© dans Login.cpp et a Ã©tÃ© entiÃ¨rement remodelÃ©
 	avec l'utilisation d'un TForm plutot que d'un menu. Affichage du MOTD
 
 	* server/Config.cpp, server/Login.cpp: Envoie d'un motd.
@@ -2061,42 +2073,42 @@
 
 	* src/Main.h: Sauvegarde de path dans une variable de EuroConqApp.
 
-	* src/Defines.h, server/Defines.h: Passage à des constantes plutot que des macros pour les tailles.
+	* src/Defines.h, server/Defines.h: Passage Ã  des constantes plutot que des macros pour les tailles.
 
 2006-01-13  Romain Bignon <progs@headfucking.net>
 
-	* src/tools/Font.cpp: Suspension temporaire du cache, il causait des problèmes.
+	* src/tools/Font.cpp: Suspension temporaire du cache, il causait des problÃ¨mes.
 
 	* src/gui/Boutton.cpp (Test): Ne renvoie true que si le bouton est Enabled.
 
 	* API, lib/Channels.h, server/Channels.cpp, src/JoinGames.cpp:
 	- Changement du protocole de PLS qui affiche si l'user est ok.
-	- Rajout du mode '!' pour se définir comme étant OK.
+	- Rajout du mode '!' pour se dÃ©finir comme Ã©tant OK.
 	- Noter en particulier dans server/Channels.cpp::SETCommand::Exec la suppression des deux macros
-	  dont la laideur me faisait frémir pendant mon someil.
+	  dont la laideur me faisait frÃ©mir pendant mon someil.
 
-	* src/gui/SpinEdit.cpp: La fonction Click() renvoie true que si la valeur a été modifiée.
+	* src/gui/SpinEdit.cpp: La fonction Click() renvoie true que si la valeur a Ã©tÃ© modifiÃ©e.
 
 2006-01-01  Laurent Defert <lodesi2@yahoo.fr>
 
-	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et éclaircissement du code.
+	* src/Main.cpp, src/Menu.cpp: Correction de quelques bugs et Ã©claircissement du code.
 
 2006-01-01  Romain Bignon <progs@headfucking.net>
 
 	* DEVELOPPEURS: Fichier pour que les developpeurs puissent laisser des notes aux autres.
-	(oui je sais il n'y a que deux developpeurs et l'IRC ça existe mais bon, on fait genre)
+	(oui je sais il n'y a que deux developpeurs et l'IRC Ã§a existe mais bon, on fait genre)
 
-	* patch: Répertoire contenant les patchs qui ont été receptionnés de l'exterieur (oui je *sais*
+	* patch: RÃ©pertoire contenant les patchs qui ont Ã©tÃ© receptionnÃ©s de l'exterieur (oui je *sais*
 	y a personne qui en envoie mais BON).
 
 2005-12-28  Romain Bignon <progs@headfucking.net>
 
-	* *.h: Passage de la majorité des fonctions membres qui le doivent en "const" pour respecter
+	* *.h: Passage de la majoritÃ© des fonctions membres qui le doivent en "const" pour respecter
 	la norme C++.
 
 2005-12-21  Romain Bignon <progs@headfucking.net>
 
-	* src/tools/Font.cpp: Mise d'un cache. (© Wormux)
+	* src/tools/Font.cpp: Mise d'un cache. (Â© Wormux)
 
 	* src/gui/SpinEdit.cpp (TSpinEdit): Composant TSpinEdit pour un Edit de nombres.
 
@@ -2112,33 +2124,33 @@
 
 	* server/Channels.cpp: Envoie des modes avec SET.
 
-	* lib/Outils.h (StrToTyp): La fonction renvoie désormais la valeur plutot que de l'assigner
-	dans une variable donnée en argument.
-	(FichierExist): Fonction pour vérifier l'existence d'un fichier.
+	* lib/Outils.h (StrToTyp): La fonction renvoie dÃ©sormais la valeur plutot que de l'assigner
+	dans une variable donnÃ©e en argument.
+	(FichierExist): Fonction pour vÃ©rifier l'existence d'un fichier.
 
 	* lib/Channels.cpp (ECBChannel::ModesStr): Fonction qui retourne le buffer des modes.
 	(ECBChannel::PlayerList): Rajout de la position et de la couleur.
 
-	* API: Modification de SET: prend en charges des modes à la IRC. Voir section 4. Modes.
+	* API: Modification de SET: prend en charges des modes Ã  la IRC. Voir section 4. Modes.
 
 2005-12-20  Romain Bignon <progs@headfucking.net>
 
-	* src/JoinGame.cpp: Utilisation du TForm pour les écrans ListGame et GameInfos.
+	* src/JoinGame.cpp: Utilisation du TForm pour les Ã©crans ListGame et GameInfos.
 
-	* Edit.cpp,Memo.cpp,ListBox.cpp,Button.cpp,TextButton.cpp: Dérivation de TComponent
+	* Edit.cpp,Memo.cpp,ListBox.cpp,Button.cpp,TextButton.cpp: DÃ©rivation de TComponent
 
 	* src/gui/MessageBox.cpp: Utilisation du TForm pour faire marcher correctement.
 
-	* src/gui/Component.cpp: Création de TComponent qui est la base de tous les composants.
+	* src/gui/Component.cpp: CrÃ©ation de TComponent qui est la base de tous les composants.
 
-	* src/gui/Form.cpp: Création de TForm qui est la base des forms contenant les composants.
-	Ça va permettre de gérer les "fenêtres" plus simplement.
+	* src/gui/Form.cpp: CrÃ©ation de TForm qui est la base des forms contenant les composants.
+	Ã‡a va permettre de gÃ©rer les "fenÃªtres" plus simplement.
 
 	* src/gui/Label.cpp: Composant TLabel. Le nom est assez explicite.
 
 2005-12-16  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/MessageBox.cpp (TMessageBox): Classe d'un composant qui affiche une fenêtre avec un message
+	* src/gui/MessageBox.cpp (TMessageBox): Classe d'un composant qui affiche une fenÃªtre avec un message
 	et des boutons d'un certain type.
 
 	* server/Config.cpp, server/euroconqd.conf: Rajout du champ DEFLIMITE pour la limite par default
@@ -2151,11 +2163,11 @@
 
 	* src/gui/Memo.cpp: Rajout fonctions SetHeight et SetWidth pour modifier la taille.
 
-	* configure.ac: Correction d'un problème qui ne mettait plus les cflags de sdl.
+	* configure.ac: Correction d'un problÃ¨me qui ne mettait plus les cflags de sdl.
 
-	* Petites modifs par ci par là.
+	* Petites modifs par ci par lÃ .
 
-	* src/Sockets.cpp (read_sock): Correction d'un bug qui rajoutait à chaques fois un parv.
+	* src/Sockets.cpp (read_sock): Correction d'un bug qui rajoutait Ã  chaques fois un parv.
 
 2005-12-02  Romain Bignon <progs@headfucking.net>
 
@@ -2165,17 +2177,17 @@
 
 2005-11-30  Romain Bignon <progs@headfucking.net>
 
-	* src/gui/: Renomage des différents composants en T*.
+	* src/gui/: Renomage des diffÃ©rents composants en T*.
 
-	* configure.ac: Possibilité de ne pas compiler le jeu.
+	* configure.ac: PossibilitÃ© de ne pas compiler le jeu.
 
 	* Application des debugages un peu partout...
 
-	* lib/Outils.cpp (Format): Fonction qui formate (à la sprintf) mais qui retourne le résultat dans
+	* lib/Outils.cpp (Format): Fonction qui formate (Ã  la sprintf) mais qui retourne le rÃ©sultat dans
 	une std::string.
-	(get_time): Retourne la date formatée.
+	(get_time): Retourne la date formatÃ©e.
 
-	* lib/Debug.cpp: Création fichier.
+	* lib/Debug.cpp: CrÃ©ation fichier.
 	(TECExcept): Classe d'exception.
 
 	* src/Debug.cpp (Debug): Fonction pour envoyer un debug au serveur et/ou printf.
@@ -2191,9 +2203,9 @@
 
 	* src/JoinGame.cpp: Utilisation du ListBox et du Edit pour faire un petit espace de discussion.
 
-	* src/gui/Memo.cpp: Création du composant Memo en s'inspirant du ListBox.
+	* src/gui/Memo.cpp: CrÃ©ation du composant Memo en s'inspirant du ListBox.
 
-	* src/gui/Edit.cpp: Création du composant Edit.
+	* src/gui/Edit.cpp: CrÃ©ation du composant Edit.
 
 2005-11-27  Romain Bignon <progs@headfucking.net>
 
@@ -2213,9 +2225,9 @@
 
 	* src/Login.cpp: Gestion commande Used
 
-	* src/Main.cpp: Meilleur système de connexion.
+	* src/Main.cpp: Meilleur systÃ¨me de connexion.
 
-	* src/gui/Menu.cpp: Utilisation d'une fonction plus généraliste et statique Menu::EnterString().
+	* src/gui/Menu.cpp: Utilisation d'une fonction plus gÃ©nÃ©raliste et statique Menu::EnterString().
 
 	* src/Sockets.cpp: Parsage du premier argument de parv (player(s)).
 
@@ -2227,49 +2239,49 @@
 
 	* src/Resources.cpp: Anim NormalButton.
 
-	* src/gui/BouttonText.cpp: Rajout du fichier avec ButtonText pour dessiner un bouton (©wormux)
+	* src/gui/BouttonText.cpp: Rajout du fichier avec ButtonText pour dessiner un bouton (Â©wormux)
 
 2005-11-25  Romain Bignon <progs@headfucking.net>
 
-	* src/JoinGame.cpp: Rajout du fichier pour la boucle de la liste des jeux, ainsi que de l'écran
-	de création/join de jeu.
+	* src/JoinGame.cpp: Rajout du fichier pour la boucle de la liste des jeux, ainsi que de l'Ã©cran
+	de crÃ©ation/join de jeu.
 
-	* src/data/anims: Répertoire créé. Avec dedans les anims des boutons "up" et "down".
+	* src/data/anims: RÃ©pertoire crÃ©Ã©. Avec dedans les anims des boutons "up" et "down".
 
-	* src/tools/Maths.cpp: Création fichier avec deux petites fonctions.
+	* src/tools/Maths.cpp: CrÃ©ation fichier avec deux petites fonctions.
 
 	* src/Resources.cpp: rajout des sprites pour UpButton et DownButton
 
-	* src/gui/ListBox.cpp: Rajout du fichier avec la classe ListBox pour dessiner une listbox (©wormux)
+	* src/gui/ListBox.cpp: Rajout du fichier avec la classe ListBox pour dessiner une listbox (Â©wormux)
 
-	* src/gui/Boutton.cpp: Rajout du fichier avec la classe Button pour dessiner un bouton (©wormux)
+	* src/gui/Boutton.cpp: Rajout du fichier avec la classe Button pour dessiner un bouton (Â©wormux)
 
 	* src/tools/Images.h: rajout de ECSprite::GetWidth() et ECSprite::GetHeight()
 
 2005-11-23  Romain Bignon <progs@headfucking.net>
 
-	* src/gui: Création du répertoire. Mise de Menu.cpp dedans ainsi que de ListBox.cpp (vide).
+	* src/gui: CrÃ©ation du rÃ©pertoire. Mise de Menu.cpp dedans ainsi que de ListBox.cpp (vide).
 
-	* server/Server.cpp (TClient::Init): Met la valeur de lastread à maintenant pour éviter un
-	PIG immédiat.
+	* server/Server.cpp (TClient::Init): Met la valeur de lastread Ã  maintenant pour Ã©viter un
+	PIG immÃ©diat.
 
 	* server/Login.cpp (BYECommand): Commande pour faire partir un client.
 
 	* server/Channels.cpp (LSPCommande): Commande pour lister les jeux.
 	(~EChannel): Destructeur se retire de la liste ChanList.
 
-	* server/Channels.cpp, server/Channels.h (sendto_players): envoie à tous les joueurs du jeu
-	(JOICommand): commande pour joindre ou créer un jeu
+	* server/Channels.cpp, server/Channels.h (sendto_players): envoie Ã  tous les joueurs du jeu
+	(JOICommand): commande pour joindre ou crÃ©er un jeu
 	(LEACommand): commande pour partir d'un jeu
 
 	* lib/Outils.c (FormatStr): fonction qui formate les chaines en un "mot" (mise de '\')
 
 2005-11-22  Romain Bignon <progs@headfucking.net>
 
-	* API: Mise à jour.
+	* API: Mise Ã  jour.
 
 	* server/Server.h, server/Server.cpp, server/Main.h, server/Login.cpp: Utilisation plus
-	structurée de TClient;
+	structurÃ©e de TClient;
 
 	* server/Channels.cpp, server/Channels.h (EChannels): Structure serveur des channels.
 	(ECPlayer): Structure serveur des players.
@@ -2279,9 +2291,9 @@
 
 2005-11-21  Romain Bignon <progs@headfucking.net>
 
-	* server/Channels.cpp, lib/Channels.h: Création des fichiers.
+	* server/Channels.cpp, lib/Channels.h: CrÃ©ation des fichiers.
 
-	* lib/Channels.cpp, lib/Channels.h: Création des fichiers.
+	* lib/Channels.cpp, lib/Channels.h: CrÃ©ation des fichiers.
 	(EChannel): classe channel par default.
 	(ECPlayer): classe player par default.
 
@@ -2289,27 +2301,27 @@
 
 	* src/Login.cpp: Prise en charge de la commande AIM.
 
-	* API: Mise à jour.
+	* API: Mise Ã  jour.
 
 	* INSTALL: Remplissage.
 
 2005-11-20  Romain Bignon <progs@headfucking.net>
 
-	* src/Sockets.cpp: réécriture des sockets. Utilisation de SDL_Thread.
+	* src/Sockets.cpp: rÃ©Ã©criture des sockets. Utilisation de SDL_Thread.
 
 	* src/Main.cpp (EuroConqApp::request_game()): Utilisation d'un second menu pour "Jouer".
 
 2005-11-18  Romain Bignon <progs@headfucking.net>
 
-	* autogen.sh, configure.ac: prise en compte sdl, ajout DEBUG, changement autogen.sh (©wormux), etc.
+	* autogen.sh, configure.ac: prise en compte sdl, ajout DEBUG, changement autogen.sh (Â©wormux), etc.
 
 	* Reorganisation des dossiers
 
-	* Passage à SDL terminé (mais il faut debuguer !)
+	* Passage Ã  SDL terminÃ© (mais il faut debuguer !)
 
-	* src/Menu.cpp: Passage normalement correct à SDL.
+	* src/Menu.cpp: Passage normalement correct Ã  SDL.
 
-	* src/tools/Images.h, src/tools/Images.c: Création du fichier (reprise de fonctions d'un tuto)
+	* src/tools/Images.h, src/tools/Images.c: CrÃ©ation du fichier (reprise de fonctions d'un tuto)
 	(ECImage): classe pour les images
 	(ECSpriteBase): classe pour la base des animations
 	(ECSprite): classe pour les animations
@@ -2339,47 +2351,47 @@
 
 	* server/Commands.h, server/Server.c: Parsage des commandes correct.
 
-	* server/Server.c (ECServer::parsemsg): Création de cette fonction de parsage.
-	(ECServer::sendrpl): Création de cette fonction pour envoyer un message
-	(ECServer::rpl): Création de cette fonction qui renvoie le pattern à partir d'un enumérateur.
+	* server/Server.c (ECServer::parsemsg): CrÃ©ation de cette fonction de parsage.
+	(ECServer::sendrpl): CrÃ©ation de cette fonction pour envoyer un message
+	(ECServer::rpl): CrÃ©ation de cette fonction qui renvoie le pattern Ã  partir d'un enumÃ©rateur.
 
 2005-11-08  Romain Bignon <progs@headfucking.net>
 
 	* pics/loading.png: Utilisation d'un png pour le loading.
 
-	* server/: Création du serveur (option --enable-server dans configure pour compiler).
+	* server/: CrÃ©ation du serveur (option --enable-server dans configure pour compiler).
 
-	* lib/: Utilisation maintenant de ce rep pour mettre le code utilisé par les deux programmes.
+	* lib/: Utilisation maintenant de ce rep pour mettre le code utilisÃ© par les deux programmes.
 
 	* Sockets.cpp: Theoriquement plus aucun bug.
 
 2005-11-08  Romain Bignon <progs@headfucking.net>
 
-	* Sockets.cpp: Système de commandes theoriquement *pret*.
+	* Sockets.cpp: SystÃ¨me de commandes theoriquement *pret*.
 
-	* Sockets (EC_Client::send): Fonction crée.
+	* Sockets (EC_Client::send): Fonction crÃ©e.
 
 2005-11-07  Romain Bignon <progs@headfucking.net>
 
-	* Sockets.cpp: Ébauche de la gestion des commandes.
+	* Sockets.cpp: Ã‰bauche de la gestion des commandes.
 
 2005-11-06  Romain Bignon <progs@headfucking.net>
 
 	* Menu.cpp: Gestion de flags:
 	M_READ_ONLY: Champ non modifiable ou lien inactif, change la couleur du focus en gris.
-	M_NOFMAJ: Ne pas mettre une maj automatique au début d'une chaine pour un MenuItem_String.
-	M_RETOUR: Gère comme étant un bouton de retour: légèrement séparé, et retourne au menu supérieur.
+	M_NOFMAJ: Ne pas mettre une maj automatique au dÃ©but d'une chaine pour un MenuItem_String.
+	M_RETOUR: GÃ¨re comme Ã©tant un bouton de retour: lÃ©gÃ¨rement sÃ©parÃ©, et retourne au menu supÃ©rieur.
 
 	* Sockets.c (connect_to_server): Affichage d'un message d'erreur si la connexion echoue.
 
-	* Sockets.c: Utilisation des sockets "de bases" avant de se servir de CL_Socket: permet d'éviter
+	* Sockets.c: Utilisation des sockets "de bases" avant de se servir de CL_Socket: permet d'Ã©viter
 	un bug bizare qui ne permet de se connecter qu'en local.
 
-	* Outils.cpp (stringtok): Équivalent de strtok pour les chaines.
+	* Outils.cpp (stringtok): Ã‰quivalent de strtok pour les chaines.
 
 	* Outils.cpp: Outils
 
-	* Config.cpp: Création de la configuration.
+	* Config.cpp: CrÃ©ation de la configuration.
 
 	* API: Reflexion sur le protocole.
 
@@ -2387,23 +2399,23 @@
 
 2005-11-05  Romain Bignon <progs@headfucking.net>
 
-	* Sockets.cpp: Création d'un support sockets.
+	* Sockets.cpp: CrÃ©ation d'un support sockets.
 
 	* Utilisation d'un repositery CVS.
 
-	* Menu.cpp: Possibilité d'une fonction à appeler lors de l'utilisation d'un Item.
+	* Menu.cpp: PossibilitÃ© d'une fonction Ã  appeler lors de l'utilisation d'un Item.
 
 	* pics/smallfont.pcs: Modification de la fonte.
 
 	* pics/: Utilisations d'un beau background. (By Thomas)
 
-	* Defines.h: Création du fichier et d'un super système de gestion des versions.
+	* Defines.h: CrÃ©ation du fichier et d'un super systÃ¨me de gestion des versions.
 
-	* Main.cpp (main): Création fonction avec menu.
+	* Main.cpp (main): CrÃ©ation fonction avec menu.
 
-	* Menu.cpp: Reprise du fichier de clanbomber pour la création de menus.
+	* Menu.cpp: Reprise du fichier de clanbomber pour la crÃ©ation de menus.
 
-	* Timer.cpp: Reprise du fichier de clanbomber pour la création de timers.
+	* Timer.cpp: Reprise du fichier de clanbomber pour la crÃ©ation de timers.
 
 	* Resources.cpp: Inspiration de clanbomber pour l'utilisation des fichiers de ressources.
 

@@ -51,7 +51,7 @@ public:
 
     virtual ~TClient() {}
 
-/* Méthodes */
+/* MÃ©thodes */
 public:
 
 	/** Send a reply to client.
@@ -128,7 +128,7 @@ public:
 	virtual void UnLock() {}
 	virtual bool Locked() const { return false; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::string nick;
 	time_t lastread;
@@ -175,7 +175,7 @@ public:
 /* Attributs */
 public:
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
     char RecvBuf[ECD_RECVSIZE+1];
     size_t recvlen;

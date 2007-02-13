@@ -344,7 +344,7 @@ template<class T> class Vector2
 		}
 
 		/**
-		 *  Calcule l'angle en radian du point M dans le repère de centre O
+		 *  Calcule l'angle en radian du point M dans le repÃšre de centre O
 		 *
 		 * Pour O=(0,0) :
 		 * - M=(10,10) -> PI/4 (0.78)

@@ -26,8 +26,8 @@
 #include <set>
 
 /* Note: il n'y a theoriquement aucune redefinition des ECB* pour les classes suivantes car toutes
- * les informations y sont déjà incluses.
- * C'est pourquoi pour les types qui n'ont pas été à redéfinir il y a des typedef pour les noms courants.
+ * les informations y sont dÃ©jÃ  incluses.
+ * C'est pourquoi pour les types qui n'ont pas Ã©tÃ© Ã  redÃ©finir il y a des typedef pour les noms courants.
  */
 
 typedef ECBMapPlayer   ECMapPlayer;
@@ -64,7 +64,7 @@ public:
 	/** Use this function to make an union with an other entity */
 	virtual void Union(ECEntity*);
 
-	/** Par default, si c'est un CountryMake change l'owner de la country, et ensuite l'owner de l'unité investie */
+	/** Par default, si c'est un CountryMake change l'owner de la country, et ensuite l'owner de l'unitÃ© investie */
 	virtual void Invest(ECBEntity* e);
 
 	virtual void ChangeOwner(ECBPlayer*);
@@ -121,7 +121,7 @@ public:
 
 	ECList<ECEvent*>* Events() { return &events; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECList<ECEvent*> events;
 	uint shooted;
@@ -156,34 +156,34 @@ public:
 	uint Flags() const { return flags; }
 	void SetFlags(uint _f) { flags = _f; }
 
-	/** Entitées associées. Il y en a qu'une seule *SAUF* pour les attaques */
+	/** EntitÃ©es associÃ©es. Il y en a qu'une seule *SAUF* pour les attaques */
 	ECList<ECEntity*> *Entities() { return &entities; }
 
 	/** Set entity owner */
 	ECEntity* Entity() const { return entity; }
 	void SetEntity(ECEntity* e) { entity = e; }
 
-	/** Case associée */
+	/** Case associÃ©e */
 	ECBCase* Case() const { return acase; }
 	void SetCase(ECBCase* c) { acase = c; }
 
-	/** Si c'est une création, une union ou autre, mettre le nombre */
+	/** Si c'est une crÃ©ation, une union ou autre, mettre le nombre */
 	void SetNb(uint n) { nb = n; }
 	uint Nb() { return nb; }
 
-	/** CE N'EST PAS LE TYPE DE L'ÉVENEMENT, MAIS LE TYPE ASSOCIÉ À UNE CREATION D'ENTITÉ */
+	/** CE N'EST PAS LE TYPE DE L'Ã‰VENEMENT, MAIS LE TYPE ASSOCIÃ‰ Ã€ UNE CREATION D'ENTITÃ‰ */
 	void SetType(uint t) { type = t; }
 	uint Type() { return type; }
 
-	/** C'est utilisé pour les MOUVEMENTS */
+	/** C'est utilisÃ© pour les MOUVEMENTS */
 	ECMove* Move() { return &move; }
 
-	/** C'est utilisé pour les ATTAQUES, on link les evenements de mouvement si il y a */
+	/** C'est utilisÃ© pour les ATTAQUES, on link les evenements de mouvement si il y a */
 	std::vector<ECEvent*> Linked() const { return linked; }
 	void AddLinked(ECEvent* li) { linked.push_back(li); }
 	bool RemoveLinked(ECEvent* li, bool use_delete = false);
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECBCase* acase;
 	uint flags;
@@ -297,14 +297,14 @@ public:
 
 	virtual void RemoveAnEntity(ECBEntity*, bool use_delete = false);
 
-/* Méthodes */
+/* MÃ©thodes */
 public:
 
 	static bool LoadMaps();
 
 	virtual ECBCase* CreateCase(uint _x, uint _y, char type_id);
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	EventVector map_events;
 	uint i;

@@ -81,10 +81,10 @@ int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
 	ECPlayer *pl = cl->Player()->Channel()->GetPlayer(parv[1].c_str());
 
 	if(!pl)
-		return Debug(W_DESYNCH, "KICK: joueur non trouvé");
+		return Debug(W_DESYNCH, "KICK: joueur non trouvÃ©");
 
 	if(pl == cl->Player())
-		return Debug(W_DESYNCH, "KICK: le joueur cherche à se kicker");
+		return Debug(W_DESYNCH, "KICK: le joueur cherche Ã  se kicker");
 
 	if(pl->Client())
 	{
@@ -263,20 +263,20 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				if(j>=parv.size()) { Debug(W_DESYNCH, "SET +v: pas de nick"); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "SET +v: %s non trouvé", parv[(j-1)].c_str()); break; }
+				if(!pl) { Debug(W_DESYNCH, "SET +v: %s non trouvÃ©", parv[(j-1)].c_str()); break; }
 
 				if(!pl->Disconnected() || pl->Lost())
 				{
-					Debug(W_DESYNCH, "SET +v: %s n'est pas deconnecté ou a déjà perdu.", pl->GetNick());
+					Debug(W_DESYNCH, "SET +v: %s n'est pas deconnectÃ© ou a dÃ©jÃ  perdu.", pl->GetNick());
 					break;
 				}
 				if(!pl->AddVote(sender))
 				{
-					Debug(W_DESYNCH, "SET +v: %s a déjà voté pour %s", sender->GetNick(), pl->GetNick());
+					Debug(W_DESYNCH, "SET +v: %s a dÃ©jÃ  votÃ© pour %s", sender->GetNick(), pl->GetNick());
 					break;
 				}
-				/* Comme on a pas reçu un nombre en argument, on ne le fait pas envoyer plus bas mais tout de suite.
-				 * Comme ça ça apparait avant l'expulsion éventuelle */
+				/* Comme on a pas reÃ§u un nombre en argument, on ne le fait pas envoyer plus bas mais tout de suite.
+				 * Comme Ã§a Ã§a apparait avant l'expulsion Ã©ventuelle */
 				sender->Channel()->send_modes(pl, "+v", TypToStr(pl->Votes()));
 				uint h = sender->Channel()->NbHumains();
 				uint r =   (h == 1) ? 1                // Il n'y a qu'un humain donc son seul vote compte
@@ -297,7 +297,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					break;
 				}
 				if(!sender->IsPriv())
-					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilÃ©giÃ©", add ? '+' : '-', parv[1][i]);
 
 				if(add)
 				{
@@ -321,7 +321,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					break;
 				}
 				if(!sender->IsPriv())
-					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilÃ©giÃ©", add ? '+' : '-', parv[1][i]);
 
 				if(add)
 				{
@@ -344,7 +344,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					break;
 				}
 				if(!sender->IsPriv())
-					return Debug(W_DESYNCH, "SET %c%c: d'un non privilégié", add ? '+' : '-', parv[1][i]);
+					return Debug(W_DESYNCH, "SET %c%c: d'un non privilÃ©giÃ©", add ? '+' : '-', parv[1][i]);
 
 				if(add)
 				{
@@ -354,11 +354,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						if(mapi >= (sender->Channel()->IsMission() ? MissionList : MapList).size())
 							Debug(W_DESYNCH, "SET +m: de la map %d hors de la liste (%d)", mapi,
 							                 (sender->Channel()->IsMission() ? MissionList : MapList).size());
-						/* Pour éviter la mise de plusieurs maps successivement, on ne traite que la dernière
-						 * donnée. Donc une fois qu'on a traité la validité du numero de la map, on le met dans
-						 * une variable qui sera vérifié à la fin de la boucle.
-						 * On ne rajoutera qu'à ce moment là le "+m" et le paramètre, donc pas de valeur attribuée
-						 * à changed ici.
+						/* Pour Ã©viter la mise de plusieurs maps successivement, on ne traite que la derniÃ¨re
+						 * donnÃ©e. Donc une fois qu'on a traitÃ© la validitÃ© du numero de la map, on le met dans
+						 * une variable qui sera vÃ©rifiÃ© Ã  la fin de la boucle.
+						 * On ne rajoutera qu'Ã  ce moment lÃ  le "+m" et le paramÃ¨tre, donc pas de valeur attribuÃ©e
+						 * Ã  changed ici.
 						 */
 						else
 							map = (sender->Channel()->IsMission() ? MissionList : MapList)[mapi];
@@ -368,7 +368,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					Debug(W_DESYNCH, "SET -m: interdit.");
 				break;
 			case '!':
-				/* Autorise seulement à se déclarer comme OK, ne peut en aucun cas retirer ce qu'il
+				/* Autorise seulement Ã  se dÃ©clarer comme OK, ne peut en aucun cas retirer ce qu'il
 				 * a dit par la suite.
 				 */
 				if(!add)
@@ -397,7 +397,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					uint nok = 0;
 					for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ++nok;
 					if(nok >= (sender->Channel()->Map()->MaxPlayers() - 1))
-						break; // C'est pas forcément une erreur
+						break; // C'est pas forcÃ©ment une erreur
 				}
 
 				if(!sender->Channel()->Joinable() || !sender->IsIA())
@@ -415,7 +415,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				if(!sender->IsPriv())
 				{
-					Debug(W_DESYNCH, "SET %cr: d'un non privilégié", add ? '+' : '-');
+					Debug(W_DESYNCH, "SET %cr: d'un non privilÃ©giÃ©", add ? '+' : '-');
 					break;
 				}
 				sender->Channel()->SetFastGame(add);
@@ -433,10 +433,10 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					{ Debug(W_DESYNCH, "SET %c%c: d'un non owner", add ? '+' : '-', parv[1][i]); break; }
 				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %co: pas de nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "SET %co: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
+				if(!pl) { Debug(W_DESYNCH, "SET %co: %s non trouvÃ©", add ? '+' : '-', parv[(j-1)].c_str()); break; }
 				if(pl->IsOwner())
 				{
-					Debug(W_DESYNCH, "SET %co: %s est owner et ne peut pas être op.", parv[(j-1)].c_str());
+					Debug(W_DESYNCH, "SET %co: %s est owner et ne peut pas Ãªtre op.", parv[(j-1)].c_str());
 					break;
 				}
 				pl->SetOp(add);
@@ -452,7 +452,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				if(j>=parv.size()) { Debug(W_DESYNCH, "SET %ca: pas de nick", add ? '+' : '-'); break; }
 				ECPlayer *pl = sender->Channel()->GetPlayer(parv[j++].c_str());
-				if(!pl) { Debug(W_DESYNCH, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str()); break; }
+				if(!pl) { Debug(W_DESYNCH, "SET %ca: %s non trouvÃ©", add ? '+' : '-', parv[(j-1)].c_str()); break; }
 				changed = YES_WITHPARAM;
 				if(add)
 				{
@@ -462,7 +462,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						sender->AddAllie(pl);
 				}
 				else if(!sender->RemoveAllie(pl))
-					changed = 0; // En cas de lag, si on reçoit deux fois de suite un -a, ça peut etre long..
+					changed = 0; // En cas de lag, si on reÃ§oit deux fois de suite un -a, Ã§a peut etre long..
 				break;
 			}
 			case 'n':
@@ -486,7 +486,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Nation() != nation; ++it);
 						if(it != plv.end())
-							break; /* Nation déjà utilisée */
+							break; /* Nation dÃ©jÃ  utilisÃ©e */
 					}
 					sender->SetNation(nation);
 					if(!need_ready) need_ready = NEEDREADY_ME;
@@ -520,7 +520,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Color() != color; ++it);
 						if(it != plv.end())
-							break; /* Couleur déjà utilisée */
+							break; /* Couleur dÃ©jÃ  utilisÃ©e */
 					}
 					sender->SetColor(color);
 					if(!need_ready) need_ready = NEEDREADY_ME;
@@ -565,7 +565,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						BPlayerVector plv = sender->Channel()->Players();
 						for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
 						if(it != plv.end())
-							break; /* Position déjà prise */
+							break; /* Position dÃ©jÃ  prise */
 					}
 					sender->SetPosition(place);
 					if(!need_ready) need_ready = NEEDREADY_ME;
@@ -579,7 +579,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 				break;
 			default:
-				Debug(W_DESYNCH, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', parv[1][i]);
+				Debug(W_DESYNCH, "SET %c%c: Reception d'un mode non supportÃ©", add ? '+' : '-', parv[1][i]);
 				break;
 		}
 		if(changed)
@@ -633,7 +633,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		ready = false;
 	}
 
-	/* Si tout le monde est READY, on passe d'un etat de la partie à un autre. */
+	/* Si tout le monde est READY, on passe d'un etat de la partie Ã  un autre. */
 	if(ready)
 		sender->Channel()->CheckReadys();
 
@@ -656,7 +656,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
  */
 int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
-	/* Ne peut être que sur un seul salon à la fois */
+	/* Ne peut Ãªtre que sur un seul salon Ã  la fois */
 	if(cl->Player() || parv[1].empty())
 		return vDebug(W_WARNING, "JOI: Essaye de joindre plusieurs salons", VSName(cl->GetNick())
 		                          VSName(cl->Player()->Channel()->GetName()) VName(parv[1]));
@@ -678,7 +678,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 
 	if(!chan && create)
-	{ /* Création du salon */
+	{ /* CrÃ©ation du salon */
 
 		/* Il y a trop de parties */
 		if(ChanList.size() >= app.GetConf()->MaxGames())
@@ -688,7 +688,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			for(std::string::iterator c = parv[1].begin(); c != parv[1].end(); ++c)
 				if(!strchr(CHAN_CHARS, *c))
 				{
-					vDebug(W_WARNING, "JOI: Le nom donné est incorrect", parv[1]);
+					vDebug(W_WARNING, "JOI: Le nom donnÃ© est incorrect", parv[1]);
 					return cl->sendrpl(ERR_CANT_CREATE);
 				}
 
@@ -772,7 +772,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 		{
 			const char* c = (*it).c_str();
-			// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
+			// Pour ne pas avoir Ã  modifier toutes les maps, UNIT reste sans '_'
 			if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
 			cl->sendrpl(MSG_SENDMAP, *it);
 		}
@@ -791,7 +791,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(chan->IsPinging())
 	{
 		/* On avertit le joueur de tous les autres +w (disconnected), ainsi que de ceux
-		 * qui sont alliés avec vous. */
+		 * qui sont alliÃ©s avec vous. */
 		BPlayerVector players = chan->Players();
 		for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 		{
@@ -800,7 +800,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			if((*it)->IsAllie(pl))
 				cl->sendrpl(*it, MSG_SET, ECArgs("+a", pl->Nick()));
 		}
-		/* Et ceux avec qui vous etes alliés */
+		/* Et ceux avec qui vous etes alliÃ©s */
 		players = pl->Allies();
 		for(BPlayerVector::const_iterator it = players.begin(); it != players.end(); ++it)
 			cl->sendrpl(pl, MSG_SET, ECArgs("+a", (*it)->Nick()));
@@ -808,10 +808,10 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		/* On se met en mode +S pour que le joueur se synch */
 		cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, "-Q+S");
 
-		/* On envoie les entitées */
+		/* On envoie les entitÃ©es */
 		chan->SendEntities(pl);
 
-		/* On envoie les propriétés */
+		/* On envoie les propriÃ©tÃ©s */
 		std::vector<ECBCountry*> cntys = chan->Map()->Countries();
 		FORit(ECBCountry*, cntys, cnty)
 			if((*cnty)->Owner() && (*cnty)->Owner()->Player())
@@ -820,13 +820,13 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		/* Et l'argent */
 		cl->sendrpl(cl->Player(), MSG_SET, ECArgs("+$", TypToStr(pl->Money())));
 
-		/* On repasse en mode +Q dans le cas où y a encore pinging.
-		 * Le problème provient si CheckPinging() retourne true. En effet, ça enverrait :
+		/* On repasse en mode +Q dans le cas oÃ¹ y a encore pinging.
+		 * Le problÃ¨me provient si CheckPinging() retourne true. En effet, Ã§a enverrait :
 		 *  R - :menareants.coderz.info SET -S+Q
 		 *  R - :menareants.coderz.info SET -Q+P
-		 * Le problème bien sur est que CheckPinging() ne sait pas si le client était +S ou +Q...
-		 * Il est à noter tout de même que les -<maj> ne servent à RIEN, dans le sens où c'est un enum, et
-		 * que le client s'en branle. Simplement c'est par conformité au protocole et par cohérence.
+		 * Le problÃ¨me bien sur est que CheckPinging() ne sait pas si le client Ã©tait +S ou +Q...
+		 * Il est Ã  noter tout de mÃªme que les -<maj> ne servent Ã  RIEN, dans le sens oÃ¹ c'est un enum, et
+		 * que le client s'en branle. Simplement c'est par conformitÃ© au protocole et par cohÃ©rence.
 		 */
 
 		cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, "-S+Q");
@@ -863,14 +863,14 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		if(cl->Player()->IsOwner())
 			chan->SetOwner(0);
-		/** \note Comme le joueur a été supprimé d'abord, on envoit à tous les joueurs et on envoie à coté
+		/** \note Comme le joueur a Ã©tÃ© supprimÃ© d'abord, on envoit Ã  tous les joueurs et on envoie Ã  cotÃ©
 		  *       au quitter car il n'est plus dans la liste.
-		  *       La raison pour laquelle on remove AVANT de LEAVE c'est dans le cas où le salon est en jeu,
-		  *       il faut que les suppressions d'unités et neutralités arrivent AVANT la suppression du
+		  *       La raison pour laquelle on remove AVANT de LEAVE c'est dans le cas oÃ¹ le salon est en jeu,
+		  *       il faut que les suppressions d'unitÃ©s et neutralitÃ©s arrivent AVANT la suppression du
 		  *       joueur chez les clients
 		  */
 		chan->RemovePlayer(cl->Player(), USE_DELETE);
-		// Note: le sendto_players est dans RemovePlayer, mais on envoie quand meme le LEA à cl qui n'a rien reçu
+		// Note: le sendto_players est dans RemovePlayer, mais on envoie quand meme le LEA Ã  cl qui n'a rien reÃ§u
 		cl->sendrpl(cl->Nick(), MSG_LEAVE);
 		if(!chan->NbPlayers())
 			delete chan;
@@ -1009,7 +1009,7 @@ void EChannel::CheckReadys()
 	uint c = 0;
 	for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
 		if((*it)->Ready() || (*it)->Lost() || (*it)->Disconnected())
-			c++; // On s'attend pas à ce qu'un joueur qui ait perdu soit pret :)
+			c++; // On s'attend pas Ã  ce qu'un joueur qui ait perdu soit pret :)
 	if(c == NbPlayers() || State() == EChannel::WAITING)
 	{
 		switch(State())
@@ -1034,7 +1034,7 @@ void EChannel::CheckReadys()
 
 						if(!IA->Join(this))
 						{
-							Debug(W_WARNING, "SET +!(starting game): Impossible de créer une IA");
+							Debug(W_WARNING, "SET +!(starting game): Impossible de crÃ©er une IA");
 							continue;
 						}
 
@@ -1042,8 +1042,8 @@ void EChannel::CheckReadys()
 					}
 				}
 
-				/* Si le salon est une pré-partie et qu'il y a eu un +!, on vérifie que
-				* si tout le monde est READY pour, dans ce cas là, lancer la partie
+				/* Si le salon est une prÃ©-partie et qu'il y a eu un +!, on vÃ©rifie que
+				* si tout le monde est READY pour, dans ce cas lÃ , lancer la partie
 				* et jarter ceux qui sont en trop.
 				*/
 				std::list<uint> colors;
@@ -1067,7 +1067,7 @@ void EChannel::CheckReadys()
 						if(!NbPlayers())
 						{
 							delete this;
-							throw ECExcept("", "Pourquoi passe-t-on par là ?");
+							throw ECExcept("", "Pourquoi passe-t-on par lÃ  ?");
 						}
 					}
 					else
@@ -1145,7 +1145,7 @@ void EChannel::CheckReadys()
 						y = StrToTyp<uint>(acaca);
 						std::string number = line;
 						if(type.empty() || owner.empty() || acaca.empty() || number.empty())
-							vDebug(W_ERR, "La déclaration d'une unité sur la map est invalide.",
+							vDebug(W_ERR, "La dÃ©claration d'une unitÃ© sur la map est invalide.",
 							              VName(type) VName(owner) VName(acaca) VName(number));
 
 						const char *e_name = FindEntityName(pl == players.end() ? 0 : dynamic_cast<ECPlayer*>(*pl));
@@ -1175,7 +1175,7 @@ void EChannel::CheckReadys()
 			}
 			case EChannel::SENDING:
 			{
-				/* Le client est pret (a tout affiché, mémorisé, ...), la partie se lance donc et on
+				/* Le client est pret (a tout affichÃ©, mÃ©morisÃ©, ...), la partie se lance donc et on
 					* commence en PLAYING.
 					*/
 				SetState(EChannel::PLAYING);
@@ -1192,7 +1192,7 @@ void EChannel::CheckReadys()
 				/* Initialisation des animations */
 				InitAnims();
 
-				/* InitAnims() envoie déjà les CREATE */
+				/* InitAnims() envoie dÃ©jÃ  les CREATE */
 				//NextAnim();
 
 				NeedReady();
@@ -1217,16 +1217,16 @@ void EChannel::CheckReadys()
 						}
 						else
 						{
-							(*enti)->Played(); /* On marque bien qu'il a été joué */
+							(*enti)->Played(); /* On marque bien qu'il a Ã©tÃ© jouÃ© */
 							for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 								money[*it] += (*enti)->TurnMoney(*it);
 							++enti;
 						}
 					}
-					/* On attribut à tout le monde son argent */
+					/* On attribut Ã  tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
-						// Inutile en theorie, mais c'est vraiment une précaution.
+						// Inutile en theorie, mais c'est vraiment une prÃ©caution.
 						if(dynamic_cast<ECPlayer*>(*it)->Events()->Empty() == false)
 						{
 							FDebug(W_WARNING, "Il reste des evenements dans un player !");
@@ -1238,7 +1238,7 @@ void EChannel::CheckReadys()
 						entv = (*it)->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 						{
-							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
+							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachÃ©s et qui ne sont
 							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
 							 */
 							if(!(*enti)->IsHidden() && !(*enti)->IsTerrain() && ((*enti)->IsBuilding() && !(*enti)->IsNaval() || !FastGame()))
@@ -1246,7 +1246,7 @@ void EChannel::CheckReadys()
 						}
 						if(!nb_units)
 						{
-							sendto_players(0, *it, MSG_SET, "+£");
+							sendto_players(0, *it, MSG_SET, "+_");
 							(*it)->SetLost();
 							for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 							{
@@ -1405,7 +1405,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 
 	if(flag & ARM_TYPE)
 	{
-		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_TYPE): Il n'y a pas d'entité");
+		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_TYPE): Il n'y a pas d'entitÃ©");
 		else
 			to_send += "%" + TypToStr(et.front()->Type());
 	}
@@ -1413,7 +1413,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 	{
 		if(flag & ARM_HIDE)
 			to_send += "+";
-		else if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_NUMER): Il n'y a pas d'entité");
+		else if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_NUMER): Il n'y a pas d'entitÃ©");
 		else
 			to_send += "+" + TypToStr(et.front()->Nb());
 	}
@@ -1425,13 +1425,13 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += "&";
 	if(flag & ARM_DEPLOY)
 	{
-		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
+		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entitÃ©");
 		else
 			to_send += (et.front()->Deployed()) ? "{" : "}";
 	}
 	if(flag & ARM_CONTENER && !et.empty())
 	{
-		if(!et.front()->Parent()) FDebug(W_WARNING, "SendArm(ARM_CONTENER): L'entité n'est pas membre d'un contener");
+		if(!et.front()->Parent()) FDebug(W_WARNING, "SendArm(ARM_CONTENER): L'entitÃ© n'est pas membre d'un contener");
 		else
 			to_send += ")" + et.front()->Parent()->LongName();
 	}
@@ -1440,7 +1440,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 	if(flag & ARM_DATA)
 		to_send += "~" + TypToStr(data.type) + "," + data.data;
 	if(flag & ARM_UPGRADE)
-		to_send += "°";
+		to_send += "U";
 	if(flag & ARM_INVEST)
 		to_send += "@";
 
@@ -1454,7 +1454,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 	{
 		if(flag & ARM_RECURSE)
 		{
-			/* On envoie à chaques joueurs qui a envoyé un element sa version non cachée */
+			/* On envoie Ã  chaques joueurs qui a envoyÃ© un element sa version non cachÃ©e */
 			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
 			{
 				if(dynamic_cast<ECPlayer*>(*pl)->Client() == 0) continue;
@@ -1467,7 +1467,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		}
 		else if(flag & ARM_HIDE)
 		{
-			/* On envoie la version cachée uniquement aux joueurs qui n'ont pas d'entity incluses dans cette action. */
+			/* On envoie la version cachÃ©e uniquement aux joueurs qui n'ont pas d'entity incluses dans cette action. */
 			for(BPlayerVector::iterator pl=players.begin(); pl != players.end(); ++pl)
 			{
 				if(dynamic_cast<ECPlayer*>(*pl)->Client() == 0) continue;
@@ -1539,7 +1539,7 @@ const char* EChannel::FindEntityName(ECPlayer* pl)
 	} while(!unchecked);
 
 	if(!unchecked)
-		throw ECExcept(VBName(unchecked), "Il y a trop d'unités !!");
+		throw ECExcept(VBName(unchecked), "Il y a trop d'unitÃ©s !!");
 
 	return num;
 }
@@ -1587,7 +1587,7 @@ void EChannel::SetMap(ECBMap *m)
 	for(std::vector<std::string>::iterator it = map_file.begin(); it != map_file.end(); ++it)
 	{
 		const char* c = (*it).c_str();
-		// Pour ne pas avoir à modifier toutes les maps, UNIT reste sans '_'
+		// Pour ne pas avoir Ã  modifier toutes les maps, UNIT reste sans '_'
 		if(*c == '_' || !strncmp(c, "UNIT", 4)) continue;
 		sendto_players(NULL, 0, MSG_SENDMAP, *it);
 	}
@@ -1731,7 +1731,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 			entity->CancelEvents();
 			SendArm(0, entity, ARM_REMOVE);
 			entity->SetOwner(0);
-			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
+			/* Ne pas passer par ECMap::RemoveAnEntity() pour Ã©viter le temps perdu Ã  le supprimer dans ECPlayer */
 			entity->Case()->Entities()->Remove(entity);
 			Map()->Entities()->Remove(entity);
 			MyFree(entity);
@@ -1758,7 +1758,7 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 	}
 	else
 	{
-		send_modes(pl, "+£");
+		send_modes(pl, "+_");
 		if(pl->Client())
 			pl->Client()->SetPlayer(0);
 		pl->ClearClient();
@@ -1790,7 +1790,7 @@ std::string EChannel::ModesStr() const
 		case PINGING: modes += "Q"; break;
 		case SCORING: modes += "E"; break;
 	}
-	/* Pas d'espace nécessaire ici, rajouté à chaques fois qu'on ajoute un param */
+	/* Pas d'espace nÃ©cessaire ici, rajoutÃ© Ã  chaques fois qu'on ajoute un param */
 	return (modes + params);
 }
 
@@ -1815,7 +1815,7 @@ void EChannel::SendEntities(ECPlayer* pl)
 
 	std::vector<ECBEntity*> ents = Map()->Entities()->List();
 
-	/* Pour aller plus vite, sinon SendArm(TClient*, ...) va le faire à chaque fois */
+	/* Pour aller plus vite, sinon SendArm(TClient*, ...) va le faire Ã  chaque fois */
 	std::vector<TClient*> clients;
 	clients.push_back(pl->Client());
 

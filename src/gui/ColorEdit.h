@@ -49,7 +49,7 @@ public:
 
 	virtual void SetXY (int _x, int _y);
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECImage img;
 	uint imgx;

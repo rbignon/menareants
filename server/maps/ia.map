@@ -1,5 +1,5 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Veuillez ne pas Ã©diter le fichier map Ã  la main.
+# Utilisez plutÃ´t l'Ã©diteur de carte intÃ©grÃ© au jeu.
 NAME IA Map
 MISSION
 PLAYER B
@@ -24,7 +24,7 @@ MAX 2
 DATE 27/7/2006
 INFO Mettez vous en joueur 2 pour vous battre contre l'IA
 INFO 
-INFO Progressez vers la gauche afin de l'anéantir
+INFO Progressez vers la gauche afin de l'anÃ©antir
 UNIT 6 B 27,0 1000
 UNIT 13 B 26,0 1000
 UNIT 3 B 27,1 1000

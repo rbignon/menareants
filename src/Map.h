@@ -76,7 +76,7 @@ public:
 
 	ECSprite* Missile() const { return missile; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECSprite* missile;
 	ECSpriteBase* missile_up;
@@ -167,6 +167,8 @@ public:
 
 	void ImageSetXY(int x, int y);
 
+	std::string OwnerNick() const;
+
 	ECase* Case() const;
 	ECPlayer* Owner() const;
 
@@ -181,7 +183,7 @@ public:
 	virtual void SetNb(uint n);
 	void SetMaxNb(uint n) { max_nb = n; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECSprite* image;
 	ECSprite* attaq;
@@ -235,7 +237,7 @@ public:
 	bool MustRedraw() const { return must_redraw; }
 	void SetMustRedraw(bool b = true) { must_redraw = b; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECSprite* image;
 	bool selected;
@@ -341,7 +343,7 @@ public:
 	uint& NbDays() { return nb_days; }
 	ECDate* InitDate() { return &init_date; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECImage preview;
 	TMap *showmap;
@@ -408,7 +410,7 @@ public:
 		return l;
 	}
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::vector<ECEntity*> entities;
 };

@@ -27,7 +27,7 @@
 
 #include "Component.h"
 
-#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN1234567890 .+-*/,;:!?()[]={}'\"&<>$éèâ`_çàê"
+#define EDIT_CHARS "azertyuiopmlkjhgfdsqwxcvbnAZERTYUIOPMLKJHGFDSQWXCVBN1234567890 .+-*/,;:!?()[]={}'\"&<>$Ã©Ã¨Ã¢`_Ã§Ã Ãª"
 
 struct ECImage;
 class Font;
@@ -53,7 +53,7 @@ public:
 
 	void Redraw();
 
-	/* Une touche a été pressée */
+	/* Une touche a Ã©tÃ© pressÃ©e */
 	void PressKey(SDL_keysym);
 
 /* Attributs */
@@ -76,7 +76,7 @@ public:
 	void SetFocus();
 	void DelFocus();
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECImage background;
 	ECImage edit;

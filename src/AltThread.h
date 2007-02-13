@@ -51,7 +51,7 @@ public:
 
 	static void Stop() { want_quit = true; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	typedef std::stack<ECAltFunction> alt_list;
 	static alt_list functions;

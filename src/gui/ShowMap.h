@@ -60,17 +60,17 @@ public:
 
 	void SetPosition(int _x, int _y, bool force = false);
 
-	/* Centre sur un objet ou des coordonées (pixels) de la carte */
+	/* Centre sur un objet ou des coordonÃ©es (pixels) de la carte */
 	void CenterTo(ECase* e) { if(!e) return; CenterTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void CenterTo(ECEntity* e) { CenterTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void CenterTo(int _x, int _y);
 
-	/* Fait un déplacement progressif */
+	/* Fait un dÃ©placement progressif */
 	void ScrollTo(ECase* e) { ScrollTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void ScrollTo(ECEntity* e) { ScrollTo(e->Image()->X() - X(), e->Image()->Y() - Y()); }
 	void ScrollTo(int _x, int _y);
 
-	/* Le point (0,0) de l'écran coincide avec ce point */
+	/* Le point (0,0) de l'Ã©cran coincide avec ce point */
 	void MoveTo(int _x, int _y);
 
 /* Attributs */
@@ -106,7 +106,7 @@ public:
 	void AddAfterDraw(ECSprite* s) { after_draw.push_back(s); }
 	void RemoveAfterDraw(ECSprite* s);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECMap* map;
 	bool schema;

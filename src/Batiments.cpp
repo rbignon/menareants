@@ -152,8 +152,8 @@ void ECMine::RecvData(ECData data)
 std::string ECMine::SpecialInfo()
 {
 	if(!Owner() || !Owner()->IsMe()) return "";
-	else if(restBuild) return "Active dans " + TypToStr(restBuild) + " jours.";
-	else return "Mine active";
+	else if(restBuild) return StringF(_("Active in %d days."), restBuild);
+	else return _("Mine actived");
 }
 
 /********************************************************************************************
@@ -165,8 +165,7 @@ void ECNuclearSearch::Init()
 	ECBNuclearSearch::Init();
 	Image()->SetAnim(true);
 	if(Owner() && Channel() && !Owner()->IsMe())
-		Channel()->Print("ATTENTION!! " + std::string(Owner()->GetNick()) + " possède maintenant la technologie nucléaire "
-		                 "avec son centre de recherches nucléaire", 0x008);
+		Channel()->Print(StringF(_("WARNING!! %s has got nuclear technologie, with his nuclear search"), Owner()->GetNick()), 0x008);
 }
 
 void ECNuclearSearch::RecvData(ECData data)
@@ -180,9 +179,9 @@ void ECNuclearSearch::RecvData(ECData data)
 			{
 				// 0x008 = I_Shit
 				if(Owner()->IsMe())
-					Channel()->Print("Vous avez un nouveau missile en stock !", 0x008);
+					Channel()->Print(_("You have got a new missile in your stock!"), 0x008);
 				else
-					Channel()->Print(std::string(Owner()->GetNick()) + " a un nouveau missile en stock !", 0x008);
+					Channel()->Print(StringF(_("%s has a new missile in stock!"), Owner()->GetNick()), 0x008);
 			}
 			missiles = new_missile_nb;
 			break;
@@ -196,7 +195,7 @@ void ECNuclearSearch::RecvData(ECData data)
 std::string ECNuclearSearch::SpecialInfo()
 {
 	return (Owner() && Owner()->IsMe())
-	           ? (TypToStr(missiles) + " missile(s) - Nouveau missile dans " + TypToStr(restBuild) + " jour(s)")
+	           ? StringF(_("%d missile(s) - New missile in %d day(s)"), missiles, restBuild)
 	           : "";
 }
 
@@ -219,13 +218,13 @@ std::string ECSilo::SpecialInfo()
 	if(!Owner() || !Owner()->IsMe())
 		return "";
 	else if(!NuclearSearch())
-		return "Relié à aucun Centre de recherches nucléaire.";
+		return _("Not linked with a NuclearSearch Center.");
 	else if(restBuild)
-		return "Ce silo ne sera pret que dans " + TypToStr(restBuild) + " jours.";
+		return StringF(_("This silo is ready in %d day(s)."), restBuild);
 	else if(!NuclearSearch()->Missiles())
-		return "Aucun missile disponible.";
+		return _("You haven't got any missile.");
 	else
-		return "Il y a " + TypToStr(NuclearSearch()->Missiles()) + " missiles disponibles.";
+		return StringF(ngettext("There is %d missile", "There are %d missiles", NuclearSearch()->Missiles()), NuclearSearch()->Missiles());
 }
 
 bool ECSilo::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
@@ -272,7 +271,7 @@ std::string ECMegalopole::SpecialInfo()
 	if(!Owner() || !Owner()->IsMe())
 		return "";
 	else
-		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
+		return StringF(_("$%d income each turn"), TurnMoney(Owner()));
 }
 
 /********************************************************************************************
@@ -284,7 +283,7 @@ std::string ECapitale::SpecialInfo()
 	if(!Owner() || !Owner()->IsMe())
 		return "";
 	else
-		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
+		return StringF(_("$%d income each turn"), TurnMoney(Owner()));
 }
 
 /********************************************************************************************
@@ -296,7 +295,7 @@ std::string ECity::SpecialInfo()
 	if(!Owner() || !Owner()->IsMe())
 		return "";
 	else
-		return "Vous rapporte " + TypToStr(TurnMoney(Owner())) + " $";
+		return StringF(_("$%d income each turn"), TurnMoney(Owner()));
 }
 
 /********************************************************************************************
@@ -308,13 +307,13 @@ void ECDefenseTower::AfterDraw()
 
 	if(!cible) return;
 
-	// Coordonnées du point de départ
+	// CoordonnÃ©es du point de dÃ©part
 	float ax = Case()->Image()->X() + 36;
 	float ay = Case()->Image()->Y() + 2;
-	// Coordonnées du point d'arrivé
+	// CoordonnÃ©es du point d'arrivÃ©
 	float bx = (int)(cible->Image()->X() + CASE_WIDTH/2 - Resources::DefenseTower_Missile()->GetWidth()/2);
 	float by = (int)(cible->Image()->Y() + CASE_HEIGHT/2 - Resources::DefenseTower_Missile()->GetHeight()/2);
-	// Point de passage le plus haut du missile (là où il commence à retomber)
+	// Point de passage le plus haut du missile (lÃ  oÃ¹ il commence Ã  retomber)
 	float ty;
 	float tx = ((ax + bx) / 2);
 
@@ -324,7 +323,7 @@ void ECDefenseTower::AfterDraw()
 		miss = SDL_GetTicks();
 
 	// Position du missile :
-	const unsigned int duration = 2000; // Durée du mouvement du missile
+	const unsigned int duration = 2000; // DurÃ©e du mouvement du missile
 	unsigned int t = SDL_GetTicks(); // Temps actuel en millisecondes
 	unsigned int t0 = miss; // Temps au moement du lancement du missile
 
@@ -333,7 +332,7 @@ void ECDefenseTower::AfterDraw()
 
 	float x = ((bx - ax) * (t - t0) / (float)duration) + ax;
 
-	// Calcule des coeffs de l'ï¿½uation
+	// Calcule des coeffs de l'Ã¯Â¿Å“uation
 	float A, B, C;
 
 	if( t - t0 < duration / 2)

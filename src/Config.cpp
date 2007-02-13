@@ -129,10 +129,10 @@ bool Config::load()
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
 		else if(key == "EFFECT") effect = (ligne == "1" || ligne == "true");
-		else if(key == "TTF" && version <= 2) { /* On conserve la compatibilité */ }
+		else if(key == "TTF" && version <= 2) { /* On conserve la compatibilitÃ© */ }
 		else
 		{
-			std::cerr << "Fichier incorrect: " << std::endl;
+			std::cerr << "Incorrect file: " << std::endl;
 			std::cerr << ": " << key << " " << ligne << std::endl;
 			MenAreAntsApp::GetInstance()->FirstRun();
 			return set_defaults();
@@ -141,7 +141,7 @@ bool Config::load()
 	if(hostname.empty() || port < 1 || port > 65535 || color >= COLOR_MAX ||
 	   nation >= ECPlayer::N_MAX || nick.empty())
 	{
-		std::cerr << "Lecture de la configuration invalide." << std::endl;
+		std::cerr << "Unable to read configuration." << std::endl;
 		MenAreAntsApp::GetInstance()->FirstRun();
 		return set_defaults();
 	}
@@ -154,7 +154,7 @@ bool Config::save() const
     std::ofstream fp(filename.c_str());
     if (!fp)
     {
-        std::cerr << "Impossible de créer le fichier de configuration" << std::endl;
+        std::cerr << "Unable to create configuration file." << std::endl;
         return 0;
     }
 
@@ -224,7 +224,7 @@ void Config::WantAddServer(TObject* OkButton, void* configinst)
 	std::string port = form->NewServer->Text();
 	if(port.empty())
 	{
-		TMessageBox("Entrez un serveur ! (sous la forme \"host:port\").", BT_OK, form).Show();
+		TMessageBox(_("Please enter a server name (in form \"host:port\")."), BT_OK, form).Show();
 		return;
 	}
 	std::string host = stringtok(port, ":");
@@ -232,7 +232,7 @@ void Config::WantAddServer(TObject* OkButton, void* configinst)
 		port = "5460";
 	else if(!is_num(port.c_str()))
 	{
-		TMessageBox("Le port doit être une valeur numerique.", BT_OK, form).Show();
+		TMessageBox(_("Port is an integer value."), BT_OK, form).Show();
 		return;
 	}
 	host = host + ":" + port;
@@ -267,7 +267,7 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 
 	if(form->Nick->GetString().empty())
 	{
-		TMessageBox("Veuillez rentrer un pseudo.", BT_OK, form).Show();
+		TMessageBox(_("Please enter a nickname."), BT_OK, form).Show();
 		return;
 	}
 
@@ -275,7 +275,7 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 
 	if(form->ServerList->Selected() == -1)
 	{
-		TMessageBox("Veuillez sélectionner un serveur.", BT_OK, form).Show();
+		TMessageBox(_("Please select a server."), BT_OK, form).Show();
 		return;
 	}
 
@@ -425,52 +425,52 @@ void TConfigForm::SetRelativePositions()
 TConfigForm::TConfigForm(ECImage *w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(120,"Configuration", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(120,_("Configuration"), white_color, Font::GetInstance(Font::Big)));
 
-	Info = AddComponent(new TLabel(160,"C'est votre premier lancement, veuillez configurer votre jeu.",
+	Info = AddComponent(new TLabel(160,_("This is your first run, please configure your game"),
 	                                        white_color, Font::GetInstance(Font::Normal)));
 	Info->Hide();
 
-	OkButton = AddComponent(new TButtonText(600,400, 150,50, "OK", Font::GetInstance(Font::Normal)));
-	CancelButton = AddComponent(new TButtonText(600,450, 150,50, "Annuler", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(600,400, 150,50, _("OK"), Font::GetInstance(Font::Normal)));
+	CancelButton = AddComponent(new TButtonText(600,450, 150,50, _("Cancel"), Font::GetInstance(Font::Normal)));
 
 	ServerList = AddComponent(new TListBox(Rectanglei(50, 200, 220, 300)));
-	ServerList->SetHint("Sélectionnez le serveur auquel vous souhaitez vous connecter.");
+	ServerList->SetHint(_("Select a meta-server in this list."));
 
 	NewServer = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,510,208));
-	NewServer->SetHint("Serveur à ajouter sous la forme \"host[:port]\"");
+	NewServer->SetHint(_("Server to add in form \"host[:port]\""));
 
-	DelServerButton = AddComponent(new TButtonText(280,460,100,30, "Supprimer", Font::GetInstance(Font::Small)));
+	DelServerButton = AddComponent(new TButtonText(280,460,100,30, _("Delete"), Font::GetInstance(Font::Small)));
 	DelServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	DelServerButton->SetHint("Supprimer le serveur sélectionné dans la liste.");
-	AddServerButton = AddComponent(new TButtonText(280,500,100,30, "Ajouter", Font::GetInstance(Font::Small)));
+	DelServerButton->SetHint(_("Delete selected server in list."));
+	AddServerButton = AddComponent(new TButtonText(280,500,100,30, _("Add"), Font::GetInstance(Font::Small)));
 	AddServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	AddServerButton->SetHint("Ajouter un serveur à la liste.");
+	AddServerButton->SetHint(_("Add a server in this list."));
 
-	NickInfo = AddComponent(new TLabel(300,200,"Pseudo :", white_color, Font::GetInstance(Font::Normal)));
+	NickInfo = AddComponent(new TLabel(300,200,_("Nickname:"), white_color, Font::GetInstance(Font::Normal)));
 	Nick = AddComponent(new TEdit(Font::GetInstance(Font::Small), 300,225,200, NICKLEN, NICK_CHARS));
-	Nick->SetHint("Votre pseudo permettra de vous distinguer des autres joueurs");
+	Nick->SetHint(_("Your nickname is used to recognize each users."));
 
-	Color = AddComponent(new TColorEdit(Font::GetInstance(Font::Small), "Couleur par défaut", 300, 250, 200));
-	Color->SetHint("Couleur par default dans chaques parties");
+	Color = AddComponent(new TColorEdit(Font::GetInstance(Font::Small), _("Default color:"), 300, 250, 200));
+	Color->SetHint(_("Default color in each games."));
 
-	NationInfo = AddComponent(new TLabel(300, 275,"Nation par défaut :", white_color, Font::GetInstance(Font::Normal)));
+	NationInfo = AddComponent(new TLabel(300, 275, _("Default nation:"), white_color, Font::GetInstance(Font::Normal)));
 	Nation = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 300, 200));
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
-		// Pour la visibilité, je précise dans ce commentaire qu'on ajoute un item qui retourne un TListBoxItem,
+		// Pour la visibilitÃ©, je prÃ©cise dans ce commentaire qu'on ajoute un item qui retourne un TListBoxItem,
 		// sur lequel on fait un SetHint.
-		Nation->AddItem(false, std::string(nations_str[i].name), TypToStr(i))->SetHint(nations_str[i].infos);
+		Nation->AddItem(false, gettext(nations_str[i].name), TypToStr(i))->SetHint(gettext(nations_str[i].infos));
 
-	ResolutionInfo = AddComponent(new TLabel(300, 320, "Résolution :", white_color, Font::GetInstance(Font::Normal)));
+	ResolutionInfo = AddComponent(new TLabel(300, 320, _("Resolution:"), white_color, Font::GetInstance(Font::Normal)));
 	Resolution = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 300, 345, 200));
 	for(uint i = 0; i < ASIZE(resolutions); ++i)
 		Resolution->AddItem(false, TypToStr(resolutions[i].w) + "x" + TypToStr(resolutions[i].h), "");
 
-	FullScreen = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 365, "Plein écran", white_color));
-	Music = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 385, "Musique", white_color));
-	Music->SetHint("Si active, les fichiers audio contenus dans le repertoire suivant seront lus pendant le jeu:\n\n"
-	                PKGDATADIR_SOUND INGAME_MUSIC);
-	Effect = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 405, "Effets", white_color));
+	FullScreen = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 365, _("Fullscreen"), white_color));
+	Music = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 385, _("Music"), white_color));
+	Music->SetHint(_("If this is active, music files are in this directory:\n\n") +
+	                std::string(PKGDATADIR_SOUND INGAME_MUSIC));
+	Effect = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 405, _("Effects"), white_color));
 
 	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 250, 150));
 	SetHint(Hints);

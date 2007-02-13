@@ -24,6 +24,7 @@
 #include "tools/Video.h"
 #include "Resources.h"
 #include "tools/Font.h"
+#include "i18n.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -35,10 +36,10 @@ static struct ButtonList_t
 	uint w;
 	uint h;
 } ButtonList[] = {
-	{ BT_OK,        "OK",       100,    30  },
-	{ BT_YES,       "Oui",      100,    30  },
-	{ BT_NO,        "Non",      100,    30  },
-	{ BT_CANCEL,    "Annuler",  100,    30  }
+	{ BT_OK,        gettext_noop("OK"),       100,    30  },
+	{ BT_YES,       gettext_noop("Yes"),      100,    30  },
+	{ BT_NO,        gettext_noop("No"),       100,    30  },
+	{ BT_CANCEL,    gettext_noop("Cancel"),   100,    30  }
 };
 
 TMessageBox::TMessageBox(std::string _s, uint _b, TForm* form, bool transparence)
@@ -180,13 +181,13 @@ void TMessageBox::SetText(std::string __s)
 	height_string = Font::GetInstance(Font::Normal)->GetHeight();
 	std::string::const_iterator _s = __s.begin();
 
-	/* On parse le message pour le découper en différentes lignes */
+	/* On parse le message pour le dÃ©couper en diffÃ©rentes lignes */
 	char s[MSGBOX_MAXWIDTH + 20 + 2];
 	for(uint i=0;;)
 	{
 		if(*_s == '\n' || ((i > MSGBOX_MAXWIDTH) && *_s == ' ') || (i > (MSGBOX_MAXWIDTH+20)) || _s == __s.end() || !(*_s))
-		{ /* Retour à la ligne. Si ça dépasse le MSGBOX_MAXWIDTH lettres, on laisse une chance
-		   * à un caractère ' ' ou '\n' de s'interposer pour couper proprement. A partir de
+		{ /* Retour Ã  la ligne. Si Ã§a dÃ©passe le MSGBOX_MAXWIDTH lettres, on laisse une chance
+		   * Ã  un caractÃ¨re ' ' ou '\n' de s'interposer pour couper proprement. A partir de
 		   * MSGBOX_MAXWIDTH + 20 on coupe net.
 		   */
 		    s[i] = '\0';
@@ -199,7 +200,7 @@ void TMessageBox::SetText(std::string __s)
 			if(w < yw) w = yw;
 
 			if(*_s == '\n')
-				++_s; /* Seulement une fois, pour retourner à la ligne si il y en a un autre */
+				++_s; /* Seulement une fois, pour retourner Ã  la ligne si il y en a un autre */
 			while(*_s == ' ') ++_s;
 			if(_s == __s.end() || !*_s) break;
 		}
@@ -263,13 +264,13 @@ void TMessageBox::SetButtons()
 	}
 	h += 20;
 
-	/* Préparation des boutons */
+	/* PrÃ©paration des boutons */
 	uint tmpw = x + 15, tmph = 0;
 	for(uint i=0;i<ASIZE(ButtonList);i++)
 		if(b & ButtonList[i].flag)
 		{
 			TButtonText *bt = new TButtonText(tmpw, y+h, ButtonList[i].w, ButtonList[i].h,
-			                                  ButtonList[i].label, Font::GetInstance(Font::Normal));
+			                                  gettext(ButtonList[i].label), Font::GetInstance(Font::Normal));
 			MyComponent(bt);
 			bt->Tag = ButtonList[i].flag;
 			bt->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));

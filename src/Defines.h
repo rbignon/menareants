@@ -23,6 +23,7 @@
 
 #include <config.h>
 
+#include "i18n.h"
 #include "lib/Defines.h"
 
 /* Nom complet de nom court du jeu */
@@ -38,7 +39,7 @@
 # define BUGUED_FULLSCREEN
 #endif
 
-/* Résolution de l'écran */
+/* RÃ©solution de l'Ã©cran */
 //const int SCREEN_HEIGHT = 600;
 //const int SCREEN_WIDTH  = 800;
 #define SCREEN_HEIGHT (Video::GetInstance()->Height())
@@ -48,13 +49,13 @@
 const int CASE_HEIGHT = 100;
 const int CASE_WIDTH = 100;
 
-/* Définitions des boutons de la souris */
+/* DÃ©finitions des boutons de la souris */
 const int MBUTTON_LEFT = 1;
 const int MBUTTON_MIDLE = 2;
 const int MBUTTON_RIGHT = 3;
 
 /*********************************************************************************************
- *           Il n'est pas nécessaire d'éditer la suite                                       *
+ *           Il n'est pas nÃ©cessaire d'Ã©diter la suite                                       *
  *********************************************************************************************/
 #if defined(WIN32) || defined(__MINGW32__)
 #define PATH_SEPARATOR "\\"
@@ -74,7 +75,7 @@ typedef unsigned int   uint;
 #define PKGDATADIR "data"
 #endif
 
-/* Définition des chemins */
+/* DÃ©finition des chemins */
 #define PKGDATADIR_PICS PKGDATADIR PATH_SEPARATOR "pics" PATH_SEPARATOR
 #define PKGDATADIR_FONTS PKGDATADIR PATH_SEPARATOR "font" PATH_SEPARATOR
 #define PKGDATADIR_FONTS_MAIN PKGDATADIR_FONTS MAIN_FONT

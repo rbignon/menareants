@@ -59,7 +59,7 @@
  *      Button1 =   AddComponent(new TButton(500,350,100,49));
  *      MyListBox = AddComponent(new TListBox(300,200,200,300));
  *      Blah =      AddComponent(new TMemo(75,325,300,200,30));
- *      // Défine the events
+ *      // DÃ©fine the events
  *      Button1->SetOnClick(&ButtonClick, 0);
  *      MyListBox->SetOnSelect(&MyListBoxOnSelect, 0);
  *    }
@@ -172,7 +172,7 @@ public:
 
 	static std::string Message;
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 protected:
 
 	/** Add a component */
@@ -193,7 +193,7 @@ protected:
 
 	bool want_quit;
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::vector<TComponent*> composants;
 	ECImage *background;

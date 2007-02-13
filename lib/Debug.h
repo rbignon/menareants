@@ -51,7 +51,7 @@ public:
 	TECExcept(std::string msg);
 };
 
-/* Pour ne pas être obligé de declarer NDEBUG */
+/* Pour ne pas Ãªtre obligÃ© de declarer NDEBUG */
 #ifndef DEBUG
 # undef assert
 # define assert(expr)  ((void)0)

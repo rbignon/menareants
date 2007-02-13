@@ -27,9 +27,9 @@
 class TMemo;
 
 /** \warning When you use a TChildForm, you HAVE to use AddComponent() in Init() and not in the constructor !!! */
-/* note pour mémoire: c'est parce que lors de la construction la variable Windows() n'est pas encore affectée, alors
- *                    que AddComponent() va la transmettre. Donc créer les composants dans Init() permet que nous meme
- *                    nous soyons bien initialisés par notre Parent
+/* note pour mÃ©moire: c'est parce que lors de la construction la variable Windows() n'est pas encore affectÃ©e, alors
+ *                    que AddComponent() va la transmettre. Donc crÃ©er les composants dans Init() permet que nous meme
+ *                    nous soyons bien initialisÃ©s par notre Parent
  */
 class TChildForm : public TComponent
 {
@@ -66,7 +66,7 @@ public:
 
 	virtual bool WantRedraw() const { return true; }
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 protected:
 
 	/** Add a component */
@@ -84,7 +84,7 @@ protected:
 	void SetFocusOrder(bool s = true) { focus_order = s; }
 	bool FocusOrder() { return focus_order; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::vector<TComponent*> composants;
 	ECImage *background;

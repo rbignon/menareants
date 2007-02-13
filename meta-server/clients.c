@@ -50,7 +50,7 @@ int m_pong (struct Client* cl, int parc, char** parv)
 /* IAM <name> <prog> <version> */
 int m_login (struct Client* cl, int parc, char** parv)
 {
-	if(cl->flags) return 0; /* Réidentification. */
+	if(cl->flags) return 0; /* RÃ©identification. */
 	if(parc < 4) return delclient(cl);
 
 	int proto = atoi(parv[3]);

@@ -14,6 +14,8 @@ AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AM_GNU_GETTEXT([external])
+
 dnl ========================================================================
 dnl == Set flags for various environments                                  =
 dnl ========================================================================
@@ -23,6 +25,12 @@ case "${host}" in
   *) WIN32="no" ;;
 esac
 AM_CONDITIONAL([WIN32], test "$WIN32" = "yes")
+
+AM_CONDITIONAL([INCLUDEDINTL], [test x$nls_cv_use_gnu_gettext = xyes])
+
+if test "x${prefix}" = "xNONE"; then
+  prefix="${ac_default_prefix}"
+fi
 
 # COMPILER ET INSTALLER LE SERVEUR
 
@@ -46,7 +54,6 @@ AC_ARG_ENABLE(  meta-server,
                 ],
         )
 
-
 # NE PAS COMPILER ET INSTALLER LE JEU
 
 INSTALL_GAME_Q=1
@@ -62,7 +69,7 @@ AC_ARG_ENABLE(  game,
         )
 
 if test "x${INSTALL_GAME_Q}" = "x1"; then
-  INSTALL_GAME=src
+  INSTALL_GAME="src po"
   AC_SUBST(INSTALL_GAME)
 fi
 
@@ -171,8 +178,8 @@ if test "x$GCC" = "xyes"; then
 
     if test "x${WARNINGS}" = "x1"; then
       dnl Enable all warnings
-# en reserve: -Weffc++ (il fait bien mal aux variables non initialisées)
-#             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
+# en reserve: -Weffc++ (il fait bien mal aux variables non initialisÃ©es)
+#             -pedantic (il trouve rien Ã  part une rÃ©pÃ©tition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
       GCC_FLAGS="-Wall"
       CFLAGS="$CFLAGS -std=c99"
@@ -216,7 +223,17 @@ MAP_FILES=`echo $MAP_FILES`
 
 AC_SUBST([MAP_FILES])
 
-AC_CONFIG_FILES(Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile meta-server/Makefile)
+if test "${WIN32}" = "yes"; then LOCALEDIR="locale"
+else LOCALEDIR="${prefix}/share/locale"; fi
+AC_ARG_WITH([localedir-name],
+    [AS_HELP_STRING([--with-localedir-name=DIR],
+                    [specify where locales are installed (default: ${prefix}/share/locale)])],
+    [LOCALEDIR="$withval"])
+
+AC_SUBST([LOCALEDIR])
+
+
+AC_CONFIG_FILES([Makefile src/Makefile src/data/Makefile lib/Makefile server/Makefile server/menareantsd.conf server/maps/Makefile meta-server/Makefile po/Makefile], [AM_POSTPROCESS_PO_MAKEFILE])
 
 AC_OUTPUT
 

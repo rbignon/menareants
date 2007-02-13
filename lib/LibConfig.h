@@ -181,7 +181,7 @@ public:
 	unsigned NbLines() const { return line; }
 	std::string Path() const { return path; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ConfigSection* AddSection(ConfigSection*);
 	std::string path;
@@ -249,7 +249,7 @@ public:
 	std::string Name() const { return name; }
 	void SetName(std::string n) { name = n; }
 
-	/** Label is an identificator in the configuration « label { }; » */
+	/** Label is an identificator in the configuration Â« label { }; Â» */
 	std::string Label() const { return label; }
 
 	std::string Description() const { return description; }
@@ -270,12 +270,12 @@ public:
 	void SetFound() { found = true; }
 
 	/** This function will be called when parser is at the end of the section.
-	 * @param eot_f a function in form « void Name (ConfigSection*); »
+	 * @param eot_f a function in form Â« void Name (ConfigSection*); Â»
 	 */
 	void SetEndOfTab(TEndOfTab eot_f) { end_func = eot_f; }
 	TEndOfTab EndOfTab() const { return end_func; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	/** This constructor is privated because only AddSection must call him. */
 	ConfigSection(std::string name, std::string description, bool multiple, MyConfig* config, ConfigSection* parent);
@@ -301,8 +301,8 @@ private:
  ********************************************************************************************/
 /** This is an abstract class whose represent an Item in pair \a label=value .
  * You have to create a derived class from this class to have a new type.
- * Overload « Integer() » and « String() » to return value in each forms.
- * Overload « SetValue(std::string) » to check value and cast to type.
+ * Overload Â« Integer() Â» and Â« String() Â» to return value in each forms.
+ * Overload Â« SetValue(std::string) Â» to check value and cast to type.
  */
 class ConfigItem
 {
@@ -361,7 +361,7 @@ public:
 
 	std::string DefValue() const { return def_value; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::string label;
 	std::string description;

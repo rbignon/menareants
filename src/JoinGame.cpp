@@ -40,14 +40,12 @@
 #include "tools/Font.h"
 #include "tools/Video.h"
 
-
 extern TLoadingForm   *LoadingForm;
 extern TInGameForm    *InGameForm;
 extern TOptionsForm   *OptionsForm;
 extern TPingingForm   *PingingForm;
 void LoadingGame(EC_Client* cl);
 std::vector<std::string> TGameInfosForm::RecvMap;
-std::string TGameInfosForm::ErrMessage;
 
 TGameInfosForm *GameInfosForm = NULL; /**< Pointer to form whose show game infos */
 int JOINED = 0;                       /**< 1 = joined, -1 = error */
@@ -77,17 +75,17 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	} messages[] =
 	{
 		/* 00 */ { 0,      0 },
-		/* 01 */ { I_INFO, "%0Et de %0Eo dégomme %1Et de %1Eo de %2s" }, // attaquant, attaqué, dommage
-		/* 02 */ { I_SHIT, "%0Et de %0Eo vient d'investir le McDo de %1s installé dans la caserne de %2Eo !! Il va tout bouffer ! "
-		                   "Il lui faudra %3s jours !" }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
-		/* 03 */ { I_INFO, "DEBUGINFO: %0s" }
+		/* 01 */ { I_INFO, gettext_noop("%0Eo's %0Et shoot %1Eo's %1Et of %2s") }, // attaquant, attaquÃ©, dommage
+		/* 02 */ { I_SHIT, gettext_noop("%0Eo's %0Et invests %1s's McPuke installed in %2Eo's barracks!! He's going to eat everything! "
+		                   "That will take %3s days for him!") }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
+		/* 03 */ { I_INFO, gettext_noop("DEBUGINFO: %0s") }
 	};
 	if(InGameForm)
 	{
 		uint id = StrToTyp<uint>(parv[1]);
 		if(!id || id > ASIZE(messages)) return Debug(W_DESYNCH|W_SEND, "INFO: Reception d'un message dont l'id n'est pas dans la liste");
 
-		const char* msg = messages[id].msg;
+		const char* msg = _(messages[id].msg);
 		std::string fmsg;
 
 		while(*msg)
@@ -121,7 +119,7 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								if(!pl)
 								{
 									fmsg += "<unknown entity>";
-									Debug(W_WARNING|W_SEND, "INFO: Le player de l'unité %s est introuvable", parv[i].c_str());
+									Debug(W_WARNING|W_SEND, "INFO: Le player de l'unitÃ© %s est introuvable", parv[i].c_str());
 									break;
 								}
 							}
@@ -135,14 +133,14 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							if(!entity)
 							{
 								fmsg += "<unknown entity>";
-								Debug(W_WARNING|W_SEND, "INFO: L'unité %s est introuvable", parv[i].c_str());
+								Debug(W_WARNING|W_SEND, "INFO: L'unitÃ© %s est introuvable", parv[i].c_str());
 							}
 							else switch(*++msg)
 							{
 								case 'o':
 								{
 									++msg;
-									fmsg += pl ? nick : "neutre";
+									fmsg += pl ? nick : _("neutral");
 									break;
 								}
 								case 't':
@@ -180,9 +178,8 @@ int KICKCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(parv[1] != me->GetNick())
 		return 0; // On s'en fou
 
-	if(GameInfosForm)
-		GameInfosForm->Kicked = "Vous avez été éjecté de la partie par " + parv[0] + "\n\n" +
-		                         ((parv.size() > 2) ? ("Raison: " + parv[2]) : "Aucune raison n'a été spécifiée");
+	TForm::Message = StringF(_("You have been kicked from game by %s.\n\n%s"), parv[0].c_str(),
+		                         parv.size() > 2 ? ((_("Reason is: ") + parv[2]).c_str()) : _("No reason specified"));
 
 	return 0;
 }
@@ -208,7 +205,7 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(GameInfosForm)
 		{
 			GameInfosForm->Hints->ClearItems();
-			GameInfosForm->Hints->AddItem("Chargement de la carte...");
+			GameInfosForm->Hints->AddItem(_("Loading map..."));
 		}
 		me->UnlockScreen();
 	}
@@ -359,7 +356,7 @@ static TPlayerLine* GetPlayerLineFromPlayer(ECPlayer* pl)
 int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(!me->Player() || !me->Player()->Channel())
-		return Debug(W_DESYNCH|W_SEND, "Reception d'un SET sans être dans un chan");
+		return Debug(W_DESYNCH|W_SEND, "Reception d'un SET sans Ãªtre dans un chan");
 
 	ECPlayer *sender = 0;
 	EChannel *chan = me->Player()->Channel();
@@ -381,7 +378,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->SetLimite(StrToTyp<uint>(parv[j++]));
 
 						if(GameInfosForm)
-						{ /* Redéfini la limite des SpinEdit de chaques joueurs */
+						{ /* RedÃ©fini la limite des SpinEdit de chaques joueurs */
 							std::vector<TComponent*> lst = GameInfosForm->Players->GetList();
 							for(std::vector<TComponent*>::iterator it=lst.begin(); it!=lst.end(); ++it)
 							{
@@ -410,7 +407,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'P':
 				if(add)
 				{
-					/* Si ce n'était pas un animation c'est pas un *nouveau* tour */
+					/* Si ce n'Ã©tait pas un animation c'est pas un *nouveau* tour */
 					if(chan->State() == EChannel::ANIMING)
 					{
 						chan->Map()->NextDay();
@@ -425,7 +422,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()), TBarreLat::SelectUnit);
 							Resources::SoundBegin()->Play();
 							InGameForm->GetElapsedTime()->reset();
-							InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
+							InGameForm->AddInfo(I_INFO, _("*** NEW TURN: ") + chan->Map()->Date()->String());
 						}
 						me->UnlockScreen();
 					}
@@ -465,7 +462,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
 				 		Resources::SoundEnd()->Play();
-				 		InGameForm->AddInfo(I_INFO, "*** FIN DU TOUR.");
+				 		InGameForm->AddInfo(I_INFO, _("*** NEW TURN."));
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
 
@@ -500,9 +497,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(!pl)
 						Debug(W_DESYNCH|W_SEND, "SET +d '%s:%s': player introuvable", nick.c_str(), s.c_str());
 					else if(pl->IsMe())
-						InGameForm->AddInfo(I_INFO, sender->Nick() + " vous donne " + s + " $");
+						InGameForm->AddInfo(I_INFO, StringF(_("%s gives you $%s"), sender->GetNick(), s.c_str()));
 					else
-						InGameForm->AddInfo(I_INFO, sender->Nick() + " donne " + s + " $ à " + pl->Nick());
+						InGameForm->AddInfo(I_INFO, StringF(_("%s gives $%s to %s"), sender->GetNick(), s.c_str(), pl->GetNick()));
 				}
 				break;
 			case 'e':
@@ -515,9 +512,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(!pl)
 						Debug(W_DESYNCH|W_SEND, "SET +d '%s:%s': player introuvable", nick.c_str(), s.c_str());
 					else if(pl->IsMe())
-						InGameForm->AddInfo(I_INFO, sender->Nick() + " vous donne un territoire");
+						InGameForm->AddInfo(I_INFO, StringF(_("%s gives you a country"), sender->GetNick()));
 					else
-						InGameForm->AddInfo(I_INFO, sender->Nick() + " donne un territoire à " + pl->Nick());
+						InGameForm->AddInfo(I_INFO, StringF(_("%s gives a country to %s"), sender->GetNick(), pl->GetNick()));
 				}
 				break;
 			case 'v':
@@ -583,10 +580,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						{
 							update = true;
 							if(add)
-								InGameForm->AddInfo(I_SHIT, std::string(players[0]->GetNick()) + " vient de vous piquer " +
-							                            std::string(ident));
+								InGameForm->AddInfo(I_SHIT, StringF(_("%s has taken your country (%s)"), players[0]->GetNick(), ident));
 							else
-								InGameForm->AddInfo(I_SHIT, "Votre country "+std::string(ident) + " est devenue neutre !");
+								InGameForm->AddInfo(I_SHIT, StringF(_("Your country %s is now neutral!"), ident));
 						}
 
 						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
@@ -594,13 +590,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						   (players[0]->IsMe() || players[0]->IsAllie(me->Player()) || last_owner && last_owner->IsAllie(me->Player())))
 						{
 							if(add)
-								InGameForm->AddInfo(I_INFO, std::string(ident) + " appartient maintenant à " +
-							                                players[0]->GetNick());
+								InGameForm->AddInfo(I_INFO, StringF(_("%s is now owned by %s"), ident, players[0]->GetNick()));
 							else
-								InGameForm->AddInfo(I_INFO, std::string(ident) + " est maintenant neutre");
+								InGameForm->AddInfo(I_INFO, StringF(_("%s is now neutral"), ident));
 						}
 						if(InGameForm && chan->State() == EChannel::PLAYING)
-							// Il n'est pas nécessaire de mettre à jour la preview en ANIMING, car c'est fait automatiquement à la fin du tour
+							// Il n'est pas nÃ©cessaire de mettre Ã  jour la preview en ANIMING, car c'est fait automatiquement Ã  la fin du tour
 							chan->Map()->CreatePreview(120,120, P_ENTITIES);
 						break;
 					}
@@ -627,9 +622,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 								InGameForm->Map->SetCreateEntity(0);
 						}
 
-						/* En mode ANIMING, la confirmation de chaque evenement est manifesté par le +!
+						/* En mode ANIMING, la confirmation de chaque evenement est manifestÃ© par le +!
 						 * et marque la fin d'un evenement, donc on a plus besoin de s'en rappeler.
-						 * On peut considérer qu'on passe par là à chaques fins d'evenements
+						 * On peut considÃ©rer qu'on passe par lÃ  Ã  chaques fins d'evenements
 						 */
 						if(add && chan->State() == EChannel::ANIMING)
 						{
@@ -656,14 +651,14 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						if(money > players[0]->Money())
 						{
-							InGameForm->BarreLat->TurnMoney->SetCaption(TypToStr(money - players[0]->Money()) + "$.t-1");
+							InGameForm->BarreLat->TurnMoney->SetCaption(StringF(_("$%d/t"), (money - players[0]->Money())));
 							InGameForm->BarreLat->TurnMoney->SetX(
 							                                   InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
 							                                   InGameForm->BarreLat->TurnMoney->Width() - 15);
-							InGameForm->AddInfo(I_INFO, "*** Vous gagnez " + TypToStr(money - players[0]->Money()) + " $");
+							InGameForm->AddInfo(I_INFO, StringF(_("*** You earn $%d"), (money - players[0]->Money())));
 						}
 						SDL_Delay(50);
-						InGameForm->BarreLat->Money->SetCaption(TypToStr(money) + " $");
+						InGameForm->BarreLat->Money->SetCaption(StringF(_("$%d"), money));
 						InGameForm->BarreLat->Money->SetColor(red_color);
 						me->LockScreen();
 				 		SDL_Delay(200);
@@ -679,7 +674,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				ECPlayer *pl = chan->GetPlayer(parv[j++].c_str());
 				if(!pl)
 				{
-					Debug(W_DESYNCH|W_SEND, "SET %co: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str());
+					Debug(W_DESYNCH|W_SEND, "SET %co: %s non trouvÃ©", add ? '+' : '-', parv[(j-1)].c_str());
 					break;
 				}
 				pl->SetOp(add);
@@ -707,21 +702,21 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					GameInfosForm->SpeedGame->Check(add);
 				break;
 			}
-			case '£':
+			case '_':
 			{
 				if(!add)
-					{ Debug(W_DESYNCH|W_SEND, "SET -£: theoriquement impossible, on ne peut pas \"déperdre\""); break; }
+					{ Debug(W_DESYNCH|W_SEND, "SET -_: theoriquement impossible, on ne peut pas \"dÃ©perdre\""); break; }
 				if(InGameForm)
 				{
 					if(sender->IsMe())
 					{
-						InGameForm->AddInfo(I_SHIT, "*** VOUS AVEZ PERDU !!!");
-						// On enlève le brouillard pour que l'user puisse voir toute la partie
+						InGameForm->AddInfo(I_SHIT, _("*** VOUS HAVE LOST!!!"));
+						// On enlÃ¨ve le brouillard pour que l'user puisse voir toute la partie
 						chan->Map()->SetBrouillard(false);
 						InGameForm->Map->SetBrouillard(false);
 					}
 					else
-						InGameForm->AddInfo(I_SHIT, "*** " + std::string(sender->GetNick()) + " a perdu.");
+						InGameForm->AddInfo(I_SHIT, StringF(_("*** %s has lost."), sender->GetNick()));
 					me->LockScreen();
 					chan->Map()->CreatePreview(120,120, P_ENTITIES);
 					me->UnlockScreen();
@@ -756,7 +751,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				ECPlayer *pl = chan->GetPlayer(parv[j++].c_str());
 				if(!pl)
 				{
-					Debug(W_DESYNCH|W_SEND, "SET %ca: %s non trouvé", add ? '+' : '-', parv[(j-1)].c_str());
+					Debug(W_DESYNCH|W_SEND, "SET %ca: %s non trouvÃ©", add ? '+' : '-', parv[(j-1)].c_str());
 					break;
 				}
 				if(add)
@@ -765,19 +760,16 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(InGameForm)
 					{
 						if(sender->IsMe())
-							InGameForm->AddInfo(I_INFO, "*** Vous vous alliez avec " + std::string(pl->GetNick()));
+							InGameForm->AddInfo(I_INFO, StringF(_("*** You become allied to %s"), pl->GetNick()));
 						else if(pl->IsMe())
 						{
 							if(pl->IsAllie(sender))
-								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
-								                            " a accepté votre alliance");
+								InGameForm->AddInfo(I_INFO, StringF(_("*** %s has accepted your alliance"), sender->GetNick()));
 							else
-								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
-								                            " s'est allié avec vous et vous propose de faire de même");
+								InGameForm->AddInfo(I_INFO, StringF(_("*** %s become allied to you."), sender->GetNick()));
 						}
 						else
-							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " s'est allié avec " +
-							                            pl->GetNick());
+							InGameForm->AddInfo(I_INFO, StringF(_("*** %s become allied to %s"), sender->GetNick(), pl->GetNick()));
 					}
 					if(OptionsForm)
 					{
@@ -798,23 +790,15 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				else
 				{
 					if(!sender->RemoveAllie(pl))
-						Debug(W_DESYNCH|W_SEND, "SET -a %s: Il se trouve qu'il n'était pas mon allié !!", pl->GetNick());
+						Debug(W_DESYNCH|W_SEND, "SET -a %s: Il se trouve qu'il n'Ã©tait pas mon alliÃ© !!", pl->GetNick());
 					else if(InGameForm)
 					{
 						if(sender->IsMe())
-							InGameForm->AddInfo(I_INFO, "*** Vous n'êtes plus allié avec " + std::string(pl->GetNick()));
+							InGameForm->AddInfo(I_INFO, StringF(_("*** You have broken your alliance with %s"), pl->GetNick()));
 						else if(pl->IsMe())
-						{
-							if(pl->IsAllie(sender))
-								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " vous a trahis "
-								                            "et a brisé votre alliance !");
-							else
-								InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) + " n'est plus allié "
-								                            "avec vous");
-						}
+								InGameForm->AddInfo(I_INFO, StringF(_("*** %s has broken his alliance with you"), sender->GetNick()));
 						else
-							InGameForm->AddInfo(I_INFO, "*** " + std::string(sender->GetNick()) +
-							                            " a rompu son alliance avec " + pl->GetNick());
+							InGameForm->AddInfo(I_INFO, StringF(_("*** %s has broken his alliance with %s"),sender->GetNick(), pl->GetNick()));
 					}
 					if(OptionsForm)
 					{
@@ -833,7 +817,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				}
 				if(pl->IsMe())
-				{ /* On affiche ou cache les territoires où était les unités de mes alliés */
+				{ /* On affiche ou cache les territoires oÃ¹ Ã©tait les unitÃ©s de mes alliÃ©s */
 					std::vector<ECBEntity*> ents = sender->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 						dynamic_cast<ECEntity*>(*enti)->SetShowedCases(add, true);
@@ -917,7 +901,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					}
 				break;
 			default:
-				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', *c);
+				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supportÃ©", add ? '+' : '-', *c);
 				break;
 		}
 	}
@@ -930,7 +914,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans être dans un chan");
+	if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un PLS sans Ãªtre dans un chan");
 
 	std::vector<int> pos_badval;
 	std::vector<int> col_badval;
@@ -968,7 +952,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 		ECPlayer *pl = 0;
 		if(!strcasecmp(nick, me->GetNick().c_str()))
-		{ /* On a déjà créé notre player */
+		{ /* On a dÃ©jÃ  crÃ©Ã© notre player */
 			if(owner) me->Player()->SetOwner();
 			if(op) me->Player()->SetOp();
 			pl = me->Player();
@@ -991,7 +975,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->MyNation = pline->nation;
 			}
 			else
-			{ /* GameInfosForm->MyPosition et GameInfosForm->MyColor ne sont probablement pas encore défini ! */
+			{ /* GameInfosForm->MyPosition et GameInfosForm->MyColor ne sont probablement pas encore dÃ©fini ! */
 				if(pos > 0)
 					pos_badval.push_back(pos);
 				if(col > 0)
@@ -1002,7 +986,7 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
 				if(me->Player()->IsOwner())
-					pline->Nick->SetHint("Cliquez sur le pseudo pour éjecter " + std::string(pl->GetNick()));
+					pline->Nick->SetHint(StringF(_("Clic on his nickname to kick %s"), pl->GetNick()));
 			}
 		}
 	}
@@ -1044,22 +1028,22 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			EChannel *c = new EChannel(parv[1], (parv[1] == "."));
 			me->SetPlayer(new ECPlayer(parv[0], c, false, false, true, false));
 
-			/* En cas de gros lag, il se peut que le joueur ait supprimé GameInfosForm avant même avoir reçu le JOIN.
-			 * Dans ce cas on prévient quand même le serveur qu'on part.
+			/* En cas de gros lag, il se peut que le joueur ait supprimÃ© GameInfosForm avant mÃªme avoir reÃ§u le JOIN.
+			 * Dans ce cas on prÃ©vient quand mÃªme le serveur qu'on part.
 			 */
 			if(!GameInfosForm && !RECOVERING)
 				me->sendrpl(MSG_LEAVE);
 		}
 		else
 		{ /* C'est un user qui rejoin le chan */
-			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans être sur un chan");
+			if(!me->Player()) return Debug(W_DESYNCH|W_SEND, "Reception d'un join sans Ãªtre sur un chan");
 
 			me->LockScreen();
 			ECPlayer *pl = new ECPlayer(parv[0].c_str(), me->Player()->Channel(), false, false, false,
 			                            (parv[0][0] == IA_CHAR));
 			if(GameInfosForm)
 			{
-				GameInfosForm->Chat->AddItem("*** " + parv[0] + " rejoint la partie", green_color);
+				GameInfosForm->Chat->AddItem(StringF(_("*** %s has joined game"), parv[0].c_str()), green_color);
 				TPlayerLine *pline;
 				GameInfosForm->Players->AddLine((pline = new TPlayerLine(pl)));
 				GameInfosForm->RecalcMemo();
@@ -1067,7 +1051,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
 				if(me->Player()->IsOwner())
-					pline->Nick->SetHint("Cliquez sur le pseudo pour éjecter " + std::string(pl->GetNick()));
+					pline->Nick->SetHint(StringF(_("Clic on his nickname to kick %s"), pl->GetNick()));
 			}
 			me->UnlockScreen();
 		}
@@ -1085,11 +1069,11 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		return vDebug(W_DESYNCH|W_SEND, "Reception d'un LEAVE d'un joueur inconnu !",
 		                                VSName(parv[0].c_str()));
 
-	/** \note Dans le protocole il ne devrait y avoir qu'un seul départ
-	 *       à la fois mais bon par respect de ce qui est *possible*
-	 *       (on ne sait jamais, après tout, on pourrait imaginer dans
+	/** \note Dans le protocole il ne devrait y avoir qu'un seul dÃ©part
+	 *       Ã  la fois mais bon par respect de ce qui est *possible*
+	 *       (on ne sait jamais, aprÃ¨s tout, on pourrait imaginer dans
 	 *        un avenir des "services" qui pourraient "hacker" (plusieurs
-	 *        départs ?) ou alors pour une eventuelle IA du serveur)
+	 *        dÃ©parts ?) ou alors pour une eventuelle IA du serveur)
 	 */
 	me->LockScreen();
 	// PAS DE RETURN ICI
@@ -1120,8 +1104,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if((*playersi)->Nation() && GameInfosForm->MyNation)
 					GameInfosForm->MyNation->Item((*playersi)->Nation())->SetEnabled();
 
-				GameInfosForm->Chat->AddItem("*** " + std::string((*playersi)->GetNick()) +
-				                             " quitte la partie", green_color);
+				GameInfosForm->Chat->AddItem(StringF(_("*** %s has leave game"), (*playersi)->GetNick()), green_color);
 				std::vector<TComponent*> plrs = GameInfosForm->Players->GetList();
 				for(std::vector<TComponent*>::iterator it=plrs.begin(); it!=plrs.end(); ++it)
 				{
@@ -1160,7 +1143,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			if(InGameForm)
 			{
-				InGameForm->AddInfo(I_INFO, "*** " + std::string((*playersi)->GetNick()) + " quitte la partie");
+				InGameForm->AddInfo(I_INFO, StringF(_("*** %s has leave game"), (*playersi)->GetNick()));
 				me->Player()->Channel()->Map()->CreatePreview(120,120, P_ENTITIES);
 			}
 			if(me->Player()->Channel()->RemovePlayer((*playersi), USE_DELETE))
@@ -1213,9 +1196,9 @@ bool MenAreAntsApp::RecoverGame(std::string chan)
 bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 {
 	if(!EC_Client::GetInstance())
-		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
+		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connectÃ©");
 
-	std::string name; /* note: comme cpath va pointer sur la valeur de name tout au long du truc, il est préferable
+	std::string name; /* note: comme cpath va pointer sur la valeur de name tout au long du truc, il est prÃ©ferable
 	                   *       de le laisser en global de la fonction et pas uniquement dans le bloc if(!cname)
 	                   */
 	bool create = false;
@@ -1235,8 +1218,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			cname = setted_name.c_str();
 #else
 		{
-			TMessageBox mb("Entrez le nom de la partie à créer",
-							HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			TMessageBox mb(_("Enter game's name to create"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars(CHAN_CHARS);
 			mb.Edit()->SetMaxLen(GAMELEN);
 			if(mb.Show() == BT_OK)
@@ -1248,10 +1230,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 #endif
 	}
 
-	/* Déclaration membres fixes */
+	/* DÃ©claration membres fixes */
 	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), client, mission);
-	GameInfosForm->Chat->AddItem("*** Vous avez bien rejoint le jeu " +
-	                                    std::string(cname), green_color);
+	GameInfosForm->Chat->AddItem(StringF(_("*** You have rejoin %s"), cname), green_color);
 
 	JOINED = 0;
 	if(create)
@@ -1259,7 +1240,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	else
 		client->sendrpl(MSG_JOIN, cname);
 
-	/* On attend 2 secondes de lag, mais si jamais on a reçu une erreur on y partira avant */
+	/* On attend 2 secondes de lag, mais si jamais on a reÃ§u une erreur on y partira avant */
 	WAIT_EVENT_T(JOINED != 0, i, 2);
 	if(JOINED <= 0)
 	{
@@ -1287,10 +1268,10 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(Config::GetInstance()->nation)
 			client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(Config::GetInstance()->nation)));
 
-		GameInfosForm->Title->SetCaption(mission ? "Partie solo" : ("Jeu : " + std::string(chan->GetName())));
+		GameInfosForm->Title->SetCaption(mission ? _("Alone game") : (_("Game: ") + std::string(chan->GetName())));
 		if(client->Player()->IsOwner())
 		{
-			GameInfosForm->PretButton->SetText("Lancer la partie");
+			GameInfosForm->PretButton->SetText(_("Start game"));
 			GameInfosForm->PretButton->SetEnabled();
 		}
 
@@ -1310,8 +1291,6 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 			MyFree(GameInfosForm);
 		throw;
 	}
-	if(GameInfosForm && !GameInfosForm->Kicked.empty())
-		TMessageBox(GameInfosForm->Kicked, BT_OK, GameInfosForm).Show();
 
 	if(!client || !client->Player())
 		MyFree(GameInfosForm);
@@ -1362,11 +1341,6 @@ void TGameInfosForm::AfterDraw()
 	}
 	if(!MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
 		MapList->SetEnabled();
-	if(TGameInfosForm::ErrMessage.empty() == false)
-	{
-		TMessageBox(TGameInfosForm::ErrMessage, BT_OK, this).Show();
-		TGameInfosForm::ErrMessage.clear();
-	}
 }
 
 void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
@@ -1398,8 +1372,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 					}
 					else if(pll->Nick->Test(mouse, button))
 					{
-						TMessageBox mb("Vous souhaitez éjecter " + pll->Nick->Caption() + " du jeu.\n"
-								"Veuillez entrer la raison :",
+						TMessageBox mb(StringF(_("You want to kick %s from game.\nPlease enter a reason:"), pll->Nick->Caption().c_str()),
 								HAVE_EDIT|BT_OK|BT_CANCEL, this);
 						std::string name;
 						if(mb.Show() == BT_OK)
@@ -1421,7 +1394,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 		client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(GameInfosForm->MyNation->Selected())));
 	else if(RetourButton->Test(mouse, button))
 	{
-		if(TMessageBox("Êtes vous sûr de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
+		if(TMessageBox(_("Do you really want to leave game?"), BT_YES|BT_NO, this).Show() == BT_YES)
 			want_quit = true;
 	}
 	else if(PretButton->Test(mouse, button))
@@ -1432,14 +1405,13 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 			EChannel* chan = client->Player()->Channel();
 			if(!chan->Map())
 			{
-				TMessageBox("Veuillez sélectionner une carte de jeu !", BT_OK, this).Show();
+				TMessageBox(_("Please select a map!"), BT_OK, this).Show();
 				ok = false;
 			}
 			else if(chan->NbPlayers() < chan->Map()->MinPlayers())
 			{
-				TMessageBox("Il n'y a pas suffisament de joueurs. Cette carte requiert entre " +
-				            TypToStr(chan->Map()->MinPlayers()) + " et " + TypToStr(chan->Map()->MaxPlayers()) +
-				            " joueurs.", BT_OK, this).Show();
+				TMessageBox(StringF(_("There are not sufficient players. This map requires between %d and %d players."),
+				                      chan->Map()->MinPlayers(), chan->Map()->MaxPlayers()), BT_OK, this).Show();
 				ok = false;
 			}
 			else
@@ -1450,13 +1422,12 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 				for(it = plv.begin(); it != plv.end(); ++it) if((*it)->Ready()) ok++;
 				if((ok+1) < chan->Map()->MinPlayers() && !chan->IsMission()) /* +1 for me */
 				{
-					TMessageBox("Il faut qu'au moins " + TypToStr(chan->Map()->MinPlayers()) + " joueurs soient prêts.",
+					TMessageBox(StringF(_("It is necessary at least that %d are ready"), chan->Map()->MinPlayers()),
 					            BT_OK, this).Show();
 					ok = false;
 				}
 				else if((ok+1) != chan->NbPlayers() &&
-					TMessageBox("Tous les joueurs ne sont pas prêts. Etes vous sûr de vouloir lancer la partie ?\n"
-						"les joueurs non prêts seront éjectés du jeu",
+					TMessageBox(StringF(_("All players aren't ready. Are you sure to want to start game?\nNo ready players will be kicked")),
 						BT_YES|BT_NO, this).Show() != BT_YES)
 					ok = false;
 			}
@@ -1472,7 +1443,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 		client->sendrpl(MSG_SET, ECArgs("+t", TypToStr(TurnTime->Value())));
 	else if(CreateIAButton->Test(mouse, button))
 	{
-		TMessageBox mb("Nom du joueur virtuel à créer :", HAVE_EDIT|BT_OK|BT_CANCEL, this);
+		TMessageBox mb(_("AI's name to create:"), HAVE_EDIT|BT_OK|BT_CANCEL, this);
 		mb.Edit()->SetAvailChars(NICK_CHARS);
 		mb.Edit()->SetMaxLen(NICKLEN);
 		std::string name;
@@ -1515,26 +1486,26 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	int right_x = Window()->GetWidth() - 175;
 
 	MapList = AddComponent(new TListBox(Rectanglei(right_x, 270, 150, 80)));
-	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, "Partie rapide", white_color));
-	SpeedGame->SetHint("Un joueur a perdu quand il n'a plus de batiments");
+	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, _("Quick game"), white_color));
+	SpeedGame->SetHint(_("A player has lost when he hasn't got any building."));
 	SpeedGame->Check();
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Argent: ",  right_x, 385, 150, 0, 50000, 5000,
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, 385, 150, 0, 50000, 5000,
 	15000));
-	BeginMoney->SetHint("Argent que possède chaque joueur au début de la partie");
+	BeginMoney->SetHint(_("Money earned by each players at begin of game"));
 
-	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), "Reflexion: ",  right_x, 405, 150, /*min*/mission ? 0 : 15, 360, 15,
+	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Turn durat.: "),  right_x, 405, 150, /*min*/mission ? 0 : 15, 360, 15,
 	60));
-	TurnTime->SetHint("Temps en secondes maximal de reflexion chaques tours");
+	TurnTime->SetHint(_("Maximal time in seconds of each turn"));
 
-	PretButton = AddComponent(new TButtonText(right_x,110, 150,50, "Pret", Font::GetInstance(Font::Normal)));
+	PretButton = AddComponent(new TButtonText(right_x,110, 150,50, _("Ready"), Font::GetInstance(Font::Normal)));
 	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(right_x,160,150,50, "Retour", Font::GetInstance(Font::Normal)));
-	CreateIAButton = AddComponent(new TButtonText(right_x,210,150,50, "Ajouter IA", Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(right_x,160,150,50, _("Back"), Font::GetInstance(Font::Normal)));
+	CreateIAButton = AddComponent(new TButtonText(right_x,210,150,50, _("Add an AI"), Font::GetInstance(Font::Normal)));
 	CreateIAButton->Hide();
-	CreateIAButton->SetHint("Ajouter un joueur artificiel (une IA) à la partie");
+	CreateIAButton->SetHint(_("Add an artificial player (an AI) in game"));
 
 	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), right_x, Window()->GetHeight()-95, 150, 60));
 	SetHint(Hints);
@@ -1556,7 +1527,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 void TGameInfosForm::RecalcMemo()
 {
 	Chat->SetXY(50, Players->Y() + Players->Height());
-	Chat->SetHeight(Window()->GetHeight() - 65 - Players->Height()-Players->Y()); /* On définit une jolie taille */
+	Chat->SetHeight(Window()->GetHeight() - 65 - Players->Height()-Players->Y()); /* On dÃ©finit une jolie taille */
 }
 
 /********************************************************************************************
@@ -1622,10 +1593,10 @@ void TPlayerLine::Init()
 	                    /*  label   x    y  w  min      max                  step  defvalue */
 	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  X()+230, Y(), 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
-	position->SetHint("Votre position sur la carte");
+	position->SetHint(_("Your position on map"));
 	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  X()+340, Y(), 50);
 	MyComponent(couleur);
-	couleur->SetHint("La couleur de votre camp");
+	couleur->SetHint(("Your color"));
 	nation = new TComboBox(Font::GetInstance(Font::Small), X()+440, Y(), 120);
 	MyComponent(nation);
 
@@ -1639,8 +1610,8 @@ void TPlayerLine::Init()
 
 	for(uint i = 0; i < ECPlayer::N_MAX; ++i)
 	{
-		TListBoxItem* j = nation->AddItem(false, std::string(nations_str[i].name), "");
-		j->SetHint(nations_str[i].infos);
+		TListBoxItem* j = nation->AddItem(false, gettext(nations_str[i].name), "");
+		j->SetHint(gettext(nations_str[i].infos));
 	}
 
 	size.x = nation->X() + nation->Width();
@@ -1691,7 +1662,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = "Pret   Pseudo      Pos.  Couleur  Nation";
+	std::string s = _("Ready  Nickname    Pos.  Color    Nation");
 	label = new TLabel(X(), Y(), s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
 	size.x = label->Width();

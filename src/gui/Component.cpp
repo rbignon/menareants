@@ -86,7 +86,7 @@ void TList::Draw(const Point2i& pos)
 	{
 		for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
 			if((*it)->Visible() && (*it)->Focused() == (first ? false : true))
-			{ // Affiche seulement à la fin les composants selectionnés
+			{ // Affiche seulement Ã  la fin les composants selectionnÃ©s
 				(*it)->Draw(pos);
 				if((*it)->OnMouseOn() && (*it)->Mouse(pos))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());

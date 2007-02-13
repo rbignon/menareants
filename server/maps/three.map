@@ -1,5 +1,5 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Veuillez ne pas Ã©diter le fichier map Ã  la main.
+# Utilisez plutÃ´t l'Ã©diteur de carte intÃ©grÃ© au jeu.
 NAME Trois joueurs
 PLAYER A A
 PLAYER B B
@@ -33,7 +33,7 @@ CITY 1000
 MIN 2
 MAX 3
 DATE 2/6/2006
-INFO Map pour trois joueurs sur trois îles
+INFO Map pour trois joueurs sur trois Ã®les
 UNIT 6 A 9,1 1000
 UNIT 1 A 9,1 1000
 UNIT 7 A 14,1 2000

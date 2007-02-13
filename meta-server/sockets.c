@@ -214,7 +214,7 @@ struct Client *addclient(int fd, struct in_addr *addr)
 		return 0;
 	if(!(myClients[fd].flags & CL_FREE))
 	{
-		printf("Connexion sur un slot déjà occupé!? (%s -> %d[%s])\n",
+		printf("Connexion sur un slot dÃ©jÃ  occupÃ©!? (%s -> %d[%s])\n",
 		                    ip, fd, myClients[fd].ip);
 		return 0;
 	}

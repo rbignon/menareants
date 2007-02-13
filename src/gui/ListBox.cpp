@@ -45,8 +45,8 @@
 
 #define SCROLLBAR
 
-TListBoxItem::TListBoxItem(const std::string& _label, Font& _font, const std::string& _value, const Color& color)
-	: TLabel(0,0, _label, color, &_font), value(_value)
+TListBoxItem::TListBoxItem(const std::string& _name, const std::string& _label, Font& _font, const std::string& _value, const Color& color)
+	: TLabel(0,0, _label, color, &_font), value(_value), name(_name)
 {
 
 }
@@ -59,6 +59,11 @@ const std::string& TListBoxItem::Label() const
 const std::string& TListBoxItem::Value() const
 {
 	return value;
+}
+
+const std::string& TListBoxItem::Name() const
+{
+	return name;
 }
 
 // struct CompareItems
@@ -229,12 +234,12 @@ TListBoxItem* TListBox::AddItem (bool selected,
                         const std::string &value,
                         const Color& color,
                         bool enabled,
-                        Font& font)
+                        Font& font, const std::string& name)
 {
 	uint pos = m_items.size();
 
 	// Push item
-	TListBoxItem * item = new TListBoxItem(label, font, value, color);
+	TListBoxItem * item = new TListBoxItem(name, label, font, value, color);
 	MyComponent(item);
 	item->SetEnabled(enabled);
 	item->SetGrayDisable();
@@ -265,7 +270,7 @@ void TListBox::ScrollTo(TListBoxItem* item)
 	ScrollTo(i);
 }
 
-/* TODO améliorer ce code moche */
+/* TODO amÃ©liorer ce code moche */
 void TListBox::ScrollTo(uint id)
 {
 	if(id == first_visible_item)
@@ -378,6 +383,12 @@ const std::string& TListBox::ReadValue (int index) const
 {
 	assert (index >= 0 && index < (int)m_items.size());
 	return m_items.at(index)->Value();
+}
+
+const std::string& TListBox::ReadName (int index) const
+{
+	assert (index >= 0 && index < (int)m_items.size());
+	return m_items.at(index)->Name();
 }
 
 void TListBox::SetEnabled(bool _en)

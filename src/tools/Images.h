@@ -72,12 +72,12 @@ public:
 /* Attributs */
 public:
 
-	/** Paramètre ou retourne le nombre de frames */
+	/** ParamÃ¨tre ou retourne le nombre de frames */
 	void SetFrame(uint nr);
 	uint Frame() { return mFrame; }
 	uint NbFrames() const;
 
-	/** Paramètre ou retourne la vitesse */
+	/** ParamÃ¨tre ou retourne la vitesse */
 	void setSpeed(float nr) { mSpeed = nr; }
 	float getSpeed() { return mSpeed; }
 
@@ -94,10 +94,10 @@ public:
 	bool Repeat() const { return repeat; }
 	void SetRepeat(bool b = true) { repeat = b; }
 
-	/** Repasse à la première frame */
+	/** Repasse Ã  la premiÃ¨re frame */
 	void rewind() { mFrame = 0; }
 
-	/* Fonctions pour changer les coordonnées */
+	/* Fonctions pour changer les coordonnÃ©es */
 	void xadd(int nr) { mX+=nr; }
 	void yadd(int nr) { mY+=nr; }
 	void xset(int nr) { mX=nr; }
@@ -119,7 +119,7 @@ public:
 	ECImage* Window() const { return mScreen; }
 	ECSpriteBase* SpriteBase() const { return mSpriteBase; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	uint mFrame;
 	int mX, mY, mOldX, mOldY;
@@ -138,7 +138,7 @@ class ECSpriteBase
 public:
 
 	/** Initialisation.
-	 * Ouvre dans un répertoire le fichier info dans lequel est inscrit les informations
+	 * Ouvre dans un rÃ©pertoire le fichier info dans lequel est inscrit les informations
 	 * pour l'animation (images, frequence, etc..)
 	 */
 	int init(const char *dir);
@@ -180,13 +180,13 @@ public:
 /* Methodes */
 public:
 
-	/** Charge l'image à partir d'un fichier */
+	/** Charge l'image Ã  partir d'un fichier */
 	void Load(char *fichier, bool alpha = false);
 
-	/** Dessin à la taille originale à la position (x,y) */
+	/** Dessin Ã  la taille originale Ã  la position (x,y) */
 	void Draw(int x, int y);
 
-	/** Dessin avec une taille différente à la position (x,y) */
+	/** Dessin avec une taille diffÃ©rente Ã  la position (x,y) */
 	void Draw(int x, int y, int w, int h, int x2, int y2);
 
 	/** Dessine en 0x0 (background) */

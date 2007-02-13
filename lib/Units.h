@@ -65,7 +65,7 @@ public:
 
 	virtual uint RealNb() const { return unit ? (unit->Nb() + Nb()) : Nb(); }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECBEntity* unit;
 };
@@ -178,7 +178,7 @@ public:
 
 	/** Prix par tours de l'avion en vol
 	 * Cette fonction constante indique le prix, lorsque l'avion est en vol, que paye
-	 * le propriétaire chaque tours où l'avion est en vol, la correspondance entre
+	 * le propriÃ©taire chaque tours oÃ¹ l'avion est en vol, la correspondance entre
 	 * le nombre d'hommes contenus et le prix.
 	 * Par exemple, si elle retourne \b 1, le joueur payera 1 * nombre_d'hommes $ par tours,
 	 * donc 1000 $ par tours si l'avion contient 1000 hommes.
@@ -376,7 +376,7 @@ public:
 
 	int& RestDestroy() { return restDestroy; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	int restDestroy;
 };
@@ -418,7 +418,7 @@ public:
 /* Attributs */
 public:
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 };
 
@@ -464,7 +464,7 @@ public:
 /* Attributs */
 public:
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 };
 
@@ -508,7 +508,7 @@ public:
 /* Attributs */
 public:
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 };
 

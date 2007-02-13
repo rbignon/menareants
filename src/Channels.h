@@ -89,7 +89,7 @@ public:
 	void AddBreakPoint(BreakPoint bp);
 	bool RemoveBreakPoint(ECBCase *c);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool isme;
 	bool is_ia;
@@ -117,7 +117,7 @@ public:
 /* Methodes */
 public:
 
-	void Print(std::string, int = 0x001); /* Par défault = I_Info */
+	void Print(std::string, int = 0x001); /* Par dÃ©fault = I_Info */
 
 /* Attributs */
 public:
@@ -135,7 +135,7 @@ public:
 	uint CurrentEvent() const { return current_event; }
 	void SetCurrentEvent(uint e) { current_event = e; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool want_leave;
 	uint current_event;

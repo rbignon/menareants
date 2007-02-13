@@ -90,7 +90,7 @@ public:
 	uint Width() const { return w; }
 	uint Height() const { return h; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	int x, y;
 	uint w, h;

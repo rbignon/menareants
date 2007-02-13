@@ -379,7 +379,7 @@ int ECSpriteBase::init(const char *dir)
 	std::ifstream fp(filename.c_str());
 
 	if(!fp)
-		throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
+		throw ECExcept(filename, "ProblÃ¨me d'ouverture des donnÃ©es. VÃ©rifiez leur prÃ©sence");
 
 	std::string ligne, key;
 	for(int count = -1; std::getline(fp, ligne) && count < (int)mNumframes;)

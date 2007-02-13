@@ -77,7 +77,7 @@ void TFPS::Draw(const Point2i& mouse)
 	// Pas encore l'heure de recalculer : exit !
 	if (nv_temps > time_in_second)
 	{
-		// On décale !
+		// On dÃ©cale !
 		while (time_in_second < nv_temps)
 		{
 			time_in_second += 1000;

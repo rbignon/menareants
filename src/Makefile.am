@@ -4,7 +4,7 @@ bin_PROGRAMS = menareants
 
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
-
+AM_CXXFLAGS=-DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
 EXTRA_DIST = v.sh
 
 DISTCLEANFILES = Version.cpp

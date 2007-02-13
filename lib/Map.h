@@ -35,7 +35,7 @@
  * ECBMap
  *  |- std::vector<ECBCases*>  <-----------
  *  |- std::vector<ECBCountry*>  <----     \
- *  `- std::vector<ECBMapPlayer*>     \    |
+ * Â `- std::vector<ECBMapPlayer*>     \    |
  *      `- std::vector<ECBCountry*> ---    /
  *          `- std::vector<ECBCases*> -----
  * </pre>
@@ -130,7 +130,7 @@ public:
 
 	void SetDest();
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	Vector moves;
 	ECBCase* first_case;
@@ -166,9 +166,9 @@ protected:
 #define ARM_CONTAIN     (ARM_CONTENER|ARM_MOVE)
 #define ARM_UNCONTAIN   (ARM_UNCONTENER|ARM_MOVE)
 /* Concerne server:EChannel::SendArm() */
-#define ARM_HIDE        0x0100 /* cache les infos aux users non concernés */
+#define ARM_HIDE        0x0100 /* cache les infos aux users non concernÃ©s */
 #define ARM_RECURSE     0x0200 /* ne JAMAIS appeler */
-#define ARM_NOCONCERNED 0x0400 /* ne pas envoyer aux users concernés */
+#define ARM_NOCONCERNED 0x0400 /* ne pas envoyer aux users concernÃ©s */
 
 #define ENTITY_EMPTY_CONSTRUCTOR(x)  x()
 #define ENTITY_CONSTRUCTOR(x)        x(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case) \
@@ -284,7 +284,7 @@ public:
 	#define MOVE_SIMULE 0x002
 	virtual bool WantMove(ECBMove::E_Move, int flags = 0) { return true; } ///< Does this entity wants to move somewhere ?
 
-	/** This is my upgrade (with ARM_UPGRADE/°) */
+	/** This is my upgrade (with ARM_UPGRADE/Â°) */
 	virtual e_type MyUpgrade() const { return E_NONE; }
 
 	/** Use this function to deploy your entity */
@@ -315,7 +315,7 @@ public:
 	/** Use this function to add some units in the entity */
 	virtual bool AddUnits(uint units);
 
-	/** Cette fonction est appelée quand une unité en créer une autre */
+	/** Cette fonction est appelÃ©e quand une unitÃ© en crÃ©er une autre */
 	virtual void Create(ECBEntity*) { return; }
 
 	/** This function remove entity from case where it is and add it in the new case.
@@ -354,12 +354,12 @@ public:
 	ECBPlayer* Owner() const { return owner; }
 	void SetOwner(ECBPlayer* _p) { owner = _p; }
 
-	/** This is an identificator of this entity (xy, x ¤ [A..z], y ¤ [A..z]) */
+	/** This is an identificator of this entity (xy, x â‚¬ [A..z], y â‚¬ [A..z]) */
 	const char* ID() const { return name; }
 	void SetID(const char* s);
 
-	/** Return a long identificator in form Owner!xy (x ¤ [A..z], y ¤ [A..z]) */
-	std::string LongName();
+	/** Return a long identificator in form Owner!xy (x â‚¬ [A..z], y â‚¬ [A..z]) */
+	std::string LongName() const;
 
 	/** This is used by server (so, why is it here ??) */
 	virtual ECBEntity* Last() const { return 0; }
@@ -396,7 +396,7 @@ public:
 	bool Deployed() const { return deployed; }
 	void SetDeployed(bool d = true) { deployed = d; }
 
-	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel à Shadowed(), qui ne sera utilisé que dans le serveur.
+	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel Ã  Shadowed(), qui ne sera utilisÃ© que dans le serveur.
 	 * En effet ce dernier a que des instances de ECEntity qui eux contiennent bien Shadowed().
 	 */
 	virtual bool IsZombie() const { return false; }
@@ -409,7 +409,7 @@ public:
 
 	ECBMove* Move() { return &move; }
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 protected:
 	ECBPlayer* owner;
 	Entity_ID name;
@@ -463,7 +463,7 @@ public:
 	ECBDate& operator++ ();    ///< prefix ++
 	ECBDate  operator++ (int); ///< postfix ++
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	uint d;
 	uint m;
@@ -534,7 +534,7 @@ public:
 	ECBCase* MoveLeft(uint c = 1) const;
 	ECBCase* MoveRight(uint c = 1) const;
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 
 	ECBMap *map;
@@ -619,7 +619,7 @@ public:
 
 class ECBFindFastPath
 {
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	struct noeud
 	{
@@ -654,7 +654,7 @@ public:
 
 	std::stack<ECBMove::E_Move> Moves() const { return moves; }
 
-/* Methodes privées */
+/* Methodes privÃ©es */
 private:
 
 	bool deja_present_dans_liste(ECBCase* n, l_noeud& l);
@@ -705,9 +705,9 @@ public:
 
 	ECBMap* Map() const { return map; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
-	friend void ECBCase::SetCountry(ECBCountry *mc); /* Il touche à mes flags */
+	friend void ECBCase::SetCountry(ECBCountry *mc); /* Il touche Ã  mes flags */
 	std::vector<ECBCase*> cases;
 	ECBMapPlayer *owner;
 	Country_ID ident;
@@ -761,7 +761,7 @@ public:
 	std::string Nick() const { return nick; }
 	void SetNick(std::string n) { nick = n; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	MapPlayer_ID id;
 	uint num;
@@ -859,7 +859,7 @@ public:
 
 	bool& IsMission() { return mission; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	std::vector<ECBCase*> map;              /**< Alignement fait ligne par ligne !!! */
 

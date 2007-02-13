@@ -69,7 +69,7 @@ public:
 	TMap* Map() const { return map; }
 	void SetMap(TMap* m) { map = m; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	TMap* map;
 	cursors_t pointer;

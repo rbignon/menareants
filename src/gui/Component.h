@@ -86,7 +86,7 @@ public:
 
 	virtual ~TComponent() {}
 
-/* Méthodes */
+/* MÃ©thodes */
 public:
 
 	/** Draw the object. */
@@ -101,7 +101,7 @@ public:
 	virtual void SetHeight (int sizeY);
 	virtual void SetWidth (int sizeX);
 
-	/* Visibilité */
+	/* VisibilitÃ© */
 	bool Visible() const { return visible; }              /**< Is this object visible ? */
 	void Show() { SetVisible(true); }                     /**< Set visible to true */
 	void Hide() { SetVisible(false); }                    /**< Set visible to false */
@@ -127,8 +127,8 @@ public:
 
 	virtual inline bool Mouse (const Point2i& pos) const { return (visible && Contains(pos)); }
 
-	/* Pas terrible, mais pour éviter une dépendance, on ne met pas SDL_BUTTON_LEFT mais sa valeur qui est 1.
-	 * On considère donc que par défaut le boutton cliqué est le GAUCHE, et donc pour que le test réussisse il faut justement
+	/* Pas terrible, mais pour Ã©viter une dÃ©pendance, on ne met pas SDL_BUTTON_LEFT mais sa valeur qui est 1.
+	 * On considÃ¨re donc que par dÃ©faut le boutton cliquÃ© est le GAUCHE, et donc pour que le test rÃ©ussisse il faut justement
 	 * que le bouton soit le GAUCHE.
 	 */
 	virtual bool Test (const Point2i& pos, int button = 1) const { return (Mouse(pos) && Enabled() && button == 1); }
@@ -171,7 +171,7 @@ public:
 
 	virtual bool RedrawBackground() const { return true; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool visible;
 	bool enabled;
@@ -186,7 +186,7 @@ private:
 	bool want_redraw;
 	bool always_redraw;
 
-/* Variables protégées */
+/* Variables protÃ©gÃ©es */
 protected:
 
 	bool dynamic_hint;
@@ -220,7 +220,7 @@ typedef std::vector<TComponent*> ComponentVector;
  *     |  |- TElement
  *     |  |  |- TSpinEdit
  *     |  |  `- TLabel
- *     |  `- TElement
+ *Â Â Â Â  |  `- TElement
  *     |     |- TSpinEdit
  *     |     `- TLabel
  *     |- TMemo
@@ -248,7 +248,7 @@ public:
 
 	~TList();
 
-/* Méthodes */
+/* MÃ©thodes */
 public:
 
 	/** Add a component in the list */
@@ -290,7 +290,7 @@ public:
 	/** Get list of components as a vector */
 	ComponentVector GetList() const { return list; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 
 	/** Set \a x for all components in list, and reset height of TList */

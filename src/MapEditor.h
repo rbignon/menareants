@@ -83,7 +83,7 @@ public:
 	bool CanSave() const { return can_save; }
 	void SetCanSave(bool b = true) { can_save = b; }
 
-/* variables privées */
+/* variables privÃ©es */
 private:
 
 	bool can_save;
@@ -302,7 +302,7 @@ private:
 
 	void OnClic(const Point2i&, int, bool&);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	EMap* map;
 };

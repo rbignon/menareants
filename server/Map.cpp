@@ -109,7 +109,7 @@ ECEvent* ECMap::FindEvent(ECBCase* c, uint f, ECEntity* e)
 
 void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 {
-	if(!Channel()) throw ECExcept(VPName(Channel()), "Pas de channel lié !?");
+	if(!Channel()) throw ECExcept(VPName(Channel()), "Pas de channel liÃ© !?");
 
 	BPlayerVector players = Channel()->Players();
 	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
@@ -163,9 +163,9 @@ void ECase::CheckInvests(ECBEntity* e)
 			break;
 		}
 		else if((*enti)->CanInvest(e))
-		{ /* On sait jamais, si par exemple une unité peut en investir une autre, mais que c'est cette autre qui se deplace
-		   * vers la mienne, ou si les deux se déplacent dans le même tour sur la meme case, ça serait con que juste
-		   * parce que l'unité investisseuse s'est déplacée *avant* l'unité à investir, il n'y ait pas d'investiture
+		{ /* On sait jamais, si par exemple une unitÃ© peut en investir une autre, mais que c'est cette autre qui se deplace
+		   * vers la mienne, ou si les deux se dÃ©placent dans le mÃªme tour sur la meme case, Ã§a serait con que juste
+		   * parce que l'unitÃ© investisseuse s'est dÃ©placÃ©e *avant* l'unitÃ© Ã  investir, il n'y ait pas d'investiture
 		   */
 			(*enti)->Invest(e);
 			break;
@@ -259,7 +259,7 @@ void ECEntity::ChangeOwner(ECBPlayer* pl)
 	if(Deployed())
 		c->SendArm(NULL, this, ARM_DEPLOY);
 
-	/* On change de propriétaire les evenements */
+	/* On change de propriÃ©taire les evenements */
 	EventVector events = Events()->List();
 	for(EventVector::iterator evti = events.begin(); evti != events.end(); ++evti)
 	{
@@ -325,19 +325,19 @@ void ECEntity::Union(ECEntity* entity)
 {
 	assert(entity->Type() == Type());
 
-	/* On lock car il fait maintenant partie intégrale de (*enti) */
+	/* On lock car il fait maintenant partie intÃ©grale de (*enti) */
 	entity->SetZombie();
 
-	/* On met dans le nouvel etat de l'entité le nouveau nombre de soldats */
+	/* On met dans le nouvel etat de l'entitÃ© le nouveau nombre de soldats */
 	SetNb(Nb() + entity->Nb());
-	/* Enfin on défini le nombre de pas restants */
+	/* Enfin on dÃ©fini le nombre de pas restants */
 	SetRestStep(RestStep() > (entity->MyStep() - entity->RestStep()) ? RestStep() - (entity->MyStep() - entity->RestStep())
 	                                                                 : 0);
 }
 
 bool ECEntity::Return()
 {
-	// On en revient à l'état après une partie.
+	// On en revient Ã  l'Ã©tat aprÃ¨s une partie.
 	ECEntity::Played();
 
 	return true;

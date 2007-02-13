@@ -130,7 +130,7 @@ public:
 protected:
 	BPlayerVector allies;
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::string nick;
 	ECBChannel *chan;
@@ -233,7 +233,7 @@ public:
 	bool IsMission() const { return mission; }
 	void SetMission(bool m = true) { mission = m; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	BPlayerVector players;
 	void SetName(std::string n) { name = n; }

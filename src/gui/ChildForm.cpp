@@ -80,7 +80,7 @@ void TChildForm::Draw(const Point2i& mouse)
 	while(1)
 	{
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
-			// Affiche seulement à la fin les composants sélectionnés
+			// Affiche seulement Ã  la fin les composants sÃ©lectionnÃ©s
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
 			   (WantRedraw() || (*it)->WantRedraw() || lastmpos != mouse && (*it)->Mouse(mouse) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(mouse)))
 			{

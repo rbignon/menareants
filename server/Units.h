@@ -180,7 +180,7 @@ public:
 
 	ECPlayer* ExOwner() const { return ex_owner; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECEntity* caserne;
 	ECPlayer* ex_owner;

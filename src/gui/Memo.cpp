@@ -117,7 +117,7 @@ void TMemo::Draw (const Point2i& mouse)
 void TMemo::AddItem (const std::string &label, Color _color)
 {
 	const char *_s = label.c_str();
-	/* On parse le message pour le dÈcouper en diffÈrentes lignes */
+	/* On parse le message pour le d√©couper en diff√©rentes lignes */
 	std::string s;
 
 	int marge = Width() < 200 ? Width()/4 : 100;
@@ -136,7 +136,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 			else if (m_items.size() >= nb_visible_items_max) first_visible_item++;
 
 			// Push item
-			if((size+20) > (Width())) s += "-"; // On a tronquÈ on rajoute un indicateur
+			if((size+20) > (Width())) s += "-"; // On a tronqu√© on rajoute un indicateur
 
 			TLabel* label = new TLabel(X(),Y(), s, _color, font, shadowed);
 			MyComponent(label);
@@ -151,7 +151,7 @@ void TMemo::AddItem (const std::string &label, Color _color)
 			s.clear();
 
 			if(*_s == '\n')
-				_s++; /* Seulement une fois, pour retourner ‡ la ligne si il y en a un autre */
+				_s++; /* Seulement une fois, pour retourner √† la ligne si il y en a un autre */
 			while(*_s == ' ') _s++;
 			if(!*_s) break;
 		}

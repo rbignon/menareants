@@ -104,7 +104,7 @@ void TEdit::Redraw()
 	else
 		substring = chaine;
 
-	/* Le " " est nécessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
+	/* Le " " est nÃ©cessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
 	edit = font->CreateSurface(substring + " ", color);
 
 	if(Focused())
@@ -168,7 +168,7 @@ void TEdit::PressKey(SDL_keysym key)
 			first_char = caret > visible_len ? caret - visible_len : 0;
 			have_redraw = true;
 			break;
-		case SDLK_RETURN: break; /* On ne prend pas "entrée" comme un caractère */
+		case SDLK_RETURN: break; /* On ne prend pas "entrÃ©e" comme un caractÃ¨re */
 		default:
 		{
 			if(maxlen && chaine.size() >= maxlen)

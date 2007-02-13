@@ -50,7 +50,7 @@
 #include <functional>
 
 #if !defined(DEBUG) && defined(UNSTABLE)
-#error Vous tentez de compiler une version instable. Si vous Ãªtes certain de vouloir la compiler, rajoutez --enable-debug dans les options du script ./configure
+#error Vous tentez de compiler une version instable. Si vous ÃƒÂªtes certain de vouloir la compiler, rajoutez --enable-debug dans les options du script ./configure
 #endif
 
 extern const char* SVNVERSION;
@@ -60,6 +60,23 @@ std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_B
 #else
 std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA);
 #endif
+
+#ifdef WIN32
+#define PACKAGE "menareants"
+#endif
+
+#define GETTEXT_DOMAIN PACKAGE
+
+void I18N_SetDir(const std::string &dir){
+  bindtextdomain(GETTEXT_DOMAIN, dir.c_str());
+  bind_textdomain_codeset (GETTEXT_DOMAIN, "UTF-8");
+}
+
+void InitI18N(const std::string &dir){
+  setlocale (LC_ALL, "");
+  I18N_SetDir (dir);
+  textdomain(GETTEXT_DOMAIN);
+}
 
 class TMainForm : public TForm
 {
@@ -153,6 +170,10 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		srand( (long)time(NULL) );
 
+		printf("sodomisÃ© Ã  sec\n");
+
+		InitI18N(INSTALL_LOCALEDIR);
+
 		Config* conf = Config::GetInstance();
 #ifndef WIN32
 		path = GetHome();
@@ -193,7 +214,7 @@ int MenAreAntsApp::main(int argc, char **argv)
 #ifdef WIN32
 		WSADATA WSAData;
 		if(WSAStartup(MAKEWORD(2,0), &WSAData) != 0)
-			throw ECExcept(VIName(WSAGetLastError()), "Impossible d'initialiser les sockets windows");
+			throw ECExcept(VIName(WSAGetLastError()), "Unable to initialize windows sockets");
 #endif
 
 		SDL_UpdateRect(video->Window()->Img, 0, 0, 0, 0);
@@ -289,7 +310,7 @@ TMainForm::TMainForm(ECImage* w)
 	OptionsButton = AddComponent(new TButton(300,230, 150,50));
 	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), Video::GetInstance()->Window()));
 
-	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, "Editeur de maps", Font::GetInstance(Font::Normal)));
+	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, _("Map Editor"), Font::GetInstance(Font::Normal)));
 	/** \todo utiliser une image bouton comme pour les autres
 	 MapEditorButton = AddComponent(new TButton(300,310, 150,50));
 	 MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), app.sdlwindow));
@@ -367,31 +388,28 @@ TCredits::TCredits(ECImage* w)
 	: TForm(w), want_goback(false)
 {
 	Label1 = AddComponent(new TLabel(105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
-	Label2 = AddComponent(new TLabel(135,"* Programmeur", red_color, Font::GetInstance(Font::Big)));
+	Label2 = AddComponent(new TLabel(135,_("* Programmer"), red_color, Font::GetInstance(Font::Big)));
 
 	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
-	Label4 = AddComponent(new TLabel(50,235,"* \"Graphiste\"", fgreen_color, Font::GetInstance(Font::Big)));
+	Label4 = AddComponent(new TLabel(50,235,_("* \"Graphiste\""), fgreen_color, Font::GetInstance(Font::Big)));
 
 	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
-	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,"* Idée originale", fwhite_color, Font::GetInstance(Font::Big)));
-	/** \todo Mettre quand il m'aurra envoyé sa musique !
-	 * Label7 = AddComponent(new TLabel(SCREEN_WIDTH-300,265,"* Musique", fwhite_color, Font::GetInstance(Font::Big)));
-	 */
+	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
-	Memo->AddItem("Merci au lycée Corneille pour nous avoir mis dans le contexte emmerdant qui "
-	              "nous a permis de trouver des idées \"amusantes\" pour passer le temps et qui "
-	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "
+	Memo->AddItem("Merci au lycÃ©e Corneille pour nous avoir mis dans le contexte emmerdant qui "
+	              "nous a permis de trouver des idÃ©es \"amusantes\" pour passer le temps et qui "
+	              "aboutirent Ã  ce jeu en version plateau que l'on pu experimenter pendant les "
 	              "cours d'histoire et d'espagnol.\n"
 	              "\n"
-	              "Merci à lodesi pour ses patchs.\n"
-	              "Merci à Anicée pour sa voix.\n"
-	              "Merci à Cesar pour ne pas avoir participé à la programmation du jeu.\n"
+	              "Merci Ã  lodesi pour ses patchs.\n"
+	              "Merci Ã  AnicÃ©e pour sa voix.\n"
+	              "Merci Ã  Cesar pour ne pas avoir participÃ© Ã  la programmation du jeu.\n"
 	              "\n"
-                  "Merci également à Zic, Spouize, Nico, Mathieu, et Thomas pour avoir testé le jeu.", white_color);
+                  "Merci Ã©galement Ã  Zic, Spouize, Nico, Mathieu, et Thomas pour avoir testÃ© le jeu.", white_color);
 	Memo->ScrollUp();
 
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, "Retour",
+	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, _("Back"),
 	                                        Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());

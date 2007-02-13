@@ -143,7 +143,7 @@ public:
 
 	uint RestBuild() const { return restBuild; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	uint restBuild;
 };
@@ -192,7 +192,7 @@ public:
 	uint& Missiles() { return missiles; }
 	uint RestBuild() const { return restBuild; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	uint missiles, restBuild;
 };
@@ -249,7 +249,7 @@ public:
 
 	uint RestBuild() const { return restBuild; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	ECBNuclearSearch* nuclear_search;
 

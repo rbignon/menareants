@@ -100,7 +100,7 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 	{
 		if(lecture->d_type == DT_DIR) continue;
 		std::string s = lecture->d_name;
-		if(s[0] == '.') continue; // On ne prend pas les fichiers cachés
+		if(s[0] == '.') continue; // On ne prend pas les fichiers cachÃ©s
 		if(!ext.empty() && s.rfind("." + ext) != s.size() - 4) continue;
 
 		file_list.push_back(s);
@@ -200,26 +200,6 @@ std::string StringF(const char* format, ...)
   return s;
 }
 
-char *duration(int s)
-{
-        static char dur[44 /* 3 + 7 + 2 + 8 + 2 + 9 + 2 + 9 + 1 */];
-        int i = 0;
-
-        if(s >= 86400)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/86400),
-                                s %= 86400, strcpy(dur + i, " jours "), i += 7;
-        if(s >= 3600)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/3600),
-                                s %= 3600, strcpy(dur + i, " heures "), i += 8;
-        if(s >= 60)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/60),
-                                s %= 60, strcpy(dur + i, " minutes "), i += 9;
-        if(s) i += snprintf(dur + i, sizeof dur - i, "%d secondes",s);
-        else dur[i-2]= 0;
-
-        return dur;
-}
-
 char *get_time(time_t mytime)
 {
         static char buftime[TIMELEN + 1];
@@ -248,7 +228,7 @@ void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage *cmd)
 	for(std::string::const_iterator it = buf.begin(); it != buf.end(); )
 	{
 		bool slash;
-		while(*it == ' ' && it != buf.end()) ++it; /* D'après valgrind il y a un problème à cette ligne, affaire à suivre */
+		while(*it == ' ' && it != buf.end()) ++it; /* D'aprÃ¨s valgrind il y a un problÃ¨me Ã  cette ligne, affaire Ã  suivre */
 		for(slash=false,j=0; (it != buf.end() && (*it != ' ' || slash)); ++it)
 			if(*it == '\\' && it+1 != buf.end() && (*(it+1) == ' ' || *(it+1) == '\\') && !slash)
 				slash = true;

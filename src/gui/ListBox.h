@@ -57,13 +57,15 @@ class TListBoxItem : public TLabel
 {
 private:
   std::string value;
+  std::string name;
 
 public:
-  TListBoxItem(const std::string& _label, Font& _font, const std::string& value,
+  TListBoxItem(const std::string& _name, const std::string& _label, Font& _font, const std::string& value,
 	      const Color& color = white_color);
 
   const std::string& Label() const;
   const std::string& Value() const;
+  const std::string& Name() const;
 };
 
 class TListBox : public TComponent
@@ -85,7 +87,7 @@ public:
 	TListBoxItem* AddItem(bool selected, const std::string &label,
 	                      const std::string &value,
 	                      const Color& color = white_color, bool enabled = true,
-	                      Font& font = *Font::GetInstance(Font::Small));
+	                      Font& font = *Font::GetInstance(Font::Small), const std::string& name = "");
 
 	void Sort();
 
@@ -118,6 +120,7 @@ public:
 	const std::string& ReadLabel() const;
 	const std::string& ReadValue() const;
 	const std::string& ReadValue(int index) const;
+	const std::string& ReadName(int index) const;
 
 	uint Size() const;
 
@@ -132,7 +135,7 @@ public:
 
 	void SetGrayDisable(bool b  = true) { gray_disable = b; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	bool always_one_selected;
 	bool no_item_hint;

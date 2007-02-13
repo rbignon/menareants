@@ -135,13 +135,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					type = StrToTyp<uint>(parv[i].substr(1));
 				break;
 			}
-			case '°':
+			case 'U':
 				flags |= ARM_UPGRADE;
 				break;
 			case '.':
 				flags |= ARM_LOCK;
 				break;
-			/** \warning PAS DE BREAK IÇI, C'EST *NORMAL* QUE ÇA SE SUIVE !! (case deplyed=false par default) */
+			/** \warning PAS DE BREAK IÃ‡I, C'EST *NORMAL* QUE Ã‡A SE SUIVE !! (case deplyed=false par default) */
 			case '{':
 				deployed = true;
 			case '}':
@@ -214,7 +214,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			if(!(flags & ARM_TYPE))
 			{
-				/* Si c'est pour supprimer on s'en fou un peu à vrai dire */
+				/* Si c'est pour supprimer on s'en fou un peu Ã  vrai dire */
 				if(!(flags & ARM_REMOVE))
 					Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Unable to find this entity and to create it.", nick.c_str(), et_name.c_str());
 				continue;
@@ -231,14 +231,14 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		else if(flags & ARM_TYPE && (int)type != entity->Type())
 		{
 			Debug(W_DESYNCH|W_SEND|W_WARNING, "ARM: This entity already exists !?!?!?!?");
-			L_SHIT("WARNING DEV: Création d'une unité qui existe déjà !!!");
+			L_SHIT("WARNING DEV: Creation of an entity already exists!!");
 		}
 		if(!moves_str.empty())
 		{
 			std::string et_longname = entity->LongName();
-			/* En prevention, si jamais j'avais prevu un mouvement mais qu'il n'a pas lieu à cause d'une attaque contre moi,
-			 * pour eviter de bouger et les desynch. On ne le fait qu'en animation, car je ne vois pas pourquoi un problème
-			 * de desynch pourrait arriver en PLAYING, et surtout il est possible que ça supprime les attaques anticipées
+			/* En prevention, si jamais j'avais prevu un mouvement mais qu'il n'a pas lieu Ã  cause d'une attaque contre moi,
+			 * pour eviter de bouger et les desynch. On ne le fait qu'en animation, car je ne vois pas pourquoi un problÃ¨me
+			 * de desynch pourrait arriver en PLAYING, et surtout il est possible que Ã§a supprime les attaques anticipÃ©es
 			 * incorrectement.
 			 */
 			if(chan->State() == EChannel::ANIMING)
@@ -278,7 +278,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			entity->Move()->Clear(entity->Case());
 		entities.push_back(entity);
 	}
-	/* On en est à la première ligne de l'evenement. */
+	/* On en est Ã  la premiÃ¨re ligne de l'evenement. */
 	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL))
 		chan->SetCurrentEvent(flags);
 
@@ -295,9 +295,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(nb != (*it)->Nb())
 			{
 				if(chan->CurrentEvent() & ARM_ATTAQ)
-					L_GREAT("Il reste " + TypToStr(nb) + " pour " + (*it)->Qual() + " " + (*it)->LongName());
+					L_GREAT(StringF(_("It remains %d for %s's %s"), nb, (*it)->OwnerNick().c_str(), (*it)->Qual()));
 				else
-					L_INFO(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a maintenant " + TypToStr(nb));
+					L_INFO(StringF(_("%s's %s has now %d"), (*it)->OwnerNick().c_str(), (*it)->Qual(), nb));
 			}
 			(*it)->SetNb(nb);
 		}
@@ -331,13 +331,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			InGameForm->ShowWaitMessage.clear();
 			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
 		}
-		else InGameForm->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : "Neutre";
+		else InGameForm->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : _("Neutral");
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
 			Timer timer;
 			/* Le soucis est que si jamais une des fonctions, pour une raison X ou Y, renvoie false en permanence,
-			 * ça fait une boucle infinie. Ça serait con de couper une partie juste à cause de ça, donc au bout
+			 * Ã§a fait une boucle infinie. Ã‡a serait con de couper une partie juste Ã  cause de Ã§a, donc au bout
 			 * de 10 secondes de boucle, on se barre.
 			 */
 			while(!ok && timer.time_elapsed(true) < 10)
@@ -374,7 +374,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				(*it)->Move()->Return(x >= 0 && y >= 0 ? (*map)(x,y) : 0);
 				(*it)->DelEvent(ARM_ATTAQ); // Il est certain que l'on perd *au moins* l'evenement d'attaque
-				if((*it)->Move()->Empty()) // Dans le cas où l'on est revenu au début, on a plus aucun evenement
+				if((*it)->Move()->Empty()) // Dans le cas oÃ¹ l'on est revenu au dÃ©but, on a plus aucun evenement
 					(*it)->SetEvent(0);
 			}
 			else
@@ -402,7 +402,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				case ARM_ATTAQ:
 					if(!(flags & ARM_INVEST))
 					{
-						L_SHIT(std::string((*it)->Qual()) + " " + (*it)->LongName() + " a été détruit(e) !");
+						L_SHIT(StringF(_("%s's %s has been destroyed!"), (*it)->OwnerNick().c_str(), (*it)->Qual()));
 						if((*it)->DeadCase())
 							(*it)->Case()->SetImage((*it)->DeadCase());
 					}
@@ -441,8 +441,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 		InGameForm->BarreAct->Update();
 #if 0 /** SURTOUT PAS APPELER.
-       * Ça appelera au final SDL_Cursor(), qui fait boucler infiniement le thread (ou quelque chose du genre), et plus
-       * aucun message ne pourra être reçu
+       * Ã‡a appelera au final SDL_Cursor(), qui fait boucler infiniement le thread (ou quelque chose du genre), et plus
+       * aucun message ne pourra Ãªtre reÃ§u
        */
 		InGameForm->SetCursor();
 #endif
@@ -654,7 +654,7 @@ void TInGameForm::FindIdling()
 
 	if(idle_ents.empty())
 	{
-		TMessageBox mb("Il n'y a plus aucune de vos unité qui soit inactive", BT_OK, InGameForm, false);
+		TMessageBox mb(_("There aren't any idling unity."), BT_OK, InGameForm, false);
 		mb.Show();
 		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
 	}
@@ -670,7 +670,7 @@ void MenAreAntsApp::InGame()
 {
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player() || !client->Player()->Channel()->Map())
-		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(client), "Non connectÃ© ou non dans un chan");
 
 	EChannel* chan = client->Player()->Channel();
 
@@ -684,17 +684,17 @@ void MenAreAntsApp::InGame()
 		if(!client->Player()->Entities()->Empty())
 			InGameForm->Map->CenterTo(dynamic_cast<ECEntity*>(client->Player()->Entities()->First()));
 		Resources::SoundStart()->Play();
-		InGameForm->AddInfo(I_INFO, "***** DEBUT DE LA PARTIE *****");
-		InGameForm->AddInfo(I_INFO, "*** NOUVEAU TOUR : " + chan->Map()->Date()->String());
-		InGameForm->AddInfo(I_INFO, "*** Vous commencez avec " + TypToStr(client->Player()->Money()) + " $");
+		InGameForm->AddInfo(I_INFO, _("***** BEGIN OF GAME *****"));
+		InGameForm->AddInfo(I_INFO, _("*** NEW TURN: ") + chan->Map()->Date()->String());
+		InGameForm->AddInfo(I_INFO, StringF(_("*** You begin with $%d"), client->Player()->Money()));
 		if(MenAreAntsApp::GetInstance()->IsFirstGame())
 		{
-			TMessageBox("Ceci est votre première partie.\nAppuyez sur F1 pour avoir de l'aide",
+			TMessageBox(_("This is your first game.\nPress F1 to give help."),
 			            BT_OK, InGameForm, false).Show();
 			MenAreAntsApp::GetInstance()->FirstGameDone();
 		}
 		else
-			InGameForm->AddInfo(I_INFO, "*** Appuyez sur F1 pour avoir de l'aide");
+			InGameForm->AddInfo(I_INFO, _("*** Press F1 to give help"));
 
 		if(client->Player()->Ready())
 			InGameForm->BarreLat->PretButton->SetEnabled(false);
@@ -778,7 +778,7 @@ void TInGameForm::AfterDraw()
 			{
 				do
 				{
-					TMessageBox("Veuillez patienter...\n\nUne unité de " + ShowWaitMessage + " bouge quelque part hors de votre champs de vision.",
+					TMessageBox(StringF(_("Please wait...\n\nAn %s's unity moves somewhere out of your field of vision."), ShowWaitMessage.c_str()),
 							0, InGameForm, false).Draw();
 					SDL_Delay(20);
 				} while(ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
@@ -887,7 +887,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					if(IsPressed(SDLK_LCTRL))
 					{
 						client->sendrpl(MSG_AMSG, SendMessage->GetString());
-						AddInfo(I_CHAT, "<" + client->GetNick() + "> [private] " + SendMessage->GetString(), client->Player());
+						AddInfo(I_CHAT, "[private] <" + client->GetNick() + "> " + SendMessage->GetString(), client->Player());
 					}
 					else
 					{
@@ -921,11 +921,11 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 {
 	if(BarreLat->PretButton->Test(mouse, button))
 	{
-		/* Le problème est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
-		 * qu'on reçoive une confirmation et qu'ainsi le bouton soit disable.
-		 * Ça pourrait nuire car ces messages seront considérés comme confirmations des animations,
-		 * et ainsi chaque +! donné sera pris en compte par le serveur que pour le suivant et
-		 * ainsi de suite, ce qui conduirait à un +! automatique en début de prochaine partie.
+		/* Le problÃ¨me est qu'en cas de gros lag, l'user peut envoyer pleins de +! avant
+		 * qu'on reÃ§oive une confirmation et qu'ainsi le bouton soit disable.
+		 * Ã‡a pourrait nuire car ces messages seront considÃ©rÃ©s comme confirmations des animations,
+		 * et ainsi chaque +! donnÃ© sera pris en compte par le serveur que pour le suivant et
+		 * ainsi de suite, ce qui conduirait Ã  un +! automatique en dÃ©but de prochaine partie.
 		 */
 		BarreLat->PretButton->SetEnabled(false);
 		client->sendrpl(MSG_SET, "+!");
@@ -944,7 +944,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	if(BarreLat->QuitButton->Test(mouse, button))
 	{
-		TMessageBox mb("Voulez-vous vraiment quitter la partie ?", BT_YES|BT_NO, this, false);
+		TMessageBox mb(_("Do you really want to quit game ?"), BT_YES|BT_NO, this, false);
 		if(mb.Show() == BT_YES)
 			want_quit = true;
 		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
@@ -987,13 +987,13 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		if(BarreAct->GiveButton->Test(mouse, button))
 		{
-			TMessageBox mb("Entrez le pseudo du joueur à qui vous souhaitez donner ce territoire",
+			TMessageBox mb(_("Enter nickname of player you want to give this country to"),
 			               BT_OK|HAVE_EDIT|BT_CANCEL, this);
-			mb.Edit()->SetAvailChars(NICK_CHARS "&"); // On rajoute le caractère spécifique aux IA
+			mb.Edit()->SetAvailChars(NICK_CHARS "&"); // On rajoute le caractÃ¨re spÃ©cifique aux IA
 			if(mb.Show() == BT_OK)
 			{
 				if(!chan->GetPlayer(mb.EditText().c_str()))
-					TMessageBox("Le joueur est introuvable", BT_OK, this, false).Show();
+					TMessageBox(_("No suck player"), BT_OK, this, false).Show();
 				else
 					client->sendrpl(MSG_SET, ECArgs("+e", mb.EditText() + ":" + BarreAct->Entity()->Case()->Country()->ID()));
 			}
@@ -1012,7 +1012,13 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		if(BarreAct->UpgradeButton->Test(mouse, button))
 		{
-			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "°"));
+			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "U"));
+			return;
+		}
+		if(BarreAct->ExtractButton->Test(mouse, button))
+		{
+			TMessageBox(_("To extract an unit, you have to press space key and to clic on a cell beside container."),
+			            BT_OK, this).Show();
 			return;
 		}
 	}
@@ -1022,9 +1028,6 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 
 	if(BarreLat->Test(mouse, button) || BarreAct->Test(mouse, button))
 		return;
-
-	if(BarreAct->ExtractButton->Test(mouse, button))
-		want = TInGameForm::W_EXTRACT;
 
 	TInGameForm::Wants mywant = want;
 	if(want)
@@ -1100,9 +1103,9 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 					if(args.Size() > 1)
 					{
 						if(selected_entity->MyStep() == 0)
-							AddInfo(I_SHIT, "Cette unité ne peut avancer.");
+							AddInfo(I_SHIT, _("This unity can't move"));
 						else if(selected_entity->Move()->Size() >= selected_entity->MyStep())
-							AddInfo(I_SHIT, "L'unité ne peut se déplacer plus vite en une journée !");
+							AddInfo(I_SHIT, _("This unit cannot move more quickly in a day!"));
 						else
 							client->sendrpl(MSG_ARM, args);
 					}
@@ -1152,8 +1155,8 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 			c = red_color; // On n'envoit pas de pl quand on veut highlight
 	}
 
-	/* Pour éviter de voir notre ligne supprimée dès l'ajout, dans le cas où le timer
-	 * arrive à expiration et qu'il n'y a rien d'affiché, on réinitialise le compteur.
+	/* Pour Ã©viter de voir notre ligne supprimÃ©e dÃ¨s l'ajout, dans le cas oÃ¹ le timer
+	 * arrive Ã  expiration et qu'il n'y a rien d'affichÃ©, on rÃ©initialise le compteur.
 	 */
 	LockScreen();
 	if(!Chat->NbItems())
@@ -1311,8 +1314,7 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list, bool click)
 		if(click)
 		{
 			i->SetOnClick(TBarreAct::CreateUnit, (void*)*it);
-			i->SetHint(TypToStr((*it)->Cost()) + " $\n" +
-			           (*it)->Infos());
+			i->SetHint(StringF(_("$%d\n%s"), (*it)->Cost(), (*it)->Infos()));
 		}
 		icons.push_back(i);
 	}
@@ -1419,10 +1421,10 @@ void TBarreLatIcons::SetList(std::vector<ECEntity*> list, TOnClickFunction func)
 			_y += _h;
 		}
 		i->SetOnClick(func, (void*)*it);
-		i->SetHint(TypToStr((*it)->Cost()) + " $\n" + (*it)->Infos());
+		i->SetHint(StringF(_("$%d\n%s"), (*it)->Cost(), (*it)->Infos()));
 		icons.push_back(i);
 	}
-	if(!left) // c'est à dire on était à droite
+	if(!left) // c'est Ã  dire on Ã©tait Ã  droite
 		_y += _h;
 
 	Init();
@@ -1460,7 +1462,7 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	ECEntity* entity = static_cast<ECEntity*>(e);
 	if(int(entity->Cost()) > ingame->Player()->Money())
 	{
-		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer cette unité.");
+		ingame->AddInfo(I_SHIT, _("You do not have enough money to create this unit."));
 		Resources::SoundResources()->Play();
 		return;
 	}
@@ -1507,7 +1509,7 @@ void TBarreAct::ShowInfos()
 	std::vector<ECEntity*> elist = EntityList.CanAttaq(entity);
 	if(!elist.empty())
 	{
-		HelpAttaqs->SetCaption("Peut attaquer :");
+		HelpAttaqs->SetCaption(_("Can attaq:"));
 		Icons->SetList(elist, false);
 		HelpInfos->SetWidth(((Width() - Icons->X() > 300) ? Icons->X() : Width() - 300) - HelpInfos->X() - 10);
 		HelpAttaqs->SetX((Width() - Icons->X() > 300) ? Icons->X() : HelpInfos->X()+HelpInfos->Width()+10);
@@ -1515,54 +1517,54 @@ void TBarreAct::ShowInfos()
 	else if(entity->Step() && !(elist = EntityList.CanInvest(entity)).empty())
 	{
 		Icons->SetList(elist, false);
-		HelpAttaqs->SetCaption("Peut investir :");
+		HelpAttaqs->SetCaption(_("Can invest:"));
 		HelpInfos->SetWidth(((Width() - Icons->X() > 300) ? Icons->X() : Width() - 300) - HelpInfos->X() - 10);
 		HelpAttaqs->SetX((Width() - Icons->X() > 300) ? Icons->X() : HelpInfos->X()+HelpInfos->Width()+10);
 	}
 	else
 	{
 		Icons->Clear();
-		HelpAttaqs->SetCaption("Ne peut rien attaquer.");
+		HelpAttaqs->SetCaption(_("Can nothing attack."));
 	}
 
-	HelpButton->SetText("Revenir");
+	HelpButton->SetText(_("Back"));
 	HelpInfos->ClearItems();
 	HelpInfos->Show();
-	HelpInfos->AddItem("Nom : " + std::string(entity->Name()));
-	HelpInfos->AddItem("Prix : " + TypToStr(entity->Cost()) + " $");
+	HelpInfos->AddItem(_("Name: ") + std::string(entity->Name()));
+	HelpInfos->AddItem(_("Cost: ") + TypToStr(entity->Cost()) + " $");
 	HelpInfos->AddItem(std::string(entity->Description()), red_color);
 
 	if(entity->IsCity())
-		HelpInfos->AddItem("Type : Quartier d'une ville");
+		HelpInfos->AddItem(_("Type: District of a city."));
 	else if(entity->IsBuilding())
-		HelpInfos->AddItem("Type : Batiment");
+		HelpInfos->AddItem(_("Type: Building"));
 	else if(entity->IsNaval())
-		HelpInfos->AddItem("Type : Unité navale");
+		HelpInfos->AddItem(_("Type: Naval unit"));
 	else if(entity->IsVehicule())
-		HelpInfos->AddItem("Type : Vehicule");
+		HelpInfos->AddItem(_("Type: Vehicule"));
 	else if(entity->IsInfantry())
-		HelpInfos->AddItem("Type : Infanterie");
+		HelpInfos->AddItem(_("Type: Infantery"));
 	else
-		HelpInfos->AddItem("Type : Indéfinie !?");
+		HelpInfos->AddItem(_("Type: Undefined!?"));
 
 	if(entity->Step())
-		HelpInfos->AddItem("Pas par tours : " + TypToStr(entity->Step()) + " cases");
+		HelpInfos->AddItem(StringF(_("Steps by turn: %d cells"), entity->Step()));
 	if(entity->MyStep() < entity->Step())
-		HelpInfos->AddItem("  -> Ralentit à " + TypToStr(entity->MyStep()) + " pas par tours");
+		HelpInfos->AddItem(StringF(_("  -> Slow downs to %d cells by turn"), entity->MyStep()));
 	else if(entity->MyStep() > entity->Step())
-		HelpInfos->AddItem("  -> Accéleré à " + TypToStr(entity->MyStep()) + " pas par tours");
+		HelpInfos->AddItem(StringF(_("  -> Accelerated to %d cells by turn"), entity->MyStep()));
 
-	HelpInfos->AddItem("Visibilité : " + TypToStr(entity->Visibility()) + " cases");
+	HelpInfos->AddItem(StringF(_("Visibility: %d cells"), entity->Visibility()));
 	if(entity->Porty())
-		HelpInfos->AddItem("Portée : " + TypToStr(entity->Porty()) + " cases");
+		HelpInfos->AddItem(StringF(_("Porty: %d cells"), entity->Porty()));
 	else if(entity->WantAttaq(0,0))
-		HelpInfos->AddItem("Portée : Aucune, combats au corps à corps");
+		HelpInfos->AddItem(_("Porty: No, engagements from body to body"));
 
 	if(entity->MyUpgrade() != ECEntity::E_NONE)
-		HelpInfos->AddItem("Upgrade : " + std::string(EntityList.Get(entity->MyUpgrade())->Name()));
+		HelpInfos->AddItem(_("Upgrade: ") + std::string(EntityList.Get(entity->MyUpgrade())->Name()));
 
 	if(entity->WantDeploy())
-		HelpInfos->AddItem("Deployable");
+		HelpInfos->AddItem(_("Deployable"));
 
 	HelpInfos->ScrollUp();
 	HelpAttaqs->Show();
@@ -1596,14 +1598,14 @@ void TBarreAct::vSetEntity(void* _e)
 
 		if(!InGameForm->BarreAct->SpecialInfo->Empty())
 			InGameForm->BarreAct->Infos->SetCaption("");
-		else if(e->Deployed()) // Il est déjà deployé, donc si y a un evenement pour se déployer c'est qu'il va se replier
-			InGameForm->BarreAct->Infos->SetCaption((e->EventType() & ARM_DEPLOY) ? "Va se replier" : "Déployé");
-		else if(e->EventType() & ARM_DEPLOY) // Donc il n'est pas actuellement déployé
-			InGameForm->BarreAct->Infos->SetCaption("Va se déployer");
+		else if(e->Deployed()) // Il est dÃ©jÃ  deployÃ©, donc si y a un evenement pour se dÃ©ployer c'est qu'il va se replier
+			InGameForm->BarreAct->Infos->SetCaption((e->EventType() & ARM_DEPLOY) ? _("Will fold up itself") : _("Deployed"));
+		else if(e->EventType() & ARM_DEPLOY) // Donc il n'est pas actuellement dÃ©ployÃ©
+			InGameForm->BarreAct->Infos->SetCaption(_("Is going to deploy"));
 		else if(e->EventType() & ARM_UPGRADE)
-			InGameForm->BarreAct->Infos->SetCaption("Va upgrader");
+			InGameForm->BarreAct->Infos->SetCaption(_("Is going to upgrade"));
 		else if(e->Locked())
-			InGameForm->BarreAct->Infos->SetCaption("Vérouillée");
+			InGameForm->BarreAct->Infos->SetCaption(_("Locked"));
 		else
 			InGameForm->BarreAct->Infos->SetCaption("");
 		InGameForm->BarreAct->Infos->Show();
@@ -1611,7 +1613,7 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Icon->SetHint(e->Infos());
 
 		int x = InGameForm->BarreAct->Width() - 5;
-		InGameForm->BarreAct->HelpButton->SetText("Plus d'infos");
+		InGameForm->BarreAct->HelpButton->SetText(_("More infos"));
 		InGameForm->BarreAct->HelpButton->SetX((x -= InGameForm->BarreAct->HelpButton->Width()));
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
@@ -1625,13 +1627,13 @@ void TBarreAct::vSetEntity(void* _e)
 				InGameForm->BarreAct->GiveButton->Hide();
 			/* On subterfuge avec ces fonctions WantDeploy, AddUnits et WantAttaq qui, dans le client,
 			 * ne font que renvoyer true ou false. Mais comme elles sont virtuelles et
-			 * surchargées sur le serveur, on se tape les arguments.
+			 * surchargÃ©es sur le serveur, on se tape les arguments.
 			 */
 			if(e->AddUnits(0))
 			{
 				InGameForm->BarreAct->UpButton->Show();
-				InGameForm->BarreAct->UpButton->SetText("Ajouter " + TypToStr(e->InitNb()));
-				InGameForm->BarreAct->UpButton->SetHint("Coût: " + TypToStr(e->Cost()) + " $");
+				InGameForm->BarreAct->UpButton->SetText(_("Add ") + TypToStr(e->InitNb()));
+				InGameForm->BarreAct->UpButton->SetHint(StringF(_("Cost: $%d"), e->Cost()));
 				InGameForm->BarreAct->UpButton->SetEnabled(
 				                            (e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()));
 				InGameForm->BarreAct->UpButton->SetX((x -= InGameForm->BarreAct->UpButton->Width()));
@@ -1644,7 +1646,7 @@ void TBarreAct::vSetEntity(void* _e)
 				ECEntity* upgrade = EntityList.Get(e->MyUpgrade());
 				InGameForm->BarreAct->UpgradeButton->Show();
 				InGameForm->BarreAct->UpgradeButton->SetHint(std::string(upgrade->Name()) + "\n" +
-				                                             "Coût: " + TypToStr(upgrade->Cost()) + " $");
+				                                             StringF(_("Cost: $%d"), upgrade->Cost()));
 				InGameForm->BarreAct->UpgradeButton->SetEnabled((int(upgrade->Cost()) <= e->Owner()->Money()));
 				InGameForm->BarreAct->UpgradeButton->SetX((x-=InGameForm->BarreAct->UpgradeButton->Width()));
 			}
@@ -1751,23 +1753,22 @@ void TBarreAct::Init()
 {
 	Name = AddComponent(new TLabel(60,15, "", black_color, Font::GetInstance(Font::Big)));
 
-	DeployButton = AddComponent(new TButtonText(300,15,100,30, "Déployer", Font::GetInstance(Font::Small)));
+	DeployButton = AddComponent(new TButtonText(300,15,100,30, _("To deploy"), Font::GetInstance(Font::Small)));
 	DeployButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	DeployButton->SetHint("Déployer l'unité pour lui permettre d'avoir des capacités en plus.");
-	UpButton = AddComponent(new TButtonText(500,15,100,30, "Ajouter", Font::GetInstance(Font::Small)));
+	DeployButton->SetHint(_("Deploy unity to have more capacities"));
+	UpButton = AddComponent(new TButtonText(500,15,100,30, _("Add"), Font::GetInstance(Font::Small)));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	ExtractButton = AddComponent(new TButtonText(500,15,100,30, "Extraire", Font::GetInstance(Font::Small)));
+	ExtractButton = AddComponent(new TButtonText(500,15,100,30, _("Extract"), Font::GetInstance(Font::Small)));
 	ExtractButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	ExtractButton->SetHint("Cliquez ensuite sur la case où vous voulez que l'unité contenue aille.\n$ Espace + clic");
-	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, "Upgrade", Font::GetInstance(Font::Small)));
+	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, _("To upgrade"), Font::GetInstance(Font::Small)));
 	UpgradeButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	UpgradeButton->SetHint("Utiliser l'amélioration de ce batiment.");
-	HelpButton = AddComponent(new TButtonText(500,15,100,30, "Plus d'infos", Font::GetInstance(Font::Small)));
+	UpgradeButton->SetHint(_("Use an amelioration of this building"));
+	HelpButton = AddComponent(new TButtonText(500,15,100,30, _("More infos"), Font::GetInstance(Font::Small)));
 	HelpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	HelpButton->SetHint("Affiche toutes les caractéristiques de l'unité.");
-	GiveButton = AddComponent(new TButtonText(500,15,100,30, "Don. Terr.", Font::GetInstance(Font::Small)));
+	HelpButton->SetHint(_("Show all characteristics of the unit."));
+	GiveButton = AddComponent(new TButtonText(500,15,100,30, _("Give Country"), Font::GetInstance(Font::Small)));
 	GiveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	GiveButton->SetHint("Donner ce territoire à un autre joueur.");
+	GiveButton->SetHint(_("Give this country to an other player."));
 
 	Owner = AddComponent(new TLabel(60,40, "", black_color, Font::GetInstance(Font::Normal)));
 
@@ -1779,11 +1780,11 @@ void TBarreAct::Init()
 	Icons = AddComponent(new TBarreActIcons(200, 59));
 
 	ChildIcon = AddComponent(new TImage(250,60));
-	ChildIcon->SetHint("Cette unité est contenue par l'unité sélectionnée");
+	ChildIcon->SetHint(_("This unit is contained by selected unit."));
 	ChildNb = AddComponent(new TLabel(310,80, "", black_color, Font::GetInstance(Font::Normal)));
 
 	HelpInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60, 15, Width()-500, Height()-15-10));
-	HelpAttaqs = AddComponent(new TLabel(HelpInfos->X()+HelpInfos->Width()+5, 40, "Peut attaquer :", black_color,
+	HelpAttaqs = AddComponent(new TLabel(HelpInfos->X()+HelpInfos->Width()+5, 40, "Can attaq:", black_color,
 	                          Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::BarreAct());
@@ -1811,7 +1812,7 @@ void TBarreLat::SelectUnit(TObject* o, void* e)
 
 	if(int(static_cast<ECEntity*>(e)->Cost()) > ingame->Player()->Money())
 	{
-		ingame->AddInfo(I_SHIT, "Vous n'avez pas assez d'argent pour créer ce batiment");
+		ingame->AddInfo(I_SHIT, _("You do not have enough money to create this unit."));
 		Resources::SoundResources()->Play();
 		return;
 	}
@@ -1860,29 +1861,29 @@ void TBarreLat::Init()
 	else
 		ProgressBar = 0;
 
-	PretButton = AddComponent(new TButtonText(30,220,100,30, "Pret", Font::GetInstance(Font::Small)));
+	PretButton = AddComponent(new TButtonText(30,220,100,30, _("Ready"), Font::GetInstance(Font::Small)));
 	PretButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	PretButton->SetHint("Cliquez ici lorsque vous avez fini vos déplacements");
+	PretButton->SetHint(_("Clic here when you have made all your moves."));
 	PretButton->SetX(X() + Width()/2 - PretButton->Width()/2);
-	SchemaButton = AddComponent(new TButtonText(30,250,100,30, "Schema", Font::GetInstance(Font::Small)));
+	SchemaButton = AddComponent(new TButtonText(30,250,100,30, _("Diagram"), Font::GetInstance(Font::Small)));
 	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	SchemaButton->SetHint("Voir la délimitation des territoires sur la carte");
+	SchemaButton->SetHint(_("Show delimitation of territories on the map."));
 	SchemaButton->SetX(X() + Width()/2 - SchemaButton->Width()/2);
-	OptionsButton = AddComponent(new TButtonText(30,280,100,30, "Options", Font::GetInstance(Font::Small)));
+	OptionsButton = AddComponent(new TButtonText(30,280,100,30, _("Options"), Font::GetInstance(Font::Small)));
 	OptionsButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	OptionsButton->SetHint("Voir les options (notament les alliances)");
+	OptionsButton->SetHint(_("Show options (alliances, etc.)"));
 	OptionsButton->SetX(X() + Width()/2 - OptionsButton->Width()/2);
-	BaliseButton = AddComponent(new TButtonText(30,310,100,30, "Balise", Font::GetInstance(Font::Small)));
+	BaliseButton = AddComponent(new TButtonText(30,310,100,30, _("Beacon"), Font::GetInstance(Font::Small)));
 	BaliseButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	BaliseButton->SetHint("Poser une balise visible pour ses alliés\nRaccourci: B + clic");
+	BaliseButton->SetHint(_("To pose a visible beacon for its allies.\nShortcut: B + clic"));
 	BaliseButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
-	IdleFindButton = AddComponent(new TButtonText(30,340,100,30, "Find idling", Font::GetInstance(Font::Small)));
+	IdleFindButton = AddComponent(new TButtonText(30,340,100,30, _("Find idling"), Font::GetInstance(Font::Small)));
 	IdleFindButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	IdleFindButton->SetHint("Random find an unit who idles.");
+	IdleFindButton->SetHint(_("Random find an unit who idles."));
 	IdleFindButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
-	QuitButton = AddComponent(new TButtonText(30,370,100,30, "Quitter", Font::GetInstance(Font::Small)));
+	QuitButton = AddComponent(new TButtonText(30,370,100,30, _("Leave"), Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	QuitButton->SetHint("Quitter la partie");
+	QuitButton->SetHint(_("Leave game"));
 	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);
 
 	chan->Map()->CreatePreview(120,120, P_ENTITIES);
@@ -1892,7 +1893,7 @@ void TBarreLat::Init()
 	Radar->SetImage(chan->Map()->Preview(), false);
 	Radar->SetOnClickPos(TBarreLat::RadarClick);
 
-	Money = AddComponent(new TLabel(50, 1, TypToStr(player->Money()) + " $", white_color, Font::GetInstance(Font::Small)));
+	Money = AddComponent(new TLabel(50, 1, StringF(_("$%d"), player->Money()), white_color, Font::GetInstance(Font::Small)));
 	Money->SetX(X() + Width()/2 - Money->Width()/2);
 
 	Date = AddComponent(new TLabel(15, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
@@ -1926,7 +1927,7 @@ void MenAreAntsApp::Options(EChannel* chan)
 {
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connectÃ© ou non dans un chan");
 
 	try
 	{
@@ -1959,19 +1960,19 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	else if(SaveButton->Test(mouse, button))
 	{
-		TMessageBox m("Quel nom voulez-vous donner à la sauvegarde ?", BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		TMessageBox m(_("What name do you want to give to your save?"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
 		m.Edit()->SetAvailChars(MAPFILE_CHARS);
 		if(m.Show() == BT_OK && m.EditText().empty() == false)
 		{
 			std::string filename = MenAreAntsApp::GetInstance()->GetPath() + m.EditText() + ".sav";
 			if(FichierExiste(filename) &&
-				TMessageBox("Une sauvegarde contient le même nom. Voulez vous la remplacer ?", BT_YES|BT_NO, this).Show() == BT_NO)
+				TMessageBox(_("A save has the same name. Do you want to erase it?"), BT_YES|BT_NO, this).Show() == BT_NO)
 				return;
 
 			client->sendrpl(MSG_SAVE, m.EditText());
 			//chan->Map()->Save(filename);
-			TMessageBox("Sauvegarde effectuée.\nVous pourrez la recharger en créant une partie et en utilisant la map de ce nom.",
-					BT_OK, this).Show();
+			TMessageBox(_("Map is saved.\nYou can reload it by creating a game and by sending this map to server."),
+			            BT_OK, this).Show();
 		}
 	}
 
@@ -1992,20 +1993,20 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 			}
 			else if(pll->GiveMoneyButton && pll->GiveMoneyButton->Test(mouse, button))
 			{
-				TMessageBox m("Combien voulez-vous donner à " + pll->Player()->Nick() + " ?", BT_OK|HAVE_EDIT|BT_CANCEL, this);
+				TMessageBox m(StringF(_("How many money do you want to give to %s?"), pll->Player()->GetNick()), BT_OK|HAVE_EDIT|BT_CANCEL, this);
 				m.Edit()->SetAvailChars("0123456789");
 				if(m.Show() == BT_OK)
 				{
 					int v = StrToTyp<int>(m.EditText());
 					if(v <= 0)
-						TMessageBox("La valeur rentrée est incorrect.", BT_OK, this).Show();
+						TMessageBox(_("This is an incorrect value."), BT_OK, this).Show();
 					else if(v > client->Player()->Money())
-						TMessageBox("Vous ne possédez pas autant d'argent !", BT_OK, this).Show();
+						TMessageBox(_("You do not have as much money!"), BT_OK, this).Show();
 					else
 					{
 						client->sendrpl(MSG_SET, ECArgs("+d", pll->Player()->Nick() + ":" + m.EditText()));
-						TMessageBox("Vous avez bien donné " + m.EditText() + " $ à " + pll->Player()->Nick(),
-								BT_OK, this).Show();
+						TMessageBox(StringF(_("You gave well $%s to %s"), m.EditText().c_str(), pll->Player()->GetNick()),
+						            BT_OK, this).Show();
 					}
 				}
 			}
@@ -2016,18 +2017,18 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 TOptionsForm::TOptionsForm(ECImage* w, EC_Client* _me, EChannel* ch)
 	: TForm(w), client(_me)
 {
-	Title = AddComponent(new TLabel(100, "Options", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(100, _("Options"), white_color, Font::GetInstance(Font::Big)));
 
-	Label1 = AddComponent(new TLabel(60, 160, "Pour vous allier avec un joueur, cliquez sur la case associée à gauche", white_color, Font::GetInstance(Font::Small)));
+	Label1 = AddComponent(new TLabel(60, 160, _("To make an alliance with a player, click on the box associated on the left"), white_color, Font::GetInstance(Font::Small)));
 
 	Players = AddComponent(new TList(60, 200));
 	BPlayerVector plvec = ch->Players();
 	for(BPlayerVector::iterator it = plvec.begin(); it != plvec.end(); ++it)
 		Players->AddLine(new TOptionsPlayerLine(_me->Player(), dynamic_cast<ECPlayer*>(*it)));
 
-	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, Window()->GetHeight() - 100,150,50, "OK", Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, Window()->GetHeight() - 100,150,50, _("OK"), Font::GetInstance(Font::Normal)));
 
-	SaveButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, OkButton->Y()-50, 150, 50, "Sauvegarder", Font::GetInstance(Font::Normal)));
+	SaveButton = AddComponent(new TButtonText(Window()->GetWidth() - 200, OkButton->Y()-50, 150, 50, _("Save"), Font::GetInstance(Font::Normal)));
 	if(_me->Player()->IsOwner() == false)
 		SaveButton->SetEnabled(false);
 
@@ -2065,8 +2066,8 @@ void TOptionsPlayerLine::Init()
 	                                              pl->IsOp() ? '@' : ' ',
 	                                              pl->Position(),
 	                                              pl->GetNick(),
-	                                              nations_str[pl->Nation()].name,
-	                                              pl->Lost() ? "(mort)" : "");
+	                                              gettext(nations_str[pl->Nation()].name),
+	                                              pl->Lost() ? _("(death)") : "");
 
 	label = new TLabel(X(), Y(), s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
 	MyComponent(label);
@@ -2077,9 +2078,9 @@ void TOptionsPlayerLine::Init()
 
 	if(pl->IsMe() == false)
 	{
-		GiveMoneyButton = new TButtonText(X()+400, Y(), 100,30, "Don. argent", Font::GetInstance(Font::Small));
+		GiveMoneyButton = new TButtonText(X()+400, Y(), 100,30, _("Give money"), Font::GetInstance(Font::Small));
 		GiveMoneyButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-		GiveMoneyButton->SetHint("Donner de l'argent à ce joueur.");
+		GiveMoneyButton->SetHint(_("Give money to this player"));
 		MyComponent(GiveMoneyButton);
 	}
 	else
@@ -2105,7 +2106,7 @@ void TOptionsPlayerLine::Draw(const Point2i& mouse)
 void LoadingGame(EC_Client* me)
 {
 	if(!me || !me->Player())
-		throw ECExcept(VPName(me), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(me), "Non connectÃ© ou non dans un chan");
 
 	EChannel *chan = me->Player()->Channel();
 	BPlayerVector plv = chan->Players();
@@ -2126,7 +2127,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 {
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connectÃ© ou non dans un chan");
 
 	try
 	{
@@ -2156,7 +2157,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(50,("Jeu : " + std::string(ch->GetName())), white_color,
+	Title = AddComponent(new TLabel(50,(_("Game: ") + std::string(ch->GetName())), white_color,
 	                                        Font::GetInstance(Font::Big)));
 
 	MapInformations = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60,150,315,200,30));
@@ -2182,7 +2183,7 @@ TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
 
 	Date = AddComponent(new TLabel(500, 130, ch->Map()->Date()->String(), white_color, Font::GetInstance(Font::Normal)));
 
-	Loading = AddComponent(new TLabel(400,500,"Chargement du jeu...", white_color, Font::GetInstance(Font::Large)));
+	Loading = AddComponent(new TLabel(400,500, _("Loading game..."), white_color, Font::GetInstance(Font::Large)));
 
 	SetBackground(Resources::Titlescreen());
 }
@@ -2211,7 +2212,7 @@ void TLoadPlayerLine::Init()
 	                                              pl->IsOp() ? '@' : ' ',
 	                                              pl->Position(),
 	                                              pl->GetNick(),
-	                                              nations_str[pl->Nation()].name);
+	                                              gettext(nations_str[pl->Nation()].name));
 
 	label = new TLabel(X()+30, Y(), s, color_eq[pl->Color()], Font::GetInstance(Font::Normal), true);
 	ready = new TLabel(X(), Y(), "OK", red_color, Font::GetInstance(Font::Normal));
@@ -2234,7 +2235,7 @@ void MenAreAntsApp::PingingGame()
 {
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connectÃ© ou non dans un chan");
 
 	EChannel* chan = client->Player()->Channel();
 
@@ -2285,7 +2286,7 @@ void TPingingForm::AfterDraw()
 
 void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 {
-	if(LeaveButton->Test(mouse, button) && TMessageBox("Êtes vous sur de vouloir quitter la partie ?", BT_YES|BT_NO, this).Show() == BT_YES)
+	if(LeaveButton->Test(mouse, button) && TMessageBox(_("Are you sure to leave game ?"), BT_YES|BT_NO, this).Show() == BT_YES)
 		client->sendrpl(MSG_LEAVE);
 
 	std::vector<TComponent*> list = Players->GetList();
@@ -2303,22 +2304,28 @@ void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 TPingingForm::TPingingForm(ECImage* w, EC_Client* cl, EChannel* ch)
 	: TForm(w), channel(ch), client(cl)
 {
-	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + " - Attente de reconnexion"), white_color,
+	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + _(" - Waiting reconnections")), white_color,
 	                      Font::GetInstance(Font::Large)));
 
 	Message = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,150,Window()->GetWidth()-200-50,150,30, false));
-	Message->AddItem("Les joueurs ci-dessous ont été déconnecté du serveur anormalement, probablement à cause "
-	                 "du plantage de leur connexion Internet.\n"
-	                 "\n"
-	                 "Vous pouvez voter pour éjecter un joueur. Lorsque la moitier des joueurs humains restants "
-	                 "aurront votés pour tel zombie, celui-ci sera éjecté.\n"
-	                 "Lorsque tous les zombies sont soit revenus soit ont été virés, la partie reprendra.", white_color);
+	Message->AddItem(_("The players below were disconnected from the server abnormally, probably because of "
+	                   "the planting of their Internet connection.\n"
+	                   "\n"
+	                   "You can vote to eject a player. When half of the remaining human players vote "
+	                   "for such zombie, this one will be ejected.\n"
+	                   "When all the zombies either returned or were kicked, the game will begin again"), white_color);
+	                 //"Les joueurs ci-dessous ont Ã©tÃ© dÃ©connectÃ© du serveur anormalement, probablement Ã  cause "
+	                 //"du plantage de leur connexion Internet.\n"
+	                 //"\n"
+	                 //"Vous pouvez voter pour Ã©jecter un joueur. Lorsque la moitier des joueurs humains restants "
+	                 //"aurront votÃ©s pour tel zombie, celui-ci sera Ã©jectÃ©.\n"
+	                 //"Lorsque tous les zombies sont soit revenus soit ont Ã©tÃ© virÃ©s, la partie reprendra.", white_color);
 	Message->ScrollUp();
 
 	Players = AddComponent(new TList(100, 350));
 	UpdateList();
 
-	LeaveButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, "Quitter",
+	LeaveButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, _("Leave"),
 	                                            Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
@@ -2346,7 +2353,7 @@ void TPingingPlayerLine::Init()
 	NbVotes = AddComponent(new TLabel(200, 10, TypToStr(dynamic_cast<ECPlayer*>(player)->Votes()), white_color,
 	                                  Font::GetInstance(Font::Big)));
 
-	Voter = AddComponent(new TButtonText(250, 0,150,50, "Voter", Font::GetInstance(Font::Normal)));
+	Voter = AddComponent(new TButtonText(250, 0,150,50, _("Vote"), Font::GetInstance(Font::Normal)));
 
 	Progress = AddComponent(new TProgressBar(450, 10, 100, 30));
 	Progress->InitVal(0, 0, 300);
@@ -2387,7 +2394,7 @@ void MenAreAntsApp::Scores(EChannel* chan)
 {
 	EC_Client* client = EC_Client::GetInstance();
 	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+		throw ECExcept(VPName(client) VPName(client->Player()), "Non connectÃ© ou non dans un chan");
 
 	Resources::DingDong()->Play();
 
@@ -2420,26 +2427,26 @@ void MenAreAntsApp::Scores(EChannel* chan)
 TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(110,(std::string(ch->GetName()) + " - Fin de Partie"), white_color,
+	Title = AddComponent(new TLabel(110,(std::string(ch->GetName()) + _(" - End of Game")), white_color,
 	                      Font::GetInstance(Font::Large)));
 
 	Players = AddComponent(new TList(70, 250));
-	Players->AddLine(new TScoresPlayerLine("Joueurs", white_color, "Pertes", "Meurtres", "Créations", "Score"));
+	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Kills"), _("Creations"), _("Score")));
 
-	InitDate = AddComponent(new TLabel(150, "Début des combats :  " + ch->Map()->InitDate()->String(), white_color,
+	InitDate = AddComponent(new TLabel(150, _("Begin of engagements:  ") + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
-	Date = AddComponent(new TLabel(180, "Fin des combats :  " + ch->Map()->Date()->String(), white_color,
+	Date = AddComponent(new TLabel(180, _("End of engagements:  ") + ch->Map()->Date()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
 	ECDate delta;
 	delta.SetDate(ch->Map()->NbDays());
 	std::string s;
-	if(delta.Year()) s += " " + TypToStr(delta.Year()) + " ans";
-	if(delta.Month()) s += " " + TypToStr(delta.Month()) + " mois";
-	if(delta.Day()) s += " " + TypToStr(delta.Day()) + " jours";
-	Duree = AddComponent(new TLabel(211, "Durée :" + s, white_color,
+	if(delta.Year()) s += " " + TypToStr(delta.Year()) + _(" years");
+	if(delta.Month()) s += " " + TypToStr(delta.Month()) + _(" months");
+	if(delta.Day()) s += " " + TypToStr(delta.Day()) + _(" days");
+	Duree = AddComponent(new TLabel(211, _("Duration:") + s, white_color,
 	                               Font::GetInstance(Font::Big)));
 
-	RetourButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, "Retour",
+	RetourButton = AddComponent(new TButtonText(Window()->GetWidth()-180, 200,150,50, _("Back"),
 	                                            Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());

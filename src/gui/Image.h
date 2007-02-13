@@ -51,7 +51,7 @@ public:
 
 	virtual bool RedrawBackground() const { return false; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 protected:
 	ECImage* image;
 

@@ -313,7 +313,7 @@ private:
 	void OnClic(const Point2i&, int, bool&);
 	void AfterDraw();
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	EC_Client* client;
 };
@@ -350,10 +350,10 @@ public:
 public:
 	ECPlayer* Player() { return pl; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 
-	/* Privatisation de constructeurs à rendre inaccessibles */
+	/* Privatisation de constructeurs Ã  rendre inaccessibles */
 	TOptionsPlayerLine();
 	TOptionsPlayerLine(int _x, int _y);
 	TOptionsPlayerLine(int _x, int _y, uint _w, uint _h);
@@ -416,10 +416,10 @@ public:
 public:
 	ECPlayer* Player() { return pl; }
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 
-	/* Privatisation de constructeurs à rendre inaccessibles */
+	/* Privatisation de constructeurs Ã  rendre inaccessibles */
 	TLoadPlayerLine();
 	TLoadPlayerLine(int _x, int _y);
 	TLoadPlayerLine(int _x, int _y, uint _w, uint _h);
@@ -461,7 +461,7 @@ private:
 	void BeforeDraw();
 	void OnClic(const Point2i& mouse, int button, bool& stop);
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	EChannel* channel;
 	EC_Client* client;
@@ -545,7 +545,7 @@ public:
 	TLabel* Created;
 	TLabel* Score;
 
-/* Variables privées */
+/* Variables privÃ©es */
 private:
 	std::string nick;
 	Color color;

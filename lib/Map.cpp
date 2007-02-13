@@ -358,9 +358,9 @@ void ECBEntity::Invest(ECBEntity* e)
 
 bool ECBEntity::CanBeCreated(ECBPlayer* pl) const
 {
-	/* Oui ça ne sert à rien de passer par cette fonction, mais comme elle était déjà utilisée
+	/* Oui Ã§a ne sert Ã  rien de passer par cette fonction, mais comme elle Ã©tait dÃ©jÃ  utilisÃ©e
 	 * en prevention de la gestion des nations (et donc de la fonction CanBeCreated(pl->Nation) qui
-	 * était pas prévue)
+	 * Ã©tait pas prÃ©vue)
 	 */
 	return pl ? CanBeCreated(pl->Nation()) : false;
 }
@@ -380,10 +380,10 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 	{
 		if((*enti)->CanCreate(this) && (*enti)->Owner() && ((*enti)->Owner() == owner || (*enti)->Owner()->IsAllie(Owner())))
 			ret = true;
-		/* On vérifie que :
+		/* On vÃ©rifie que :
 		 * - si les deux sont des batiments et que ce ne sont pas les memes
 		 * - si les deux ne sont pas des batiments et que ce ne sont pas les memes
-		 * on ne peut pas construire, car deux unités du meme "type" ne peuvent pas
+		 * on ne peut pas construire, car deux unitÃ©s du meme "type" ne peuvent pas
 		 * cohabiter sur la meme case
 		 */
 		if((!(*enti)->IsTerrain() || !IsTerrain() || Type() == (*enti)->Type()) &&
@@ -391,8 +391,8 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 			return false;
 	}
 
-	/* Si la case sur laquelle je suis est au meme joueur que l'entité et que c'est
-	 * une case qui permet de créer une unité de ce type (donc ville etc)
+	/* Si la case sur laquelle je suis est au meme joueur que l'entitÃ© et que c'est
+	 * une case qui permet de crÃ©er une unitÃ© de ce type (donc ville etc)
 	 */
 	if(!ret && c->Country()->Owner() && c->CanCreate(this) && c->Country()->Owner() &&
 	   (c->Country()->Owner()->Player() == Owner() || c->Country()->Owner()->Player()->IsAllie(Owner())))
@@ -413,7 +413,7 @@ void ECBEntity::ChangeCase(ECBCase* new_case)
 	acase = new_case;
 }
 
-std::string ECBEntity::LongName()
+std::string ECBEntity::LongName() const
 {
 	return std::string(Owner() ? Owner()->GetNick() : "*") + "!" + ID();
 }
@@ -434,13 +434,13 @@ bool ECBFindFastPath::FindPath()
 	ajouter_liste_fermee(courant);
 	ajouter_cases_adjacentes(courant);
 
-	/* tant que la destination n'a pas été atteinte et qu'il reste des noeuds à explorer dans la liste ouverte */
+	/* tant que la destination n'a pas Ã©tÃ© atteinte et qu'il reste des noeuds Ã  explorer dans la liste ouverte */
 	while(courant != to_case && !liste_ouverte.empty())
 	{
 		/* on cherche le meilleur noeud de la liste ouverte, on sait qu'elle n'est pas vide donc il existe */
 		courant = meilleur_noeud(liste_ouverte);
 
-		/* on le passe dans la liste fermee, il ne peut pas déjà y être */
+		/* on le passe dans la liste fermee, il ne peut pas dÃ©jÃ  y Ãªtre */
 		ajouter_liste_fermee(courant);
 
 		/* on recommence la recherche des noeuds adjacents */
@@ -468,7 +468,7 @@ bool ECBFindFastPath::deja_present_dans_liste(ECBCase* n, l_noeud& l)
 void ECBFindFastPath::ajouter_cases_adjacentes(ECBCase* n)
 {
 	noeud tmp;
-	/* on met tous les noeud adjacents dans la liste ouverte (+vérif) */
+	/* on met tous les noeud adjacents dans la liste ouverte (+vÃ©rif) */
 	for (int _i=n->X()-1; _i<=int(n->X()+1); _i++)
 	{
 		if ((_i<0) || (_i >= (int)map->Width()))  /* en dehors de l'image, on oublie */
@@ -504,26 +504,26 @@ void ECBFindFastPath::ajouter_cases_adjacentes(ECBCase* n)
 			}
 			if (!deja_present_dans_liste(it, liste_fermee))
 			{
-				/* le noeud n'est pas déjà présent dans la liste fermée */
+				/* le noeud n'est pas dÃ©jÃ  prÃ©sent dans la liste fermÃ©e */
 
-				/* calcul du cout G du noeud en cours d'étude : cout du parent + distance jusqu'au parent */
+				/* calcul du cout G du noeud en cours d'Ã©tude : cout du parent + distance jusqu'au parent */
 				tmp.cout_g = liste_fermee[n].cout_g + n->Delta(it);
 
-				/* calcul du cout H du noeud à la destination */
+				/* calcul du cout H du noeud Ã  la destination */
 				tmp.cout_h = it->Delta(to_case);
 				tmp.cout_f = tmp.cout_g + tmp.cout_h;
 				tmp.parent = n;
 
 				if (deja_present_dans_liste(it, liste_ouverte))
 				{
-					/* le noeud est déjà présent dans la liste ouverte, il faut comparer les couts */
+					/* le noeud est dÃ©jÃ  prÃ©sent dans la liste ouverte, il faut comparer les couts */
 					if (tmp.cout_f < liste_ouverte[it].cout_f){
-						/* si le nouveau chemin est meilleur, on met à jour */
+						/* si le nouveau chemin est meilleur, on met Ã  jour */
 						liste_ouverte[it]=tmp;
 					}
 					/* le noeud courant a un moins bon chemin, on ne change rien */
 				}else{
-					/* le noeud n'est pas présent dans la liste ouverte, on l'y ajoute */
+					/* le noeud n'est pas prÃ©sent dans la liste ouverte, on l'y ajoute */
 					liste_ouverte[it]=tmp;
 				}
 			}
@@ -553,7 +553,7 @@ void ECBFindFastPath::ajouter_liste_fermee(ECBCase* p)
 
 	/* il faut le supprimer de la liste ouverte, ce n'est plus une solution explorable */
 	if (liste_ouverte.erase(p)==0)
-		throw ECExcept("", "Erreur, le noeud n'apparait pas dans la liste ouverte, impossible à supprimer");
+		throw ECExcept("", "Erreur, le noeud n'apparait pas dans la liste ouverte, impossible Ã  supprimer");
 	return;
 }
 
@@ -722,7 +722,7 @@ ECBMap::ECBMap(std::string _filename)
  *   CITY [money by city]
  *   MIN [min]
  *   MAX [max]
- *   DATE [jour] [mois] [année]
+ *   DATE [jour] [mois] [annÃ©e]
  *   INFO [ligne]
  *   INFO [ligne]
  *   ..
@@ -768,27 +768,27 @@ ECBMap::ECBMap(std::string _filename)
  *   Here we define money that all players have when they begin game.
  *   </pre>
  *
- *  7) CITY [money by city]
+ *  7) CITYÂ [money by city]
  *   <pre>
  *   Here we put money win by each city.
  *   </pre>
  *
- *  8) MIN [min]
+ *  8) MINÂ [min]
  *   <pre>
  *   Min players.
  *   </pre>
  *
- *  6) MAX [max]
+ *  6) MAXÂ [max]
  *   <pre>
  *   Max players. It's channel limit.
  *   </pre>
  *
- *  7) DATE [jour] [mois] [année]
+ *  7) DATE [jour] [mois] [annÃ©e]
  *   <pre>
  *   Initial date of game.
  *   </pre>
  *
- *  8) INFO [ligne]
+ *  8) INFOÂ [ligne]
  *   <pre>
  *   This is one of lines who is a short text of map.
  *   </pre>
@@ -804,7 +804,7 @@ ECBMap::ECBMap(std::string _filename)
 void ECBMap::Init()
 {
 	if(initialised)
-		throw ECExcept(VBName(initialised), "Appel de la fonction alors que la carte est déjà initialisée");
+		throw ECExcept(VBName(initialised), "Appel de la fonction alors que la carte est dÃ©jÃ  initialisÃ©e");
 
 	chan = 0;
 	x = 0;
@@ -851,11 +851,11 @@ void ECBMap::Init()
 			{
 				if(!isalpha(ligne[0]))
 					throw ECExcept(VCName(ligne[0]), "L'identifiant de ce player n'est pas correct "
-					                                 "(doit être une lettre)");
+					                                 "(doit Ãªtre une lettre)");
 				BMapPlayersVector::iterator it = map_players.begin();
 				for(; it != map_players.end() && (*it)->ID() != ligne[0]; ++it);
 				if(it != map_players.end())
-					throw ECExcept(VCName(ligne[0]), "L'identifiant du player est déjà utilisé");
+					throw ECExcept(VCName(ligne[0]), "L'identifiant du player est dÃ©jÃ  utilisÃ©");
 				ECBMapPlayer* mp = CreateMapPlayer(ligne[0], ++num_player);
 				map_players.push_back(mp);
 
@@ -865,7 +865,7 @@ void ECBMap::Init()
 			}
 			else if(key == "MAP") recv_map = true;
 			else if(key == "START_SCRIPTING") recv_scripting = true;
-			else if(key == "BEGIN") {} // compatibilité
+			else if(key == "BEGIN") {} // compatibilitÃ©
 			else if(key == "CITY") city_money = atoi(ligne.c_str());
 			else if(key == "MIN") min = atoi(ligne.c_str());
 			else if(key == "MAX") max = atoi(ligne.c_str());
@@ -884,7 +884,7 @@ void ECBMap::Init()
 					BMapPlayersVector::iterator it = map_players.begin();
 					for(; it != map_players.end() && (*it)->ID() != owner[0]; ++it);
 					if(it == map_players.end())
-						throw ECExcept(VName(owner), "Déclaration d'une unité pour un owner qui n'existe pas");
+						throw ECExcept(VName(owner), "DÃ©claration d'une unitÃ© pour un owner qui n'existe pas");
 
 					(*it)->AddUnit(ligne);
 				}
@@ -925,7 +925,7 @@ void ECBMap::Init()
 						map.push_back(acase);
 						break;
 					}
-					/* Récupération de l'identification de la Country (première partie) */
+					/* RÃ©cupÃ©ration de l'identification de la Country (premiÃ¨re partie) */
 					case 1:
 					{
 						c_id[0] = ligne[i];
@@ -944,7 +944,7 @@ void ECBMap::Init()
 							country = CreateCountry(this, c_id);
 							map_countries.push_back(country);
 						}
-						else /* La country existe déjà */
+						else /* La country existe dÃ©jÃ  */
 							country = *it;
 						acase->SetCountry(country);
 						country->AddCase(acase);
@@ -957,7 +957,7 @@ void ECBMap::Init()
 						{ /* C'est une country *neutre* */
 							if(country->Owner())
 								throw ECExcept(VCName(ligne[i]) VIName(_x) VIName(_y) VSName(country->ID()),
-								               "Cette country est un coup neutre un coup appartient à quelqu'un ?");
+								               "Cette country est un coup neutre un coup appartient Ã  quelqu'un ?");
 							else
 								break;
 						}
@@ -974,7 +974,7 @@ void ECBMap::Init()
 							throw ECExcept(VCName(country->Owner()->ID()) VCName((*it)->ID())
 							               VIName(_x) VIName(_y), "Une country a deux owners !");
 
-						if(!(*it)->FindCountry(c_id)) /* Ce MapPlayer n'a pas encore cette country en mémoire */
+						if(!(*it)->FindCountry(c_id)) /* Ce MapPlayer n'a pas encore cette country en mÃ©moire */
 							(*it)->AddCountry(country);
 						break;
 					}
@@ -982,7 +982,7 @@ void ECBMap::Init()
 					case 4:
 					{
 						/* C'est une fonction virtuelle qui dans la lib ne fait rien.
-						 * Elle sera surpassée dans le client pour définir les attributs propres
+						 * Elle sera surpassÃ©e dans le client pour dÃ©finir les attributs propres
 						 * aux images.
 						 */
 						SetCaseAttr(acase, ligne[i]);
@@ -1005,14 +1005,14 @@ void ECBMap::Init()
 			_y++;
 		}
 	}
-	/* Vérification finale des données */
+	/* VÃ©rification finale des donnÃ©es */
 	if(!city_money || !x || !y || map.empty() || map_players.empty() || map_countries.empty() ||
 	   !min || !max || map_players.size() != max || min > max)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
 		               VIName(max) VIName(map_countries.size()),
 		               "Fichier incorrect !");
 
-	/* La map est *bien* initialisée !! */
+	/* La map est *bien* initialisÃ©e !! */
 	initialised = true;
 }
 
@@ -1037,29 +1037,29 @@ void ECBMap::ClearMapPlayers()
 
 void ECBMap::Reload()
 {
-	/* On libère tout ce qui est ouvert pour tout recharger à partir des lignes */
+	/* On libÃ¨re tout ce qui est ouvert pour tout recharger Ã  partir des lignes */
 	Destruct();
 	Init();
 }
 
 void ECBMap::Destruct()
 {
-	/* Libération des MapPlayers */
+	/* LibÃ©ration des MapPlayers */
 	for(std::vector<ECBMapPlayer*>::iterator it=map_players.begin(); it != map_players.end(); ++it)
 		delete *it;
 	map_players.clear();
 
-	/* Libération des cases */
+	/* LibÃ©ration des cases */
 	for(std::vector<ECBCase*>::iterator it=map.begin(); it != map.end(); ++it)
 		delete *it;
 	map.clear();
 
-	/* Libération des Countries */
+	/* LibÃ©ration des Countries */
 	for(std::vector<ECBCountry*>::iterator it=map_countries.begin(); it != map_countries.end(); ++it)
 		delete *it;
 	map_countries.clear();
 
-	/* Libération des entitées */
+	/* LibÃ©ration des entitÃ©es */
 	entities.Clear(USE_DELETE);
 
 	initialised = false;
@@ -1073,10 +1073,10 @@ ECBMap::~ECBMap()
 ECBCase*& ECBMap::operator() (uint _x, uint _y)
 {
 	if(!initialised)
-		throw ECExcept("", "ECBMap n'est pas initialisé");
+		throw ECExcept("", "ECBMap n'est pas initialisÃ©");
 
 	if (_x >= x || _y >= y)
-		throw ECExcept(VIName(x) VIName(y) VIName(_x) VIName(_y), "Access à un element hors du tableau");
+		throw ECExcept(VIName(x) VIName(y) VIName(_x) VIName(_y), "Access Ã  un element hors du tableau");
 
 	/** \warning ALIGNEMENT FAIT LIGNE PAR LIGNE !!! */
 	return map[ _y * x + _x ];
@@ -1113,7 +1113,7 @@ void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 void ECBMap::Save(std::vector<std::string>& fp)
 {
 	if(map_players.empty())
-		throw ECExcept("", "Veuillez créer des joueurs !");
+		throw ECExcept("", "Veuillez crÃ©er des joueurs !");
 
 	fp.push_back ("# Please don't edit this file by hand.");
 	fp.push_back ("# Use the game's map editor.");
@@ -1143,7 +1143,7 @@ void ECBMap::Save(std::vector<std::string>& fp)
 		{
 			ECBCase *c = dynamic_cast<ECBCase*>(map[ _y * x + _x ]);
 			if(!c)
-				throw ECExcept(VPName(c), "Veuillez ne pas enregistrer une carte non achevée");
+				throw ECExcept(VPName(c), "Veuillez ne pas enregistrer une carte non achevÃ©e");
 			line += TypToStr(c->TypeID()) + c->Country()->ID();
 			line += TypToStr(c->Country()->Owner() ? c->Country()->Owner()->ID() : '*') + c->ImgID();
 		}

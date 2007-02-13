@@ -1,5 +1,5 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Veuillez ne pas Ã©diter le fichier map Ã  la main.
+# Utilisez plutÃ´t l'Ã©diteur de carte intÃ©grÃ© au jeu.
 NAME Europa Conquest
 PLAYER A A
 PLAYER B B
@@ -46,9 +46,9 @@ MIN 2
 MAX 6
 DATE 3/9/1939
 INFO Carte de l'Europe lors de la guerre froide.
-INFO Ce conflit se déroule de part et d'autre du rideau de fer.
+INFO Ce conflit se dÃ©roule de part et d'autre du rideau de fer.
 INFO 
-INFO Map créée par zorkis
+INFO Map crÃ©Ã©e par zorkis
 UNIT 6 A 5,12 1000
 UNIT 6 A 7,8 1000
 UNIT 7 A 10,10 2000

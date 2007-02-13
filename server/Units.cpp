@@ -78,7 +78,7 @@ void ECJouano::Invest(ECBEntity* entity)
 	mcdo->RestDestroy() = JOUANO_DESTROYTURN + 1;
 
 	/* >  Channel()->SendArm(0, entity, ARM_DATA, 0, 0, ECData(DATA_JOUANO, entity->RestDestroy()));
-	 * Inutile: à la fin du tour, ECMcDo::Played() sera appellé et l'enverra de lui même.
+	 * Inutile: Ã  la fin du tour, ECMcDo::Played() sera appellÃ© et l'enverra de lui mÃªme.
 	 * C'est d'ailleurs pour cela que l'on fait JOUANO_DESTROYTURN + 1, car la fonction en question
 	 * va decrementer la variable.
 	 */
@@ -96,14 +96,14 @@ void ECMcDo::Invest(ECBEntity* entity)
 
 	ECEntity* enti = dynamic_cast<ECEntity*>(entity);
 
-	/* Pour le client, on supprime à la fois la caserne et le mcdonald */
+	/* Pour le client, on supprime Ã  la fois la caserne et le mcdonald */
 	Channel()->SendArm(0, enti, ARM_REMOVE|ARM_INVEST);
 	Channel()->SendArm(0, this, ARM_REMOVE|ARM_INVEST);
 
-	/* On se met à autant que la caserne */
+	/* On se met Ã  autant que la caserne */
 	SetNb(enti->Nb());
 
-	/* On se rappelle de la caserne, de son ancien owner puis on se définit un nouvel owner */
+	/* On se rappelle de la caserne, de son ancien owner puis on se dÃ©finit un nouvel owner */
 	caserne = enti;
 	ex_owner = Owner();
 	SetOwner(enti->Owner());
@@ -116,18 +116,18 @@ void ECMcDo::Invest(ECBEntity* entity)
 	else
 		Map()->Neutres()->Add(this);
 
-	/* On change d'identité maintenant qu'on "appartient" à l'owner de la caserne, et on réapparait */
+	/* On change d'identitÃ© maintenant qu'on "appartient" Ã  l'owner de la caserne, et on rÃ©apparait */
 	SetID(Channel()->FindEntityName(Owner()));
 	Channel()->SendArm(NULL, this, ARM_CREATE|ARM_HIDE, Case()->X(), Case()->Y());
 
-	/* On se déploie pour avoir le status batiment */
+	/* On se dÃ©ploie pour avoir le status batiment */
 	SetDeployed();
 	Channel()->SendArm(0, this, ARM_DEPLOY);
 
 	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_INVESTED, TypToStr(caserne->Type())));
 	Channel()->SendArm(0, this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
 
-	/* On enlève caserne de partout, mais on ne libère PAS la mémoire ! */
+	/* On enlÃ¨ve caserne de partout, mais on ne libÃ¨re PAS la mÃ©moire ! */
 	Map()->RemoveAnEntity(caserne);
 }
 
@@ -142,12 +142,12 @@ void ECMcDo::Played()
 		{
 			/* On supprime le malheureux McDo, et on restaure la caserne */
 
-			// Suppression propagée de notre mcdo
+			// Suppression propagÃ©e de notre mcdo
 			Channel()->SendArm(0, this, ARM_REMOVE);
 
-			delete caserne; // on supprime la caserne qu'on avait gardé et qui n'est plus dans aucune liste
+			delete caserne; // on supprime la caserne qu'on avait gardÃ© et qui n'est plus dans aucune liste
 
-			/* On créé notre caserne avec les propriétés du McDo, et je rappelle que Owner() est bien l'owner
+			/* On crÃ©Ã© notre caserne avec les propriÃ©tÃ©s du McDo, et je rappelle que Owner() est bien l'owner
 			 * de l'ex caserne
 			 */
 			ECEntity* caserne = CreateAnEntity(E_CASERNE, Channel()->FindEntityName(Owner()), Owner(), Case());
@@ -174,7 +174,7 @@ int ECMcDo::TurnMoney(ECBPlayer* pl)
 	if(!Deployed()) return 0;
 
 	if(ex_owner == Owner())
-		return 0; /* En effet, on a du investir le McDo avec un ingénieur ou conquérir la ville un truc du genre */
+		return 0; /* En effet, on a du investir le McDo avec un ingÃ©nieur ou conquÃ©rir la ville un truc du genre */
 
 	if(ex_owner == pl)
 		return 1000;
@@ -200,9 +200,9 @@ void ECMcDo::ChangeOwner(ECBPlayer* pl)
 
 void ECEnginer::Invest(ECBEntity* entity)
 {
-	/* On a été tué mais bon faudrait quand même que le test ne se fasse pas ici, le problème est que la fonction
-	 * qui nous appelle ici est dans la lib (ECBCase::CheckInvests()). Elle n'est appelée que par le serveur,
-	 * et est dans la lib parce que la classe ECBCase n'est pas dérivée dans le serveur. Il faudrait trouver
+	/* On a Ã©tÃ© tuÃ© mais bon faudrait quand mÃªme que le test ne se fasse pas ici, le problÃ¨me est que la fonction
+	 * qui nous appelle ici est dans la lib (ECBCase::CheckInvests()). Elle n'est appelÃ©e que par le serveur,
+	 * et est dans la lib parce que la classe ECBCase n'est pas dÃ©rivÃ©e dans le serveur. Il faudrait trouver
 	 * une alternative.
 	 */
 	if(IsZombie()) return;
@@ -386,9 +386,9 @@ bool ECMissiLauncher::WantDeploy()
 bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 {
 	/* Il faut:
-	 * - être déployé
-	 * - que ça soit notre première action
-	 * - qu'on n'ait pas déjà prévu une attaque
+	 * - Ãªtre dÃ©ployÃ©
+	 * - que Ã§a soit notre premiÃ¨re action
+	 * - qu'on n'ait pas dÃ©jÃ  prÃ©vu une attaque
 	 */
 	if(!Deployed() || !force && Last())
 		return false;
@@ -411,7 +411,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	/* C'est une attaque contre moi (probablement sur la meme case).
-	 * Effectivement, cette unité ne tire QUE quand on lui en donne l'ordre
+	 * Effectivement, cette unitÃ© ne tire QUE quand on lui en donne l'ordre
 	 */
 	if(!(EventType() & ARM_ATTAQ) || event->Case() == Case())
 		return false;
@@ -443,7 +443,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			else if((*it)->Type() == E_MISSILAUNCHER)        killed = uint(Nb() * coef);
 			else
 			{
-				FDebug(W_WARNING, "Shoot d'un type non supporté");
+				FDebug(W_WARNING, "Shoot d'un type non supportÃ©");
 				continue;
 			}
 			if(!killed) continue;
@@ -455,8 +455,8 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
 		}
 
-#if 0 // Uniquement si on veut qu'un lance-missile se reploie après avoir tiré
-	/* Si on est déployé (ça devrait etre le cas !!), on se remet normal pour faire perdre un tour
+#if 0 // Uniquement si on veut qu'un lance-missile se reploie aprÃ¨s avoir tirÃ©
+	/* Si on est dÃ©ployÃ© (Ã§a devrait etre le cas !!), on se remet normal pour faire perdre un tour
 	 * au joueur si il veut retirer (il faut se redeployer)
 	 */
 	if(Deployed())
@@ -465,7 +465,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 		Channel()->SendArm(NULL, this, ARM_DEPLOY);
 	}
 	else
-		FDebug(W_WARNING, "On n'est pas deployé !?");
+		FDebug(W_WARNING, "On n'est pas deployÃ© !?");
 #endif
 
 	return false;
@@ -483,8 +483,8 @@ bool ECUnit::WantAttaq(uint mx, uint my, bool force)
 	if(here->X() != mx || here->Y() != my)
 		return false;
 
-	/* Si il n'y a personne à attaquer on n'attaque pas */
-	if(here->Entities()->Size() <= 1) // <=1 car je suis forcément dans la liste vu que je suis sur la case
+	/* Si il n'y a personne Ã  attaquer on n'attaque pas */
+	if(here->Entities()->Size() <= 1) // <=1 car je suis forcÃ©ment dans la liste vu que je suis sur la case
 		return false;
 
 	std::vector<ECBEntity*> ents = here->Entities()->List();
@@ -501,8 +501,8 @@ bool ECUnit::WantAttaq(uint mx, uint my, bool force)
 
 bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
-	/* J'ai déjà fait tous mes pas
-	 * Si on est deployé on ne peut pas bouger */
+	/* J'ai dÃ©jÃ  fait tous mes pas
+	 * Si on est deployÃ© on ne peut pas bouger */
 	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() || !Case() || Locked() && !(flags & MOVE_FORCE))
 		return false;
 

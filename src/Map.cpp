@@ -154,6 +154,8 @@ ECSpriteBase* ECEntity::DeadCase() const
 	return 0;
 }
 
+std::string ECEntity::OwnerNick() const { return (Owner() ? Owner()->GetNick() : _("Neutral")); }
+
 void ECEntity::Select(bool s)
 {
 	selected = s;
@@ -238,7 +240,7 @@ void ECEntity::AfterDraw()
 	if(Selected())
 	{
 		Resources::Cadre()->Draw(image->X(),image->Y());
-		if(Nb() && Map()->Channel()) /* Uniquement si sélectionnée et en jeu (non map editor) */
+		if(Nb() && Map()->Channel()) /* Uniquement si sÃ©lectionnÃ©e et en jeu (non map editor) */
 		{
 			life.SetWindow(image->Window());
 			life.SetXY(image->X()+2, image->Y()+2);
@@ -260,8 +262,8 @@ void ECEntity::AfterDraw()
 
 bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 {
-	/* = -1 : on ne peut investir en cas de présence d'une unité enemie. N'arrive pas si c'est sur un conteneur
-	 * =  0 : n'a trouvé aucune unité à investir ou me contenant, ni aucune unité enemie
+	/* = -1 : on ne peut investir en cas de prÃ©sence d'une unitÃ© enemie. N'arrive pas si c'est sur un conteneur
+	 * =  0 : n'a trouvÃ© aucune unitÃ© Ã  investir ou me contenant, ni aucune unitÃ© enemie
 	 * =  1 : peut investir
 	 * =  2 : peut me contenir
 	 */
@@ -280,8 +282,8 @@ bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 			can_invest = 1;
 		if(!enti->Like(this) && enti->CanAttaq(this) && can_invest != 2)
 		{
-			/* chercher l'interet de ce truc là.
-				* -> Je suppose que c'est pour dire que dans le cas où y a une unité enemie, on ne parle pas
+			/* chercher l'interet de ce truc lÃ .
+				* -> Je suppose que c'est pour dire que dans le cas oÃ¹ y a une unitÃ© enemie, on ne parle pas
 				*    d'entrer dans le batiment mais de se battre, donc on montre pas encore la fleche quoi
 				*/
 			can_invest = -1;
@@ -719,7 +721,7 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 					         (Brouillard() && c->Showed()<=0) ? (col.GetBlue()>60) ? col.GetBlue() - 60 : 0 : col.GetBlue()));
 				}
 		}
-	/* Position des unités */
+	/* Position des unitÃ©s */
 	if(flags & P_ENTITIES)
 	{
 		std::vector<ECBEntity*> ents = entities.List();
