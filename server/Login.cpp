@@ -165,7 +165,7 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	app.NBco++;
 	app.NBtot++;
-	app.MSet("+p" + TypToStr(app.NBco));
+	app.MSet("+p", TypToStr(app.NBco));
 
 	cl->sendrpl(MSG_LOGGED, cl->Nick());
 

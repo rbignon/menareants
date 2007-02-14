@@ -117,7 +117,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 	if(!Enabled() || !Mouse(mousePosition)) return false;
 
 	if (m_items.empty())
-	return false;
+		return false;
 
 	// buttons for listbox with more items than visible (first or last item not visible)
 	if(first_visible_item > 0 || m_items.back()->Y() + m_items.back()->Height() > Y() + Height())

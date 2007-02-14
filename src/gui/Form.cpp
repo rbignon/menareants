@@ -133,6 +133,12 @@ void TForm::Actions(SDL_Event event, uint a)
 			}
 			break;
 		}
+		case SDL_MOUSEBUTTONUP:
+		{
+			OnClicUp(Point2i(event.button.x, event.button.y), event.button.button);
+			SetMustRedraw();
+			break;
+		}
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if(a & ACTION_NOMOUSE) break;

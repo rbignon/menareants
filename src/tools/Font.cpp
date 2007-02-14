@@ -57,7 +57,9 @@ Font* Font::FONT_ARRAY[] = {NULL, NULL, NULL, NULL, NULL, NULL};
 /*
  * Constants
  */
-const int Font::FONT_SIZE[] = {40, 32, 24, 16, 14, 12};
+#define NEW_FONT
+
+const int Font::FONT_SIZE[] = {40, 32, 24, 14, 12, 8};
 
 Font* Font::GetInstance(int type)
 {
@@ -70,6 +72,7 @@ Font* Font::GetInstance(int type)
 Font::Font(int size)
 {
   m_font = NULL;
+
   bool ok = Load(PKGDATADIR_FONTS_MAIN, size);
 
   if( !ok )

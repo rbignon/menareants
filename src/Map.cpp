@@ -517,29 +517,35 @@ struct case_img_t case_img[] = {
 	{ 'M', Resources::CaseMontain,         'M' }
 };
 
-void TBarreCaseIcons::GoLast(TObject* o, void* e)
+bool TBarreCaseIcons::Clic (const Point2i& mouse, int button)
 {
-	TBarreCaseIcons* parent = dynamic_cast<TBarreCaseIcons*>(o->Parent());
+	if(Mouse(mouse) == false) return false;
 
-	assert(parent);
+	if (Next->Visible() || Last->Visible())
+	{
+		if (button == SDL_BUTTON_WHEELDOWN || Next->Test(mouse))
+		{
+			// bottom button
+			if(first < (ASIZE(case_img)-2)) first += 2;
+			else if(first < (ASIZE(case_img)-1)) ++first;
+			Init();
+			return true;
+		}
 
-	if(parent->first > 1) parent->first -= 2;
-	else if(parent->first > 0) --parent->first;
 
-	parent->SetList();
+		if (button == SDL_BUTTON_WHEELUP || Last->Test(mouse))
+		{
+			// top button
+			if(first > 1) first -= 2;
+			else first = 0;
+			Init();
+			return true;
+		}
+	}
+
+	return TChildForm::Clic(mouse, button);
 }
 
-void TBarreCaseIcons::GoNext(TObject* o, void* e)
-{
-	TBarreCaseIcons* parent = dynamic_cast<TBarreCaseIcons*>(o->Parent());
-
-	assert(parent);
-
-	if(parent->first < (ASIZE(case_img)-2)) parent->first += 2;
-	else if(parent->first < (ASIZE(case_img)-1)) ++parent->first;
-
-	parent->SetList();
-}
 
 void TBarreCaseIcons::SetList()
 {

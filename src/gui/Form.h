@@ -137,6 +137,7 @@ public:
 protected:
 
 	virtual void OnClic(const Point2i& mouse, int button, bool& stop) {}
+	virtual void OnClicUp(const Point2i& mouse, int button) {}
 	virtual void BeforeDraw() {}
 	virtual void AfterDraw() {}
 	virtual void OnMouseMotion(const Point2i& mouse) {}

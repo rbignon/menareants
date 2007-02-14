@@ -1,3 +1,13 @@
+2007-02-14 Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp: Correction d'un bug vicieux.
+
+	* src/ShowMap.cpp: On peut maintenant scroller la map en maintenant la molette appuyée et en dirigeant la souris vers la direction du mouvement.
+
+	* server/Channels.cpp: Correction d'un bug qui n'envoyait pas le nmobre de joueurs possédés au meta-serveur.
+
+	* src/InGame.cpp, src/MapEditor.h: Possibilité de scroller sur les listes d'images avec la molette.
+
 2007-02-13 Romain Bignon <progs@headfucking.net>
 
 	* src/: Traduction intégrale en anglais.

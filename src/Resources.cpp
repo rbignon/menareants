@@ -102,6 +102,7 @@
 	R_RESOURCE_P(ECImage,    PointerRadar,     PKGDATADIR_PICS "cursors/radar.png", true);
 	R_RESOURCE_P(ECImage,    PointerAddBP,     PKGDATADIR_PICS "cursors/add_bp.png", true);
 	R_RESOURCE_P(ECImage,    PointerRemBP,     PKGDATADIR_PICS "cursors/rem_bp.png", true);
+	R_RESOURCE_P(ECImage,      MoveMapPoint,     PKGDATADIR_PICS "move_map.png", true);
 	R_RESOURCE(ECSpriteBase, Balise,           "balise");
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");

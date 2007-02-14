@@ -146,7 +146,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 				if(event->Entities()->Empty() == false && event->Entity())
 				{
 					ECEntity* e = event->Entities()->First();
-					if(!e->Case() || !event->Entity()->CanAttaq(e) || e->IsZombie() ||
+					if(!e->Case() || !event->Entity()->CanAttaq(e) || e->IsZombie() || e->Parent() ||
 					   event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
 					{
 						ret = false;
@@ -180,7 +180,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					                                                event->Entity()->GetAttaquedEntities(event->Case())
 					                                              : event->Case()->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator it = case_entities.begin(); it != case_entities.end(); ++it)
-						if(!(*it)->IsZombie())
+						if(!(*it)->IsZombie() && !(*it)->Locked())
 						{
 							/* Si l'unité est hidden, il faut bien montrer son existance lors d'un combat, donc on créé l'unité.
 							Les alliés du propriétaire ont déjà vu la création de l'unité, et vont donc recevoir une nouvelle
@@ -283,12 +283,12 @@ bool EChannel::ShowAnim(ECEvent* event)
 					}
 					else
 					{
-						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->Fixed();
+						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
 						if(!fixed.empty() && !dynamic_cast<EContainer*>(*it))
 							for(fix = fixed.begin();
-							        fix != fixed.end() && (*fix == *it || !(*fix)->Move()->Empty() ||
-							        (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
+							        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() ||
+							        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
 							    ++fix);
 
 						if(fix != fixed.end() && (*it)->Move()->Empty())
@@ -366,7 +366,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					bool attaq = false, invest = false;
 					FORit(ECBEntity*, entities, e)
 					{
-						if((*e)->IsZombie()) continue;
+						if((*e)->IsZombie() || (*e)->Parent()) continue;
 						if(ThereIsAttaq(entity, *e))
 						{
 							attaq = true;
@@ -403,15 +403,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 						invest_event->Move()->SetMoves(event->Move()->Moves());
 						invest_event->Move()->Return(c);
 
-						ShowAnim(invest_event);
+						SendArm(NULL, entity, ARM_MOVE, event->Case()->X(), event->Case()->Y(), 0, ToVec(invest_event));
 
 						MyFree(invest_event);
-
-						if(entity->IsZombie())
-						{
-							end = true;
-							break;
-						}
 
 						event->Move()->GoTo(c);
 						entity->Move()->GoTo(c);
@@ -460,13 +454,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 
 				if(entity->Move()->Empty())
 				{
-					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->Fixed();
+					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->List();
 					std::vector<ECBEntity*>::iterator fix = fixed.end();
 					if(!fixed.empty() && !dynamic_cast<EContainer*>(entity))
 						for(fix = fixed.begin();
-						    fix != fixed.end() && (*fix == entity || !(*fix)->Move()->Empty() ||
-						    (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner());
-						    ++fix);
+							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() ||
+							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner());
+							++fix);
 
 					if(fix != fixed.end())
 					{
@@ -522,6 +516,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 	FORit(ECEntity*, ents, it)
 		(*it)->Events()->Remove(event);
 	Map()->RemoveEvent(event, USE_DELETE);
+
+	Debug(W_DEBUG|W_ECHO, "=== End of event ===");
+
 
 	return ret;
 }

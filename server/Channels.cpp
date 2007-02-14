@@ -1129,6 +1129,7 @@ void EChannel::CheckReadys()
 				sendto_players(0, app.ServerName(), MSG_SET, "-W+S");
 				app.NBwchan--;
 				app.NBachan++;
+				app.MSet("+w", ECArgs(TypToStr(app.NBwchan)));
 
 				for(BPlayerVector::iterator pl=players.begin();; ++pl)
 				{

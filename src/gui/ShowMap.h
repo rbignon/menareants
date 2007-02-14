@@ -33,7 +33,7 @@ public:
 
 	TMap(ECMap* _map)
 		: TComponent(0,0), map(_map), schema(false), x_min(0), y_min(0), create_entity(0), selected_entity(0),
-		  have_brouillard(true), must_redraw(true), mutex(0)
+		  have_brouillard(true), must_redraw(true), mutex(0), move_map(false)
 	{}
 
 /* Methodes */
@@ -106,6 +106,8 @@ public:
 	void AddAfterDraw(ECSprite* s) { after_draw.push_back(s); }
 	void RemoveAfterDraw(ECSprite* s);
 
+	void MoveMap(bool b, Point2i point = Point2i()) { move_map = b; move_point = point; }
+
 /* Variables privées */
 private:
 	ECMap* map;
@@ -117,6 +119,8 @@ private:
 	bool must_redraw;
 	SDL_mutex* mutex;
 	std::vector<ECSprite*> after_draw;
+	bool move_map;
+	Point2i move_point;
 
 	void DrawFog(ECase* c);
 };

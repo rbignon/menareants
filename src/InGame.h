@@ -60,8 +60,7 @@ public:
 
 	void SetList(std::vector<ECEntity*> list, bool click = true);
 
-	static void GoNext(TObject*, void*);
-	static void GoLast(TObject*, void*);
+	virtual bool Clic(const Point2i&, int button);
 
 private:
 	std::vector<TImage*> icons;
@@ -86,8 +85,7 @@ public:
 
 	void SetList(std::vector<ECEntity*> list, TOnClickFunction func);
 
-	static void GoNext(TObject*, void*);
-	static void GoLast(TObject*, void*);
+	virtual bool Clic(const Point2i&, int button);
 
 private:
 	std::vector<TImage*> icons;
@@ -271,6 +269,7 @@ private:
 
 	void OnMouseMotion(const Point2i& mouse);
 	void OnClic(const Point2i& mouse, int, bool&);
+	void OnClicUp(const Point2i& mouse, int button);
 	void OnKeyUp(SDL_keysym);
 	void OnKeyDown(SDL_keysym);
 	void AfterDraw();

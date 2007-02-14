@@ -30,7 +30,7 @@
 #define APP_NAME "Men Are Ants"
 
 #define APP_SITE "http://menareants.coderz.info/"
-#define MAIN_FONT "larabieb.ttf"
+#define MAIN_FONT "FreeMonoBold.ttf"
 
 /* Defines */
 #undef  BUGUED_INTRO

@@ -1496,7 +1496,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	Players->AddLine(new TPlayerLineHeader);
 
 	int chat_width = 325 * Window()->GetWidth() / 800;
-	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,325,chat_width,495,30));
+	Chat = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,325,chat_width,495,/*maxlines*/50));
 	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,Window()->GetHeight()-45,chat_width,
 	                                     MAXBUFFER-20));
 
@@ -1558,7 +1558,7 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
 	size.y = 30;
-	size.x = 560;
+	size.x = 565;
 	position = 0;
 	couleur = 0;
 	nation = 0;
@@ -1611,18 +1611,18 @@ void TPlayerLine::Init()
 	delete Status;
 	delete Nick;
 	                    /*  label   x    y  w  min      max                  step  defvalue */
-	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  X()+230, Y(), 50, 0, pl->Channel()->Limite(), 1,    0);
+	position = new TSpinEdit(Font::GetInstance(Font::Small), "",  X()+240, Y(), 50, 0, pl->Channel()->Limite(), 1,    0);
 	MyComponent(position);
 	position->SetHint(_("Your position on map"));
-	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  X()+340, Y(), 50);
+	couleur = new TColorEdit(Font::GetInstance(Font::Small), "",  X()+360, Y(), 50);
 	MyComponent(couleur);
 	couleur->SetHint(("Your color"));
-	nation = new TComboBox(Font::GetInstance(Font::Small), X()+440, Y(), 120);
+	nation = new TComboBox(Font::GetInstance(Font::Small), X()+445, Y(), 120);
 	MyComponent(nation);
 
 	Ready = new TLabel(X(), Y(), "OK", gray_color, Font::GetInstance(Font::Big));
-	Status = new TLabel(X()+75, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
-	Nick = new TLabel(X()+95, Y(), pl->GetNick(), white_color, Font::GetInstance(Font::Big));
+	Status = new TLabel(X()+85, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
+	Nick = new TLabel(X()+105, Y(), pl->GetNick(), white_color, Font::GetInstance(Font::Big));
 
 	MyComponent(Ready);
 	MyComponent(Status);
@@ -1682,7 +1682,7 @@ void TPlayerLineHeader::Init()
 	if(label)
 		delete label;
 
-	std::string s = _("Ready  Nickname    Pos.  Color    Nation");
+	std::string s = _("Ready  Nickname   Pos.   Color  Nation");
 	label = new TLabel(X(), Y(), s, white_color, Font::GetInstance(Font::Big));
 	MyComponent(label);
 	size.x = label->Width();

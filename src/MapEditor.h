@@ -121,8 +121,7 @@ private:
 
 	static void SelectCase(TObject* o, void* e);
 
-	static void GoNext(TObject*, void*);
-	static void GoLast(TObject*, void*);
+	virtual bool Clic(const Point2i&, int button);
 
 	uint first;
 };

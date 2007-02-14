@@ -354,7 +354,7 @@ void ECServer::delclient(TClient *del)
 		if(del->HasFlag(ECD_AUTH))
 		{
 			NBco--;
-			MSet("+p " + TypToStr(NBco));
+			MSet("+p", TypToStr(NBco));
 			Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
 		}
 		FD_CLR(del->GetFd(), &global_fd_set);

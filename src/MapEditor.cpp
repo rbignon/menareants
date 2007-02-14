@@ -596,9 +596,6 @@ void TBarreCaseIcons::Init()
 
 	Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
 	Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
-
-	Next->SetOnClick(TBarreCaseIcons::GoNext, 0);
-	Last->SetOnClick(TBarreCaseIcons::GoLast, 0);
 }
 
 void TBarreCaseIcons::SelectCase(TObject* o, void* e)

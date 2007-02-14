@@ -172,7 +172,7 @@ void TEdit::PressKey(SDL_keysym key)
 		{
 			if(maxlen && chaine.size() >= maxlen)
 				return;
-			if(key.unicode < '!' && key.unicode != ' ') return;
+			if(key.unicode < ' ') return;
 
 			std::string new_txt = chaine;
 			if(key.unicode > 0)

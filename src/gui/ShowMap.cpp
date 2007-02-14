@@ -327,7 +327,6 @@ void TMap::DrawFog(ECase* c)
 		                                  c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomRight()->GetHeight());
 }
 
-
 void TMap::Draw(const Point2i& mouse)
 {
 	if(!map) return;
@@ -336,19 +335,28 @@ void TMap::Draw(const Point2i& mouse)
 	{
 		int xx = X(), yy = Y();
 
-		/* Changement de position automatique */
-		if(mouse.x >= 0 && mouse.x < 20)
-			xx += 30 - mouse.x;
-		if(mouse.y >= 0 && mouse.y < 20)
-			yy += 30 - mouse.y;
-		if(mouse.x > int(SCREEN_WIDTH-20) && mouse.x <= int(SCREEN_WIDTH))
-			xx -= 30 - (SCREEN_WIDTH - mouse.x);
-		if(mouse.y > int(SCREEN_HEIGHT-20) && mouse.y <= int(SCREEN_HEIGHT))
-			yy -= 30 - (SCREEN_HEIGHT - mouse.y);
+		if(move_map)
+		{
+			xx += move_point.x - mouse.x;
+			yy += move_point.y - mouse.y;
+		}
+		else
+		{
+			/* Changement de position automatique */
+			if(mouse.x >= 0 && mouse.x < 20)
+				xx += 30 - mouse.x;
+			if(mouse.y >= 0 && mouse.y < 20)
+				yy += 30 - mouse.y;
+			if(mouse.x > int(SCREEN_WIDTH-20) && mouse.x <= int(SCREEN_WIDTH))
+				xx -= 30 - (SCREEN_WIDTH - mouse.x);
+			if(mouse.y > int(SCREEN_HEIGHT-20) && mouse.y <= int(SCREEN_HEIGHT))
+				yy -= 30 - (SCREEN_HEIGHT - mouse.y);
+		}
 
 		if(xx != X() || yy != Y())
 			SetXY(xx, yy);
 	}
+	else move_map = false;
 
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
@@ -588,6 +596,11 @@ void TMap::Draw(const Point2i& mouse)
 				}
 			}
 		}
+	}
+	if(move_map)
+	{
+		ECImage* surf = Resources::MoveMapPoint();
+		surf->Draw(move_point.x - surf->GetWidth()/2, move_point.y - surf->GetHeight()/2);
 	}
 	SetMustRedraw(false);
 }

@@ -689,12 +689,12 @@ void MenAreAntsApp::InGame()
 		InGameForm->AddInfo(I_INFO, StringF(_("*** You begin with $%d"), client->Player()->Money()));
 		if(MenAreAntsApp::GetInstance()->IsFirstGame())
 		{
-			TMessageBox(_("This is your first game.\nPress F1 to give help."),
+			TMessageBox(_("This is your first game.\nPress F1 to get help."),
 			            BT_OK, InGameForm, false).Show();
 			MenAreAntsApp::GetInstance()->FirstGameDone();
 		}
 		else
-			InGameForm->AddInfo(I_INFO, _("*** Press F1 to give help"));
+			InGameForm->AddInfo(I_INFO, _("*** Press F1 to get help"));
 
 		if(client->Player()->Ready())
 			InGameForm->BarreLat->PretButton->SetEnabled(false);
@@ -917,6 +917,15 @@ void TInGameForm::OnMouseMotion(const Point2i& mouse)
 	InGameForm->SetCursor();
 }
 
+void TInGameForm::OnClicUp(const Point2i& mouse, int button)
+{
+	if(button == SDL_BUTTON_MIDDLE)
+	{
+		Map->MoveMap(false);
+		Map->SetMustRedraw();
+	}
+}
+
 void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 {
 	if(BarreLat->PretButton->Test(mouse, button))
@@ -1028,6 +1037,12 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 
 	if(BarreLat->Test(mouse, button) || BarreAct->Test(mouse, button))
 		return;
+
+	if(button == SDL_BUTTON_MIDDLE && Map->Enabled())
+	{
+		Map->MoveMap(true, mouse);
+		return;
+	}
 
 	TInGameForm::Wants mywant = want;
 	if(want)
@@ -1236,26 +1251,32 @@ TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
  *                               TBarreActIcons                                             *
  ********************************************************************************************/
 
-void TBarreActIcons::GoLast(TObject* o, void* e)
+bool TBarreActIcons::Clic (const Point2i& mouse, int button)
 {
-	TBarreActIcons* parent = dynamic_cast<TBarreActIcons*>(o->Parent());
+	if(Mouse(mouse) == false) return false;
 
-	assert(parent);
+	if (Next->Visible() || Last->Visible())
+	{
+		if (button == SDL_BUTTON_WHEELDOWN || Next->Test(mouse))
+		{
+			// bottom button
+			if(!icons.empty() && icons.size()-first-1 >= max_height/icons.front()->Width())
+				++first;
+			Init();
+			return true;
+		}
 
-	if(parent->first > 0) --parent->first;
-	parent->Init();
-}
 
-void TBarreActIcons::GoNext(TObject* o, void* e)
-{
-	TBarreActIcons* parent = dynamic_cast<TBarreActIcons*>(o->Parent());
+		if (button == SDL_BUTTON_WHEELUP || Last->Test(mouse))
+		{
+			// top button
+			if(first > 0) --first;
+			Init();
+			return true;
+		}
+	}
 
-	assert(parent);
-
-	if(!parent->icons.empty() && parent->icons.size()-parent->first-1 >= parent->max_height/parent->icons.front()->Width())
-		++parent->first;
-
-	parent->Init();
+	return TChildForm::Clic(mouse, button);
 }
 
 void TBarreActIcons::Init()
@@ -1273,9 +1294,6 @@ void TBarreActIcons::Init()
 
 	Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
 	Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
-
-	Next->SetOnClick(TBarreActIcons::GoNext, 0);
-	Last->SetOnClick(TBarreActIcons::GoLast, 0);
 
 	uint line = 0;
 	int _h = 0, _x = 0;
@@ -1336,28 +1354,35 @@ void TBarreActIcons::SetList(std::vector<ECEntity*> list, bool click)
  *                                TBarreLatIcons                                            *
  ********************************************************************************************/
 
-void TBarreLatIcons::GoLast(TObject* o, void* e)
+bool TBarreLatIcons::Clic (const Point2i& mouse, int button)
 {
-	TBarreLatIcons* parent = dynamic_cast<TBarreLatIcons*>(o->Parent());
+	if(Mouse(mouse) == false) return false;
 
-	assert(parent);
+	if (Next->Visible() || Last->Visible())
+	{
+		if (button == SDL_BUTTON_WHEELDOWN || Next->Test(mouse))
+		{
+			int paire = icons.size()%2 ? 1 : 0;
+			// bottom button
+			if(!icons.empty() &&
+			   (icons.size()/2)-first-1+paire >= max_height/icons.front()->Height())
+				++first;
 
-	if(parent->first > 0) --parent->first;
-	parent->Init();
-}
+			Init();
+			return true;
+		}
 
-void TBarreLatIcons::GoNext(TObject* o, void* e)
-{
-	TBarreLatIcons* parent = dynamic_cast<TBarreLatIcons*>(o->Parent());
 
-	assert(parent);
+		if (button == SDL_BUTTON_WHEELUP || Last->Test(mouse))
+		{
+			// top button
+			if(first > 0) --first;
+			Init();
+			return true;
+		}
+	}
 
-	int paire = parent->icons.size()%2 ? 1 : 0;
-	if(!parent->icons.empty() &&
-	   (parent->icons.size()/2)-parent->first-1+paire >= parent->max_height/parent->icons.front()->Height())
-		++parent->first;
-
-	parent->Init();
+	return TChildForm::Clic(mouse, button);
 }
 
 void TBarreLatIcons::Init()
@@ -1374,9 +1399,6 @@ void TBarreLatIcons::Init()
 
 	Last->SetImage (new ECSprite(Resources::UpButton(), Window()));
 	Next->SetImage (new ECSprite(Resources::DownButton(), Window()));
-
-	Next->SetOnClick(TBarreLatIcons::GoNext, 0);
-	Last->SetOnClick(TBarreLatIcons::GoLast, 0);
 
 	bool left = true;
 	uint line = 0;
@@ -1500,6 +1522,7 @@ void TBarreAct::ShowInfos()
 	SpecialInfo->Hide();
 	ExtractButton->Hide();
 	DeployButton->Hide();
+	GiveButton->Hide();
 	UpButton->Hide();
 	UpgradeButton->Hide();
 	ChildIcon->Hide();
@@ -1525,13 +1548,15 @@ void TBarreAct::ShowInfos()
 	{
 		Icons->Clear();
 		HelpAttaqs->SetCaption(_("Can nothing attack."));
+		HelpAttaqs->SetX(X() + Width() - HelpAttaqs->Width() - 10);
+		HelpInfos->SetWidth(HelpAttaqs->X() - HelpInfos->X() - 10);
 	}
 
 	HelpButton->SetText(_("Back"));
 	HelpInfos->ClearItems();
 	HelpInfos->Show();
 	HelpInfos->AddItem(_("Name: ") + std::string(entity->Name()));
-	HelpInfos->AddItem(_("Cost: ") + TypToStr(entity->Cost()) + " $");
+	HelpInfos->AddItem(StringF(_("Cost: $%d"), entity->Cost()));
 	HelpInfos->AddItem(std::string(entity->Description()), red_color);
 
 	if(entity->IsCity())
@@ -1753,14 +1778,14 @@ void TBarreAct::Init()
 {
 	Name = AddComponent(new TLabel(60,15, "", black_color, Font::GetInstance(Font::Big)));
 
-	DeployButton = AddComponent(new TButtonText(300,15,100,30, _("To deploy"), Font::GetInstance(Font::Small)));
+	DeployButton = AddComponent(new TButtonText(300,15,100,30, _("Deploy"), Font::GetInstance(Font::Small)));
 	DeployButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	DeployButton->SetHint(_("Deploy unity to have more capacities"));
 	UpButton = AddComponent(new TButtonText(500,15,100,30, _("Add"), Font::GetInstance(Font::Small)));
 	UpButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	ExtractButton = AddComponent(new TButtonText(500,15,100,30, _("Extract"), Font::GetInstance(Font::Small)));
 	ExtractButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
-	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, _("To upgrade"), Font::GetInstance(Font::Small)));
+	UpgradeButton = AddComponent(new TButtonText(500,15,100,30, _("Upgrade"), Font::GetInstance(Font::Small)));
 	UpgradeButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	UpgradeButton->SetHint(_("Use an amelioration of this building"));
 	HelpButton = AddComponent(new TButtonText(500,15,100,30, _("More infos"), Font::GetInstance(Font::Small)));

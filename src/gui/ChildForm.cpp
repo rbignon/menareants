@@ -46,7 +46,7 @@ void TChildForm::PressKey(SDL_keysym k)
 
 bool TChildForm::Clic(const Point2i& mouse, int _button)
 {
-	if(!Test(mouse,_button)) return false;
+	if(!Test(mouse)) return false;
 
 	TComponent* clicked = 0;
 	/* Va dans l'ordre inverse */
