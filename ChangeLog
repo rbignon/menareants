@@ -8,6 +8,8 @@
 
 	* src/InGame.cpp, src/MapEditor.h: Possibilité de scroller sur les listes d'images avec la molette.
 
+	* server/Login.cpp, src/Login.cpp: Statistique sur la version du serveur.
+
 2007-02-13 Romain Bignon <progs@headfucking.net>
 
 	* src/: Traduction intégrale en anglais.

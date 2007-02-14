@@ -245,7 +245,7 @@ int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 /** Statistics of server.
  *
- * Syntax: STAT nbactco nbco nbch chinwait chingame chtot uptime
+ * Syntax: STAT nbactco nbco nbch chinwait chingame chtot uptime version
  */
 int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -256,6 +256,8 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		                                               parv[1].c_str(), parv[2].c_str(), parv[6].c_str()));
 		ConnectedForm->ChanStats->SetCaption(StringF(_("There are %s game(s), with %s in game and %s in preparation."),
 		                                               parv[3].c_str(), parv[5].c_str(), parv[4].c_str()));
+		if(parv.size() > 8)
+			ConnectedForm->ServerStats->SetCaption(parv[8]);
 	}
 	return 0;
 }
@@ -877,6 +879,8 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90," ", white_color, Font::GetInstance(Font::Normal)));
 	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height()," ", white_color, Font::GetInstance(Font::Normal)));
 	ChanStats = AddComponent(new TLabel(75,UserStats->Y()+UserStats->Height()," ", white_color,
+	                                    Font::GetInstance(Font::Normal)));
+	ServerStats = AddComponent(new TLabel(75,ChanStats->Y()+ChanStats->Height()," ", white_color,
 	                                    Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());

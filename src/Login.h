@@ -51,6 +51,7 @@ public:
 	TLabel*      Welcome;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
+	TLabel*      ServerStats;
 	TLabel*      Uptime;
 	TLabel*      ListLabel;
 	TLabel*      MOTDLabel;
