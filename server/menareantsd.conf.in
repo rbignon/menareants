@@ -74,3 +74,21 @@ games {
 	# Limite maximale d'utilisateurs dans une partie.
 	deflimite = 8
 }
+
+# «ban»
+# Ajouter une section de ce type pour bannir une ip ou un pseudonyme.
+# Pour le moment, il ne supporte pas les wildcards.
+# Vous pouvez en définir plusieurs.
+#
+# ban {
+# 	# Ip du joueur
+# 	ip = 127.0.0.1
+#
+# 	# Raison
+# 	reason = We aren't allow local connexions
+# }
+#
+# ban {
+# 	nick = Progs
+# 	reason = I love you
+# }

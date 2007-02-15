@@ -245,7 +245,9 @@ public:
 private:
 
 	void OnKeyUp(SDL_keysym);
+	void OnKeyDown(SDL_keysym key);
 	void OnClic(const Point2i&, int, bool&);
+	void OnClicUp(const Point2i& mouse, int button);
 	void BeforeDraw();
 
 	EMap* map;

@@ -318,8 +318,10 @@ void EC_Client::Disconnect()
 
 	if(pl)
 	{
+		LockScreen();
 		delete pl->Channel();
 		pl = 0;
+		UnlockScreen();
 	}
 }
 

@@ -157,6 +157,10 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(*nick == '\0') return cl->exit(ERR_CMDS);
 
+	std::string reason;
+	if(app.GetConf()->IsBanned(cl->GetIp(), nick, reason))
+		return cl->exit(ERR_BANNED, reason);
+
 	if(app.FindClient(nick))
 		return cl->exit(ERR_NICK_USED);
 

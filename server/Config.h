@@ -49,6 +49,8 @@ public:
 	uint MSPort() const;
 	std::vector<std::string> Motd() const { return motd; }
 
+	bool IsBanned(const std::string& ip, const std::string& nick, std::string& reason);
+
 private:
 	std::vector<std::string> motd;
 

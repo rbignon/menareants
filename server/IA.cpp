@@ -264,7 +264,7 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_s
 
 void TIA::FirstMovements()
 {
-	if(!Player()) return;
+	if(!Player() || Player()->Lost()) return;
 
 	units.clear();
 
@@ -382,6 +382,8 @@ void TIA::FirstMovements()
 			WantMoveTo(*enti, victim->Case());
 		}
 	}
+
+	ia_send(ECPacket(MSG_SET, "+!"));
 }
 
 /********************************************************************************************
@@ -397,27 +399,8 @@ int TIA::LEACommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 		app.delclient(me);
 		return 0;
 	}
-	else
-		me->CheckIfIReady();
-	return 0;
-}
 
-void TIA::CheckIfIReady()
-{
-	if(!Player()->Ready() && Player()->Channel()->State() == EChannel::PLAYING)
-	{
-		BPlayerVector pls = Player()->Channel()->Players();
-		uint counter = 0, humans = 0;
-		for(BPlayerVector::const_iterator it = pls.begin(); it != pls.end(); ++it)
-			if(!(*it)->IsIA())
-			{
-				humans++;
-				if((*it)->Ready())
-					counter++;
-			}
-		if(counter == humans)
-			ia_send(ECPacket(MSG_SET, "!"));
-	}
+	return 0;
 }
 
 void TIA::MakeAllies()
@@ -516,18 +499,16 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 				    me->ia_send(ECPacket(MSG_SET, "+!"));
 				break;
 			case '!':
-			    /* Si on met -!, on remet l'IA prete */
-			    if(!add && !me->Player()->Ready() && me->Player()->Channel()->State() != EChannel::PLAYING)
-			    {
+				/* Si on met -!, on remet l'IA prete */
+				if(!add && !me->Player()->Ready() && !me->Player()->Lost() && me->Player()->Channel()->State() != EChannel::PLAYING)
+				{
 					for(std::vector<ECPlayer*>::iterator it=players.begin(); it != players.end(); ++it)
-					    if(*it == me->Player())
-					    {
+						if(*it == me->Player())
+						{
 							me->ia_send(ECPacket(MSG_SET, "+!"));
 							break;
 						}
 				}
-				else if(add)
-					me->CheckIfIReady();
 
 				break;
 		}

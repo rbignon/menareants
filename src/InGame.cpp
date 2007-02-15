@@ -214,9 +214,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		{
 			if(!(flags & ARM_TYPE))
 			{
-				/* Si c'est pour supprimer on s'en fou un peu à vrai dire */
-				if(!(flags & ARM_REMOVE))
-					Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Unable to find this entity and to create it.", nick.c_str(), et_name.c_str());
+				Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Unable to find this entity and to create it.", nick.c_str(), et_name.c_str());
 				continue;
 			}
 			if(!(flags & ARM_CREATE) || type >= ECEntity::E_END || type < 1)
@@ -2486,7 +2484,7 @@ TScoresPlayerLine::TScoresPlayerLine(std::string n, Color col, std::string _k, s
 	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
 {
 	size.y = 40;
-	size.x = 550;
+	size.x = 650;
 }
 
 TScoresPlayerLine::~TScoresPlayerLine()

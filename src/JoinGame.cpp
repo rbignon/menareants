@@ -656,7 +656,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						}
 					}
 					if(add && InGameForm && chan->State() == EChannel::PLAYING)
-						InGameForm->AddInfo(I_INFO, std::string((*it)->GetNick()) + " est pret.");
+						InGameForm->AddInfo(I_INFO, StringF(_("%s is ready."), (*it)->GetNick()));
 				}
 				me->UnlockScreen();
 				break;

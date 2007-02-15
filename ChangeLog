@@ -1,3 +1,13 @@
+2007-02-15 Romain Bignon <progs@headfucking.net>
+
+	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Corrections de multiples bugs (au moins 4).
+
+	* server/InGame.cpp: Début des stats.
+
+	* src/MapEditor.cpp: Support du scrolling de la map.
+
+	* server/Login.cpp, server/Config.cpp, server/menareantsd.conf.in, src/Login.cpp: Possibilité de bannir une IP ou un pseudo du serveur.
+
 2007-02-14 Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp: Correction d'un bug vicieux.

@@ -207,7 +207,7 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 		{
 			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
 			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-				if((*it)->IsCity())
+				if(!(*it)->IsZombie() && (*it)->IsCity())
 					(*it)->ChangeOwner(owner ? owner->Player() : 0);
 		}
 		if(owner && owner->Player())

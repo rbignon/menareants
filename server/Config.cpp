@@ -63,6 +63,22 @@ std::string Config::AdminPass() const { return conf->GetSection("server")->GetIt
 std::string Config::MSHost() const { return conf->GetSection("meta-server")->GetItem("host")->String(); }
 uint Config::MSPort() const { return conf->GetSection("meta-server")->GetItem("port")->Integer(); }
 
+bool Config::IsBanned(const std::string& ip, const std::string& nick, std::string& reason)
+{
+	std::vector<ConfigSection*> sections = conf->GetSectionClones("ban");
+	FOR(ConfigSection*, sections, ban)
+	{
+		std::string b_ip = ban->GetItem("ip")->String();
+		std::string b_nick = ban->GetItem("nick")->String();
+		if((b_nick == " " || !strcasecmp(b_nick.c_str(), nick.c_str())) && (b_ip == " " || b_ip == ip) && (b_ip != " " || b_nick != " "))
+		{
+			reason = ban->GetItem("reason")->String();
+			return true;
+		}
+	}
+	return false;
+}
+
 bool Config::load()
 {
 	MyConfig* save = conf;
@@ -84,6 +100,11 @@ bool Config::load()
 		section = conf->AddSection("games", "Rules of games", false);
 		section->AddItem(new ConfigItem_int("maxgames", "Maximum of games", 0));
 		section->AddItem(new ConfigItem_int("deflimite", "Maximum of users in a game", 2));
+
+		section = conf->AddSection("ban", "Ban an IP", true);
+		section->AddItem(new ConfigItem_string("ip", "IP of victim", " "));
+		section->AddItem(new ConfigItem_string("nick", "Nick of victim", " "));
+		section->AddItem(new ConfigItem_string("reason", "Reason of ban"), true);
 
 		if(!conf->Load())
 		{

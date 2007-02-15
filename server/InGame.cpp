@@ -28,8 +28,29 @@
 #include "Batiments.h"
 #include "Main.h"
 
+#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
 void EChannel::InitAnims()
 {
+#ifdef DEBUG
+	EventVector evts = Map()->Events();
+
+	for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
+	{
+		if((*evti)->Entity())
+			Debug(W_DEBUG|W_ECHO, "=== event - %s %d,%d (%s - %s) ===", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
+		              (*evti)->Case()->Y(), (*evti)->Entity()->LongName().c_str(), SHOW_EVENT((*evti)->Entity()->EventType()));
+		else
+			Debug(W_DEBUG|W_ECHO, "=== event - %s %d,%d (no sender) ===", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
+		              (*evti)->Case()->Y());
+		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
+		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		{
+			if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
+			else
+			  Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
+		}
+	}
+#endif
 	std::vector<ECEvent*> events = Map()->Events();
 	FORit(ECEvent*, events, eventit)
 	{
@@ -84,7 +105,6 @@ void EChannel::InitAnims()
 		first_playing = 0;
 }
 
-#define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
 void EChannel::NextAnim()
 {
 	assert(Map());
@@ -174,6 +194,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					entv.push_back(event->Entity());
 					event->Entity()->Tag = T_CONTINUE;
 				}
+				std::map<ECEntity*, int> ents_init_nb;
 				/* On rends zombie temporairement toutes les entités. Les vainqueurs seront délockés */
 				{
 					std::vector<ECBEntity*> case_entities = event->Entity() ?
@@ -191,6 +212,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 
 							e->SetZombie();
 							e->Tag = T_CONTINUE;
+							ents_init_nb[e] = e->RealNb();
 
 							if(e != event->Entity())
 								entv.push_back(e);
@@ -283,6 +305,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 					}
 					else
 					{
+						if(!event->Entity() && (*it)->Owner())
+							for(std::map<ECEntity*,int>::iterator en = ents_init_nb.begin(); en != ents_init_nb.end(); ++en)
+							{
+								if((*it)->Like(en->first)) continue;
+								(*it)->Owner()->Stats()->score += en->second;
+								(*it)->Owner()->Stats()->score += en->second - ents_init_nb[*it];
+							}
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
 						if(!fixed.empty() && !dynamic_cast<EContainer*>(*it))
@@ -352,6 +381,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 				ECBMove::Vector moves = event->Move()->Moves();
 				ECBCase* c = entity->Case();
 				bool end = false;
+				int score_to_add = 1;
 				FORit(ECBMove::E_Move, moves, m)
 				{
 					switch(*m)
@@ -361,6 +391,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 						case ECBMove::Left: c = c->MoveLeft(); break;
 						case ECBMove::Right: c = c->MoveRight(); break;
 					}
+					score_to_add *= 2;
 					entity->ChangeCase(c);
 					std::vector<ECBEntity*> entities = c->Entities()->List();
 					bool attaq = false, invest = false;
@@ -413,6 +444,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 						dynamic_cast<ECase*>(c)->CheckInvests(entity);
 					}
 				}
+				if(entity->Owner()) entity->Owner()->Stats()->score += score_to_add;
 				if(end)
 					break;
 
@@ -420,7 +452,6 @@ bool EChannel::ShowAnim(ECEvent* event)
 				{
 					std::vector<ECEvent*> ev;
 					ev.push_back(event);
-
 
 					if(event->Flags() == ARM_CONTAIN)
 					{
@@ -556,6 +587,9 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	if(cl->Player()->Ready())
 		return Debug(W_DESYNCH, "ARM: Played is ready !");
+
+	if(cl->Player()->Lost())
+		return Debug(W_DESYNCH, "ARM: Player has lost !");
 
 	EChannel* chan = cl->Player()->Channel();
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
@@ -798,6 +832,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				ECEvent* event = new ECEvent(ARM_UPGRADE, entity, entity->DestCase());
 				entity->Lock();
 				map->AddEvent(event);
+				entity->AddEvent(flags);
+				entity->Events()->Add(event);
 				if(entity->Owner())
 					entity->Owner()->Events()->Add(event);
 				flags |= ARM_LOCK;
@@ -856,6 +892,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				event->Move()->SetEntity(entity);
 				event->Move()->SetFirstCase(last_case);
 				map->AddEvent(event);
+				entity->AddEvent(flags);
 				if(entity->Owner())
 					entity->Owner()->Events()->Add(event);
 				entity->Events()->Add(event);
@@ -917,22 +954,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			entity->Created(true); // callback, et true veut dire que ça a été créé tout de suite
 
 	}
-#ifdef DEBUG
-	EventVector evts = map->Events();
-
-	for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
-	{
-		Debug(W_DEBUG, "=== event - %s %d,%d (%s - %s) ===", SHOW_EVENT((*evti)->Flags()), (*evti)->Case()->X(),
-		                             (*evti)->Case()->Y(), (*evti)->Entity()->LongName().c_str(), SHOW_EVENT((*evti)->Entity()->EventType()));
-		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
-		for(std::vector<ECEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		{
-			if(!(*enti)) Debug(W_DEBUG, "bizare, nul ? %p", *enti);
-			else
-			  Debug(W_DEBUG, "      - Member %s (%s)", (*enti)->LongName().c_str(), SHOW_EVENT((*enti)->EventType()));
-		}
-	}
-#endif
 
 	return 0;
 }

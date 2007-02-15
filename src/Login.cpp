@@ -116,6 +116,9 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		case ERR_NICK_USED:
 			me->SetCantConnect(StringF(_("%s is already used"), Config::GetInstance()->nick.c_str()));
 			break;
+		case ERR_BANNED:
+			me->SetCantConnect(_("You are banned from this server.\n\n") + parv[2]);
+			break;
 		case ERR_CANT_JOIN:
 			JOINED = -1;
 			ErrMessage = _("Unable to join this game. It doesn't exist anymore, or it is full, or it had started");

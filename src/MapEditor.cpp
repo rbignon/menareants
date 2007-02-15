@@ -356,6 +356,26 @@ void TMapEditor::BeforeDraw()
 	SetMustRedraw();
 }
 
+void TMapEditor::OnKeyDown(SDL_keysym key)
+{
+	switch(key.sym)
+	{
+		case SDLK_UP:
+			Map->SetPosition(Map->X(), Map->Y()+40);
+			break;
+		case SDLK_DOWN:
+			Map->SetPosition(Map->X(), Map->Y()-40);
+			break;
+		case SDLK_LEFT:
+			Map->SetPosition(Map->X()+40, Map->Y());
+			break;
+		case SDLK_RIGHT:
+			Map->SetPosition(Map->X()-40, Map->Y());
+			break;
+		default: break;
+	}
+}
+
 void TMapEditor::OnKeyUp(SDL_keysym key)
 {
 	switch(key.sym)
@@ -373,6 +393,15 @@ void TMapEditor::OnKeyUp(SDL_keysym key)
 			break;
 		}
 		default: break;
+	}
+}
+
+void TMapEditor::OnClicUp(const Point2i& mouse, int button)
+{
+	if(button == SDL_BUTTON_MIDDLE)
+	{
+		Map->MoveMap(false);
+		Map->SetMustRedraw();
 	}
 }
 
@@ -465,6 +494,12 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 	   BarreCase->Test(mouse, button) ||
 	   BarreLat->Test(mouse, button))
 		return;
+
+	if(button == SDL_BUTTON_MIDDLE && Map->Enabled())
+	{
+		Map->MoveMap(true, mouse);
+		return;
+	}
 
 	if(button == MBUTTON_LEFT)
 	{

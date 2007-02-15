@@ -1100,7 +1100,8 @@ void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 {
 	if(!e) return;
 
-	e->Case()->Entities()->Remove(e);
+	if(e->Case())
+		e->Case()->Entities()->Remove(e);
 	entities.Remove(e);
 	if(e->Owner())
 		e->Owner()->Entities()->Remove(e);
