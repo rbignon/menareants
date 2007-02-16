@@ -173,8 +173,6 @@ void TForm::Actions(SDL_Event event, uint a)
 
 void TForm::Update(bool flip)
 {
-	BeforeDraw();
-
 	if(!Message.empty())
 	{
 		TMessageBox(Message, BT_OK, this).Show();
@@ -207,6 +205,8 @@ void TForm::Update(bool flip)
 void TForm::Draw()
 {
 	int _x, _y;
+
+	BeforeDraw();
 
 	if(mutex)
 		SDL_LockMutex(mutex);

@@ -172,7 +172,7 @@ int TClient::parsemsg(const ECMessage& cmdname, const std::vector<std::string>& 
 
 	if(!cmd || (parv.size()-1) < cmd->Args())
 	{
-		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick())
+		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VCName(cmdname)
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
 		if(!IsAuth(this))
 			exit(MSG_MAJ, "-");

@@ -133,7 +133,7 @@ bool TComboBox::Clic (const Point2i& mouse, int button)
 
 	if(opened)
 		r = TListBox::Clic(mouse, button);
-	if(m_open.Test(mouse, button))
+	else if(Mouse(mouse)) // We can clic everywhere on the label and the button to open
 		SetOpened(!opened), r = true;
 	if(opened && MouseIsOnWhichItem(mouse) != -1)
 		SetOpened(false), r = true;

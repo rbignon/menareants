@@ -12,7 +12,7 @@ if [ -f "$PREFIX/$TARGET/bin/$TARGET-sdl-config" ]; then
 fi
 cache=cross-config.cache
 sh configure --cache-file="$cache" \
-	--target=$TARGET --host=$TARGET --build=i386-linux \
+	--target=$TARGET --host=$TARGET --build=i386-linux --with-gnu-ld \
 	$*
 status=$?
 rm -f "$cache"

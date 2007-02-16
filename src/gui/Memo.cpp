@@ -54,13 +54,11 @@ void TMemo::Init()
 
   nb_visible_items_max = Height()/height_item;
 
-  if(!show_background) return;
+  SDL_Rect r_back = {0,0,Width(), show_background ? Height() : height_item};
 
-  SDL_Rect r_back = {0,0,Width(), Height()};
-
-  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), Height(),
+  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), show_background ? Height() : height_item,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-  background.FillRect(r_back, background.MapColor(BoxColor));
+  background.FillRect(r_back, show_background ? background.MapColor(BoxColor) : background.MapColor(BoxShadowColor));
 
 }
 
@@ -92,13 +90,15 @@ bool TMemo::Clic (const Point2i& mouse, int button)
 
 void TMemo::Draw (const Point2i& mouse)
 {
-	if(!background.IsNull())
+	if(show_background && !background.IsNull())
 		Window()->Blit(background, position);
 
 	uint i=0;
 	for(std::vector<TLabel*>::iterator it = m_items.begin()+first_visible_item;
 	    i < nb_visible_items && it != m_items.end(); i++, ++it)
 	{
+		if(!show_background && !shadowed)
+			Window()->Blit(background, Point2i(X(), Y()+i*height_item));
 		(*it)->SetXY(X()+5, Y()+i*height_item);
 		(*it)->Draw(mouse);
 	}

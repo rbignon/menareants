@@ -54,7 +54,7 @@ public:
 /* Methodes */
 public:
 
-	bool Contain(ECBEntity*);
+	virtual bool Contain(ECBEntity*);
 	bool UnContain();
 
 /* Attributs */

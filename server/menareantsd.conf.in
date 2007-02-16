@@ -77,18 +77,22 @@ games {
 
 # «ban»
 # Ajouter une section de ce type pour bannir une ip ou un pseudonyme.
-# Pour le moment, il ne supporte pas les wildcards.
+# Vous pouvez utiliser les wildcards '?' et '*' dans les chaînes.
 # Vous pouvez en définir plusieurs.
 #
 # ban {
-# 	# Ip du joueur
-# 	ip = 127.0.0.1
+# 	# Ip du joueur (ne prends pas en compte les hostnames)
+# 	ip = 127.0.0.*
 #
 # 	# Raison
-# 	reason = We aren't allow local connexions
+# 	reason = We aren't allowing local connections
 # }
 #
 # ban {
-# 	nick = Progs
+# 	nick = Pr?gs
 # 	reason = I love you
 # }
+ban {
+	nick = AnusFertile
+	reason = The owner of this server didn't change his configuration file ! And you suck my dick pankkake
+}

@@ -517,6 +517,237 @@ struct case_img_t case_img[] = {
 	{ 'M', Resources::CaseMontain,         'M' }
 };
 
+ECase* TBarreCase::ChangeCaseType(ECase* c, case_img_t* type)
+{
+	TMapEditor *me = dynamic_cast<TMapEditor*>(Parent());
+
+	int x = c->X(), y = c->Y();
+	std::vector<ECBEntity*> entities = c->Entities()->List();
+	ECBCountry* country = c->Country();
+
+	country->RemoveCase(c);
+
+	bool selected = c->Selected();
+	delete c;
+	c = dynamic_cast<ECase*>(me->Map->Map()->CreateCase(x,y, type->type));
+	me->Map->Map()->SetCaseAttr(c, type->c);
+	c->Select(selected);
+
+	c->Image()->set(me->Map->X()+(CASE_WIDTH * c->X()), me->Map->Y()+(CASE_HEIGHT * c->Y()));
+	c->SetCountry(country);
+	country->AddCase(c);
+
+	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); entities.end() != enti; ++enti)
+		(*enti)->SetCase(c);
+
+	(*me->Map->Map())(x,y) = c;
+
+	return c;
+}
+
+void TBarreCase::CheckAroundCase(ECase* c)
+{
+	if(c->Selected() && (c->ImgID() == 'm' || c->ImgID() == 't'))
+	{
+		ECBCase *top = c->MoveUp(),
+		        *bottom = c->MoveDown(),
+		        *left = c->MoveLeft(),
+		        *right = c->MoveRight(),
+		        *tl = top->MoveLeft(),
+		        *tr = top->MoveRight(),
+		        *bl = bottom->MoveLeft(),
+		        *br = bottom->MoveRight(),
+		        *acase = tl;
+
+		for(uint i=0; i <= 2; ++i)
+		{
+			uint j=0;
+			for(; j <= 2; ++j)
+			{
+				if(!dynamic_cast<ECase*>(acase)->Selected())
+				{
+					/*
+						{ 'a', Resources::CaseBordSud,         'm' },
+						{ 'b', Resources::CaseBordNord,        'm' },
+						{ 'c', Resources::CaseBordEst,         'm' },
+						{ 'd', Resources::CaseBordOuest,       'm' },
+						{ 'e', Resources::CaseBordSudEst,      'm' },
+						{ 'f', Resources::CaseBordSudOuest,    'm' },
+						{ 'g', Resources::CaseBordNordOuest,   'm' },
+						{ 'h', Resources::CaseBordNordEst,     'm' },
+						{ 'i', Resources::CaseCoinNordOuest,   'm' },
+						{ 'j', Resources::CaseCoinNordEst,     'm' },
+						{ 'k', Resources::CaseCoinSudEst,      'm' },
+						{ 'l', Resources::CaseCoinSudOuest,    'm' },
+					*/
+					char t = 0;
+					#if 0
+					if(acase == top)
+					{
+						if(type->c == 'm')
+						{
+							if(acase->MoveUp()->TypeID() == 'm')
+								t = 'm';
+							else
+								t = 'a';
+						}
+						else
+						{
+							if(acase->MoveUp()->TypeID() == 't')
+								t = 't';
+							else
+								t = 'b';
+						}
+					}
+					else if(acase == bottom)
+					{
+						if(type->c == 'm')
+						{
+							if(acase->MoveDown()->TypeID() == 'm')
+								t = 'm';
+							else
+								t = 'b';
+						}
+						else
+						{
+							if(acase->MoveDown()->TypeID() == 't')
+								t = 't';
+							else
+								t = 'a';
+						}
+					}
+					else if(acase == left)
+					{
+						if(type->c == 'm')
+						{
+							if(acase->MoveLeft()->TypeID() == 'm')
+								t = 'm';
+							else
+								t = 'c';
+						}
+						else
+						{
+							if(acase->MoveLeft()->TypeID() == 't')
+								t = 't';
+							else
+								t = 'd';
+						}
+					}
+					else if(acase == right)
+					{
+						if(type->c == 'm')
+						{
+							if(acase->MoveRight()->TypeID() == 'm')
+								t = 'm';
+							else
+								t = 'd';
+						}
+						else
+						{
+							if(acase->MoveRight()->TypeID() == 't')
+								t = 't';
+							else
+								t = 'c';
+						}
+					}
+					else if(acase == tl)
+					{
+						if(type->c == 'm')
+						{
+							if(acase->MoveLeft()->ImgID() == 'j' || acase->MoveLeft()->ImgID() == 'a')
+								t = 'a';
+							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 't')
+								t = 'a';
+							else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveUp()->TypeID() == 'm')
+								t = 'c';
+							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 'm')
+								t = acase->MoveLeft()->MoveUp()->TypeID() == 't' ? 'e' : 'm';
+							else
+								t = 'j';
+						}
+						else
+						{
+							if(acase->MoveLeft()->ImgID() == 'g' || acase->MoveLeft()->ImgID() == 'b')
+								t = 'b';
+							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 't')
+								t = 'a';
+							else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveUp()->TypeID() == 'm')
+								t = 'c';
+							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 'm')
+								t = 'm';
+							if(acase->MoveLeft()->ImgID() == 'g' || acase->MoveLeft()->ImgID() == 'b')
+								t = 'b';
+							else if(acase->MoveLeft()->TypeID() == 't')
+								t = 't';
+							else
+								t = 'g';
+						}
+					}
+					else if(acase == tr) t = type->c == 'm' ? 'i' : 'h';
+					else if(acase == bl) t = type->c == 'm' ? 'l' : 'f';
+					else if(acase == br) t = type->c == 'm' ? 'k' : 'e';
+					#endif
+
+					if(c->ImgID() == 'm')
+					{
+						if(acase->MoveRight()->TypeID() == 't' && acase->MoveDown()->TypeID() == 't' && acase->MoveRight()->MoveDown()->TypeID() == 't')
+							t = 'k';
+						else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveDown()->TypeID() == 't' && acase->MoveLeft()->MoveDown()->TypeID() == 't')
+							t = 'l';
+						else if(acase->MoveRight()->TypeID() == 't' && acase->MoveUp()->TypeID() == 't' && acase->MoveRight()->MoveUp()->TypeID() == 't')
+							t = 'i';
+						else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveUp()->TypeID() == 't' && acase->MoveLeft()->MoveUp()->TypeID() == 't')
+							t = 'j';
+						else if(acase->MoveRight()->TypeID() == 't')
+							t = 'd';
+						else if(acase->MoveLeft()->TypeID() == 't')
+							t = 'c';
+						else if(acase->MoveUp()->TypeID() == 't')
+							t = 'a';
+						else if(acase->MoveUp()->TypeID() == 't')
+							t = 'b';
+						else if(acase->MoveUp()->MoveLeft()->TypeID() == 't')
+							t = 'e';
+						else if(acase->MoveUp()->MoveRight()->TypeID() == 't')
+							t = 'f';
+						else if(acase->MoveDown()->MoveLeft()->TypeID() == 't')
+							t = 'h';
+						else if(acase->MoveDown()->MoveRight()->TypeID() == 't')
+							t = 'g';
+					}
+
+					if(t)
+					{
+
+						case_img_t* type;
+						for(uint i = 0; i < ASIZE(case_img); ++i)
+							if(case_img[i].c == t)
+							{
+								type = &case_img[i];
+								break;
+							}
+						acase = ChangeCaseType(dynamic_cast<ECase*>(acase), type);
+					}
+				}
+
+				if(c->X() == acase->X())
+					j = 1;
+
+				if(c->X() == acase->Map()->Width()-1)
+					break;
+				acase = acase->MoveRight();
+			}
+			if(acase->Y() == c->Y())
+				i = 1;
+
+			if(acase->Y() == acase->Map()->Height()-1)
+				break;
+			acase = acase->MoveDown();
+			acase = acase->MoveLeft(j);
+		}
+	}
+}
+
 bool TBarreCaseIcons::Clic (const Point2i& mouse, int button)
 {
 	if(Mouse(mouse) == false) return false;

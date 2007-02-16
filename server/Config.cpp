@@ -70,7 +70,9 @@ bool Config::IsBanned(const std::string& ip, const std::string& nick, std::strin
 	{
 		std::string b_ip = ban->GetItem("ip")->String();
 		std::string b_nick = ban->GetItem("nick")->String();
-		if((b_nick == " " || !strcasecmp(b_nick.c_str(), nick.c_str())) && (b_ip == " " || b_ip == ip) && (b_ip != " " || b_nick != " "))
+		if((b_nick == " " || !match(b_nick.c_str(), nick.c_str())) &&
+		   (b_ip == " " || !match(b_ip.c_str(), ip.c_str())) &&
+		   (b_ip != " " || b_nick != " "))
 		{
 			reason = ban->GetItem("reason")->String();
 			return true;

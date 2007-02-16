@@ -62,7 +62,7 @@ public:
 
 	void FirstMovements();
 	void MakeAllies();
-	void WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases = 0, bool intel_search = true);
+	void WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases = 0, bool proch = false);
 
 /* Attributs */
 public:

@@ -2,11 +2,25 @@
 
 	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Corrections de multiples bugs (au moins 4).
 
-	* server/InGame.cpp: Début des stats.
+	* server/InGame.cpp: Début des scores.
 
 	* src/MapEditor.cpp: Support du scrolling de la map.
 
 	* server/Login.cpp, server/Config.cpp, server/menareantsd.conf.in, src/Login.cpp: Possibilité de bannir une IP ou un pseudo du serveur.
+
+	* src/MapEditor.cpp: Début du support de la pose de cases intelligentes (par exemple quand on met une case d'eau, tout autour y a des cases bordures).
+
+	* lib/Map.cpp: Fonction pour rechercher la case accessible la plus proche de celle recherchée.
+
+	* server/IA.cpp: Amélioration de l'IA, peut de nouveau utiliser les bateaux.
+
+	* server/Units.cpp, server/InGame.cpp: Correction de bugs concernant les conteneurs.
+
+	* server/InGame.cpp: Lorsque l'on presse la touche 'n', on obtient l'historique des messages.
+
+	* server/Config.cpp: On peut maintenant mettre des wildcards dans le mask de ban.
+
+	* configure.ac: Support de gettext dans la compilation Windows.
 
 2007-02-14 Romain Bignon <progs@headfucking.net>
 

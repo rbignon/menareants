@@ -333,6 +333,19 @@ void ECEntity::Union(ECEntity* entity)
 	/* Enfin on défini le nombre de pas restants */
 	SetRestStep(RestStep() > (entity->MyStep() - entity->RestStep()) ? RestStep() - (entity->MyStep() - entity->RestStep())
 	                                                                 : 0);
+
+	/* On récupère les evenements */
+	std::vector<ECEvent*> events = entity->Events()->List();
+	FORit(ECEvent*, events, evti)
+	{
+		Events()->Add(*evti);
+		if((*evti)->Entity() == entity)
+			(*evti)->SetEntity(this);
+		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
+		FORit(ECEntity*, ents, enti)
+			if(*enti == entity)
+				*enti = this;
+	}
 }
 
 bool ECEntity::Return()

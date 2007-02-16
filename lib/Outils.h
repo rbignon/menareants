@@ -45,6 +45,9 @@ bool is_ip(const char *ip);
 /** Formate une chaine et retourne dans une std::string */
 std::string StringF(const char* format, ...);
 
+/** Match a string with a wildcards mask */
+int match(const char *mask, const char *string);
+
 /** Mets une chaine dans un tableau de chaines */
 void SplitBuf(std::string buf, std::vector<std::string> *parv, ECMessage* cmd);
 

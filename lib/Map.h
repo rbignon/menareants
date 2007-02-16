@@ -340,6 +340,9 @@ public:
 	 */
 	bool FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& moves, ECBCase* from = 0);
 
+	/** Cherche la case accessible la plus proche */
+	ECBCase* SearchProximCase(ECBCase* dest);
+
 /* Attributs */
 public:
 

@@ -482,7 +482,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				 	if(InGameForm && InGameForm->BarreLat)
 				 	{
 				 		Resources::SoundEnd()->Play();
-				 		InGameForm->AddInfo(I_INFO, _("*** NEW TURN."));
+				 		InGameForm->AddInfo(I_INFO, _("*** END OF TURN."));
 				 		InGameForm->Map->SetEnabled(false);
 				 		InGameForm->ShowBarreLat(false);
 

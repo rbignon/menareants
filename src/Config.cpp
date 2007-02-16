@@ -238,6 +238,7 @@ void Config::WantAddServer(TObject* OkButton, void* configinst)
 	host = host + ":" + port;
 	conf->server_list.push_back(host);
 	form->ServerList->AddItem(true, host, host, black_color, true);
+	form->NewServer->ClearString();
 	return;
 }
 

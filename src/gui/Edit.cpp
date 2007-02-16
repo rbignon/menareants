@@ -113,7 +113,7 @@ void TEdit::Redraw()
 
 	if(Focused())
 	{
-		uint caret_x = font->GetWidth(substring.substr(0, caret-first_char));
+		uint caret_x = substring.empty() ? 1 : font->GetWidth(substring.substr(0, caret-first_char));
 		SLOCK(edit.Img);
 		DrawLine(edit.Img, caret_x, 1, caret_x, Height()-2, edit.MapColor(color));
 		SUNLOCK(edit.Img);

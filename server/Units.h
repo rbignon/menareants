@@ -61,6 +61,8 @@ public:
 
 	virtual void Union(ECEntity*);
 
+	virtual bool Contain(ECBEntity* entity);
+
 	void ReleaseShoot();
 };
 

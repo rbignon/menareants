@@ -314,10 +314,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 							}
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
-						if(!fixed.empty() && !dynamic_cast<EContainer*>(*it))
+						if(!fixed.empty())
 							for(fix = fixed.begin();
 							        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() ||
-							        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner());
+							        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner() ||
+							        dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
+							        dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
+							        dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(*it)->Type());
 							    ++fix);
 
 						if(fix != fixed.end() && (*it)->Move()->Empty())
@@ -487,10 +490,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 				{
 					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->List();
 					std::vector<ECBEntity*>::iterator fix = fixed.end();
-					if(!fixed.empty() && !dynamic_cast<EContainer*>(entity))
+					if(!fixed.empty())
 						for(fix = fixed.begin();
 							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() ||
-							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner());
+							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner() ||
+							dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
+							dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(entity)->Containing() &&
+							dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(entity)->Type() );
 							++fix);
 
 					if(fix != fixed.end())
@@ -905,7 +911,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 			}
 			if(flags & ARM_CONTENER && container)
-				event->Entities()->Add(container);
+				flags &= ~ARM_CONTENER; // On ne dit pas au client qu'on va débarquer, car SendArm() cherche Parent(), or on n'est pas encore
+				                        // réellement contenu.
 
 			/*if(event_found)
 				events_sended.push_back(event_found);*/

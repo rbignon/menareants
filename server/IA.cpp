@@ -25,7 +25,6 @@
 #include "Channels.h"
 #include "Debug.h"
 #include "Units.h"
-#include <sys/time.h>
 
 /********************************************************************************************
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
@@ -60,7 +59,7 @@ public:
 				uint d = 0;
 				for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
 						if(!IA()->recruted[*e] && !dynamic_cast<ECBoat*>(*e)->Containing() &&
-						   (!boat || d > unit->Case()->Delta((*e)->Case())))
+						   (!boat && unit->Case()->Delta((*e)->Case()) < 20 || d > unit->Case()->Delta((*e)->Case())))
 							boat = dynamic_cast<ECBoat*>(*e),
 							d = boat->Case()->Delta((*e)->Case());
 
@@ -132,15 +131,15 @@ public:
 									" les %d hommes", boat->Nb(), unit->Nb());
 				return false;
 			}
-			if(unit->Case()->Delta(boat->Case()) == 1)
+			if(unit->DestCase()->Delta(boat->DestCase()) == 1)
 				IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 			else
 			{
 				bool in_boat = false;
 				for(uint i = 0; i < boat->MyStep(); ++i)
 				{
-					IA()->WantMoveTo(boat, unit->Case(), 1);
-					if(unit->Case()->Delta(boat->Case()) == 1)
+					IA()->WantMoveTo(boat, unit->Case(), 1, true);
+					if(unit->DestCase()->Delta(boat->DestCase()) == 1)
 					{
 						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 						in_boat = true;
@@ -151,8 +150,8 @@ public:
 				{
 					for(uint i = 0; i < unit->MyStep(); ++i)
 					{
-						IA()->WantMoveTo(unit, boat->Case(), 0, false);
-						if(unit->Case()->Delta(boat->Case()) == 1)
+						IA()->WantMoveTo(unit, boat->DestCase(), 0, true);
+						if(unit->DestCase()->Delta(boat->DestCase()) == 1)
 						{
 							IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
 							break;
@@ -176,29 +175,31 @@ public:
 
 			for(uint i = 0; i < boat->MyStep(); ++i)
 			{
-				if(boat->Case()->Delta(victim->Case()) < 5 && boat->RestStep() > 0)
+				if(boat->RestStep() > 0 && boat->DestCase() == boat->SearchProximCase(victim->Case()))
 				{
 					unit->SetRestStep(unit->MyStep());
-					ECBCase* last_case = boat->Last() ? boat->Last()->Case() : 0;
-					if(boat->Case()->MoveLeft() != last_case && boat->Case()->X()-1 >= victim->Case()->X() &&
+
+					ECBMove::E_Move last_move = boat->Move()->Empty() ? (ECBMove::E_Move)-1 : boat->Move()->Moves().back();
+					if(last_move != ECBMove::Right && boat->DestCase()->X()-1 >= victim->Case()->X() &&
 					   !boat->WantMove(ECMove::Left, MOVE_SIMULE) &&
-					   boat->Case()->X() > 0 && boat->Case()->MoveLeft()->Flags() & C_TERRE)
-						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()))));
-					else if(boat->Case()->MoveRight() != last_case && boat->Case()->X()+1 <= victim->Case()->X() &&
+					   boat->DestCase()->X() > 0 && boat->DestCase()->MoveLeft()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->DestCase()->X()-1) + "," + TypToStr(boat->DestCase()->Y()))));
+					else if(last_move != ECBMove::Left && boat->DestCase()->X()+1 <= victim->Case()->X() &&
 					   !boat->WantMove(ECMove::Right, MOVE_SIMULE) &&
-					   boat->Case()->X() < boat->Map()->Width()-1 && boat->Case()->MoveRight()->Flags() & C_TERRE)
-						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()+1) + "," + TypToStr(boat->Case()->Y()))));
-					else if(boat->Case()->MoveUp() != last_case && boat->Case()->Y()-1 >= victim->Case()->Y() &&
+					   boat->DestCase()->X() < boat->Map()->Width()-1 && boat->DestCase()->MoveRight()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->DestCase()->X()+1) + "," + TypToStr(boat->DestCase()->Y()))));
+					else if(last_move != ECBMove::Down && boat->DestCase()->Y()-1 >= victim->Case()->Y() &&
 					   !boat->WantMove(ECMove::Up, MOVE_SIMULE) &&
-					   boat->Case()->Y() > 0 && boat->Case()->MoveUp()->Flags() & C_TERRE)
-						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()) + "," + TypToStr(boat->Case()->Y()-1))));
-					else if(boat->Case()->MoveDown() != last_case && boat->Case()->Y()+1 <= victim->Case()->Y() &&
+					   boat->DestCase()->Y() > 0 && boat->DestCase()->MoveUp()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->DestCase()->X()) + "," + TypToStr(boat->DestCase()->Y()-1))));
+					else if(last_move != ECBMove::Up && boat->DestCase()->Y()+1 <= victim->Case()->Y() &&
 					   !boat->WantMove(ECMove::Down, MOVE_SIMULE) &&
-					   boat->Case()->Y() < boat->Map()->Height()-1 && boat->Case()->MoveDown()->Flags() & C_TERRE)
-						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->Case()->X()-1) + "," + TypToStr(boat->Case()->Y()+1))));
+					   boat->DestCase()->Y() < boat->Map()->Height()-1 && boat->DestCase()->MoveDown()->Flags() & C_TERRE)
+						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(boat->ID(), "(" + TypToStr(boat->DestCase()->X()) + "," + TypToStr(boat->DestCase()->Y()+1))));
 					else
 					{
-						IA()->WantMoveTo(boat, victim->Case(), 1);
+						FDebug(W_WARNING, "On est bien sur la case d'arrivée du bateau mais on peut pas débarquer !");
+						IA()->WantMoveTo(boat, victim->Case(), 1, true);
 						continue;
 					}
 
@@ -207,7 +208,7 @@ public:
 						unit->SetNb(1000 + rand()%10 * 100);
 					return false;
 				}
-				IA()->WantMoveTo(boat, victim->Case(), 1);
+				IA()->WantMoveTo(boat, victim->Case(), 1, true);
 			}
 		}
 
@@ -221,29 +222,19 @@ public:
 #else
 #define IA_DEBUG(x)
 #endif
-void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool intel_search)
+void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool proxim)
 {
 	std::string msg;
 	std::stack<ECBMove::E_Move> moves;
 	if(!nb_cases || nb_cases > enti->RestStep())
 		nb_cases = enti->RestStep();
 
-#ifdef DEBUG
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	int burst = tv.tv_usec;
-#endif
-	if(!enti->FindFastPath(dest, moves))
+	if(!enti->FindFastPath(dest, moves, enti->DestCase()) && (!proxim || !enti->FindFastPath(enti->SearchProximCase(dest), moves, enti->DestCase())))
 	{
 		if(enti->IsInfantry() && !recruted[enti])
 			UseStrategy(new UseTransportBoat(this), enti);
 		return;
 	}
-#ifdef DEBUG
-	gettimeofday(&tv, NULL);
-	double tt = (tv.tv_usec - burst) / 1000000.0;
-	dynamic_cast<ECEntity*>(enti)->Channel()->send_info(0, EChannel::I_DEBUG, "Pour " + TypToStr(enti->Case()->Delta(dest)) + " cases, l'algorithme met: " + StringF("%.6f", tt) + "s");
-#endif
 
 	ECArgs args;
 	args += enti->ID();
@@ -533,6 +524,7 @@ void TIA::RemoveEntity(ECBEntity* e)
 
 void TIA::UseStrategy(Strategy* s, ECBEntity* e)
 {
+	if(!s->Exec()) return;
 	AddStrategy(s);
 	s->AddEntity(e);
 }

@@ -238,12 +238,33 @@ void EContainer::Union(ECEntity* entity)
 	if(!container) return;
 
 	if(!Containing())
+	{
 		Contain(container->Containing());
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_CONTENER);
+	}
 	else if(container->Containing())
 	{
 		dynamic_cast<ECEntity*>(Containing())->Union(dynamic_cast<ECEntity*>(container->Containing()));
-		dynamic_cast<ECEntity*>(container->Containing())->SetZombie();
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_REMOVE|ARM_INVEST);
+		if(Owner() && Owner()->Client())
+			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
 	}
+}
+
+bool EContainer::Contain(ECBEntity* entity)
+{
+	if(Containing())
+	{
+		Containing()->SetNb(Containing()->Nb() + entity->Nb());
+		dynamic_cast<ECEntity*>(entity)->SetZombie();
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(entity), ARM_REMOVE|ARM_INVEST);
+		if(Owner() && Owner()->Client())
+			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
+
+		return true;
+	}
+
+	return ECBContainer::Contain(entity);
 }
 
 bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)

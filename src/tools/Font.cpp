@@ -59,7 +59,7 @@ Font* Font::FONT_ARRAY[] = {NULL, NULL, NULL, NULL, NULL, NULL};
  */
 #define NEW_FONT
 
-const int Font::FONT_SIZE[] = {40, 32, 24, 14, 12, 8};
+const int Font::FONT_SIZE[] = {40, 32, 24, 14, 12, 9};
 
 Font* Font::GetInstance(int type)
 {

@@ -228,6 +228,7 @@ public:
 	TBarreAct* BarreAct;
 
 	TMemo*     Chat;
+	TMemo*     ChatHistory;
 	TEdit*     SendMessage;
 	TFPS*      FPS;
 

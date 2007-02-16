@@ -547,7 +547,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 
 	ECase* acase = Map->TestCase(Cursor->GetPosition());
 
-	if(!acase || acase->Showed() <= 0)
+	if(!acase || acase->Showed() <= 0 && Map->HaveBrouillard())
 		return W_NONE;
 
 	if(WantBalise || IsPressed(SDLK_b))
@@ -729,7 +729,12 @@ void MenAreAntsApp::InGame()
 
 void TInGameForm::BeforeDraw()
 {
-	BarreLat->ScreenPos->SetXY(
+	if(ChatHistory->Visible())
+		Map->ToRedraw(ChatHistory);
+	else
+		Map->ToRedraw(Chat);
+	if(client->Player()->Channel()->State() == EChannel::PLAYING)
+		BarreLat->ScreenPos->SetXY(
 		            BarreLat->Radar->X() -
 		              ((int)BarreLat->Radar->Width()/(int)chan->Map()->Width() *
 		               Map->X()/CASE_WIDTH),
@@ -825,6 +830,11 @@ void TInGameForm::OnKeyDown(SDL_keysym key)
 		case SDLK_RIGHT:
 			Map->SetPosition(Map->X()-40, Map->Y());
 			break;
+		case SDLK_c:
+			Map->ToRedraw(ChatHistory);
+			ChatHistory->SetVisible(true);
+			Chat->SetVisible(false);
+			break;
 		default: break;
 	}
 }
@@ -837,6 +847,13 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 		{
 			if(!SendMessage->Focused())
 				Sound::NextMusic();
+			break;
+		}
+		case SDLK_c:
+		{
+			Map->ToRedraw(ChatHistory);
+			ChatHistory->SetVisible(false);
+			Chat->SetVisible(true);
 			break;
 		}
 		case SDLK_F1:
@@ -1176,6 +1193,7 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 		timer.reset();
 
 	Chat->AddItem(line, c);
+	ChatHistory->AddItem(line, c);
 	Map->ToRedraw(Chat);
 	UnlockScreen();
 }
@@ -1231,6 +1249,11 @@ TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
 	                              SCREEN_WIDTH - BarreLat->Width() - 20 - 30,
 	                              10 * Font::GetInstance(Font::Small)->GetHeight(), 9, false));
 	Chat->SetShadowed();
+
+	ChatHistory = AddComponent(new TMemo(Font::GetInstance(Font::Small), 30, 20 + SendMessage->Height() + 20,
+	                                     SCREEN_WIDTH - BarreLat->Width() - 20 - 30,
+	                                     SCREEN_HEIGHT - BarreAct->Height() - 50 - SendMessage->Height(), 0, false));
+	ChatHistory->Hide();
 
 	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
 
@@ -1695,6 +1718,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->DeployButton->Hide();
 			InGameForm->BarreAct->UpButton->Hide();
 			InGameForm->BarreAct->UpgradeButton->Hide();
+			InGameForm->BarreAct->GiveButton->Hide();
 		}
 
 		EContainer* container = dynamic_cast<EContainer*>(e);

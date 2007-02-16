@@ -149,6 +149,9 @@ public:
 public:
 	void Update(ECase* = 0);
 
+	ECase* ChangeCaseType(ECase*, case_img_t*);
+	void CheckAroundCase(ECase* c);
+
 	void Init();
 
 	void UnSelect(bool update = true);

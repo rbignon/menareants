@@ -32,7 +32,7 @@ ECBContainer::~ECBContainer()
 
 bool ECBContainer::Contain(ECBEntity* entity)
 {
-	if(!entity || Containing())
+	if(!entity)
 		return false;
 
 	entity->ChangeCase(0);

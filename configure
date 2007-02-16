@@ -6941,7 +6941,7 @@ fi
 
 # WIN32
 if test "${WIN32}" = "yes"; then
-	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
+	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm -lintl"
 #	LIBS="$LIBS -lSDL_gfx -lSDL_ttf -lwsock32 -lSDL_image -lSDL_mixer -lwinmm"
 fi
 

@@ -650,23 +650,10 @@ void TBarreCaseIcons::SelectCase(TObject* o, void* e)
 	case_img_t* ci = static_cast<case_img_t*>(e);
 	std::vector<ECase*> cases = bc->Cases();
 	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
-	{
-		int x = (*it)->X(), y = (*it)->Y();
-		std::vector<ECBEntity*> entities = (*it)->Entities()->List();
-		ECBCountry* country = (*it)->Country();
-		country->RemoveCase(*it);
-		delete *it;
-		*it = dynamic_cast<ECase*>(me->Map->Map()->CreateCase(x,y, ci->type));
-		me->Map->Map()->SetCaseAttr(*it, ci->c);
-		(*it)->Image()->set(me->Map->X()+(CASE_WIDTH  * (*it)->X()),
-		                    me->Map->Y()+(CASE_HEIGHT * (*it)->Y()));
-		(*it)->SetCountry(country);
-		country->AddCase(*it);
-		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); entities.end() != enti; ++enti)
-			(*enti)->SetCase(*it);
-		(*me->Map->Map())(x,y) = *it;
-		(*it)->Select();
-	}
+		*it = bc->ChangeCaseType(*it, ci);
+
+	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
+		bc->CheckAroundCase(*it);
 
 	me->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 }

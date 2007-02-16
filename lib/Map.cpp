@@ -418,6 +418,23 @@ std::string ECBEntity::LongName() const
 	return std::string(Owner() ? Owner()->GetNick() : "*") + "!" + ID();
 }
 
+ECBCase* ECBEntity::SearchProximCase(ECBCase* dest)
+{
+	uint d = 0;
+	ECBCase *c = 0;
+	std::vector<ECBCase*> map = dest->Map()->Cases();
+	FORit(ECBCase*, map, it)
+	{
+		if(!CanWalkOn(*it)) continue;
+		if(!d || dest->Delta(*it) < d)
+		{
+			d = dest->Delta(*it);
+			c = *it;
+		}
+	}
+	return c;
+}
+
 /********************************************************************************************
  *                               ECBFindFastPath                                            *
  ********************************************************************************************/

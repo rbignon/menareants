@@ -349,8 +349,13 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	struct timeval timeout;
 	memset(&timeout, 0, sizeof(timeout));
 	timeout.tv_sec = 5; // 5seconds timeout
+#ifdef WIN32
+	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+	setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, sizeof(timeout));
+#else
 	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 	setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+#endif
 
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_addr.s_addr = inet_addr(stringtok(host, ":").c_str());
