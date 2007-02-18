@@ -133,6 +133,7 @@ public:
 	 */
 	virtual bool Test (const Point2i& pos, int button = 1) const { return (Mouse(pos) && Enabled() && button == 1); }
 	virtual bool Clic (const Point2i& pos, int button) { return Test(pos, button); }
+	virtual void ClicUp (const Point2i& pos, int button) {}
 
 	/** Called when user press a key... */
 	virtual void PressKey(SDL_keysym) { return; }
@@ -279,6 +280,8 @@ public:
 	void Init() {}
 
 	virtual bool Clic (const Point2i&, int button);
+
+	virtual void ClicUp (const Point2i&, int button);
 
 	virtual void DelFocus();
 

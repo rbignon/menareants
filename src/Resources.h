@@ -143,10 +143,6 @@ public:
 	R_RESOURCE(ECSpriteBase, DownButton);
 	R_RESOURCE(ECSpriteBase, NormalButton);
 	R_RESOURCE(ECSpriteBase, LitleButton);
-	R_RESOURCE(ECSpriteBase, PlayButton);
-	R_RESOURCE(ECSpriteBase, OptionsButton);
-	R_RESOURCE(ECSpriteBase, CreditsButton);
-	R_RESOURCE(ECSpriteBase, QuitterButton);
 	R_RESOURCE(ECSpriteBase, MissionButton);
 	R_RESOURCE(ECSpriteBase, EscarmoucheButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);

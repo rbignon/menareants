@@ -671,7 +671,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		parv[1] = parv[1].substr(0,GAMELEN);
 
 	for(ChannelVector::iterator it=ChanList.begin(); it != ChanList.end(); ++it)
-		if(!strcasecmp((*it)->GetName(), parv[1].c_str()))
+		if((*it)->State() != EChannel::SCORING && !strcasecmp((*it)->GetName(), parv[1].c_str()))
 		{
 			chan = *it;
 			break;
@@ -1308,7 +1308,6 @@ bool EChannel::CheckEndOfGame()
 	}
 
 	SetState(EChannel::SCORING);
-	SetName(".");
 	sendto_players(0, app.ServerName(), MSG_SET, "-A+E");
 	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 	{

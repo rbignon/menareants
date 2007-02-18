@@ -37,25 +37,16 @@ MapVector MissionList;
 
 bool ECMap::LoadMaps()
 {
-	std::ifstream fp(MAP_FILE);
+	std::vector<std::string> maps = GetFileList(PKGDATADIR, "map");
 
-	if(!fp)
-	{
-		if(!(app.HasFlag(ECServer::F_SILENT)))
-			Debug(W_ERR|W_ECHO, "Unable to load map list files: %s", MAP_FILE);
-		return false;
-	}
-
-	std::string ligne;
 	uint nbmaps = 0, nbmissions = 0;
 
-	while(std::getline(fp, ligne))
+	for(std::vector<std::string>::reverse_iterator ligne = maps.rbegin(); ligne != maps.rend(); ++ligne)
 	{
-		if(ligne[0] == '#' || ligne[0] == '\0') continue;
 		ECMap *map = 0;
 		try
 		{
-			map = new ECMap(std::string(PKGDATADIR + ligne));
+			map = new ECMap(std::string(PKGDATADIR + *ligne));
 			map->Init();
 		}
 		catch(TECExcept &e)
@@ -63,7 +54,7 @@ bool ECMap::LoadMaps()
 			delete map;
 			if(!(app.HasFlag(ECServer::F_SILENT)))
 			{
-				Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne.c_str());
+				Debug(W_ERR|W_ECHO, "Unable to load this map file : %s", ligne->c_str());
 				vDebug(W_ERR|W_ECHO, e.Message(), e.Vars());
 			}
 			continue;

@@ -1,3 +1,18 @@
+2007-02-17 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/ListBox.cpp: Scrollbar fonctionnelle.
+
+	* server/Channels.cpp: Les salons ne sont plus renommés en "." lors d'une fin de partie (+E scoring).
+
+2007-02-16 Romain Bignon <progs@headfucking.net>
+
+	* server/Map.cpp, server/maps/maps.list: Le fichier maps.list n'est desormais plus utilisé, on cherche simplement tous les *.map nous même.
+
+	* server/maps/Conquer.map: Cette carte 4 joueurs se joue 3 contre 1. Un des joueurs est embusqué sur une île, nommé le "Chateau" où il a un revenu confortable.
+	Le but des trois autres joueurs est d'attaquer et de conquérir le château. Il est à noter que sur cette carte le revenu est assez large.
+
+	* src/data/anims/*button, src/Resources.cpp, src/Main.cpp: Utilisation de boutons normaux pour le menu.
+
 2007-02-15 Romain Bignon <progs@headfucking.net>
 
 	* server/InGame.cpp, server/Map.cpp, server/Channels.cpp: Corrections de multiples bugs (au moins 4).

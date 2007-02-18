@@ -88,10 +88,10 @@ public:
 /* Composants */
 public:
 
-	TButton*    PlayButton;
-	TButton*    OptionsButton;
-	TButton*    CreditsButton;
-	TButton*    QuitterButton;
+	TButtonText* PlayButton;
+	TButtonText* OptionsButton;
+	TButtonText* CreditsButton;
+	TButtonText* QuitterButton;
 	TButtonText* MapEditorButton;
 	TLabel*     Version;
 	TFPS*       FPS;
@@ -302,23 +302,15 @@ void TMainForm::SetRelativePositions()
 TMainForm::TMainForm(ECImage* w)
 	: TForm(w)
 {
-	PlayButton = AddComponent(new TButton(300,150, 150,50));
-	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), Video::GetInstance()->Window()));
+	PlayButton = AddComponent(new TButtonText(300,150, 150,50, _("Play"), Font::GetInstance(Font::Normal)));
 
-	OptionsButton = AddComponent(new TButton(300,230, 150,50));
-	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), Video::GetInstance()->Window()));
+	OptionsButton = AddComponent(new TButtonText(300,230, 150,50, _("Options"), Font::GetInstance(Font::Normal)));
 
 	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, _("Map Editor"), Font::GetInstance(Font::Normal)));
-	/** \todo utiliser une image bouton comme pour les autres
-	 MapEditorButton = AddComponent(new TButton(300,310, 150,50));
-	 MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), app.sdlwindow));
-	 */
 
-	CreditsButton = AddComponent(new TButton(300,390, 150,50));
-	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), Video::GetInstance()->Window()));
+	CreditsButton = AddComponent(new TButtonText(300,390, 150,50, _("Credits"), Font::GetInstance(Font::Normal)));
 
-	QuitterButton = AddComponent(new TButton(300,470, 150,50));
-	QuitterButton->SetImage(new ECSprite(Resources::QuitterButton(), Video::GetInstance()->Window()));
+	QuitterButton = AddComponent(new TButtonText(300,470, 150,50, _("Exit"), Font::GetInstance(Font::Normal)));
 
 	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_CLIENT_VERSION, white_color, Font::GetInstance(Font::Big)));
 
@@ -395,6 +387,7 @@ TCredits::TCredits(ECImage* w)
 	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
+	Memo->SetShadowed();
 	Memo->AddItem("Merci au lycée Corneille pour nous avoir mis dans le contexte emmerdant qui "
 	              "nous a permis de trouver des idées \"amusantes\" pour passer le temps et qui "
 	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "

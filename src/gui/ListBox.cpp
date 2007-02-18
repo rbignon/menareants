@@ -75,7 +75,7 @@ const std::string& TListBoxItem::Name() const
 // };
 
 TListBox::TListBox (const Rectanglei &rect, bool always_one_selected_b)
-	: TComponent(rect), no_item_hint(false), box_color(BoxColor), on_change(0), gray_disable(true)
+	: TComponent(rect), no_item_hint(false), scrolling(false), box_color(BoxColor), on_change(0), gray_disable(true)
 {
 	first_visible_item = 0;
 	selected_item = -1;
@@ -112,6 +112,11 @@ int TListBox::MouseIsOnWhichItem(const Point2i &mousePosition) const
 	return -1;
 }
 
+void TListBox::ClicUp (const Point2i& pos, int button)
+{
+	scrolling = false;
+}
+
 bool TListBox::Clic(const Point2i &mousePosition, int button)
 {
 	if(!Enabled() || !Mouse(mousePosition)) return false;
@@ -119,8 +124,11 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 	if (m_items.empty())
 		return false;
 
+	if(button == SDL_BUTTON_LEFT && ScrollBarPos().Contains(mousePosition))
+		scrolling = true;
+
 	// buttons for listbox with more items than visible (first or last item not visible)
-	if(first_visible_item > 0 || m_items.back()->Y() + m_items.back()->Height() > Y() + Height())
+	if(first_visible_item > 0 && first_visible_item+1 < m_items.size()/*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/)
 	{
 		if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT && m_down.Mouse(mousePosition))
 		{
@@ -169,6 +177,11 @@ void TListBox::Draw(const Point2i &mousePosition)
 	// Draw border and bg color
 	Window()->BoxColor(rect, box_color);
 	//Window()->RectangleColor(rect, white_color);
+
+	if(scrolling && mousePosition.y < Y() + Height() - 12 && mousePosition.y > Y() + 12)
+	{
+		first_visible_item = (mousePosition.y - Y() - 10) * m_items.size() / (Height()-20);
+	}
 
 	// Draw items
 	Point2i pos = GetPosition() + Point2i(5, 0);
@@ -219,14 +232,20 @@ void TListBox::Draw(const Point2i &mousePosition)
 		m_up.Draw(mousePosition);
 		m_down.Draw(mousePosition);
 #ifdef SCROLLBAR
-		uint tmp_y, tmp_h;
-		tmp_y = Y()+10+ first_visible_item* (Height()-20) / m_items.size();
-		tmp_h = /*nb_visible_items_max * */(Height()-20) / m_items.size();
-		if (tmp_h < 5) tmp_h =5;
-
-		Window()->BoxColor(Rectanglei(X()+Width()-10, tmp_y, 5,  /*tmp_y+*/tmp_h), white_color);
+		Rectanglei scrollbar = ScrollBarPos();
+		Window()->BoxColor(scrollbar, (scrolling || scrollbar.Contains(mousePosition)) ? white_color : gray_color);
 #endif
 	}
+}
+
+Rectanglei TListBox::ScrollBarPos() const
+{
+	uint tmp_y, tmp_h;
+	tmp_y = Y()+10+ first_visible_item* (Height()-20) / m_items.size();
+	tmp_h = /*nb_visible_items_max * */(Height()-20) / m_items.size();
+	if (tmp_h < 5) tmp_h =5;
+
+	return Rectanglei(X()+Width()-11, tmp_y, 9,  /*tmp_y+*/tmp_h);
 }
 
 TListBoxItem* TListBox::AddItem (bool selected,
@@ -263,17 +282,14 @@ void TListBox::Sort()
 void TListBox::ScrollTo(TListBoxItem* item)
 {
 	uint i = 0;
-	for(std::vector<TListBoxItem*>::const_iterator it = m_items.begin(); it != m_items.end() && *it != item; ++it);
-
-	if(i >= m_items.size()) return;
-
+	for(std::vector<TListBoxItem*>::const_iterator it = m_items.begin(); it != m_items.end() && *it != item; ++it) i++;
 	ScrollTo(i);
 }
 
 /* TODO améliorer ce code moche */
 void TListBox::ScrollTo(uint id)
 {
-	if(id == first_visible_item)
+	if(id == first_visible_item || id >= m_items.size())
 		return;
 	else if(id > first_visible_item)
 		while(1)

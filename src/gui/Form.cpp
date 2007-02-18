@@ -135,7 +135,14 @@ void TForm::Actions(SDL_Event event, uint a)
 		}
 		case SDL_MOUSEBUTTONUP:
 		{
-			OnClicUp(Point2i(event.button.x, event.button.y), event.button.button);
+			if(a & ACTION_NOMOUSE) break;
+			Point2i mouse(event.button.x, event.button.y);
+
+			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+				if((*it)->Visible() && !(a & ACTION_NOCLIC))
+					(*it)->ClicUp(mouse, event.button.button);
+
+			OnClicUp(mouse, event.button.button);
 			SetMustRedraw();
 			break;
 		}

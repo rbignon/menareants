@@ -123,6 +123,14 @@ bool TList::Clic (const Point2i& pos, int button)
 	return click;
 }
 
+void TList::ClicUp (const Point2i& pos, int button)
+{
+	for(std::vector<TComponent*>::iterator it = list.begin(); it != list.end(); ++it)
+		(*it)->ClicUp(pos, button);
+
+	return;
+}
+
 void TList::DelFocus()
 {
 	TComponent::DelFocus();

@@ -50,6 +50,8 @@ public:
 
 	virtual bool Clic(const Point2i&, int button);
 
+	virtual void ClicUp(const Point2i&, int button);
+
 	void Clear();
 
 /* Attributs */

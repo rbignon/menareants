@@ -108,10 +108,6 @@
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
 	R_RESOURCE(ECSpriteBase, NormalButton,     "normalbutton");
 	R_RESOURCE(ECSpriteBase, LitleButton,      "litlebutton");
-	R_RESOURCE(ECSpriteBase, PlayButton,       "playbutton");
-	R_RESOURCE(ECSpriteBase, OptionsButton,    "optionsbutton");
-	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
-	R_RESOURCE(ECSpriteBase, QuitterButton,    "quitterbutton");
 	R_RESOURCE(ECSpriteBase, MissionButton,    "missionbutton");
 	R_RESOURCE(ECSpriteBase, EscarmoucheButton,"escarmouchebutton");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");

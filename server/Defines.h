@@ -48,9 +48,6 @@ const int COMLEN=10;
 #define CONFIG_FILE "/etc/menareantsd.conf"
 #endif
 
-/* File of maplist */
-#define MAP_FILE PKGDATADIR "maps.list"
-
 /*********************************************************************************************
  *           Il n'est pas nécessaire d'éditer la suite                                       *
  *********************************************************************************************/

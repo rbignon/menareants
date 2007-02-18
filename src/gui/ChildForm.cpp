@@ -44,6 +44,15 @@ void TChildForm::PressKey(SDL_keysym k)
 		(*it)->PressKey(k);
 }
 
+void TChildForm::ClicUp(const Point2i& mouse, int button)
+{
+	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
+		if((*it)->Visible())
+			(*it)->ClicUp(mouse, button);
+
+	return;
+}
+
 bool TChildForm::Clic(const Point2i& mouse, int _button)
 {
 	if(!Test(mouse)) return false;

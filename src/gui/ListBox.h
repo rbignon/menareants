@@ -84,6 +84,8 @@ public:
 
 	bool Clic(const Point2i &mousePosition, int button);
 
+	void ClicUp (const Point2i& pos, int button);
+
 	TListBoxItem* AddItem(bool selected, const std::string &label,
 	                      const std::string &value,
 	                      const Color& color = white_color, bool enabled = true,
@@ -135,10 +137,14 @@ public:
 
 	void SetGrayDisable(bool b  = true) { gray_disable = b; }
 
+	Rectanglei ScrollBarPos() const;
+
 /* Variables privées */
 private:
 	bool always_one_selected;
 	bool no_item_hint;
+	bool scrolling;
+	Point2i scroll_point;
 
 protected:
 	// what are the items ?

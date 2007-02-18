@@ -547,6 +547,8 @@ ECase* TBarreCase::ChangeCaseType(ECase* c, case_img_t* type)
 
 void TBarreCase::CheckAroundCase(ECase* c)
 {
+#undef INTELLIGENT_EDITOR
+#ifdef INTELLIGENT_EDITOR
 	if(c->Selected() && (c->ImgID() == 'm' || c->ImgID() == 't'))
 	{
 		ECBCase *top = c->MoveUp(),
@@ -746,6 +748,7 @@ void TBarreCase::CheckAroundCase(ECase* c)
 			acase = acase->MoveLeft(j);
 		}
 	}
+#endif
 }
 
 bool TBarreCaseIcons::Clic (const Point2i& mouse, int button)
