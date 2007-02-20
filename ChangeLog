@@ -1,3 +1,23 @@
+2007-02-20 Romain Bignon <progs@headfucking.net>
+
+	* server/Map.cpp (ECEntity::CancelEvents): Supprime maintenant les evenements des unités liés aux evenements supprimés.
+
+	* server/IA.cpp: Corrections sur l'utilisation des bateaux, créée sur les capitales et les megalopoles, favorise la création sur les villes du front.
+
+	* src/gui/Form.cpp: Prise en compte (enfin!) de l'attribut AlwaysRedraw() des TComponent.
+
+	* src/gui/FPS.cpp: Hérite maintenant de TLabel plutôt que de l'avoir dans ses membres.
+
+	* src/InGame.cpp: Correction d'un crash possible lors d'une création d'unité (mutex).
+
+	* server/InGame.cpp: Correction de trois bugs :
+	- Lorsqu'une unité sortait d'un conteneur et allait directement investir un batiment, il n'y avait pas de ARM_UNCONTENER envoyé, donc l'unité restait invisible
+	- L'évenement n'était pas supprimé de la liste des evenements des unités liées.
+	- Lorsqu'un évenement pour entrer dans un conteneur était précédé d'un mouvement, l'évenement ne se faisait pas.
+
+	* server/Map.cpp (ECEntity::CancelEvents): Supprime également les évenements des unités liées par les evenements supprimés.
+
+
 2007-02-17 Romain Bignon <progs@headfucking.net>
 
 	* src/gui/ListBox.cpp: Scrollbar fonctionnelle.

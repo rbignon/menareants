@@ -254,7 +254,7 @@ int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(ConnectedForm)
 	{
-		ConnectedForm->Uptime->SetCaption(StringF(_("This server is running from %s."), duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
+		ConnectedForm->Uptime->SetCaption(StringF(_("This server is running from %s"), duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
 		ConnectedForm->UserStats->SetCaption(StringF(_("There are %s users, with %s total connections and %s played games"),
 		                                               parv[1].c_str(), parv[2].c_str(), parv[6].c_str()));
 		ConnectedForm->ChanStats->SetCaption(StringF(_("There are %s game(s), with %s in game and %s in preparation."),

@@ -1581,13 +1581,13 @@ void TPlayerLine::SetXY (int px, int py)
 {
 	TComponent::SetXY(px, py);
 
-	if(position) position->SetXY(px+230, py);
-	if(couleur) couleur->SetXY(px+340, py);
-	if(nation) nation->SetXY(px+440, py);
+	if(position) position->SetXY(px+240, py);
+	if(couleur) couleur->SetXY(px+360, py);
+	if(nation) nation->SetXY(px+445, py);
 
 	if(Ready) Ready->SetXY(px, py);
-	if(Status) Status->SetXY(px+75, py);
-	if(Nick) Nick->SetXY(px+95, py);
+	if(Status) Status->SetXY(px+85, py);
+	if(Nick) Nick->SetXY(px+105, py);
 }
 
 bool TPlayerLine::OwnZone(const Point2i& mouse, int button)

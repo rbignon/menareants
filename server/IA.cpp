@@ -80,13 +80,18 @@ public:
 				{ /* Le joueur n'a pas de chantier naval, on en construit un */
 					ECBCase* cc = 0;
 					d = 0;
-					BCountriesVector countries = IA()->Player()->MapPlayer()->Countries();
-					for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
+					BPlayerVector allies = IA()->Player()->Allies();
+					allies.push_back(IA()->Player());
+					FORit(ECBPlayer*, allies, allie)
 					{
-						std::vector<ECBCase*> cases = (*cty)->Cases();
-						for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
-							if(((*c)->Flags() & C_MER) && (!cc || d > unit->Case()->Delta(*c)))
-								cc = *c, d = unit->Case()->Delta(*c);
+						BCountriesVector countries = (*allie)->MapPlayer()->Countries();
+						for(BCountriesVector::iterator cty = countries.begin(); cty != countries.end(); ++cty)
+						{
+							std::vector<ECBCase*> cases = (*cty)->Cases();
+							for(std::vector<ECBCase*>::iterator c = cases.begin(); c != cases.end(); ++c)
+								if(((*c)->Flags() & C_MER) && (!cc || d > unit->Case()->Delta(*c)))
+									cc = *c, d = unit->Case()->Delta(*c);
+						}
 					}
 					// Semblerait qu'il n'y ait pas de mer dans nos countries
 					if(!cc || d > 8)
@@ -138,7 +143,7 @@ public:
 				bool in_boat = false;
 				for(uint i = 0; i < boat->MyStep(); ++i)
 				{
-					IA()->WantMoveTo(boat, unit->Case(), 1, true);
+					IA()->WantMoveTo(boat, unit->DestCase(), 1, true);
 					if(unit->DestCase()->Delta(boat->DestCase()) == 1)
 					{
 						IA()->ia_send(ECPacket(MSG_ARM, ECArgs(unit->ID(), std::string(")") + boat->ID())));
@@ -229,10 +234,19 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool proxim)
 	if(!nb_cases || nb_cases > enti->RestStep())
 		nb_cases = enti->RestStep();
 
+	if(!nb_cases)
+		return;
+
 	if(!enti->FindFastPath(dest, moves, enti->DestCase()) && (!proxim || !enti->FindFastPath(enti->SearchProximCase(dest), moves, enti->DestCase())))
 	{
 		if(enti->IsInfantry() && !recruted[enti])
 			UseStrategy(new UseTransportBoat(this), enti);
+		return;
+	}
+
+	if(moves.empty())
+	{
+		Debug(W_WARNING, "TIA::WantMoveTo(): FindFastPath returns true but an empty movements list !?");
 		return;
 	}
 
@@ -284,7 +298,7 @@ void TIA::FirstMovements()
 			switch((*enti)->Type())
 			{
 				case ECEntity::E_CASERNE:
-					switch(rand()%15)
+					switch(rand()%8)
 					{
 						case 0:
 						case 1:
@@ -308,19 +322,41 @@ void TIA::FirstMovements()
 						case 6: t = ECEntity::E_MISSILAUNCHER; break;
 					}
 					break;
+				case ECEntity::E_MEGALOPOLE:
+					t = ECEntity::E_CHAR;
+					break;
+				case ECEntity::E_CAPITALE:
+					t = ECEntity::E_ARMY;
+					break;
 				default:
 					t = rand()%ECEntity::E_END;
 					break;
 			}
 			if(t)
 			{
-				ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
-				                                 "+", "%" + TypToStr(t))));
-				/* HACK pour que les armées ne soient pas de 100 */
-				if(t == ECEntity::E_ARMY)
-					for(int j = 12; j >= 0; --j)
-						ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
-				                                                 "+", "%" + TypToStr(t))));
+				/* On calcule la distance entre le batiment et l'unité enemie la plus proche, dans le but de construire
+				 * le plus possible près du front.
+				 */
+				uint d = uint(-1);
+				std::vector<ECBEntity*> all_entities = (*enti)->Map()->Entities()->List();
+				FORit(ECBEntity*, all_entities, e)
+					if(!(*e)->IsHidden() && !(*e)->IsTerrain() && !(*enti)->Like(*e) &&
+					   d > (*enti)->Case()->Delta((*e)->Case()))
+						d = (*enti)->Case()->Delta((*e)->Case());
+
+				if(d == 0 || (rand()%d) < 5)
+				{ /* Soit d == 0 (dans ce cas là on a l'unité enemie sur notre case), soit on ne construie que
+				   * si rand() modulo (d) est nul.
+				   */
+
+					ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
+					                                 "+", "%" + TypToStr(t))));
+					/* HACK pour que les armées ne soient pas de 100 */
+					if(t == ECEntity::E_ARMY)
+						for(int j = 12; j >= 0; --j)
+							ia_send(ECPacket(MSG_ARM, ECArgs("-", "=" + TypToStr((*enti)->Case()->X()) + "," + TypToStr((*enti)->Case()->Y()),
+							                                 "+", "%" + TypToStr(t))));
+				}
 			}
 		}
 		if((*enti)->Owner() != Player())
@@ -524,9 +560,9 @@ void TIA::RemoveEntity(ECBEntity* e)
 
 void TIA::UseStrategy(Strategy* s, ECBEntity* e)
 {
+	s->AddEntity(e);
 	if(!s->Exec()) return;
 	AddStrategy(s);
-	s->AddEntity(e);
 }
 
 bool TIA::RemoveStrategy(Strategy* _s, bool use_delete)

@@ -29,7 +29,7 @@
 const uint TFPS::MIN_NB_VALUES = 4;
 
 TFPS::TFPS(int x, int y, Font* f)
-	: TComponent(x, y), text(x, y, "", white_color, f)
+	: TLabel(x, y, "", white_color, f)
 {
   display = true;
   average = -1;
@@ -47,7 +47,7 @@ TFPS::TFPS(int x, int y, Font* f)
 
 void TFPS::Init()
 {
-	MyComponent(&text);
+	TLabel::Init();
 	Reset();
 }
 
@@ -107,7 +107,6 @@ void TFPS::Draw(const Point2i& mouse)
 
 	snprintf(buffer, sizeof(buffer)-1, "%.1f", average);
 	buffer[sizeof(buffer)-1] = '\0';
-	text.SetCaption(std::string(buffer) + " fps");
-	text.Draw(mouse);
-	size.x = text.Width();
+	SetCaption(std::string(buffer) + " fps");
+	TLabel::Draw(mouse);
 }

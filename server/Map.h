@@ -95,7 +95,7 @@ public:
 	virtual void ReleaseShoot();
 
 	/** Cancel all events and send a message to client */
-	void CancelEvents();
+	void CancelEvents(bool send_message = false);
 
 	/** This function return a vector of entities who will be attaqued by me if I want to attaq this case
 	 * @param c attaqued case

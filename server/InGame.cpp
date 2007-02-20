@@ -431,13 +431,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 					}
 					else if(invest)
 					{
-						ECEvent* invest_event = new ECEvent(ARM_MOVE, entity, c);
+						ECEvent* invest_event = new ECEvent(event->Flags(), entity, c);
 						invest_event->Move()->SetEntity(entity);
 						invest_event->Move()->SetFirstCase(event->Move()->FirstCase());
 						invest_event->Move()->SetMoves(event->Move()->Moves());
 						invest_event->Move()->Return(c);
 
-						SendArm(NULL, entity, ARM_MOVE, event->Case()->X(), event->Case()->Y(), 0, ToVec(invest_event));
+						SendArm(NULL, entity, event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ToVec(invest_event));
 
 						MyFree(invest_event);
 
@@ -549,7 +549,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 		if(event->Entity()->Owner())
 			event->Entity()->Owner()->Events()->Remove(event);
 	}
-	std::vector<ECEntity*> ents;
+	std::vector<ECEntity*> ents = event->Entities()->List();
 	FORit(ECEntity*, ents, it)
 		(*it)->Events()->Remove(event);
 	Map()->RemoveEvent(event, USE_DELETE);
@@ -592,10 +592,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		              VPName(cl->Player()));
 
 	if(cl->Player()->Ready())
-		return Debug(W_DESYNCH, "ARM: Played is ready !");
+		return Debug(W_DESYNCH, "ARM: Player %s is ready!", cl->GetNick());
 
 	if(cl->Player()->Lost())
-		return Debug(W_DESYNCH, "ARM: Player has lost !");
+		return Debug(W_DESYNCH, "ARM: Player %s has lost!", cl->GetNick());
 
 	EChannel* chan = cl->Player()->Channel();
 	ECMap *map = dynamic_cast<ECMap*>(chan->Map());
@@ -606,9 +606,13 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	{
 		entity = dynamic_cast<ECEntity*>(cl->Player()->Entities()->Find(parv[1].c_str()));
 
-		if(!entity || entity->IsZombie() || entity->Locked())
-			return vDebug(W_DESYNCH, "ARM: Unable to find entity", VPName(entity) VName(parv[1])
-			                          VBName(entity ? entity->IsZombie() : false) VIName(entity ? entity->Type() : 0));
+		if(!entity)
+			return vDebug(W_DESYNCH, "ARM: Unable to find entity", VPName(entity) VName(parv[0]) VName(parv[1]));
+
+		if(entity->IsZombie() || entity->Locked())
+			return vDebug(W_DESYNCH, "ARM: We can move this entity!", VPName(entity) VName(parv[0]) VName(parv[1])
+			                          VBName(entity->IsZombie()) VIName(entity->Type()) VBName(entity->Locked())
+			                          VPName(entity->Parent()));
 	}
 
 	uint y = 0, x = 0, type = 0, nb = 0;
@@ -902,17 +906,18 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				if(entity->Owner())
 					entity->Owner()->Events()->Add(event);
 				entity->Events()->Add(event);
-				if(container)
-				{ /* On ajoute l'evenement au conteneur histoire qu'il y ait quelque chose
-				   * séparant son dernier mouvement et un éventuel nouveau mouvement.
-				   */
-					event->Entities()->Add(container);
-					container->Events()->Add(event);
-				}
+
 			}
-			if(flags & ARM_CONTENER && container)
+			if(container)
+			{
+				/* On ajoute l'evenement au conteneur histoire qu'il y ait quelque chose
+				 * séparant son dernier mouvement et un éventuel nouveau mouvement.
+				 */
+				event->Entities()->Add(container);
+				container->Events()->Add(event);
 				flags &= ~ARM_CONTENER; // On ne dit pas au client qu'on va débarquer, car SendArm() cherche Parent(), or on n'est pas encore
 				                        // réellement contenu.
+			}
 
 			/*if(event_found)
 				events_sended.push_back(event_found);*/

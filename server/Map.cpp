@@ -377,12 +377,30 @@ std::nrvector<TClient*> ECEntity::EntitiesToClients(std::vector<ECEntity*> entit
 	return players;
 }
 
-void ECEntity::CancelEvents()
+void ECEntity::CancelEvents(bool send_message)
 {
 	ECMap* map = dynamic_cast<ECMap*>(Map());
 	EventVector events = Events()->List();
+	std::vector<ECEntity*> entities;
 	for(EventVector::iterator evti = events.begin(); evti != events.end(); ++evti)
 	{
+		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
+		if((*evti)->Entity() != this)
+		{
+			(*evti)->Entity()->Events()->Remove(*evti);
+			if((*evti)->Entity()->Owner())
+				(*evti)->Entity()->Owner()->Events()->Remove(*evti);
+			entities.push_back((*evti)->Entity());
+		}
+		FORit(ECEntity*, ents, enti)
+			if(*enti != this)
+			{
+				(*enti)->Events()->Remove(*evti);
+				if((*enti)->Owner())
+					(*enti)->Owner()->Events()->Remove(*evti);
+				entities.push_back(*enti);
+			}
+
 		if(Owner())
 			Owner()->Events()->Remove(*evti);
 		map->RemoveEvent(*evti, USE_DELETE);
@@ -390,4 +408,11 @@ void ECEntity::CancelEvents()
 
 	Events()->Clear();
 	Return();
+
+	if(send_message && Owner() && Owner()->Client())
+		Channel()->SendArm(Owner()->Client(), this, ARM_RETURN, Case()->X(), Case()->Y());
+
+	// On annule les evenements des unités liées à ces evenements
+	FORit(ECEntity*, entities, enti)
+		(*enti)->CancelEvents(true); // true signifie qu'on va envoyer un ARM_RETURN
 }

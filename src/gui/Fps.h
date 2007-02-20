@@ -28,7 +28,7 @@
 
 class Font;
 
-class TFPS : public TComponent
+class TFPS : public TLabel
 {
 private:
   // Minimum number of values needed to compute the average

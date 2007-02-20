@@ -97,7 +97,7 @@ int KICKCommand::Exec(TClient* cl, std::vector<std::string> parv)
 	pl->Channel()->RemovePlayer(pl, USE_DELETE);
 
 	if(victim)
-		victim->sendrpl(MSG_LEAVE, victim->Nick());
+		victim->sendrpl(victim->Nick(), MSG_LEAVE);
 
 	return 0;
 }

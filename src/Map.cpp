@@ -234,7 +234,7 @@ void ECEntity::Draw()
 
 void ECEntity::AfterDraw()
 {
-	if(!image || Map()->ShowMap()->HaveBrouillard() && Case()->Showed() <= 0)
+	if(!image || Map()->ShowMap()->HaveBrouillard() && Case() && Case()->Showed() <= 0)
 		return;
 
 	if(Selected())

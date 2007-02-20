@@ -184,6 +184,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 
 	std::vector<ECEntity*> entities;
+	me->LockScreen();
+	ECAltThread::LockThread();
 	while(!parv[0].empty())
 	{
 		std::string et_name = stringtok(parv[0], ",");
@@ -276,6 +278,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			entity->Move()->Clear(entity->Case());
 		entities.push_back(entity);
 	}
+	me->UnlockScreen();
+	ECAltThread::UnlockThread();
 	/* On en est à la première ligne de l'evenement. */
 	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL))
 		chan->SetCurrentEvent(flags);
@@ -906,8 +910,28 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					}
 					else
 					{
-						client->sendrpl(MSG_MSG, SendMessage->GetString());
-						AddInfo(I_CHAT, "<" + client->GetNick() + "> " + SendMessage->GetString(), client->Player());
+						std::string s = SendMessage->GetString();
+						bool send_message = true;
+						if(IsPressed(SDLK_LSHIFT) && IsPressed(SDLK_LALT))
+						{
+							send_message = false;
+							if(s == "show_map on")
+							{
+								chan->Map()->SetBrouillard(false);
+								InGameForm->Map->SetBrouillard(false);
+							}
+							else if(s == "show_map off")
+							{
+								chan->Map()->SetBrouillard(true);
+								InGameForm->Map->SetBrouillard(true);
+							}
+							else send_message = true;
+						}
+						if(send_message)
+						{
+							client->sendrpl(MSG_MSG, s);
+							AddInfo(I_CHAT, "<" + client->GetNick() + "> " + s, client->Player());
+						}
 					}
 				}
 				SendMessage->ClearString();

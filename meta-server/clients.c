@@ -41,6 +41,12 @@ static void list_servers(struct Client* cl)
 	return;
 }
 
+static void send_stats(struct Client* cl)
+{
+	sendrpl(cl, MSG_STAT, "%d %d", nb_tchan, nb_tusers);
+	return;
+}
+
 int m_pong (struct Client* cl, int parc, char** parv)
 {
 	cl->flags &= ~CL_PING;
@@ -72,10 +78,16 @@ int m_login (struct Client* cl, int parc, char** parv)
 			add_user(cl, parv[1]);
 		}
 		cl->flags = CL_USER;
-		sendrpl(cl, MSG_STAT, "%d %d", nb_tchan, nb_tusers);
+		send_stats(cl);
 		list_servers(cl);
 		if(proto <= 1)
 			delclient(cl);
+	}
+	else if(!strcmp(parv[2], WEB_SMALLNAME))
+	{
+		send_stats(cl);
+		list_servers(cl);
+		delclient(cl);
 	}
 	else if(!strcmp(parv[2], SERV_SMALLNAME))
 	{

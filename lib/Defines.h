@@ -31,6 +31,7 @@
 #define SERV_SMALLNAME "MenAreAntsD"
 #define CLIENT_SMALLNAME "MenAreAnts"
 #define MS_SMALLNAME "MenAreAntsMS"
+#define WEB_SMALLNAME "MenAreInTheWeb"
 
 #define SERV_DEFPORT 5461
 #define MSERV_DEFPORT 5460
