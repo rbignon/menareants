@@ -28,6 +28,7 @@
 #include "main.h"
 #include "sockets.h"
 #include "lib/Defines.h"
+#include "lib/Version.h"
 
 int myproto=0;
 int pingfreq = DEFPINGFREQ;
@@ -58,7 +59,7 @@ int main(int argc, char **argv)
 				port = atoi(optarg);
 				break;
 			case 'v':
-				printf("MenAreAnts Meta Server v" APP_VERSION " P" APP_PVERSION
+				printf("MenAreAnts Meta Server v" APP_VERSION
 				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")\n");
 				exit(EXIT_SUCCESS);
 				break;

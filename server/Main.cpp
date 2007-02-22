@@ -19,6 +19,7 @@
  */
 
 #include "Defines.h"
+#include "Version.h"
 #include "Commands.h"
 #include "Map.h"
 #include "Channels.h"
@@ -122,7 +123,7 @@ int ECServer::main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'v':
-				std::cout << "MenAreAnts Daemon v" APP_VERSION " P" APP_PVERSION
+				std::cout << "MenAreAnts Daemon v" APP_VERSION
 				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")" << std::endl;
 				exit(EXIT_SUCCESS);
 				break;

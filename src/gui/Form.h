@@ -92,7 +92,8 @@
  * --Progs
  */
 
-class TMemo; /* Besoin pour les Hints */
+#include "Memo.h"
+
 class SDL_mutex;
 
 #define FORM_RUN(form, condition) do { (form)->Actions(); (form)->Update(); } while((condition))
@@ -150,7 +151,9 @@ public:
 	/** Set background picture */
 	void SetBackground(ECImage *image);
 
-	void SetHint(TMemo* h) { Hint = h; }
+	int Width() const { return Window()->GetWidth(); }
+	int Height() const { return Window()->GetHeight(); }
+
 	void SetMutex(SDL_mutex* m) { mutex = m; }
 
 	void LockScreen() const;
@@ -199,11 +202,12 @@ private:
 	std::vector<TComponent*> composants;
 	ECImage *background;
 	bool focus_order;
-	TMemo* Hint;
+	TMemo Hint;
 	SDL_mutex* mutex;
 	uint max_fps;
 	bool must_redraw;
 	Point2i lastmpos;
+	uint last_move_time;
 };
 
 #endif /* EC_FORM_H */

@@ -98,7 +98,7 @@ void TChildForm::Draw(const Point2i& mouse)
 				if((*it)->OnMouseOn() && (*it)->Mouse(mouse))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
 				(*it)->Draw(mouse);
-				if(!put_hint && (*it)->Visible() && (*it)->HaveHint() && (*it)->Mouse(mouse))
+				if(!put_hint && (*it)->Visible() && (*it)->IsHint(mouse))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

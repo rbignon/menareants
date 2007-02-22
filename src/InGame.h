@@ -181,7 +181,6 @@ public:
 	TLabel*         Date;
 	TLabel*         Money;
 	TLabel*         TurnMoney;
-	TMemo*          UnitsInfos;
 	TBarreLatIcons* Icons;
 	TImage*         ScreenPos;
 

@@ -109,22 +109,29 @@ int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...)
 
 int SplitBuf(char* buf, char **parv, int size)
 {
-        int parc = 0, i;
+	int parc = 0, i, over = 0;
 
-        while(*buf && parc < size)
-        {
-        	int slash = 0;
-                while(*buf == ' ') *buf++ = 0;
-                if(!*buf) break;
-                parv[parc++] = buf;
-                while(*buf && (*buf != ' ' || slash))
-                	if(*buf == '\\' && *(buf+1) && (*(buf+1) == ' ' || *(buf+1) == '\\') && !slash)
-                		slash = 1;
-                	else
-                		++buf, slash = 0;
-        }
-        for(i = parc; i < size; ++i) parv[i] = NULL;
-        return parc;
+	while(*buf && parc < size)
+	{
+		int slash = 0;
+		while(*buf == ' ') *buf++ = 0;
+		if(!*buf) break;
+		parv[parc++] = buf;
+		for(;*buf && (*buf != ' ' || slash); ++buf)
+			if(*buf == '\\' && *(buf+1) && (*(buf+1) == ' ' || *(buf+1) == '\\') && !slash)
+			{
+				over++;
+				slash = 1;
+			}
+			else
+			{
+				if(over) *(buf-over) = *buf;
+				slash = 0;
+			}
+	}
+	*(buf-over) = 0;
+	for(i = parc; i < size; ++i) parv[i] = NULL;
+	return parc;
 }
 
 int parsemsg(struct Client* cl)

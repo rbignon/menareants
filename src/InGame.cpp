@@ -1284,7 +1284,6 @@ TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
 	ShowBarreLat();
 
 	SetFocusOrder(false);
-	SetHint(BarreLat->UnitsInfos);
 
 	Cursor = AddComponent(new TCursor);
 	Cursor->SetMap(Map);
@@ -1970,9 +1969,6 @@ void TBarreLat::Init()
 	Date = AddComponent(new TLabel(15, 20, chan->Map()->Date()->String(), white_color, Font::GetInstance(Font::Small)));
 	TurnMoney = AddComponent(new TLabel(110, 20, "", white_color, Font::GetInstance(Font::Small)));
 
-	UnitsInfos = AddComponent(new TMemo(Font::GetInstance(Font::Small), 15, Height() - 100 - 10, Width() - 60, 100));
-	UnitsInfos->SetX(X() + Width()/2 - UnitsInfos->Width()/2);
-
 	ScreenPos = AddComponent(new TImage(0,0));
 	ECImage* surf = new ECImage();
 	surf->NewSurface(chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-Width()) / CASE_WIDTH,
@@ -1983,7 +1979,7 @@ void TBarreLat::Init()
 	ScreenPos->SetEnabled(false);
 
 	Icons = AddComponent(new TBarreLatIcons(0, 420));
-	Icons->SetMaxHeight(UnitsInfos->Y() - Icons->Y());
+	Icons->SetMaxHeight(Height() - Icons->Y());
 	Icons->SetList(EntityList.Buildings(player), TBarreLat::SelectUnit);
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);
 

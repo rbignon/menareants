@@ -22,6 +22,7 @@
 #define ECMS_SERVERS_H
 
 #define SERVERLEN 50
+#define VERSIONLEN 50
 
 struct Server
 {
@@ -34,6 +35,9 @@ struct Server
 	int nb_games;
 	int nb_wait_games;
 	int port;
+	int tot_users;
+	int tot_games;
+	char version[VERSIONLEN+1];
 
 	struct Server* next;
 	struct Server* last;

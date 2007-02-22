@@ -26,9 +26,12 @@
 std::string TForm::Message;
 
 TForm::TForm(ECImage* w)
-	: want_quit(false), background(0), focus_order(true), Hint(0), mutex(0), max_fps(35), must_redraw(true)
+	: want_quit(false), background(0), focus_order(true),
+	  Hint(Font::GetInstance(Font::Small), 0, 0, 200, 800, 0, false),
+	  mutex(0), max_fps(35), must_redraw(true), last_move_time(0)
 {
 	SetWindow(w);
+	MyComponent(&Hint);
 }
 
 TForm::~TForm()
@@ -116,21 +119,7 @@ void TForm::Actions(SDL_Event event, uint a)
 			break;
 		case SDL_MOUSEMOTION:
 		{
-			Point2i mouse(event.button.x,event.button.y);
-			OnMouseMotion(mouse);
-			if(Hint)
-			{
-				Hint->ClearItems();
-				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				{
-					if((*it)->Visible() && (*it)->HaveHint() &&
-					   ((*it)->DynamicHint() || (*it)->Mouse(mouse)))
-					{
-						Hint->AddItem((*it)->Hint());
-						break;
-					}
-				}
-			}
+
 			break;
 		}
 		case SDL_MOUSEBUTTONUP:
@@ -189,7 +178,43 @@ void TForm::Update(bool flip)
 	unsigned int start, delay, sleep_fps;
 	start = SDL_GetTicks();
 
+	int _x, _y;
+	SDL_GetMouseState( &_x, &_y);
+	Point2i pos(_x,_y);
+
+	if(pos != lastmpos)
+	{
+		OnMouseMotion(pos);
+		last_move_time = SDL_GetTicks();
+		if(Hint.Visible())
+		{
+			Hint.Hide();
+			SetMustRedraw();
+		}
+
+		Hint.ClearItems();
+		for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
+		{
+			if((*it)->Visible() && (*it)->IsHint(pos))
+			{
+				Hint.AddItem((*it)->Hint());
+				break;
+			}
+		}
+	}
+
+
+	if(!Hint.Visible() && !Hint.Empty() && last_move_time <= SDL_GetTicks()-500)
+		Hint.Show();
+
 	Draw();
+
+	if(Hint.Visible())
+	{
+		Hint.SetXY((_x + Hint.Width())  > Width()  ? (Width()  - Hint.Width())  : _x,
+		           (_y + Hint.RealHeight())  > Height()  ? (Height()  - Hint.RealHeight())  : _y);
+		Hint.Draw(Point2i(_x,_y));
+	}
 
 	if(flip)
 		Window()->Flip();

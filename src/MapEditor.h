@@ -32,7 +32,6 @@
 #include "gui/Image.h"
 #include "gui/Edit.h"
 #include "gui/ComboBox.h"
-#include "gui/Memo.h"
 #include "gui/Label.h"
 
 class TCheckBox;
@@ -291,8 +290,6 @@ public:
 	TEdit*       City;
 
 	TCheckBox*   Mission;
-
-	TMemo*       Hints;
 
 /* Methodes */
 public:

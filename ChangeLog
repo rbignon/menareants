@@ -1,3 +1,11 @@
+2007-02-21 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Form.cpp: Utilisation du TMemo Hint comme bulle d'aide à coté de la souris plutot que d'un pointeur vers un composant de la fenêtre.
+
+	* lib/Version.h, lib/v.sh: La version SVN est maintenant écrite ici.
+
+	* meta-server/server.cpp: La version de chaque serveur, ainsi que le nombre total de  connexions et de parties, sont envoyées.
+
 2007-02-20 Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp (ECEntity::CancelEvents): Supprime maintenant les evenements des unités liés aux evenements supprimés.
@@ -16,7 +24,6 @@
 	- Lorsqu'un évenement pour entrer dans un conteneur était précédé d'un mouvement, l'évenement ne se faisait pas.
 
 	* server/Map.cpp (ECEntity::CancelEvents): Supprime également les évenements des unités liées par les evenements supprimés.
-
 
 2007-02-17 Romain Bignon <progs@headfucking.net>
 

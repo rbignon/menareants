@@ -28,7 +28,6 @@ TList::TList(int _x, int _y)
 	: TComponent(_x, _y)
 {
 	list.clear();
-	dynamic_hint = true;
 	SetAlwaysRedraw();
 }
 
@@ -90,7 +89,7 @@ void TList::Draw(const Point2i& pos)
 				(*it)->Draw(pos);
 				if((*it)->OnMouseOn() && (*it)->Mouse(pos))
 					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				if((*it)->Visible() && !(*it)->Hint().empty() && (*it)->Mouse(pos))
+				if((*it)->Visible() && (*it)->IsHint(pos))
 				{
 					SetHint((*it)->Hint());
 					put_hint = true;

@@ -37,7 +37,6 @@
 #include "gui/ComboBox.h"
 #include "gui/ColorEdit.h"
 #include "gui/MessageBox.h"
-#include "gui/Memo.h"
 #include "gui/CheckBox.h"
 #include "tools/Video.h"
 
@@ -199,7 +198,6 @@ public:
 	TLabel*         Info;
 	TLabel*         NickInfo;
 	TLabel*         NationInfo;
-	TMemo*          Hints;
 	TEdit*          NewServer;
 	TButtonText*    AddServerButton;
 	TButtonText*    DelServerButton;
@@ -404,10 +402,9 @@ void TConfigForm::SetRelativePositions()
 	Title->Init();
 	Info->Init();
 
-	Hints->SetX(Window()->GetWidth() - Hints->Width() - 20);
-	OkButton->SetXY(Hints->X() + Hints->Width()/2 - OkButton->Width()/2,
-	                Hints->Y() + Hints->Height() + 50);
-	CancelButton->SetXY(Hints->X() + Hints->Width()/2 - CancelButton->Width()/2,
+	OkButton->SetXY(Window()->GetWidth() - OkButton->Width() - 20,
+	                200);
+	CancelButton->SetXY(Window()->GetWidth() - OkButton->Width() - 20,
 	                    OkButton->Y() + OkButton->Height());
 
 	int x = Window()->GetWidth()/2 - 100;
@@ -472,9 +469,6 @@ TConfigForm::TConfigForm(ECImage *w)
 	Music->SetHint(_("If this is active, music files are in this directory:\n\n") +
 	                std::string(PKGDATADIR_SOUND INGAME_MUSIC));
 	Effect = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 405, _("Effects"), white_color));
-
-	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 550, 200, 250, 150));
-	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
 

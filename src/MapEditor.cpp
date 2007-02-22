@@ -1233,9 +1233,6 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 	Mission->SetHint(_("If checked, this map is a mission and the player will be the first in the list.\n"
 	                  "This editor can't configure special characteristics of missions"));
 
-	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), 300, 480, 290, 100));
-	SetHint(Hints);
-
 	SetBackground(Resources::Titlescreen());
 }
 

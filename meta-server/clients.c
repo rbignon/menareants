@@ -28,14 +28,30 @@
 
 struct User* user_head = 0;
 
-/* LSP <ip:port> <nom> <+/-> <nbjoueurs> <nbmax> <nbgames> <maxgames> <nbwgames> <proto> */
+char* FormatStr(const char* s)
+{
+	static char ptr[MAXBUFFER+1];
+	unsigned int i = 0;
+
+	for(; *s && i < MAXBUFFER; ++s)
+	{
+		if(*s == '\\'/* && *(s+1) == ' '*/) ptr[i++] = '\\';
+		else if(*s == ' ') ptr[i++] = '\\';
+		ptr[i++] = *s;
+	}
+	ptr[i] = 0;
+	return ptr;
+}
+
+/* LSP <ip:port> <nom> <+/-> <nbjoueurs> <nbmax> <nbgames> <maxgames> <nbwgames> <proto> <version> <tot_users> <tot_games> */
 static void list_servers(struct Client* cl)
 {
 	struct Server* s = server_head;
 	for(; s; s = s->next)
-		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
+		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d %s %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
 		                   ((s->nb_games - s->nb_wait_games) >= s->max_games || s->nb_players >= s->max_players) ? '-' : '+',
-		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto);
+		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto, FormatStr(s->version),
+		                   s->tot_users, s->tot_games);
 
 	sendcmd(cl, MSG_ENDOFSLIST);
 	return;

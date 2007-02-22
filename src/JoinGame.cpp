@@ -202,11 +202,6 @@ int SMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			MyFree(map);
 		}
 		chan->SetMap(NULL);
-		if(GameInfosForm)
-		{
-			GameInfosForm->Hints->ClearItems();
-			GameInfosForm->Hints->AddItem(_("Loading map..."));
-		}
 		me->UnlockScreen();
 	}
 	TGameInfosForm::RecvMap.push_back(parv[1]);
@@ -242,8 +237,8 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			map = new ECMap(TGameInfosForm::RecvMap);
 			map->Init();
 			if(GameInfosForm)
-				map->CreatePreview(GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
-				                   GameInfosForm->Hints->X() - GameInfosForm->Preview->X() - 85,
+				map->CreatePreview(GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 85,
+				                   GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 85,
 				                   P_POSITIONS);
 		}
 		catch(TECExcept &e)
@@ -267,7 +262,6 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			GameInfosForm->MapTitle->SetXY(GameInfosForm->Preview->X() + GameInfosForm->Preview->Width()/2 -
 			                               GameInfosForm->MapTitle->Width()/2,
 			                               GameInfosForm->Preview->Y() - GameInfosForm->MapTitle->Height() - 5);
-			GameInfosForm->Hints->ClearItems();
 			GameInfosForm->SetMustRedraw();
 		}
 		me->UnlockScreen();
@@ -1526,9 +1520,6 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	CreateIAButton = AddComponent(new TButtonText(right_x,210,150,50, _("Add an AI"), Font::GetInstance(Font::Normal)));
 	CreateIAButton->Hide();
 	CreateIAButton->SetHint(_("Add an artificial player (an AI) in game"));
-
-	Hints = AddComponent(new TMemo(Font::GetInstance(Font::Small), right_x, Window()->GetHeight()-95, 150, 60));
-	SetHint(Hints);
 
 	SetBackground(Resources::Titlescreen());
 

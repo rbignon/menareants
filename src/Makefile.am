@@ -5,11 +5,7 @@ bin_PROGRAMS = menareants
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 AM_CXXFLAGS=-DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
-EXTRA_DIST = v.sh
 
-DISTCLEANFILES = Version.cpp
-
-nodist_menareants_SOURCES = Version.cpp
 menareants_SOURCES = \
 		tools/Font.cpp \
 		tools/Color.cpp \
@@ -55,9 +51,6 @@ menareants_SOURCES = \
 		InGame.cpp
 
 menareants_LDADD =${top_builddir}/lib/libmenareants.a
-
-Version.cpp: $(menareants_SOURCES)
-	@$(SHELL) v.sh
 
 distclean-local:
 	rm -f menareants.cfg

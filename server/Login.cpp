@@ -24,6 +24,7 @@
 #include "Outils.h"
 #include "Main.h"
 #include "Debug.h"
+#include "Version.h"
 #include <string>
 #include <fstream>
 

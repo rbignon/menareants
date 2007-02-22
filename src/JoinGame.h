@@ -65,8 +65,6 @@ public:
 	TLabel*      MapTitle;
 	TImage*      Preview;
 
-	TMemo*       Hints;
-
 	TSpinEdit*   MyPosition;
 	TColorEdit*  MyColor;
 	TComboBox*   MyNation;
@@ -135,6 +133,8 @@ public:
 /* Attributs */
 public:
 	ECPlayer* Player() { return pl; }
+
+	virtual bool IsHint(const Point2i& pos) const { return HaveHint(); }
 
 /* Variables privées */
 private:

@@ -18,6 +18,7 @@
  * $Id$
  */
 
+#include "Version.h"
 #include "Server.h"
 #include "Main.h"
 #include "Commands.h"
@@ -462,6 +463,8 @@ void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
 
 void ECServer::ParseMetaServer()
 {
+	if(!ms_sock) return;
+
 	char buf[MAXBUFFER];
 	if(recv(ms_sock, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
 	{
@@ -544,7 +547,7 @@ bool ECServer::ConnectMetaServer()
 		highsock = ms_sock;
 
 	SendMetaServer(MSG_IAM, ECArgs(conf->ServerName(), SERV_SMALLNAME, APP_MSPROTO));
-	MSet("+iPGv", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION));
+	MSet("+iPGvV", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION, APP_VERSION));
 
 	return true;
 }

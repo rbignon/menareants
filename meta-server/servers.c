@@ -33,6 +33,8 @@ struct Server* server_head = 0;
  * +G <max games>                                 :- max jeux
  * +w <nb waiting games>                          :- nombre de jeux en attente
  * +v <version>                                   :- version du protocole
+ * +V <version>                                   :- version du serveur
+ * +i <port>                                      :- port du serveur
  */
 int m_server_set (struct Client* cl, int parc, char** parv)
 {
@@ -51,7 +53,10 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 			{
 				int nb = (i < parc && add) ? atoi(parv[i++]) : 0;
 				if(nb > cl->server->nb_players)
+				{
+					cl->server->tot_users += nb - cl->server->nb_players;
 					nb_tusers += nb - cl->server->nb_players;
+				}
 				cl->server->nb_players = nb;
 				break;
 			}
@@ -62,7 +67,10 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 			{
 				int nb = (i < parc && add) ? atoi(parv[i++]) : 0;
 				if(nb > cl->server->nb_games)
+				{
+					cl->server->tot_games += nb - cl->server->nb_games;
 					nb_tchan += nb - cl->server->nb_games;
+				}
 				cl->server->nb_games = nb;
 				break;
 			}
@@ -74,6 +82,9 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 				break;
 			case 'v':
 				cl->server->proto = (i < parc && add) ? atoi(parv[i++]) : 0;
+				break;
+			case 'V':
+				strncpy(cl->server->version, parv[i++], VERSIONLEN);
 				break;
 			case 'i':
 				cl->server->port = (i < parc && add) ? atoi(parv[i++]) : 0;
@@ -106,7 +117,9 @@ struct Server* add_server(struct Client* cl, const char* name)
 
 	strncpy(server->name, name, SERVERLEN);
 	server->client = cl;
-	server->proto = server->port = server->nb_wait_games = server->nb_games = server->max_games = server->max_players = server->nb_players = 0;
+	server->version[0] = 0;
+	server->proto = server->port = server->nb_wait_games = server->nb_games = server->max_games = server->max_players = server->nb_players
+	              = server->tot_users = server->tot_games = 0;
 
 	cl->server = server;
 

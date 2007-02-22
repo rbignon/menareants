@@ -71,6 +71,7 @@ public:
   void ClearItems();
   bool Empty() const { return m_items.empty(); }
   void SetShadowed(bool b = true) { shadowed = b; }
+  int RealHeight() const { return m_items.size() * height_item; }
 };
 
 #endif /* EC_MEMO_H */

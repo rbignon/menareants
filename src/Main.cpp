@@ -37,6 +37,7 @@
 #include "Defines.h"
 #include "Resources.h"
 #include "Sound.h"
+#include "Version.h"
 #include "gui/Boutton.h"
 #include "gui/BouttonText.h"
 #include "gui/ComboBox.h"
@@ -51,14 +52,6 @@
 
 #if !defined(DEBUG) && defined(UNSTABLE)
 #error Vous tentez de compiler une version instable. Si vous Ãªtes certain de vouloir la compiler, rajoutez --enable-debug dans les options du script ./configure
-#endif
-
-extern const char* SVNVERSION;
-#ifdef APP_VERSION_PATCH
-std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA "(P" APP_PVERSION ")") + SVNVERSION +
-                          std::string("-") + APP_VERSION_PATCH;
-#else
-std::string APP_CLIENT_VERSION = std::string(APP_VERSION_ALPHA "." APP_VERSION_BETA);
 #endif
 
 #ifdef WIN32
@@ -312,7 +305,7 @@ TMainForm::TMainForm(ECImage* w)
 
 	QuitterButton = AddComponent(new TButtonText(300,470, 150,50, _("Exit"), Font::GetInstance(Font::Normal)));
 
-	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_CLIENT_VERSION, white_color, Font::GetInstance(Font::Big)));
+	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
 
 	FPS = AddComponent(new TFPS(5, 5, Font::GetInstance(Font::Small)));
 

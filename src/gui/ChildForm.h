@@ -68,6 +68,8 @@ public:
 
 	virtual bool WantRedraw() const { return true; }
 
+	virtual bool IsHint(const Point2i& pos) const { return HaveHint(); }
+
 /* Variables protégées */
 protected:
 

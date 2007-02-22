@@ -66,9 +66,7 @@ am_menareants_OBJECTS = Font.$(OBJEXT) Color.$(OBJEXT) \
 	Login.$(OBJEXT) Channels.$(OBJEXT) Map.$(OBJEXT) \
 	Batiments.$(OBJEXT) Units.$(OBJEXT) MapEditor.$(OBJEXT) \
 	JoinGame.$(OBJEXT) InGame.$(OBJEXT)
-nodist_menareants_OBJECTS = Version.$(OBJEXT)
-menareants_OBJECTS = $(am_menareants_OBJECTS) \
-	$(nodist_menareants_OBJECTS)
+menareants_OBJECTS = $(am_menareants_OBJECTS)
 menareants_DEPENDENCIES = ${top_builddir}/lib/libmenareants.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -82,7 +80,7 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(menareants_SOURCES) $(nodist_menareants_SOURCES)
+SOURCES = $(menareants_SOURCES)
 DIST_SOURCES = $(menareants_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -219,9 +217,6 @@ target_vendor = @target_vendor@
 SUBDIRS = data
 INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
 AM_CXXFLAGS = -DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
-EXTRA_DIST = v.sh
-DISTCLEANFILES = Version.cpp
-nodist_menareants_SOURCES = Version.cpp
 menareants_SOURCES = \
 		tools/Font.cpp \
 		tools/Color.cpp \
@@ -374,7 +369,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpinEdit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Units.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Version.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Video.Po@am__quote@
 
 .c.o:
@@ -970,7 +964,6 @@ mostlyclean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1040,9 +1033,6 @@ uninstall-info: uninstall-info-recursive
 	tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-info-am
 
-
-Version.cpp: $(menareants_SOURCES)
-	@$(SHELL) v.sh
 
 distclean-local:
 	rm -f menareants.cfg

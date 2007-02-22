@@ -58,12 +58,6 @@
 #define	APP_VERSION_PATCH	"pre3"	/* troisiï¿œe prï¿œrelease */
 #endif
 
-#ifdef APP_VERSION_PATCH
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH
-#else
-#	define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA
-#endif
-
 #ifdef __cplusplus
 
 /* Tailles de variables */

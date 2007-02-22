@@ -47,7 +47,7 @@ public:
 	TComponent(ECImage* w = 0)
 		: TObject(w), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  want_redraw(false), always_redraw(false), dynamic_hint(false)
+		  want_redraw(false), always_redraw(false)
 	{}
 
 	/** Constructor with position
@@ -58,7 +58,7 @@ public:
 	TComponent(int _x, int _y, ECImage* w = 0)
 		: TObject(w), Rectanglei(_x, _y, 0, 0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  want_redraw(false), always_redraw(false), dynamic_hint(false)
+		  want_redraw(false), always_redraw(false)
 	{}
 
 	/** Constructor with position and size
@@ -71,7 +71,7 @@ public:
 	TComponent(int _x, int _y, uint _w, uint _h, ECImage* w = 0)
 		: TObject(w), Rectanglei(_x, _y, _w, _h), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  want_redraw(false), always_redraw(false), dynamic_hint(false)
+		  want_redraw(false), always_redraw(false)
 	{}
 
 	/** Constructor with position and size
@@ -81,7 +81,7 @@ public:
 	TComponent(const Rectanglei& _rect, ECImage* w = 0)
 		: TObject(w), Rectanglei(_rect), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
-		  want_redraw(false), always_redraw(false), dynamic_hint(false)
+		  want_redraw(false), always_redraw(false)
 	{}
 
 	virtual ~TComponent() {}
@@ -160,7 +160,8 @@ public:
 	void SetHint(T h) { hint = h; }
 	std::string& Hint() { return hint; }
 	bool HaveHint() const { return !hint.empty(); }
-	bool DynamicHint() const { return dynamic_hint; }
+
+	virtual bool IsHint(const Point2i& pos) const { return HaveHint() && Mouse(pos); }
 
 	int Tag;
 
@@ -186,11 +187,6 @@ private:
 	std::string hint;
 	bool want_redraw;
 	bool always_redraw;
-
-/* Variables protégées */
-protected:
-
-	bool dynamic_hint;
 };
 typedef std::vector<TComponent*> ComponentVector;
 
@@ -292,6 +288,8 @@ public:
 
 	/** Get list of components as a vector */
 	ComponentVector GetList() const { return list; }
+
+	virtual bool IsHint(const Point2i& pos) const { return HaveHint(); }
 
 /* Variables privées */
 private:
