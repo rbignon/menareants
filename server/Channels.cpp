@@ -715,6 +715,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 			pl = dynamic_cast<ECPlayer*>(*ppl);
 			pl->SetDisconnected(false);
 			pl->SetClient(cl);
+			app.MSet("-r", pl->Nick());
 		}
 		else
 		{
@@ -829,6 +830,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		 * que le client s'en branle. Simplement c'est par conformité au protocole et par cohérence.
 		 */
 
+		if(pl->Ready())
+			cl->sendrpl(pl, MSG_SET, "+!");
 		cl->sendrpl(app.GetConf()->ServerName(), MSG_SET, "-S+Q");
 		chan->CheckPinging();
 	}
@@ -1423,12 +1426,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += "-";
 	if(flag & ARM_NOPRINCIPAL)
 		to_send += "&";
-	if(flag & ARM_DEPLOY)
-	{
-		if(et.empty()) FDebug(W_WARNING, "SendArm(ARM_DEPLOY): Il n'y a pas d'entité");
-		else
-			to_send += (et.front()->Deployed()) ? "{" : "}";
-	}
+	if((flag & ARM_DEPLOY) || ((flag & ARM_CREATE) && et.front()->Deployed()))
+		to_send += (et.front()->Deployed()) ? "{" : "}";
 	if(flag & ARM_CONTENER && !et.empty())
 	{
 		if(!et.front()->Parent()) FDebug(W_WARNING, "SendArm(ARM_CONTENER): L'entité n'est pas membre d'un contener");
@@ -1460,7 +1459,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 				if(dynamic_cast<ECPlayer*>(*pl)->Client() == 0) continue;
 				std::vector<ECEntity*>::iterator it;
 				for(it = et.begin();
-				    it != et.end() && (*it)->Owner() != *pl; ++it);
+				    it != et.end() && (*it)->Owner() != *pl && (!(*it)->Owner() || !(*it)->Owner()->IsAllie(*pl));
+				    ++it);
 				if(it != et.end())
 					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(et, MSG_ARM, to_send);
 			}
@@ -1473,7 +1473,8 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 				if(dynamic_cast<ECPlayer*>(*pl)->Client() == 0) continue;
 				std::vector<ECEntity*>::iterator it;
 				for(it = et.begin();
-				    it != et.end() && (*it)->Owner() != *pl; ++it);
+				    it != et.end() && (*it)->Owner() != *pl && (!(*it)->Owner() || !(*it)->Owner()->IsAllie(*pl));
+				    ++it);
 				if(it == et.end())
 					dynamic_cast<ECPlayer*>(*pl)->Client()->sendrpl(et, MSG_ARM, to_send);
 			}
@@ -1822,7 +1823,43 @@ void EChannel::SendEntities(ECPlayer* pl)
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		if((*enti)->IsHidden() && (*enti)->Owner() != pl) continue;
-		SendArm(clients, dynamic_cast<ECEntity*>(*enti), (*enti)->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE), (*enti)->Case()->X(), (*enti)->Case()->Y());
+		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+
+		if(entity->Parent())
+		{
+			SendArm(clients, entity, entity->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE),
+			                         entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
+			SendArm(clients, dynamic_cast<ECEntity*>(entity->Parent()), entity->Parent()->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE),
+			                                                            entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
+			SendArm(clients, entity, ARM_CONTENER);
+		}
+		else
+			SendArm(clients, entity, entity->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE), entity->Case()->X(), entity->Case()->Y());
+
+		entity->Resynch(pl);
+
+		if(entity->Owner() == pl || entity->Owner() && entity->Owner()->IsAllie(pl))
+		{
+			std::vector<ECEvent*> events = entity->Events()->List();
+			FOR(ECEvent*, events, event)
+			{
+				switch(event->Flags())
+				{
+					case ARM_ATTAQ:
+						SendArm(clients, entity, ARM_ATTAQ, event->Case()->X(), event->Case()->Y());
+						break;
+					case ARM_MOVE:
+					case ARM_CONTAIN:
+					case ARM_UNCONTAIN:
+						SendArm(clients, entity, ARM_MOVE, event->Case()->X(), event->Case()->Y(), 0, ToVec(event));
+						break;
+					case ARM_DEPLOY:
+						SendArm(clients, event->Entity(), ARM_DEPLOY);
+					default:
+						break;
+				}
+			}
+		}
 	}
 }
 

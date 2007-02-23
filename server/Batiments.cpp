@@ -164,6 +164,11 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
  *                                        ECMine                                            *
  ********************************************************************************************/
 
+void ECMine::Resynch(ECPlayer* pl)
+{
+	Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
+}
+
 void ECMine::Played()
 {
 	if(restBuild)
@@ -197,6 +202,13 @@ bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
  *                               ECNuclearSearch                                            *
  ********************************************************************************************/
 
+void ECNuclearSearch::Resynch(ECPlayer* pl)
+{
+	Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_NBMISSILES, TypToStr(missiles)));
+	if(Owner() && (Owner() == pl || Owner()->IsAllie(pl)))
+		Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
+}
+
 void ECNuclearSearch::Played()
 {
 	restBuild--;
@@ -221,6 +233,12 @@ void ECNuclearSearch::RemoveOneMissile()
 /********************************************************************************************
  *                                        ECSilo                                            *
  ********************************************************************************************/
+
+void ECSilo::Resynch(ECPlayer* pl)
+{
+	if(Owner() && (Owner() == pl || Owner()->IsAllie(pl)))
+		Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
+}
 
 void ECSilo::Played()
 {

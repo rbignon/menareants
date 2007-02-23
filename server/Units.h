@@ -177,6 +177,8 @@ public:
 	virtual void ChangeOwner(ECBPlayer*);
 	virtual void Played();
 
+	void Resynch(ECPlayer* pl);
+
 /* Attributs */
 public:
 

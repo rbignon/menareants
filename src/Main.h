@@ -37,7 +37,6 @@ class MenAreAntsApp
 {
 private:
 
-	SDL_Thread* Thread;
 	SDL_mutex* mutex;
 	std::string path;
 	bool want_quit;
@@ -83,7 +82,7 @@ public:
 	SDL_mutex* Mutex() const { return mutex; }
 
 	MenAreAntsApp()
-		: Thread(0), mutex(0), want_quit(false), first_run(false), first_game(false)
+		: mutex(0), want_quit(false), first_run(false), first_game(false)
 	{}
 
 	static MenAreAntsApp* singleton;

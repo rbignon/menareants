@@ -89,6 +89,8 @@ public:
 
 	virtual void Played();
 
+	void Resynch(ECPlayer* pl);
+
 	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 };
 
@@ -113,6 +115,8 @@ public:
 	virtual void Union(ECEntity*) { return; }
 
 	virtual void Played();
+
+	void Resynch(ECPlayer* pl);
 
 	void RemoveOneMissile();
 };
@@ -140,6 +144,8 @@ public:
 	virtual void Played();
 
 	virtual bool WantAttaq(uint x, uint y, bool);
+
+	void Resynch(ECPlayer* pl);
 
 /* Attributs */
 public:

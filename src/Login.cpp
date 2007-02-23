@@ -320,6 +320,19 @@ int HELmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
+/** I've been disconnected from server when I was playing a game. It asks me if I want to rejoin this game.
+ *
+ * Syntax: REJOIN server:port
+ */
+int REJOINmsCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+{
+	if(!ListServerForm) return 0;
+
+	ListServerForm->Rejoin = parv[1];
+
+	return 0;
+}
+
 /** Receive a server name in the list from meta-server
  *
  * Syntax: LSP ip nom +/- nbjoueurs nbmax nbgames maxgames nbwgames proto
@@ -399,13 +412,15 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
 	assert(ListServerForm);
-	ListServerForm->RecvSList = false;
 	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s), with %d total connections and %d played games"),
 	                                                ListServerForm->nb_users, ListServerForm->nb_tusers, ListServerForm->nb_tchans));
 	ListServerForm->ChanStats->SetCaption(StringF(_("There are %d game(s) on %d servers, with %d in game and %d in preparation"),
 	                                               ListServerForm->nb_chans, ListServerForm->ServerList->Size(), ListServerForm->nb_chans - ListServerForm->nb_wchans,
 	                                               ListServerForm->nb_wchans));
 	ListServerForm->nb_chans = ListServerForm->nb_wchans = ListServerForm->nb_users = ListServerForm->nb_tchans = ListServerForm->nb_tusers = 0;
+	ListServerForm->RefreshButton->SetEnabled();
+	ListServerForm->EscarmoucheButton->SetEnabled();
+	ListServerForm->MissionButton->SetEnabled();
 	return 0;
 }
 
@@ -423,58 +438,49 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 
 void MenAreAntsApp::RefreshList()
 {
-	if(ListServerForm->RecvSList == true || EC_Client::GetInstance()) return;
-
-	ListServerForm->RecvSList = true;
 	ListServerForm->ConnectButton->SetEnabled(false);
 	ListServerForm->RefreshButton->SetEnabled(false);
 	ListServerForm->EscarmoucheButton->SetEnabled(false);
 	ListServerForm->MissionButton->SetEnabled(false);
-
-	mutex = SDL_CreateMutex();
-	EC_Client* client = EC_Client::GetInstance(true);
-
-	client->SetMutex(mutex);
-	client->SetHostName(Config::GetInstance()->hostname);
-	client->SetPort(Config::GetInstance()->port);
-	/* Ajout des commandes            CMDNAME FLAGS ARGS */
-	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
-	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
-	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
-	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
-
-	Thread = SDL_CreateThread(EC_Client::read_sock, client);
-
 	ListServerForm->ServerList->ClearItems();
 
-	WAIT_EVENT_T(client->IsConnected() || client->Error() || !ListServerForm->RecvSList, i, 5);
-
-	if((!client || !client->IsConnected()) && ListServerForm->RecvSList)
+	if(MetaServer.IsConnected())
 	{
-		std::string msg;
-		if(client)
-			client->SetWantDisconnect();
-
-		if(!client)
-			msg = _("Unable to connect to meta-server");
-		else
-			msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
-		TMessageBox(msg, BT_OK, ListServerForm).Show();
-
-		SDL_WaitThread(Thread, 0);
-		delete client;
-		EC_Client::singleton = 0;
-		if(mutex)
-		{
-			SDL_DestroyMutex(mutex);
-			mutex = 0;
-		}
-		ListServerForm->RecvSList = false;
-		ListServerForm->SetWantQuit();
+		MetaServer.sendrpl(MSG_SERVLIST);
 		return;
 	}
 
-	ListServerForm->SetMutex(mutex);
+	EC_Client* client = &MetaServer;
+
+	client->SetHostName(Config::GetInstance()->hostname);
+	client->SetPort(Config::GetInstance()->port);
+	client->ClearCommands();
+	/* Ajout des commandes            CMDNAME FLAGS ARGS */
+	client->AddCommand(new PIGCommand(MSG_PING,		0,	0)); // on appelle volontairement PIGCommand() qui fait la même chose pour serveur et meta-serveur
+	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
+	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
+	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
+	client->AddCommand(new REJOINmsCommand(MSG_REJOIN,	0,	1));
+	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
+
+	MetaServer.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
+
+	WAIT_EVENT_T(client->IsConnected() || client->Error(), i, 5);
+
+	if(!client->IsConnected())
+	{
+		std::string msg;
+
+		client->SetWantDisconnect();
+
+		msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
+
+		TMessageBox(msg, BT_OK, ListServerForm).Show();
+
+		SDL_WaitThread(MetaServer.Thread(), 0);
+		ListServerForm->SetWantQuit();
+		return;
+	}
 }
 
 void MenAreAntsApp::ServerList()
@@ -482,23 +488,9 @@ void MenAreAntsApp::ServerList()
 	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
 
 	RefreshList();
-	do
-	{
-		if(!ListServerForm->RecvSList && EC_Client::GetInstance() != 0 && EC_Client::GetInstance()->IsConnected() == false)
-		{
-			EC_Client::GetInstance()->SetWantDisconnect();
-			SDL_WaitThread(Thread, 0);
-			delete EC_Client::GetInstance();
-			EC_Client::singleton = NULL;
-			mutex = 0;
-			ListServerForm->SetMutex(0);
-			ListServerForm->RefreshButton->SetEnabled(true);
-			ListServerForm->EscarmoucheButton->SetEnabled(true);
-			ListServerForm->MissionButton->SetEnabled(true);
-		}
-		ListServerForm->Actions();
-		ListServerForm->Update();
-	} while(!ListServerForm->WantQuit());
+
+	ListServerForm->Run();
+
 	MyFree(ListServerForm);
 }
 
@@ -508,10 +500,27 @@ void MenAreAntsApp::ServerList()
 
 void TListServerForm::AfterDraw()
 {
+	if(Rejoin.empty() == false)
+	{
+		if(TMessageBox(StringF(_("You have been disconnected while playing to the %s game. Do you want to rejoin it ?"), Rejoin.c_str()),
+				BT_YES|BT_NO, this).Show() == BT_YES)
+		{
+			MenAreAntsApp::GetInstance()->ConnectedTo(Rejoin, Rejoin);
+		}
+		Rejoin.clear();
+	}
 	if(timer.time_elapsed() > 60)
 	{
 		MenAreAntsApp::GetInstance()->RefreshList();
 		timer.reset();
+	}
+	if(!MetaServer.IsConnected() && !MetaServer.WantDisconnect())
+	{
+		TMessageBox mb(_("You have been disconnected."), BT_OK, NULL);
+		mb.SetBackGround(Resources::Titlescreen());
+		mb.Show();
+		want_quit = true;
+		return;
 	}
 }
 
@@ -542,8 +551,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 	}
 	else if(RetourButton->Test(mouse, button))
 	{
-		if(EC_Client::GetInstance())
-			WAIT_EVENT_T(EC_Client::GetInstance()->IsConnected() == false, i, 4);
+		MenAreAntsApp::GetInstance()->Disconnect(&MetaServer);
 		want_quit = true;
 	}
 	else if(MissionButton->Test(mouse, button) || EscarmoucheButton->Test(mouse, button))
@@ -582,7 +590,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 }
 
 TListServerForm::TListServerForm(ECImage* w)
-	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), RecvSList(false)
+	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0)
 {
 	ServerList = AddComponent(new TListBox(Rectanglei(0, 0, 500,350)));
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
@@ -628,11 +636,12 @@ TListServerForm::TListServerForm(ECImage* w)
 EC_Client* MenAreAntsApp::Connect(std::string host)
 {
 	mutex = SDL_CreateMutex();
-	EC_Client* client = EC_Client::GetInstance(true);
+	EC_Client* client = &Server;
 
 	client->SetMutex(mutex);
 	client->SetHostName(stringtok(host, ":"));
 	client->SetPort(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
+	client->ClearCommands();
 	/* Ajout des commandes            CMDNAME		FLAGS	ARGS */
 	client->AddCommand(new ARMCommand(MSG_ARM,		0,	0));
 
@@ -668,25 +677,20 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->AddCommand(new REJOINCommand(MSG_REJOIN,	0,	1));
 	client->AddCommand(new ADMINCommand(MSG_ADMIN,		0,	0));
 
-	Thread = SDL_CreateThread(EC_Client::read_sock, client);
+	Server.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
 
 	WAIT_EVENT_T(client->IsConnected() || client->Error(), i, 5);
 
-	if(!client || !client->IsConnected())
+	if(!client->IsConnected())
 	{
 		std::string msg;
-		if(client)
-			client->SetWantDisconnect();
 
-		if(!client)
-			msg = _("Unable to connect.");
-		else
-			msg = _("Unable to connect:\n\n") + client->CantConnect();
+		client->SetWantDisconnect();
+
+		msg = _("Unable to connect:\n\n") + client->CantConnect();
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
-		SDL_WaitThread(Thread, 0);
-		delete client;
-		EC_Client::singleton = 0;
+		SDL_WaitThread(Server.Thread(), 0);
 		if(mutex)
 		{
 			SDL_DestroyMutex(mutex);
@@ -701,14 +705,10 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 void MenAreAntsApp::Disconnect(EC_Client* client)
 {
 	if(client)
-	{
 		client->SetWantDisconnect();
-		SDL_WaitThread(Thread, 0);
-		delete client;
-		EC_Client::singleton = NULL;
-	}
-	else if(Thread)
-		SDL_WaitThread(Thread, 0);
+
+	if(client->Thread())
+		SDL_WaitThread(client->Thread(), 0);
 
 	if(mutex)
 	{
@@ -719,7 +719,7 @@ void MenAreAntsApp::Disconnect(EC_Client* client)
 
 void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
 {
-	if(EC_Client::GetInstance())
+	if(Server.IsConnected())
 	{
 		FDebug(W_SEND|W_ERR, "We are already connected !");
 		return;
@@ -744,7 +744,7 @@ void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
 	catch(const TECExcept &e)
 	{
 		vDebug(W_ERR|W_SEND, e.Message(), e.Vars());
-		EC_Client::GetInstance()->SetWantDisconnect();
+		Server.SetWantDisconnect();
 		TMessageBox mb(_("An error was occured in game!!\n\n"
 		                 "It has been send to MenAreAnts' coders, and they are going to fix it.\n\n"
 		                 "Sorry for obstruct caused"), BT_OK, NULL);
@@ -771,14 +771,10 @@ void TConnectedForm::AfterDraw()
 {
 	if(Rejoin.empty() == false)
 	{
-		if(TMessageBox(StringF(_("You have been disconnected while playing to the %s game. Do you want to rejoin it ?"), Rejoin.c_str()),
-				BT_YES|BT_NO, this).Show() == BT_YES)
-		{
-			MenAreAntsApp::GetInstance()->RecoverGame(Rejoin);
-		}
+		MenAreAntsApp::GetInstance()->RecoverGame(Rejoin);
 		Rejoin.clear();
 	}
-	if(!client || !client->IsConnected())
+	if(!client->WantDisconnect() && !client->IsConnected())
 	{
 		TMessageBox mb(_("You have been disconnected."), BT_OK, NULL);
 		mb.SetBackGround(Resources::Titlescreen());

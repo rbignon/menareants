@@ -37,8 +37,8 @@ typedef unsigned int   uint;
 
 /* Interval */
 const int MAXBUFFER=1024;
-const uint ECD_SENDSIZE=1024;
-const uint ECD_RECVSIZE=1020;
+const uint ECD_SENDSIZE=8192;
+const uint ECD_RECVSIZE=1024;
 const int COMLEN=10;
 
 /* Config */

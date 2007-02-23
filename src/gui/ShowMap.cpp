@@ -39,6 +39,11 @@ void TMap::Init()
 	size.y = CASE_HEIGHT * map->Height();
 	size.x = CASE_WIDTH  * map->Width();
 
+	// Si en +SENDING on a envoyé une attaque, la non présence des images à l'écran faussera le dessin créé
+	std::vector<ECBEntity*> ents = Map()->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+		dynamic_cast<ECEntity*>(*enti)->SetAttaquedCase(dynamic_cast<ECEntity*>(*enti)->AttaquedCase());
+
 	SetAlwaysRedraw();
 	SetMustRedraw();
 }

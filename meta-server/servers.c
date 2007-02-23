@@ -35,6 +35,7 @@ struct Server* server_head = 0;
  * +v <version>                                   :- version du protocole
  * +V <version>                                   :- version du serveur
  * +i <port>                                      :- port du serveur
+ * +r <nick>                                      :- tel user peut rejoindre tel chan
  */
 int m_server_set (struct Client* cl, int parc, char** parv)
 {
@@ -89,6 +90,23 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 			case 'i':
 				cl->server->port = (i < parc && add) ? atoi(parv[i++]) : 0;
 				break;
+			case 'r':
+			{
+				unsigned int j;
+				for(j = 0; j < MAXREJOINS; ++j)
+					if(add && cl->server->rejoins[j][0] == 0)
+					{
+						strncpy(cl->server->rejoins[j], parv[i], NICKLEN);
+						break;
+					}
+					else if(!add && !strcmp(cl->server->rejoins[j], parv[i]))
+					{
+						cl->server->rejoins[j][0] = 0;
+						break;
+					}
+				i++;
+				break;
+			}
 			default:
 				break;
 		}
@@ -99,6 +117,7 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 struct Server* add_server(struct Client* cl, const char* name)
 {
 	struct Server *server = 0, *head = server_head;
+	unsigned i;
 
 	if(cl->server || cl->user)
 		return 0;
@@ -120,6 +139,10 @@ struct Server* add_server(struct Client* cl, const char* name)
 	server->version[0] = 0;
 	server->proto = server->port = server->nb_wait_games = server->nb_games = server->max_games = server->max_players = server->nb_players
 	              = server->tot_users = server->tot_games = 0;
+	server->uptime = Now;
+
+	for(i=0; i < MAXREJOINS; ++i)
+		server->rejoins[i][0] = 0;
 
 	cl->server = server;
 

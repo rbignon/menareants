@@ -57,6 +57,13 @@ int TRealClient::exit(const ECError& err, ECArgs args)
 	return 0;
 }
 
+int TRealClient::flush()
+{
+	send(GetFd(), SendBuf, sendlen, 0);
+
+	sendlen = 0;
+	return 0;
+}
 
 int TRealClient::sendbuf(std::string buf)
 {
@@ -67,7 +74,11 @@ int TRealClient::sendbuf(std::string buf)
 
 	buf += "\r\n";
 
-	send(GetFd(), buf.c_str(), buf.size(), 0);
+	memcpy(SendBuf + sendlen, buf.c_str(), buf.size());
+
+	sendlen += buf.size();
+
+	FD_SET(GetFd(), app.GlobalWriteSet());
 
 	return 0;
 }
@@ -303,7 +314,8 @@ TClient *ECServer::addclient(int fd, const char *ip)
 
 	if(fd >= 0)
 	{
-		FD_SET(fd, &global_fd_set);
+		FD_SET(fd, &global_read_set);
+		FD_SET(fd, &global_write_set);
 		myClients[fd] = newC;
 		if((unsigned)fd > highsock) highsock = fd;
 
@@ -333,6 +345,8 @@ void TClient::Free()
 			pl->ClearClient();
 			pl->SetDisconnected();
 			c->send_modes(pl, "+w");
+			if(!pl->Lost()) // On envoie que si bien sur il peut revenir
+				app.MSet("+r", pl->Nick());
 			if(!c->CheckPinging())
 				c->CheckReadys();
 		}
@@ -358,7 +372,8 @@ void ECServer::delclient(TClient *del)
 			MSet("+p", TypToStr(NBco));
 			Debug(W_CONNS, "<< Deconnexion de %s@%s", del->GetNick(), del->GetIp());
 		}
-		FD_CLR(del->GetFd(), &global_fd_set);
+		FD_CLR(del->GetFd(), &global_read_set);
+		FD_CLR(del->GetFd(), &global_write_set);
 		myClients.erase(del->GetFd());
 		close(del->GetFd());
 		if((unsigned)del->GetFd() >= highsock)
@@ -380,7 +395,8 @@ int ECServer::init_socket(void)
 	struct sockaddr_in localhost; /* bind info structure */
 
 	memset(&localhost, 0, sizeof localhost);
-	FD_ZERO(&global_fd_set);
+	FD_ZERO(&global_write_set);
+	FD_ZERO(&global_read_set);
 
 	sock = socket(AF_INET, SOCK_STREAM, 0); /* on demande un socket */
 	if(sock < 0)
@@ -410,7 +426,8 @@ int ECServer::init_socket(void)
 	listen(sock, 5);
 	if((unsigned)sock > highsock)
 		highsock = sock;
-	FD_SET(sock, &global_fd_set);
+	FD_SET(sock, &global_read_set);
+	FD_SET(sock, &global_write_set);
 
 	CurrentTS = time(NULL);
 	uptime = CurrentTS;
@@ -468,8 +485,7 @@ void ECServer::ParseMetaServer()
 	char buf[MAXBUFFER];
 	if(recv(ms_sock, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
 	{
-		Debug(W_WARNING, "Error in recv(meta-server) (%d: %s)\n", errno, strerror(errno));
-		FD_CLR(ms_sock, &global_fd_set);
+		FD_CLR(ms_sock, &global_read_set);
 		close(ms_sock);
 		ms_sock = 0;
 		ConnectMetaServer();
@@ -523,6 +539,8 @@ bool ECServer::ConnectMetaServer()
 		{
 			if(!(flags & F_SILENT))
 				std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ")" << std::endl;
+			close(ms_sock);
+			ms_sock = 0;
 			return false;
 		}
 
@@ -538,10 +556,12 @@ bool ECServer::ConnectMetaServer()
 	{
 		if(!(flags & F_SILENT))
 			std::cerr << "Unable to connect to meta-server " << hostname << " (Port " << port << ") : " << strerror(errno) << std::endl;
+		close(ms_sock);
+		ms_sock = 0;
 		return false;
 	}
 
-	FD_SET(ms_sock, &global_fd_set);
+	FD_SET(ms_sock, &global_read_set);
 
 	if((unsigned)ms_sock > highsock)
 		highsock = ms_sock;
@@ -554,7 +574,7 @@ bool ECServer::ConnectMetaServer()
 
 int ECServer::run_server(void)
 {
-	fd_set tmp_fdset;
+	fd_set tmp_write_set, tmp_read_set;
 	time_t last_call = CurrentTS;
 	struct timeval timeout = {0,0};
 
@@ -575,10 +595,11 @@ int ECServer::run_server(void)
 			flags &= ~F_RELOAD;
 		}
 
-		tmp_fdset = global_fd_set; /* save */
+		tmp_read_set = global_read_set;
+		tmp_write_set = global_write_set;
 		if((timeout.tv_sec = last_call + app.GetConf()->PingFreq() - CurrentTS) < 0) timeout.tv_sec = 0;
 		timeout.tv_usec = 0;
-		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
+		if(select(highsock + 1, &tmp_read_set, &tmp_write_set, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
 			{
@@ -591,7 +612,14 @@ int ECServer::run_server(void)
 			CurrentTS = time(NULL);
 			for(unsigned int i = 0;i <= highsock;++i)
 			{
-				if(!FD_ISSET(i, &tmp_fdset)) continue;
+				if(FD_ISSET(i, &tmp_write_set))
+				{
+					RealClientList::iterator cl = myClients.find(i);
+					if(cl != myClients.end())
+						dynamic_cast<TRealClient*>(cl->second)->flush();
+					FD_CLR(i, &global_write_set);
+				}
+				if(!FD_ISSET(i, &tmp_read_set)) continue;
 				if(i == (unsigned)sock)
 				{
 					struct sockaddr_in newcon;
@@ -601,7 +629,9 @@ int ECServer::run_server(void)
 						if(!addclient(newfd, inet_ntoa(newcon.sin_addr))) close(newfd);
 				}
 				else if(i == (unsigned)ms_sock)
+				{
 					ParseMetaServer();
+				}
 				else
 				{
 					RealClientList::iterator cl = myClients.find(i);

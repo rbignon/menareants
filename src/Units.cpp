@@ -72,8 +72,14 @@ std::string ECMcDo::SpecialInfo()
 		                        restDestroy);
 	else if(ex_owner == Owner())
 		return StringF(_("Free orders of McPuke for %s"), ex_owner->GetNick());
-	else
+	else if(ex_owner->IsMe())
+		return StringF(_("%s paies $1000 for orders to you"), Owner() ? Owner()->GetNick() : "Neutral");
+	else if(!Owner())
+		return StringF(_("Neutral paies $1000 for orders to %s"), ex_owner->GetNick());
+	else if(Owner()->IsMe())
 		return StringF(_("You pay $1000 for orders to %s"), ex_owner->GetNick());
+	else
+		return StringF(_("%s paies $1000 for orders to %s"), Owner()->GetNick(), ex_owner->GetNick());
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)
@@ -373,4 +379,11 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 	if(event_type & ARM_MOVE)
 			SetAnim(false);
 	return true;
+}
+
+void ECUnit::SetDeployed(bool d)
+{
+	ECBEntity::SetDeployed(d);
+	if(Deployed() && images[I_Deployed])
+		SetImage(images[I_Deployed]);
 }

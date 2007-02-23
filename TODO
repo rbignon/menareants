@@ -3,13 +3,11 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
--finir le truc de l'éditeur de maps
 -améliorer le proto2 du meta-server (gestion d'une base de données d'users)
 
 * Urgent
--de manière générale, faire en sorte que les alliés partagent un maximum d'infos
--améliorer le find fast path pour, si la case d'arrivée est inacessible, aller jusqu'à la case accessible
- la plus proche de la case d'arrivée.
+-meta-serveur: gestion d'une base de données
+-finir le truc de l'éditeur de maps (pose de case intelligente (mer et terre))
 -pouvoir envoyer un changement de niveau via le protocole
 -pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 

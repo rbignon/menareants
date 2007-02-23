@@ -152,7 +152,7 @@ class TRealClient : public TClient
 public:
 
 	TRealClient(int _fd, const char* _ip)
-	    : TClient(_fd, _ip), recvlen(0)
+	    : TClient(_fd, _ip), recvlen(0), sendlen(0)
 	{}
 
 /* Methodes */
@@ -167,6 +167,8 @@ public:
 	virtual int sendrpl(const ECError&, ECArgs = ECArgs());
 	virtual int sendrpl(const ECPacket&);
 
+	int flush();
+
 
 	/** Close connexion with client and send a formated message. */
 	int exit(const ECMessage&, ECArgs = ECArgs());
@@ -179,6 +181,8 @@ public:
 private:
     char RecvBuf[ECD_RECVSIZE+1];
     size_t recvlen;
+    char SendBuf[ECD_SENDSIZE+1];
+    size_t sendlen;
 };
 
 #endif

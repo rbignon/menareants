@@ -373,7 +373,12 @@ std::nrvector<TClient*> ECEntity::EntitiesToClients(std::vector<ECEntity*> entit
 	std::nrvector<TClient*> players;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if((*it)->Owner() && (*it)->Owner()->Client())
+		{
+			std::vector<ECBPlayer*> allies = (*it)->Owner()->Allies();
+			FORit(ECBPlayer*, allies, al)
+				players.push_back(dynamic_cast<ECPlayer*>(*al)->Client());
 			players.push_back((*it)->Owner()->Client());
+		}
 	return players;
 }
 

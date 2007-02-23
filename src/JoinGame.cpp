@@ -1175,7 +1175,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 bool MenAreAntsApp::RecoverGame(std::string chan)
 {
-	EC_Client* client = EC_Client::GetInstance();
+	EC_Client* client = &Server;
 
 	if(!client)
 		return false;
@@ -1209,15 +1209,15 @@ bool MenAreAntsApp::RecoverGame(std::string chan)
 
 bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 {
-	if(!EC_Client::GetInstance())
-		throw ECExcept(VPName(EC_Client::GetInstance()), "Non connecté");
+	if(!Server.IsConnected())
+		throw ECExcept(VBName(Server.IsConnected()), "Non connecté");
 
 	std::string name; /* note: comme cpath va pointer sur la valeur de name tout au long du truc, il est préferable
 	                   *       de le laisser en global de la fonction et pas uniquement dans le bloc if(!cname)
 	                   */
 	bool create = false;
 
-	EC_Client* client = EC_Client::GetInstance();
+	EC_Client* client = &Server;
 
 #ifdef SETTED_NAME
 	std::string setted_name = client->GetNick() + "'s game";

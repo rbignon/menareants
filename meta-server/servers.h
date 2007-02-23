@@ -21,8 +21,12 @@
 #ifndef ECMS_SERVERS_H
 #define ECMS_SERVERS_H
 
+#include <time.h>
+#include "lib/Defines.h"
+
 #define SERVERLEN 50
 #define VERSIONLEN 50
+#define MAXREJOINS 10
 
 struct Server
 {
@@ -37,7 +41,9 @@ struct Server
 	int port;
 	int tot_users;
 	int tot_games;
+	time_t uptime;
 	char version[VERSIONLEN+1];
+	char rejoins[MAXREJOINS][NICKLEN+1];
 
 	struct Server* next;
 	struct Server* last;

@@ -37,17 +37,13 @@
 #include "Debug.h"
 #include "Config.h"
 
-EC_Client* EC_Client::singleton = NULL;
-EC_Client* EC_Client::GetInstance(bool create)
-{
-	if (singleton == NULL && create)
-		singleton = new EC_Client();
-
-	return singleton;
-}
+EC_Client MetaServer;
+EC_Client Server;
 
 int EC_Client::sendrpl(const ECError& err, ECArgs args)
 {
+	if(!sock || !connected && !logging) return -1;
+
 	std::string buf;
 
 	buf += static_cast<char>(MSG_ERROR);
@@ -330,10 +326,18 @@ void EC_Client::Disconnect()
 	}
 }
 
+void EC_Client::ClearCommands()
+{
+	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end(); ++it)
+		delete *it;
+
+	Commands.clear();
+}
+
 EC_Client::~EC_Client()
 {
 	Disconnect();
+	ClearCommands();
 
-	for(std::vector<EC_ACommand*>::const_iterator it = Commands.begin(); it != Commands.end(); ++it)
-		delete *it;
+
 }

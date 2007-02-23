@@ -90,6 +90,17 @@ void ECJouano::Invest(ECBEntity* entity)
  *                               ECMcDo                                                     *
  ********************************************************************************************/
 
+void ECMcDo::Resynch(ECPlayer* pl)
+{
+	if(caserne)
+	{
+		Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_INVESTED, TypToStr(caserne->Type())));
+		Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_EXOWNER, ex_owner ? ex_owner->GetNick() : "McGerbale neutre"));
+	}
+	if(restDestroy > 0)
+		Channel()->SendArm(pl->Client(), this, ARM_DATA, 0,0, ECData(DATA_JOUANO, TypToStr(restDestroy)));
+}
+
 void ECMcDo::Invest(ECBEntity* entity)
 {
 	if(IsZombie()) return;

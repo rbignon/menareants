@@ -39,14 +39,12 @@ const int MAXBUFFER=1024;
 class EC_ACommand;
 class ECPlayer;
 struct SDL_mutex;
+struct SDL_Thread;
 
 class EC_Client
 {
 /* Constructeur/Destructeur */
 public:
-
-	static EC_Client* singleton;
-	static EC_Client* GetInstance(bool create = false);
 
 	EC_Client(const char *hostname, unsigned short port);
 	EC_Client();
@@ -55,35 +53,6 @@ public:
 
 /* Fonctions publiques */
 public:
-
-	/** Messages à utiliser dans les reply
-	 *
-	 * \attention mettre à jour systematiquement msgTab[] dans Sockets.cpp
-	 */
-	enum msg {
-		IAM,         /**< IAM */
-		PONG,        /**< POG */
-		ERRORN,      /**< ERR */
-		ERRORV,      /**< ERR */
-		STAT,        /**< STAT */
-		ADMIN,       /**< ADMIN */
-
-		LISTGAME,    /**< LSP */
-		JOIN,        /**< JOI */
-		CREATE,      /**< JOI $ */
-		LEAVE,       /**< LEA */
-		KICK,        /**< KICK */
-		MSG,         /**< MSG */
-		AMSG,        /**< AMSG */
-		SET,         /**< SET */
-		JIA,         /**< JIA */
-
-		ARM,         /**< ARM */
-		BREAKPOINT,  /**< BP */
-		SAVE,        /**< SAVE */
-
-		NONE
-	};
 
 	static int read_sock(void *data);
 
@@ -118,12 +87,16 @@ public:
 	void UnlockScreen() const;
 
 	void AddCommand(EC_ACommand* cmd) { Commands.push_back(cmd); }
+	void ClearCommands();
 
 	void SetHostName(std::string h) { hostname = h; }
 	std::string HostName() const { return hostname; }
 
 	void SetPort(unsigned p) { port = p; }
 	unsigned Port() const { return port; }
+
+	void SetThread(SDL_Thread* t) { thread = t; }
+	SDL_Thread* Thread() const { return thread; }
 
 /* Variables protégées */
 private:
@@ -147,6 +120,7 @@ private:
 
 	ECPlayer *pl;
 	SDL_mutex* mutex;
+	SDL_Thread* thread;
 
 	std::string hostname;
 	unsigned int port;
@@ -155,5 +129,8 @@ private:
 	void Loop();
 	void Disconnect();
 };
+
+extern EC_Client MetaServer;
+extern EC_Client Server;
 
 #endif /* EC_Sockets_h */

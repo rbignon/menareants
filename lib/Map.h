@@ -397,7 +397,7 @@ public:
 	 * shoot someone.
 	 */
 	bool Deployed() const { return deployed; }
-	void SetDeployed(bool d = true) { deployed = d; }
+	virtual void SetDeployed(bool d = true) { deployed = d; }
 
 	/** C'est pour que ECList\<ECBEntity*\> puisse faire appel à Shadowed(), qui ne sera utilisé que dans le serveur.
 	 * En effet ce dernier a que des instances de ECEntity qui eux contiennent bien Shadowed().

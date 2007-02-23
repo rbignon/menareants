@@ -40,6 +40,11 @@ void sig_die(int c)
 	running = 0;
 }
 
+void sig_restart(int c)
+{
+	running = -1;
+}
+
 int main(int argc, char **argv)
 {
 	struct rlimit rlim; /* used for core size */
@@ -71,6 +76,7 @@ int main(int argc, char **argv)
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, &sig_die);
+	signal(SIGINT, &sig_restart);
 
 	if(background)
 	{
@@ -95,6 +101,9 @@ int main(int argc, char **argv)
 		run_server();
 
 	clean_up();
+
+	if(running < 0)
+		execlp(argv[0], argv[0], NULL, NULL); /* restarting.. */
 
 	exit(EXIT_SUCCESS);
 }

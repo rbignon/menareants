@@ -88,6 +88,9 @@ public:
 	};
 	bool HasFlag(int i) { return flags & i; }
 
+	fd_set* GlobalReadSet() { return &global_read_set; }
+	fd_set* GlobalWriteSet() { return &global_write_set; }
+
 protected:
 	Config *conf;
 	int run_server(void);
@@ -101,7 +104,8 @@ protected:
 	time_t uptime;
 	int sock, ms_sock;
 	unsigned int highsock;
-	fd_set global_fd_set;
+	fd_set global_read_set;
+	fd_set global_write_set;
 	std::string path;
 
 	int flags;

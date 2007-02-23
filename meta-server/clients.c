@@ -43,15 +43,27 @@ char* FormatStr(const char* s)
 	return ptr;
 }
 
-/* LSP <ip:port> <nom> <+/-> <nbjoueurs> <nbmax> <nbgames> <maxgames> <nbwgames> <proto> <version> <tot_users> <tot_games> */
+/* LSP <ip:port> <nom> <+/-> <nbjoueurs> <nbmax> <nbgames> <maxgames> <nbwgames> <proto> <version> <tot_users> <tot_games> <uptime> */
 static void list_servers(struct Client* cl)
 {
 	struct Server* s = server_head;
 	for(; s; s = s->next)
-		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d %s %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
+	{
+		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d %s %d %d %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
 		                   ((s->nb_games - s->nb_wait_games) >= s->max_games || s->nb_players >= s->max_players) ? '-' : '+',
 		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto, FormatStr(s->version),
-		                   s->tot_users, s->tot_games);
+		                   s->tot_users, s->tot_games, s->uptime);
+		if(cl->proto >= 2)
+		{
+			unsigned i;
+			for(i=0; i < MAXREJOINS; ++i)
+				if(s->rejoins[i][0] != 0 && !strcmp(s->rejoins[i], cl->user->name))
+				{
+					sendrpl(cl, MSG_REJOIN, "%s:%d", s->client->ip, s->port ? s->port : SERV_DEFPORT);
+					break;
+				}
+		}
+	}
 
 	sendcmd(cl, MSG_ENDOFSLIST);
 	return;
@@ -61,6 +73,13 @@ static void send_stats(struct Client* cl)
 {
 	sendrpl(cl, MSG_STAT, "%d %d", nb_tchan, nb_tusers);
 	return;
+}
+
+int m_serv_list (struct Client* cl, int parc, char** parv)
+{
+	send_stats(cl);
+	list_servers(cl);
+	return 0;
 }
 
 int m_pong (struct Client* cl, int parc, char** parv)

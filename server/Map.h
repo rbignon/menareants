@@ -89,6 +89,9 @@ public:
 	 */
 	virtual void Created(bool for_me) {}
 
+	/** This function is called when we send all entities for a REJOINS player... */
+	virtual void Resynch(ECPlayer* pl) {}
+
 	/** Shoot an entity */
 	void Shoot(ECEntity*, uint);
 	void Shooted(uint n) { shooted += n; }

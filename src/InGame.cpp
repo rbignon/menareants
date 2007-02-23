@@ -303,7 +303,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			(*it)->SetNb(nb);
 		}
-		if(flags & ARM_DEPLOY && chan->State() == EChannel::ANIMING)
+		if(flags & ARM_DEPLOY && (chan->State() == EChannel::ANIMING || (flags & ARM_CREATE)))
 			(*it)->SetDeployed(deployed);
 		if(flags & ARM_ATTAQ)
 			(*it)->SetAttaquedCase(dynamic_cast<ECase*>((*map)(x,y)));
@@ -368,7 +368,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			event_case->SetImage(Resources::CaseTerreDead());
 	}
 	/* PLAYING */
-	else if(chan->State() == EChannel::PLAYING)
+	else if(chan->State() <= EChannel::PLAYING)
 	{
 		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		{
@@ -378,6 +378,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				(*it)->DelEvent(ARM_ATTAQ); // Il est certain que l'on perd *au moins* l'evenement d'attaque
 				if((*it)->Move()->Empty()) // Dans le cas où l'on est revenu au début, on a plus aucun evenement
 					(*it)->SetEvent(0);
+			}
+			else if(flags & ARM_CREATE)
+			{ // Il est possible que lors d'un create, il y ait une indication de deploy, donc ce n'est pas un souhait
+			  // mais quelque chose d'établis
+				flags &= ~ARM_DEPLOY;
 			}
 			else
 			{
@@ -392,7 +397,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 
 	/* APRES ANIMATIONS */
-	if(flags & ARM_CONTENER && container && chan->State() == EChannel::ANIMING)
+	if((flags & ARM_CONTENER) && container && (chan->State() == EChannel::ANIMING || chan->State() == EChannel::SENDING))
 		for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 			container->Contain(*it);
 	if(flags & ARM_REMOVE)
@@ -670,8 +675,8 @@ void TInGameForm::FindIdling()
 
 void MenAreAntsApp::InGame()
 {
-	EC_Client* client = EC_Client::GetInstance();
-	if(!client || !client->Player() || !client->Player()->Channel()->Map())
+	EC_Client* client = &Server;
+	if(!client->IsConnected() || !client->Player() || !client->Player()->Channel()->Map())
 		throw ECExcept(VPName(client), "Non connecté ou non dans un chan");
 
 	EChannel* chan = client->Player()->Channel();
@@ -776,7 +781,7 @@ void TInGameForm::AfterDraw()
 			if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
 			{
 				client->sendrpl(MSG_SET, "+!");
-				elapsed_time.reset();
+				//elapsed_time.reset();
 			}
 			break;
 		case EChannel::ANIMING:
@@ -1538,7 +1543,7 @@ void TBarreAct::CreateUnit(TObject* o, void* e)
 	args += "%" + TypToStr(entity->Type());
 	args += "=" + TypToStr(x) + "," + TypToStr(y);
 	args += "+";
-	EC_Client::GetInstance()->sendrpl(MSG_ARM, args);
+	Server.sendrpl(MSG_ARM, args);
 }
 
 void TBarreAct::UnSelect()
@@ -1659,7 +1664,7 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Name->SetCaption(e->Name());
 		InGameForm->BarreAct->Nb->SetCaption(
 		    e->Nb() ?
-		       (((e->Owner() != InGameForm->BarreAct->me) ? "~ " : "") + TypToStr(e->Nb()))
+		       (((e->Owner() != InGameForm->BarreAct->me && (!e->Owner() || !e->Owner()->IsAllie(InGameForm->BarreAct->me))) ? "~ " : "") + TypToStr(e->Nb()))
 		       : "???");
 		InGameForm->BarreAct->Nb->Show();
 		InGameForm->BarreAct->SpecialInfo->SetCaption(e->SpecialInfo());
@@ -1992,9 +1997,9 @@ void TBarreLat::Init()
 
 void MenAreAntsApp::Options(EChannel* chan)
 {
-	EC_Client* client = EC_Client::GetInstance();
-	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+	EC_Client* client = &Server;
+	if(!client->IsConnected() || !client->Player())
+		throw ECExcept(VBName(client->IsConnected()) VPName(client->Player()), "Non connecté ou non dans un chan");
 
 	try
 	{
@@ -2192,9 +2197,9 @@ void LoadingGame(EC_Client* me)
 
 void MenAreAntsApp::LoadGame(EChannel* chan)
 {
-	EC_Client* client = EC_Client::GetInstance();
-	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+	EC_Client* client = &Server;
+	if(!client->IsConnected() || !client->Player())
+		throw ECExcept(VBName(client->IsConnected()) VPName(client->Player()), "Non connecté ou non dans un chan");
 
 	try
 	{
@@ -2300,18 +2305,17 @@ void TLoadPlayerLine::Draw(const Point2i& mouse)
 
 void MenAreAntsApp::PingingGame()
 {
-	EC_Client* client = EC_Client::GetInstance();
-	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+	if(!Server.IsConnected() || !Server.Player())
+		throw ECExcept(VBName(Server.IsConnected()) VPName(Server.Player()), "Non connecté ou non dans un chan");
 
-	EChannel* chan = client->Player()->Channel();
+	EChannel* chan = Server.Player()->Channel();
 
 	if(chan->State() != EChannel::PINGING)
 		return;
 
 	try
 	{
-		PingingForm = new TPingingForm(Video::GetInstance()->Window(), client, chan);
+		PingingForm = new TPingingForm(Video::GetInstance()->Window(), &Server, chan);
 
 		PingingForm->SetMutex(mutex);
 
@@ -2459,9 +2463,8 @@ void TScoresForm::WantLeave(TObject* o, void* cl)
 
 void MenAreAntsApp::Scores(EChannel* chan)
 {
-	EC_Client* client = EC_Client::GetInstance();
-	if(!client || !client->Player())
-		throw ECExcept(VPName(client) VPName(client->Player()), "Non connecté ou non dans un chan");
+	if(!Server.IsConnected() || !Server.Player())
+		throw ECExcept(VPName(Server.IsConnected()) VPName(Server.Player()), "Non connecté ou non dans un chan");
 
 	Resources::DingDong()->Play();
 
@@ -2472,12 +2475,12 @@ void MenAreAntsApp::Scores(EChannel* chan)
 			return;
 
 		ScoresForm->SetMutex(mutex);
-		ScoresForm->RetourButton->SetOnClick(TScoresForm::WantLeave, client);
+		ScoresForm->RetourButton->SetOnClick(TScoresForm::WantLeave, &Server);
 		do
 		{
 			ScoresForm->Actions();
 			ScoresForm->Update();
-		} while(client->IsConnected() && client->Player() &&
+		} while(Server.IsConnected() && Server.Player() &&
 		        chan->State() == EChannel::SCORING);
 
 	}

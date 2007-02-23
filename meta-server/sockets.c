@@ -145,9 +145,10 @@ int parsemsg(struct Client* cl)
 		int (*func) (struct Client*, int, char**);
 	} cmds[] =
 	{
-		{MSG_IAM,   m_login},
-		{MSG_SET,   m_server_set},
-		{MSG_PONG,  m_pong}
+		{MSG_IAM,      m_login},
+		{MSG_SET,      m_server_set},
+		{MSG_PONG,     m_pong},
+		{MSG_SERVLIST, m_serv_list}
 	};
 
 	parc = SplitBuf(cl->RecvBuf, parv, MAXPARA);
@@ -329,10 +330,16 @@ void clean_up(void)
 			if(del->user)
 				remove_user(del->user);
 			del->flags = CL_FREE;
-			del->fd = 0;
 
 			close(del->fd);
+			del->fd = 0;
 		}
+
+	if(sock)
+	{
+		close(sock);
+		sock = 0;
+	}
 }
 
 int run_server(void)
@@ -341,7 +348,7 @@ int run_server(void)
 	time_t last_call = time(NULL);
 	struct timeval timeout = {0,0};
 
-	while(running)
+	while(running > 0)
 	{
 		if(last_call + pingfreq < Now)
 		{

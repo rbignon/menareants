@@ -67,6 +67,8 @@ public:
 
 	void RefreshColor(Color last);
 
+	virtual void SetDeployed(bool d = true);
+
 /* Mathodes prot��s */
 protected:
 	bool MoveEffect(const std::vector<ECEntity*>&);

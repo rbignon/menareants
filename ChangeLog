@@ -1,10 +1,32 @@
+2007-02-22 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: Maintenant il y a une instance par connexion.
+
+	* src/Login.cpp: Support de la version 2 du protocole MetaServer.
+
+	* server/Server.cpp: Les envoies sont asynchrones.
+
+	* meta-server/servers.c, meta-server/clients.c: Envoie l'uptime du serveur.
+
+	* meta-server/main.c: Support du restart.
+
+	* meta-server/sockets.c: Correction d'un bug qui ne fermait pas les connexions correctement lors de la fermeture du serveur.
+
+	* src/Login.cpp, meta-server/server.c, server/Server.cpp, server/Channels.cpp: Gestion des REJOIN.
+
+	* server/Channels.cpp (EChannels::SendEntities): Envoie les évenements et gère les unités contenues.
+
+	* src/InGame.cpp: Corrections concernant l'envoie d'unités lors du resynch en SENDING d'un REJOIN.
+
+	* serger/Channels.cpp, server/InGame.cpp: Les informations sont un maximum partagées entre les alliés (nombres dans les unités).
+
 2007-02-21 Romain Bignon <progs@headfucking.net>
 
 	* src/gui/Form.cpp: Utilisation du TMemo Hint comme bulle d'aide à coté de la souris plutot que d'un pointeur vers un composant de la fenêtre.
 
 	* lib/Version.h, lib/v.sh: La version SVN est maintenant écrite ici.
 
-	* meta-server/server.cpp: La version de chaque serveur, ainsi que le nombre total de  connexions et de parties, sont envoyées.
+	* meta-server/server.c: La version de chaque serveur, ainsi que le nombre total de  connexions et de parties, sont envoyées.
 
 2007-02-20 Romain Bignon <progs@headfucking.net>
 

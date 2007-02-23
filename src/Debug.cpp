@@ -60,12 +60,12 @@ int vDebug(unsigned int flags, std::string msg, std::string vars)
 	else if(flags & W_DEBUG)   s ="[DEBUG]   ";
 	s += msg;
 
-	if(flags & W_SEND && EC_Client::GetInstance())
+	if(flags & W_SEND && Server.IsConnected())
 	{
 		if(vars.empty())
-			EC_Client::GetInstance()->sendrpl(MSG_ERROR, ECArgs(s));
+			Server.sendrpl(MSG_ERROR, ECArgs(s));
 		else
-			EC_Client::GetInstance()->sendrpl(MSG_ERROR, ECArgs(s, vars));
+			Server.sendrpl(MSG_ERROR, ECArgs(s, vars));
 	}
 
 	std::cout << s << std::endl;

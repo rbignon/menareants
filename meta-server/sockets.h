@@ -68,5 +68,6 @@ void clean_up(void);
 
 extern unsigned nb_tchan;
 extern unsigned nb_tusers;
+extern time_t Now;
 
 #endif /* ECMS_SOCKETS_H */

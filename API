@@ -253,7 +253,7 @@ Sommaire:
         > STAT <nbtchan> <nbtusers>                        :Statistiques
         > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste un serveur
                      <nbmax> <nbgames> <maxgames> <proto>
-                     <version> <totusers> <totgames>
+                     <version> <totusers> <totgames> <uptime>
         > EOL                                              :fin du listing
 
         > NICKUSED                                         :pseudo déjà utilisé
