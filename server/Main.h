@@ -79,6 +79,7 @@ public:
 	void delclient(TClient *del);
 
 	int MSet(std::string, ECArgs = ECArgs());
+	int MSet(ECPlayer*, std::string, ECArgs = ECArgs());
 
 	enum
 	{

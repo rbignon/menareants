@@ -51,6 +51,7 @@ public:
 	std::string hostname;
 	int port;
 	std::string nick;
+	std::string passwd;
 	unsigned int color;
 	unsigned int nation;
 	unsigned int screen_width;

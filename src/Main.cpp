@@ -137,6 +137,7 @@ void MenAreAntsApp::WantConfig(TObject*, void* b)
 
 void MenAreAntsApp::UnLoad()
 {
+	Config::GetInstance()->save();
 #ifdef WIN32
 	WSACleanup();
 #endif
@@ -366,6 +367,7 @@ public:
 	TLabel*   Label5;
 	TLabel*   Label7;
 	TLabel*   Label6;
+	TImage*   Title;
 	TMemo*    Memo;
 
 	TButtonText* OkButton;
@@ -401,16 +403,23 @@ void MenAreAntsApp::WantCredits(TObject*, void*)
 TCredits::TCredits(ECImage* w)
 	: TForm(w), want_goback(false)
 {
-	Label1 = AddComponent(new TLabel(105,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
-	Label2 = AddComponent(new TLabel(135,_("* Programmer"), red_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TImage(300, 100, (Height()<800 ? Resources::TitleMini() : Resources::Title()), false));
+	Title->SetXY(Width()/2 - Title->Width()/2, 50);
 
-	Label3 = AddComponent(new TLabel(50,205,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
-	Label4 = AddComponent(new TLabel(50,235,_("* \"Graphiste\""), fgreen_color, Font::GetInstance(Font::Big)));
+	Label1 = AddComponent(new TLabel(Title->Y()+Title->Height()+10,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
+	Label2 = AddComponent(new TLabel(Label1->Y()+Label1->Height(),_("* Programmer"), red_color, Font::GetInstance(Font::Big)));
 
-	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,205,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
-	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,235,_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
+	Label3 = AddComponent(new TLabel(50,Label2->Y()+Label2->Height()+30,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
+	Label4 = AddComponent(new TLabel(50,Label3->Y()+Label3->Height(),_("* \"Graphiste\""), fgreen_color, Font::GetInstance(Font::Big)));
 
-	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
+	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label2->Y()+Label2->Height()+30,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
+	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label3->Y()+Label3->Height(),_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
+
+	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, _("Back"),
+	                                        Font::GetInstance(Font::Normal)));
+
+	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, Label6->Y()+Label6->Height()+30, SCREEN_WIDTH-50-50,
+	                              SCREEN_HEIGHT-(Label6->Y()+Label6->Height()+30)-OkButton->Height()-20, 0, false));
 	Memo->SetShadowed();
 	Memo->AddItem(_("Contributors:\n"
 	                "\n"
@@ -423,9 +432,6 @@ TCredits::TCredits(ECImage* w)
 	                "- Zic, Spouize, Nico, Mathieu and Thomas who have tested the game."), white_color);
 
 	Memo->ScrollUp();
-
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, _("Back"),
-	                                        Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

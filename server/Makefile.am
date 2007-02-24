@@ -1,7 +1,7 @@
 SUBDIRS = maps
 
 DEFS = -DCONFDIR=\"${sysconfdir}/\" -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
-INCLUDES = -I. -I$(top_srcdir) -I$(top_srcdir)/lib
+INCLUDES = -I$(top_srcdir)/lib
 LIBS =
 
 bin_PROGRAMS = menareants-server

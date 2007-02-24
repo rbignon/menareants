@@ -22,9 +22,13 @@
 #include <assert.h>
 #include "main.h"
 #include "clients.h"
+#include "database.h"
 #include "servers.h"
 #include "sockets.h"
 #include "lib/Defines.h"
+
+#define PASS_HASH "la"
+extern char *crypt(const char *, const char *);
 
 struct User* user_head = 0;
 
@@ -82,10 +86,95 @@ int m_serv_list (struct Client* cl, int parc, char** parv)
 	return 0;
 }
 
+int m_show_scores(struct Client* cl, int parc, char** parv)
+{
+#if 0 /** @todo à faire */
+	struct RegUser (*list)[50];
+
+	int i, k;
+	struct RegUser *u = reguser_head;
+
+	for(i=0;i<=MAXUSERS && u;i++, u=u->next)
+		lstats[i].u = u;
+
+	for(i=1; i < tusers;i++)
+	{
+		k=i;
+		while(k && lstats[k].u->stats->score > lstats[k-1].u->stats->score)
+		{
+			u = lstats[k-1].u;
+			lstats[k-1].u = lstats[k].u;
+			lstats[k].u = u;
+			k--;
+		}
+	}
+#endif
+
+	return 0;
+
+}
+
 int m_pong (struct Client* cl, int parc, char** parv)
 {
 	cl->flags &= ~CL_PING;
 	return 0;
+}
+
+/* REG <pass> */
+int m_reg_nick (struct Client* cl, int parc, char** parv)
+{
+	struct RegUser* reg = 0;
+
+	if(!cl->user || !(cl->flags & CL_USER) || (cl->flags & CL_LOGGED))
+		return 0;
+
+	if(parc < 2)
+		return 0;
+
+	reg = add_reguser(cl->user->name, crypt(parv[1], PASS_HASH), 0, 0, 0, 0, 0, 0);
+
+	cl->flags = (CL_USER|CL_LOGGED);
+	cl->user->reguser = reg;
+	reg->user = cl->user;
+
+	return senderr(cl, ERR_LOGIN_SUCCESS);
+}
+
+/* LOGIN <pass> */
+int m_login_nick (struct Client* cl, int parc, char** parv)
+{
+	struct RegUser* reg = 0;
+	struct User* user = user_head;
+
+	if(!cl->user || (cl->flags & CL_USER) || (cl->flags & CL_SERVER) || parc < 2)
+		return senderr(cl, ERR_LOGIN_BADPASS);
+
+	if(!(reg = find_reguser(cl->user->name)))
+		return senderr(cl, ERR_CMDS);
+
+	if(strcmp(reg->passwd, crypt(parv[1], PASS_HASH)))
+	{
+		senderr(cl, ERR_LOGIN_BADPASS);
+		delclient(cl);
+		return 0;
+	}
+
+	cl->flags = (CL_USER|CL_LOGGED);
+	cl->user->reguser = reg;
+	reg->user = cl->user;
+	send_stats(cl);
+	list_servers(cl);
+
+	while(user)
+		if(user != cl->user && !strcasecmp(user->name, reg->name))
+		{
+			struct User* save = user->next;
+			delclient(user->client);
+			user = save;
+		}
+		else user = user->next;
+
+	return senderr(cl, ERR_LOGIN_SUCCESS);
 }
 
 /* IAM <name> <prog> <version> */
@@ -103,14 +192,30 @@ int m_login (struct Client* cl, int parc, char** parv)
 
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
+		if(strchr(parv[1], ' '))
+		{
+			senderr(cl, ERR_CMDS);
+			delclient(cl);
+			return 0;
+		}
 		if(proto >= 2)
 		{
 			struct User* user = user_head;
+			struct RegUser* reg = reguser_head;
+
 			for(; user; user = user->next)
-				if(!strcasecmp(user->name, parv[1]))
-					return senderr(cl, ERR_NICK_USED);
+				if(user->client && (user->client->flags & CL_USER) && !strcasecmp(user->name, parv[1]))
+				{
+					senderr(cl, ERR_NICK_USED);
+					delclient(cl);
+					return 0;
+				}
 
 			add_user(cl, parv[1]);
+
+			for(; reg; reg = reg->next)
+				if(!strcasecmp(reg->name, parv[1]))
+					return senderr(cl, ERR_REGNICK);
 		}
 		cl->flags = CL_USER;
 		send_stats(cl);
@@ -151,8 +256,9 @@ struct User* add_user(struct Client* cl, const char* name)
 	}
 
 	strncpy(user->name, name, NICKLEN);
-	user->client = cl;
+	user->reguser = 0;
 
+	user->client = cl;
 	cl->user = user;
 
 	user_head = user;
@@ -168,6 +274,8 @@ void remove_user(struct User* user)
 	assert(user);
 
 	user->client->user = 0;
+	if(user->reguser)
+		user->reguser->user = 0;
 
 	if(user->next) user->next->last = user->last;
 	if(user->last) user->last->next = user->next;

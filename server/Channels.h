@@ -87,11 +87,12 @@ public:
 
 	struct stats_t
 	{
-		stats_t() : killed(0), shooted(0), created(0), score(0) {}
+		stats_t() : killed(0), shooted(0), created(0), score(0), best_revenu(0) {}
 		uint killed;
 		uint shooted;
 		uint created;
 		uint score;
+		int best_revenu;
 	};
 
 	stats_t Stats() const { return stats; }
@@ -114,6 +115,8 @@ public:
 
 	ECList<ECEvent*>* Events() { return &events; }
 
+	void CalculBestRevenu(int revenu) { if(revenu > stats.best_revenu) stats.best_revenu = revenu; }
+
 /* Variables privées */
 private:
 	TClient *client;
@@ -121,6 +124,7 @@ private:
 	BPlayerVector votes;
 	std::vector<BreakPoint> breakpoints;
 	ECList<ECEvent*> events;
+	int best_revenu;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 

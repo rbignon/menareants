@@ -64,7 +64,13 @@ enum ECMessage
 	MSG_SCORE,     // f
 
 	MSG_SERVLIST,  // g
-	MSG_ENDOFSLIST // h
+	MSG_ENDOFSLIST,// h
+
+	MSG_REGNICK,   // i
+	MSG_LOGIN,     // j
+	MSG_USET,      // k
+
+	MSG_END
 
 };
 
@@ -82,7 +88,10 @@ enum ECError
 	ERR_ADMIN_NOSUCHVICTIM,
 	ERR_ADMIN_CANT_REHASH,
 	ERR_ADMIN_SUCCESS,
-	ERR_BANNED
+	ERR_BANNED,
+	ERR_REGNICK,
+	ERR_LOGIN_SUCCESS,
+	ERR_LOGIN_BADPASS
 };
 
 #ifdef __cplusplus

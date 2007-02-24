@@ -3,7 +3,7 @@ SUBDIRS = data
 bin_PROGRAMS = menareants
 
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
-INCLUDES = -I. -I$(top_srcdir) -I${top_srcdir}/lib
+INCLUDES = -I${top_srcdir}/lib
 AM_CXXFLAGS=-DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
 
 menareants_SOURCES = \

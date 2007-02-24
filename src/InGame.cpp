@@ -290,7 +290,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	/* AVANT ANIMATIONS */
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		if(flags & ARM_CREATE)
+		if(flags & ARM_TYPE)
 			(*it)->Created();
 		if(flags & ARM_NUMBER)
 		{
@@ -379,7 +379,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if((*it)->Move()->Empty()) // Dans le cas où l'on est revenu au début, on a plus aucun evenement
 					(*it)->SetEvent(0);
 			}
-			else if(flags & ARM_CREATE)
+			else if(flags & ARM_TYPE)
 			{ // Il est possible que lors d'un create, il y ait une indication de deploy, donc ce n'est pas un souhait
 			  // mais quelque chose d'établis
 				flags &= ~ARM_DEPLOY;
@@ -440,7 +440,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 	if(InGameForm && chan->State() == EChannel::PLAYING)
 	{
-		if(flags & ARM_CREATE)
+		if(flags & ARM_TYPE)
 		{
 			me->LockScreen();
 			InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
@@ -2512,7 +2512,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	                      Font::GetInstance(Font::Huge)));
 
 	Players = AddComponent(new TList(70, 250));
-	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Kills"), _("Creations"), _("Score")));
+	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Killed"), _("Creations"), _("Score")));
 
 	InitDate = AddComponent(new TLabel(150, _("Begin of engagements:  ") + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));

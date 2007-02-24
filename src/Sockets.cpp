@@ -202,6 +202,7 @@ void EC_Client::Loop()
 		}
 	}
 	Disconnect();
+	thread = 0;
 }
 
 void EC_Client::LockScreen() const
@@ -258,6 +259,7 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	error = false;
 	logging = true;
 	want_disconnect = false;
+	readQi = 0;
 
 	/* Si c'est une host, on la résoud */
 	if(!is_ip(hostname))

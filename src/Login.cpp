@@ -151,6 +151,29 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		case ERR_ADMIN_SUCCESS:
 			ErrMessage = ("Done.");
 			break;
+		case ERR_REGNICK:
+			if(Config::GetInstance()->passwd.empty() == false)
+				me->sendrpl(MSG_LOGIN, Config::GetInstance()->passwd);
+			else if(ListServerForm)
+				ListServerForm->login = true;
+			break;
+		case ERR_LOGIN_SUCCESS:
+			if(!ListServerForm) break;
+			if(ListServerForm->login)
+			{
+				ListServerForm->login = false;
+				ErrMessage = _("You have logged.");
+			}
+			ListServerForm->RegisterButton->Hide();
+			ListServerForm->AccountButton->Show();
+			break;
+		case ERR_LOGIN_BADPASS:
+			Config::GetInstance()->passwd.clear();
+			MetaServer.SetWantDisconnect();
+			ErrMessage = _("Incorrect password.");
+			if(ListServerForm)
+				ListServerForm->login = false;
+			break;
 	}
 	if(!ErrMessage.empty())
 		TForm::Message = ErrMessage;
@@ -462,6 +485,7 @@ void MenAreAntsApp::RefreshList()
 	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
 	client->AddCommand(new REJOINmsCommand(MSG_REJOIN,	0,	1));
 	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
+	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
 
 	MetaServer.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
 
@@ -509,16 +533,29 @@ void TListServerForm::AfterDraw()
 		}
 		Rejoin.clear();
 	}
+	if(login && Config::GetInstance()->passwd.empty())
+	{
+		TMessageBox mb(_("This nickname is registered.\n\nEnter the password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		if(mb.Show() == BT_OK && mb.Edit()->Text().empty() == false)
+		{
+			Config::GetInstance()->passwd = mb.Edit()->Text();
+			MetaServer.sendrpl(MSG_LOGIN, mb.Edit()->Text());
+		}
+		else
+		{
+			login = false;
+			MetaServer.SetWantDisconnect();
+		}
+	}
 	if(timer.time_elapsed() > 60)
 	{
 		MenAreAntsApp::GetInstance()->RefreshList();
 		timer.reset();
 	}
-	if(!MetaServer.IsConnected() && !MetaServer.WantDisconnect())
+	if(!MetaServer.IsConnected())
 	{
-		TMessageBox mb(_("You have been disconnected."), BT_OK, NULL);
-		mb.SetBackGround(Resources::Titlescreen());
-		mb.Show();
+		if(!MetaServer.WantDisconnect())
+			TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
 		want_quit = true;
 		return;
 	}
@@ -547,6 +584,19 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		{
 			MenAreAntsApp::GetInstance()->ConnectedTo(msg.Edit()->Text(), msg.Edit()->Text());
 			MenAreAntsApp::GetInstance()->RefreshList();
+		}
+	}
+	else if(RegisterButton->Test(mouse, button))
+	{
+		TMessageBox msg(_("You can register an account to protect your nickname, and to save your statistics (score, etc.)\n"
+		                  "The password will be saved on your computer and you will not have to enter it each times you want to "
+		                  "play.\n\n"
+		                  "Enter a password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		if(msg.Show() == BT_OK && msg.Edit()->Text().empty() == false)
+		{
+			Config::GetInstance()->passwd = msg.Edit()->Text();
+			login = true;
+			MetaServer.sendrpl(MSG_REGNICK, msg.Edit()->Text());
 		}
 	}
 	else if(RetourButton->Test(mouse, button))
@@ -590,11 +640,14 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 }
 
 TListServerForm::TListServerForm(ECImage* w)
-	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0)
+	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), login(false)
 {
 	ServerList = AddComponent(new TListBox(Rectanglei(0, 0, 500,350)));
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
 	ServerList->SetGrayDisable(false);
+
+	Welcome = AddComponent(new TLabel(30,StringF(_("Men Are Ants is for YOU, %s!"), Config::GetInstance()->nick.c_str()),
+	                                  white_color, Font::GetInstance(Width() <= 800 ? Font::Large : Font::Huge)));
 
 	Label1 = AddComponent(new TLabel(ServerList->Y()-60, _("Please select a server in this list:"), white_color, Font::GetInstance(Font::Big)));
 
@@ -627,7 +680,15 @@ TListServerForm::TListServerForm(ECImage* w)
 	                                            Font::GetInstance(Font::Normal)));
 	RefreshButton = AddComponent(new TButtonText(button_x, ConnectToButton->Y()+ConnectToButton->Height(), 150,50, _("Refresh"),
 	                                            Font::GetInstance(Font::Normal)));
-	RetourButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, _("Back"),
+	RegisterButton = AddComponent(new TButtonText(button_x, RefreshButton->Y()+RefreshButton->Height(), 150,50, _("Reg. your nick"),
+	                                            Font::GetInstance(Font::Normal)));
+	RegisterButton->SetHint(_("Register your nickname to save your stats and to protect it from other users"));
+	AccountButton = AddComponent(new TButtonText(button_x, RefreshButton->Y()+RefreshButton->Height(), 150,50, _("Your account"),
+	                                            Font::GetInstance(Font::Normal)));
+	AccountButton->Hide();
+	StatsButton = AddComponent(new TButtonText(button_x, AccountButton->Y()+AccountButton->Height(), 150,50, _("Statistics"),
+	                                            Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButtonText(button_x,StatsButton->Y()+StatsButton->Height()+10,150,50, _("Back"),
 	                                          Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
@@ -774,11 +835,11 @@ void TConnectedForm::AfterDraw()
 		MenAreAntsApp::GetInstance()->RecoverGame(Rejoin);
 		Rejoin.clear();
 	}
-	if(!client->WantDisconnect() && !client->IsConnected())
+	if(!client->IsConnected())
 	{
-		TMessageBox mb(_("You have been disconnected."), BT_OK, NULL);
-		mb.SetBackGround(Resources::Titlescreen());
-		mb.Show();
+		if(!client->WantDisconnect())
+			TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
+
 		want_quit = true;
 		return;
 	}

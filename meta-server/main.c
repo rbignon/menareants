@@ -21,11 +21,13 @@
 #include <sys/resource.h>
 #include <dirent.h>
 #include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <getopt.h>
 #include <unistd.h>
 #include "main.h"
+#include "database.h"
 #include "sockets.h"
 #include "lib/Defines.h"
 #include "lib/Version.h"
@@ -33,6 +35,7 @@
 int myproto=0;
 int pingfreq = DEFPINGFREQ;
 int port = DEFPORT;
+char dbpath[50];
 extern int running;
 
 void sig_die(int c)
@@ -51,7 +54,9 @@ int main(int argc, char **argv)
 	int tmp;
 	int background = 1;
 
-	while((tmp = getopt(argc, argv, "nvhp:f:")) != EOF)
+	snprintf(dbpath, sizeof dbpath - 1, "%s/" DBPATH, getenv("HOME"));
+
+	while((tmp = getopt(argc, argv, "nvhd:p:f:")) != EOF)
 		switch(tmp)
 		{
 			case 'n':
@@ -64,13 +69,25 @@ int main(int argc, char **argv)
 				port = atoi(optarg);
 				break;
 			case 'v':
-				printf("MenAreAnts Meta Server v" APP_VERSION
-				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")\n");
+				puts("MenAreAnts Meta Server v" APP_VERSION
+				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")");
 				exit(EXIT_SUCCESS);
 				break;
+			case 'd':
+				strncpy(dbpath, optarg, sizeof dbpath - 1);
+				break;
 			case 'h':
+				printf("Usage: %s [-nhv] [-d <database path>] [-p <port>] [-f <ping freq>]\n\n", argv[0]);
+				puts  ("\t-n                 launch in background");
+				puts  ("\t-v                 display menareants-meta-server's version");
+				puts  ("\t-h                 show this notice");
+				printf("\t-d <database path> give a filename to use as database [default=\"%s\"]\n", dbpath);
+				printf("\t-p <port>          port to use [default=%d]\n", DEFPORT);
+				printf("\t-f <ping freq>     frequence of pings [default=%d]\n", DEFPINGFREQ);
+				exit(EXIT_SUCCESS);
+				break;
 			default:
-				printf("Usage: %s [-n] [-p <port>] [-f <ping freq>]\n", argv[0]);
+				printf("Usage: %s [-nhv] [-d <database path>] [-p <port>] [-f <ping freq>]\n", argv[0]);
 				exit(EXIT_FAILURE);
 		}
 
@@ -78,11 +95,24 @@ int main(int argc, char **argv)
 	signal(SIGTERM, &sig_die);
 	signal(SIGINT, &sig_restart);
 
+	if((tmp = load_users(dbpath)) != 1)
+	{
+		switch(tmp)
+		{
+			case 0:
+				printf("ERROR: %s isn't a valid path. Please check it.\n", dbpath);
+				exit(EXIT_FAILURE);
+			case -1:
+				printf("WARNING: Unable to load %s. We are going to starting with an empty database\n", dbpath);
+				break;
+		}
+	}
+
 	if(background)
 	{
 		if((tmp = fork()) == -1)
 		{
-			printf("Unable to run in background\n");
+			puts("Unable to run in background");
 			exit(0);
 		}
 		if(tmp > 1) exit(0);
@@ -101,6 +131,8 @@ int main(int argc, char **argv)
 		run_server();
 
 	clean_up();
+
+	write_users(dbpath);
 
 	if(running < 0)
 		execlp(argv[0], argv[0], NULL, NULL); /* restarting.. */

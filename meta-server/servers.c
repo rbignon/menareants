@@ -20,11 +20,69 @@
 
 #include "servers.h"
 #include "sockets.h"
+#include "database.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct Server* server_head = 0;
+
+/* USET <account> <modes> [<args> ..]                 :Paramètres d'un account
+ *     +k <killed>                                    :- unités tués
+ *     +d <deaths>                                    :- unités perdues
+ *     +s <score>                                     :- score
+ *     +c <creations>                                 :- créations
+ *     +r <revenu>                                    :- meilleurs revenu
+ *     +g                                             :- une partie en plus
+ */
+int m_user_set (struct Client* cl, int parc, char** parv)
+{
+	int i = 3, add = 1;
+	const char *m = parv[2];
+	struct RegUser* reg;
+
+	if(parc < 3) return 0;
+
+	if(!(reg = find_reguser(parv[1])))
+		return 0;
+
+	for(; m && *m; ++m)
+		switch(*m)
+		{
+			case '+': add = 1; break;
+			case '-': add = 0; break;
+			case 'k':
+				reg->killed = (i < parc && add) ? (reg->killed + atoi(parv[i++])) : 0;
+				break;
+			case 'd':
+				reg->deaths = (i < parc && add) ? (reg->deaths + atoi(parv[i++])) : 0;
+				break;
+			case 's':
+				reg->score = (i < parc && add) ? (reg->score + atoi(parv[i++])) : 0;
+				break;
+			case 'c':
+				reg->creations = (i < parc && add) ? (reg->creations + atoi(parv[i++])) : 0;
+				break;
+			case 'r':
+				if(add && i < parc)
+				{
+					int nb = atoi(parv[i++]);
+					if(reg->best_revenu < nb)
+						reg->best_revenu = nb;
+				}
+				else
+					reg->best_revenu = 0;
+				break;
+			case 'g':
+				if(add)
+					reg->nb_games++;
+				else
+					reg->nb_games--;
+				break;
+		}
+
+	return 0;
+}
 
 /* SET <+pPmgv> [params ...]
  * +p <nb players>                                :- nombre de players actuellement
@@ -41,7 +99,6 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 {
 	int i = 2, add = 1;
 	const char *m = parv[1];
-	if(!(cl->flags & CL_SERVER)) return delclient(cl);
 
 	if(parc < 2) return 0;
 

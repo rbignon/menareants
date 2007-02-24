@@ -1230,16 +1230,17 @@ void EChannel::CheckReadys()
 					/* On attribut à tout le monde son argent */
 					for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 					{
+						ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
 						// Inutile en theorie, mais c'est vraiment une précaution.
-						if(dynamic_cast<ECPlayer*>(*it)->Events()->Empty() == false)
+						if(pl->Events()->Empty() == false)
 						{
 							FDebug(W_WARNING, "Il reste des evenements dans un player !");
 							dynamic_cast<ECPlayer*>(*it)->Events()->Clear();
 						}
 
-						if((*it)->Lost()) continue;
+						if(pl->Lost()) continue;
 						int nb_units = 0;
-						entv = (*it)->Entities()->List();
+						entv = pl->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 						{
 							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
@@ -1250,8 +1251,8 @@ void EChannel::CheckReadys()
 						}
 						if(!nb_units)
 						{
-							sendto_players(0, *it, MSG_SET, "+_");
-							(*it)->SetLost();
+							sendto_players(0, pl, MSG_SET, "+_");
+							pl->SetLost();
 							for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
 							{
 								ECList<ECBEntity*>::iterator it = enti;
@@ -1262,7 +1263,10 @@ void EChannel::CheckReadys()
 							}
 						}
 						else
-							dynamic_cast<ECPlayer*>(*it)->UpMoney(money[*it]);
+						{
+							pl->CalculBestRevenu(money[*it]);
+							pl->UpMoney(money[*it]);
+						}
 					}
 
 					if(!CheckEndOfGame())
@@ -1315,10 +1319,14 @@ bool EChannel::CheckEndOfGame()
 	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 	{
 		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
-		sendto_players(0, pl, MSG_SCORE, ECArgs(TypToStr(pl->Stats()->killed),
-		                                        TypToStr(pl->Stats()->shooted),
-		                                        TypToStr(pl->Stats()->created),
-		                                        TypToStr(pl->Stats()->score)));
+		ECArgs args;
+		args += TypToStr(pl->Stats()->killed);
+		args += TypToStr(pl->Stats()->shooted);
+		args += TypToStr(pl->Stats()->created);
+		args += TypToStr(pl->Stats()->score);
+		args += TypToStr(pl->Stats()->best_revenu);
+		app.MSet(pl, "+kdcsrg", args);
+		sendto_players(0, pl, MSG_SCORE, args);
 	}
 	return true;
 }

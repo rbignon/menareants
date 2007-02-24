@@ -468,6 +468,15 @@ int ECServer::SendMetaServer(ECMessage s, ECArgs args)
 	return 0;
 }
 
+int ECServer::MSet(ECPlayer* pl, std::string c, ECArgs args)
+{
+	ECArgs s(pl->Nick());
+	s += c;
+	s += args;
+
+	return SendMetaServer(MSG_USET, s);
+}
+
 int ECServer::MSet(std::string c, ECArgs args)
 {
 	ECArgs s(c);

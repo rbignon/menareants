@@ -15,6 +15,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 AM_GNU_GETTEXT([external])
+AC_CHECK_LIB([crypt], [main])
 
 dnl ========================================================================
 dnl == Set flags for various environments                                  =
@@ -117,7 +118,6 @@ AC_CHECK_LIB(SDL_gfx, rotozoomSurfaceXY,,
 if test "x${INSTALL_GAME_Q}" = "x1"; then
 	LIBS="$LIBS $SDL_LIBS"
 	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
-	CFLAGS="$CFLAGS $SDL_CFLAGS"
 fi
 
 # WIN32
@@ -182,7 +182,7 @@ if test "x$GCC" = "xyes"; then
 #             -pedantic (il trouve rien à part une répétition de ;; dans SDL_ttf.h)
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
       GCC_FLAGS="-Wall"
-      CFLAGS="$CFLAGS -std=c99"
+      CFLAGS="$CFLAGS -D_GNU_SOURCE=1 -std=c99"
       CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel -ansi"
 
       dnl Enable *more* warnings

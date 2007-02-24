@@ -39,10 +39,11 @@
 struct Server;
 struct in_addr;
 
-#define CL_FREE   0x01
-#define CL_SERVER 0x02
-#define CL_USER   0x04
-#define CL_PING   0x08
+#define CL_FREE    0x01
+#define CL_SERVER  0x02
+#define CL_USER    0x04
+#define CL_PING    0x08
+#define CL_LOGGED  0x10
 struct Client
 {
 	struct Server* server;
@@ -58,13 +59,14 @@ struct Client
 };
 
 struct Client *addclient(int fd, struct in_addr *addr);
-int delclient(struct Client *del);
-int senderr(struct Client* cl, enum ECError err);
-int sendcmd(struct Client* cl, enum ECMessage cmd);
-int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...);
-int run_server(void);
-int init_socket(void);
-void clean_up(void);
+extern int delclient(struct Client *del);
+extern int senderr(struct Client* cl, enum ECError err);
+extern int sendcmd(struct Client* cl, enum ECMessage cmd);
+extern int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...);
+extern int run_server(void);
+extern int init_socket(void);
+extern void clean_up(void);
+extern int SplitBuf(char* buf, char **parv, int size);
 
 extern unsigned nb_tchan;
 extern unsigned nb_tusers;

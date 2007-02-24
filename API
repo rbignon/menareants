@@ -246,6 +246,12 @@ Sommaire:
             +i <port>                                      :- port
             +r <nick>                                      :- tel user peut rejoindre tel chan
 
+        USET <account> <modes> [<args> ..]                 :Paramètres d'un account
+            +k <killed>                                    :- unités tués
+            +d <deaths>                                    :- unités perdues
+            +s <score>                                     :- score
+            +c <creations>                                 :- créations
+
      c) Meta-server <-> Client
 
         > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
@@ -256,5 +262,10 @@ Sommaire:
                      <version> <totusers> <totgames> <uptime>
         > EOL                                              :fin du listing
 
-        > NICKUSED                                         :pseudo déjà utilisé
+        > ERR NICKUSED                                     :pseudo déjà utilisé
         > REJOIN <ip:port> <game>                          :le joueur peut rejoindre une partie
+
+        > ERR REGNICK                                      :le pseudo est enregistré
+        < LOGIN <pass>                                     :login
+        < REGNICK                                          :s'enregistrer
+        > ERR LOGGED                                       :loggé

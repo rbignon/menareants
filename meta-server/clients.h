@@ -24,10 +24,13 @@
 #include "lib/Defines.h"
 
 struct Client;
+struct RegUser;
 
 struct User
 {
 	struct Client* client;
+	struct RegUser* reguser;
+
 	char name[NICKLEN+1];
 
 	struct User *last;
@@ -36,11 +39,14 @@ struct User
 
 extern struct User* user_head;
 
-struct User* add_user(struct Client* cl, const char* name);
-void remove_user(struct User* user);
+extern struct User* add_user(struct Client* cl, const char* name);
+extern void remove_user(struct User* user);
 
-int m_login (struct Client*, int, char**);
-int m_pong (struct Client* cl, int parc, char** parv);
-int m_serv_list (struct Client* cl, int parc, char** parv);
+extern int m_login (struct Client*, int, char**);
+extern int m_pong (struct Client* cl, int parc, char** parv);
+extern int m_serv_list (struct Client* cl, int parc, char** parv);
+extern int m_login_nick (struct Client* cl, int parc, char** parv);
+extern int m_reg_nick (struct Client* cl, int parc, char** parv);
+extern int m_show_scores(struct Client* cl, int parc, char** parv);
 
 #endif /* ECMS_CLIENTS_H */

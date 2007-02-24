@@ -24,6 +24,7 @@
 #include "servers.h"
 #include "clients.h"
 #include "main.h"
+#include "database.h"
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
@@ -43,10 +44,13 @@ unsigned highsock = 0;
 unsigned nb_tchan = 0;
 unsigned nb_tusers = 0;
 static struct Client myClients[MAXCLIENTS];
+extern char dbpath[50];
 
 static void check_pings()
 {
+	static int save_db = 0;
 	unsigned int i = 0;
+
 	for(;i <= highsock;++i)
 		if(myClients[i].last_read + pingfreq > Now)
 		{
@@ -55,6 +59,13 @@ static void check_pings()
 			else
 				sendcmd(&myClients[i], MSG_PING);
 		}
+
+	save_db++;
+	if(save_db >= 10)
+	{
+		write_users(dbpath);
+		save_db = 0;
+	}
 }
 
 int sendbuf(struct Client* cl, char* buf, int len)
@@ -143,12 +154,17 @@ int parsemsg(struct Client* cl)
 	static struct {
 		enum ECMessage cmd;
 		int (*func) (struct Client*, int, char**);
+		int flags;
 	} cmds[] =
 	{
-		{MSG_IAM,      m_login},
-		{MSG_SET,      m_server_set},
-		{MSG_PONG,     m_pong},
-		{MSG_SERVLIST, m_serv_list}
+		{MSG_IAM,      m_login,          0},
+		{MSG_SET,      m_server_set,     CL_SERVER},
+		{MSG_USET,     m_user_set,       CL_SERVER},
+		{MSG_PONG,     m_pong,           0},
+		{MSG_SERVLIST, m_serv_list,      CL_USER},
+		{MSG_REGNICK,  m_reg_nick,       CL_USER},
+		{MSG_LOGIN,    m_login_nick,     0},
+		{MSG_SCORE,    m_show_scores,    CL_USER}
 	};
 
 	parc = SplitBuf(cl->RecvBuf, parv, MAXPARA);
@@ -160,6 +176,13 @@ int parsemsg(struct Client* cl)
 	for(i = 0; i < ASIZE(cmds); ++i)
 		if(cmds[i].cmd == cmdname)
 		{
+			if(cmds[i].flags && !(cl->flags & cmds[i].flags))
+			{
+				senderr(cl, ERR_CMDS);
+				delclient(cl);
+				return 0;
+			}
+
 			cmds[i].func (cl, parc, parv);
 			return 1;
 		}

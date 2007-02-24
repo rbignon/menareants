@@ -88,16 +88,22 @@ public:
 	TButtonText* RefreshButton;
 	TButtonText* ConnectButton;
 	TButtonText* ConnectToButton;
+	TButtonText* RegisterButton;
+	TButtonText* StatsButton;
+	TButtonText* AccountButton;
 	TButton*     MissionButton;
 	TButton*     EscarmoucheButton;
 	TLabel*      Label1;
 	TLabel*      Label2;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
+	TLabel*      Welcome;
 
 	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers;
 
 	std::string Rejoin;
+
+	bool login;
 
 private:
 	Timer timer;

@@ -124,6 +124,7 @@ bool Config::load()
 		else if(key == "FULLSCREEN") fullscreen = (ligne == "1" || ligne == "true");
 		else if(key == "MUSIC") music = (ligne == "1" || ligne == "true");
 		else if(key == "EFFECT") effect = (ligne == "1" || ligne == "true");
+		else if(key == "PASSWORD") passwd = ligne;
 		else if(key == "TTF" && version <= 2) { /* On conserve la compatibilité */ }
 		else
 		{
@@ -146,26 +147,29 @@ bool Config::load()
 
 bool Config::save() const
 {
-    std::ofstream fp(filename.c_str());
-    if (!fp)
-    {
-        std::cerr << "Unable to create configuration file." << std::endl;
-        return 0;
-    }
+	std::ofstream fp(filename.c_str());
+	if (!fp)
+	{
+		std::cerr << "Unable to create configuration file." << std::endl;
+		return 0;
+	}
 
-    fp << "VERSION " << CLIENT_CONFVERSION << std::endl;
-    fp << "SERVER " << hostname << std::endl;
-    fp << "PORT " << port << std::endl;
-    fp << "NICK " << nick << std::endl;
-    fp << "COLOR " << color << std::endl;
-    fp << "NATION " << nation << std::endl;
-    fp << "SWIDTH " << screen_width << std::endl;
-    fp << "SHEIGHT " << screen_height << std::endl;
-    fp << "FULLSCREEN " << fullscreen << std::endl;
-    fp << "MUSIC " << music << std::endl;
-    fp << "EFFECT " << effect << std::endl;
-    for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
-    	fp << "SERVERLIST " << *it << std::endl;
+	fp << "VERSION " << CLIENT_CONFVERSION << std::endl;
+	fp << "SERVER " << hostname << std::endl;
+	fp << "PORT " << port << std::endl;
+	fp << "NICK " << nick << std::endl;
+	fp << "COLOR " << color << std::endl;
+	fp << "NATION " << nation << std::endl;
+	fp << "SWIDTH " << screen_width << std::endl;
+	fp << "SHEIGHT " << screen_height << std::endl;
+	fp << "FULLSCREEN " << fullscreen << std::endl;
+	fp << "MUSIC " << music << std::endl;
+	fp << "EFFECT " << effect << std::endl;
+	if(passwd.empty() == false)
+		fp << "PASSWORD " << passwd << std::endl;
+
+	for(std::vector<std::string>::const_iterator it = server_list.begin(); it != server_list.end(); ++it)
+		fp << "SERVERLIST " << *it << std::endl;
 
 	return true;
 }
@@ -265,6 +269,9 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 		TMessageBox(_("Please enter a nickname."), BT_OK, form).Show();
 		return;
 	}
+
+	if(form->Nick->Text() != conf->nick)
+		conf->passwd.clear();
 
 	conf->nick = form->Nick->GetString();
 

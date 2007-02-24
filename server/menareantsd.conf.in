@@ -27,8 +27,8 @@
 # au serveur lancé.
 server {
 
-	# Nom du serveur
-	name = personnal.server
+	# Nom du serveur (veuillez le configurer)
+	# name = personnal.server
 
 	# Port écouté
 	port = 5461
