@@ -43,6 +43,7 @@ fd_set global_fd_set;
 unsigned highsock = 0;
 unsigned nb_tchan = 0;
 unsigned nb_tusers = 0;
+unsigned nb_tregs = 0;
 static struct Client myClients[MAXCLIENTS];
 extern char dbpath[50];
 

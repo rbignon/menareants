@@ -115,9 +115,10 @@ AC_CHECK_LIB(SDL_gfx, rotozoomSurfaceXY,,
 					AC_MSG_ERROR([SDL_gfx library >= 2.0.13 required])
 				fi)
 
+AC_SUBST(SDL_CFLAGS)
+
 if test "x${INSTALL_GAME_Q}" = "x1"; then
 	LIBS="$LIBS $SDL_LIBS"
-	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 fi
 
 # WIN32

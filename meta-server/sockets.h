@@ -70,6 +70,7 @@ extern int SplitBuf(char* buf, char **parv, int size);
 
 extern unsigned nb_tchan;
 extern unsigned nb_tusers;
+extern unsigned nb_tregs;
 extern time_t Now;
 
 #endif /* ECMS_SOCKETS_H */

@@ -995,6 +995,10 @@ EChannel::~EChannel()
 
 	app.MSet("+wg", ECArgs(TypToStr(app.NBwchan), TypToStr(app.NBchan)));
 
+	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
+		if((*pl)->CanRejoin())
+			app.MSet(pl->Nick(), "-r");
+
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{
 		if (*it == this)

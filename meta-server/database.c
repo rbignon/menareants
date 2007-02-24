@@ -58,6 +58,8 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 	if(head)
 		head->last = reguser;
 
+	nb_tregs++;
+
 	return reguser;
 }
 
@@ -81,6 +83,8 @@ void remove_reguser(struct RegUser* reguser)
 	if(reguser->next) reguser->next->last = reguser->last;
 	if(reguser->last) reguser->last->next = reguser->next;
 	else reguser_head = reguser->next;
+
+	nb_tregs--;
 
 	free(reguser);
 }

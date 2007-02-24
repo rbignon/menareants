@@ -579,7 +579,7 @@ bool ECServer::ConnectMetaServer()
 		highsock = ms_sock;
 
 	SendMetaServer(MSG_IAM, ECArgs(conf->ServerName(), SERV_SMALLNAME, APP_MSPROTO));
-	MSet("+iPGvV", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION, APP_VERSION));
+	MSet("+iPGvVu", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION, APP_VERSION, TypToStr(uptime)));
 
 	return true;
 }

@@ -7014,9 +7014,10 @@ echo "$as_me: error: SDL_gfx library >= 2.0.13 required" >&2;}
 fi
 
 
+
+
 if test "x${INSTALL_GAME_Q}" = "x1"; then
 	LIBS="$LIBS $SDL_LIBS"
-	CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 fi
 
 # WIN32

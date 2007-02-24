@@ -125,7 +125,7 @@ public:
 		Push(s3);
 	}
 	ECArgs(const std::string& s1, const std::string& s2, const std::string& s3,
-	                const std::string& s4)
+	       const std::string& s4)
 		: dont_split(false)
 	{
 		Push(s1);
@@ -135,7 +135,7 @@ public:
 	}
 
 	ECArgs(const std::string& s1, const std::string& s2, const std::string& s3,
-	                const std::string& s4, const std::string& s5)
+	       const std::string& s4, const std::string& s5)
 		: dont_split(false)
 	{
 		Push(s1);
@@ -144,6 +144,19 @@ public:
 		Push(s4);
 		Push(s5);
 	}
+
+	ECArgs(const std::string& s1, const std::string& s2, const std::string& s3,
+	       const std::string& s4, const std::string& s5, const std::string& s6)
+		: dont_split(false)
+	{
+		Push(s1);
+		Push(s2);
+		Push(s3);
+		Push(s4);
+		Push(s5);
+		Push(s6);
+	}
+
 
 /* Attributs */
 public:

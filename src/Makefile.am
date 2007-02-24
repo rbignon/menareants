@@ -4,7 +4,8 @@ bin_PROGRAMS = menareants
 
 DEFS = -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I${top_srcdir}/lib
-AM_CXXFLAGS=-DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
+AM_CXXFLAGS= @SDL_CFLAGS@ -DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
+AM_CFLAGS= @SDL_CFLAGS@
 
 menareants_SOURCES = \
 		tools/Font.cpp \

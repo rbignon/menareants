@@ -75,7 +75,7 @@ static void list_servers(struct Client* cl)
 
 static void send_stats(struct Client* cl)
 {
-	sendrpl(cl, MSG_STAT, "%d %d", nb_tchan, nb_tusers);
+	sendrpl(cl, MSG_STAT, "%d %d %d", nb_tchan, nb_tusers, nb_tregs);
 	return;
 }
 

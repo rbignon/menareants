@@ -435,8 +435,8 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
 	assert(ListServerForm);
-	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s), with %d total connections and %d played games"),
-	                                                ListServerForm->nb_users, ListServerForm->nb_tusers, ListServerForm->nb_tchans));
+	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s) and %d accounts, with %d total connections and %d played games"),
+	                                                ListServerForm->nb_users, ListServerForm->nb_tregs, ListServerForm->nb_tusers, ListServerForm->nb_tchans));
 	ListServerForm->ChanStats->SetCaption(StringF(_("There are %d game(s) on %d servers, with %d in game and %d in preparation"),
 	                                               ListServerForm->nb_chans, ListServerForm->ServerList->Size(), ListServerForm->nb_chans - ListServerForm->nb_wchans,
 	                                               ListServerForm->nb_wchans));
@@ -456,6 +456,8 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	assert(ListServerForm);
 	ListServerForm->nb_tchans = StrToTyp<uint>(parv[1]);
 	ListServerForm->nb_tusers = StrToTyp<uint>(parv[2]);
+	if(parv.size() > 3)
+		ListServerForm->nb_tregs = StrToTyp<uint>(parv[2]);
 	return 0;
 }
 
@@ -640,7 +642,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 }
 
 TListServerForm::TListServerForm(ECImage* w)
-	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), login(false)
+	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), nb_tregs(0), login(false)
 {
 	ServerList = AddComponent(new TListBox(Rectanglei(0, 0, 500,350)));
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);

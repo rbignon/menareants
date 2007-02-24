@@ -99,7 +99,7 @@ public:
 	TLabel*      ChanStats;
 	TLabel*      Welcome;
 
-	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers;
+	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers, nb_tregs;
 
 	std::string Rejoin;
 

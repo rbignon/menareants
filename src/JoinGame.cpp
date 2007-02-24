@@ -1378,40 +1378,30 @@ void TGameInfosForm::SpinEditChange(TSpinEdit* SpinEdit)
 void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 {
 	client->LockScreen();
-	if(client->Player()->IsPriv())
+	if(client->Player()->IsOwner())
 	{
-		if(MapList->Test(mouse, button) && MapList->Selected() != -1)
+		std::vector<TComponent*> list = Players->GetList();
+		for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 		{
-			client->sendrpl(MSG_SET, ECArgs("+m", TypToStr(MapList->Selected())));
-			listmapclick.reset();
-			MapList->SetEnabled(false);
-		}
-
-		if(client->Player()->IsOwner())
-		{
-			std::vector<TComponent*> list = Players->GetList();
-			for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
+			TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
+			if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
 			{
-				TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
-				if(pll && !pll->Player()->IsMe() && !pll->Player()->IsOwner())
+				if(pll->OwnZone(mouse, button))
 				{
-					if(pll->OwnZone(mouse, button))
+					if(pll->Player()->IsOp())
+						client->sendrpl(MSG_SET, ECArgs("-o", pll->Player()->Nick()));
+					else
+						client->sendrpl(MSG_SET, ECArgs("+o", pll->Player()->Nick()));
+				}
+				else if(pll->Nick->Test(mouse, button))
+				{
+					TMessageBox mb(StringF(_("You want to kick %s from game.\nPlease enter a reason:"), pll->Nick->Caption().c_str()),
+							HAVE_EDIT|BT_OK|BT_CANCEL, this);
+					std::string name;
+					if(mb.Show() == BT_OK)
 					{
-						if(pll->Player()->IsOp())
-							client->sendrpl(MSG_SET, ECArgs("-o", pll->Player()->Nick()));
-						else
-							client->sendrpl(MSG_SET, ECArgs("+o", pll->Player()->Nick()));
-					}
-					else if(pll->Nick->Test(mouse, button))
-					{
-						TMessageBox mb(StringF(_("You want to kick %s from game.\nPlease enter a reason:"), pll->Nick->Caption().c_str()),
-								HAVE_EDIT|BT_OK|BT_CANCEL, this);
-						std::string name;
-						if(mb.Show() == BT_OK)
-						{
-							name = mb.EditText();
-							client->sendrpl(MSG_KICK, ECArgs(pll->Nick->Caption(), name));
-						}
+						name = mb.EditText();
+						client->sendrpl(MSG_KICK, ECArgs(pll->Nick->Caption(), name));
 					}
 				}
 			}

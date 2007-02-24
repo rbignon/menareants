@@ -94,6 +94,7 @@ int m_user_set (struct Client* cl, int parc, char** parv)
  * +V <version>                                   :- version du serveur
  * +i <port>                                      :- port du serveur
  * +r <nick>                                      :- tel user peut rejoindre tel chan
+ * +u <uptime>                                    :- uptime
  */
 int m_server_set (struct Client* cl, int parc, char** parv)
 {
@@ -146,6 +147,9 @@ int m_server_set (struct Client* cl, int parc, char** parv)
 				break;
 			case 'i':
 				cl->server->port = (i < parc && add) ? atoi(parv[i++]) : 0;
+				break;
+			case 'u':
+				cl->server->uptime = (i < parc && add) ? atoi(parv[i++]) : 0;
 				break;
 			case 'r':
 			{

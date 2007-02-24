@@ -185,7 +185,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	std::vector<ECEntity*> entities;
 	me->LockScreen();
-	ECAltThread::LockThread();
+
 	while(!parv[0].empty())
 	{
 		std::string et_name = stringtok(parv[0], ",");
@@ -279,7 +279,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		entities.push_back(entity);
 	}
 	me->UnlockScreen();
-	ECAltThread::UnlockThread();
+
 	/* On en est à la première ligne de l'evenement. */
 	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL))
 		chan->SetCurrentEvent(flags);

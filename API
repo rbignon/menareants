@@ -245,6 +245,7 @@ Sommaire:
             +V <version>                                   :- version du serveur
             +i <port>                                      :- port
             +r <nick>                                      :- tel user peut rejoindre tel chan
+            +u <uptime>                                    :- uptime
 
         USET <account> <modes> [<args> ..]                 :Paramètres d'un account
             +k <killed>                                    :- unités tués
@@ -256,7 +257,7 @@ Sommaire:
 
         > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
         < IAM <name> <prog> <version>                      :Donne son nom, son prog et sa version
-        > STAT <nbtchan> <nbtusers>                        :Statistiques
+        > STAT <nbtchan> <nbtusers> <nbregs>               :Statistiques
         > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste un serveur
                      <nbmax> <nbgames> <maxgames> <proto>
                      <version> <totusers> <totgames> <uptime>
