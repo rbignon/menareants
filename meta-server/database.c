@@ -146,5 +146,7 @@ int write_users(const char* file)
 		fprintf(fp, "NICK %s %s %d %d %d %d %d %d\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
 		                                              reg->killed, reg->creations, reg->score, reg->best_revenu);
 
+	fclose(fp);
+
 	return 1;
 }

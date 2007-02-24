@@ -26,7 +26,7 @@
 #include "lib/Messages.h"
 
 #define DEFPORT 5460
-#define DEFPINGFREQ 360
+#define DEFPINGFREQ 300
 #define MAXCLIENTS 100
 
 #define CMDLEN 3

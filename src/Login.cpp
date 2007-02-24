@@ -41,8 +41,9 @@
 #include "JoinGame.h"
 #include "Sockets.h"
 
-TConnectedForm  *ConnectedForm  = NULL;
-TListServerForm *ListServerForm = NULL;
+TConnectedForm    *ConnectedForm  = NULL;
+TListServerForm   *ListServerForm = NULL;
+TGlobalScoresForm *GlobalScoresForm = NULL;
 static bool RC_MOTD = false;
 extern bool JOINED;
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
@@ -449,7 +450,7 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 
 /** Statistics about meta-server
  *
- * Syntax: STAT chans users
+ * Syntax: STAT chans users regusers
  */
 int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
@@ -457,7 +458,7 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	ListServerForm->nb_tchans = StrToTyp<uint>(parv[1]);
 	ListServerForm->nb_tusers = StrToTyp<uint>(parv[2]);
 	if(parv.size() > 3)
-		ListServerForm->nb_tregs = StrToTyp<uint>(parv[2]);
+		ListServerForm->nb_tregs = StrToTyp<uint>(parv[3]);
 	return 0;
 }
 
@@ -488,6 +489,7 @@ void MenAreAntsApp::RefreshList()
 	client->AddCommand(new REJOINmsCommand(MSG_REJOIN,	0,	1));
 	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
 	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
+	client->AddCommand(new SCOREmsCommand(MSG_SCORE,	0,	6));
 
 	MetaServer.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
 
@@ -588,6 +590,8 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 			MenAreAntsApp::GetInstance()->RefreshList();
 		}
 	}
+	else if(AccountButton->Test(mouse, button))
+		TMessageBox(_("This button does nothing..."), BT_OK, this).Show();
 	else if(RegisterButton->Test(mouse, button))
 	{
 		TMessageBox msg(_("You can register an account to protect your nickname, and to save your statistics (score, etc.)\n"
@@ -690,6 +694,7 @@ TListServerForm::TListServerForm(ECImage* w)
 	AccountButton->Hide();
 	StatsButton = AddComponent(new TButtonText(button_x, AccountButton->Y()+AccountButton->Height(), 150,50, _("Statistics"),
 	                                            Font::GetInstance(Font::Normal)));
+	StatsButton->SetOnClick(TGlobalScoresForm::Scores, 0);
 	RetourButton = AddComponent(new TButtonText(button_x,StatsButton->Y()+StatsButton->Height()+10,150,50, _("Back"),
 	                                          Font::GetInstance(Font::Normal)));
 
@@ -949,6 +954,82 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	                                    Font::GetInstance(Font::Normal)));
 	ServerStats = AddComponent(new TLabel(75,ChanStats->Y()+ChanStats->Height()," ", white_color,
 	                                    Font::GetInstance(Font::Normal)));
+
+	SetBackground(Resources::Titlescreen());
+}
+
+/********************************************************************************************
+ *                               TGlobalScoresForm                                          *
+ ********************************************************************************************/
+
+// SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu>
+int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(GlobalScoresForm)
+	{
+		if(GlobalScoresForm->ListBox->Empty())
+			GlobalScoresForm->BestPlayer->SetCaption(StringF(_("And the better player is.... %s with %s points!"),
+			                                                   parv[1].c_str(), parv[5].c_str()));
+		GlobalScoresForm->ListBox->AddItem(false,
+		                      StringF("%-15s %7s %9s %9s %11s    %12s", parv[1].c_str(), parv[5].c_str(), parv[2].c_str(),
+		                                                             parv[3].c_str(), parv[4].c_str(), StringF(_("$%s"), parv[6].c_str()).c_str()),
+		                      parv[1]);
+
+		if(GlobalScoresForm->best_incomes < StrToTyp<int>(parv[6]))
+		{
+			GlobalScoresForm->best_incomes = StrToTyp<int>(parv[6]);
+			GlobalScoresForm->BestIncomes->SetCaption(StringF(_("The one who incomes the must of money is %s with $%s per turn!"),
+			                                                   parv[1].c_str(), parv[6].c_str()));
+		}
+		if(GlobalScoresForm->best_kills < StrToTyp<int>(parv[3]))
+		{
+			GlobalScoresForm->best_kills = StrToTyp<int>(parv[3]);
+			GlobalScoresForm->BestKills->SetCaption(StringF(_("%s has killed %s men! He's a butcher!"),
+			                                                  parv[1].c_str(), parv[3].c_str()));
+		}
+	}
+	return 0;
+}
+
+void TGlobalScoresForm::Scores(TObject*, void*)
+{
+	GlobalScoresForm = new TGlobalScoresForm(Video::GetInstance()->Window());
+
+	MetaServer.sendrpl(MSG_SCORE);
+
+	GlobalScoresForm->Run();
+
+	MyFree(GlobalScoresForm);
+}
+
+void TGlobalScoresForm::OnClic(const Point2i& mouse, int button, bool& stop)
+{
+	if(RetourButton->Test(mouse, button))
+		want_quit = true;
+}
+
+TGlobalScoresForm::TGlobalScoresForm(ECImage* im)
+	: TForm(im), best_incomes(0), best_kills(0)
+{
+	ListBox = AddComponent(new TListBox(Rectanglei(0, 0, 520,350)));
+	ListBox->SetXY(Window()->GetWidth()/2 - ListBox->Width()/2 - 50, Window()->GetHeight()/2 - ListBox->Height()/2 + 70);
+	ListBox->SetGrayDisable(false);
+
+	Headers = AddComponent(new TLabel(ListBox->X(), ListBox->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
+	Headers->SetCaption(_("Nickname        Score   Deaths  Killed  Creations  Best incomes"));
+
+	Title = AddComponent(new TLabel(10, _("Scores"), white_color, Font::GetInstance(Font::Huge)));
+
+	BestPlayer = AddComponent(new TLabel(50, " ", white_color, Font::GetInstance(Font::Big)));
+
+	BestIncomes = AddComponent(new TLabel(BestPlayer->Y()+BestPlayer->Height()+15, " ", white_color, Font::GetInstance(Font::Normal)));
+
+	BestKills = AddComponent(new TLabel(BestIncomes->Y()+BestIncomes->Height()+15, " ", white_color, Font::GetInstance(Font::Normal)));
+
+	int button_x = ListBox->X() + ListBox->Width() + 10;
+
+	RetourButton = AddComponent(new TButtonText(button_x,ListBox->Y(),150,50, _("Back"),
+	                                                Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
 }

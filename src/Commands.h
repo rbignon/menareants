@@ -77,6 +77,8 @@ class STATmsCommand : public EC_ACommand { public: STATmsCommand(const ECMessage
 
 class REJOINmsCommand : public EC_ACommand { public: REJOINmsCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~REJOINmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
 
+class SCOREmsCommand : public EC_ACommand { public: SCOREmsCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~SCOREmsCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };
+
 /* GENERAL */
 
 class HELCommand : public EC_ACommand { public: HELCommand(const ECMessage& _CmdName, unsigned int _flags, unsigned int _args)  : EC_ACommand(_CmdName, _flags, _args) {} virtual ~HELCommand() {} virtual int Exec(PlayerList players, EC_Client *me, ParvList parv); };

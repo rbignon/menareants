@@ -30,6 +30,29 @@
 
 class EC_Client;
 
+class TGlobalScoresForm : public TForm
+{
+public:
+
+	TGlobalScoresForm(ECImage*);
+
+	static void Scores(TObject*, void*);
+
+public:
+
+	TLabel*      Title;
+	TLabel*      BestPlayer;
+	TLabel*      BestIncomes;
+	TLabel*      BestKills;
+	TLabel*      Headers;
+	TListBox*    ListBox;
+	TButtonText* RetourButton;
+
+	void OnClic(const Point2i& position, int button, bool& stop);
+
+	int best_incomes, best_kills;
+};
+
 /** This is class based on TForm showed when I am connected */
 class TConnectedForm : public TForm
 {

@@ -49,7 +49,6 @@ extern char dbpath[50];
 
 static void check_pings()
 {
-	static int save_db = 0;
 	unsigned int i = 0;
 
 	for(;i <= highsock;++i)
@@ -61,12 +60,7 @@ static void check_pings()
 				sendcmd(&myClients[i], MSG_PING);
 		}
 
-	save_db++;
-	if(save_db >= 10)
-	{
-		write_users(dbpath);
-		save_db = 0;
-	}
+	write_users(dbpath);
 }
 
 int sendbuf(struct Client* cl, char* buf, int len)

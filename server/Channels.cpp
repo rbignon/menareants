@@ -997,7 +997,7 @@ EChannel::~EChannel()
 
 	for(BPlayerVector::iterator pl = players.begin(); pl != players.end(); ++pl)
 		if((*pl)->CanRejoin())
-			app.MSet(pl->Nick(), "-r");
+			app.MSet((*pl)->Nick(), "-r");
 
 	for (ChannelVector::iterator it = ChanList.begin(); it != ChanList.end(); )
 	{

@@ -88,27 +88,35 @@ int m_serv_list (struct Client* cl, int parc, char** parv)
 
 int m_show_scores(struct Client* cl, int parc, char** parv)
 {
-#if 0 /** @todo à faire */
-	struct RegUser (*list)[50];
+/** @todo à changer */
+	struct RegUser* list[50];
 
-	int i, k;
+	unsigned int i, k, max_show = 50;
 	struct RegUser *u = reguser_head;
 
-	for(i=0;i<=MAXUSERS && u;i++, u=u->next)
-		lstats[i].u = u;
+	for(i=0;i<50 && u;i++, u=u->next)
+		list[i] = u;
 
-	for(i=1; i < tusers;i++)
+	for(i=1; i < nb_tregs;i++)
 	{
 		k=i;
-		while(k && lstats[k].u->stats->score > lstats[k-1].u->stats->score)
+		while(k && list[k]->score > list[k-1]->score)
 		{
-			u = lstats[k-1].u;
-			lstats[k-1].u = lstats[k].u;
-			lstats[k].u = u;
+			u = list[k-1];
+			list[k-1] = list[k];
+			list[k] = u;
 			k--;
 		}
 	}
-#endif
+
+	if(!(cl->flags & CL_LOGGED))
+		max_show = 10;
+	else if(nb_tregs < 50)
+		max_show = nb_tregs;
+
+	for(i=0; i < max_show; ++i)
+		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
+		                                            list[i]->creations, list[i]->score, list[i]->best_revenu);
 
 	return 0;
 
