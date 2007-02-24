@@ -1282,7 +1282,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(Config::GetInstance()->nation)
 			client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(Config::GetInstance()->nation)));
 
-		GameInfosForm->Title->SetCaption(mission ? _("Alone game") : (_("Game: ") + std::string(chan->GetName())));
+		GameInfosForm->Title->SetCaption(mission ? _("Alone game") : chan->GetName());
 		if(client->Player()->IsOwner())
 		{
 			GameInfosForm->PretButton->SetText(_("Start game"));
@@ -1355,6 +1355,24 @@ void TGameInfosForm::AfterDraw()
 	}
 	if(!MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
 		MapList->SetEnabled();
+}
+
+void TGameInfosForm::MapListChange(TListBox* MapList)
+{
+	if(!Server.Player()->IsPriv() || MapList->Selected() < 0)
+		return;
+
+	Server.sendrpl(MSG_SET, ECArgs("+m", TypToStr(MapList->Selected())));
+	GameInfosForm->listmapclick.reset();
+	MapList->SetEnabled(false);
+}
+
+void TGameInfosForm::SpinEditChange(TSpinEdit* SpinEdit)
+{
+	if(SpinEdit == GameInfosForm->BeginMoney)
+		Server.sendrpl(MSG_SET, ECArgs("+b", TypToStr(SpinEdit->Value())));
+	else if(SpinEdit == GameInfosForm->TurnTime)
+		Server.sendrpl(MSG_SET, ECArgs("+t", TypToStr(SpinEdit->Value())));
 }
 
 void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
@@ -1451,10 +1469,6 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	else if(SpeedGame->Test(mouse, button))
 		client->sendrpl(MSG_SET, SpeedGame->Checked() ? "+r" : "-r");
-	else if(BeginMoney->Test(mouse, button))
-		client->sendrpl(MSG_SET, ECArgs("+b", TypToStr(BeginMoney->Value())));
-	else if(TurnTime->Test(mouse, button))
-		client->sendrpl(MSG_SET, ECArgs("+t", TypToStr(TurnTime->Value())));
 	else if(CreateIAButton->Test(mouse, button))
 	{
 		TMessageBox mb(_("AI's name to create:"), HAVE_EDIT|BT_OK|BT_CANCEL, this);
@@ -1484,7 +1498,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	: TForm(w), RecvMapList(false), mission(_mission), client(cl)
 {
-	Title = AddComponent(new TLabel(6,"Jeu", white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(20,"Jeu", white_color, Font::GetInstance(Font::Huge)));
 
 	Players = AddComponent(new TList(50, 110));
 	Players->AddLine(new TPlayerLineHeader);
@@ -1500,6 +1514,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	int right_x = Window()->GetWidth() - 175;
 
 	MapList = AddComponent(new TListBox(Rectanglei(right_x, 270, 150, 80)));
+	MapList->SetOnChange(TGameInfosForm::MapListChange);
 	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, _("Quick game"), white_color));
 	SpeedGame->SetHint(_("A player has lost when he hasn't got any building."));
 	SpeedGame->Check();
@@ -1509,10 +1524,12 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, 385, 150, 0, 50000, 5000,
 	15000));
 	BeginMoney->SetHint(_("Money earned by each players at begin of game"));
+	BeginMoney->SetOnChange(TGameInfosForm::SpinEditChange);
 
 	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Turn durat.: "),  right_x, 405, 150, /*min*/mission ? 0 : 15, 360, 15,
 	60));
 	TurnTime->SetHint(_("Maximal time in seconds of each turn"));
+	TurnTime->SetOnChange(TGameInfosForm::SpinEditChange);
 
 	PretButton = AddComponent(new TButtonText(right_x,110, 150,50, _("Ready"), Font::GetInstance(Font::Normal)));
 	PretButton->SetEnabled(false);

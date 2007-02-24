@@ -325,6 +325,7 @@ public:
 public:
 
 	TListBox*    MapsList;
+	TLabel*      Title;
 	TButtonText* RetourButton;
 	TButtonText* NewButton;
 	TButtonText* LoadButton;

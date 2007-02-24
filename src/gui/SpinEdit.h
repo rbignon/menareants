@@ -50,6 +50,8 @@ public:
 	TSpinEdit(Font *font, std::string label, int _x, int _y, uint _width, int _min, int _max, uint _step = 1,
 	          int _defvalue = 0);
 
+	typedef void (*OnChangeFunc) (TSpinEdit*);
+
 /* Methodes */
 public:
 
@@ -79,6 +81,8 @@ public:
 	void AddBadValue(int i);                                      /**< Add a bad value */
 	void DelBadValue(int i);                                      /**< Remove a bad value */
 
+	void SetOnChange(OnChangeFunc on) { on_change = on; }
+
 /* Variables privées */
 protected:
 	TButton m_plus, m_minus;
@@ -95,6 +99,7 @@ protected:
 
 	Color color;
 	Font *font;
+	OnChangeFunc on_change;
 };
 
 #endif /* EC_SPINEDIT_H */

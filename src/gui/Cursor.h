@@ -71,9 +71,12 @@ public:
 
 /* Variables privées */
 private:
+	bool initialized;
 	TMap* map;
 	cursors_t pointer;
 	ImgList cursors;
 };
+
+extern TCursor Cursor;
 
 #endif /* EC_CURSOR_H */

@@ -1,3 +1,10 @@
+2007-02-23 Romain Bignon <progs@headfucking.net>
+
+	* src/gui/Cursor.cpp, src/gui/Form.cpp: Utilisation de TCursor TOUT LE TEMPS, avec un curseur par défault rouge. Permet de corriger le bug de windows et que le jeu en plein écran
+	soit plus agréable (il y avait des bugs de positions de curseur (image -> wm).
+
+	* src/Main.cpp, src/Resources.cpp: Utilisation d'une nouvelle image de background pour les menus, ainsi que dans le menu principal, utilisation de nouveaux boutons.
+
 2007-02-22 Romain Bignon <progs@headfucking.net>
 
 	* src/Sockets.cpp: Maintenant il y a une instance par connexion.

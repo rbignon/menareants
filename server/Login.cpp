@@ -129,7 +129,7 @@ static void send_stats(TClient *cl)
 	args += TypToStr(app.NBtotchan);
 	args += TypToStr(app.Uptime());
 	args += "MenAreAnts Daemon v" APP_VERSION " P" APP_PVERSION
-				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")";
+				             " (c) Romain Bignon (Build #" GENERATION " " __DATE__ " " __TIME__ ")";
 	cl->sendrpl(MSG_STAT, args);
 }
 

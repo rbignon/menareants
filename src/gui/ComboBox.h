@@ -63,6 +63,11 @@ public:
 
 	virtual void SetXY (int x, int y);
 
+	inline bool Intersect( const Rectanglei &r2 ) const
+	{
+		return Rectanglei::Intersect(r2) || Rectanglei(X(), real_y, edit_bg.GetWidth(), edit_bg.GetHeight()).Intersect(r2);
+	}
+
 /* Variables privées */
 protected:
 	TButton m_open;

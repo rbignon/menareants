@@ -98,6 +98,8 @@ public:
 
 	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);
+	R_RESOURCE(ECImage,      Title);
+	R_RESOURCE(ECImage,      TitleMini);
 	R_RESOURCE(ECImage,      Loadscreen);
 	R_RESOURCE(ECImage,      BarreLat);
 	R_RESOURCE(ECImage,      BarreAct);
@@ -128,6 +130,7 @@ public:
 	R_RESOURCE(ECImage,      FlecheAttaqGauche);
 	R_RESOURCE(ECImage,      FlecheAttaqHaut);
 	R_RESOURCE(ECImage,      FlecheAttaqBas);
+	R_RESOURCE(ECImage,      PointerStandard);
 	R_RESOURCE(ECImage,      PointerSelect);
 	R_RESOURCE(ECImage,      PointerAttaq);
 	R_RESOURCE(ECImage,      PointerMaintainedAttaq);
@@ -145,6 +148,11 @@ public:
 	R_RESOURCE(ECSpriteBase, LitleButton);
 	R_RESOURCE(ECSpriteBase, MissionButton);
 	R_RESOURCE(ECSpriteBase, EscarmoucheButton);
+	R_RESOURCE(ECSpriteBase, PlayButton);
+	R_RESOURCE(ECSpriteBase, OptionsButton);
+	R_RESOURCE(ECSpriteBase, MapEditorButton);
+	R_RESOURCE(ECSpriteBase, CreditsButton);
+	R_RESOURCE(ECSpriteBase, QuitButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);

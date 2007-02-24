@@ -49,7 +49,7 @@ public:
 	ECImage* Image() const { return image; }
 	void SetImage(ECImage* _img, bool wana_delete = true);/**< Set maximal value */
 
-	virtual bool RedrawBackground() const { return false; }
+	//virtual bool RedrawBackground() const { return false; }
 
 /* Variables privées */
 protected:

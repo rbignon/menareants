@@ -81,11 +81,7 @@ bool Config::set_defaults(bool want_save)
 	nation = 0;
 	screen_width = 1024;
 	screen_height = 768;
-#ifdef WIN32
 	fullscreen = true;
-#else
-	fullscreen = false;
-#endif
 	server_list.clear();
 	server_list.push_back("game.coderz.info:5460");
 	music = true;
@@ -356,11 +352,8 @@ void Config::Configuration(bool first)
 	ConfigForm->Music->SetOnClick(Config::SetMusic, this);
 	ConfigForm->Effect->Check(effect);
 	ConfigForm->FullScreen->Check(fullscreen);
-#ifndef BUGUED_FULLSCREEN
-	ConfigForm->FullScreen->SetEnabled(false);
-#else
+
 	ConfigForm->FullScreen->SetOnClick(Config::SetFullScreen, this);
-#endif
 	ConfigForm->Resolution->SetOnChange(Config::ChangeResolution);
 	for(uint i = 0; i < ASIZE(resolutions); ++i)
 		if(screen_width == resolutions[i].w && screen_height == resolutions[i].h)
@@ -423,7 +416,7 @@ void TConfigForm::SetRelativePositions()
 TConfigForm::TConfigForm(ECImage *w)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(120,_("Configuration"), white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(60,_("Configuration"), white_color, Font::GetInstance(Font::Huge)));
 
 	Info = AddComponent(new TLabel(160,_("This is your first run, please configure your game"),
 	                                        white_color, Font::GetInstance(Font::Normal)));

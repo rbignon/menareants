@@ -29,7 +29,7 @@ TSpinEdit::TSpinEdit(Font* f, std::string _label, int _x, int _y, uint _width, i
                      int _defvalue)
 	: TComponent(_x, _y, _width, SPINEDIT_HEIGHT), m_plus(_x,_y,10,10), m_minus(_x,_y,10,10),
 	  txt_label(_x, _y, _label, white_color, f), txt_value(_x,_y,"", white_color, f),
-	  min(_min), max(_max), step(_step), color(white_color), font(f)
+	  min(_min), max(_max), step(_step), color(white_color), font(f), on_change(0)
 {
 	/* Sécurités */
 	if(max < min) max = min;
@@ -102,8 +102,14 @@ bool TSpinEdit::ChangeValueByClick(bool up)
 			new_value = up ? new_value + step : new_value - step;
 			continue;
 		}
+		else if(SetValue(new_value))
+		{
+			if(on_change)
+				(*on_change) (this);
+			return true;
+		}
 		else
-			return SetValue(new_value);
+			return false;
 	}
 	return false;
 }

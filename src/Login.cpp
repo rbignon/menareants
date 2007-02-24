@@ -394,7 +394,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? black_color : red_color,
+		                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? white_color : red_color,
 		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION), *Font::GetInstance(Font::Small), parv[2]);
 
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
@@ -860,7 +860,7 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	ListLabel = AddComponent(new TLabel(GList->X()+5, GList->Y()-20, _("Game list:"), white_color, Font::GetInstance(Font::Normal)));
 
-	Welcome = AddComponent(new TLabel(Motd->Y()/2,"You are connected", white_color, Font::GetInstance(Font::Big)));
+	Welcome = AddComponent(new TLabel(Motd->Y()/2,"You are connected", white_color, Font::GetInstance(Width() < 1000 ? Font::Big : Font::Large)));
 
 	int button_x = GList->X() + GList->Width() + 10;
 

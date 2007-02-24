@@ -258,7 +258,7 @@ template<class T> class rectangle
 		 *
 		 * @param r2 The second rectangle.
 		 */
-		inline bool Intersect( const rectangle<T> &r2 ) const{
+		virtual inline bool Intersect( const rectangle<T> &r2 ) const{
 			if( IsSizeZero() || r2.IsSizeZero() )
 				return false;
 

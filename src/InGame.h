@@ -38,7 +38,6 @@ struct SDL_Thread;
 
 class EChannel;
 class ECPlayer;
-class TCursor;
 
 /********************************************************************************************
  *                               TInGameForm                                                *
@@ -203,6 +202,7 @@ class TInGameForm : public TForm
 public:
 
 	TInGameForm(ECImage*, EC_Client*);
+	~TInGameForm();
 
 	enum Wants
 	{
@@ -230,8 +230,6 @@ public:
 	TMemo*     ChatHistory;
 	TEdit*     SendMessage;
 	TFPS*      FPS;
-
-	TCursor*   Cursor;
 
 	SDL_Thread* Thread;
 

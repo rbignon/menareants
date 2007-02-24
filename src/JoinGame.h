@@ -88,6 +88,8 @@ private:
 	void OnClic(const Point2i&, int, bool&);
 	void OnKeyUp(SDL_keysym key);
 	void AfterDraw();
+	static void MapListChange(TListBox* MapList);
+	static void SpinEditChange(TSpinEdit* SpinEdit);
 
 /* Variables privées */
 private:

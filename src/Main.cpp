@@ -41,8 +41,10 @@
 #include "gui/Boutton.h"
 #include "gui/BouttonText.h"
 #include "gui/ComboBox.h"
+#include "gui/Cursor.h"
 #include "gui/Form.h"
 #include "gui/Fps.h"
+#include "gui/Image.h"
 #include "gui/Label.h"
 #include "gui/Memo.h"
 #include "tools/Font.h"
@@ -81,11 +83,12 @@ public:
 /* Composants */
 public:
 
-	TButtonText* PlayButton;
-	TButtonText* OptionsButton;
-	TButtonText* CreditsButton;
-	TButtonText* QuitterButton;
-	TButtonText* MapEditorButton;
+	TButton*    PlayButton;
+	TButton*    OptionsButton;
+	TButton*    CreditsButton;
+	TButton*    QuitterButton;
+	TButton*    MapEditorButton;
+	TImage*     Title;
 	TLabel*     Version;
 	TFPS*       FPS;
 
@@ -195,6 +198,9 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		loading_image->Draw();
 
+		Cursor.SetWindow(video->Window());
+		Cursor.Init();
+
 		if (TTF_Init()==-1) {
 			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;
 			return false;
@@ -284,26 +290,51 @@ int main (int argc, char **argv)
 
 void TMainForm::SetRelativePositions()
 {
-	PlayButton->SetXY(Window()->GetWidth()/2 - PlayButton->Width()/2, 150 * Window()->GetHeight() / 600);
-	OptionsButton->SetXY(Window()->GetWidth()/2 - OptionsButton->Width()/2, 230 * Window()->GetHeight() / 600);
-	MapEditorButton->SetXY(Window()->GetWidth()/2 - MapEditorButton->Width()/2, 310 * Window()->GetHeight() / 600);
-	CreditsButton->SetXY(Window()->GetWidth()/2 - CreditsButton->Width()/2, 390 * Window()->GetHeight() / 600);
-	QuitterButton->SetXY(Window()->GetWidth()/2 - QuitterButton->Width()/2, 470 * Window()->GetHeight() / 600);
-	Version->SetXY(Window()->GetWidth()-50 - Version->Width(), Version->Y());
+	if(Height() < 800)
+		Title->SetImage(Resources::TitleMini(), false);
+	else
+		Title->SetImage(Resources::Title(), false);
+
+	Title->SetXY(Window()->GetWidth()/2 - Title->Width()/2, 50);
+	int left = Width()/2 - (PlayButton->Width() + 40 + OptionsButton->Width() + 40 + MapEditorButton->Width()) / 2;
+	int up = Height()/2 - 40;
+	if(up+198+QuitterButton->Height() > Height()) up = Height() - QuitterButton->Height() - 198;
+
+	PlayButton->SetXY(left, up);
+	OptionsButton->SetXY(PlayButton->X()+PlayButton->Width()+40, up);
+	MapEditorButton->SetXY(OptionsButton->X()+OptionsButton->Width()+40, up);
+
+	up += 198;
+	left += 112;
+	CreditsButton->SetXY(left, up);
+	QuitterButton->SetXY(CreditsButton->X() + CreditsButton->Width() + 40, up);
+	Version->SetXY(Title->X() + Title->Width() - Version->Width(), Title->Y()+Title->Height() + ((Height() < 800) ? 5 : 20));
 }
 
 TMainForm::TMainForm(ECImage* w)
 	: TForm(w)
 {
-	PlayButton = AddComponent(new TButtonText(300,150, 150,50, _("Play"), Font::GetInstance(Font::Normal)));
+	CreditsButton = AddComponent(new TButton(300,390, 150,50));
+	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), Video::GetInstance()->Window()));
+	CreditsButton->SetHint(_("Credits"));
 
-	OptionsButton = AddComponent(new TButtonText(300,230, 150,50, _("Options"), Font::GetInstance(Font::Normal)));
+	QuitterButton = AddComponent(new TButton(300,470, 150,50));
+	QuitterButton->SetImage(new ECSprite(Resources::QuitButton(), Video::GetInstance()->Window()));
+	QuitterButton->SetHint(_("Exit"));
 
-	MapEditorButton = AddComponent(new TButtonText(300,310, 150,50, _("Map Editor"), Font::GetInstance(Font::Normal)));
+	PlayButton = AddComponent(new TButton(300,150, 150,50));
+	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), Video::GetInstance()->Window()));
+	PlayButton->SetHint(_("Play a game"));
 
-	CreditsButton = AddComponent(new TButtonText(300,390, 150,50, _("Credits"), Font::GetInstance(Font::Normal)));
+	OptionsButton = AddComponent(new TButton(300,230, 150,50));
+	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), Video::GetInstance()->Window()));
+	OptionsButton->SetHint(_("Options"));
 
-	QuitterButton = AddComponent(new TButtonText(300,470, 150,50, _("Exit"), Font::GetInstance(Font::Normal)));
+	MapEditorButton = AddComponent(new TButton(300,310, 150,50));
+	MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), Video::GetInstance()->Window()));
+	MapEditorButton->SetHint(_("Map Editor"));
+
+	Title = AddComponent(new TImage(300, 100, Resources::Title(), false));
 
 	Version = AddComponent(new TLabel(Window()->GetWidth()-50,105,APP_VERSION, white_color, Font::GetInstance(Font::Big)));
 
@@ -381,16 +412,16 @@ TCredits::TCredits(ECImage* w)
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, 340, SCREEN_WIDTH-50-50, 190, 0, false));
 	Memo->SetShadowed();
-	Memo->AddItem("Merci au lycée Corneille pour nous avoir mis dans le contexte emmerdant qui "
-	              "nous a permis de trouver des idées \"amusantes\" pour passer le temps et qui "
-	              "aboutirent à ce jeu en version plateau que l'on pu experimenter pendant les "
-	              "cours d'histoire et d'espagnol.\n"
-	              "\n"
-	              "Merci à lodesi pour ses patchs.\n"
-	              "Merci à Anicée pour sa voix.\n"
-	              "Merci à Cesar pour ne pas avoir participé à la programmation du jeu.\n"
-	              "\n"
-                  "Merci également à Zic, Spouize, Nico, Mathieu, et Thomas pour avoir testé le jeu.", white_color);
+	Memo->AddItem(_("Contributors:\n"
+	                "\n"
+	                "=Programmation=\n"
+	                "- lodesi: patches for defense tower and other effects.\n"
+	                "- phh: patche for the plane.\n"
+	                "\n"
+	                "=Others=\n"
+	                "- Anicée: for her voice.\n"
+	                "- Zic, Spouize, Nico, Mathieu and Thomas who have tested the game."), white_color);
+
 	Memo->ScrollUp();
 
 	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, _("Back"),

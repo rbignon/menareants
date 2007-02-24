@@ -23,19 +23,11 @@
 #include "gui/ShowMap.h"
 #include <SDL_mouse.h>
 
-TCursor::TCursor()
-	: map(0), pointer(Standard)
-{
-	SetCursorImage(Select, Resources::PointerSelect());
-	SetCursorImage(Attaq, Resources::PointerAttaq());
-	SetCursorImage(MaintainedAttaq, Resources::PointerMaintainedAttaq());
-	SetCursorImage(CantAttaq, Resources::PointerCantAttaq());
-	SetCursorImage(Invest, Resources::PointerInvest());
-	SetCursorImage(Left, Resources::PointerLeft());
-	SetCursorImage(Radar, Resources::PointerRadar());
-	SetCursorImage(AddBP, Resources::PointerAddBP());
-	SetCursorImage(RemBP, Resources::PointerRemBP());
+TCursor Cursor;
 
+TCursor::TCursor()
+	: initialized(false), map(0), pointer(TOPLEFT_POINTERS)
+{
 	SetAlwaysRedraw();
 }
 
@@ -46,14 +38,29 @@ TCursor::~TCursor()
 
 void TCursor::Init()
 {
+	if(initialized) return;
 
+	SDL_ShowCursor(false);
+	SetCursorImage(Standard, Resources::PointerStandard());
+	SetCursorImage(Select, Resources::PointerSelect());
+	SetCursorImage(Attaq, Resources::PointerAttaq());
+	SetCursorImage(MaintainedAttaq, Resources::PointerMaintainedAttaq());
+	SetCursorImage(CantAttaq, Resources::PointerCantAttaq());
+	SetCursorImage(Invest, Resources::PointerInvest());
+	SetCursorImage(Left, Resources::PointerLeft());
+	SetCursorImage(Radar, Resources::PointerRadar());
+	SetCursorImage(AddBP, Resources::PointerAddBP());
+	SetCursorImage(RemBP, Resources::PointerRemBP());
+
+	SetCursor(Standard);
+
+	SDL_WarpMouse(Window()->GetWidth()/2, Window()->GetHeight()/2);
+	initialized = true;
 }
 
 void TCursor::Draw(const Point2i& pos)
 {
 	SetXY(pos.X(), pos.Y());
-	if (pointer == Standard)
-		return; // use standard SDL cursor
 
 	ECImage* img = cursors[pointer];
 
@@ -78,14 +85,14 @@ void TCursor::SetCursor(cursors_t p)
 	if (pointer == p || p == TOPLEFT_POINTERS || p == MIDDLE_POINTERS) return;
 
 	pointer = p;
-
-	if (pointer == Standard) SDL_ShowCursor(true);
-	else SDL_ShowCursor(false);
+	ECImage* img = cursors[pointer];
+	SetHeight(img->GetHeight());
+	SetWidth(img->GetWidth());
 }
 
 void TCursor::SetCursorImage(cursors_t i, ECImage* b)
 {
-	if(i == TOPLEFT_POINTERS || i == MIDDLE_POINTERS || i == Standard) return;
+	if(i == TOPLEFT_POINTERS || i == MIDDLE_POINTERS) return;
 
 	cursors[i] = b;
 }

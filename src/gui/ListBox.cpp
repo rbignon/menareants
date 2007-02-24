@@ -128,12 +128,13 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 		scrolling = true;
 
 	// buttons for listbox with more items than visible (first or last item not visible)
-	if(first_visible_item > 0 && first_visible_item+1 < m_items.size()/*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/)
+	if(m_down.Visible())
+	//if(first_visible_item > 0 || first_visible_item+1 < m_items.size()/*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/)
 	{
 		if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT && m_down.Mouse(mousePosition))
 		{
 			// bottom button
-			if( m_items.back()->Y() + m_items.back()->Height() > Y() + Height() )
+			if( first_visible_item+1 < m_items.size() /*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/ )
 				first_visible_item++ ;
 
 			return true;
@@ -205,15 +206,15 @@ void TListBox::Draw(const Point2i &mousePosition)
 		// item is selected or mouse-overed
 		if (draw_it)
 		{
-			if(int(i) == selected_item)
-				Window()->BoxColor(rect, BoxColorSelected);
-			else if(Enabled() && i == uint(item))
+			if(Enabled() && i == uint(item))
 			{
 				if(m_items.at(i)->Enabled())
 					Window()->BoxColor(rect, BoxColorMoused);
 				if(!NoItemHint())
 					SetHint(m_items.at(i)->Hint());
 			}
+			else if(int(i) == selected_item)
+				Window()->BoxColor(rect, BoxColorSelected);
 		}
 
 		// Really draw items
@@ -229,6 +230,7 @@ void TListBox::Draw(const Point2i &mousePosition)
 	// buttons for listbox with more items than visible
 	if (m_items.size() > local_max_visible_items || first_visible_item > 0)
 	{
+		m_down.Show();
 		m_up.Draw(mousePosition);
 		m_down.Draw(mousePosition);
 #ifdef SCROLLBAR
@@ -236,6 +238,8 @@ void TListBox::Draw(const Point2i &mousePosition)
 		Window()->BoxColor(scrollbar, (scrolling || scrollbar.Contains(mousePosition)) ? white_color : gray_color);
 #endif
 	}
+	else
+		m_down.Hide();
 }
 
 Rectanglei TListBox::ScrollBarPos() const

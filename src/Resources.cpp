@@ -62,7 +62,9 @@
 
 /* IMAGES*/
 	R_RESOURCE(ECSpriteBase, Intro,            "intro");
-	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_ANIMS "intro/17.png");
+	R_RESOURCE(ECImage,      Titlescreen,      PKGDATADIR_PICS "background.png");
+	R_RESOURCE_P(ECImage,    Title,            PKGDATADIR_PICS "title.png", true);
+	R_RESOURCE_P(ECImage,    TitleMini,        PKGDATADIR_PICS "title_mini.png", true);
 	R_RESOURCE(ECImage,      Loadscreen,       PKGDATADIR_PICS "loading.png");
 	R_RESOURCE(ECImage,      BarreLat,         PKGDATADIR_PICS "barrelat.png");
 	R_RESOURCE(ECImage,      BarreAct,         PKGDATADIR_PICS "barreact.png");
@@ -94,6 +96,7 @@
 	R_RESOURCE_P(ECImage,    FlecheAttaqHaut,  PKGDATADIR_PICS "fleches/fleche_attaq_haut.png", true);
 	R_RESOURCE_P(ECImage,    FlecheAttaqBas,   PKGDATADIR_PICS "fleches/fleche_attaq_bas.png", true);
 	R_RESOURCE_P(ECImage,    PointerSelect,    PKGDATADIR_PICS "cursors/select.png", true);
+	R_RESOURCE_P(ECImage,    PointerStandard,  PKGDATADIR_PICS "cursors/standard.png", true);
 	R_RESOURCE_P(ECImage,    PointerAttaq,     PKGDATADIR_PICS "cursors/attaq.png", true);
 	R_RESOURCE_P(ECImage,    PointerMaintainedAttaq, PKGDATADIR_PICS "cursors/maintened_attaq.png", true);
 	R_RESOURCE_P(ECImage,    PointerCantAttaq, PKGDATADIR_PICS "cursors/cantattaq.png", true);
@@ -102,7 +105,7 @@
 	R_RESOURCE_P(ECImage,    PointerRadar,     PKGDATADIR_PICS "cursors/radar.png", true);
 	R_RESOURCE_P(ECImage,    PointerAddBP,     PKGDATADIR_PICS "cursors/add_bp.png", true);
 	R_RESOURCE_P(ECImage,    PointerRemBP,     PKGDATADIR_PICS "cursors/rem_bp.png", true);
-	R_RESOURCE_P(ECImage,      MoveMapPoint,     PKGDATADIR_PICS "move_map.png", true);
+	R_RESOURCE_P(ECImage,    MoveMapPoint,     PKGDATADIR_PICS "move_map.png", true);
 	R_RESOURCE(ECSpriteBase, Balise,           "balise");
 	R_RESOURCE(ECSpriteBase, UpButton,         "upbutton");
 	R_RESOURCE(ECSpriteBase, DownButton,       "downbutton");
@@ -110,6 +113,11 @@
 	R_RESOURCE(ECSpriteBase, LitleButton,      "litlebutton");
 	R_RESOURCE(ECSpriteBase, MissionButton,    "missionbutton");
 	R_RESOURCE(ECSpriteBase, EscarmoucheButton,"escarmouchebutton");
+	R_RESOURCE(ECSpriteBase, PlayButton,       "playbutton");
+	R_RESOURCE(ECSpriteBase, OptionsButton,    "optionsbutton");
+	R_RESOURCE(ECSpriteBase, MapEditorButton,  "mapeditorbutton");
+	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
+	R_RESOURCE(ECSpriteBase, QuitButton,       "quitbutton");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");

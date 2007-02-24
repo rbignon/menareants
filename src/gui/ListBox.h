@@ -51,8 +51,6 @@
 
 class TListBox;
 
-typedef void (*OnChangeFunc) (TListBox*);
-
 class TListBoxItem : public TLabel
 {
 private:
@@ -74,6 +72,8 @@ class TListBox : public TComponent
 public:
 	TListBox (const Rectanglei &rect, bool always_one_selected_b = true);
 	~TListBox();
+
+	typedef void (*OnChangeFunc) (TListBox*);
 
 /* Methodes */
 public:

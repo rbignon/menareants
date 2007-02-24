@@ -25,6 +25,7 @@
 #include "Resources.h"
 #include "tools/Font.h"
 #include "i18n.h"
+#include "gui/Cursor.h"
 
 #include "tools/Maths.h"
 #include <algorithm>
@@ -172,6 +173,8 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 
 	if(Form)
 		Form->SetMustRedraw();
+
+	Cursor.Draw(mouse);
 
 	return;
 }

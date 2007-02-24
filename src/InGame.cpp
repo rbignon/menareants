@@ -543,8 +543,8 @@ private:
 
 TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 {
-	if(BarreLat->Mouse(Cursor->GetPosition()) ||
-	   BarreAct->Mouse(Cursor->GetPosition()) ||
+	if(BarreLat->Mouse(Cursor.GetPosition()) ||
+	   BarreAct->Mouse(Cursor.GetPosition()) ||
 	   Player()->Channel()->State() != EChannel::PLAYING)
 		return W_NONE;
 
@@ -554,7 +554,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 	if(button_type != SDL_BUTTON_LEFT)
 		return W_NONE;
 
-	ECase* acase = Map->TestCase(Cursor->GetPosition());
+	ECase* acase = Map->TestCase(Cursor.GetPosition());
 
 	if(!acase || acase->Showed() <= 0 && Map->HaveBrouillard())
 		return W_NONE;
@@ -582,7 +582,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 		{
 			if(IsPressed(SDLK_LCTRL))
 			{
-				Cursor->SetCursor(TCursor::MaintainedAttaq);
+				Cursor.SetCursor(TCursor::MaintainedAttaq);
 				return W_MATTAQ;
 			}
 			FOR(ECBEntity*, ents, enti)
@@ -628,25 +628,25 @@ void TInGameForm::SetCursor()
 
 	if(!want)
 	{
-		if(BarreLat->Radar->Mouse(Cursor->GetPosition()))
-			Cursor->SetCursor(TCursor::Radar);
+		if(BarreLat->Radar->Mouse(Cursor.GetPosition()))
+			Cursor.SetCursor(TCursor::Radar);
 		else
-			Cursor->SetCursor(TCursor::Standard);
+			Cursor.SetCursor(TCursor::Standard);
 		return;
 	}
 
 	switch(want)
 	{
-		case W_INVEST: Cursor->SetCursor(TCursor::Invest); break;
-		case W_CANTATTAQ: Cursor->SetCursor(TCursor::CantAttaq); break;
-		case W_MATTAQ: Cursor->SetCursor(TCursor::MaintainedAttaq); break;
-		case W_SELECT: Cursor->SetCursor(TCursor::Select); break;
+		case W_INVEST: Cursor.SetCursor(TCursor::Invest); break;
+		case W_CANTATTAQ: Cursor.SetCursor(TCursor::CantAttaq); break;
+		case W_MATTAQ: Cursor.SetCursor(TCursor::MaintainedAttaq); break;
+		case W_SELECT: Cursor.SetCursor(TCursor::Select); break;
 		case W_EXTRACT:
-		case W_MOVE: Cursor->SetCursor(TCursor::Left); break;
-		case W_ATTAQ: Cursor->SetCursor(TCursor::Attaq); break;
-		case W_ADDBP: Cursor->SetCursor(TCursor::AddBP); break;
-		case W_REMBP: Cursor->SetCursor(TCursor::RemBP); break;
-		default: Cursor->SetCursor(TCursor::Standard); break;
+		case W_MOVE: Cursor.SetCursor(TCursor::Left); break;
+		case W_ATTAQ: Cursor.SetCursor(TCursor::Attaq); break;
+		case W_ADDBP: Cursor.SetCursor(TCursor::AddBP); break;
+		case W_REMBP: Cursor.SetCursor(TCursor::RemBP); break;
+		default: Cursor.SetCursor(TCursor::Standard); break;
 	}
 
 }
@@ -711,6 +711,8 @@ void MenAreAntsApp::InGame()
 		InGameForm->Map->SetMustRedraw();
 
 		InGameForm->Run();
+
+		Cursor.SetCursor(TCursor::Standard);
 
 		ECAltThread::Stop();
 		SDL_WaitThread(InGameForm->Thread, 0);
@@ -875,6 +877,11 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 
 			MyFree(HelpForm);
 			Map->SetMustRedraw();
+			break;
+		}
+		case SDLK_F11:
+		{
+			Video::GetInstance()->SetConfig(Video::GetInstance()->Width(), Video::GetInstance()->Height(), !Video::GetInstance()->IsFullScreen());
 			break;
 		}
 		case SDLK_TAB:
@@ -1257,6 +1264,11 @@ void TInGameForm::ShowBarreLat(bool show)
 	Map->SetXY(Map->X(), Map->Y());
 }
 
+TInGameForm::~TInGameForm()
+{
+	Cursor.SetMap(0);
+}
+
 TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
 	: TForm(w), WantBalise(false), player(cl->Player()), client(cl), chan(cl->Player()->Channel()), want(W_NONE)
 {
@@ -1290,8 +1302,7 @@ TInGameForm::TInGameForm(ECImage* w, EC_Client* cl)
 
 	SetFocusOrder(false);
 
-	Cursor = AddComponent(new TCursor);
-	Cursor->SetMap(Map);
+	Cursor.SetMap(Map);
 
 	Thread = 0;
 }
@@ -2089,7 +2100,7 @@ void TOptionsForm::OnClic(const Point2i& mouse, int button, bool&)
 TOptionsForm::TOptionsForm(ECImage* w, EC_Client* _me, EChannel* ch)
 	: TForm(w), client(_me)
 {
-	Title = AddComponent(new TLabel(100, _("Options"), white_color, Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(60, _("Options"), white_color, Font::GetInstance(Font::Huge)));
 
 	Label1 = AddComponent(new TLabel(60, 160, _("To make an alliance with a player, click on the box associated on the left"), white_color, Font::GetInstance(Font::Small)));
 
@@ -2229,8 +2240,8 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 TLoadingForm::TLoadingForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(50,(_("Game: ") + std::string(ch->GetName())), white_color,
-	                                        Font::GetInstance(Font::Big)));
+	Title = AddComponent(new TLabel(50,(ch->IsMission() ? _("Alone game") : ch->GetName()), white_color,
+	                                        Font::GetInstance(Font::Huge)));
 
 	MapInformations = AddComponent(new TMemo(Font::GetInstance(Font::Small), 60,150,315,200,30));
 	std::vector<std::string> map_infos = ch->Map()->MapInfos();
@@ -2375,8 +2386,8 @@ void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 TPingingForm::TPingingForm(ECImage* w, EC_Client* cl, EChannel* ch)
 	: TForm(w), channel(ch), client(cl)
 {
-	Title = AddComponent(new TLabel(100,(std::string(ch->GetName()) + _(" - Waiting reconnections")), white_color,
-	                      Font::GetInstance(Font::Large)));
+	Title = AddComponent(new TLabel(60,(std::string(ch->GetName()) + _(" - Waiting reconnections")), white_color,
+	                      Font::GetInstance(Font::Huge)));
 
 	Message = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,150,Window()->GetWidth()-200-50,150,30, false));
 	Message->AddItem(_("The players below were disconnected from the server abnormally, probably because of "
@@ -2497,8 +2508,8 @@ void MenAreAntsApp::Scores(EChannel* chan)
 TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	: TForm(w)
 {
-	Title = AddComponent(new TLabel(110,(std::string(ch->GetName()) + _(" - End of Game")), white_color,
-	                      Font::GetInstance(Font::Large)));
+	Title = AddComponent(new TLabel(60,(std::string(ch->GetName()) + _(" - End of Game")), white_color,
+	                      Font::GetInstance(Font::Huge)));
 
 	Players = AddComponent(new TList(70, 250));
 	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Kills"), _("Creations"), _("Score")));
@@ -2508,7 +2519,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	Date = AddComponent(new TLabel(180, _("End of engagements:  ") + ch->Map()->Date()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
 	ECDate delta;
-	delta.SetDate(ch->Map()->NbDays());
+	delta.SetDate(ch->Map()->NbDays()+1);
 	std::string s;
 	if(delta.Year()) s += " " + TypToStr(delta.Year()) + _(" years");
 	if(delta.Month()) s += " " + TypToStr(delta.Month()) + _(" months");

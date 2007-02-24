@@ -74,6 +74,9 @@ int TRealClient::sendbuf(std::string buf)
 
 	buf += "\r\n";
 
+	if(sendlen + buf.size() >= sizeof SendBuf)
+		flush();
+
 	memcpy(SendBuf + sendlen, buf.c_str(), buf.size());
 
 	sendlen += buf.size();

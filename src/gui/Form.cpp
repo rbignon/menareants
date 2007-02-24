@@ -20,6 +20,7 @@
 
 #include "Form.h"
 #include "Memo.h"
+#include "gui/Cursor.h"
 #include "MessageBox.h"
 #include <SDL.h>
 
@@ -209,10 +210,14 @@ void TForm::Update(bool flip)
 
 	Draw();
 
+	Cursor.Draw(pos);
+
+	lastmpos = pos;
+
 	if(Hint.Visible())
 	{
-		Hint.SetXY((_x + Hint.Width())  > Width()  ? (Width()  - Hint.Width())  : _x,
-		           (_y + Hint.RealHeight())  > Height()  ? (Height()  - Hint.RealHeight())  : _y);
+		Hint.SetXY((_x + Hint.Width())  > Width()  ? (_x - Hint.Width())  : (_x),
+		           (_y + Cursor.Height() + Hint.RealHeight())  > Height()  ? (_y  - Hint.RealHeight())  : (_y + Cursor.Height()));
 		Hint.Draw(Point2i(_x,_y));
 	}
 
@@ -246,6 +251,9 @@ void TForm::Draw()
 	if(background && MustRedraw())
 		Window()->Blit(background);
 
+	if(background)
+		Window()->Blit(background, Cursor, Cursor.GetPosition());
+
 	SDL_GetMouseState( &_x, &_y);
 
 	Point2i pos(_x, _y);
@@ -256,7 +264,7 @@ void TForm::Draw()
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
-			   (MustRedraw() || (*it)->AlwaysRedraw() || (*it)->WantRedraw() || lastmpos != pos && (*it)->Mouse(pos) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)))
+			   (MustRedraw() || (*it)->AlwaysRedraw() || (*it)->WantRedraw() || (*it)->Intersect(Cursor) || (*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)))
 			{
 				if(background && (*it)->RedrawBackground())
 					Window()->Blit(background, **it, (*it)->GetPosition());
@@ -268,8 +276,6 @@ void TForm::Draw()
 		if(first) first = false;
 		else break;
 	}
-
-	lastmpos = pos;
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);

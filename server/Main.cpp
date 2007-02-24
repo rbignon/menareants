@@ -124,7 +124,7 @@ int ECServer::main(int argc, char **argv)
 				break;
 			case 'v':
 				std::cout << "MenAreAnts Daemon v" APP_VERSION
-				             " (c) Romain Bignon (Build " __DATE__ " " __TIME__ ")" << std::endl;
+				             " (c) Romain Bignon (Build #" GENERATION " " __DATE__ " " __TIME__ ")" << std::endl;
 				exit(EXIT_SUCCESS);
 				break;
 			default:
