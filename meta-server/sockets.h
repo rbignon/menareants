@@ -30,7 +30,7 @@
 #define MAXCLIENTS 100
 
 #define CMDLEN 3
-#define MAXPARA 10
+#define MAXPARA 15
 #define MAXBUFFER 1024
 #define IPLEN 3 + 1 + 3 + 1 + 3 + 1 + 3
 

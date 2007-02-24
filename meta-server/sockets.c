@@ -120,9 +120,13 @@ int SplitBuf(char* buf, char **parv, int size)
 	while(*buf && parc < size)
 	{
 		int slash = 0;
-		while(*buf == ' ') *buf++ = 0;
+		while(*buf == ' ')
+		{
+			*(buf-over) = 0;
+			buf++;
+		}
 		if(!*buf) break;
-		parv[parc++] = buf;
+		parv[parc++] = buf-over;
 		for(;*buf && (*buf != ' ' || slash); ++buf)
 			if(*buf == '\\' && *(buf+1) && (*(buf+1) == ' ' || *(buf+1) == '\\') && !slash)
 			{
@@ -161,6 +165,8 @@ int parsemsg(struct Client* cl)
 		{MSG_LOGIN,    m_login_nick,     0},
 		{MSG_SCORE,    m_show_scores,    CL_USER}
 	};
+
+	//printf("R - %s\n", cl->RecvBuf);
 
 	parc = SplitBuf(cl->RecvBuf, parv, MAXPARA);
 
