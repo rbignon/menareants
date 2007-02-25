@@ -1,0 +1,35 @@
+.TH MENAREANTS-META-SERVER 6 "February 25, 2007" Linux "Server Manual"
+.SH NAME
+menareants-meta-server \- Men Are Ants' Meta Server
+.SH SYNOPSIS
+\fBmenareants-meta-server [-nhv] [-d \fIdatabase path\fB] [-p \fIport\fB] [-f \fIping frequence\fB]\fR
+.SH DESCRIPTION
+.PP
+This server can receive clients to play a game.
+.SH OPTIONS
+.TP
+\fB\-d\fR \fIdatabase path\fR
+Use a specific database file. Default is ~/.maams-db
+.TP
+\fB\-p\fR \fIport\fR
+Use a different port. Default is 5460
+.TP
+\fB\-f\fR \fIping frequence\fR
+Meta-server checks every 300 seconds if a server or an user is a zombie.
+You can change this period with this parameter.
+.TP
+\fB\-h\fR
+Show help.
+.TP
+\fB\-n\fR
+Don't launch in background.
+.TP
+\fB\-v\fR
+Display Men Are Ants Meta Server's version
+.SH "SEE ALSO"
+.BR menareants (6),
+.BR menareants-server (6).
+
+.SH AUTHOR
+.PP
+MenAreAnts Meta Server is wrote by Romain Bignon <progs@coderz.info>.

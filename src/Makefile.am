@@ -7,6 +7,9 @@ INCLUDES = -I${top_srcdir}/lib
 AM_CXXFLAGS= @SDL_CFLAGS@ -DINSTALL_LOCALEDIR=\"@LOCALEDIR@\"
 AM_CFLAGS= @SDL_CFLAGS@
 
+man6_MANS = menareants.6
+EXTRA_DIST = $(man6_MANS)
+
 menareants_SOURCES = \
 		tools/Font.cpp \
 		tools/Color.cpp \

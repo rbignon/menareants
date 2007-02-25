@@ -4,6 +4,9 @@ DEFS = -DCONFDIR=\"${sysconfdir}/\" -DPKGDATADIR=\"$(pkgdatadir)/\" @DEFS@
 INCLUDES = -I$(top_srcdir)/lib
 LIBS =
 
+man6_MANS = menareants-server.6
+EXTRA_DIST = $(man6_MANS)
+
 bin_PROGRAMS = menareants-server
 menareants_server_SOURCES = \
 	Main.cpp \

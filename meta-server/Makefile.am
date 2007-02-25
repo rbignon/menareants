@@ -8,5 +8,8 @@ menareants_meta_server_SOURCES = \
 	servers.c \
 	clients.c
 
+man6_MANS = menareants-meta-server.6
+EXTRA_DIST = $(man6_MANS)
+
 clean-generic:
 	-rm -f .#* *~
