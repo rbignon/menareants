@@ -86,13 +86,15 @@ int m_serv_list (struct Client* cl, int parc, char** parv)
 	return 0;
 }
 
-int m_show_scores(struct Client* cl, int parc, char** parv)
+static int show_scores(struct Client* cl)
 {
-/** @todo à changer */
 	struct RegUser* list[50];
 
 	unsigned int i, k, max_show = 50;
 	struct RegUser *u = reguser_head;
+
+	if(!u)
+		return 0;
 
 	for(i=0;i<50 && u;i++, u=u->next)
 		list[i] = u;
@@ -109,17 +111,22 @@ int m_show_scores(struct Client* cl, int parc, char** parv)
 		}
 	}
 
-	if(!(cl->flags & CL_LOGGED))
+	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
 		max_show = 10;
 	else if(nb_tregs < 50)
 		max_show = nb_tregs;
 
 	for(i=0; i < max_show; ++i)
-		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
-		                                            list[i]->creations, list[i]->score, list[i]->best_revenu);
+		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
+		                                            list[i]->creations, list[i]->score, list[i]->best_revenu, list[i]->nb_games);
 
 	return 0;
 
+}
+
+int m_show_scores(struct Client* cl, int parc, char** parv)
+{
+	return show_scores(cl);
 }
 
 int m_pong (struct Client* cl, int parc, char** parv)
@@ -233,8 +240,16 @@ int m_login (struct Client* cl, int parc, char** parv)
 	}
 	else if(!strcmp(parv[2], WEB_SMALLNAME))
 	{
-		send_stats(cl);
-		list_servers(cl);
+		switch(proto)
+		{
+			case 1:
+				send_stats(cl);
+				list_servers(cl);
+				break;
+			case 2:
+				show_scores(cl);
+				break;
+		}
 		delclient(cl);
 	}
 	else if(!strcmp(parv[2], SERV_SMALLNAME))
