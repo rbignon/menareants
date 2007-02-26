@@ -259,20 +259,34 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 		std::string date;
 		name = MenAreAntsApp::GetInstance()->GetPath() + name + ".map";
 
+		while(1)
 		{
-			TMessageBox mb(_("How many X-coordinate cells?"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			TMessageBox mb(_("How many X-coordinate cells? (20 minimum)"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
-			if(mb.Show() == BT_OK)
+			if(mb.Show() == BT_OK && !mb.EditText().empty())
+			{
 				x = StrToTyp<uint>(mb.EditText());
+				if(x < 20)
+					TMessageBox(_("Please specifie a X-coordinate to 20 cells minimum"), BT_OK, form).Show();
+				else
+					break;
+			}
 			else return true;
 		}
+		while(1)
 		{
-			TMessageBox mb(_("How many Y-coordinate cells?"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
+			TMessageBox mb(_("How many Y-coordinate cells? (20 minimum)"), HAVE_EDIT|BT_OK|BT_CANCEL, form);
 			mb.Edit()->SetAvailChars("0123456789");
 			mb.Edit()->SetMaxLen(2);
-			if(mb.Show() == BT_OK)
+			if(mb.Show() == BT_OK && !mb.EditText().empty())
+			{
 				y = StrToTyp<uint>(mb.EditText());
+				if(y < 20)
+					TMessageBox(_("Please specifie a Y-coordinate to 20 cells minimum"), BT_OK, form).Show();
+				else
+					break;
+			}
 			else return true;
 		}
 		{
@@ -282,7 +296,7 @@ bool TMapEditor::Editor(const char *path, TForm* form)
 			mb.Edit()->SetMaxLen(10);
 			if(mb.Show() == BT_OK)
 				date = mb.EditText();
-			else return true;
+			if(date.empty()) return true;
 		}
 		try
 		{

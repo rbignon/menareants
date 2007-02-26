@@ -1,3 +1,11 @@
+2007-02-26 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: Une partie statique de la classe EC_Client s'occupe du thread qui est initialisé au lancement du programme, et terminé à la fin.
+
+	* server/Channels.cpp, server/InGame.cpp: Correction temporaire d'un int overflow sur les scores (le score pouvait être négatif (!?) et c'était un entier non signé).
+
+	* src/Login.cpp: Au premier lancement, propose l'enregistrement d'un nickname.
+
 2007-02-25 Romain Bignon <progs@headfucking.net>
 
 	* src/menareants.6, server/menareants-server.6, meta-server/menareants-meta-server.6: Créations de manpages.

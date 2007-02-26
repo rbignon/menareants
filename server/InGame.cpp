@@ -308,8 +308,11 @@ bool EChannel::ShowAnim(ECEvent* event)
 						if(!event->Entity() && (*it)->Owner())
 							for(std::map<ECEntity*,int>::iterator en = ents_init_nb.begin(); en != ents_init_nb.end(); ++en)
 							{
-								if((*it)->Like(en->first)) continue;
+								if((*it)->Like(en->first) || !en->second)
+									continue;
 								(*it)->Owner()->Stats()->score += en->second;
+								if((*it)->Case() != en->first->Case())
+									continue;
 								(*it)->Owner()->Stats()->score += en->second - ents_init_nb[*it];
 							}
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();

@@ -165,6 +165,7 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				ListServerForm->login = false;
 				ErrMessage = _("You have logged.");
 			}
+			MenAreAntsApp::GetInstance()->FirstRunDone();
 			ListServerForm->RegisterButton->Hide();
 			ListServerForm->AccountButton->Show();
 			break;
@@ -338,9 +339,7 @@ int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int HELmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->SetConnected();
 	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_MSPROTO));
-	me->UnsetLogging();
 	return 0;
 }
 
@@ -454,6 +453,8 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
  */
 int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
+	me->UnsetLogging();
+	me->SetConnected();
 	assert(ListServerForm);
 	ListServerForm->nb_tchans = StrToTyp<uint>(parv[1]);
 	ListServerForm->nb_tusers = StrToTyp<uint>(parv[2]);
@@ -478,8 +479,6 @@ void MenAreAntsApp::RefreshList()
 
 	EC_Client* client = &MetaServer;
 
-	client->SetHostName(Config::GetInstance()->hostname);
-	client->SetPort(Config::GetInstance()->port);
 	client->ClearCommands();
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
 	client->AddCommand(new PIGCommand(MSG_PING,		0,	0)); // on appelle volontairement PIGCommand() qui fait la même chose pour serveur et meta-serveur
@@ -491,11 +490,11 @@ void MenAreAntsApp::RefreshList()
 	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
 	client->AddCommand(new SCOREmsCommand(MSG_SCORE,	0,	6));
 
-	MetaServer.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
+	client->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port);
 
-	WAIT_EVENT_T(client->IsConnected() || client->Error(), i, 5);
+	WAIT_EVENT_T(client->IsConnected() || client->IsLogging() || client->Error(), i, 5);
 
-	if(!client->IsConnected())
+	if(!client->IsConnected() && !client->IsLogging())
 	{
 		std::string msg;
 
@@ -505,7 +504,6 @@ void MenAreAntsApp::RefreshList()
 
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
-		SDL_WaitThread(MetaServer.Thread(), 0);
 		ListServerForm->SetWantQuit();
 		return;
 	}
@@ -525,6 +523,20 @@ void MenAreAntsApp::ServerList()
 /*********************************************************************************************
  *                               TListServerForm                                             *
  ********************************************************************************************/
+
+void TListServerForm::AskForRegister()
+{
+	TMessageBox msg(_("You can register an account to protect your nickname, and to save your statistics (score, etc.)\n"
+	                  "The password will be saved on your computer and you will not have to enter it each times you want to "
+	                  "play.\n\n"
+	                  "Enter a password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
+	if(msg.Show() == BT_OK && msg.Edit()->Text().empty() == false)
+	{
+		Config::GetInstance()->passwd = msg.Edit()->Text();
+		login = true;
+		MetaServer.sendrpl(MSG_REGNICK, msg.Edit()->Text());
+	}
+}
 
 void TListServerForm::AfterDraw()
 {
@@ -551,12 +563,19 @@ void TListServerForm::AfterDraw()
 			MetaServer.SetWantDisconnect();
 		}
 	}
+	if(MenAreAntsApp::GetInstance()->IsFirstRun() && !login && !MetaServer.WantDisconnect() && MetaServer.IsConnected())
+	{
+		if(TMessageBox(_("Hello! This is your first run!\nYou can register an account to have score saving and your nickname protected.\n\n"
+		                 "Do you want to register it?"), BT_YES|BT_NO, this).Show() == BT_YES)
+			AskForRegister();
+		MenAreAntsApp::GetInstance()->FirstRunDone();
+	}
 	if(timer.time_elapsed() > 60)
 	{
 		MenAreAntsApp::GetInstance()->RefreshList();
 		timer.reset();
 	}
-	if(!MetaServer.IsConnected())
+	if(!MetaServer.IsConnected() && !MetaServer.IsLogging())
 	{
 		if(!MetaServer.WantDisconnect())
 			TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
@@ -567,6 +586,7 @@ void TListServerForm::AfterDraw()
 
 void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 {
+	if(!MetaServer.IsConnected()) return;
 	if(ServerList->Test(mouse, button))
 	{
 		if(ServerList->Selected() >= 0 && ServerList->SelectedItem()->Enabled())
@@ -594,20 +614,11 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 		TMessageBox(_("This button does nothing..."), BT_OK, this).Show();
 	else if(RegisterButton->Test(mouse, button))
 	{
-		TMessageBox msg(_("You can register an account to protect your nickname, and to save your statistics (score, etc.)\n"
-		                  "The password will be saved on your computer and you will not have to enter it each times you want to "
-		                  "play.\n\n"
-		                  "Enter a password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
-		if(msg.Show() == BT_OK && msg.Edit()->Text().empty() == false)
-		{
-			Config::GetInstance()->passwd = msg.Edit()->Text();
-			login = true;
-			MetaServer.sendrpl(MSG_REGNICK, msg.Edit()->Text());
-		}
+		AskForRegister();
 	}
 	else if(RetourButton->Test(mouse, button))
 	{
-		MenAreAntsApp::GetInstance()->Disconnect(&MetaServer);
+		MetaServer.SetWantDisconnect();
 		want_quit = true;
 	}
 	else if(MissionButton->Test(mouse, button) || EscarmoucheButton->Test(mouse, button))
@@ -639,7 +650,6 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 			if(!client->IsConnected())
 				TMessageBox(_("You have been disconnected"), BT_OK).Show();
 			client->SetWantDisconnect();
-			MenAreAntsApp::GetInstance()->Disconnect(client);
 			MenAreAntsApp::GetInstance()->RefreshList();
 		}
 	}
@@ -703,12 +713,8 @@ TListServerForm::TListServerForm(ECImage* w)
 
 EC_Client* MenAreAntsApp::Connect(std::string host)
 {
-	mutex = SDL_CreateMutex();
 	EC_Client* client = &Server;
 
-	client->SetMutex(mutex);
-	client->SetHostName(stringtok(host, ":"));
-	client->SetPort(host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
 	client->ClearCommands();
 	/* Ajout des commandes            CMDNAME		FLAGS	ARGS */
 	client->AddCommand(new ARMCommand(MSG_ARM,		0,	0));
@@ -745,7 +751,8 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 	client->AddCommand(new REJOINCommand(MSG_REJOIN,	0,	1));
 	client->AddCommand(new ADMINCommand(MSG_ADMIN,		0,	0));
 
-	Server.SetThread(SDL_CreateThread(EC_Client::read_sock, client));
+	std::string hostname = stringtok(host, ":");
+	Server.Connect(hostname.c_str(), host.empty() ? SERV_DEFPORT : StrToTyp<uint>(host));
 
 	WAIT_EVENT_T(client->IsConnected() || client->Error(), i, 5);
 
@@ -758,31 +765,10 @@ EC_Client* MenAreAntsApp::Connect(std::string host)
 		msg = _("Unable to connect:\n\n") + client->CantConnect();
 		TMessageBox(msg, BT_OK, ListServerForm).Show();
 
-		SDL_WaitThread(Server.Thread(), 0);
-		if(mutex)
-		{
-			SDL_DestroyMutex(mutex);
-			mutex = 0;
-		}
 		return 0;
 	}
 
 	return client;
-}
-
-void MenAreAntsApp::Disconnect(EC_Client* client)
-{
-	if(client)
-		client->SetWantDisconnect();
-
-	if(client->Thread())
-		SDL_WaitThread(client->Thread(), 0);
-
-	if(mutex)
-	{
-		SDL_DestroyMutex(mutex);
-		mutex = 0;
-	}
 }
 
 void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
@@ -823,8 +809,6 @@ void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
 #endif
 	}
 	MyFree(ConnectedForm);
-
-	Disconnect(client);
 
 	return;
 

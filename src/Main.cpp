@@ -36,6 +36,7 @@
 #include "Debug.h"
 #include "Defines.h"
 #include "Resources.h"
+#include "Sockets.h"
 #include "Sound.h"
 #include "Version.h"
 #include "gui/Boutton.h"
@@ -137,6 +138,7 @@ void MenAreAntsApp::WantConfig(TObject*, void* b)
 
 void MenAreAntsApp::UnLoad()
 {
+	EC_Client::Exit();
 	Config::GetInstance()->save();
 #ifdef WIN32
 	WSACleanup();
@@ -201,6 +203,9 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		Cursor.SetWindow(video->Window());
 		Cursor.Init();
+
+		EC_Client::Init();
+		mutex = EC_Client::Mutex();
 
 		if (TTF_Init()==-1) {
 			std::cerr << "TTF_Init: "<< TTF_GetError() << std::endl;

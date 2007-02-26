@@ -43,10 +43,26 @@ struct SDL_Thread;
 
 class EC_Client
 {
+/* Statique */
+
+	static SDL_mutex* mutex;
+	static SDL_Thread* thread;
+	static fd_set global_fd_set;
+	static SOCKET highsock;
+	static std::vector<EC_Client*> clients;
+	static bool StopThread;
+
+public:
+
+	static int read_sock(void *data);
+	static void Init();
+	static void Exit();
+	static SDL_Thread* Thread() { return thread; }
+	static SDL_mutex* Mutex() { return mutex; }
+
 /* Constructeur/Destructeur */
 public:
 
-	EC_Client(const char *hostname, unsigned short port);
 	EC_Client();
 
 	~EC_Client();
@@ -54,9 +70,7 @@ public:
 /* Fonctions publiques */
 public:
 
-	static int read_sock(void *data);
-
-	bool Connect(const char *hostname, unsigned short port);
+	bool Connect(const char* hostname, unsigned int port);
 
 	int sendrpl(const ECMessage& cmd, ECArgs args = ECArgs());
 	int sendrpl(const ECError& err, ECArgs args = ECArgs());
@@ -78,11 +92,10 @@ public:
 	void SetCantConnect(std::string _msg) { cantconnect = _msg; error = true; }
 
 	void UnsetLogging() { logging = false; }
+	bool IsLogging() const { return logging; }
 
 	bool Error() { return error; }
 
-	void SetMutex(SDL_mutex* m) { mutex = m; }
-	SDL_mutex* Mutex() const { return mutex; }
 	void LockScreen() const;
 	void UnlockScreen() const;
 
@@ -94,9 +107,6 @@ public:
 
 	void SetPort(unsigned p) { port = p; }
 	unsigned Port() const { return port; }
-
-	void SetThread(SDL_Thread* t) { thread = t; }
-	SDL_Thread* Thread() const { return thread; }
 
 /* Variables protégées */
 private:
@@ -111,7 +121,6 @@ private:
 
 	char readQ[MAXBUFFER + 1];
 	unsigned int readQi;
-	fd_set global_fd_set;
 
 	std::string nick;
 
@@ -119,14 +128,10 @@ private:
 	bool error;
 
 	ECPlayer *pl;
-	SDL_mutex* mutex;
-	SDL_Thread* thread;
 
 	std::string hostname;
 	unsigned int port;
 
-	void Init();
-	void Loop();
 	void Disconnect();
 };
 

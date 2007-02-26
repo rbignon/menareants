@@ -39,6 +39,12 @@
 
 EC_Client MetaServer;
 EC_Client Server;
+std::vector<EC_Client*> EC_Client::clients;
+bool EC_Client::StopThread = false;
+SDL_mutex* EC_Client::mutex = 0;
+SDL_Thread* EC_Client::thread = 0;
+fd_set EC_Client::global_fd_set;
+SOCKET EC_Client::highsock = 0;
 
 int EC_Client::sendrpl(const ECError& err, ECArgs args)
 {
@@ -139,22 +145,12 @@ void EC_Client::parse_message(std::string buf)
 
 int EC_Client::read_sock(void *data)
 {
-	EC_Client *cl = reinterpret_cast<EC_Client*>(data);
-
-	if(!cl->Connect(cl->hostname.c_str(), cl->port))
-		return 0;
-
-	cl->Loop();
-
-	return 0;
-}
-
-void EC_Client::Loop()
-{
 	fd_set tmp_fdset;
 	struct timeval timeout = {0,0};
 
-	while(!WantDisconnect())
+	StopThread = false;
+
+	while(!StopThread)
 	{
 		char buf[MAXBUFFER + 1] = {0};
 		register char *ptr;
@@ -165,44 +161,56 @@ void EC_Client::Loop()
 		timeout.tv_sec = 1; /*  Nécessaire pour être au courant du WantDisconnect() */
 		timeout.tv_usec = 0; /* quand il y a une inactivité au niveau des sockets */
 
-		if(select(sock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
+		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
 			{
 				printf("We catch an error from select() (%d: %s)\n", errno, strerror(errno));
-				connected = false;
 				break;
 			}
 			continue;
 		}
-		if(WantDisconnect()) break;
+		if(StopThread) break;
 
-		if(!FD_ISSET(sock, &tmp_fdset)) continue;
-
-		if((r = recv(sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
+		FOR(EC_Client*, clients, cl)
 		{
-			Debug(W_DEBUG, "We catch an error from recv() (%d: %s)", errno, strerror(errno));
-			connected = false;
-			break;
-		}
-
-		ptr = buf;
-		buf[r] = 0;
-
-		while(*ptr)
-		{
-			if(*ptr == '\n')
+			if(!cl->sock) continue;
+			if(cl->WantDisconnect())
 			{
-				readQ[readQi-1] = 0; /* pour le \r devant le \n */
-				parse_message(readQ);
-				readQi = 0;
+				cl->Disconnect();
+				continue;
 			}
-			else readQ[readQi++] = *ptr;
-			++ptr;
+			if(!FD_ISSET(cl->sock, &tmp_fdset)) continue;
+
+			if((r = recv(cl->sock, buf, sizeof buf -1, 0)) <= 0 && errno != EINTR)
+			{
+				Debug(W_DEBUG, "We catch an error from recv() (%d: %s)", errno, strerror(errno));
+				cl->Disconnect();
+				break;
+			}
+
+			ptr = buf;
+			buf[r] = 0;
+
+			while(*ptr)
+			{
+				if(*ptr == '\n')
+				{
+					cl->readQ[cl->readQi-1] = 0; /* pour le \r devant le \n */
+					cl->parse_message(cl->readQ);
+					cl->readQi = 0;
+				}
+				else cl->readQ[cl->readQi++] = *ptr;
+				++ptr;
+			}
 		}
 	}
-	Disconnect();
+	FORit(EC_Client*, clients, cl)
+		(*cl)->Disconnect();
+
 	thread = 0;
+
+	return 0;
 }
 
 void EC_Client::LockScreen() const
@@ -220,29 +228,26 @@ void EC_Client::UnlockScreen() const
 void EC_Client::Init()
 {
 	/* Initialisation des variables */
-	connected = false;
-	readQi = 0;
-	sock = 0;
-	want_disconnect = false;
-	pl = NULL;
-	error = false;
-	logging = true;
 	FD_ZERO(&global_fd_set);
-	mutex = 0;
+	mutex = SDL_CreateMutex();
+	thread = SDL_CreateThread(EC_Client::read_sock, 0);
+	clients.push_back(&MetaServer);
+	clients.push_back(&Server);
+}
+
+void EC_Client::Exit()
+{
+	StopThread = true;
+	SDL_WaitThread(thread, 0);
 }
 
 EC_Client::EC_Client()
+	: sock(0), connected(false), want_disconnect(false), logging(false), readQi(0), error(false), pl(0), port(0)
 {
-	Init();
+
 }
 
-EC_Client::EC_Client(const char *hostname, unsigned short port)
-{
-	Init();
-	Connect(hostname, port);
-}
-
-bool EC_Client::Connect(const char *hostname, unsigned short port)
+bool EC_Client::Connect(const char *hostname, unsigned int port)
 {
 	if(connected || sock) return false;
 
@@ -257,9 +262,11 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 	const char* ip = hostname;
 
 	error = false;
-	logging = true;
+	logging = false;
 	want_disconnect = false;
 	readQi = 0;
+
+	Debug(W_DEBUG, "Trying to connect to %s:%d ...", hostname, port);
 
 	/* Si c'est une host, on la résoud */
 	if(!is_ip(hostname))
@@ -303,6 +310,16 @@ bool EC_Client::Connect(const char *hostname, unsigned short port)
 
 	FD_SET(sock, &global_fd_set);
 
+	this->hostname = hostname;
+	this->port = port;
+
+	logging = true;
+
+	Debug(W_DEBUG, "Connected to %s", hostname);
+
+	if(sock > highsock)
+		highsock = sock;
+
 	return true;
 }
 
@@ -315,8 +332,11 @@ void EC_Client::Disconnect()
 #else
 		close(sock);
 #endif
+		Debug(W_DEBUG, "Disconnecting from %s", hostname.c_str());
+		FD_CLR(sock, &global_fd_set);
 		sock = 0;
 		connected = false;
+		logging = false;
 	}
 
 	if(pl)
@@ -340,6 +360,4 @@ EC_Client::~EC_Client()
 {
 	Disconnect();
 	ClearCommands();
-
-
 }

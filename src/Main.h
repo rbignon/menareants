@@ -46,7 +46,6 @@ public:
 	void RefreshList();
 	void ConnectedTo(std::string name, std::string host);
 	EC_Client* Connect(std::string host);
-	void Disconnect(EC_Client*);
 	void ListGames();
 	bool GameInfos(const char* c, TForm* f = 0, bool mission = false);
 	void LoadGame(EChannel* ch);
@@ -76,6 +75,8 @@ public:
 	std::string GetPath() const { return path; }
 
 	void FirstRun() { first_run = true; first_game = true; }
+	bool IsFirstRun() const { return first_run; }
+	void FirstRunDone() { first_run = false; }
 	bool IsFirstGame() const { return first_game; }
 	void FirstGameDone() { first_game = false; }
 

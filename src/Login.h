@@ -131,6 +131,7 @@ public:
 private:
 	Timer timer;
 	void AfterDraw();
+	void AskForRegister();
 	void OnClic(const Point2i& position, int button, bool& stop);
 };
 #endif

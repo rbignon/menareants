@@ -91,7 +91,7 @@ public:
 		uint killed;
 		uint shooted;
 		uint created;
-		uint score;
+		int score;
 		int best_revenu;
 	};
 
