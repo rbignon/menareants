@@ -48,59 +48,6 @@ static bool RC_MOTD = false;
 extern bool JOINED;
 bool EOL = false;                     /**< EOL is setted to \a true by thread when it received all list of games */
 
-char *duration(int s)
-{
-        static char dur[44 /* 3 + 7 + 2 + 8 + 2 + 9 + 2 + 9 + 1 */];
-        int i = 0;
-
-        if(s >= 86400)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/86400),
-                                s %= 86400, strcpy(dur + i, _(" days ")), i += 7;
-        if(s >= 3600)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/3600),
-                                s %= 3600, strcpy(dur + i, _(" hours ")), i += 8;
-        if(s >= 60)
-                i += snprintf(dur + i, sizeof dur - i, "%d", s/60),
-                                s %= 60, strcpy(dur + i, _(" minutes ")), i += 9;
-        if(s) i += snprintf(dur + i, sizeof dur - i, _("%d seconds"),s);
-        else dur[i-2]= 0;
-
-        return dur;
-}
-
-/** We are connected to server.
- *
- * Syntax: HEL prog version
- */
-int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_PVERSION));
-	return 0;
-}
-
-/** Server acknowledges my nickname.
- *
- * Syntax: AIM nick
- */
-int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	me->set_nick(parv[1]);
-	me->UnsetLogging();
-	me->SetConnected();
-	return 0;
-}
-
-/** Received a PING from server.
- *
- * Syntax: PIG
- */
-int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	me->sendrpl(MSG_PONG);
-
-	return 0;
-}
-
 /** This is a handler for errors messages.
  *
  * Syntax: ERROR number [args]
@@ -182,156 +129,87 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	return 0;
 }
 
-/** My game isn't compatible with this server.
- *
- * Syntax: MAJ <0/+/->
- */
-int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+
+char *duration(int s)
 {
-	switch(parv[1][0])
-	{
-		case '0':
-			me->SetCantConnect(_("This game isn't compatible with this server!?"));
-			break;
-		case '+':
-			me->SetCantConnect(_("You use a version more recent than that of the server"));
-			break;
-		case '-':
-			me->SetCantConnect(std::string(_("You have to update Men Are Ants to play on this server.\n\n")) +
-#ifndef WIN32
-			                     _("Type \"make update && sudo make install\".\n")
-#else
-			                     _("Download MenAreAnts.zip on website.\n")
-#endif
-			                     + StringF(_("Go on %s to get more informations."), APP_SITE));
-			break;
-		default:
-			me->SetCantConnect(_("Unable to connect to this server."));
-			vDebug(W_DESYNCH|W_SEND, "Reception d'un MAJ bizarre !",
-		                                VName(parv[1]));
-			break;
-	}
-	return 0;
+        static char dur[44 /* 3 + 7 + 2 + 8 + 2 + 9 + 2 + 9 + 1 */];
+        int i = 0;
+
+        if(s >= 86400)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/86400),
+                                s %= 86400, strcpy(dur + i, _(" days ")), i += 7;
+        if(s >= 3600)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/3600),
+                                s %= 3600, strcpy(dur + i, _(" hours ")), i += 8;
+        if(s >= 60)
+                i += snprintf(dur + i, sizeof dur - i, "%d", s/60),
+                                s %= 60, strcpy(dur + i, _(" minutes ")), i += 9;
+        if(s) i += snprintf(dur + i, sizeof dur - i, _("%d seconds"),s);
+        else dur[i-2]= 0;
+
+        return dur;
 }
 
-/** It's a notification to my admin status.
- *
- * Syntax: ADMIN
- */
-int ADMINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+void MenAreAntsApp::RefreshList()
 {
-	if(ConnectedForm)
+	ListServerForm->ConnectButton->SetEnabled(false);
+	ListServerForm->RefreshButton->SetEnabled(false);
+	ListServerForm->EscarmoucheButton->SetEnabled(false);
+	ListServerForm->MissionButton->SetEnabled(false);
+	ListServerForm->ServerList->ClearItems();
+
+	if(MetaServer.IsConnected())
 	{
-		ConnectedForm->RehashButton->SetVisible(true);
-		ConnectedForm->KillButton->SetVisible(true);
-	}
-	return 0;
-}
-
-/** I've been disconnected from server when I was playing a game. It asks me if I want to rejoin this game.
- *
- * Syntax: REJOIN game
- */
-int REJOINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
-{
-	if(!ConnectedForm) return 0;
-
-	ConnectedForm->Rejoin = parv[1];
-
-	return 0;
-}
-
-/** I receive message of the day of server.
- *
- * Syntax: MOTD [ligne]
- */
-int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	if(!ConnectedForm) return 0;
-
-	if(!RC_MOTD)
-	{
-		RC_MOTD = true;
-		ConnectedForm->Motd->ClearItems();
+		MetaServer.sendrpl(MSG_SERVLIST);
+		return;
 	}
 
-	ConnectedForm->Motd->AddItem(parv.size() > 1 ? parv[1] : "", black_color);
-	return 0;
-}
+	EC_Client* client = &MetaServer;
 
-/** I received all message of the day from server.
- *
- * Syntax: EOM
- */
-int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	RC_MOTD = false;
-	if(ConnectedForm)
-		ConnectedForm->Motd->ScrollUp();
-	return 0;
-}
+	client->ClearCommands();
+	/* Ajout des commandes            CMDNAME FLAGS ARGS */
+	client->AddCommand(new PIGCommand(MSG_PING,		0,	0)); // on appelle volontairement PIGCommand() qui fait la même chose pour serveur et meta-serveur
+	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
+	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
+	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
+	client->AddCommand(new REJOINmsCommand(MSG_REJOIN,	0,	1));
+	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
+	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
+	client->AddCommand(new SCOREmsCommand(MSG_SCORE,	0,	6));
 
-/** Statistics of server.
- *
- * Syntax: STAT nbactco nbco nbch chinwait chingame chtot uptime version
- */
-int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	if(ConnectedForm)
+	client->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port);
+
+	WAIT_EVENT_T(client->IsConnected() || client->IsLogging() || client->Error(), i, 5);
+
+	if(!client->IsConnected() && !client->IsLogging())
 	{
-		ConnectedForm->Uptime->SetCaption(StringF(_("This server is running from %s"), duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
-		ConnectedForm->UserStats->SetCaption(StringF(_("There are %s users, with %s total connections and %s played games"),
-		                                               parv[1].c_str(), parv[2].c_str(), parv[6].c_str()));
-		ConnectedForm->ChanStats->SetCaption(StringF(_("There are %s game(s), with %s in game and %s in preparation."),
-		                                               parv[3].c_str(), parv[5].c_str(), parv[4].c_str()));
-		if(parv.size() > 8)
-			ConnectedForm->ServerStats->SetCaption(parv[8]);
+		std::string msg;
+
+		client->SetWantDisconnect();
+
+		msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
+
+		TMessageBox(msg, BT_OK, ListServerForm).Show();
+
+		ListServerForm->SetWantQuit();
+		return;
 	}
-	return 0;
 }
 
-/** List games.
- *
- * Syntax: LSP nom ingame nbjoueur nbmax [mapname]
- */
-int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+void MenAreAntsApp::ServerList()
 {
-	if(!ConnectedForm)
-		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ConnectedForm));
+	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
 
-	me->LockScreen();
-	if(parv[2][0] == '+')
-	{
-		if(parv[3] == "0")
-			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[2].c_str()), parv[1],
-			                              black_color, true);
-		else if(parv.size() > 5)
-			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s %s", parv[1].c_str(), parv[3].c_str(),
-			                                                                 parv[4].c_str(), parv[5].c_str()), parv[1],
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
-		else
-			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s", parv[1].c_str(), parv[3].c_str(),
-			                                                              parv[4].c_str()), parv[1],
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
-	}
-	else
-		ConnectedForm->GList->AddItem(false, StringF(_("%-8s  Playing: %s"), parv[1].c_str(), parv[5].c_str()), parv[1],
-		                             red_color, false);
-	me->UnlockScreen();
-	return 0;
+	RefreshList();
+
+	ListServerForm->Run();
+
+	MyFree(ListServerForm);
 }
 
-/** End of channel list
- *
- * Syntax: EOL
- */
-int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
-{
-	EOL = true;
-	return 0;
-}
+/*********************************************************************************************
+ *                               TListServerForm                                             *
+ ********************************************************************************************/
 
 /** Connected to a meta-server
  *
@@ -435,7 +313,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 {
 	assert(ListServerForm);
-	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s) and %d accounts, with %d total connections and %d played games"),
+	ListServerForm->UserStats->SetCaption(StringF(_("There are %d users(s), with %d accounts, %d total connections and %d played games"),
 	                                                ListServerForm->nb_users, ListServerForm->nb_tregs, ListServerForm->nb_tusers, ListServerForm->nb_tchans));
 	ListServerForm->ChanStats->SetCaption(StringF(_("There are %d game(s) on %d servers, with %d in game and %d in preparation"),
 	                                               ListServerForm->nb_chans, ListServerForm->ServerList->Size(), ListServerForm->nb_chans - ListServerForm->nb_wchans,
@@ -463,66 +341,6 @@ int STATmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	return 0;
 }
 
-void MenAreAntsApp::RefreshList()
-{
-	ListServerForm->ConnectButton->SetEnabled(false);
-	ListServerForm->RefreshButton->SetEnabled(false);
-	ListServerForm->EscarmoucheButton->SetEnabled(false);
-	ListServerForm->MissionButton->SetEnabled(false);
-	ListServerForm->ServerList->ClearItems();
-
-	if(MetaServer.IsConnected())
-	{
-		MetaServer.sendrpl(MSG_SERVLIST);
-		return;
-	}
-
-	EC_Client* client = &MetaServer;
-
-	client->ClearCommands();
-	/* Ajout des commandes            CMDNAME FLAGS ARGS */
-	client->AddCommand(new PIGCommand(MSG_PING,		0,	0)); // on appelle volontairement PIGCommand() qui fait la même chose pour serveur et meta-serveur
-	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
-	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
-	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
-	client->AddCommand(new REJOINmsCommand(MSG_REJOIN,	0,	1));
-	client->AddCommand(new HELmsCommand(MSG_HELLO,		0,	1));
-	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
-	client->AddCommand(new SCOREmsCommand(MSG_SCORE,	0,	6));
-
-	client->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port);
-
-	WAIT_EVENT_T(client->IsConnected() || client->IsLogging() || client->Error(), i, 5);
-
-	if(!client->IsConnected() && !client->IsLogging())
-	{
-		std::string msg;
-
-		client->SetWantDisconnect();
-
-		msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
-
-		TMessageBox(msg, BT_OK, ListServerForm).Show();
-
-		ListServerForm->SetWantQuit();
-		return;
-	}
-}
-
-void MenAreAntsApp::ServerList()
-{
-	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
-
-	RefreshList();
-
-	ListServerForm->Run();
-
-	MyFree(ListServerForm);
-}
-
-/*********************************************************************************************
- *                               TListServerForm                                             *
- ********************************************************************************************/
 
 void TListServerForm::AskForRegister()
 {
@@ -818,6 +636,190 @@ void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
 /********************************************************************************************
  *                               TConnectedForm                                             *
  ********************************************************************************************/
+
+/** We are connected to server.
+ *
+ * Syntax: HEL prog version
+ */
+int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_PVERSION));
+	return 0;
+}
+
+/** Server acknowledges my nickname.
+ *
+ * Syntax: AIM nick
+ */
+int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	me->set_nick(parv[1]);
+	me->UnsetLogging();
+	me->SetConnected();
+	return 0;
+}
+
+/** Received a PING from server.
+ *
+ * Syntax: PIG
+ */
+int PIGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	me->sendrpl(MSG_PONG);
+
+	return 0;
+}
+
+/** My game isn't compatible with this server.
+ *
+ * Syntax: MAJ <0/+/->
+ */
+int MAJCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	switch(parv[1][0])
+	{
+		case '0':
+			me->SetCantConnect(_("This game isn't compatible with this server!?"));
+			break;
+		case '+':
+			me->SetCantConnect(_("You use a version more recent than that of the server"));
+			break;
+		case '-':
+			me->SetCantConnect(std::string(_("You have to update Men Are Ants to play on this server.\n\n")) +
+#ifndef WIN32
+			                     _("Type \"make update && sudo make install\".\n")
+#else
+			                     _("Download MenAreAnts.zip on website.\n")
+#endif
+			                     + StringF(_("Go on %s to get more informations."), APP_SITE));
+			break;
+		default:
+			me->SetCantConnect(_("Unable to connect to this server."));
+			vDebug(W_DESYNCH|W_SEND, "Reception d'un MAJ bizarre !",
+		                                VName(parv[1]));
+			break;
+	}
+	return 0;
+}
+
+/** It's a notification to my admin status.
+ *
+ * Syntax: ADMIN
+ */
+int ADMINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+{
+	if(ConnectedForm)
+	{
+		ConnectedForm->RehashButton->SetVisible(true);
+		ConnectedForm->KillButton->SetVisible(true);
+	}
+	return 0;
+}
+
+/** I've been disconnected from server when I was playing a game. It asks me if I want to rejoin this game.
+ *
+ * Syntax: REJOIN game
+ */
+int REJOINCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
+{
+	if(!ConnectedForm) return 0;
+
+	ConnectedForm->Rejoin = parv[1];
+
+	return 0;
+}
+
+/** I receive message of the day of server.
+ *
+ * Syntax: MOTD [ligne]
+ */
+int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(!ConnectedForm) return 0;
+
+	if(!RC_MOTD)
+	{
+		RC_MOTD = true;
+		ConnectedForm->Motd->ClearItems();
+	}
+
+	ConnectedForm->Motd->AddItem(parv.size() > 1 ? parv[1] : "", black_color);
+	return 0;
+}
+
+/** I received all message of the day from server.
+ *
+ * Syntax: EOM
+ */
+int EOMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	RC_MOTD = false;
+	if(ConnectedForm)
+		ConnectedForm->Motd->ScrollUp();
+	return 0;
+}
+
+/** Statistics of server.
+ *
+ * Syntax: STAT nbactco nbco nbch chinwait chingame chtot uptime version
+ */
+int STATCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(ConnectedForm)
+	{
+		ConnectedForm->Uptime->SetCaption(StringF(_("This server is running from %s"), duration(time(NULL) - StrToTyp<time_t>(parv[7]))));
+		ConnectedForm->UserStats->SetCaption(StringF(_("There are %s users, with %s total connections and %s played games"),
+		                                               parv[1].c_str(), parv[2].c_str(), parv[6].c_str()));
+		ConnectedForm->ChanStats->SetCaption(StringF(_("There are %s game(s), with %s in game and %s in preparation."),
+		                                               parv[3].c_str(), parv[5].c_str(), parv[4].c_str()));
+		if(parv.size() > 8)
+			ConnectedForm->ServerStats->SetCaption(parv[8]);
+	}
+	return 0;
+}
+
+/** List games.
+ *
+ * Syntax: LSP nom ingame nbjoueur nbmax [mapname]
+ */
+int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	if(!ConnectedForm)
+		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ConnectedForm));
+
+	me->LockScreen();
+	if(parv[2][0] == '+')
+	{
+		if(parv[3] == "0")
+			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[2].c_str()), parv[1],
+			                              black_color, true);
+		else if(parv.size() > 5)
+			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s %s", parv[1].c_str(), parv[3].c_str(),
+			                                                                 parv[4].c_str(), parv[5].c_str()), parv[1],
+			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
+			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
+		else
+			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s", parv[1].c_str(), parv[3].c_str(),
+			                                                              parv[4].c_str()), parv[1],
+			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
+			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
+	}
+	else
+		ConnectedForm->GList->AddItem(false, StringF(_("%-8s  Playing: %s"), parv[1].c_str(), parv[5].c_str()), parv[1],
+		                             red_color, false);
+	me->UnlockScreen();
+	return 0;
+}
+
+/** End of channel list
+ *
+ * Syntax: EOL
+ */
+int EOLCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
+{
+	EOL = true;
+	return 0;
+}
 
 void TConnectedForm::AfterDraw()
 {
