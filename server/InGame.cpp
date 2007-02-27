@@ -161,19 +161,28 @@ bool EChannel::ShowAnim(ECEvent* event)
 			{
 				/* Si il y a event->Entity(), ça veut dire que c'est quelqu'un qui a fait une attaque
 				 * explicite.
-				 * Et si la liste des entités n'est pas vide, c'est à dire que la première entité est la cible.
+				 * Et si la liste des entités n'est pas vide, ça veut dire qu'il y a des cibles précises,
+				 * et on va chercher à voir qui on attaque (dans le cas où elle a bougée).
 				 */
 				if(event->Entities()->Empty() == false && event->Entity())
 				{
-					ECEntity* e = event->Entities()->First();
-					if(!e->Case() || !event->Entity()->CanAttaq(e) || e->IsZombie() || e->Parent() ||
-					   event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
+					std::vector<ECEntity*> ents = event->Entities()->List();
+					ECEntity* victim = 0;
+					FOR(ECEntity*, ents, e)
+					{
+						if(!e->Case() || !event->Entity()->CanAttaq(e) || e->IsZombie() || e->Parent() ||
+						   event->Entity()->Case()->Delta(e->Case()) > event->Entity()->Porty())
+							continue;
+						if(!victim || e->Case() != event->Case())
+							victim = e;
+					}
+					if(e)
+						event->SetCase(e->Case());
+					else
 					{
 						ret = false;
-						break; // L'unité n'est pas atteignable, donc finalement on n'attaque pas
+						break;
 					}
-
-					event->SetCase(e->Case());
 				}
 
 				enum

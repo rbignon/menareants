@@ -3,11 +3,9 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 À faire:
 
 * En cours
+-voir les bugtrack et task sur https://gna.org/projects/menareants/
 
 * Urgent
--finir le truc de l'éditeur de maps (pose de case intelligente (mer et terre))
--pouvoir envoyer un changement de niveau via le protocole
--pouvoir jarter musique/effet dans les options, ainsi que changer de chanson
 
 -contacter masami.ko@gmail.com pour lui demander pour sa musique http://yeknan.free.fr/wormux/musique/Komuro_Masami.-.Bussou_na_machi.ogg
 
@@ -25,10 +23,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 [DONE] Pouvoir annuler les actions d'une unité
 
 * Après
--limiter le nombre d'unités à construire sur batiments
--à la fin des parties, sauvegarder l'etat de la carte pour ensuite afficher un tableau des parties avec les scores
--permettre d'ajouter de l'infanterie dans un bateau qui contient déjà de l'infanterie du même type
--pouvoir définir une cible sur plusieurs tours
 
 * Bof
 -passer à de la 3d isometrique (à confirmer)

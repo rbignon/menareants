@@ -343,6 +343,8 @@ public:
 	uint& NbDays() { return nb_days; }
 	ECDate* InitDate() { return &init_date; }
 
+	std::string ShowWaitMessage;
+
 /* Variables privées */
 private:
 	ECImage preview;

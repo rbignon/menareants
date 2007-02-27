@@ -364,9 +364,6 @@ public:
 	/** Return a long identificator in form Owner!xy (x € [A..z], y € [A..z]) */
 	std::string LongName() const;
 
-	/** This is used by server (so, why is it here ??) */
-	virtual ECBEntity* Last() const { return 0; }
-
 	/** This is events of this entity */
 	uint EventType() const { return event_type; }
 	void SetEvent(uint _e) { event_type = _e; }

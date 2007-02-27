@@ -422,7 +422,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 	 * - que ça soit notre première action
 	 * - qu'on n'ait pas déjà prévu une attaque
 	 */
-	if(!Deployed() || !force && Last())
+	if(!Deployed())
 		return false;
 
 	/* On n'attaque pas sur notre case */

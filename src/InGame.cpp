@@ -303,7 +303,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			}
 			(*it)->SetNb(nb);
 		}
-		if(flags & ARM_DEPLOY && (chan->State() == EChannel::ANIMING || (flags & ARM_CREATE)))
+		if(flags & ARM_DEPLOY && (chan->State() == EChannel::ANIMING || chan->State() == EChannel::SENDING))
 			(*it)->SetDeployed(deployed);
 		if(flags & ARM_ATTAQ)
 			(*it)->SetAttaquedCase(dynamic_cast<ECase*>((*map)(x,y)));
@@ -327,13 +327,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char AFTER_EVENT = 3;
 		char event_moment;
 		ECase* event_case = x < 0 ? 0 : dynamic_cast<ECase*>((*map)(x,y));
-		if(InGameForm && (event_case && event_case->Showed() > 0 || entities.front()->Case()->Showed() > 0) &&
+		if(InGameForm && (!InGameForm->Map->HaveBrouillard() || event_case && event_case->Showed() > 0 || entities.front()->Case()->Showed() > 0) &&
 		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE && !entities.front()->IsHiddenOnCase())
 		{
-			InGameForm->ShowWaitMessage.clear();
+			chan->Map()->ShowWaitMessage.clear();
 			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
 		}
-		else InGameForm->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : _("Neutral");
+		else chan->Map()->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : _("Neutral");
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -416,7 +416,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					break;
 			}
 			if((*it)->Selected() && InGameForm)
+			{
 				InGameForm->BarreAct->SetEntity(0);
+
+				while(InGameForm->BarreAct->Select()) SDL_Delay(20);
+			}
 
 			ECAltThread::LockThread();
 			me->LockScreen();
@@ -427,11 +431,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 			(*it)->SetShowedCases(false);
 			if(InGameForm)
-			{
 				InGameForm->Map->ToRedraw(*it);
-				if((*it)->Selected())
-					InGameForm->BarreAct->UnSelect();
-			}
+
 			map->RemoveAnEntity(*it, USE_DELETE);
 			it = entities.erase(it);
 
@@ -446,7 +447,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
 			me->UnlockScreen();
 		}
-		InGameForm->BarreAct->Update();
+		if(!(flags & ARM_REMOVE) && !(flags & ARM_INVEST))
+			InGameForm->BarreAct->Update();
 #if 0 /** SURTOUT PAS APPELER.
        * Ça appelera au final SDL_Cursor(), qui fait boucler infiniement le thread (ou quelque chose du genre), et plus
        * aucun message ne pourra être reçu
@@ -777,25 +779,26 @@ void TInGameForm::AfterDraw()
 	switch(chan->State())
 	{
 		case EChannel::PLAYING:
-			if(!BarreLat->ProgressBar) break;
+			if(!BarreLat->ProgressBar || client->Player()->Ready()) break;
 
 			BarreLat->ProgressBar->SetValue((long)elapsed_time.time_elapsed(true));
-			if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime() && !client->Player()->Ready())
+			if(BarreLat->ProgressBar->Value() >= (long)chan->TurnTime())
 			{
 				client->sendrpl(MSG_SET, "+!");
-				//elapsed_time.reset();
+				elapsed_time.reset();
 			}
 			break;
 		case EChannel::ANIMING:
 			elapsed_time.reset();
-			if(ShowWaitMessage.empty() == false)
+			if(chan->Map()->ShowWaitMessage.empty() == false)
 			{
 				do
 				{
-					TMessageBox(StringF(_("Please wait...\n\nAn %s's unity moves somewhere out of your field of vision."), ShowWaitMessage.c_str()),
+					Map->SetMustRedraw();
+					TMessageBox(StringF(_("Please wait...\n\nAn %s's unity moves somewhere out of your field of vision."), chan->Map()->ShowWaitMessage.c_str()),
 							0, InGameForm, false).Draw();
 					SDL_Delay(20);
-				} while(ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
+				} while(chan->Map()->ShowWaitMessage.empty() == false && chan->State() == EChannel::ANIMING);
 				Map->SetMustRedraw();
 			}
 
@@ -1004,10 +1007,19 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	if(BarreLat->QuitButton->Test(mouse, button))
 	{
-		TMessageBox mb(_("Do you really want to quit game ?"), BT_YES|BT_NO, this, false);
-		if(mb.Show() == BT_YES)
+		if(Player()->Lost())
 			want_quit = true;
-		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
+		else
+		{
+			TMessageBox mb(_("Are you sure to abort game?"), BT_YES|BT_NO, this, false);
+			if(mb.Show() == BT_YES)
+			{
+				Server.sendrpl(MSG_SET, "+_");
+				BarreLat->QuitButton->SetCaption(_("Leave game"));
+			}
+
+			Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
+		}
 		return;
 	}
 
@@ -1612,7 +1624,7 @@ void TBarreAct::ShowInfos()
 		HelpInfos->SetWidth(HelpAttaqs->X() - HelpInfos->X() - 10);
 	}
 
-	HelpButton->SetText(_("Back"));
+	HelpButton->SetCaption(_("Back"));
 	HelpInfos->ClearItems();
 	HelpInfos->Show();
 	HelpInfos->AddItem(_("Name: ") + std::string(entity->Name()));
@@ -1657,7 +1669,9 @@ void TBarreAct::ShowInfos()
 
 void TBarreAct::SetEntity(ECEntity* e)
 {
+	ECAltThread::LockThread();
 	ECAltThread::Put(TBarreAct::vSetEntity, e);
+	ECAltThread::UnlockThread();
 }
 
 void TBarreAct::vSetEntity(void* _e)
@@ -1698,7 +1712,7 @@ void TBarreAct::vSetEntity(void* _e)
 		InGameForm->BarreAct->Icon->SetHint(e->Infos());
 
 		int x = InGameForm->BarreAct->Width() - 5;
-		InGameForm->BarreAct->HelpButton->SetText(_("More infos"));
+		InGameForm->BarreAct->HelpButton->SetCaption(_("More infos"));
 		InGameForm->BarreAct->HelpButton->SetX((x -= InGameForm->BarreAct->HelpButton->Width()));
 		if(e->Owner() == InGameForm->BarreAct->me && !e->Owner()->Ready() && !e->Locked())
 		{
@@ -1717,7 +1731,7 @@ void TBarreAct::vSetEntity(void* _e)
 			if(e->AddUnits(0))
 			{
 				InGameForm->BarreAct->UpButton->Show();
-				InGameForm->BarreAct->UpButton->SetText(_("Add ") + TypToStr(e->InitNb()));
+				InGameForm->BarreAct->UpButton->SetCaption(_("Add ") + TypToStr(e->InitNb()));
 				InGameForm->BarreAct->UpButton->SetHint(StringF(_("Cost: $%d"), e->Cost()));
 				InGameForm->BarreAct->UpButton->SetEnabled(
 				                            (e->CanBeCreated(e->Move()->Dest()) && int(e->Cost()) <= e->Owner()->Money()));
@@ -1743,7 +1757,7 @@ void TBarreAct::vSetEntity(void* _e)
 				InGameForm->BarreAct->DeployButton->Show();
 				InGameForm->BarreAct->DeployButton->SetX((x -= InGameForm->BarreAct->DeployButton->Width()));
 				InGameForm->BarreAct->DeployButton->SetEnabled(!(e->EventType() & ARM_DEPLOY));
-				InGameForm->BarreAct->DeployButton->SetText(e->DeployButton());
+				InGameForm->BarreAct->DeployButton->SetCaption(e->DeployButton());
 			}
 			else
 				InGameForm->BarreAct->DeployButton->Hide();
@@ -1808,7 +1822,6 @@ void TBarreAct::vSetEntity(void* _e)
 	}
 	else
 	{
-		InGameForm->BarreAct->select = false;
 		if(InGameForm->BarreAct->entity)
 			InGameForm->BarreAct->entity->Select(false);
 		InGameForm->Map->SetSelectedEntity(0);
@@ -1824,6 +1837,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->Hide();
 
 		}
+		InGameForm->BarreAct->select = false;
 	}
 }
 
@@ -1967,7 +1981,7 @@ void TBarreLat::Init()
 	IdleFindButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	IdleFindButton->SetHint(_("Random find an unit who idles."));
 	IdleFindButton->SetX(X() + Width()/2 - BaliseButton->Width()/2);
-	QuitButton = AddComponent(new TButtonText(30,370,100,30, _("Leave"), Font::GetInstance(Font::Small)));
+	QuitButton = AddComponent(new TButtonText(30,370,100,30, _("Abort"), Font::GetInstance(Font::Small)));
 	QuitButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	QuitButton->SetHint(_("Leave game"));
 	QuitButton->SetX(X() + Width()/2 - QuitButton->Width()/2);

@@ -1089,11 +1089,9 @@ ECBMap::~ECBMap()
 
 ECBCase*& ECBMap::operator() (uint _x, uint _y)
 {
-	if(!initialised)
-		throw ECExcept("", "ECBMap n'est pas initialisé");
+	assert(initialised);
 
-	if (_x >= x || _y >= y)
-		throw ECExcept(VIName(x) VIName(y) VIName(_x) VIName(_y), "Access à un element hors du tableau");
+	assert(_x < x && _y < y);
 
 	/** \warning ALIGNEMENT FAIT LIGNE PAR LIGNE !!! */
 	return map[ _y * x + _x ];

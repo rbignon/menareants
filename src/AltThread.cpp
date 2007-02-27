@@ -54,7 +54,7 @@ int ECAltThread::Exec(void *data)
 			}
 			SDL_UnlockMutex(mutex);
 		}
-		SDL_Delay(20);
+		SDL_Delay(50);
 	}
 
 	SDL_DestroyMutex(mutex);

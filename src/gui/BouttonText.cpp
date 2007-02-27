@@ -40,7 +40,7 @@ void TButtonText::Init()
 	MyComponent(&label);
 }
 
-void TButtonText::SetText(const std::string &text)
+void TButtonText::SetCaption(const std::string &text)
 {
   label.SetCaption(text);
   label.SetXY(X()+Width()/2-label.Width()/2, Y()+Height()/2-label.Height()/2);
@@ -79,7 +79,7 @@ void TButtonText::Draw (const Point2i& mouse)
 
 //-----------------------------------------------------------------------------
 
-std::string TButtonText::GetText() const
+std::string TButtonText::Caption() const
 {
   return label.Caption();
 }

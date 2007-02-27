@@ -444,7 +444,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->Map()->InitDate()->SetDate(chan->Map()->Date());
 					if(InGameForm && InGameForm->BarreLat)
 					{
-						InGameForm->ShowWaitMessage.clear();
+						chan->Map()->ShowWaitMessage.clear();
 				 		InGameForm->BarreLat->Date->SetCaption(chan->Map()->Date()->String());
 				 		InGameForm->BarreLat->Show();
 						// Move the lateral bar
@@ -1285,7 +1285,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		GameInfosForm->Title->SetCaption(mission ? _("Alone game") : chan->GetName());
 		if(client->Player()->IsOwner())
 		{
-			GameInfosForm->PretButton->SetText(_("Start game"));
+			GameInfosForm->PretButton->SetCaption(_("Start game"));
 			GameInfosForm->PretButton->SetEnabled();
 		}
 

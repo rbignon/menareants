@@ -148,7 +148,8 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 	ECPlayer *sender = cl->Player();
 
 	bool add = true;
-	bool ready = false;
+	bool check_ready = false;
+	bool check_end_of_game = false;
 	const char NEEDREADY_ALL = 1;
 	const char NEEDREADY_ME = 2;
 	char need_ready = 0;
@@ -179,6 +180,27 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			case '+': add = true; break;
 			case '-': add = false; break;
+			case '_':
+				if(!add)
+				{
+					Debug(W_DESYNCH, "SET -_: forbidden");
+					break;
+				}
+				if(sender->Channel()->State() != EChannel::PLAYING)
+				{
+					Debug(W_DESYNCH, "SET +_: channel must be +P");
+					break;
+				}
+				if(sender->Lost())
+				{
+					Debug(W_DESYNCH, "SET +_: player have already lost");
+					break;
+				}
+				sender->HaveLost();
+				changed = YES_NOPARAMS;
+				check_ready = true;
+				check_end_of_game = true;
+				break;
 			case 'd':
 			{
 				if(!add)
@@ -401,7 +423,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				}
 
 				if(!sender->Channel()->Joinable() || !sender->IsIA())
-					ready = true;
+					check_ready = true;
 				sender->SetReady(add);
 				if(need_ready == NEEDREADY_ME) need_ready = 0;
 				changed = YES_NOPARAMS;
@@ -630,11 +652,18 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case NEEDREADY_ALL: sender->Channel()->NeedReady(); break;
 			case NEEDREADY_ME:  sender->NeedReady(); break;
 		}
-		ready = false;
+		check_ready = false;
 	}
 
+	/* Si on veut vérifier qu'il y a une fin de partie, on attribue à cette variable d'etat
+	 * la sortie de la fonction de vérification, ce qui permet, dans le reste du traitement,
+	 * de savoir si il y a eu fin de partie ou non.
+	 */
+	if(check_end_of_game)
+		check_end_of_game = sender->Channel()->CheckEndOfGame();
+
 	/* Si tout le monde est READY, on passe d'un etat de la partie à un autre. */
-	if(ready)
+	if(!check_end_of_game && check_ready)
 		sender->Channel()->CheckReadys();
 
 	{
@@ -971,6 +1000,34 @@ bool ECPlayer::RemoveBreakPoint(ECBCase* c)
 			++it;
 	}
 	return false;
+}
+
+void ECPlayer::HaveLost()
+{
+	std::vector<ECBEntity*> ents = Entities()->List();
+	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+	{
+		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+		entity->CancelEvents();
+		Channel()->SendArm(0, entity, ARM_REMOVE);
+		entity->SetOwner(0);
+		/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
+		entity->Case()->Entities()->Remove(entity);
+		Channel()->Map()->Entities()->Remove(entity);
+		MyFree(entity);
+	}
+	if(MapPlayer())
+	{
+		BCountriesVector conts = MapPlayer()->Countries();
+		for(BCountriesVector::iterator conti = conts.begin(); conti != conts.end(); ++conti)
+		{
+			(*conti)->SetOwner(0);
+			Channel()->send_modes(this, "-@", (*conti)->ID());
+		}
+	}
+	Entities()->Clear();
+
+	SetLost();
 }
 
 /********************************************************************************************
@@ -1438,7 +1495,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += "-";
 	if(flag & ARM_NOPRINCIPAL)
 		to_send += "&";
-	if((flag & ARM_DEPLOY) || ((flag & ARM_CREATE) && et.front()->Deployed()))
+	if(flag & ARM_DEPLOY)
 		to_send += (et.front()->Deployed()) ? "{" : "}";
 	if(flag & ARM_CONTENER && !et.empty())
 	{
@@ -1499,6 +1556,10 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		else
 			sendto_players(NULL, et, MSG_ARM, to_send);
 	}
+
+	if(!(flag & ARM_DEPLOY) && (flag & ARM_TYPE) && et.front()->Deployed())
+		SendArm(cl, et, ARM_DEPLOY);
+
 }
 
 void EChannel::ByeEveryBody(ECBPlayer* exception)
@@ -1735,38 +1796,14 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 
 	ECPlayer* pl = dynamic_cast<ECPlayer*>(ppl);
 
-	if(!Joinable())
-	{
-		std::vector<ECBEntity*> ents = pl->Entities()->List();
-		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
-		{
-			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-			entity->CancelEvents();
-			SendArm(0, entity, ARM_REMOVE);
-			entity->SetOwner(0);
-			/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
-			entity->Case()->Entities()->Remove(entity);
-			Map()->Entities()->Remove(entity);
-			MyFree(entity);
-		}
-		if(pl->MapPlayer())
-		{
-			BCountriesVector conts = pl->MapPlayer()->Countries();
-			for(BCountriesVector::iterator conti = conts.begin(); conti != conts.end(); ++conti)
-			{
-				(*conti)->SetOwner(0);
-				send_modes(pl, "-@", (*conti)->ID());
-			}
-		}
-	}
-	pl->Entities()->Clear();
+	pl->HaveLost();
 
 	if(!IsInGame())
 	{
 		if(pl->Client())
 			sendto_players(0, pl, MSG_LEAVE);
 
-		if(!IsInGame() && use_delete)
+		if(use_delete)
 			delete pl;
 	}
 	else
@@ -1775,10 +1812,9 @@ bool EChannel::RemovePlayer(ECBPlayer* ppl, bool use_delete)
 		if(pl->Client())
 			pl->Client()->SetPlayer(0);
 		pl->ClearClient();
-		pl->SetLost();
 	}
 
-	if(State() != EChannel::PLAYING || !CheckEndOfGame())
+	if(!CheckEndOfGame())
 		CheckReadys();
 
 	return true;

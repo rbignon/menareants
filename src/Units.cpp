@@ -271,9 +271,12 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 				ChangeCase(acase->MoveUp()), move.RemoveFirst(), changed_case = true;
 			break;
 	}
-	if(changed_case && entities.size() == 1 && Case()->Showed() > 0 &&
+	if(changed_case && entities.size() == 1 && (!Map()->Brouillard() || Case()->Showed() > 0) &&
 	   dynamic_cast<ECMap*>(acase->Map())->ShowMap() && !IsHiddenOnCase())
+	{
 		dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
+		Map()->ShowWaitMessage.clear();
+	}
 
 	if(!move.Empty() && m != move.First())
 		SetImage(images[(imgs_t)move.First()]);

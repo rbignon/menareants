@@ -68,6 +68,8 @@ public:
 	/** This player need to be ready. */
 	void NeedReady();
 
+	void HaveLost();
+
 /* Attributs */
 public:
 

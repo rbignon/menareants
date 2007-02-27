@@ -38,8 +38,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -59,8 +59,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -80,8 +80,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -107,8 +107,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -134,8 +134,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void Union(ECEntity*) { return; }
 
@@ -166,8 +166,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -187,8 +187,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -208,8 +208,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -229,8 +229,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void Union(ECEntity*) { return; }
 
@@ -252,8 +252,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void Union(ECEntity*) { return; }
 
@@ -276,8 +276,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -297,8 +297,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 
@@ -318,8 +318,8 @@ public:
 /* Methodes */
 public:
 
-	/** @return last case */
-	virtual bool Return() { return false; }
+
+
 
 	virtual void CreateLast() {}
 

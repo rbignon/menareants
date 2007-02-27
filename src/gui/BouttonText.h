@@ -45,11 +45,11 @@ public:
   virtual void SetImage (ECSprite *image);
 
   virtual void Draw (const Point2i&);
-  void SetText (const std::string &text);
+  void SetCaption (const std::string &text);
   void SetEnabled(bool b = true);
   virtual void SetXY(int x, int y);
 
-  std::string GetText() const;
+  std::string Caption() const;
 };
 
 #endif /* EC_BOUTTONTEXT_H */

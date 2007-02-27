@@ -259,7 +259,6 @@ public:
 
 	ECPlayer* Player() const { return player; }
 
-	std::string ShowWaitMessage;
 	bool WantBalise;
 
 /* Evenements */

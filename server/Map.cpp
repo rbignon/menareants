@@ -342,7 +342,7 @@ void ECEntity::Union(ECEntity* entity)
 bool ECEntity::Return()
 {
 	// On en revient à l'état après une partie.
-	ECEntity::Played();
+	Played();
 
 	return true;
 }
