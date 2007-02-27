@@ -176,8 +176,8 @@ bool EChannel::ShowAnim(ECEvent* event)
 						if(!victim || e->Case() != event->Case())
 							victim = e;
 					}
-					if(e)
-						event->SetCase(e->Case());
+					if(victim)
+						event->SetCase(victim->Case());
 					else
 					{
 						ret = false;

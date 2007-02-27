@@ -1495,7 +1495,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += "-";
 	if(flag & ARM_NOPRINCIPAL)
 		to_send += "&";
-	if(flag & ARM_DEPLOY)
+	if(flag & ARM_DEPLOY || (flag & ARM_TYPE) && et.front()->Deployed())
 		to_send += (et.front()->Deployed()) ? "{" : "}";
 	if(flag & ARM_CONTENER && !et.empty())
 	{
@@ -1556,10 +1556,6 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		else
 			sendto_players(NULL, et, MSG_ARM, to_send);
 	}
-
-	if(!(flag & ARM_DEPLOY) && (flag & ARM_TYPE) && et.front()->Deployed())
-		SendArm(cl, et, ARM_DEPLOY);
-
 }
 
 void EChannel::ByeEveryBody(ECBPlayer* exception)
