@@ -160,6 +160,7 @@ int parsemsg(struct Client* cl)
 		{MSG_SET,      m_server_set,     CL_SERVER},
 		{MSG_USET,     m_user_set,       CL_SERVER},
 		{MSG_PONG,     m_pong,           0},
+		{MSG_PING,     m_ping,           0},
 		{MSG_SERVLIST, m_serv_list,      CL_USER},
 		{MSG_REGNICK,  m_reg_nick,       CL_USER},
 		{MSG_LOGIN,    m_login_nick,     0},

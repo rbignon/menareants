@@ -393,12 +393,23 @@ void TListServerForm::AfterDraw()
 		MenAreAntsApp::GetInstance()->RefreshList();
 		timer.reset();
 	}
-	if(!MetaServer.IsConnected() && !MetaServer.IsLogging())
+	if(!MetaServer.IsConnected())
 	{
-		if(!MetaServer.WantDisconnect())
-			TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
-		want_quit = true;
-		return;
+		if(!MetaServer.IsLogging())
+		{
+			if(!MetaServer.WantDisconnect())
+				TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
+			want_quit = true;
+			return;
+		}
+		else
+			do
+			{
+				SDL_Event event;
+				SDL_PollEvent( &event);
+				TMessageBox(_("Please wait while connecting..."), 0, this).Draw();
+				SDL_Delay(20);
+			} while(!MetaServer.IsConnected() && MetaServer.IsLogging() && !login);
 	}
 }
 
@@ -948,7 +959,7 @@ TConnectedForm::TConnectedForm(ECImage* w)
  *                               TGlobalScoresForm                                          *
  ********************************************************************************************/
 
-// SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu>
+// SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories>
 int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(GlobalScoresForm)
@@ -956,9 +967,11 @@ int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(GlobalScoresForm->ListBox->Empty())
 			GlobalScoresForm->BestPlayer->SetCaption(StringF(_("And the better player is.... %s with %s points!"),
 			                                                   parv[1].c_str(), parv[5].c_str()));
+
+		int defeats = StrToTyp<int>(parv[7]) - StrToTyp<int>(parv[8]);
 		GlobalScoresForm->ListBox->AddItem(false,
-		                      StringF("%-15s %7s %9s %9s %11s    %12s", parv[1].c_str(), parv[5].c_str(), parv[2].c_str(),
-		                                                             parv[3].c_str(), parv[4].c_str(), StringF(_("$%s"), parv[6].c_str()).c_str()),
+		                      StringF("%-15s%9s %12s %9d   %-11s %9s", parv[1].c_str(), parv[5].c_str(), parv[8].c_str(),
+		                                                                defeats, parv[3].c_str(), StringF(_("$%s"), parv[6].c_str()).c_str()),
 		                      parv[1]);
 
 		if(GlobalScoresForm->best_incomes < StrToTyp<int>(parv[6]))
@@ -1002,7 +1015,7 @@ TGlobalScoresForm::TGlobalScoresForm(ECImage* im)
 	ListBox->SetGrayDisable(false);
 
 	Headers = AddComponent(new TLabel(ListBox->X(), ListBox->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
-	Headers->SetCaption(_("Nickname        Score   Deaths  Killed  Creations  Best incomes"));
+	Headers->SetCaption(_("Nickname         Score  Victories  Defeats  Killed  Best incomes"));
 
 	Title = AddComponent(new TLabel(10, _("Scores"), white_color, Font::GetInstance(Font::Huge)));
 

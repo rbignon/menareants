@@ -24,7 +24,7 @@
 #include "lib/Defines.h"
 
 #define DBPATH ".maams-db"
-#define DBVERSION 1
+#define DBVERSION 2
 #define PASSWDLEN 16
 
 struct User;
@@ -35,7 +35,7 @@ struct RegUser
 	char passwd[PASSWDLEN+1];
 
 	int killed, deaths, creations, score, best_revenu;
-	int nb_games;
+	int nb_games, victories;
 
 	struct User* user;
 
@@ -55,7 +55,7 @@ extern struct RegUser* reguser_head;
 extern int load_users(const char* file);
 extern int write_users(const char* file);
 
-extern struct RegUser* add_reguser(const char* nick, const char* passwd, int nb_games, int deaths, int killed, int creations, int score, int best_revenu);
+extern struct RegUser* add_reguser(const char* nick, const char* passwd, int nb_games, int deaths, int killed, int creations, int score, int best_revenu, int victories);
 extern void remove_reguser(struct RegUser* reguser);
 extern struct RegUser* find_reguser(const char* nick);
 

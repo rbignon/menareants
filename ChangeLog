@@ -1,3 +1,11 @@
+2007-02-28 Romain Bignon <progs@headfucking.net>
+
+	* API, meta-server/database.cp, server/Channels.cpp: Compte les victoires.
+
+	* server/Main.cpp: Ping le serveur pour savoir si il va se faire deconnecter ou non.
+
+	* src/Login.cpp, src/InGame.cpp: La souris bouge pendant les messages d'attente, et en jeu on peut utiliser F11.
+
 2007-02-27 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp, src/Units.cpp, src/Map.h: Le waitmessage est maintenant un membre de ECMap pour qu'une entité puisse le jarter au besoin.

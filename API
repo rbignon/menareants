@@ -252,6 +252,7 @@ Sommaire:
             +d <deaths>                                    :- unités perdues
             +s <score>                                     :- score
             +c <creations>                                 :- créations
+            +v                                             :- victoire
 
      c) Meta-server <-> Client
 

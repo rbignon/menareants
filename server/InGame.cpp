@@ -231,7 +231,6 @@ bool EChannel::ShowAnim(ECEvent* event)
 				if(entv.empty())
 				{
 					ret = false;
-					Debug(W_DEBUG, "ARM ATTAQ: List is empty.");
 					break;
 				}
 

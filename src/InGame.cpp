@@ -794,6 +794,9 @@ void TInGameForm::AfterDraw()
 			{
 				do
 				{
+					SDL_Event event;
+					if(SDL_PollEvent( &event) && event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_F11)
+						Video::GetInstance()->SetConfig(Video::GetInstance()->Width(), Video::GetInstance()->Height(), !Video::GetInstance()->IsFullScreen());
 					Map->SetMustRedraw();
 					TMessageBox(StringF(_("Please wait...\n\nAn %s's unity moves somewhere out of your field of vision."), chan->Map()->ShowWaitMessage.c_str()),
 							0, InGameForm, false).Draw();

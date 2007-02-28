@@ -1386,7 +1386,7 @@ bool EChannel::CheckEndOfGame()
 		args += TypToStr(pl->Stats()->created);
 		args += TypToStr(pl->Stats()->score);
 		args += TypToStr(pl->Stats()->best_revenu);
-		app.MSet(pl, "+kdcsrg", args);
+		app.MSet(pl, "+kdcsrgv", args);
 		sendto_players(0, pl, MSG_SCORE, args);
 	}
 	return true;

@@ -500,6 +500,7 @@ void ECServer::ParseMetaServer()
 		FD_CLR(ms_sock, &global_read_set);
 		close(ms_sock);
 		ms_sock = 0;
+		Debug(W_CONNS|W_ECHO, "Disconnected from meta-server. Reconnecting...");
 		ConnectMetaServer();
 		return;
 	}
@@ -592,7 +593,7 @@ int ECServer::run_server(void)
 
 	while(running)
 	{
-		if(time_t(last_call + app.GetConf()->PingFreq()) < CurrentTS)
+		if(time_t(last_call + app.GetConf()->PingFreq()) <= CurrentTS)
 		{
 			sig_alarm();
 			last_call = CurrentTS;

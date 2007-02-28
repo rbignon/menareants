@@ -35,7 +35,7 @@ void strip_newline(char *string)
 }
 
 struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, int deaths, int killed,
-                            int creations, int score, int best_revenu)
+                            int creations, int score, int best_revenu, int victories)
 {
 	struct RegUser *reguser = calloc(1, sizeof* reguser), *head = reguser_head;
 
@@ -50,6 +50,7 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 	reguser->creations = creations;
 	reguser->score = score;
 	reguser->best_revenu = best_revenu;
+	reguser->victories = victories;
 
 	reguser->user = 0;
 
@@ -115,17 +116,22 @@ int load_users(const char* file)
 
 		strip_newline(parv[parc-1]);
 
-		// NICK <name> <pass> <nb_games> <deaths> <killed> <creations> <score> <meilleurs revenu>
+		// NICK <name> <pass> <nb_games> <deaths> <killed> <creations> <score> <meilleurs revenu> <victoires>
 		if(!strcmp(buf, "VERSION"))
 			version = atoi(parv[1]);
 		else if(!strcmp(buf, "NICK"))
 		{
+			int victories = 0;
 			if(parc < 9)
 			{
 				printf("WARNING: Unable to load %s reguser\n", parc > 1 ? parv[1] : "unknown");
 				continue;
 			}
-			add_reguser(parv[1], parv[2], atoi(parv[3]), atoi(parv[4]), atoi(parv[5]), atoi(parv[6]), atoi(parv[7]), atoi(parv[8]));
+			if(version >= 2)
+				victories = atoi(parv[9]);
+			else
+				victories = atoi(parv[3]);
+			add_reguser(parv[1], parv[2], atoi(parv[3]), atoi(parv[4]), atoi(parv[5]), atoi(parv[6]), atoi(parv[7]), atoi(parv[8]), victories);
 		}
 	}
 	fclose(fp);
@@ -143,8 +149,8 @@ int write_users(const char* file)
 	fprintf(fp, "VERSION %d\n", DBVERSION);
 
 	for(; reg; reg = reg->next)
-		fprintf(fp, "NICK %s %s %d %d %d %d %d %d\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
-		                                              reg->killed, reg->creations, reg->score, reg->best_revenu);
+		fprintf(fp, "NICK %s %s %d %d %d %d %d %d %d\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
+		                                              reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories);
 
 	fclose(fp);
 

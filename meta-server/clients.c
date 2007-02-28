@@ -117,8 +117,8 @@ static int show_scores(struct Client* cl)
 		max_show = nb_tregs;
 
 	for(i=0; i < max_show; ++i)
-		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
-		                                            list[i]->creations, list[i]->score, list[i]->best_revenu, list[i]->nb_games);
+		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
+		                                            list[i]->creations, list[i]->score, list[i]->best_revenu, list[i]->nb_games, list[i]->victories);
 
 	return 0;
 
@@ -135,6 +135,11 @@ int m_pong (struct Client* cl, int parc, char** parv)
 	return 0;
 }
 
+int m_ping (struct Client* cl, int parc, char** parv)
+{
+	return sendcmd(cl, MSG_PONG);
+}
+
 /* REG <pass> */
 int m_reg_nick (struct Client* cl, int parc, char** parv)
 {
@@ -146,7 +151,7 @@ int m_reg_nick (struct Client* cl, int parc, char** parv)
 	if(parc < 2)
 		return 0;
 
-	reg = add_reguser(cl->user->name, crypt(parv[1], PASS_HASH), 0, 0, 0, 0, 0, 0);
+	reg = add_reguser(cl->user->name, crypt(parv[1], PASS_HASH), 0, 0, 0, 0, 0, 0, 0);
 
 	cl->flags = (CL_USER|CL_LOGGED);
 	cl->user->reguser = reg;

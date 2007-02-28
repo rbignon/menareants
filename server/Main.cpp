@@ -71,6 +71,8 @@ void ECServer::sig_alarm()
 
 	if(!ms_sock)
 		ConnectMetaServer();
+	else
+		SendMetaServer(MSG_PING);
 }
 
 void ECServer::sig_reload(int c)

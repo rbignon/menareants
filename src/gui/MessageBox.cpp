@@ -125,6 +125,7 @@ void TMessageBox::Draw()
 	start = SDL_GetTicks();
 
 	SDL_GetMouseState( &x, &y);
+
 	if(realbg)
 		Window()->Blit(realbg);
 	if(Form)
