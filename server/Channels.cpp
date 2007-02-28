@@ -1366,7 +1366,7 @@ bool EChannel::CheckEndOfGame()
 	bool end_of_game = true;
 	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end() && end_of_game; ++it)
 	{
-		if((*it)->Lost()) continue;
+		if((*it)->Lost() || (*it)->IsIA()) continue;
 		for(std::vector<ECBPlayer*>::iterator it2 = players.begin(); it2 != players.end() && end_of_game; ++it2)
 		{
 			if((*it2)->Lost()) continue;

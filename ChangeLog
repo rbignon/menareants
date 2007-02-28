@@ -6,6 +6,8 @@
 
 	* src/Login.cpp, src/InGame.cpp: La souris bouge pendant les messages d'attente, et en jeu on peut utiliser F11.
 
+	* server/Channels.cpp (CheckEndOfGame): Putain de bug qui faisait une boucle infinie si il restait que des IAs ennemies corrigé.
+
 2007-02-27 Romain Bignon <progs@headfucking.net>
 
 	* src/InGame.cpp, src/Units.cpp, src/Map.h: Le waitmessage est maintenant un membre de ECMap pour qu'une entité puisse le jarter au besoin.
