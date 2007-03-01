@@ -78,6 +78,7 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 					reg->nb_games++;
 				else
 					reg->nb_games--;
+				break;
 			case 'v':
 				if(add)
 					reg->victories++;
