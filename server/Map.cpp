@@ -332,10 +332,9 @@ void ECEntity::Union(ECEntity* entity)
 		Events()->Add(*evti);
 		if((*evti)->Entity() == entity)
 			(*evti)->SetEntity(this);
-		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
-		FORit(ECEntity*, ents, enti)
-			if(*enti == entity)
-				*enti = this;
+
+		if((*evti)->Entities()->Remove(entity))
+			(*evti)->Entities()->Add(this);
 	}
 }
 

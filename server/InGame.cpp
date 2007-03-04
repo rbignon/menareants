@@ -319,7 +319,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 								if((*it)->Like(en->first) || !en->second)
 									continue;
 								(*it)->Owner()->Stats()->score += en->second;
-								if((*it)->Case() != en->first->Case())
+								if((*it)->Case() != en->first->Case() || en->second <= ents_init_nb[*it])
 									continue;
 								(*it)->Owner()->Stats()->score += en->second - ents_init_nb[*it];
 							}
@@ -518,9 +518,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 						SendArm(NULL, entity, ARM_INVEST|ARM_REMOVE, entity->Case()->X(), entity->Case()->Y());
 						if(entity->Owner())
 							SendArm(entity->Owner()->Client(), gobeur, ARM_NUMBER);
-						/* Pas besoin de le mettre zombie, il l'est déjà.
-						 * (*it)->SetZombie();
-						 */
+						entity->SetZombie();
 					}
 				}
 
@@ -562,7 +560,11 @@ bool EChannel::ShowAnim(ECEvent* event)
 	}
 	std::vector<ECEntity*> ents = event->Entities()->List();
 	FORit(ECEntity*, ents, it)
+	{
 		(*it)->Events()->Remove(event);
+		if((*it)->Owner())
+			(*it)->Owner()->Events()->Remove(event);
+	}
 	Map()->RemoveEvent(event, USE_DELETE);
 
 	Debug(W_DEBUG|W_ECHO, "=== End of event ===");
@@ -621,7 +623,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			return vDebug(W_DESYNCH, "ARM: Unable to find entity", VPName(entity) VName(parv[0]) VName(parv[1]));
 
 		if(entity->IsZombie() || entity->Locked())
-			return vDebug(W_DESYNCH, "ARM: We can move this entity!", VPName(entity) VName(parv[0]) VName(parv[1])
+			return vDebug(W_DESYNCH, "ARM: We can't move this entity!", VPName(entity) VName(parv[0]) VName(parv[1])
 			                          VBName(entity->IsZombie()) VIName(entity->Type()) VBName(entity->Locked())
 			                          VPName(entity->Parent()));
 	}

@@ -48,7 +48,10 @@ public:
 			}
 
 		if(!unit)
+		{
+			FDebug(W_DEBUG, "L'unité a disparue !");
 			return false;
+		}
 
 		if((entities = Entities()->Find(ECEntity::E_BOAT)).empty())
 		{ /* On a pas de bateau encore d'assigné, on en cherche un */
@@ -133,7 +136,7 @@ public:
 					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau contient déjà quelqu'un !?");
 				else
 					Debug(W_WARNING, "IA::UseTransportBoat: Le bateau a été augmenté à %d mais ne peut toujours pas contenir"
-									" les %d hommes", boat->Nb(), unit->Nb());
+					                 " les %d hommes", boat->Nb(), unit->Nb());
 				return false;
 			}
 			if(unit->DestCase()->Delta(boat->DestCase()) == 1)
@@ -178,9 +181,13 @@ public:
 
 			if(!victim) return true;
 
+			ECBCase* proxim_case = boat->SearchProximCase(victim->Case());
+
 			for(uint i = 0; i < boat->MyStep(); ++i)
 			{
-				if(boat->RestStep() > 0 && boat->DestCase() == boat->SearchProximCase(victim->Case()))
+				if(boat->DestCase() == victim->Case())
+					break;
+				if(boat->RestStep() > 0 && boat->DestCase() == proxim_case)
 				{
 					unit->SetRestStep(unit->MyStep());
 
@@ -222,13 +229,12 @@ public:
 
 };
 
-#if 0
-#define IA_DEBUG(x) (*Player()->Channel()) << (*enti)->LongName() + " " + x
-#else
-#define IA_DEBUG(x)
-#endif
 void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool proxim)
 {
+	assert(enti);
+	assert(enti->DestCase());
+	assert(dest);
+
 	std::string msg;
 	std::stack<ECBMove::E_Move> moves;
 	if(!nb_cases || nb_cases > enti->RestStep())
@@ -246,7 +252,9 @@ void TIA::WantMoveTo(ECBEntity* enti, ECBCase* dest, uint nb_cases, bool proxim)
 
 	if(moves.empty())
 	{
-		Debug(W_WARNING, "TIA::WantMoveTo(): FindFastPath returns true but an empty movements list !?");
+		vDebug(W_WARNING, "TIA::WantMoveTo(): FindFastPath returns true but we have an empty movements list !?",
+		                  VIName(nb_cases) VBName(proxim) VIName(enti->DestCase()->X()) VIName(enti->DestCase()->Y())
+		                  VIName(dest->X()) VIName(dest->Y()));
 		return;
 	}
 
@@ -298,16 +306,15 @@ void TIA::FirstMovements()
 			switch((*enti)->Type())
 			{
 				case ECEntity::E_CASERNE:
-					switch(rand()%8)
+					switch(rand()%7)
 					{
 						case 0:
 						case 1:
 						case 2:
-						case 3:
-						case 4: t = ECEntity::E_ARMY; break;
-						case 5: t = ECEntity::E_ENGINER; break;
-						case 6: t = ECEntity::E_TOURIST; break;
-						case 7: t = ECEntity::E_MCDO; break;
+						case 3: t = ECEntity::E_ARMY; break;
+						case 4: t = ECEntity::E_ENGINER; break;
+						case 5: t = ECEntity::E_TOURIST; break;
+						case 6: t = ECEntity::E_MCDO; break;
 					}
 					break;
 				case ECEntity::E_CHARFACT:
@@ -554,15 +561,21 @@ int TIA::SETCommand (std::vector<ECPlayer*> players, TIA *me, std::vector<std::s
 
 void TIA::RemoveEntity(ECBEntity* e)
 {
+	recruted[e] = false;
 	for (std::vector<Strategy*>::iterator it = strategies.begin(); it != strategies.end(); ++it)
+	{
+		Debug(W_DEBUG, "On supprime l'unité %s", e->LongName().c_str());
 		(*it)->RemoveEntity(e);
+	}
 }
 
 void TIA::UseStrategy(Strategy* s, ECBEntity* e)
 {
 	s->AddEntity(e);
-	if(!s->Exec()) return;
-	AddStrategy(s);
+	if(!s->Exec())
+		delete s;
+	else
+		AddStrategy(s);
 }
 
 bool TIA::RemoveStrategy(Strategy* _s, bool use_delete)
@@ -571,6 +584,7 @@ bool TIA::RemoveStrategy(Strategy* _s, bool use_delete)
 	{
 		if (*it == _s)
 		{
+			Debug(W_DEBUG, "On supprime la stratégie");
 			if(use_delete)
 				delete _s;
 			it = strategies.erase(it);

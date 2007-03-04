@@ -1271,21 +1271,15 @@ void EChannel::CheckReadys()
 
 					std::vector<ECBEntity*> entv = Map()->Entities()->List();
 					std::map<ECBPlayer*, int> money;
-					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end();)
+					for(std::vector<ECBEntity*>::iterator enti = entv.begin(); enti != entv.end(); ++enti)
 					{
 						if(dynamic_cast<ECEntity*>(*enti)->IsZombie())
-						{
-							ECList<ECBEntity*>::iterator it = enti;
-							++it;
 							Map()->RemoveAnEntity(*enti, USE_DELETE);
-							enti = it;
-						}
 						else
 						{
 							(*enti)->Played(); /* On marque bien qu'il a été joué */
 							for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 								money[*it] += (*enti)->TurnMoney(*it);
-							++enti;
 						}
 					}
 					/* On attribut à tout le monde son argent */
@@ -1296,7 +1290,7 @@ void EChannel::CheckReadys()
 						if(pl->Events()->Empty() == false)
 						{
 							FDebug(W_WARNING, "Il reste des evenements dans un player !");
-							dynamic_cast<ECPlayer*>(*it)->Events()->Clear();
+							pl->Events()->Clear();
 						}
 
 						if(pl->Lost()) continue;
