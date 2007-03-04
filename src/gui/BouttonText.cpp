@@ -27,8 +27,8 @@ TButtonText::TButtonText() : TButton(), font(0)
 
 //-----------------------------------------------------------------------------
 
-TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, const std::string &text, Font *f)
-  : TButton(_x, _y, _w, _h), label(_x, _y, text, white_color, f), font(f)
+TButtonText::TButtonText (int _x, int _y, unsigned int _w, unsigned int _h, const std::string &text, Font *f, Color c)
+  : TButton(_x, _y, _w, _h), label(_x, _y, text, white_color, f), color(c), font(f)
 {
 
 }
@@ -50,7 +50,7 @@ void TButtonText::SetCaption(const std::string &text)
 void TButtonText::SetEnabled(bool b)
 {
 	TComponent::SetEnabled(b);
-	label.SetColor(Enabled() ? white_color : gray_color);
+	label.SetColor(Enabled() ? color : gray_color);
 	SetWantRedraw();
 }
 

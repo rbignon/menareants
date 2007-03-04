@@ -24,6 +24,7 @@
 
 #include "Boutton.h"
 #include "Label.h"
+#include "tools/Color.h"
 #include <string>
 #include <SDL.h>
 
@@ -33,12 +34,13 @@ class TButtonText : public TButton
 {
 private:
   TLabel label;
+  Color color;
 
   Font *font;
 
 public:
   TButtonText();
-  TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text, Font* font);
+  TButtonText (int x, int y, unsigned int w, unsigned int h, const std::string &text, Font* font, Color cl = white_color);
 
   void Init();
 

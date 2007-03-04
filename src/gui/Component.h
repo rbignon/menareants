@@ -45,7 +45,7 @@ public:
 
 	/** Default constructor, set x, y, h and w to 0 and \a visible and \a enabled to true. */
 	TComponent(ECImage* w = 0)
-		: TObject(w), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Tag(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  want_redraw(false), always_redraw(false)
 	{}
@@ -56,7 +56,7 @@ public:
 	 * @param w Window
 	 */
 	TComponent(int _x, int _y, ECImage* w = 0)
-		: TObject(w), Rectanglei(_x, _y, 0, 0), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Rectanglei(_x, _y, 0, 0), Tag(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  want_redraw(false), always_redraw(false)
 	{}
@@ -69,7 +69,7 @@ public:
 	 * @param w Window
 	 */
 	TComponent(int _x, int _y, uint _w, uint _h, ECImage* w = 0)
-		: TObject(w), Rectanglei(_x, _y, _w, _h), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Rectanglei(_x, _y, _w, _h), Tag(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  want_redraw(false), always_redraw(false)
 	{}
@@ -79,7 +79,7 @@ public:
 	 * @param w Window
 	 */
 	TComponent(const Rectanglei& _rect, ECImage* w = 0)
-		: TObject(w), Rectanglei(_rect), visible(true), enabled(true), focus(false), force_focus(false),
+		: TObject(w), Rectanglei(_rect), Tag(0), visible(true), enabled(true), focus(false), force_focus(false),
 		  on_click_func(0), on_click_param(0), on_click_pos_func(0), on_mouse_on_func(0), on_mouse_on_param(0),
 		  want_redraw(false), always_redraw(false)
 	{}

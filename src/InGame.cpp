@@ -2231,7 +2231,7 @@ void MenAreAntsApp::LoadGame(EChannel* chan)
 
 	try
 	{
-		chan->Map()->CreatePreview(300,300, P_POSITIONS);
+		chan->Map()->CreatePreview(300,300, 0);
 		LoadingForm = new TLoadingForm(Video::GetInstance()->Window(), chan);
 		LoadingForm->SetMutex(mutex);
 

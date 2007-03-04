@@ -65,9 +65,10 @@ public:
 	TLabel*      MapTitle;
 	TImage*      Preview;
 
-	TSpinEdit*   MyPosition;
 	TColorEdit*  MyColor;
 	TComboBox*   MyNation;
+
+	std::vector<TButtonText*> Positions;
 
 /* Variables publiques */
 public:
@@ -81,6 +82,10 @@ public:
 	void RecalcMemo();
 
 	void ChangeStatus(bool);
+
+	void RefreshPositions();
+
+	void MapSetted();
 
 /* Evenements */
 private:
@@ -125,7 +130,6 @@ public:
 /* Composants */
 public:
 
-	TSpinEdit   *position;
 	TColorEdit  *couleur;
 	TComboBox   *nation;
 	TLabel*     Ready;

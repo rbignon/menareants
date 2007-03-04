@@ -190,6 +190,8 @@ protected:
 		return comp;
 	}
 
+	void RemoveComponent(TComponent* comp);
+
 	void SetFocusOrder(bool s = true) { focus_order = s; }
 	bool FocusOrder() const { return focus_order; }
 

@@ -984,40 +984,6 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 		}
 	}
 
-	/* Numero du player */
-	if(flags & P_POSITIONS)
-	{
-		for(std::vector<ECMapPlayer*>::iterator it = map_players.begin(); it != map_players.end(); ++it)
-		{
-			uint begin_x = Width(), begin_y = Height(), max_x = 0, max_y = 0;
-			std::vector<ECountry*> coun = (*it)->Countries();
-			for(std::vector<ECountry*>::iterator ci = coun.begin(); ci != coun.end(); ++ci)
-			{
-				std::vector<ECBCase*> cas = (*ci)->Cases();
-				for(std::vector<ECBCase*>::iterator casi = cas.begin(); casi != cas.end(); ++casi)
-				{
-					if((*casi)->Flags() & (C_TERRE))
-					{
-						if(begin_x > (*casi)->X()) begin_x = (*casi)->X();
-						if(begin_y > (*casi)->Y()) begin_y = (*casi)->Y();
-						if(max_x < (*casi)->X()) max_x = (*casi)->X();
-						if(max_y < (*casi)->Y()) max_y = (*casi)->Y();
-					}
-				}
-			}
-			SDL_Surface *txtsurf = TTF_RenderUTF8_Blended(&(Font::GetInstance(Font::Small)->GetTTF()),
-			                                  TypToStr((*it)->Num()).c_str(), white_color.GetSDLColor());
-			SDL_Rect dst_rect;
-			dst_rect.x = (begin_x+max_x)/2 * size_x;
-			dst_rect.y = (begin_y+max_y)/2 * size_y;
-			dst_rect.h = txtsurf->h;
-			dst_rect.w = txtsurf->w;
-
-			SDL_BlitSurface(txtsurf,NULL,surf, &dst_rect);
-			SDL_FreeSurface(txtsurf);
-		}
-	}
-
 	SUNLOCK(surf);
 
 	preview.SetImage(surf);

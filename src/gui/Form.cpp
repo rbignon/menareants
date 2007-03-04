@@ -47,6 +47,21 @@ void TForm::Clear()
 	composants.clear();
 }
 
+void TForm::RemoveComponent(TComponent* comp)
+{
+	LockScreen();
+	for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end();)
+		if(*it == comp)
+		{
+			delete *it;
+			it = composants.erase(it);
+		}
+		else
+			++it;
+
+	UnlockScreen();
+}
+
 void TForm::LockScreen() const
 {
 	if(mutex)
