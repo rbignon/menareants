@@ -212,9 +212,16 @@ int m_login (struct Client* cl, int parc, char** parv)
 
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
-		const char* p = 0;
-		if((p = strchr(parv[1], ' ')))
-			*p = 0;
+		int i;
+		const char* c = parv[1];
+
+		for(i = 0; *c && i < NICKLEN && strchr(NICK_CHARS, *c); ++i, ++c);
+		if(*c)
+		{
+			senderr(cl, ERR_CMDS);
+			delclient(cl);
+			return 0;
+		}
 		if(proto >= 2)
 		{
 			struct User* user = user_head;
