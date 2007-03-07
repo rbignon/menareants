@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: progs@coderz.info\n"
-"POT-Creation-Date: 2007-02-28 21:13+0100\n"
+"POT-Creation-Date: 2007-03-06 22:37+0100\n"
 "PO-Revision-Date: 2007-02-28 21:13+0100\n"
 "Last-Translator: Romain Bignon <progs@headfucking.net>\n"
 "Language-Team:  <en@li.org>\n"
@@ -70,7 +70,7 @@ msgstr " mois"
 msgid " years"
 msgstr " années"
 
-#: src/JoinGame.cpp:675 src/InGame.cpp:1999
+#: src/JoinGame.cpp:660 src/InGame.cpp:1999
 #, c-format
 msgid "$%d"
 msgstr "%d $"
@@ -89,17 +89,17 @@ msgstr ""
 msgid "$%d income each turn"
 msgstr "Rapporte %d $ par tours"
 
-#: src/JoinGame.cpp:668
+#: src/JoinGame.cpp:653
 #, c-format
 msgid "$%d/t"
 msgstr "%d $/t"
 
-#: src/Login.cpp:974
+#: src/Login.cpp:981
 #, c-format
 msgid "$%s"
 msgstr "%s $"
 
-#: src/Login.cpp:819
+#: src/Login.cpp:826
 #, c-format
 msgid "%-8s  Playing: %s"
 msgstr "%-8s  Playing: %s"
@@ -128,22 +128,22 @@ msgstr "%d missiles(s) - Nouveau missile dans %d jour(s)"
 msgid "%d seconds"
 msgstr "%d secondes"
 
-#: src/JoinGame.cpp:516
+#: src/JoinGame.cpp:503
 #, c-format
 msgid "%s gives $%s to %s"
 msgstr "%s donne %s $ à %s"
 
-#: src/JoinGame.cpp:531
+#: src/JoinGame.cpp:518
 #, c-format
 msgid "%s gives a country to %s"
 msgstr "%s donne un territoire à %s"
 
-#: src/JoinGame.cpp:514
+#: src/JoinGame.cpp:501
 #, c-format
 msgid "%s gives you $%s"
 msgstr "%s vous donne %s $"
 
-#: src/JoinGame.cpp:529
+#: src/JoinGame.cpp:516
 #, c-format
 msgid "%s gives you a country"
 msgstr "%s vous donne un territoire"
@@ -153,12 +153,12 @@ msgstr "%s vous donne un territoire"
 msgid "%s has a new missile in stock!"
 msgstr "%s a un nouveau missile en stock !"
 
-#: src/Login.cpp:986
+#: src/Login.cpp:993
 #, c-format
 msgid "%s has killed %s men! He's a butcher!"
 msgstr "%s a tué %s hommes ! C'est un boucher !"
 
-#: src/JoinGame.cpp:597
+#: src/JoinGame.cpp:582
 #, c-format
 msgid "%s has taken your country (%s)"
 msgstr "%s a pris un de vos territoires (%s)"
@@ -168,17 +168,17 @@ msgstr "%s a pris un de vos territoires (%s)"
 msgid "%s is already used"
 msgstr "Le pseudo %s est déjà utilisé"
 
-#: src/JoinGame.cpp:609
+#: src/JoinGame.cpp:594
 #, c-format
 msgid "%s is now neutral"
 msgstr "%s est maintenant neutre"
 
-#: src/JoinGame.cpp:607
+#: src/JoinGame.cpp:592
 #, c-format
 msgid "%s is now owned by %s"
 msgstr "%s appartient maintenant à %s"
 
-#: src/JoinGame.cpp:653
+#: src/JoinGame.cpp:638
 #, c-format
 msgid "%s is ready."
 msgstr "Le pseudo %s est prêt."
@@ -219,51 +219,51 @@ msgstr "Idée originale"
 msgid "* Programmer"
 msgstr "Programmeur"
 
-#: src/JoinGame.cpp:786
+#: src/JoinGame.cpp:771
 #, c-format
 msgid "*** %s become allied to %s"
 msgstr "*** %s est maintenant allié avec %s"
 
-#: src/JoinGame.cpp:783
+#: src/JoinGame.cpp:768
 #, c-format
 msgid "*** %s become allied to you."
 msgstr "*** %s est maintenant allié avec vous."
 
-#: src/JoinGame.cpp:781
+#: src/JoinGame.cpp:766
 #, c-format
 msgid "*** %s has accepted your alliance"
 msgstr "*** %s a accepté votre alliance"
 
-#: src/JoinGame.cpp:815
+#: src/JoinGame.cpp:800
 #, c-format
 msgid "*** %s has broken his alliance with %s"
 msgstr "*** %s a rompu l'alliance qu'il avait avec %s"
 
-#: src/JoinGame.cpp:813
+#: src/JoinGame.cpp:798
 #, c-format
 msgid "*** %s has broken his alliance with you"
 msgstr "*** %s a rompu l'alliance qu'il avait avec vous"
 
-#: src/JoinGame.cpp:1060
+#: src/JoinGame.cpp:1026
 #, c-format
 msgid "*** %s has joined game"
 msgstr "*** %s a rejoint la partie"
 
-#: src/JoinGame.cpp:1121 src/JoinGame.cpp:1160
+#: src/JoinGame.cpp:1084 src/JoinGame.cpp:1124
 #, c-format
 msgid "*** %s has leave game"
 msgstr "*** %s a quitté la partie"
 
-#: src/JoinGame.cpp:733
+#: src/JoinGame.cpp:718
 #, c-format
 msgid "*** %s has lost."
 msgstr "*** %s a perdu"
 
-#: src/JoinGame.cpp:479
+#: src/JoinGame.cpp:466
 msgid "*** END OF TURN."
 msgstr "*** FIN DU TOUR."
 
-#: src/JoinGame.cpp:439 src/InGame.cpp:697
+#: src/JoinGame.cpp:426 src/InGame.cpp:697
 msgid "*** NEW TURN: "
 msgstr "*** NOUVEAU TOUR: "
 
@@ -271,11 +271,11 @@ msgstr "*** NOUVEAU TOUR: "
 msgid "*** Press F1 to get help"
 msgstr "*** Appuyez sur F1 pour avoir de l'aide"
 
-#: src/JoinGame.cpp:727
+#: src/JoinGame.cpp:712
 msgid "*** VOUS HAVE LOST!!!"
 msgstr "*** VOUS AVEZ PERDU !!!"
 
-#: src/JoinGame.cpp:777
+#: src/JoinGame.cpp:762
 #, c-format
 msgid "*** You become allied to %s"
 msgstr "*** Vous êtes maintenant allié à %s"
@@ -285,17 +285,17 @@ msgstr "*** Vous êtes maintenant allié à %s"
 msgid "*** You begin with $%d"
 msgstr "*** Vous commencez la partie avec %d $"
 
-#: src/JoinGame.cpp:672
+#: src/JoinGame.cpp:657
 #, c-format
 msgid "*** You earn $%d"
 msgstr "*** Vous gagnez %d $"
 
-#: src/JoinGame.cpp:811
+#: src/JoinGame.cpp:796
 #, c-format
 msgid "*** You have broken your alliance with %s"
 msgstr "*** Vous avez cassé votre alliance avec %s"
 
-#: src/JoinGame.cpp:1249
+#: src/JoinGame.cpp:1213
 #, c-format
 msgid "*** You have rejoin %s"
 msgstr "*** Vous avez rejoint %s"
@@ -308,7 +308,7 @@ msgstr "****** DÉBUT DE LA PARTIE ******"
 msgid "A classical tank"
 msgstr "Char d'assaut"
 
-#: src/JoinGame.cpp:1509
+#: src/JoinGame.cpp:1562
 msgid "A player has lost when he hasn't got any building."
 msgstr "Un joueur a perdu lorsqu'il n'a plus de bâtiments."
 
@@ -316,7 +316,7 @@ msgstr "Un joueur a perdu lorsqu'il n'a plus de bâtiments."
 msgid "A save has the same name. Do you want to erase it?"
 msgstr "Une sauvegarde possède le même nom. Voulez vous l'écraser ?"
 
-#: src/JoinGame.cpp:1464
+#: src/JoinGame.cpp:1426
 msgid "AI's name to create:"
 msgstr "Nom de l'IA à créer :"
 
@@ -329,7 +329,7 @@ msgstr "Abandonner"
 msgid "Active in %d days."
 msgstr "Active dans %d jours."
 
-#: src/Config.cpp:444 src/MapEditor.cpp:1206 src/MapEditor.cpp:1220
+#: src/Config.cpp:447 src/MapEditor.cpp:1206 src/MapEditor.cpp:1220
 #: src/InGame.cpp:1862
 msgid "Add"
 msgstr "Ajouter"
@@ -338,15 +338,15 @@ msgstr "Ajouter"
 msgid "Add "
 msgstr "Ajouter "
 
-#: src/Config.cpp:446
+#: src/Config.cpp:449
 msgid "Add a server in this list."
 msgstr "Ajouter un serveur dans la liste."
 
-#: src/JoinGame.cpp:1527
+#: src/JoinGame.cpp:1580
 msgid "Add an AI"
 msgstr "Ajouter une IA"
 
-#: src/JoinGame.cpp:1529
+#: src/JoinGame.cpp:1582
 msgid "Add an artificial player (an AI) in game"
 msgstr "Ajouter un joueur artificiel (une IA) dans la partie"
 
@@ -358,7 +358,7 @@ msgstr "Al-Quaïda"
 msgid "Al-Quaïda network and its diverted boïngs."
 msgstr "Le réseau Al-Quaïda et ses boeing détournés."
 
-#: src/JoinGame.cpp:1452
+#: src/JoinGame.cpp:1414
 msgid ""
 "All players aren't ready. Are you sure to want to start game?\n"
 "No ready players will be kicked"
@@ -367,11 +367,11 @@ msgstr ""
 "partie ?\n"
 "Les joueurs qui ne sont pas prêts seront éjectés"
 
-#: src/JoinGame.cpp:1285 src/InGame.cpp:2260
+#: src/JoinGame.cpp:1249 src/InGame.cpp:2260
 msgid "Alone game"
 msgstr "Mission solo"
 
-#: src/Login.cpp:631
+#: src/Login.cpp:638
 msgid ""
 "An error was occured in game!!\n"
 "\n"
@@ -386,7 +386,7 @@ msgstr ""
 "\n"
 "Nous vous prions de bien vouloir nous excuser pour la gêne occasionnée"
 
-#: src/Login.cpp:968
+#: src/Login.cpp:975
 #, c-format
 msgid "And the better player is.... %s with %s points!"
 msgstr "Et le meilleurs joueur est... %s avec %s points !"
@@ -403,8 +403,8 @@ msgstr "Êtes-vous sûr de vouloir quitter la partie ?"
 msgid "Army"
 msgstr "Armée"
 
-#: src/Main.cpp:423 src/Login.cpp:537 src/Login.cpp:1030
-#: src/MapEditor.cpp:1333 src/JoinGame.cpp:1526 src/InGame.cpp:1630
+#: src/Main.cpp:423 src/Login.cpp:544 src/Login.cpp:1037
+#: src/MapEditor.cpp:1333 src/JoinGame.cpp:1579 src/InGame.cpp:1630
 #: src/InGame.cpp:2547
 msgid "Back"
 msgstr "Retour"
@@ -465,7 +465,7 @@ msgstr "Peut investir :"
 msgid "Can nothing attack."
 msgstr "Ne peut rien attaquer."
 
-#: src/gui/MessageBox.cpp:43 src/Config.cpp:433
+#: src/gui/MessageBox.cpp:43 src/Config.cpp:436
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -485,7 +485,7 @@ msgstr "Centre ville"
 msgid "Clic here when you have made all your moves."
 msgstr "Appuyez ici quand vous avez fais tous vos déplacements."
 
-#: src/JoinGame.cpp:1003 src/JoinGame.cpp:1068
+#: src/JoinGame.cpp:976 src/JoinGame.cpp:1033
 #, c-format
 msgid "Clic on his nickname to kick %s"
 msgstr "Cliquez sur ce pseudonyme pour éjecter %s"
@@ -502,11 +502,11 @@ msgstr "Colombie"
 msgid "Colombia producing cocaine."
 msgstr "La Colombie productrice de cocaïne."
 
-#: src/Config.cpp:426 src/MapEditor.cpp:984
+#: src/Config.cpp:429 src/MapEditor.cpp:984
 msgid "Configuration"
 msgstr "Configuration"
 
-#: src/Login.cpp:521
+#: src/Login.cpp:528
 msgid "Connect"
 msgstr "Se connecter"
 
@@ -542,7 +542,7 @@ msgstr "Coût : %d $"
 msgid "Countries:"
 msgstr "Territoires :"
 
-#: src/Login.cpp:935
+#: src/Login.cpp:942
 msgid "Create a game"
 msgstr "Créer une partie"
 
@@ -563,15 +563,15 @@ msgstr "DEBUGINFO: %0s"
 msgid "Deaths"
 msgstr "Pertes"
 
-#: src/Config.cpp:453
+#: src/Config.cpp:456
 msgid "Default color in each games."
 msgstr "Couleur par défaut dans chaque parties."
 
-#: src/Config.cpp:452
+#: src/Config.cpp:455
 msgid "Default color:"
 msgstr "Couleur par défaut :"
 
-#: src/Config.cpp:455
+#: src/Config.cpp:458
 msgid "Default nation:"
 msgstr "Nation par défaut :"
 
@@ -579,12 +579,12 @@ msgstr "Nation par défaut :"
 msgid "Defense tower"
 msgstr "Tour de défense"
 
-#: src/Config.cpp:441 src/MapEditor.cpp:918 src/MapEditor.cpp:1209
+#: src/Config.cpp:444 src/MapEditor.cpp:918 src/MapEditor.cpp:1209
 #: src/MapEditor.cpp:1223
 msgid "Delete"
 msgstr "Supprimer"
 
-#: src/Config.cpp:443
+#: src/Config.cpp:446
 msgid "Delete selected server in list."
 msgstr "Supprimer un serveur de la liste."
 
@@ -608,11 +608,11 @@ msgstr "Déployé."
 msgid "Diagram"
 msgstr "Schéma."
 
-#: src/Login.cpp:939
+#: src/Login.cpp:946
 msgid "Disconnect"
 msgstr "Se déconnecter"
 
-#: src/JoinGame.cpp:1419
+#: src/JoinGame.cpp:1381
 msgid "Do you really want to leave game?"
 msgstr "Êtes-vous sûr de vouloir quitter la partie ?"
 
@@ -620,7 +620,7 @@ msgstr "Êtes-vous sûr de vouloir quitter la partie ?"
 msgid "Do you want to save this map ?"
 msgstr "Voulez-vous sauvegarder la carte ?"
 
-#: src/Login.cpp:703
+#: src/Login.cpp:710
 msgid "Download MenAreAnts.zip on website.\n"
 msgstr "Téléchargez MenAreAnts.zip sur le site.\n"
 
@@ -632,7 +632,7 @@ msgstr "Durée :"
 msgid "Earns you some money each turn"
 msgstr "Rapporte une certaine somme par tours"
 
-#: src/Config.cpp:471
+#: src/Config.cpp:477
 msgid "Effects"
 msgstr "Effets"
 
@@ -644,7 +644,7 @@ msgstr "Fin des combats :  "
 msgid "Engineer"
 msgstr "Ingénieur"
 
-#: src/Login.cpp:524
+#: src/Login.cpp:531
 msgid "Enter a server"
 msgstr "Entrer un serveur"
 
@@ -652,7 +652,7 @@ msgstr "Entrer un serveur"
 msgid "Enter filename for this map"
 msgstr "Entrez le nom du fichier de la carte"
 
-#: src/JoinGame.cpp:1235
+#: src/JoinGame.cpp:1199
 msgid "Enter game's name to create"
 msgstr "Entrez le nom de la partie à créer"
 
@@ -661,7 +661,7 @@ msgid "Enter nickname of player you want to give this country to"
 msgstr ""
 "Entrez le pseudonyme de la personne à qui vous souhaitez donner ce territoire"
 
-#: src/Login.cpp:908
+#: src/Login.cpp:915
 msgid "Enter user's nickname you want to kill:"
 msgstr "Entrez le pseudo de l'utilisateur que vous souhaitez déconnecter :"
 
@@ -706,11 +706,11 @@ msgstr "Consomations gratuites de McGerbale pour %s"
 msgid "Freighter"
 msgstr "Avion-cargo"
 
-#: src/Config.cpp:467
+#: src/Config.cpp:470
 msgid "Fullscreen"
 msgstr "Plein écran"
 
-#: src/Login.cpp:926
+#: src/Login.cpp:933
 msgid "Game list:"
 msgstr "Liste des parties :"
 
@@ -730,7 +730,7 @@ msgstr "Donner de l'argent à un autre joueur"
 msgid "Give this country to an other player."
 msgstr "Donner ce territoire à un autre joueur."
 
-#: src/Login.cpp:705
+#: src/Login.cpp:712
 #, c-format
 msgid "Go on %s to get more informations."
 msgstr "Visitez %s pour avoir plus d'informations."
@@ -749,7 +749,7 @@ msgstr ""
 msgid "He is able to repair buildings or capture new ones."
 msgstr "Il peut capturer les bâtiments ennemies ou réparer les vôtres."
 
-#: src/Login.cpp:386
+#: src/Login.cpp:393
 msgid ""
 "Hello! This is your first run!\n"
 "You can register an account to have score saving and your nickname "
@@ -763,7 +763,7 @@ msgstr ""
 "\n"
 "Voulez-vous l'enregistrer ?"
 
-#: src/Sockets.cpp:277
+#: src/Sockets.cpp:284
 msgid "Hostname is unreachable"
 msgstr "Impossible de résoudre l'hostname"
 
@@ -794,7 +794,7 @@ msgstr ""
 "liste. Cet éditeur de carte ne peut pas configurer les caractéristiques "
 "spéciales des missions"
 
-#: src/Config.cpp:469
+#: src/Config.cpp:475
 msgid ""
 "If this is active, music files are in this directory:\n"
 "\n"
@@ -814,7 +814,7 @@ msgstr "Va se déployer"
 msgid "Is going to upgrade"
 msgstr "Va upgrader."
 
-#: src/JoinGame.cpp:1447
+#: src/JoinGame.cpp:1409
 #, c-format
 msgid "It is necessary at least that %d are ready"
 msgstr "Il doit y avoir au moins %d joueurs prêts"
@@ -840,7 +840,7 @@ msgstr "Touriste japonais"
 msgid "Japanese tourists and the advantage of photography."
 msgstr "Les touristes japonais et l'avantage de la photographie."
 
-#: src/Login.cpp:932
+#: src/Login.cpp:939
 msgid "Join game"
 msgstr "Rejoindre"
 
@@ -857,7 +857,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jours"
 
-#: src/Login.cpp:944
+#: src/Login.cpp:951
 msgid "Kill an user"
 msgstr "Killer un joueur"
 
@@ -948,7 +948,7 @@ msgstr ""
 "Le nombre maximum de joueurs doit être au moins égal au nombre minimal de "
 "joueurs"
 
-#: src/JoinGame.cpp:1521
+#: src/JoinGame.cpp:1574
 msgid "Maximal time in seconds of each turn"
 msgstr "Temps maximal de reflexion d'un tour en secondes"
 
@@ -960,12 +960,12 @@ msgstr "Donald de McGerbale"
 msgid "Megalopolis"
 msgstr "Mégalopole"
 
-#: src/Login.cpp:494
+#: src/Login.cpp:501
 #, c-format
 msgid "Men Are Ants is for YOU, %s!"
 msgstr "Men Are Ants est pour TOI, %s !"
 
-#: src/Login.cpp:920
+#: src/Login.cpp:927
 msgid "Message of the day"
 msgstr "Message du jour du serveur"
 
@@ -989,7 +989,7 @@ msgstr "Véhicule lanceur de missiles à portée de 8 cases une fois déployé."
 msgid "Mission"
 msgstr "Mission"
 
-#: src/JoinGame.cpp:1516
+#: src/JoinGame.cpp:1569
 msgid "Money earned by each players at begin of game"
 msgstr "Argent initial de chaque joueur"
 
@@ -997,7 +997,7 @@ msgstr "Argent initial de chaque joueur"
 msgid "Money for cities"
 msgstr "Argent par villes"
 
-#: src/JoinGame.cpp:1514
+#: src/JoinGame.cpp:1567
 msgid "Money: "
 msgstr "Argent : "
 
@@ -1005,7 +1005,7 @@ msgstr "Argent : "
 msgid "More infos"
 msgstr "Plus d'infos."
 
-#: src/Config.cpp:468
+#: src/Config.cpp:474
 msgid "Music"
 msgstr "Musique"
 
@@ -1046,11 +1046,11 @@ msgstr "Neutre paye 1000 $ à %s pour les consomations."
 msgid "New map"
 msgstr "Créer une carte"
 
-#: src/Login.cpp:1018
+#: src/Login.cpp:1025
 msgid "Nickname         Score  Victories  Defeats  Killed  Best incomes"
 msgstr "Pseudo           Score  Victoires  Defaites  Tués  Meilleurs revenu"
 
-#: src/Config.cpp:448
+#: src/Config.cpp:451
 msgid "Nickname:"
 msgstr "Pseudo :"
 
@@ -1091,7 +1091,7 @@ msgstr "Fabrication de missiles nucléaires."
 msgid "Nuclear research center"
 msgstr "Centre de recherches nucléaires"
 
-#: src/gui/MessageBox.cpp:40 src/Config.cpp:432 src/MapEditor.cpp:1199
+#: src/gui/MessageBox.cpp:40 src/Config.cpp:435 src/MapEditor.cpp:1199
 #: src/InGame.cpp:2129
 msgid "OK"
 msgstr "OK"
@@ -1116,7 +1116,7 @@ msgstr ""
 "Propriétaire du territoire sélectionné.\n"
 "Un territoire neutre n'aura pas de propriétaire au début d'une partie."
 
-#: src/Login.cpp:500
+#: src/Login.cpp:507
 msgid "Ping  Name                 Proto   Players   Games  On Standby"
 msgstr "Ping  Nom                  Proto   Joueurs Parties  En Attente"
 
@@ -1132,15 +1132,15 @@ msgstr "Joueurs"
 msgid "Players:"
 msgstr "Joueurs :"
 
-#: src/Config.cpp:269
+#: src/Config.cpp:272
 msgid "Please enter a nickname."
 msgstr "Veuillez entrer un pseudonyme."
 
-#: src/Login.cpp:435
+#: src/Login.cpp:442
 msgid "Please enter a server hostname and a port, in form hostname[:port]"
 msgstr "Veuillez entrer un serveur et un port, de la forme hostname[:port]"
 
-#: src/Config.cpp:225
+#: src/Config.cpp:228
 msgid "Please enter a server name (in form \"host:port\")."
 msgstr "Veuillez entrer l'hôte d'un serveur (de la forme \"host:port\")"
 
@@ -1152,15 +1152,15 @@ msgstr "Veuillez donner un nom à la carte !"
 msgid "Please put a number in this unit."
 msgstr "Veuillez mettre un nombre dans cette unité."
 
-#: src/JoinGame.cpp:1430
+#: src/JoinGame.cpp:1392
 msgid "Please select a map!"
 msgstr "Veuillez sélectionner une carte !"
 
-#: src/Login.cpp:497
+#: src/Login.cpp:504
 msgid "Please select a server in this list:"
 msgstr "Veuillez sélectionner un serveur :"
 
-#: src/Config.cpp:280
+#: src/Config.cpp:283
 msgid "Please select a server."
 msgstr "Veuillez sélectionner un serveur."
 
@@ -1176,7 +1176,7 @@ msgstr "Veuillez entrer une abscisse de 20 cases minimum"
 msgid "Please specifie a Y-coordinate to 20 cells minimum"
 msgstr "Veuillez entrer une ordonnée de 20 cases minimum"
 
-#: src/Login.cpp:410
+#: src/Login.cpp:417
 msgid "Please wait while connecting..."
 msgstr "Connexion en cours, veuillez patienter..."
 
@@ -1191,7 +1191,7 @@ msgstr ""
 "\n"
 "Une unité de %s bouge quelque part hors de votre champ de vision."
 
-#: src/Config.cpp:233
+#: src/Config.cpp:236
 msgid "Port is an integer value."
 msgstr "Le port doit être une valeur numérique."
 
@@ -1204,7 +1204,7 @@ msgstr "Portée : %d cases"
 msgid "Porty: No, engagements from body to body"
 msgstr "Portée : Aucune, combats au corps à corps"
 
-#: src/JoinGame.cpp:1508
+#: src/JoinGame.cpp:1561
 msgid "Quick game"
 msgstr "Partie rapide"
 
@@ -1220,23 +1220,24 @@ msgstr "Aléatoire"
 msgid "Random find an unit who idles."
 msgstr "Trouve une unité inactive."
 
-#: src/JoinGame.cpp:1524 src/InGame.cpp:1967
+#: src/JoinGame.cpp:1577 src/InGame.cpp:1967
 msgid "Ready"
 msgstr "Prêt"
 
-#: src/JoinGame.cpp:1683
-msgid "Ready  Nickname   Pos.   Color  Nation"
+#: src/JoinGame.cpp:1724
+#, fuzzy
+msgid "Ready  Nickname      Color  Nation"
 msgstr "Prêt   Pseudo     Pos.   Couleur  Nation"
 
 #: src/JoinGame.cpp:182
 msgid "Reason is: "
 msgstr "Raison : "
 
-#: src/Login.cpp:526 src/Login.cpp:937
+#: src/Login.cpp:533 src/Login.cpp:944
 msgid "Refresh"
 msgstr "Actualiser"
 
-#: src/Login.cpp:528
+#: src/Login.cpp:535
 msgid "Reg. your nick"
 msgstr "Enr. pseudo"
 
@@ -1244,18 +1245,18 @@ msgstr "Enr. pseudo"
 msgid "Region of Noisy and its caves."
 msgstr "La contrée de Noisy et ses cavernes."
 
-#: src/Login.cpp:530
+#: src/Login.cpp:537
 msgid ""
 "Register your nickname to save your stats and to protect it from other users"
 msgstr ""
 "Enregistrez votre pseudo pour le protéger et pour sauvegarder vos "
 "statistiques"
 
-#: src/Login.cpp:941
+#: src/Login.cpp:948
 msgid "Rehash config."
 msgstr "Actu. Config."
 
-#: src/Config.cpp:462
+#: src/Config.cpp:465
 msgid "Resolution:"
 msgstr "Résolution :"
 
@@ -1267,11 +1268,11 @@ msgstr "Sauvegarder"
 msgid "Score"
 msgstr "Score"
 
-#: src/Login.cpp:1020
+#: src/Login.cpp:1027
 msgid "Scores"
 msgstr "Scores"
 
-#: src/Config.cpp:436
+#: src/Config.cpp:439
 msgid "Select a meta-server in this list."
 msgstr "Sélectionnez un meta-serveur dans cette liste."
 
@@ -1304,7 +1305,7 @@ msgstr ""
 msgid "Server doesn't understand a command we have sended"
 msgstr "Le serveur n'a pas compris une commande que je lui ai envoyée"
 
-#: src/Config.cpp:439
+#: src/Config.cpp:442
 msgid "Server to add in form \"host[:port]\""
 msgstr "Ajoutez un hôte sous forme \"host[:port]\""
 
@@ -1332,11 +1333,11 @@ msgstr "Afficher les options (notament les alliances)"
 msgid "Spain"
 msgstr "Espagne"
 
-#: src/JoinGame.cpp:1288
+#: src/JoinGame.cpp:1252
 msgid "Start game"
 msgstr "Lancer le jeu"
 
-#: src/Login.cpp:534
+#: src/Login.cpp:541
 msgid "Statistics"
 msgstr "Stats"
 
@@ -1475,7 +1476,7 @@ msgstr ""
 "Il est très efficace contre les bâtiments, moyennement contre les véhicules "
 "et peu efficace contre l'infanterie."
 
-#: src/Login.cpp:980
+#: src/Login.cpp:987
 #, c-format
 msgid "The one who incomes the must of money is %s with $%s per turn!"
 msgstr "Celui qui a eu le meilleurs revenus est %s avec %s $ par tours !"
@@ -1498,7 +1499,7 @@ msgstr ""
 "Lorsque tous les zombies sont soit revenus soit ont été virés, la partie "
 "reprendra."
 
-#: src/Sockets.cpp:113
+#: src/Sockets.cpp:114
 msgid ""
 "The server where your want to connect to doesn't know the same language than "
 "me!"
@@ -1514,7 +1515,7 @@ msgstr "Le chantier naval peut construire des bateaux."
 msgid "The tank factory can build basic vehicles."
 msgstr "L'usine de chars peut construire des véhicules."
 
-#: src/Login.cpp:318
+#: src/Login.cpp:325
 #, c-format
 msgid ""
 "There are %d game(s) on %d servers, with %d in game and %d in preparation"
@@ -1522,7 +1523,7 @@ msgstr ""
 "Il y a %d parties sur %d serveurs, dont %d en cours de jeu et %d en "
 "préparation"
 
-#: src/Login.cpp:316
+#: src/Login.cpp:323
 #, c-format
 msgid ""
 "There are %d users(s), with %d accounts, %d total connections and %d played "
@@ -1531,17 +1532,17 @@ msgstr ""
 "Il y a %d joueur(s), avec %d comptes, %d connexions totales et %d parties "
 "jouées"
 
-#: src/Login.cpp:784
+#: src/Login.cpp:791
 #, c-format
 msgid "There are %s game(s), with %s in game and %s in preparation."
 msgstr "Il y a %s partie(s), dont %s en cours de jeu et %s en préparation."
 
-#: src/Login.cpp:782
+#: src/Login.cpp:789
 #, c-format
 msgid "There are %s users, with %s total connections and %s played games"
 msgstr "Il y a %s joueurs, avec %s connexions totales et %s parties jouées"
 
-#: src/JoinGame.cpp:1435
+#: src/JoinGame.cpp:1397
 #, c-format
 msgid ""
 "There are not sufficient players. This map requires between %d and %d "
@@ -1561,7 +1562,7 @@ msgid_plural "There are %d missiles"
 msgstr[0] "Il y a %d missile disponible"
 msgstr[1] "Il y a %d missiles disponibles"
 
-#: src/Login.cpp:458
+#: src/Login.cpp:465
 msgid ""
 "There isn't any disponible server\n"
 "\n"
@@ -1571,7 +1572,7 @@ msgstr ""
 "\n"
 "Veuillez réessayer plus tard."
 
-#: src/Login.cpp:469
+#: src/Login.cpp:476
 msgid ""
 "There isn't any server to host your game.\n"
 "\n"
@@ -1597,7 +1598,7 @@ msgstr "Cet identifiant est déjà utilisé"
 msgid "This barrack is populated by a McPuke !!!"
 msgstr "Cette caserne est envahie par un McGerbale !!!"
 
-#: src/Login.cpp:443
+#: src/Login.cpp:450
 msgid "This button does nothing..."
 msgstr "Ce bouton ne fait rien..."
 
@@ -1605,7 +1606,7 @@ msgstr "Ce bouton ne fait rien..."
 msgid "This carrier ship can transport infantry."
 msgstr "Ce bateau de transport peut contenir des unités d'infanterie."
 
-#: src/Login.cpp:693
+#: src/Login.cpp:700
 msgid "This game isn't compatible with this server!?"
 msgstr "Ce jeu n'est pas compatible avec ce serveur !?"
 
@@ -1627,7 +1628,7 @@ msgstr ""
 "Ceci est votre première partie.\n"
 "Appuyez sur F1 pour obtenir de l'aide."
 
-#: src/Config.cpp:428
+#: src/Config.cpp:431
 msgid "This is your first run, please configure your game"
 msgstr "C'est votre premier lancement, veuillez configurer le jeu"
 
@@ -1639,7 +1640,7 @@ msgstr "Cette carte doit avoir au moins un territoire"
 msgid "This map might have at least two players"
 msgstr "Cette carte doit avoir au moins deux joueurs"
 
-#: src/Login.cpp:372
+#: src/Login.cpp:379
 msgid ""
 "This nickname is registered.\n"
 "\n"
@@ -1670,7 +1671,7 @@ msgstr ""
 "Le serveur est remplis. Veuillez en essayer un autre ou recommencer plus "
 "tard."
 
-#: src/Login.cpp:781
+#: src/Login.cpp:788
 #, c-format
 msgid "This server is running from %s"
 msgstr "Ce serveur a été lancé il y a %s"
@@ -1723,7 +1724,7 @@ msgstr "Train"
 msgid "Trains are only able to move on rails."
 msgstr "Les trains ne peuvent se déplacer que sur les rails."
 
-#: src/JoinGame.cpp:1519
+#: src/JoinGame.cpp:1572
 msgid "Turn durat.: "
 msgstr "Durée tour : "
 
@@ -1731,7 +1732,7 @@ msgstr "Durée tour : "
 msgid "Two times more income than the city center."
 msgstr "Rapporte deux fois plus d'argent que le centre ville"
 
-#: src/Login.cpp:701
+#: src/Login.cpp:708
 msgid "Type \"make update && sudo make install\".\n"
 msgstr "Tapez en console \"make update && sudo make install\".\n"
 
@@ -1767,7 +1768,7 @@ msgstr "URSS"
 msgid "USA"
 msgstr "États-Unis"
 
-#: src/Login.cpp:190
+#: src/Login.cpp:194
 msgid ""
 "Unable to connect to meta-server:\n"
 "\n"
@@ -1775,11 +1776,11 @@ msgstr ""
 "Impossible de se connecter au meta-serveur :\n"
 "\n"
 
-#: src/Login.cpp:708
+#: src/Login.cpp:715
 msgid "Unable to connect to this server."
 msgstr "Impossible de se connecter à ce serveur."
 
-#: src/Login.cpp:594
+#: src/Login.cpp:601
 msgid ""
 "Unable to connect:\n"
 "\n"
@@ -1814,7 +1815,7 @@ msgstr ""
 "votre partie)\n"
 "- La partie est plein"
 
-#: src/Login.cpp:477
+#: src/Login.cpp:484
 msgid ""
 "Unable to create this game.\n"
 " There are too games on this server. Please retry."
@@ -1894,7 +1895,7 @@ msgid "Way more powerful than defense towers, C&C fans will recognize it."
 msgstr ""
 "Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
 
-#: src/Login.cpp:623
+#: src/Login.cpp:630
 #, c-format
 msgid "Welcome to %s, %s !"
 msgstr "Bienvenue sur %s, %s !"
@@ -1936,7 +1937,7 @@ msgstr ""
 "Vous êtes bannis du serveur.\n"
 "\n"
 
-#: src/Login.cpp:897
+#: src/Login.cpp:904
 msgid ""
 "You are in an administration login proccess.\n"
 "\n"
@@ -1947,7 +1948,7 @@ msgstr ""
 "\n"
 "Entrez le mot de passe :"
 
-#: src/Login.cpp:347
+#: src/Login.cpp:354
 msgid ""
 "You can register an account to protect your nickname, and to save your "
 "statistics (score, etc.)\n"
@@ -1980,11 +1981,11 @@ msgstr "Vous n'avez pas suffisamment d'argent pour créer cette unité."
 msgid "You gave well $%s to %s"
 msgstr "Vous avez donné %s $ à %s"
 
-#: src/Login.cpp:480
+#: src/Login.cpp:487
 msgid "You have been disconnected"
 msgstr "Vous avez été déconnecté."
 
-#: src/Login.cpp:363
+#: src/Login.cpp:370
 #, c-format
 msgid ""
 "You have been disconnected while playing to the %s game. Do you want to "
@@ -1993,7 +1994,7 @@ msgstr ""
 "Vous avez été déconnecté pendant que vous jouiez dans la partie %s. Voulez-"
 "vous la rejoindre ?"
 
-#: src/Login.cpp:401 src/Login.cpp:845
+#: src/Login.cpp:408 src/Login.cpp:852
 msgid "You have been disconnected."
 msgstr "Vous avez été déconnecté"
 
@@ -2020,7 +2021,7 @@ msgstr "Vous êtes identifié."
 msgid "You have to put how many give cities"
 msgstr "Vous devez mettre le revenu d'une ville"
 
-#: src/Login.cpp:699
+#: src/Login.cpp:706
 msgid ""
 "You have to update Men Are Ants to play on this server.\n"
 "\n"
@@ -2057,11 +2058,11 @@ msgstr "Vous payez %d $ par tours."
 msgid "You pay $1000 for orders to %s"
 msgstr "1000 $ payés à %s pour les consomations."
 
-#: src/Login.cpp:696
+#: src/Login.cpp:703
 msgid "You use a version more recent than that of the server"
 msgstr "Vous utilisez une version plus récente que celle du serveur."
 
-#: src/JoinGame.cpp:1398
+#: src/JoinGame.cpp:1362
 #, c-format
 msgid ""
 "You want to kick %s from game.\n"
@@ -2070,11 +2071,11 @@ msgstr ""
 "Vous avez manifesté le souhait de virer %s du jeu.\n"
 "Veuillez entrer une raison :"
 
-#: src/Login.cpp:531
+#: src/Login.cpp:538
 msgid "Your account"
 msgstr "Votre compte"
 
-#: src/JoinGame.cpp:599
+#: src/JoinGame.cpp:584
 #, c-format
 msgid "Your country %s is now neutral!"
 msgstr "Votre territoire %s est maintenant neutre !"
@@ -2083,13 +2084,9 @@ msgstr "Votre territoire %s est maintenant neutre !"
 msgid "Your nation will be selected by random."
 msgstr "Votre nation choisie aléatoirement."
 
-#: src/Config.cpp:450
+#: src/Config.cpp:453
 msgid "Your nickname is used to recognize each users."
 msgstr "Votre pseudonyme vous distinguera des autres joueurs."
-
-#: src/JoinGame.cpp:1614
-msgid "Your position on map"
-msgstr "Votre position sur la carte"
 
 #: src/Units.h:469
 msgid "army"
@@ -2182,3 +2179,6 @@ msgstr "l'usine de chars"
 #: src/Units.h:168
 msgid "train"
 msgstr "le train de transport"
+
+#~ msgid "Your position on map"
+#~ msgstr "Votre position sur la carte"

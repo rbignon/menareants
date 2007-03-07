@@ -74,14 +74,17 @@ bool Config::set_defaults(bool want_save)
 	port = 5460;
 #ifdef WIN32
 	nick = getenv("USERNAME");
+	screen_width = 800;
+	screen_height = 600;
+	fullscreen = false;
 #else
 	nick = getenv("USER");
-#endif
-	color = 0;
-	nation = 0;
 	screen_width = 1024;
 	screen_height = 768;
 	fullscreen = true;
+#endif
+	color = 0;
+	nation = 0;
 	server_list.clear();
 	server_list.push_back("game.coderz.info:5460");
 	music = true;
@@ -465,6 +468,9 @@ TConfigForm::TConfigForm(ECImage *w)
 		Resolution->AddItem(false, TypToStr(resolutions[i].w) + "x" + TypToStr(resolutions[i].h), "");
 
 	FullScreen = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 365, _("Fullscreen"), white_color));
+#ifdef WIN32
+	FullScreen->Hide();
+#endif
 	Music = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 300, 385, _("Music"), white_color));
 	Music->SetHint(_("If this is active, music files are in this directory:\n\n") +
 	                std::string(PKGDATADIR_SOUND INGAME_MUSIC));

@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <iostream>
 #include <cstdarg>
+#include <SDL_thread.h>
 #ifdef WIN32
 #include <winsock2.h>
 #else
@@ -266,8 +267,6 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 	want_disconnect = false;
 	readQi = 0;
 
-	Debug(W_DEBUG, "Trying to connect to %s:%d ...", hostname, port);
-
 	/* Si c'est une host, on la résoud */
 	if(!is_ip(hostname))
 	{
@@ -332,12 +331,12 @@ void EC_Client::Disconnect()
 #else
 		close(sock);
 #endif
-		Debug(W_DEBUG, "Disconnecting from %s", hostname.c_str());
 		FD_CLR(sock, &global_fd_set);
 		sock = 0;
-		connected = false;
-		logging = false;
 	}
+
+	connected = false;
+	logging = false;
 
 	if(pl)
 	{

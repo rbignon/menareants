@@ -1,3 +1,11 @@
+2007-03-06 Romain Bignon <progs@headfucking.net>
+
+	* meta-server/server.c: Correction d'un crash !
+
+	* server/Main.cpp: Correctino d'un crash !
+
+	* src/JoinGame.cpp: Les numeros sur la carte affichent bien le numero d'ordre de la liste, et plus le numero d'ordre dans la liste de EChannel (qui mettait toujours soit en premier).
+
 2007-03-04 Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Plutôt que d'avoir un SpinEdit pour choisir sa position, il y a maintenant des boutons sur la preview de la map pour choisir où l'on souhaite être.

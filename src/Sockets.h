@@ -74,7 +74,6 @@ public:
 
 	int sendrpl(const ECMessage& cmd, ECArgs args = ECArgs());
 	int sendrpl(const ECError& err, ECArgs args = ECArgs());
-	int sendbuf(std::string s);
 
 	bool IsConnected() const { return connected; }
 	void SetConnected() { connected = true; }
@@ -133,6 +132,7 @@ private:
 	unsigned int port;
 
 	void Disconnect();
+	int sendbuf(std::string s);
 };
 
 extern EC_Client MetaServer;

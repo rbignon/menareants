@@ -196,6 +196,8 @@ struct Server* add_server(struct Client* cl, const char* name)
 		if(!strcmp(server->name, name) && !strcmp(server->client->ip, cl->ip))
 			delclient(server->client);
 
+	head = server_head;
+
 	server = calloc(1, sizeof* server);
 
 	if(!server)

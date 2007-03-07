@@ -164,6 +164,7 @@ void MenAreAntsApp::RefreshList()
 		return;
 	}
 
+
 	EC_Client* client = &MetaServer;
 
 	client->ClearCommands();

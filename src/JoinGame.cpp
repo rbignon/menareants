@@ -1471,11 +1471,14 @@ void TGameInfosForm::RefreshPositions()
 		(*bt)->Tag = 0;
 	}
 
-	std::vector<ECBPlayer*> players = client->Player()->Channel()->Players();
 	int i = 1;
-	FORit(ECBPlayer*, players, it)
+	std::vector<TComponent*> list = Players->GetList();
+	for(std::vector<TComponent*>::iterator it=list.begin(); it!=list.end(); ++it)
 	{
-		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
+		TPlayerLine* pll = dynamic_cast<TPlayerLine*>(*it);
+		if(!pll) continue;
+
+		ECPlayer* pl = pll->Player();
 
 		if(pl->Position())
 		{

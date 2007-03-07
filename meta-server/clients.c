@@ -200,10 +200,10 @@ int m_login_nick (struct Client* cl, int parc, char** parv)
 /* IAM <name> <prog> <version> */
 int m_login (struct Client* cl, int parc, char** parv)
 {
+	int proto = atoi(parv[3]);
+
 	if(cl->flags) return 0; /* Réidentification. */
 	if(parc < 4) return delclient(cl);
-
-	int proto = atoi(parv[3]);
 
 	if(proto > myproto || proto < 1)
 		return delclient(cl);
@@ -212,12 +212,9 @@ int m_login (struct Client* cl, int parc, char** parv)
 
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
-		if(strchr(parv[1], ' '))
-		{
-			senderr(cl, ERR_CMDS);
-			delclient(cl);
-			return 0;
-		}
+		const char* p = 0;
+		if((p = strchr(parv[1], ' ')))
+			*p = 0;
 		if(proto >= 2)
 		{
 			struct User* user = user_head;
