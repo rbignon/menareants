@@ -48,6 +48,7 @@
 #include "gui/Image.h"
 #include "gui/Label.h"
 #include "gui/Memo.h"
+#include "gui/MessageBox.h"
 #include "tools/Font.h"
 #include "tools/Images.h"
 #include "tools/Video.h"
@@ -233,6 +234,10 @@ int MenAreAntsApp::main(int argc, char **argv)
 		MainForm->MapEditorButton->SetOnClick(MenAreAntsApp::WantMapEditor, this);
 		MainForm->OptionsButton->SetOnClick(MenAreAntsApp::WantConfig, (void*)false);
 		Sound::SetMusicList(MENU_MUSIC);
+#ifdef WIN32
+		TMessageBox(_("You are using Microsoft Windows. Please note that the Windows version of this game can be bugged.\n\n"
+		              "This is a free software, please use a GOOD Operating System, like GNU/Linux."), BT_OK, MainForm).Show();
+#endif
 		do
 		{
 			MainForm->Actions();

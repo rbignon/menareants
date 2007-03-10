@@ -112,7 +112,7 @@ static char *correct_nick(const char *nick)
 	{
 		if(*nick == ' ') newnick[i++] = '_';
 		else if(strchr(NICK_CHARS, *nick)) newnick[i++] = *nick;
-		*nick++;
+		nick++;
 	}
 	newnick[i] = '\0';
 	return newnick;

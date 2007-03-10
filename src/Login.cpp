@@ -170,6 +170,7 @@ void MenAreAntsApp::RefreshList()
 	client->ClearCommands();
 	/* Ajout des commandes            CMDNAME FLAGS ARGS */
 	client->AddCommand(new PIGCommand(MSG_PING,		0,	0)); // on appelle volontairement PIGCommand() qui fait la même chose pour serveur et meta-serveur
+	client->AddCommand(new AIMCommand(MSG_LOGGED,		0,	1));
 	client->AddCommand(new LSPmsCommand(MSG_SERVLIST,	0,	1));
 	client->AddCommand(new EOLmsCommand(MSG_ENDOFSLIST,	0,	0));
 	client->AddCommand(new STATmsCommand(MSG_STAT,		0,	2));
@@ -668,6 +669,11 @@ int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	me->set_nick(parv[1]);
 	me->UnsetLogging();
 	me->SetConnected();
+	if(me == &MetaServer && ListServerForm)
+	{
+		Config::GetInstance()->nick = parv[1];
+		ListServerForm->Welcome->SetCaption(StringF(_("Men Are Ants is for YOU, %s!"), me->GetNick().c_str()));
+	}
 	return 0;
 }
 

@@ -162,6 +162,12 @@ int EC_Client::read_sock(void *data)
 		timeout.tv_sec = 1; /*  Nécessaire pour être au courant du WantDisconnect() */
 		timeout.tv_usec = 0; /* quand il y a une inactivité au niveau des sockets */
 
+		if(!highsock)
+		{
+			SDL_Delay(10);
+			continue;
+		}
+
 		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)
 		{
 			if(errno != EINTR)
@@ -176,6 +182,7 @@ int EC_Client::read_sock(void *data)
 		FOR(EC_Client*, clients, cl)
 		{
 			if(!cl->sock) continue;
+
 			if(cl->WantDisconnect())
 			{
 				cl->Disconnect();

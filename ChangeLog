@@ -6,6 +6,15 @@
 
 	* src/JoinGame.cpp: Les numeros sur la carte affichent bien le numero d'ordre de la liste, et plus le numero d'ordre dans la liste de EChannel (qui mettait toujours soit en premier).
 
+2007-03-10 Romain Bignon <progs@headfucking.net>
+
+	* src/Sockets.cpp: Dans la version windows, si il n'y avait aucun socket connecté, select() foirait et donc sortait de la boucle, ce qui quittait le thread et rendait au final
+	  la connexion à une partie impossible.
+
+	* src/Main.cpp: Dans la version windows, il affiche un message au lancement pour prévenir les utilisateurs qu'ils utilisent un OS de merde.
+
+	* meta-server/client.c, src/Login.cpp: Un message AIM est envoyé au client lors de la connexion effectuée pour informer du pseudo utilisé.
+
 2007-03-04 Romain Bignon <progs@headfucking.net>
 
 	* src/JoinGame.cpp: Plutôt que d'avoir un SpinEdit pour choisir sa position, il y a maintenant des boutons sur la preview de la map pour choisir où l'on souhaite être.

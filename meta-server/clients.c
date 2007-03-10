@@ -194,7 +194,23 @@ int m_login_nick (struct Client* cl, int parc, char** parv)
 		}
 		else user = user->next;
 
+	sendrpl(cl, MSG_LOGGED, "%s", cl->user->name);
 	return senderr(cl, ERR_LOGIN_SUCCESS);
+}
+
+static char *correct_nick(const char *nick)
+{
+	static char newnick[NICKLEN + 1];
+	unsigned int i = 0;
+
+	while(*nick && i < NICKLEN)
+	{
+		if(*nick == ' ') newnick[i++] = '_';
+		else if(strchr(NICK_CHARS, *nick)) newnick[i++] = *nick;
+		nick++;
+	}
+	newnick[i] = '\0';
+	return newnick;
 }
 
 /* IAM <name> <prog> <version> */
@@ -212,11 +228,8 @@ int m_login (struct Client* cl, int parc, char** parv)
 
 	if(!strcmp(parv[2], CLIENT_SMALLNAME))
 	{
-		int i;
-		const char* c = parv[1];
-
-		for(i = 0; *c && i < NICKLEN && strchr(NICK_CHARS, *c); ++i, ++c);
-		if(*c)
+		const char* nick = correct_nick(parv[1]);
+		if(!*nick)
 		{
 			senderr(cl, ERR_CMDS);
 			delclient(cl);
@@ -235,11 +248,13 @@ int m_login (struct Client* cl, int parc, char** parv)
 					return 0;
 				}
 
-			add_user(cl, parv[1]);
+			add_user(cl, nick);
 
 			for(; reg; reg = reg->next)
-				if(!strcasecmp(reg->name, parv[1]))
+				if(!strcasecmp(reg->name, nick))
 					return senderr(cl, ERR_REGNICK);
+
+			sendrpl(cl, MSG_LOGGED, "%s", nick);
 		}
 		cl->flags = CL_USER;
 		send_stats(cl);
