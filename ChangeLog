@@ -1,10 +1,10 @@
-2007-03-06 Romain Bignon <progs@headfucking.net>
+2007-03-11 Romain Bignon <progs@headfucking.net>
 
-	* meta-server/server.c: Correction d'un crash !
+	* src/ShowMap.cpp: Maintenant quand le bouton "Schema" est pressé, il affiche les délimitations entre les territoires enemis.
 
-	* server/Main.cpp: Correctino d'un crash !
+	* src/gui/ListBox.cpp (ScrollTo): Maintenant il scroll bien.
 
-	* src/JoinGame.cpp: Les numeros sur la carte affichent bien le numero d'ordre de la liste, et plus le numero d'ordre dans la liste de EChannel (qui mettait toujours soit en premier).
+	* server/maps/Japan.map: Carte du japon pour 3 joueurs.
 
 2007-03-10 Romain Bignon <progs@headfucking.net>
 
@@ -14,6 +14,14 @@
 	* src/Main.cpp: Dans la version windows, il affiche un message au lancement pour prévenir les utilisateurs qu'ils utilisent un OS de merde.
 
 	* meta-server/client.c, src/Login.cpp: Un message AIM est envoyé au client lors de la connexion effectuée pour informer du pseudo utilisé.
+
+2007-03-06 Romain Bignon <progs@headfucking.net>
+
+	* meta-server/server.c: Correction d'un crash !
+
+	* server/Main.cpp: Correction d'un crash !
+
+	* src/JoinGame.cpp: Les numeros sur la carte affichent bien le numero d'ordre de la liste, et plus le numero d'ordre dans la liste de EChannel (qui mettait toujours soit en premier).
 
 2007-03-04 Romain Bignon <progs@headfucking.net>
 

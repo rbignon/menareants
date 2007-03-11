@@ -26,6 +26,7 @@
 #include "tools/Font.h"
 #include "Form.h"
 #include "Units.h"
+#include "gui/ColorEdit.h"
 #include <SDL_gfxPrimitives.h>
 
 #undef SCREEN_HEIGHT
@@ -332,6 +333,69 @@ void TMap::DrawFog(ECase* c)
 		                                  c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomRight()->GetHeight());
 }
 
+void TMap::DrawCountries(ECase* c)
+{
+	const int LINE_WIDTH = 10;
+	if(c->Showed() <= 0 && HaveBrouillard())
+		return;
+
+	if(map->Channel() && (!c->Country()->Owner() || !c->Country()->Owner()->Player()))
+		return;
+
+	/* !WARNING! Le code qui suit risque de faire mal aux yeux. Prière de faire bien attention en lisant ces lignes de
+	 *           ne pas tomber dans un coma.
+	 *           Merci.
+	 */
+
+	if(map->Channel() && (!c->MoveUp()->Country()->Owner() || !c->MoveUp()->Country()->Owner()->Player()
+	                      || c->MoveUp()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveUp()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), CASE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveDown()->Country()->Owner() || !c->MoveDown()->Country()->Owner()->Player()
+	                      || c->MoveDown()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveDown()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, CASE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveLeft()->Country()->Owner() || !c->MoveLeft()->Country()->Owner()->Player()
+	                      || c->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveLeft()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveRight()->Country()->Owner() || !c->MoveRight()->Country()->Owner()->Player()
+	                      || c->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveRight()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveUp()->MoveRight()->Country()->Owner() || !c->MoveUp()->MoveRight()->Country()->Owner()->Player()
+	                      || c->MoveUp()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveUp()->MoveRight()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveUp()->MoveLeft()->Country()->Owner() || !c->MoveUp()->MoveLeft()->Country()->Owner()->Player()
+	                      || c->MoveUp()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveUp()->MoveLeft()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveDown()->MoveRight()->Country()->Owner() || !c->MoveDown()->MoveRight()->Country()->Owner()->Player()
+	                      || c->MoveDown()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveDown()->MoveRight()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+
+	if(map->Channel() && (!c->MoveDown()->MoveLeft()->Country()->Owner() || !c->MoveDown()->MoveLeft()->Country()->Owner()->Player()
+	                      || c->MoveDown()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
+	   || !map->Channel() && c->MoveDown()->MoveLeft()->Country() != c->Country())
+		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
+		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
+}
+
 void TMap::Draw(const Point2i& mouse)
 {
 	if(!map) return;
@@ -431,7 +495,10 @@ void TMap::Draw(const Point2i& mouse)
 					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
 			if(schema)
+			{
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
+				DrawCountries(c);
+			}
 
 			if(map->Channel()) // Si il n'y a pas de channel, c'est l'éditeur de map et on n'utilise pas ça dans ce cas.
 				c->SetMustRedraw(false);

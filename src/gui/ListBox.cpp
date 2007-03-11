@@ -295,7 +295,9 @@ void TListBox::ScrollTo(uint id)
 {
 	if(id == first_visible_item || id >= m_items.size())
 		return;
-	else if(id > first_visible_item)
+
+	first_visible_item = id;
+	/*else if(id > first_visible_item)
 		while(1)
 		{
 			 if(m_items.back()->Y() + m_items.back()->Height() > Y() + Height())
@@ -314,7 +316,7 @@ void TListBox::ScrollTo(uint id)
 				break;
 			if(first_visible_item == id)
 				break;
-		}
+		}*/
 
 	SetWantRedraw();
 }

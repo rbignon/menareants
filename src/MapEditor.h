@@ -212,6 +212,7 @@ public:
 	TButtonText*        QuitButton;
 	TButtonText*        OptionsButton;
 	TButtonText*        SaveButton;
+	TButtonText*        SchemaButton;
 	TImage*             ScreenPos;
 	TBarreLatIcons*     Icons;
 

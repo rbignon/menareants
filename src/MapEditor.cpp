@@ -444,6 +444,11 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		}
 		return;
 	}
+	if(BarreLat->SchemaButton->Test(mouse, button))
+	{
+		Map->ToggleSchema();
+		return;
+	}
 	if(BarreLat->SaveButton->Test(mouse, button))
 	{
 		if(!map->CanSave())
@@ -462,6 +467,7 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 			TMessageBox(std::string(_("Unable to save this map:\n\n")) + e.Message(),
 					BT_OK, this).Show();
 		}
+		return;
 	}
 	if(BarreLat->QuitButton->Test(mouse, button))
 	{
@@ -987,12 +993,15 @@ void TEditBarreLat::Init()
 	SaveButton = AddComponent(new TButtonText(30,300,100,30, _("Save"), Font::GetInstance(Font::Small)));
 	SaveButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 	SaveButton->SetX(X() + Width()/2 - SaveButton->Width()/2);
+	SchemaButton = AddComponent(new TButtonText(30,330,100,30, _("Diagram"), Font::GetInstance(Font::Small)));
+	SchemaButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+	SchemaButton->SetX(X() + Width()/2 - SchemaButton->Width()/2);
 
 	TMapEditor* editor = dynamic_cast<TMapEditor*>(Parent());
 
 	OptionsButton->SetOnClick(TOptionsMap::Options, (void*)editor->Map->Map());
 
-	Icons = AddComponent(new TBarreLatIcons(20, 340));
+	Icons = AddComponent(new TBarreLatIcons(20, 370));
 	Icons->SetMaxHeight(SCREEN_HEIGHT - Icons->Y());
 	Icons->SetList(EntityList.List(), TEditBarreLat::SelectUnit);
 	Icons->SetX(X() + Width()/2 - Icons->Width()/2);

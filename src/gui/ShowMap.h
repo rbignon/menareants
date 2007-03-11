@@ -123,6 +123,7 @@ private:
 	Point2i move_point;
 
 	void DrawFog(ECase* c);
+	void DrawCountries(ECase* c);
 };
 
 #endif /* EC_SHOWMAP_H */
