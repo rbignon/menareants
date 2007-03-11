@@ -15,6 +15,7 @@ menareants_SOURCES = \
 		tools/Color.cpp \
 		tools/Images.cpp \
 		tools/Maths.cpp \
+		tools/effects_wave.cpp \
 		tools/Video.cpp \
 		tools/SDL_rotozoom.c \
 		tools/SDL_gfxPrimitives.c \

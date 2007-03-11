@@ -248,7 +248,7 @@ int ECSprite::init(ECSpriteBase *base, ECImage *screen)
   //mSpriteBase = new ECSpriteBase(base->path.c_str());
   mSpriteBase = base;
 
-  if(mSpriteBase->mNumframes>1 && mSpriteBase->animation) mAnimating=true;
+  if(mSpriteBase->NumFrames()>1 && mSpriteBase->animation) mAnimating=true;
 
   mScreen = screen;
   return 0;
@@ -263,18 +263,18 @@ bool ECSprite::Anim() const { return (mSpriteBase->animation && mAnimating); }
 
 void ECSprite::SetFrame(uint nr)
 {
-	mFrame = nr < mSpriteBase->mNumframes ? nr : mSpriteBase->mNumframes-1;
+	mFrame = nr < mSpriteBase->NumFrames() ? nr : mSpriteBase->NumFrames()-1;
 }
 
 uint ECSprite::NbFrames() const
 {
-	return mSpriteBase ? mSpriteBase->mNumframes : 0;
+	return mSpriteBase ? mSpriteBase->NumFrames() : 0;
 }
 
 ECImage* ECSprite::First() const
 {
-	if(mSpriteBase && mSpriteBase->mNumframes)
-		return &mSpriteBase->mAnim[0];
+	if(mSpriteBase && mSpriteBase->surfaces.empty() == false)
+		return &mSpriteBase->surfaces.front();
 	return 0;
 }
 
@@ -282,11 +282,11 @@ void ECSprite::draw()
 {
 	if(mAnimating && mSpriteBase->animation)
 	{
-		if(mLastupdate + mSpriteBase->mAnim[mFrame].pause * mSpeed<SDL_GetTicks())
+		if(mLastupdate + mSpriteBase->surfaces[mFrame].pause * mSpeed<SDL_GetTicks())
 		{
 			if(order)
 			{
-				if(mFrame >= mSpriteBase->mNumframes-1)
+				if(mFrame >= mSpriteBase->NumFrames()-1)
 				{
 					if(!repeat)
 						mAnimating = false;
@@ -303,7 +303,7 @@ void ECSprite::draw()
 					if(!repeat)
 						mAnimating = false;
 					else
-						mFrame = mSpriteBase->mNumframes-1;
+						mFrame = mSpriteBase->NumFrames()-1;
 				}
 				else mFrame--;
 			}
@@ -318,7 +318,7 @@ void ECSprite::draw()
 	dest.y = mY;
 	dest.w = GetWidth();
 	dest.h = GetHeight();
-	mScreen->Blit(&mSpriteBase->mAnim[mFrame], &dest);
+	mScreen->Blit(mSpriteBase->surfaces[mFrame], &dest);
 }
 
 int ECSprite::GetWidth()
@@ -350,23 +350,21 @@ void ECSprite::Zoom(double zoomx, double zoomy, bool smooth)
  *                                      ECSpriteBase                                    *
  ****************************************************************************************/
 
-ECSpriteBase::ECSpriteBase(const char *dir)
+ECSpriteBase::ECSpriteBase()
+	: mBuilt(0), mW(0), mH(0), alpha(false), animation(false)
 {
-	mAnim = 0;
-	mBuilt = 0;
-	mNumframes = 0;
-	mW = 0;
-	mH = 0;
-	alpha = false;
-	animation = false;
 
+}
+
+ECSpriteBase::ECSpriteBase(const char *dir)
+	: mBuilt(0), mW(0), mH(0), alpha(false), animation(false)
+{
 	init(dir);
 }
 
 ECSpriteBase::~ECSpriteBase()
 {
-	if(mAnim)
-		delete [] mAnim;
+
 }
 
 int ECSpriteBase::init(const char *dir)
@@ -382,20 +380,14 @@ int ECSpriteBase::init(const char *dir)
 		throw ECExcept(filename, "Problème d'ouverture des données. Vérifiez leur présence");
 
 	std::string ligne, key;
-	for(int count = -1; std::getline(fp, ligne) && count < (int)mNumframes;)
+	while(std::getline(fp, ligne))
 	{
 		if(ligne[0] == '#' || ligne[0] == '\r' || ligne[0] == '\0' || ligne[0] == '\n')
 			continue;
 
 		std::string key = stringtok(ligne, " ");
 
-		if(count < 0 && key == "FILES:")
-		{
-			mNumframes = StrToTyp<uint>(ligne);
-			mAnim = new ECImage[mNumframes];
-			mBuilt = 1;
-			count++;
-		}
+		if(key == "FILES:") continue; // On ignore
 		else
 		{
 			filename = PKGDATADIR_ANIMS + std::string(dir) + PATH_SEPARATOR + key;
@@ -415,22 +407,23 @@ int ECSpriteBase::init(const char *dir)
 			}
 
 			SDL_Surface *temp;
+			ECImage img;
 			if((temp = IMG_Load(filename.c_str())) == NULL)
 				throw ECExcept(filename, "Impossible de charger l'image: " + filename);
 
 			if(!a)
 				SDL_SetColorKey(temp, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b));
 
-			mAnim[count].Img = a ? SDL_DisplayFormatAlpha(temp) : SDL_DisplayFormat(temp);
-			mAnim[count].SetAlpha(a);
+			img.SetImage(a ? SDL_DisplayFormatAlpha(temp) : SDL_DisplayFormat(temp));
+			img.SetAlpha(a);
 			SDL_FreeSurface(temp);
 
-			mAnim[count].pause = pause;
+			img.pause = pause;
 			if(pause) animation = true;
-			if(!mW) mW = mAnim[count].Img->w;
-			if(!mH) mH = mAnim[count].Img->h;
+			if(!mW) mW = img.Img->w;
+			if(!mH) mH = img.Img->h;
 
-			count++;
+			surfaces.push_back(img);
 		}
 	}
 
@@ -440,34 +433,34 @@ int ECSpriteBase::init(const char *dir)
 
 void ECSpriteBase::ChangeColor(Color from, Color to)
 {
-	for(uint i=0; i < mNumframes; ++i)
-		ChangePixelColor(&mAnim[i], from, to);
+	for(uint i=0; i < NumFrames(); ++i)
+		ChangePixelColor(&surfaces[i], from, to);
 }
 
 void ECSpriteBase::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
 {
-	for(uint i=0; i < mNumframes; ++i)
+	for(uint i=0; i < NumFrames(); ++i)
 	{
-		mAnim[i].RotoZoom(angle, zoomx, zoomy, smooth);
-		mW = mAnim[i].Img->w;
-		mH = mAnim[i].Img->h;
- }
+		surfaces[i].RotoZoom(angle, zoomx, zoomy, smooth);
+		mW = surfaces[i].Img->w;
+		mH = surfaces[i].Img->h;
+	}
 }
 
 void ECSpriteBase::Zoom(double zoomx, double zoomy, bool smooth)
 {
-	for(uint i=0; i < mNumframes; ++i)
+	for(uint i=0; i < NumFrames(); ++i)
 	{
-		mAnim[i].Zoom(zoomx, zoomy, smooth);
-		mW = mAnim[i].Img->w;
-		mH = mAnim[i].Img->h;
+		surfaces[i].Zoom(zoomx, zoomy, smooth);
+		mW = surfaces[i].Img->w;
+		mH = surfaces[i].Img->h;
 	}
 }
 
-ECImage* ECSpriteBase::First() const
+ECImage* ECSpriteBase::First()
 {
-	if(mNumframes)
-		return &mAnim[0];
+	if(surfaces.empty() == false)
+		return &surfaces.front();
 	return 0;
 }
 
@@ -479,6 +472,12 @@ ECImage::ECImage(char* fichier, bool _alpha)
 	: Img(0), shadowed(0), pause(0), autofree(true), alpha(_alpha), x(0), y(0)
 {
 	Load(fichier, _alpha);
+}
+
+ECImage::ECImage(const Point2i &size, Uint32 flags, bool useAlpha)
+	: Img(0), shadowed(0), pause(0), autofree(true), alpha(useAlpha), x(0), y(0)
+{
+	NewSurface(size, flags, useAlpha);
 }
 
 void ECImage::Load(char *fichier, bool _alpha)
@@ -705,7 +704,7 @@ int ECImage::FillRect(SDL_Rect &dstRect, const Color color)
 	return SDL_FillRect( Img, &dstRect, MapColor(color));
 }
 
-void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
+void ECImage::NewSurface(const Point2i& size, Uint32 flags, bool useAlpha)
 {
 	Uint32 alphaMask;
 	Uint32 redMask;
@@ -730,7 +729,7 @@ void ECImage::NewSurface(uint width, uint height, Uint32 flags, bool useAlpha)
 	if( !useAlpha )
 		alphaMask = 0;
 
-	Img = SDL_CreateRGBSurface(flags, width, height, 32,
+	Img = SDL_CreateRGBSurface(flags, size.x, size.y, 32,
 			redMask, greenMask, blueMask, alphaMask );
 
 	if( Img == NULL )
@@ -822,7 +821,7 @@ ECImage* ECImage::Shadow()
 
 	shadowed = new ECImage;
 
-	shadowed->NewSurface(CASE_WIDTH, CASE_HEIGHT, SDL_HWSURFACE, false);
+	shadowed->NewSurface(Point2i(CASE_WIDTH, CASE_HEIGHT), SDL_HWSURFACE, false);
 	shadowed->Blit(this);
 	SDL_Rect r_back = {0,0,GetWidth(), GetHeight()};
 	ECImage brouillard;
@@ -832,4 +831,63 @@ ECImage* ECImage::Shadow()
 	shadowed->Blit(brouillard);
 
 	return shadowed;
+}
+
+Uint32 ECImage::GetPixel(int x, int y){
+    int bpp = Img->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8 *p = (Uint8 *)Img->pixels + y * Img->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        return *p;
+
+    case 2:
+        return *(Uint16 *)p;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
+            return p[0] | p[1] << 8 | p[2] << 16;
+
+    case 4:
+        return *(Uint32 *)p;
+
+    default:
+		throw ECExcept("", "Unknow bpp!");
+        return 0;   // To make gcc happy
+    }
+}
+
+void ECImage::PutPixel(int x, int y, Uint32 pixel){
+    int bpp = Img->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to set */
+    Uint8 *p = (Uint8 *)Img->pixels + y * Img->pitch + x * bpp;
+
+    switch(bpp) {
+    case 1:
+        *p = pixel;
+        break;
+
+    case 2:
+        *(Uint16 *)p = pixel;
+        break;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+            p[0] = (pixel >> 16) & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = pixel & 0xff;
+        } else {
+            p[0] = pixel & 0xff;
+            p[1] = (pixel >> 8) & 0xff;
+            p[2] = (pixel >> 16) & 0xff;
+        }
+        break;
+
+    case 4:
+        *(Uint32 *)p = pixel;
+        break;
+    }
 }

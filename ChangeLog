@@ -6,6 +6,12 @@
 
 	* server/maps/Japan.map: Carte du japon pour 3 joueurs.
 
+	* src/tools/effects_wave.cpp: Patch de lodesi pour avoir un effet d'onde, sera utilisé pour Jouano.
+
+	* Batiments.h (ECBarbedWire): On peut poser des barbelés pour empêcher l'infanterie de passer.
+
+	* src/tools/Images.h: Remaniement.
+
 2007-03-10 Romain Bignon <progs@headfucking.net>
 
 	* src/Sockets.cpp: Dans la version windows, si il n'y avait aucun socket connecté, select() foirait et donc sortait de la boucle, ce qui quittait le thread et rendait au final

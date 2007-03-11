@@ -276,7 +276,7 @@ public:
 	bool CanAttaq(const ECBEntity* e)
 	{
 		if((Parent() && Parent()->CanAttaq(e)) || e->Level() == Level() && !e->IsHidden() ||
-		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain())
+		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain() || e->Type() == E_BARBEDWIRE)
 			return true;
 		else
 			return false;
@@ -306,7 +306,7 @@ public:
 	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return 2; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
@@ -351,7 +351,7 @@ public:
 	virtual uint InitNb() const { return 300; }
 	virtual uint Step() const { return Deployed() ? 0 : 2; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 
 	bool CanInvest(const ECBEntity* e) const
 	{
@@ -403,7 +403,7 @@ public:
 	virtual uint Step() const { return 4; }
 	virtual uint Visibility() const { return 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 
 	bool CanInvest(const ECBEntity* e) const { return false; }
 	bool CanAttaq(const ECBEntity* e) { return (e->IsInfantry()); }
@@ -442,7 +442,7 @@ public:
 	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return 1; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
@@ -489,7 +489,7 @@ public:
 	virtual uint Cost() const { return 2000; }
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 2; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && (c->Entities()->Find(E_BARBEDWIRE).empty() == true); }
 
 	bool CanAttaq(const ECBEntity* e)
 	{

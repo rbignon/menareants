@@ -203,6 +203,7 @@ public:
 		/*21*/E_TRAIN,
 		/*22*/E_PLANE,
 		/*23*/E_JOUANO,
+		/*24*/E_BARBEDWIRE,
 		/*XX*/E_END
 	};
 

@@ -32,4 +32,5 @@ U_DECL(ECRail)
 U_DECL(ECTrain)
 U_DECL(ECPlane)
 U_DECL(ECJouano)
+U_DECL(ECBarbedWire)
 U_END

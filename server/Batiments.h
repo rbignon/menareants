@@ -26,6 +26,22 @@
 #include "lib/Batiments.h"
 
 /********************************************************************************************
+ *                                        ECBarbedWire                                      *
+ ********************************************************************************************/
+class ECBarbedWire : public ECEntity, public ECBBarbedWire
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECBarbedWire) {}
+
+/* Methodes */
+public:
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+/********************************************************************************************
  *                                        ECRail                                            *
  ********************************************************************************************/
 class ECRail : public ECEntity, public ECBRail
@@ -37,11 +53,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
-
-	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
 };
@@ -58,11 +69,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
-
-	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
 };

@@ -65,7 +65,7 @@ void TProgressBar::SetHeight(uint h)
 
 void TProgressBar::ChangeSize()
 {
-  image.NewSurface(Width(), Height(), SDL_SWSURFACE|SDL_SRCALPHA, true);
+  image.NewSurface(Point2i(Width(), Height()), SDL_SWSURFACE|SDL_SRCALPHA, true);
 }
 
 void TProgressBar::InitVal (long pval, long pmin, long pmax)

@@ -795,7 +795,7 @@ void TBarreCaseIcons::SetList()
 	for(uint _i = first; _i < ASIZE(case_img); ++_i, up = !up)
 	{
 		ECImage* img = new ECImage;
-		img->NewSurface(CASE_WIDTH, CASE_HEIGHT, case_img[_i].spr()->First()->Img->flags, false);
+		img->NewSurface(Point2i(CASE_WIDTH, CASE_HEIGHT), case_img[_i].spr()->First()->Img->flags, false);
 		img->Blit(case_img[_i].spr()->First());
 		img->Zoom(double(50) / double(img->GetWidth()), double(50) / double(img->GetHeight()), true);
 

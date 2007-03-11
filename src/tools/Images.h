@@ -24,6 +24,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
+#include <vector>
 #include "Defines.h"
 #include "tools/Rectangle.h"
 
@@ -149,18 +150,20 @@ public:
 	void Zoom(double zoomx, double zoomy, bool smooth);
 
 	ECSpriteBase(const char *dir);
+	ECSpriteBase();
 	~ECSpriteBase();
 
-	ECImage* First() const;
+	ECImage* First();
 
 	bool Alpha() const { return alpha; }
 
+	int NumFrames() const { return surfaces.size(); }
+
 /* Variables publiques */
 public:
-	ECImage *mAnim;
+	std::vector<ECImage> surfaces;
 	int mBuilt;
 	uint mW, mH;
-	uint mNumframes;
 	bool animation;
 	std::string path;
 	bool alpha;
@@ -174,6 +177,7 @@ public:
 	ECImage(const ECImage&);
 	ECImage(char* fichier, bool alpha = false);
 	ECImage() : Img(0), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
+	explicit ECImage(const Point2i &size, Uint32 flags, bool useAlpha = true);
 
 	~ECImage();
 
@@ -240,10 +244,16 @@ public:
 	int FillRect(SDL_Rect &dstRect, Uint32 color);
 	int FillRect(SDL_Rect &dstRect, const Color color);
 
-	void NewSurface(uint width, uint height, Uint32 flags, bool useAlpha);
+	void NewSurface(const Point2i& size, Uint32 flags, bool useAlpha);
 
 	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
 	void Zoom(double zoomx, double zoomy, bool smooth);
+
+	void Lock() { SDL_LockSurface( Img ); }
+	void Unlock() { SDL_UnlockSurface( Img ); }
+
+	Uint32 GetPixel(int x, int y);
+	void PutPixel(int x, int y, Uint32 pixel);
 
 /* Attributs */
 public:
@@ -258,6 +268,13 @@ public:
 	void SetAlpha(bool a = true) { alpha = a; }
 
 	ECImage* Shadow();
+
+	void SetPause(int _p) { pause = _p; }
+
+	inline unsigned char *GetPixels() const
+	{
+		return (unsigned char *) Img->pixels;
+	}
 
 /* Variables publiques */
 public:

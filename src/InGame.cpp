@@ -2004,8 +2004,8 @@ void TBarreLat::Init()
 
 	ScreenPos = AddComponent(new TImage(0,0));
 	ECImage* surf = new ECImage();
-	surf->NewSurface(chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-Width()) / CASE_WIDTH,
-	                 chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT,
+	surf->NewSurface(Point2i(chan->Map()->Preview()->GetWidth()  / chan->Map()->Width()  * (SCREEN_WIDTH-Width()) / CASE_WIDTH,
+	                         chan->Map()->Preview()->GetHeight() / chan->Map()->Height() * SCREEN_HEIGHT / CASE_HEIGHT),
 	                 SDL_HWSURFACE|SDL_SRCALPHA, true);
 	surf->RectangleColor(Rectanglei(0,0,surf->GetWidth(), surf->GetHeight()), Color(0xff, 0xfc, 0x00, 255), 1);
 	ScreenPos->SetImage(surf);

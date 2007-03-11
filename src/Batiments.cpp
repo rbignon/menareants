@@ -78,6 +78,85 @@ ECBatiment::~ECBatiment()
 }
 
 /********************************************************************************************
+ *                                         ECBarbedWire                                     *
+ ********************************************************************************************/
+void ECBarbedWire::Created()
+{
+	FindMyImage();
+}
+
+void ECBarbedWire::Played()
+{
+	ECEntity::Played();
+
+	FindMyImage();
+}
+
+void ECBarbedWire::FindMyImage(bool others)
+{
+	std::vector<ECBEntity*> entities;
+	int r = Case()->SearchAroundType(Type(), entities);
+
+	if(!r)
+		SetImage(Resources::BarbedWire_Horiz());
+
+	if((r & C_UP))
+	{
+		if((r & C_DOWN))
+		{
+			if((r & C_LEFT) && (r & C_RIGHT))
+				SetImage(Resources::BarbedWire_Aiguillage());
+			else if((r & C_LEFT))
+				SetImage(Resources::BarbedWire_TOuest());
+			else if((r & C_RIGHT))
+				SetImage(Resources::BarbedWire_TEst());
+			else
+				SetImage(Resources::BarbedWire_Verti());
+		}
+		else
+			if((r & C_LEFT) && (r & C_RIGHT))
+				SetImage(Resources::BarbedWire_TNord());
+			else if((r & C_LEFT))
+				SetImage(Resources::BarbedWire_SudEst());
+			else if((r & C_RIGHT))
+				SetImage(Resources::BarbedWire_SudOuest());
+			else
+				SetImage(Resources::BarbedWire_Down());
+	}
+	else if(r & C_DOWN)
+	{
+		if((r & C_LEFT) && (r & C_RIGHT))
+			SetImage(Resources::BarbedWire_TSud());
+		else if(r & C_LEFT)
+			SetImage(Resources::BarbedWire_NordEst());
+		else if(r & C_RIGHT)
+			SetImage(Resources::BarbedWire_NordOuest());
+		else
+			SetImage(Resources::BarbedWire_Up());
+	}
+	else if(r & C_LEFT && r & C_RIGHT)
+		SetImage(Resources::BarbedWire_Horiz());
+	else if(r & C_LEFT)
+		SetImage(Resources::BarbedWire_Right());
+	else if(r & C_RIGHT)
+		SetImage(Resources::BarbedWire_Left());
+	else
+		SetImage(Resources::BarbedWire_Horiz());
+
+	/*if((r & C_UP || r & C_DOWN) && !(r & C_LEFT) && !(r & C_RIGHT))
+		SetImage(Resources::BarbedWire_Verti());
+	else if((r & C_RIGHT || r & C_LEFT) && !(r & C_DOWN) && !(r & C_UP))
+		SetImage(Resources::BarbedWire_Horiz());
+	else if(
+	else
+		SetImage(Resources::BarbedWire_Aiguillage());*/
+
+	if(others)
+		FORit(ECBEntity*, entities, it)
+			dynamic_cast<ECBarbedWire*>(*it)->FindMyImage(false);
+}
+
+/********************************************************************************************
  *                                         ECRail                                           *
  ********************************************************************************************/
 void ECRail::Created()

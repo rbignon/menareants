@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: progs@coderz.info\n"
-"POT-Creation-Date: 2007-03-11 14:01+0100\n"
-"PO-Revision-Date: 2007-03-10 17:29+0100\n"
+"POT-Creation-Date: 2007-03-11 21:25+0100\n"
+"PO-Revision-Date: 2007-03-11 21:25+0100\n"
 "Last-Translator: Romain Bignon <progs@headfucking.net>\n"
 "Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -84,7 +84,7 @@ msgstr ""
 "%d $\n"
 "%s"
 
-#: src/Batiments.cpp:274 src/Batiments.cpp:286 src/Batiments.cpp:298
+#: src/Batiments.cpp:353 src/Batiments.cpp:365 src/Batiments.cpp:377
 #, c-format
 msgid "$%d income each turn"
 msgstr "Rapporte %d $ par tours"
@@ -118,7 +118,7 @@ msgstr ""
 msgid "%0Eo's %0Et shoot %1Eo's %1Et of %2s"
 msgstr "%0Et de %0Eo dégomme %1Et de %1Eo de %2s"
 
-#: src/Batiments.cpp:198
+#: src/Batiments.cpp:277
 #, c-format
 msgid "%d missile(s) - New missile in %d day(s)"
 msgstr "%d missiles(s) - Nouveau missile dans %d jour(s)"
@@ -148,7 +148,7 @@ msgstr "%s vous donne %s $"
 msgid "%s gives you a country"
 msgstr "%s vous donne un territoire"
 
-#: src/Batiments.cpp:184
+#: src/Batiments.cpp:263
 #, c-format
 msgid "%s has a new missile in stock!"
 msgstr "%s a un nouveau missile en stock !"
@@ -324,7 +324,7 @@ msgstr "Nom de l'IA à créer :"
 msgid "Abort"
 msgstr "Abandonner"
 
-#: src/Batiments.cpp:155
+#: src/Batiments.cpp:234
 #, c-format
 msgid "Active in %d days."
 msgstr "Active dans %d jours."
@@ -417,11 +417,15 @@ msgstr ""
 "Mal habillé et gros ventre, il peut détruire un Mc Gerbale installé dans "
 "votre caserne."
 
+#: src/Batiments.h:87
+msgid "Barbed Wire"
+msgstr "Barbelés"
+
 #: src/Units.h:340
 msgid "Barrack + McPuke"
 msgstr "Caserne + McGerbale"
 
-#: src/Batiments.h:469
+#: src/Batiments.h:501
 msgid "Barracks"
 msgstr "Caserne"
 
@@ -437,15 +441,15 @@ msgstr "Balise"
 msgid "Begin of engagements:  "
 msgstr "Début des combats :  "
 
-#: src/Batiments.h:498
+#: src/Batiments.h:530
 msgid "Builds ships."
 msgstr "Construit des unités navales."
 
-#: src/Batiments.h:444
+#: src/Batiments.h:476
 msgid "Builds vehicles."
 msgstr "Construit des véhicules."
 
-#: src/Batiments.h:296
+#: src/Batiments.h:328
 msgid "Business center"
 msgstr "Centre d'affaire"
 
@@ -453,7 +457,7 @@ msgstr "Centre d'affaire"
 msgid "Can attaq:"
 msgstr "Peut attaquer :"
 
-#: src/Batiments.h:359
+#: src/Batiments.h:391
 msgid "Can fire to defend your city."
 msgstr "Peut tirer pour défendre la ville."
 
@@ -477,7 +481,7 @@ msgstr "Bateau de transport"
 msgid "Carrier plane (cargo plane)"
 msgstr "Avion de transport"
 
-#: src/Batiments.h:324
+#: src/Batiments.h:356
 msgid "City center"
 msgstr "Centre ville"
 
@@ -575,7 +579,7 @@ msgstr "Couleur par défaut :"
 msgid "Default nation:"
 msgstr "Nation par défaut :"
 
-#: src/Batiments.h:357
+#: src/Batiments.h:389
 msgid "Defense tower"
 msgstr "Tour de défense"
 
@@ -628,7 +632,7 @@ msgstr "Téléchargez MenAreAnts.zip sur le site.\n"
 msgid "Duration:"
 msgstr "Durée :"
 
-#: src/Batiments.h:326
+#: src/Batiments.h:358
 msgid "Earns you some money each turn"
 msgstr "Rapporte une certaine somme par tours"
 
@@ -677,7 +681,7 @@ msgstr "Extraire"
 msgid "Find idling"
 msgstr "Inactifs"
 
-#: src/Batiments.h:270
+#: src/Batiments.h:302
 msgid "Five times more income than the city center."
 msgstr "Rapporte cinq fois plus que le centre ville"
 
@@ -685,7 +689,7 @@ msgstr "Rapporte cinq fois plus que le centre ville"
 msgid "Flying"
 msgstr "En vol"
 
-#: src/Batiments.h:111
+#: src/Batiments.h:143
 msgid "Forest"
 msgstr "Forêt"
 
@@ -869,7 +873,7 @@ msgstr "Tués"
 msgid "Landing"
 msgstr "Atterrir"
 
-#: src/Batiments.h:218
+#: src/Batiments.h:250
 msgid "Launching silo"
 msgstr "Silo de lancement"
 
@@ -956,7 +960,7 @@ msgstr "Temps maximal de reflexion d'un tour en secondes"
 msgid "McPuke Donald"
 msgstr "Donald de McGerbale"
 
-#: src/Batiments.h:268
+#: src/Batiments.h:300
 msgid "Megalopolis"
 msgstr "Mégalopole"
 
@@ -973,7 +977,7 @@ msgstr "Message du jour du serveur"
 msgid "Min players"
 msgstr "Min joueurs"
 
-#: src/Batiments.cpp:156
+#: src/Batiments.cpp:235
 msgid "Mine actived"
 msgstr "Mine active"
 
@@ -1009,11 +1013,11 @@ msgstr "Plus d'infos."
 msgid "Music"
 msgstr "Musique"
 
-#: src/Batiments.h:397
+#: src/Batiments.h:429
 msgid "NOD's obelisk"
 msgstr "Obélisque du NOD"
 
-#: src/Batiments.h:402
+#: src/Batiments.h:434
 msgid ""
 "NOD's obelisk considerably multiplies your attack power against vehicles and "
 "infantry, and can now attack buildings (except the city centers)!\n"
@@ -1075,19 +1079,19 @@ msgstr "Joueur introuvable"
 msgid "Noisy"
 msgstr "Noisy"
 
-#: src/Batiments.cpp:221
+#: src/Batiments.cpp:300
 msgid "Not linked with a NuclearSearch Center."
 msgstr "N'est pas relié à un Centre de recherches Nucléaire."
 
-#: src/Batiments.h:220
+#: src/Batiments.h:252
 msgid "Nuclear missile launching silo"
 msgstr "Silo de lancement de missiles nucléaires"
 
-#: src/Batiments.h:183
+#: src/Batiments.h:215
 msgid "Nuclear missile manufacturing."
 msgstr "Fabrication de missiles nucléaires."
 
-#: src/Batiments.h:181
+#: src/Batiments.h:213
 msgid "Nuclear research center"
 msgstr "Centre de recherches nucléaires"
 
@@ -1208,7 +1212,7 @@ msgstr "Portée : Aucune, combats au corps à corps"
 msgid "Quick game"
 msgstr "Partie rapide"
 
-#: src/Batiments.h:87
+#: src/Batiments.h:119
 msgid "Rail"
 msgstr "Rail"
 
@@ -1312,7 +1316,7 @@ msgstr "Ajoutez un hôte sous forme \"host[:port]\""
 msgid "Ship"
 msgstr "Bateau"
 
-#: src/Batiments.h:496
+#: src/Batiments.h:528
 msgid "Shipyard"
 msgstr "Chantier naval"
 
@@ -1353,7 +1357,7 @@ msgstr "Décoller"
 msgid "Tank"
 msgstr "Char"
 
-#: src/Batiments.h:442
+#: src/Batiments.h:474
 msgid "Tank factory"
 msgstr "Usine de chars"
 
@@ -1398,11 +1402,11 @@ msgstr "L'URSS et ses goulags..."
 msgid "The United States invests the world with of McDonalds."
 msgstr "Les États-Unis investissent le monde avec des McGerbales."
 
-#: src/Batiments.h:474
+#: src/Batiments.h:506
 msgid "The barracks builds basic infantry."
 msgstr "La caserne construit l'infanterie de base."
 
-#: src/Batiments.h:301
+#: src/Batiments.h:333
 msgid ""
 "The business center earns you money each turn, two times more than the city "
 "center. Whoever takes your business center becomes the owner of all the "
@@ -1412,7 +1416,7 @@ msgstr ""
 "centre ville. Celui qui prend votre centre d'affaire devient possesseur de "
 "tous les quartiers de la ville."
 
-#: src/Batiments.h:186
+#: src/Batiments.h:218
 msgid ""
 "The center regularly builds a missile which can be launched from the nuclear "
 "silo."
@@ -1420,7 +1424,7 @@ msgstr ""
 "Le centre fabrique des missiles nucléaires fréquemment et peuvent être "
 "lancés depuis le Silo de lancement."
 
-#: src/Batiments.h:329
+#: src/Batiments.h:361
 msgid ""
 "The city center earns you money each turn. Whoever takes your business "
 "center becomes the owner of all the districts of the city."
@@ -1428,7 +1432,7 @@ msgstr ""
 "Le centre ville rapporte de l'argent chaque tour. Celui qui prend votre "
 "centre ville devient possesseur de tous les quartiers de la ville."
 
-#: src/Batiments.h:362
+#: src/Batiments.h:394
 msgid ""
 "The defense tower is originally located in cities. It provides a non-"
 "negligible defense, even if it has a short reach. Use missile launchers to "
@@ -1438,7 +1442,7 @@ msgstr ""
 "défense non négligeable, même si elle a une porté plutôt faible. Comptez sur "
 "les lance-missiles pour la détruire."
 
-#: src/Batiments.h:223
+#: src/Batiments.h:255
 msgid ""
 "The launching silo can launch the nuclear missile avalaible in the nuclear "
 "research center stock. The damages caused by a H bomb are very important (6 "
@@ -1449,7 +1453,7 @@ msgstr ""
 "importance très grande (sur 6 cases avec pour centre la zone d'impact). Vos "
 "unités ne sont pas à l'abris de vos propres tirs !!"
 
-#: src/Batiments.h:273
+#: src/Batiments.h:305
 msgid ""
 "The megalopolis earns you money each turn, FIVE times more than the city "
 "center, and 2,5 times more than the business center. Whoever takes your "
@@ -1459,7 +1463,7 @@ msgstr ""
 "ville, et 2,5 fois plus que le centre d'affaires. Celui qui prend votre "
 "mégalopole devient possesseur de tous les quartiers de la ville."
 
-#: src/Batiments.h:148
+#: src/Batiments.h:180
 msgid "The mine explodes when an unit passes on it."
 msgstr "La mine invisible explose quand une unité passe dessus."
 
@@ -1506,11 +1510,11 @@ msgstr ""
 "Le serveur o vous souhaitez vous connecter n'a pas l'air de parler le même "
 "langage que moi !"
 
-#: src/Batiments.h:501
+#: src/Batiments.h:533
 msgid "The shipyard is able to build ships."
 msgstr "Le chantier naval peut construire des bateaux."
 
-#: src/Batiments.h:447
+#: src/Batiments.h:479
 msgid "The tank factory can build basic vehicles."
 msgstr "L'usine de chars peut construire des véhicules."
 
@@ -1554,7 +1558,7 @@ msgstr ""
 msgid "There aren't any idling unity."
 msgstr "Il n'y a pas d'unité inactive."
 
-#: src/Batiments.cpp:227
+#: src/Batiments.cpp:306
 #, c-format
 msgid "There is %d missile"
 msgid_plural "There are %d missiles"
@@ -1675,7 +1679,7 @@ msgstr ""
 msgid "This server is running from %s"
 msgstr "Ce serveur a été lancé il y a %s"
 
-#: src/Batiments.cpp:223
+#: src/Batiments.cpp:302
 #, c-format
 msgid "This silo is ready in %d day(s)."
 msgstr "Ce silo sera prêt dans %d jour(s)"
@@ -1719,7 +1723,7 @@ msgstr ""
 msgid "Train"
 msgstr "Train"
 
-#: src/Batiments.h:88
+#: src/Batiments.h:120
 msgid "Trains are only able to move on rails."
 msgstr "Les trains ne peuvent se déplacer que sur les rails."
 
@@ -1727,7 +1731,7 @@ msgstr "Les trains ne peuvent se déplacer que sur les rails."
 msgid "Turn durat.: "
 msgstr "Durée tour : "
 
-#: src/Batiments.h:298
+#: src/Batiments.h:330
 msgid "Two times more income than the city center."
 msgstr "Rapporte deux fois plus d'argent que le centre ville"
 
@@ -1847,13 +1851,13 @@ msgstr ""
 "Impossible de sauvegarder la carte :\n"
 "\n"
 
-#: src/Batiments.h:113
+#: src/Batiments.h:145
 msgid "Under a forest, infantry units become invisible for enemies."
 msgstr ""
 "Quand de l'infanterie passe sous une forêt elle disparait aux yeux de "
 "l'ennemie."
 
-#: src/Batiments.h:146
+#: src/Batiments.h:178
 msgid "Underground mine"
 msgstr "Mine souterraine"
 
@@ -1869,7 +1873,7 @@ msgstr "Upgrade : "
 msgid "Use an amelioration of this building"
 msgstr "Utiliser une amélioration de ce bâtiment"
 
-#: src/Batiments.h:471
+#: src/Batiments.h:503
 msgid "Used to train men."
 msgstr "Entraîne de l'infanterie."
 
@@ -1882,14 +1886,14 @@ msgstr "Visibilité : %d cases"
 msgid "Vote"
 msgstr "Voter"
 
-#: src/Batiments.cpp:168
+#: src/Batiments.cpp:247
 #, c-format
 msgid "WARNING!! %s has got nuclear technologie, with his nuclear search"
 msgstr ""
 "ATTENTION!! %s vient de créer un centre de recherches nucléaire. Il possède "
 "maintenant la technologie nucléaire !!"
 
-#: src/Batiments.h:399
+#: src/Batiments.h:431
 msgid "Way more powerful than defense towers, C&C fans will recognize it."
 msgstr ""
 "Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
@@ -1960,6 +1964,11 @@ msgstr ""
 "Ceci est un logiciel libre, nous vous invitons à utiliser un BON système "
 "d'exploitation, tel que GNU/Linux."
 
+#: src/Batiments.h:88
+msgid "You can put a barbed wire to prevent the infantry from walking."
+msgstr ""
+"Vous pouvez poser des barbelés pour empêcher l'infanterie ennemie d'avancer."
+
 #: src/Login.cpp:349
 msgid ""
 "You can register an account to protect your nickname, and to save your "
@@ -2021,7 +2030,7 @@ msgstr ""
 "\n"
 "%s"
 
-#: src/Batiments.cpp:182
+#: src/Batiments.cpp:261
 msgid "You have got a new missile in your stock!"
 msgstr "Vous avez un nouveau missile en stock !"
 
@@ -2056,7 +2065,7 @@ msgstr ""
 "Vous ne pouvez pas sauvegarder la carte tant que vous ne l'avez pas "
 "configuré."
 
-#: src/Batiments.cpp:225
+#: src/Batiments.cpp:304
 msgid "You haven't got any missile."
 msgstr "Aucun missile disponible."
 
@@ -2104,7 +2113,11 @@ msgstr "Votre pseudonyme vous distinguera des autres joueurs."
 msgid "army"
 msgstr "l'armée"
 
-#: src/Batiments.h:470
+#: src/Batiments.h:89
+msgid "barbed wire"
+msgstr "les barbelés"
+
+#: src/Batiments.h:502
 msgid "barracks"
 msgstr "la caserne"
 
@@ -2112,15 +2125,15 @@ msgstr "la caserne"
 msgid "barracks+McPuke"
 msgstr "la caserne+McGerbale"
 
-#: src/Batiments.h:297
+#: src/Batiments.h:329
 msgid "business center"
 msgstr "le centre d'affaires"
 
-#: src/Batiments.h:325
+#: src/Batiments.h:357
 msgid "city center"
 msgstr "le centre ville"
 
-#: src/Batiments.h:358
+#: src/Batiments.h:390
 msgid "defense tower"
 msgstr "la tour de défense"
 
@@ -2128,7 +2141,7 @@ msgstr "la tour de défense"
 msgid "engineer"
 msgstr "l'ingénieur"
 
-#: src/Batiments.h:112
+#: src/Batiments.h:144
 msgid "forest"
 msgstr "la forêt"
 
@@ -2140,15 +2153,15 @@ msgstr "l'avion-cargo"
 msgid "japan tourist"
 msgstr "le touriste japonais"
 
-#: src/Batiments.h:219
+#: src/Batiments.h:251
 msgid "launching silo"
 msgstr "le silo nucléaire"
 
-#: src/Batiments.h:269
+#: src/Batiments.h:301
 msgid "megalopolis"
 msgstr "la mégalopole"
 
-#: src/Batiments.h:147
+#: src/Batiments.h:179
 msgid "mine"
 msgstr "la mine"
 
@@ -2160,15 +2173,15 @@ msgstr "le lance-missiles"
 msgid "neutral"
 msgstr "neutre"
 
-#: src/Batiments.h:182
+#: src/Batiments.h:214
 msgid "nuclear research center"
 msgstr "le centre de recherches nucléaires"
 
-#: src/Batiments.h:398
+#: src/Batiments.h:430
 msgid "obelisk"
 msgstr "l'obélisque"
 
-#: src/Batiments.h:89
+#: src/Batiments.h:121
 msgid "rail"
 msgstr "le rail"
 
@@ -2176,7 +2189,7 @@ msgstr "le rail"
 msgid "ship"
 msgstr "le bateau de transport"
 
-#: src/Batiments.h:497
+#: src/Batiments.h:529
 msgid "shipyard"
 msgstr "le chantier naval"
 
@@ -2184,7 +2197,7 @@ msgstr "le chantier naval"
 msgid "tank"
 msgstr "le char"
 
-#: src/Batiments.h:443
+#: src/Batiments.h:475
 msgid "tank factory"
 msgstr "l'usine de chars"
 

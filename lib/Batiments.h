@@ -38,6 +38,38 @@
 #include "Map.h"
 
 /********************************************************************************************
+ *                                        ECBarbedWire                                      *
+ ********************************************************************************************/
+/** This is a barbedwire. */
+class ECBBarbedWire : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBBarbedWire) {}
+
+	ENTITY_CONSTRUCTOR(ECBBarbedWire) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_BARBEDWIRE; }
+	virtual uint Cost() const { return 500; }
+	virtual uint InitNb() const { return 1;}
+	virtual uint Visibility() const { return 0; } /**< Il ne voit rien du tout */
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	/** BarbedWire is a building to prevent from constructing buildings here, and to be drawed at background. */
+	virtual bool IsBuilding() const { return true; }
+	virtual bool IsTerrain() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+};
+
+/********************************************************************************************
  *                                        ECBRail                                           *
  ********************************************************************************************/
 /** This is a rail for trains. */

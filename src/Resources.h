@@ -268,6 +268,22 @@ public:
 	R_RESOURCE(ECSpriteBase, Plane_Dos);
 	R_RESOURCE(ECSpriteBase, Plane_Deployed);
 	R_RESOURCE(ECSpriteBase, Plane_Reployed);
+	R_RESOURCE(ECImage,      BarbedWire_Icon);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Horiz);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Verti);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Aiguillage);
+	R_RESOURCE(ECSpriteBase, BarbedWire_TNord);
+	R_RESOURCE(ECSpriteBase, BarbedWire_TSud);
+	R_RESOURCE(ECSpriteBase, BarbedWire_TEst);
+	R_RESOURCE(ECSpriteBase, BarbedWire_TOuest);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Left);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Right);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Up);
+	R_RESOURCE(ECSpriteBase, BarbedWire_Down);
+	R_RESOURCE(ECSpriteBase, BarbedWire_NordOuest);
+	R_RESOURCE(ECSpriteBase, BarbedWire_NordEst);
+	R_RESOURCE(ECSpriteBase, BarbedWire_SudOuest);
+	R_RESOURCE(ECSpriteBase, BarbedWire_SudEst);
 };
 
 #undef R_RESOURCE

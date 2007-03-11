@@ -61,6 +61,38 @@ private:
 };
 
 /********************************************************************************************
+ *                                         ECBarbedWire                                     *
+ ********************************************************************************************/
+
+class ECBarbedWire : public ECBatiment, public ECBBarbedWire
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBarbedWire) {}
+
+	ENTITY_CONSTRUCTOR(ECBarbedWire), ECBatiment(Resources::BarbedWire_Horiz()) {}
+
+	virtual void Created();
+
+/* Methodes */
+public:
+
+	void Played();
+	void FindMyImage(bool make_others = true);
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("Barbed Wire"); }
+	virtual const char* Infos() const { return _("You can put a barbed wire to prevent the infantry from walking."); }
+	virtual const char* Qual() const { return _("barbed wire"); }
+	virtual const char* Description() const { return Infos(); }
+	virtual ECImage* Icon() const { return Resources::BarbedWire_Icon(); }
+	virtual bool CanBeSelected() const { return false; }
+};
+
+/********************************************************************************************
  *                                         ECRail                                           *
  ********************************************************************************************/
 

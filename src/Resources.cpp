@@ -233,6 +233,22 @@
 	R_RESOURCE(ECSpriteBase, Plane_Dos,         "units/plane/dos");
 	R_RESOURCE(ECSpriteBase, Plane_Deployed,    "units/plane/deployed");
 	R_RESOURCE(ECSpriteBase, Plane_Reployed,    "units/plane/reployed");
+	R_RESOURCE(ECImage,      BarbedWire_Icon,   PKGDATADIR_PICS "units/barbedwire_icon.png");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Horiz,        "units/barbedwire/horiz");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Verti,        "units/barbedwire/verti");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Aiguillage,   "units/barbedwire/aiguillage");
+	R_RESOURCE(ECSpriteBase, BarbedWire_TNord,        "units/barbedwire/Tnord");
+	R_RESOURCE(ECSpriteBase, BarbedWire_TSud,         "units/barbedwire/Tsud");
+	R_RESOURCE(ECSpriteBase, BarbedWire_TEst,         "units/barbedwire/Test");
+	R_RESOURCE(ECSpriteBase, BarbedWire_TOuest,       "units/barbedwire/Touest");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Left,         "units/barbedwire/left");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Right,        "units/barbedwire/right");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Up,           "units/barbedwire/up");
+	R_RESOURCE(ECSpriteBase, BarbedWire_Down,         "units/barbedwire/down");
+	R_RESOURCE(ECSpriteBase, BarbedWire_NordOuest,    "units/barbedwire/nordouest");
+	R_RESOURCE(ECSpriteBase, BarbedWire_NordEst,      "units/barbedwire/nordest");
+	R_RESOURCE(ECSpriteBase, BarbedWire_SudOuest,     "units/barbedwire/sudouest");
+	R_RESOURCE(ECSpriteBase, BarbedWire_SudEst,       "units/barbedwire/sudest");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects

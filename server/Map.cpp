@@ -361,6 +361,8 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 		{
 			uint killed = rand() % (nb/2+enemies);
 			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
+			if(!killed)
+				return false;
 			Shoot(*it, killed);
 		}
 

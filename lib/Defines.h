@@ -39,7 +39,7 @@
 /* Version protocolaire
  * ï¿œincrï¿œenter en cas de modification du protocole
  */
-#define APP_PVERSION	"12"
+#define APP_PVERSION	"13"
 #define APP_MSPROTO	"2"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
