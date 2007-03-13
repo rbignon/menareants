@@ -41,6 +41,7 @@ POTFILES = \
 		src/Login.cpp \
 		src/Channels.cpp \
 		src/Map.cpp \
+		src/Map.h \
 		src/Batiments.h \
 		src/Batiments.cpp \
 		src/Units.h \

@@ -86,6 +86,69 @@ void ECJouano::Invest(ECBEntity* entity)
 	SetZombie();
 }
 
+bool ECJouano::WantDeploy()
+{
+	if((EventType() & ARM_ATTAQ) || Deployed())
+		return false;
+
+	SetDeployed(true);
+
+	Debug(W_DEBUG, "Création d'un evenement ATTAQ");
+	ECEvent* event = new ECEvent(ARM_ATTAQ, this, DestCase());
+
+	Map()->AddEvent(event);
+	if(Owner())
+	{
+		if(Owner()->Client())
+			Channel()->SendArm(Owner()->Client(), this, ARM_DEPLOY);
+		Owner()->Events()->Add(event);
+	}
+	AddEvent(ARM_ATTAQ);
+	Events()->Add(event);
+
+	return false;
+}
+
+bool ECJouano::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	/* C'est une attaque contre moi (probablement sur la meme case). */
+	if(!(EventType() & ARM_ATTAQ))
+		return ECEntity::Attaq(entities, event);
+
+	ECBCase* c = event->Case();
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if(*it != this && (*it)->Case() != c && (*it)->IsInfantry())
+			Shoot(*it, 400-rand()%100);
+
+	SetDeployed(false);
+
+	return false;
+}
+
+std::vector<ECBEntity*> ECJouano::GetAttaquedEntities(ECBCase* c) const
+{
+	std::vector<ECBEntity*> entities;
+	ECBCase* cc = c->MoveLeft(Porty())->MoveUp(Porty());
+	for(uint i=0; i <= 2*Porty(); ++i)
+	{
+		uint j=0;
+		for(; j <= 2*Porty(); ++j)
+		{
+			std::vector<ECBEntity*> ents = cc->Entities()->List();
+			entities.insert(entities.end(), ents.begin(), ents.end());
+
+			if(cc->X() == cc->Map()->Width()-1)
+				break;
+			cc = cc->MoveRight();
+		}
+		if(cc->Y() == cc->Map()->Height()-1)
+			break;
+		cc = cc->MoveDown();
+		cc = cc->MoveLeft(j);
+	}
+	return entities;
+}
+
 /********************************************************************************************
  *                               ECMcDo                                                     *
  ********************************************************************************************/

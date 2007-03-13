@@ -306,6 +306,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				                          : h/2+1;     // Nombre impair d'humains donc la moitier + 1 doit voter pour
 				if(pl->Votes() >= r)
 				{ /* EXPULSION */
+					app.MSet("-r", pl->Nick());
 					sender->Channel()->RemovePlayer(pl, false);
 					sender->Channel()->CheckPinging();
 				}

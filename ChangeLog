@@ -1,3 +1,17 @@
+2007-03-12 Romain Bignon <progs@headfucking.net>
+
+	* Units.h (ECJouano): L'unité Jouano peut maintenant se deployer pour péter et faire des domages à l'infanterie environnante.
+
+	* meta-server/client.c: Une fois que le joueur a reçu un REJOIN, celui ci est supprimé.
+
+	* meta-server/database.c: On se souvient maintenant de l'heure de l'enregistrement et de la dernière partie.
+
+	* server/Channels.cpp: Lorsqu'un user se fait virer du jeu parce que tous les joueurs ont votés pour lui, on informe le meta-serveur de ça.
+
+	* src/data/sound/units/prout.ogg, src/Units.cpp: Utilisation de l'image du sol avec une onde, ainsi que du son d'un prout.
+
+	* server/InGame.cpp: Lorsqu'une unité voulait entrer dans un bateau qui avait été supprimée, elle avançait quand même vers le bord, et puis rien...
+
 2007-03-11 Romain Bignon <progs@headfucking.net>
 
 	* src/ShowMap.cpp: Maintenant quand le bouton "Schema" est pressé, il affiche les délimitations entre les territoires enemis.

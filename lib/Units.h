@@ -303,9 +303,10 @@ public:
 public:
 
 	virtual e_type Type() const { return E_JOUANO; }
-	virtual uint Cost() const { return 5000; }
+	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return 2; }
+	virtual uint Porty() const { return 2; }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
@@ -320,6 +321,7 @@ public:
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool WantDeploy() { return true; }
 	virtual bool AddUnits(uint) { return false; }
 };
 

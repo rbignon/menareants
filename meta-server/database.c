@@ -35,7 +35,8 @@ void strip_newline(char *string)
 }
 
 struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, int deaths, int killed,
-                            int creations, int score, int best_revenu, int victories)
+                            int creations, int score, int best_revenu, int victories, time_t reg_timestamp,
+                            time_t last_visit)
 {
 	struct RegUser *reguser = calloc(1, sizeof* reguser), *head = reguser_head;
 
@@ -51,6 +52,8 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 	reguser->score = score;
 	reguser->best_revenu = best_revenu;
 	reguser->victories = victories;
+	reguser->reg_timestamp = reg_timestamp;
+	reguser->last_visit = last_visit;
 
 	reguser->user = 0;
 
@@ -116,23 +119,47 @@ int load_users(const char* file)
 
 		strip_newline(parv[parc-1]);
 
-		// NICK <name> <pass> <nb_games> <deaths> <killed> <creations> <score> <meilleurs revenu> <victoires>
+		// NICK <name> <pass> <nb_games> <deaths> <killed> <creations> <score> <meilleurs revenu> <victoires> <reg_timestamp> <last_game>
 		if(!strcmp(buf, "VERSION"))
 			version = atoi(parv[1]);
+		else if(!version)
+			printf("WARNING[config]: Skip %s line, there isn't any version\n", buf);
 		else if(!strcmp(buf, "NICK"))
 		{
+			/* parv[1] = name
+			 * parv[2] = passws
+			 * parv[3] = nb_games
+			 * parv[4] = deaths
+			 * parv[5] = killed
+			 * parv[6] = creations
+			 * parv[7] = score
+			 * parv[8] = best income
+			 * parv[9] = victoires
+			 * parv[10]= reg_timestamp
+			 * parv[11]= last_game
+			 */
 			int victories = 0;
-			if(parc < 9)
+			time_t reg_timestamp = 0, last_game = 0;
+			if(parc < 9 || (version >= 3 && parc < 11))
 			{
-				printf("WARNING: Unable to load %s reguser\n", parc > 1 ? parv[1] : "unknown");
+				printf("WARNING[config]: Unable to load %s reguser\n", parc > 1 ? parv[1] : "unknown");
 				continue;
 			}
 			if(version >= 2)
 				victories = atoi(parv[9]);
 			else
 				victories = atoi(parv[3]);
-			add_reguser(parv[1], parv[2], atoi(parv[3]), atoi(parv[4]), atoi(parv[5]), atoi(parv[6]), atoi(parv[7]), atoi(parv[8]), victories);
+
+			if(version >= 3)
+			{
+				reg_timestamp = atoi(parv[10]);
+				last_game = atoi(parv[11]);
+			}
+			add_reguser(parv[1], parv[2], atoi(parv[3]), atoi(parv[4]), atoi(parv[5]), atoi(parv[6]), atoi(parv[7]), atoi(parv[8]),
+			            victories, reg_timestamp, last_game);
 		}
+		else
+			printf("WARNING[config]: Unable to recognize %s line\n", buf);
 	}
 	fclose(fp);
 	return 1;
@@ -149,8 +176,9 @@ int write_users(const char* file)
 	fprintf(fp, "VERSION %d\n", DBVERSION);
 
 	for(; reg; reg = reg->next)
-		fprintf(fp, "NICK %s %s %d %d %d %d %d %d %d\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
-		                                              reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories);
+		fprintf(fp, "NICK %s %s %d %d %d %d %d %d %d %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
+		                                                         reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories,
+		                                                         reg->reg_timestamp, reg->last_visit);
 
 	fclose(fp);
 

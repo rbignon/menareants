@@ -38,6 +38,7 @@ class ECPlayer;
 class TClient;
 class ECEvent;
 class ECase;
+class ECMap;
 
 /********************************************************************************************
  *                                 ECEntity                                                 *
@@ -116,6 +117,8 @@ public:
 	int Tag;
 
 	EChannel* Channel() const;
+
+	ECMap* Map() const;
 
 	ECPlayer* Owner() const;
 

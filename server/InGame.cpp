@@ -372,6 +372,23 @@ bool EChannel::ShowAnim(ECEvent* event)
 					break;
 				}
 				ECEntity* entity = event->Entity();
+				if(event->Flags() == ARM_CONTAIN)
+				{
+					EContainer* container;
+					if(event->Entities()->Empty() || !(container = dynamic_cast<EContainer*>(event->Entities()->First())))
+					{
+						Debug(W_WARNING, "ARM CONTAIN: There isn't any container in event's entities !");
+						break;
+					}
+					/* Si le conteneur est un zombie, c'est qu'il a été supprimé et donc on ne pénètre pas à l'interieur */
+					if(container->IsZombie())
+					{
+						event->Move()->Return(entity->Case());
+						entity->Move()->Return(entity->Case());
+						ret = false;
+						break;
+					}
+				}
 				if(event->Flags() == ARM_UNCONTAIN)
 				{
 					EContainer* container = dynamic_cast<EContainer*>(entity->Parent());

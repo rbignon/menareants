@@ -140,9 +140,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
 	virtual void Union(ECEntity*) { return; }
 
 	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);

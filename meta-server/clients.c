@@ -64,6 +64,7 @@ static void list_servers(struct Client* cl)
 				if(s->rejoins[i][0] != 0 && !strcmp(s->rejoins[i], cl->user->name))
 				{
 					sendrpl(cl, MSG_REJOIN, "%s:%d", s->client->ip, s->port ? s->port : SERV_DEFPORT);
+					s->rejoins[i][0] = 0;
 					break;
 				}
 		}
@@ -113,12 +114,15 @@ static int show_scores(struct Client* cl)
 
 	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
 		max_show = 10;
-	else if(nb_tregs < 50)
+
+	if(nb_tregs < max_show)
 		max_show = nb_tregs;
 
 	for(i=0; i < max_show; ++i)
-		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d %d", list[i]->name, list[i]->deaths, list[i]->killed,
-		                                            list[i]->creations, list[i]->score, list[i]->best_revenu, list[i]->nb_games, list[i]->victories);
+		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d %d %ld %ld", list[i]->name, list[i]->deaths, list[i]->killed,
+		                                                          list[i]->creations, list[i]->score, list[i]->best_revenu,
+		                                                          list[i]->nb_games, list[i]->victories,
+		                                                          list[i]->reg_timestamp, list[i]->last_visit);
 
 	return 0;
 
@@ -151,7 +155,7 @@ int m_reg_nick (struct Client* cl, int parc, char** parv)
 	if(parc < 2)
 		return 0;
 
-	reg = add_reguser(cl->user->name, crypt(parv[1], PASS_HASH), 0, 0, 0, 0, 0, 0, 0);
+	reg = add_reguser(cl->user->name, crypt(parv[1], PASS_HASH), 0, 0, 0, 0, 0, 0, 0, Now, 0);
 
 	cl->flags = (CL_USER|CL_LOGGED);
 	cl->user->reguser = reg;

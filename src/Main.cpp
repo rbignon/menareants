@@ -202,8 +202,12 @@ int MenAreAntsApp::main(int argc, char **argv)
 
 		loading_image->Draw();
 
+		video->Flip();
+
 		Cursor.SetWindow(video->Window());
 		Cursor.Init();
+
+		Resources::Init();
 
 		EC_Client::Init();
 		mutex = EC_Client::Mutex();

@@ -85,6 +85,7 @@ public:
 	Resources();
 	~Resources();
 	static void Unload();
+	static void Init();
 
 	/* Ne pas oublier de rajouter dans Resources.cpp */
 	R_RESOURCE(Sound,        DingDong);
@@ -95,6 +96,7 @@ public:
 	R_RESOURCE(Sound,        SoundMitraillette);
 	R_RESOURCE(Sound,        SoundObelisque);
 	R_RESOURCE(Sound,        SoundMcDo);
+	R_RESOURCE(Sound,        SoundProut);
 
 	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);

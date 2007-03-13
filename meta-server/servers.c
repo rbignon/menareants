@@ -75,7 +75,10 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 				break;
 			case 'g':
 				if(add)
+				{
+					reg->last_visit = Now;
 					reg->nb_games++;
+				}
 				else
 					reg->nb_games--;
 				break;

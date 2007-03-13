@@ -25,6 +25,7 @@
 #include "Defines.h"
 #include "Sound.h"
 #include "tools/Images.h"
+#include "Units.h"
 
 #define R_CLEARTYPE(type) for(std::vector<type*>::iterator it = type##_objects.begin(); it != type##_objects.end(); ++it) \
                           	delete *it; \
@@ -59,6 +60,7 @@
 	R_RESOURCE(Sound,        SoundMitraillette,"bruits/machinegun.wav");
 	R_RESOURCE(Sound,        SoundObelisque,   "bruits/laserfire.wav");
 	R_RESOURCE(Sound,        SoundMcDo,        "units/Gerbale.ogg");
+	R_RESOURCE(Sound,        SoundProut,       "units/prout.ogg");
 
 /* IMAGES*/
 	R_RESOURCE(ECSpriteBase, Intro,            "intro");
@@ -264,6 +266,11 @@ Resources::Resources()
 Resources::~Resources()
 {
 
+}
+
+void Resources::Init()
+{
+	ECJouano::Anim.Init();
 }
 
 void Resources::Unload()

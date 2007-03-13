@@ -305,6 +305,11 @@ ECPlayer* ECEntity::Owner() const
 	return dynamic_cast<ECPlayer*>(ECBEntity::Owner());
 }
 
+ECMap* ECEntity::Map() const
+{
+	return dynamic_cast<ECMap*>(ECBEntity::Map());
+}
+
 EChannel* ECEntity::Channel() const
 {
 	assert(Map());

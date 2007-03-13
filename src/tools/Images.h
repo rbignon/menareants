@@ -157,7 +157,7 @@ public:
 
 	bool Alpha() const { return alpha; }
 
-	int NumFrames() const { return surfaces.size(); }
+	uint NumFrames() const { return surfaces.size(); }
 
 /* Variables publiques */
 public:

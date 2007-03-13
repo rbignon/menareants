@@ -135,7 +135,7 @@ public:
 
 	virtual std::string SpecialInfo() { return ""; }
 
-	virtual std::string DeployButton() { return Deployed() ? "Replier" : "Deployer"; }
+	virtual std::string DeployButton() { return Deployed() ? _("Fold up") : _("Deploy"); }
 
 	virtual void Draw();
 
@@ -255,7 +255,7 @@ public:
 /* Methodes */
 public:
 
-	virtual const char* Name() const { return "Terre"; }
+	virtual const char* Name() const { return _("Ground"); }
 };
 
 /** This class is a derived class from ECBCase whose is sea */
@@ -268,7 +268,7 @@ public:
 /* Methodes */
 public:
 
-	virtual const char* Name() const { return "Mer"; }
+	virtual const char* Name() const { return _("Water"); }
 };
 
 /** This class is a derived class from ECBCase whose is a bridge */
@@ -281,7 +281,7 @@ public:
 /* Methodes */
 public:
 
-	virtual const char* Name() const { return "Pont"; }
+	virtual const char* Name() const { return _("Bridge"); }
 };
 
 /** This class is a derived class from ECBCase whose is a montain */
@@ -294,7 +294,7 @@ public:
 /* Methodes */
 public:
 
-	virtual const char* Name() const { return "Montagne"; }
+	virtual const char* Name() const { return _("Montain"); }
 };
 
 /********************************************************************************************

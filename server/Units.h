@@ -150,9 +150,13 @@ public:
 /* Methodes */
 public:
 
+	virtual bool WantDeploy();
+
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
-	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event) { return false; }
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 	virtual void Invest(ECBEntity* e);
+
+	std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) const;
 };
 
 /********************************************************************************************

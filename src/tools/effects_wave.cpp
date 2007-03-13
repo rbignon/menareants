@@ -1,23 +1,23 @@
-/******************************************************************************
- *  Wormux is a convivial mass murder game.
- *  Copyright (C) 2001-2004 Lawrence Azzoug.
+/* src/tools/effects_wave.cpp - Wave effect
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * Copyright (C) 2007 Laurent Defert
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
- ******************************************************************************
- *  Graphic effects on sprite
- *****************************************************************************/
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * $Id$
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -102,6 +102,7 @@ ECSpriteBase* WaveEffect::Wave3dSurface(ECImage &a, unsigned int _nbr_frames, un
   ECSpriteBase* anim = new ECSpriteBase();
   anim->mW = size_x;
   anim->mH = size_y;
+  anim->animation = true;
   for(unsigned int frame = 0; frame < nbr_frames ; frame++)
   {
     float len_total = Length(1.0, frame);
@@ -141,9 +142,9 @@ ECSpriteBase* WaveEffect::Wave3dSurface(ECImage &a, unsigned int _nbr_frames, un
 	float h = Height(d, frame);
 	if(h < 0.5)
 	{
-	  col_buf[1] *= (h + 0.5);
-	  col_buf[2] *= (h + 0.5);
-	  col_buf[3] *= (h + 0.5);
+	  col_buf[1] *= (unsigned char)(h + 0.5);
+	  col_buf[2] *= (unsigned char)(h + 0.5);
+	  col_buf[3] *= (unsigned char)(h + 0.5);
 	}
       }
       memcpy(buf, &col, 4);

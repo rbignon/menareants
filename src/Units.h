@@ -297,17 +297,43 @@ public:
 		PutImage(I_Left, Resources::Jouano_Face());
 	}
 
+	struct ECAnim
+	{
+		ECSpriteBase* anim;
+
+		ECAnim() : anim(0) {}
+
+		void Init();
+
+		~ECAnim()
+		{
+			delete anim;
+		}
+	};
+
+	static ECAnim Anim;
+
 /* Infos */
 public:
 
 	virtual const char* Name() const { return _("Jouano"); }
 	virtual const char* Qual() const { return _("Jouano"); }
-	virtual const char* Infos() const { return _("Bad dressed with a beer belly, he's able to destroy an McPuke installed on your barrack."); }
+	virtual const char* Infos() const { return _("Bad dressed with a beer belly, he's able to destroy an McPuke installed on your barrack and to fart."); }
 	virtual const char* Description() const
 	{
-		return _("Send your fat Jouano on one of your McPuke occupied barrack, he'll eat everything and ruin it.");
+		return _("Send your fat Jouano on one of your McPuke occupied barrack, he'll eat everything and ruin it.\n"
+		         "\n"
+		         "You can fart on all enemy infantry...");
 	}
 	virtual ECImage* Icon() const { return Resources::Jouano_Icon(); }
+	virtual std::string DeployButton() { return Deployed() ? _("Fart") : _("Fart"); }
+	virtual std::string SpecialInfo();
+
+	virtual bool BeforeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
+
+	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 };
 
 /********************************************************************************************

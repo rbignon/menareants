@@ -24,7 +24,80 @@
 #include "gui/ColorEdit.h"
 #include "Channels.h"
 #include "Sound.h"
+#include "tools/effects_wave.h"
 #include <SDL_gfxPrimitives.h>
+
+/********************************************************************************************
+ *                                ECJouano                                                  *
+ ********************************************************************************************/
+
+ECJouano::ECAnim ECJouano::Anim;
+
+void ECJouano::ECAnim::Init()
+{
+	if(anim) return;
+	WaveEffect e;
+	ECImage f(Point2i(Resources::CaseTerreDead()->First()->GetWidth(), Resources::CaseTerreDead()->First()->GetHeight()), SDL_SWSURFACE);
+	f.Blit(Resources::CaseTerreDead()->First());
+	anim = e.Wave3dSurface(f, 9, 900, 7.0);
+}
+
+std::string ECJouano::SpecialInfo()
+{
+	if(!Deployed() && (EventType() & ARM_DEPLOY))
+		return _("Is going to fart");
+
+	return "";
+}
+
+bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+		{
+			if(c != Case()) break;
+
+			Case()->SetImage(Anim.anim);
+			Case()->Image()->SetAnim(true);
+			Case()->Image()->SetRepeat(false);
+			Resources::SoundProut()->Play(false);
+			while(Case()->Image()->Anim()) SDL_Delay(20);
+			Case()->SetImage(Resources::CaseTerreDead());
+
+			return true;
+		}
+		default:
+			return ECUnit::BeforeEvent(entities,c, me);
+	}
+	return true;
+}
+
+bool ECJouano::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+		{
+			return true;
+		}
+		default:
+			return ECUnit::MakeEvent(entities,c, me);
+	}
+	return true;
+}
+
+bool ECJouano::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	switch(event_type)
+	{
+		case ARM_ATTAQ:
+			return true;
+		default:
+			return ECUnit::AfterEvent(entities,c, me);
+	}
+	return true;
+}
 
 /********************************************************************************************
  *                                ECMcDo                                                    *
@@ -110,7 +183,7 @@ std::string ECPlane::SpecialInfo()
 {
 	std::string s = !Deployed() ? _("Flying") : _("On ground");
 
-	if(Owner()->IsMe())
+	if(Owner() && Owner()->IsMe())
 	{
 		if(Containing())
 		{
@@ -133,7 +206,7 @@ std::string ECPlane::SpecialInfo()
 std::string ECTrain::SpecialInfo()
 {
 	if(Containing()) return _(" - Contain:");
-	else if(!Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
+	else if(Owner() && Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
 	else return "";
 }
 
@@ -143,7 +216,7 @@ std::string ECTrain::SpecialInfo()
 std::string ECBoat::SpecialInfo()
 {
 	if(Containing()) return _(" - Contain:");
-	else if(!Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
+	else if(Owner() && Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
 	else return "";
 }
 
@@ -255,19 +328,19 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	switch(m)
 	{
 		case ECMove::Right:
-			if(Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
 				ChangeCase(acase->MoveRight()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Left:
-			if(Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
 				ChangeCase(acase->MoveLeft()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Down:
-			if(Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
 				ChangeCase(acase->MoveDown()), move.RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Up:
-			if(Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
 				ChangeCase(acase->MoveUp()), move.RemoveFirst(), changed_case = true;
 			break;
 	}

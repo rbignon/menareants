@@ -351,13 +351,13 @@ void ECSprite::Zoom(double zoomx, double zoomy, bool smooth)
  ****************************************************************************************/
 
 ECSpriteBase::ECSpriteBase()
-	: mBuilt(0), mW(0), mH(0), alpha(false), animation(false)
+	: mBuilt(0), mW(0), mH(0), animation(false), alpha(false)
 {
 
 }
 
 ECSpriteBase::ECSpriteBase(const char *dir)
-	: mBuilt(0), mW(0), mH(0), alpha(false), animation(false)
+	: mBuilt(0), mW(0), mH(0), animation(false), alpha(false)
 {
 	init(dir);
 }
