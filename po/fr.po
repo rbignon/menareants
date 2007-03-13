@@ -6,7 +6,6 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: progs@coderz.info\n"
-"POT-Creation-Date: 2007-03-13 02:10+0100\n"
 "PO-Revision-Date: 2007-03-13 02:12+0100\n"
 "Last-Translator: Romain Bignon <progs@headfucking.net>\n"
 "Language-Team:  <en@li.org>\n"
@@ -29,12 +28,12 @@ msgstr "  -> Accéléré à %d cases par tours"
 msgid "  -> Slow downs to %d cells by turn"
 msgstr "  -> Ralentis à %d cases par tours"
 
-#: src/Units.cpp:209 src/Units.cpp:223 src/Units.cpp:233
+#: src/Units.cpp:195 src/Units.cpp:209 src/Units.cpp:219
 #, c-format
 msgid " - Capacity: %d"
 msgstr " - Capacité : %d"
 
-#: src/Units.cpp:207 src/Units.cpp:212 src/Units.cpp:222 src/Units.cpp:232
+#: src/Units.cpp:193 src/Units.cpp:198 src/Units.cpp:208 src/Units.cpp:218
 msgid " - Contain:"
 msgstr " - Contient :"
 
@@ -183,12 +182,12 @@ msgstr "%s appartient maintenant à %s"
 msgid "%s is ready."
 msgstr "%s est prêt."
 
-#: src/Units.cpp:169
+#: src/Units.cpp:155
 #, c-format
 msgid "%s paies $1000 for orders to %s"
 msgstr "%s paye 1000 $ à %s pour les consomations."
 
-#: src/Units.cpp:163
+#: src/Units.cpp:149
 #, c-format
 msgid "%s paies $1000 for orders to you"
 msgstr "%s vous paye 1000 $ pour les consomations."
@@ -666,7 +665,8 @@ msgstr "Entrez le nom de la partie à créer"
 
 #: src/InGame.cpp:1065
 msgid "Enter nickname of player you want to give this country to"
-msgstr "Entrez le pseudonyme de la personne à qui vous souhaitez donner ce territoire"
+msgstr ""
+"Entrez le pseudonyme de la personne à qui vous souhaitez donner ce territoire"
 
 #: src/Login.cpp:915
 msgid "Enter user's nickname you want to kill:"
@@ -692,7 +692,7 @@ msgstr "Inactifs"
 msgid "Five times more income than the city center."
 msgstr "Rapporte cinq fois plus que le centre ville"
 
-#: src/Units.cpp:198
+#: src/Units.cpp:184
 msgid "Flying"
 msgstr "En vol"
 
@@ -712,7 +712,7 @@ msgstr "France"
 msgid "France of Dominique de Villepin."
 msgstr "La France de Dominique de Villepin."
 
-#: src/Units.cpp:161
+#: src/Units.cpp:147
 #, c-format
 msgid "Free orders of McPuke for %s"
 msgstr "Consomations gratuites de McGerbale pour %s"
@@ -871,12 +871,14 @@ msgstr "Rejoindre"
 msgid "Jouano"
 msgstr "Jouano"
 
-#: src/Units.cpp:157
+#: src/Units.cpp:143
 #, c-format
 msgid "Jouano is eating all Big Mac ! He will finish it in %d day"
 msgid_plural "Jouano is eating all Big Mac ! He will finish it in %d days"
-msgstr[0] "Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jour"
-msgstr[1] "Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jours"
+msgstr[0] ""
+"Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jour"
+msgstr[1] ""
+"Jouano est en train de bouffer tous les Big Mac ! Il aura fini dans %d jours"
 
 #: src/Login.cpp:951
 msgid "Kill an user"
@@ -1062,7 +1064,7 @@ msgstr "Nom : "
 msgid "Neutral"
 msgstr "Neutre"
 
-#: src/Units.cpp:165
+#: src/Units.cpp:151
 #, c-format
 msgid "Neutral paies $1000 for orders to %s"
 msgstr "Neutre paye 1000 $ à %s pour les consomations."
@@ -1121,7 +1123,7 @@ msgstr "Centre de recherches nucléaires"
 msgid "OK"
 msgstr "OK"
 
-#: src/Units.cpp:198
+#: src/Units.cpp:184
 msgid "On ground"
 msgstr "Au sol"
 
@@ -1270,7 +1272,8 @@ msgid "Region of Noisy and its caves."
 msgstr "La contrée de Noisy et ses cavernes."
 
 #: src/Login.cpp:532
-msgid "Register your nickname to save your stats and to protect it from other users"
+msgid ""
+"Register your nickname to save your stats and to protect it from other users"
 msgstr ""
 "Enregistrez votre pseudo pour le protéger et pour sauvegarder vos "
 "statistiques"
@@ -1321,11 +1324,13 @@ msgstr ""
 "Envoyez votre gros Jouano sur une de vos casernes investies d'un Mc Gerbale, "
 "il mangera tout et fera exploser celui-ci.\n"
 "\n"
-"Vous pouvez également le faire péter pour détruire l'infanterie (amie ou ennemie) dans un carré de 3x3 cases autour de Jouano..."
+"Vous pouvez également le faire péter pour détruire l'infanterie (amie ou "
+"ennemie) dans un carré de 3x3 cases autour de Jouano..."
 
 #: src/Login.cpp:97
 msgid "Server can't rehash configuration. Please verify it."
-msgstr "Le serveur ne peut pas recharger la configuration. Veuillez la vérifier."
+msgstr ""
+"Le serveur ne peut pas recharger la configuration. Veuillez la vérifier."
 
 #: src/Login.cpp:88
 msgid "Server doesn't understand a command we have sended"
@@ -1543,7 +1548,8 @@ msgstr "L'usine de chars peut construire des véhicules."
 
 #: src/Login.cpp:320
 #, c-format
-msgid "There are %d game(s) on %d servers, with %d in game and %d in preparation"
+msgid ""
+"There are %d game(s) on %d servers, with %d in game and %d in preparation"
 msgstr ""
 "Il y a %d parties sur %d serveurs, dont %d en cours de jeu et %d en "
 "préparation"
@@ -1727,7 +1733,8 @@ msgstr ""
 "et cliquer sur une case frontalière à celle où se trouve le conteneur."
 
 #: src/InGame.cpp:2122
-msgid "To make an alliance with a player, click on the box associated on the left"
+msgid ""
+"To make an alliance with a player, click on the box associated on the left"
 msgstr ""
 "Pour créer une alliance avec un joueur, cliquez sur la case associée sur la "
 "gauche"
@@ -1920,7 +1927,8 @@ msgstr "Mer"
 
 #: src/Batiments.h:431
 msgid "Way more powerful than defense towers, C&C fans will recognize it."
-msgstr "Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
+msgstr ""
+"Bien plus puissante que la tour de défense, les fans de C&C la reconnaîtront."
 
 #: src/Login.cpp:625
 #, c-format
@@ -1990,7 +1998,8 @@ msgstr ""
 
 #: src/Batiments.h:88
 msgid "You can put a barbed wire to prevent the infantry from walking."
-msgstr "Vous pouvez poser des barbelés pour empêcher l'infanterie ennemie d'avancer."
+msgstr ""
+"Vous pouvez poser des barbelés pour empêcher l'infanterie ennemie d'avancer."
 
 #: src/Login.cpp:349
 msgid ""
@@ -2092,12 +2101,12 @@ msgstr ""
 msgid "You haven't got any missile."
 msgstr "Aucun missile disponible."
 
-#: src/Units.cpp:205
+#: src/Units.cpp:191
 #, c-format
 msgid "You pay $%d each turn"
 msgstr "Vous payez %d $ par tours."
 
-#: src/Units.cpp:167
+#: src/Units.cpp:153
 #, c-format
 msgid "You pay $1000 for orders to %s"
 msgstr "1000 $ payés à %s pour les consomations."
@@ -2227,4 +2236,3 @@ msgstr "l'usine de chars"
 #: src/Units.h:168
 msgid "train"
 msgstr "le train de transport"
-

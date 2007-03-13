@@ -142,9 +142,9 @@ ECSpriteBase* WaveEffect::Wave3dSurface(ECImage &a, unsigned int _nbr_frames, un
 	float h = Height(d, frame);
 	if(h < 0.5)
 	{
-	  col_buf[1] *= (unsigned char)(h + 0.5);
-	  col_buf[2] *= (unsigned char)(h + 0.5);
-	  col_buf[3] *= (unsigned char)(h + 0.5);
+	  col_buf[1] *= (h + 0.5);
+	  col_buf[2] *= (h + 0.5);
+	  col_buf[3] *= (h + 0.5);
 	}
       }
       memcpy(buf, &col, 4);
