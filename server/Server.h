@@ -128,6 +128,9 @@ public:
 	virtual void UnLock() {}
 	virtual bool Locked() const { return false; }
 
+	void SetCookie(std::string c) { cookie = c; }
+	std::string Cookie() const { return cookie; }
+
 /* Variables privées */
 private:
 	std::string nick;
@@ -141,6 +144,7 @@ private:
 #define ECD_ADMIN	0x10
 	std::string ip;
 	ECPlayer *pl;
+	std::string cookie;
 };
 
 /** TClient class.
@@ -169,13 +173,13 @@ public:
 
 	int flush();
 
-
 	/** Close connexion with client and send a formated message. */
 	int exit(const ECMessage&, ECArgs = ECArgs());
 	int exit(const ECError&, ECArgs = ECArgs());
 
 /* Attributs */
 public:
+
 
 /* Variables privées */
 private:

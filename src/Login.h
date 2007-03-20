@@ -46,7 +46,7 @@ public:
 	TLabel*      BestKills;
 	TLabel*      Headers;
 	TListBox*    ListBox;
-	TButtonText* RetourButton;
+	TButton*     RetourButton;
 
 	void OnClic(const Point2i& position, int button, bool& stop);
 
@@ -67,8 +67,8 @@ public:
 	TMemo*       Motd;
 	TButtonText* CreerButton;
 	TButtonText* JoinButton;
-	TButtonText* RefreshButton;
-	TButtonText* DisconnectButton;
+	TButton*     RefreshButton;
+	TButton*     DisconnectButton;
 	TButtonText* RehashButton;
 	TButtonText* KillButton;
 	TLabel*      Welcome;
@@ -107,13 +107,13 @@ public:
 public:
 
 	TListBox*    ServerList;
-	TButtonText* RetourButton;
-	TButtonText* RefreshButton;
-	TButtonText* ConnectButton;
+	TButton*     RetourButton;
+	TButton*     RefreshButton;
+	TButton*     ConnectButton;
 	TButtonText* ConnectToButton;
-	TButtonText* RegisterButton;
-	TButtonText* StatsButton;
-	TButtonText* AccountButton;
+	TButton*     RegisterButton;
+	TButton*     StatsButton;
+	TButton*     AccountButton;
 	TButton*     MissionButton;
 	TButton*     EscarmoucheButton;
 	TLabel*      Label1;

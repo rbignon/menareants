@@ -140,6 +140,7 @@ Sommaire:
          +Q                  :attente d'un joueur qui a perdu la connexion (PINGING)
          +E                  :fin du jeu (SCORING)
          +t <temps>          :temps par tours maximum pour jouer
+         +s                  :compte les scores pour le meta-serveur
         Mode pour un user:
          +c <couleur>        :l'user se définie sa couleur
          +p <position>       :l'user définie sa position
@@ -257,7 +258,7 @@ Sommaire:
      c) Meta-server <-> Client
 
         > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
-        < IAM <name> <prog> <version>                      :Donne son nom, son prog et sa version
+        < IAM <name> <prog> <version> [cookie|pass]        :Donne son nom, son prog et sa version
         > STAT <nbtchan> <nbtusers> <nbregs>               :Statistiques
         > LSP <ip:port> <nom> <+/-> <nbjoueurs>            :liste un serveur
                      <nbmax> <nbgames> <maxgames> <proto>
@@ -269,5 +270,6 @@ Sommaire:
 
         > ERR REGNICK                                      :le pseudo est enregistré
         < LOGIN <pass>                                     :login
+
         < REGNICK                                          :s'enregistrer
         > ERR LOGGED                                       :loggé

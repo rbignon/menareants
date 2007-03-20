@@ -62,6 +62,11 @@ meta-server {
 
 	# Port du meta-serveur
 	port = 5460
+
+	# Mot de passe du meta-serveur pour votre serveur pour être identifié
+	# et pouvoir modifier les statistiques des utilisateurs.
+	# Ceci reconnaît votre serveur comme un serveur "officiel".
+	# password = abcd
 }
 
 # «games»

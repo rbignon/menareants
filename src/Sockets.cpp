@@ -89,6 +89,18 @@ int EC_Client::sendbuf(std::string buf)
 	return 0;
 }
 
+bool EC_Client::Request(const ECMessage& cmd, ECArgs args)
+{
+	request.clear();
+	request += static_cast<char>(cmd);
+	if(!args.Empty())
+		request += " " + args.String();
+
+	Connect(hostname.c_str(), port);
+
+	return true;
+}
+
 /* [:parv[0]] CMD [parv[1] [parv[2] ... [parv[parv.size()-1]]]] */
 void EC_Client::parse_message(std::string buf)
 {
@@ -340,6 +352,8 @@ void EC_Client::Disconnect()
 #endif
 		FD_CLR(sock, &global_fd_set);
 		sock = 0;
+
+		Debug(W_DEBUG, "Disconnected from %s", hostname.c_str());
 	}
 
 	connected = false;

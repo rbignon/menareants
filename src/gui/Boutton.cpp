@@ -60,14 +60,16 @@ void TButton::Draw (const Point2i& mouse)
 
 void TButton::DrawImage (const Point2i& mouse)
 {
-  if(!image) return;
+	if(!image) return;
 
-  unsigned int frame = Test(mouse) ? 1 : 0;
+	unsigned int frame = Test(mouse) ? 1 : 0;
 
-  image->SetFrame(frame);
-  image->set(X(), Y());
-  image->draw();
+	if(image->NbFrames() > 2 && !Enabled())
+		frame = 2;
 
+	image->SetFrame(frame);
+	image->set(X(), Y());
+	image->draw();
 }
 
 void TButton::SetImage (ECSprite *_image)

@@ -121,7 +121,10 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			MetaServer.SetWantDisconnect();
 			ErrMessage = _("Incorrect password.");
 			if(ListServerForm)
+			{
+				ListServerForm->SetWantQuit();
 				ListServerForm->login = false;
+			}
 			break;
 	}
 	if(!ErrMessage.empty())
@@ -156,14 +159,17 @@ void MenAreAntsApp::RefreshList()
 	ListServerForm->RefreshButton->SetEnabled(false);
 	ListServerForm->EscarmoucheButton->SetEnabled(false);
 	ListServerForm->MissionButton->SetEnabled(false);
+	ListServerForm->StatsButton->SetEnabled(false);
+	ListServerForm->RegisterButton->SetEnabled(false);
+	ListServerForm->AccountButton->SetEnabled(false);
 	ListServerForm->ServerList->ClearItems();
 
-	if(MetaServer.IsConnected())
-	{
-		MetaServer.sendrpl(MSG_SERVLIST);
-		return;
-	}
+	MetaServer.Request(MSG_SERVLIST);
+}
 
+void MenAreAntsApp::ServerList()
+{
+	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
 
 	EC_Client* client = &MetaServer;
 
@@ -179,32 +185,14 @@ void MenAreAntsApp::RefreshList()
 	client->AddCommand(new ERRORCommand(MSG_ERROR,		0,	1));
 	client->AddCommand(new SCOREmsCommand(MSG_SCORE,	0,	6));
 
-	client->Connect(Config::GetInstance()->hostname.c_str(), Config::GetInstance()->port);
-
-	WAIT_EVENT_T(client->IsConnected() || client->IsLogging() || client->Error(), i, 5);
-
-	if(!client->IsConnected() && !client->IsLogging())
-	{
-		std::string msg;
-
-		client->SetWantDisconnect();
-
-		msg = _("Unable to connect to meta-server:\n\n") + client->CantConnect();
-
-		TMessageBox(msg, BT_OK, ListServerForm).Show();
-
-		ListServerForm->SetWantQuit();
-		return;
-	}
-}
-
-void MenAreAntsApp::ServerList()
-{
-	ListServerForm = new TListServerForm(Video::GetInstance()->Window());
+	client->SetHostName(Config::GetInstance()->hostname);
+	client->SetPort(Config::GetInstance()->port);
 
 	RefreshList();
 
 	ListServerForm->Run();
+
+	client->SetWantDisconnect();
 
 	MyFree(ListServerForm);
 }
@@ -219,7 +207,13 @@ void MenAreAntsApp::ServerList()
  */
 int HELmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_MSPROTO));
+	ECArgs args = Config::GetInstance()->nick;
+	args += CLIENT_SMALLNAME;
+	args += APP_MSPROTO;
+	if(Config::GetInstance()->cookie.empty() == false)
+		args += Config::GetInstance()->cookie;
+
+	me->sendrpl(MSG_IAM, args);
 	return 0;
 }
 
@@ -309,6 +303,16 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 #else
 	close(sock);
 #endif
+
+	if(StrToTyp<int>(parv[9]) > atoi(APP_PVERSION) && parv[2].find(".DEV.") == std::string::npos)
+#ifdef WIN32
+		TForm::Message = StringF(_("There is a more recent version of this game. Download it on %s"), APP_SITE);
+#else
+		TForm::Message = StringF(_("There is a more recent version of this game.\n\n"
+		                           "If you have sources, type \"make update && make install\"\n"
+		                           "If you have a package, update your distribution or download new version at %s"), APP_SITE);
+#endif
+
 	return 0;
 }
 
@@ -324,6 +328,13 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	ListServerForm->RefreshButton->SetEnabled();
 	ListServerForm->EscarmoucheButton->SetEnabled();
 	ListServerForm->MissionButton->SetEnabled();
+	ListServerForm->StatsButton->SetEnabled();
+	ListServerForm->RegisterButton->SetEnabled();
+	ListServerForm->AccountButton->SetEnabled();
+
+	if(ListServerForm->ServerList->Empty())
+		TForm::Message = _("There is no server available. Try later or check your firewall.");
+
 	return 0;
 }
 
@@ -352,9 +363,10 @@ void TListServerForm::AskForRegister()
 	                  "Enter a password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
 	if(msg.Show() == BT_OK && msg.Edit()->Text().empty() == false)
 	{
-		Config::GetInstance()->passwd = msg.Edit()->Text();
+		Config::GetInstance()->passwd = msg.Edit()->Text().c_str();
 		login = true;
-		MetaServer.sendrpl(MSG_REGNICK, msg.Edit()->Text());
+		// On envoie bien le pass en clair au meta-serveur
+		MetaServer.Request(MSG_REGNICK, msg.Edit()->Text().c_str());
 	}
 }
 
@@ -374,16 +386,16 @@ void TListServerForm::AfterDraw()
 		TMessageBox mb(_("This nickname is registered.\n\nEnter the password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
 		if(mb.Show() == BT_OK && mb.Edit()->Text().empty() == false)
 		{
-			Config::GetInstance()->passwd = mb.Edit()->Text();
-			MetaServer.sendrpl(MSG_LOGIN, mb.Edit()->Text());
+			Config::GetInstance()->passwd = mb.Edit()->Text().c_str();
+			MetaServer.sendrpl(MSG_LOGIN, mb.Edit()->Text().c_str());
 		}
 		else
 		{
 			login = false;
-			MetaServer.SetWantDisconnect();
+			want_quit = true;
 		}
 	}
-	if(MenAreAntsApp::GetInstance()->IsFirstRun() && !login && !MetaServer.WantDisconnect() && MetaServer.IsConnected())
+	if(MenAreAntsApp::GetInstance()->IsFirstRun() && !login && ServerList->Empty() == false)
 	{
 		if(TMessageBox(_("Hello! This is your first run!\nYou can register an account to have score saving and your nickname protected.\n\n"
 		                 "Do you want to register it?"), BT_YES|BT_NO, this).Show() == BT_YES)
@@ -395,29 +407,21 @@ void TListServerForm::AfterDraw()
 		MenAreAntsApp::GetInstance()->RefreshList();
 		timer.reset();
 	}
-	if(!MetaServer.IsConnected())
+	if(!MetaServer.IsConnected() && MetaServer.IsLogging())
 	{
-		if(!MetaServer.IsLogging())
+		do
 		{
-			if(!MetaServer.WantDisconnect())
-				TMessageBox(_("You have been disconnected."), BT_OK, this).Show();
-			want_quit = true;
-			return;
-		}
-		else
-			do
-			{
-				SDL_Event event;
-				SDL_PollEvent( &event);
-				TMessageBox(_("Please wait while connecting..."), 0, this).Draw();
-				SDL_Delay(20);
-			} while(!MetaServer.IsConnected() && MetaServer.IsLogging() && !login);
+			SDL_Event event;
+			SDL_PollEvent( &event);
+			TMessageBox(_("Please wait while connecting..."), 0, this).Draw();
+			SDL_Delay(20);
+		} while(!MetaServer.IsConnected() && MetaServer.IsLogging() && !login);
 	}
 }
 
 void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 {
-	if(!MetaServer.IsConnected()) return;
+	//if(!MetaServer.IsConnected()) return;
 	if(ServerList->Test(mouse, button))
 	{
 		if(ServerList->Selected() >= 0 && ServerList->SelectedItem()->Enabled())
@@ -475,7 +479,7 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 			EC_Client* client = MenAreAntsApp::GetInstance()->Connect(ServerList->ReadValue(r));
 			if(!client)
 				return;
-			if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, ConnectedForm, MissionButton->Test(mouse, button)))
+			if(!MenAreAntsApp::GetInstance()->GameInfos(NULL, ConnectedForm, MissionButton->Test(mouse, button) ? G_MISSION : G_ESCARMOUCHE))
 				TMessageBox(_("Unable to create this game.\n There are too games on this server. Please retry."),
 				            BT_OK, ConnectedForm).Show();
 			if(!client->IsConnected())
@@ -501,43 +505,54 @@ TListServerForm::TListServerForm(ECImage* w)
 	Label2 = AddComponent(new TLabel(ServerList->X(), ServerList->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
 	Label2->SetCaption(_("Ping  Name                 Proto   Players   Games  On Standby"));
 
-	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2 - 100, Label1->Y()/2, 220,50));
+	int f = (Label1->Y()-(Welcome->Y()+Welcome->Height()))/2+20;
+	if(f < Welcome->Y()+Welcome->Height())
+		f = Welcome->Y()+Welcome->Height();
+	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2, f, 220,50));
+	MissionButton->SetHint(_("Mission"));
 	MissionButton->SetImage(new ECSprite(Resources::MissionButton(), Video::GetInstance()->Window()));
 
-	if(Label1->Y() - (MissionButton->Y()+MissionButton->Height()) <= 50)
-	{
-		MissionButton->SetX(MissionButton->X() - 200);
-		EscarmoucheButton = AddComponent(new TButton(MissionButton->X()+MissionButton->Width()+100, MissionButton->Y(), 220,50));
-	}
-	else
-		EscarmoucheButton = AddComponent(new TButton(MissionButton->X(), MissionButton->Y()+MissionButton->Height()+(Label1->Y() - (MissionButton->Y()+MissionButton->Height()))/2-25, 220,50));
-
+	MissionButton->SetX(MissionButton->X() - 200);
+	if(MissionButton->Y()+MissionButton->Height() > Label1->Y())
+		Label1->Hide();
+	EscarmoucheButton = AddComponent(new TButton(MissionButton->X()+MissionButton->Width()+100, MissionButton->Y(), 220,50));
+	EscarmoucheButton->SetHint(_("Skirmich against computer"));
 	EscarmoucheButton->SetImage(new ECSprite(Resources::EscarmoucheButton(), Video::GetInstance()->Window()));
 
 	UserStats = AddComponent(new TLabel(ServerList->X()-25, ServerList->Y()+ServerList->Height()+10, " ", white_color, Font::GetInstance(Font::Normal)));
 
 	ChanStats = AddComponent(new TLabel(ServerList->X()-25, UserStats->Y()+UserStats->Height(), " ", white_color, Font::GetInstance(Font::Normal)));
 
-	int button_x = ServerList->X() + ServerList->Width() + 15;
+	int button_x = ServerList->X() + ServerList->Width();
 
-	ConnectButton = AddComponent(new TButtonText(button_x, ServerList->Y(), 150,50, _("Connect"),
-	                                            Font::GetInstance(Font::Normal)));
+	ConnectButton = AddComponent(new TButton(button_x, ServerList->Y(), 150,50));
+	ConnectButton->SetImage(new ECSprite(Resources::OkButton(), Video::GetInstance()->Window()));
+	ConnectButton->SetHint(_("Join selected server"));
 	ConnectButton->SetEnabled(false);
-	ConnectToButton = AddComponent(new TButtonText(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50, _("Enter a server"),
+
+	ConnectToButton = AddComponent(new TButtonText(ConnectButton->X()+ConnectButton->Width(), ConnectButton->Y(), 150,50, _("Enter a server"),
 	                                            Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(button_x, ConnectToButton->Y()+ConnectToButton->Height(), 150,50, _("Refresh"),
-	                                            Font::GetInstance(Font::Normal)));
-	RegisterButton = AddComponent(new TButtonText(button_x, RefreshButton->Y()+RefreshButton->Height(), 150,50, _("Reg. your nick"),
-	                                            Font::GetInstance(Font::Normal)));
+
+	RegisterButton = AddComponent(new TButton(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50));
+	RegisterButton->SetImage(new ECSprite(Resources::SaveButton(), Video::GetInstance()->Window()));
 	RegisterButton->SetHint(_("Register your nickname to save your stats and to protect it from other users"));
-	AccountButton = AddComponent(new TButtonText(button_x, RefreshButton->Y()+RefreshButton->Height(), 150,50, _("Your account"),
-	                                            Font::GetInstance(Font::Normal)));
+
+	AccountButton = AddComponent(new TButton(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50));
+	AccountButton->SetImage(new ECSprite(Resources::AccountButton(), Video::GetInstance()->Window()));
+	AccountButton->SetHint(_("See your profile"));
 	AccountButton->Hide();
-	StatsButton = AddComponent(new TButtonText(button_x, AccountButton->Y()+AccountButton->Height(), 150,50, _("Statistics"),
-	                                            Font::GetInstance(Font::Normal)));
+
+	StatsButton = AddComponent(new TButton(RegisterButton->X()+RegisterButton->Width(), ConnectButton->Y()+ConnectButton->Height(), 150,50));
+	StatsButton->SetHint(_("Show scoring"));
+	StatsButton->SetImage(new ECSprite(Resources::ScoresButton(), Video::GetInstance()->Window()));
 	StatsButton->SetOnClick(TGlobalScoresForm::Scores, 0);
-	RetourButton = AddComponent(new TButtonText(button_x,StatsButton->Y()+StatsButton->Height()+10,150,50, _("Back"),
-	                                          Font::GetInstance(Font::Normal)));
+
+	RefreshButton = AddComponent(new TButton(button_x, RegisterButton->Y()+RegisterButton->Height(), 150,50));
+	RefreshButton->SetImage(new ECSprite(Resources::RefreshButton(), Video::GetInstance()->Window()));
+	RefreshButton->SetHint(_("Refresh server list"));
+
+	RetourButton = AddComponent(new TButton(RefreshButton->X()+RefreshButton->Width(),RegisterButton->Y()+RegisterButton->Height(),150,50));
+	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 
 	SetBackground(Resources::Titlescreen());
 }
@@ -656,13 +671,19 @@ void MenAreAntsApp::ConnectedTo(std::string name, std::string host)
  */
 int HELCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
-	me->sendrpl(MSG_IAM, ECArgs(Config::GetInstance()->nick, CLIENT_SMALLNAME, APP_PVERSION));
+	ECArgs args = Config::GetInstance()->nick;
+	args += CLIENT_SMALLNAME;
+	args += APP_PVERSION;
+	if(Config::GetInstance()->cookie.empty() == false)
+		args += Config::GetInstance()->cookie;
+
+	me->sendrpl(MSG_IAM, args);
 	return 0;
 }
 
 /** Server acknowledges my nickname.
  *
- * Syntax: AIM nick
+ * Syntax: AIM nick [cookie]
  */
 int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -671,8 +692,17 @@ int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	me->SetConnected();
 	if(me == &MetaServer && ListServerForm)
 	{
+		if(parv.size() > 2)
+			Config::GetInstance()->cookie = parv[2];
 		Config::GetInstance()->nick = parv[1];
 		ListServerForm->Welcome->SetCaption(StringF(_("Men Are Ants is for YOU, %s!"), me->GetNick().c_str()));
+
+		if(me->Request().empty() == false)
+		{
+			me->sendbuf(me->Request());
+			me->Request().clear();
+			me->sendrpl(MSG_BYE);
+		}
 	}
 	return 0;
 }
@@ -941,14 +971,16 @@ TConnectedForm::TConnectedForm(ECImage* w)
 	JoinButton->SetEnabled(false);
 	CreerButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(), 150,50, _("Create a game"),
 	                                            Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButtonText(button_x,CreerButton->Y()+CreerButton->Height(),150,50, _("Refresh"),
-	                                                Font::GetInstance(Font::Normal)));
-	DisconnectButton = AddComponent(new TButtonText(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50, _("Disconnect"),
-	                                                Font::GetInstance(Font::Normal)));
+	RefreshButton = AddComponent(new TButton(button_x,CreerButton->Y()+CreerButton->Height(),150,50));
+	RefreshButton->SetImage(new ECSprite(Resources::RefreshButton(), Video::GetInstance()->Window()));
+	RefreshButton->SetHint(_("Refresh list"));
+	DisconnectButton = AddComponent(new TButton(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50));
+	DisconnectButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
+	DisconnectButton->SetHint(_("Disconnect from server"));
 	RehashButton = AddComponent(new TButtonText(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50, _("Rehash config."),
 	                                                Font::GetInstance(Font::Normal)));
 	RehashButton->SetVisible(false);
-	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, _("Kill an user"),
+	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, _("To kill an user"),
 	                                                Font::GetInstance(Font::Normal)));
 	KillButton->SetVisible(false);
 
@@ -1001,7 +1033,7 @@ void TGlobalScoresForm::Scores(TObject*, void*)
 {
 	GlobalScoresForm = new TGlobalScoresForm(Video::GetInstance()->Window());
 
-	MetaServer.sendrpl(MSG_SCORE);
+	MetaServer.Request(MSG_SCORE);
 
 	GlobalScoresForm->Run();
 
@@ -1034,8 +1066,8 @@ TGlobalScoresForm::TGlobalScoresForm(ECImage* im)
 
 	int button_x = ListBox->X() + ListBox->Width() + 10;
 
-	RetourButton = AddComponent(new TButtonText(button_x,ListBox->Y(),150,50, _("Back"),
-	                                                Font::GetInstance(Font::Normal)));
+	RetourButton = AddComponent(new TButton(button_x,ListBox->Y(),150,50));
+	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 
 	SetBackground(Resources::Titlescreen());
 }

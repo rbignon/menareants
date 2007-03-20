@@ -97,6 +97,7 @@ public:
 	R_RESOURCE(Sound,        SoundObelisque);
 	R_RESOURCE(Sound,        SoundMcDo);
 	R_RESOURCE(Sound,        SoundProut);
+	R_RESOURCE(Sound,        SoundMissile);
 
 	R_RESOURCE(ECSpriteBase, Intro);
 	R_RESOURCE(ECImage,      Titlescreen);
@@ -155,6 +156,16 @@ public:
 	R_RESOURCE(ECSpriteBase, MapEditorButton);
 	R_RESOURCE(ECSpriteBase, CreditsButton);
 	R_RESOURCE(ECSpriteBase, QuitButton);
+	R_RESOURCE(ECSpriteBase, AccountButton);
+	R_RESOURCE(ECSpriteBase, BackButton);
+	R_RESOURCE(ECSpriteBase, CancelButton);
+	R_RESOURCE(ECSpriteBase, MBackButton);
+	R_RESOURCE(ECSpriteBase, MCancelButton);
+	R_RESOURCE(ECSpriteBase, MOkButton);
+	R_RESOURCE(ECSpriteBase, OkButton);
+	R_RESOURCE(ECSpriteBase, RefreshButton);
+	R_RESOURCE(ECSpriteBase, SaveButton);
+	R_RESOURCE(ECSpriteBase, ScoresButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);
@@ -263,6 +274,7 @@ public:
 	R_RESOURCE(ECSpriteBase, Train_Dos);
 	R_RESOURCE(ECImage,      Jouano_Icon);
 	R_RESOURCE(ECSpriteBase, Jouano_Face);
+	R_RESOURCE(ECSpriteBase, Jouano_Fog);
 	R_RESOURCE(ECImage,      Plane_Icon);
 	R_RESOURCE(ECSpriteBase, Plane_Face);
 	R_RESOURCE(ECSpriteBase, Plane_Left);

@@ -191,8 +191,8 @@ public:
 /* Composants */
 public:
 
-	TButtonText*    OkButton;
-	TButtonText*    CancelButton;
+	TButton*        OkButton;
+	TButton*        CancelButton;
 	TListBox*       ServerList;
 	TEdit*          Nick;
 	TColorEdit*     Color;
@@ -274,7 +274,10 @@ void Config::WantOk(TObject* OkButton, void* configinst)
 	}
 
 	if(form->Nick->Text() != conf->nick)
+	{
+		conf->cookie.clear();
 		conf->passwd.clear();
+	}
 
 	conf->nick = form->Nick->GetString();
 
@@ -432,8 +435,10 @@ TConfigForm::TConfigForm(ECImage *w)
 	                                        white_color, Font::GetInstance(Font::Normal)));
 	Info->Hide();
 
-	OkButton = AddComponent(new TButtonText(600,400, 150,50, _("OK"), Font::GetInstance(Font::Normal)));
-	CancelButton = AddComponent(new TButtonText(600,450, 150,50, _("Cancel"), Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButton(600,400, 150,50));
+	OkButton->SetImage(new ECSprite(Resources::OkButton(), Video::GetInstance()->Window()));
+	CancelButton = AddComponent(new TButton(600,450, 150,50));
+	CancelButton->SetImage(new ECSprite(Resources::CancelButton(), Video::GetInstance()->Window()));
 
 	ServerList = AddComponent(new TListBox(Rectanglei(50, 200, 220, 300)));
 	ServerList->SetHint(_("Select a meta-server in this list."));

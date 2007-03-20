@@ -203,7 +203,7 @@ EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
 
 	date.SetDate(d);
 
-	ECBCountry* country = CreateCountry(this, "AA");
+	ECBCountry* country = CreateCountry(this, "NN");
 	map_countries.push_back(country);
 
 	for(_y = 0; _y < y; ++_y)
@@ -433,7 +433,7 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		        !BarreCase->Test(mouse, button) &&
 		        (acase = Map->TestCase(mouse)))
 		{
-			ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->InitNb(), map);
+			ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->Type() == ECEntity::E_ARMY ? 1000 : entity->InitNb(), map);
 			map->AddAnEntity(et);
 
 			BarreCase->UnSelect();
@@ -1310,7 +1310,6 @@ void TLoadMapFile::OnClic(const Point2i& mouse, int button, bool&)
 			mb.Show();
 		}
 		Refresh();
-		LoadButton->SetEnabled(false);
 	}
 	else if(RetourButton->Test(mouse, button))
 		want_quit = true;
@@ -1319,6 +1318,7 @@ void TLoadMapFile::OnClic(const Point2i& mouse, int button, bool&)
 void TLoadMapFile::Refresh()
 {
 	MapsList->ClearItems();
+	LoadButton->SetEnabled(false);
 
 	std::vector<std::string> file_list = GetFileList(MenAreAntsApp::GetInstance()->GetPath(), "map");
 

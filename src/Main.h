@@ -47,7 +47,9 @@ public:
 	void ConnectedTo(std::string name, std::string host);
 	EC_Client* Connect(std::string host);
 	void ListGames();
-	bool GameInfos(const char* c, TForm* f = 0, bool mission = false);
+	#define G_MISSION      0x01
+	#define G_ESCARMOUCHE  0x02
+	bool GameInfos(const char* c, TForm* f = 0, int flags = 0);
 	void LoadGame(EChannel* ch);
 	void Options(EChannel* ch);
 	void InGame();

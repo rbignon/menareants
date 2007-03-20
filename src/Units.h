@@ -318,7 +318,7 @@ public:
 
 	virtual const char* Name() const { return _("Jouano"); }
 	virtual const char* Qual() const { return _("Jouano"); }
-	virtual const char* Infos() const { return _("Bad dressed with a beer belly, he's able to destroy an McPuke installed on your barrack and to fart."); }
+	virtual const char* Infos() const { return _("Bad dressed with a beer belly, he's able to destroy an McPuke installed on your barrack and to fart. It can be created only one time."); }
 	virtual const char* Description() const
 	{
 		return _("Send your fat Jouano on one of your McPuke occupied barrack, he'll eat everything and ruin it.\n"
@@ -368,7 +368,7 @@ public:
 	virtual const char* Qual() const { return Deployed() ? _("barracks+McPuke") : _("McPuke Donald"); }
 	virtual const char* Infos() const
 	{
-		return Deployed() ? "" : _("Send him to a barrack, i'll install a McPuke.");
+		return Deployed() ? "" : _("Send him to a barrack, he'll install a McPuke.");
 	}
 	virtual const char* Description() const
 	{

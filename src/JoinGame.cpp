@@ -78,7 +78,8 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		/* 01 */ { I_INFO, gettext_noop("%0Eo's %0Et shoot %1Eo's %1Et of %2s") }, // attaquant, attaqué, dommage
 		/* 02 */ { I_SHIT, gettext_noop("%0Eo's %0Et invests %1s's McPuke installed in %2Eo's barracks!! He's going to eat everything! "
 		                   "That will take %3s days for him!") }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
-		/* 03 */ { I_INFO, gettext_noop("DEBUGINFO: %0s") }
+		/* 03 */ { I_INFO, gettext_noop("DEBUGINFO: %0s") },
+		/* 04 */ { I_SHIT, gettext_noop("%0eo's %0Et is farting!!! Every infantry next to him will be damaged because of stink!!") }
 	};
 	if(InGameForm)
 	{
@@ -701,6 +702,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					GameInfosForm->SpeedGame->Check(add);
 				break;
 			}
+			case 's':
+			{
+				if(GameInfosForm)
+					GameInfosForm->Scoring->Check(add);
+				break;
+			}
 			case '_':
 			{
 				if(!add)
@@ -1171,7 +1178,7 @@ bool MenAreAntsApp::RecoverGame(std::string chan)
 	return true;
 }
 
-bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
+bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, int flags)
 {
 	if(!Server.IsConnected())
 		throw ECExcept(VBName(Server.IsConnected()), "Non connecté");
@@ -1189,7 +1196,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	if(!cname)
 	{
 		create = true;
-		if(mission)
+		if(flags & G_MISSION)
 			cname = ".";
 		else
 #ifdef SETTED_NAME
@@ -1209,7 +1216,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 	}
 
 	/* Déclaration membres fixes */
-	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), client, mission);
+	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), client, (flags & G_MISSION));
 	GameInfosForm->Chat->AddItem(StringF(_("*** You have rejoin %s"), cname), green_color);
 
 	JOINED = 0;
@@ -1246,7 +1253,12 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, bool mission)
 		if(Config::GetInstance()->nation)
 			client->sendrpl(MSG_SET, ECArgs("+n", TypToStr(Config::GetInstance()->nation)));
 
-		GameInfosForm->Title->SetCaption(mission ? _("Alone game") : chan->GetName());
+		if(flags & G_MISSION)
+			GameInfosForm->Scoring->Hide();
+		if(flags & G_ESCARMOUCHE)
+			client->sendrpl(MSG_SET, "-s");
+
+		GameInfosForm->Title->SetCaption((flags & G_MISSION) ? _("Alone game") : chan->GetName());
 		if(client->Player()->IsOwner())
 		{
 			GameInfosForm->PretButton->SetCaption(_("Start game"));
@@ -1421,6 +1433,8 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 	}
 	else if(SpeedGame->Test(mouse, button))
 		client->sendrpl(MSG_SET, SpeedGame->Checked() ? "+r" : "-r");
+	else if(Scoring->Test(mouse, button))
+		client->sendrpl(MSG_SET, Scoring->Checked() ? "+s" : "-s");
 	else if(CreateIAButton->Test(mouse, button))
 	{
 		TMessageBox mb(_("AI's name to create:"), HAVE_EDIT|BT_OK|BT_CANCEL, this);
@@ -1454,6 +1468,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 {
 	MapList->SetVisible(add);
 	SpeedGame->SetEnabled(add);
+	Scoring->SetEnabled(add);
 	BeginMoney->SetEnabled(add);
 	TurnTime->SetEnabled(add);
 
@@ -1464,10 +1479,12 @@ void TGameInfosForm::ChangeStatus(bool add)
 
 void TGameInfosForm::RefreshPositions()
 {
+	if(Positions.empty()) return;
+
 	FORit(TButtonText*, Positions, bt)
 	{
 		(*bt)->SetCaption("");
-		(*bt)->SetEnabled();
+		(*bt)->SetEnabled(!client->Player()->Channel()->IsMission());
 		(*bt)->Tag = 0;
 	}
 
@@ -1561,6 +1578,10 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, _("Quick game"), white_color));
 	SpeedGame->SetHint(_("A player has lost when he hasn't got any building."));
 	SpeedGame->Check();
+
+	Scoring = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 435, _("Scoring"), white_color));
+	Scoring->SetHint(_("Do you want to send to meta-server scoring of game ?"));
+	Scoring->Check();
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */

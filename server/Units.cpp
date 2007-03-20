@@ -118,7 +118,9 @@ bool ECJouano::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	ECBCase* c = event->Case();
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(*it != this && (*it)->Case() != c && (*it)->IsInfantry())
-			Shoot(*it, 400-rand()%100);
+			Shoot(*it, 500-rand()%100-(*it)->Case()->Delta(Case()));
+
+	Channel()->send_info(0, EChannel::I_JOUANO_FART, LongName());
 
 	SetDeployed(false);
 
@@ -251,9 +253,9 @@ int ECMcDo::TurnMoney(ECBPlayer* pl)
 		return 0; /* En effet, on a du investir le McDo avec un ingénieur ou conquérir la ville un truc du genre */
 
 	if(ex_owner == pl)
-		return 1000;
+		return 2000;
 	else if(Owner() == pl)
-		return -1000;
+		return -2000;
 	else
 		return 0;
 }

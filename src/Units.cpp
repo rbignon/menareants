@@ -56,13 +56,20 @@ bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_
 	{
 		case ARM_ATTAQ:
 		{
-			if(c != Case()) break;
+			if(c != Case() || c->Showed() <= 0) break;
 
 			Case()->SetImage(Anim.anim);
 			Case()->Image()->SetAnim(true);
 			Case()->Image()->SetRepeat(false);
 			Resources::SoundProut()->Play(false);
 			while(Case()->Image()->Anim()) SDL_Delay(20);
+
+			SetAttaqImg(Resources::Jouano_Fog(), Image()->X()-CASE_WIDTH*2, Image()->Y()-CASE_HEIGHT*2);
+			AttaqImg()->SetRepeat(false);
+			AttaqImg()->SetAnim(true);
+			SDL_Delay(1000);
+			SetAttaqImg(0,0,0);
+
 			Case()->SetImage(Resources::CaseTerreDead());
 
 			return true;
@@ -146,13 +153,13 @@ std::string ECMcDo::SpecialInfo()
 	else if(ex_owner == Owner())
 		return StringF(_("Free orders of McPuke for %s"), ex_owner->GetNick());
 	else if(ex_owner->IsMe())
-		return StringF(_("%s paies $1000 for orders to you"), Owner() ? Owner()->GetNick() : "Neutral");
+		return StringF(_("%s paies $2000 for orders to you"), Owner() ? Owner()->GetNick() : "Neutral");
 	else if(!Owner())
-		return StringF(_("Neutral paies $1000 for orders to %s"), ex_owner->GetNick());
+		return StringF(_("Neutral paies $2000 for orders to %s"), ex_owner->GetNick());
 	else if(Owner()->IsMe())
-		return StringF(_("You pay $1000 for orders to %s"), ex_owner->GetNick());
+		return StringF(_("You pay $2000 for orders to %s"), ex_owner->GetNick());
 	else
-		return StringF(_("%s paies $1000 for orders to %s"), Owner()->GetNick(), ex_owner->GetNick());
+		return StringF(_("%s paies $2000 for orders to %s"), Owner()->GetNick(), ex_owner->GetNick());
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)

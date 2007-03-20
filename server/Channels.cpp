@@ -445,6 +445,22 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				changed = YES_NOPARAMS;
 				break;
 			}
+			case 's':
+			{
+				if(!sender->Channel()->Joinable())
+				{
+					Debug(W_DESYNCH, "SET %cr: interdit en cours de partie", add ? '+' : '-');
+					break;
+				}
+				if(!sender->IsPriv())
+				{
+					Debug(W_DESYNCH, "SET %cr: d'un non privilégié", add ? '+' : '-');
+					break;
+				}
+				sender->Channel()->SetScoring(add);
+				changed = YES_NOPARAMS;
+				break;
+			}
 			case 'o':
 			{
 				if(!sender->Channel()->Joinable())
@@ -761,6 +777,7 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 	}
 	cl->SetPlayer(pl);
+	pl->SetCookie(cl->Cookie());
 
 	/** @page JOIN_MSGS Join's messages
 	 *
@@ -1028,6 +1045,12 @@ void ECPlayer::HaveLost()
 	}
 	Entities()->Clear();
 
+	std::vector<ECEvent*> evts = Events()->List();
+	FOR(ECEvent*, evts, evti)
+		Channel()->Map()->RemoveEvent(evti, USE_DELETE);
+
+	Events()->Clear();
+
 	SetLost();
 }
 
@@ -1036,7 +1059,7 @@ void ECPlayer::HaveLost()
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name, bool mission)
-	: ECBChannel(_name, mission), owner(0), fast_game(true), begin_money(20000), first_playing(0), playing(0)
+	: ECBChannel(_name, mission), owner(0), fast_game(true), scoring(true), begin_money(20000), first_playing(0), playing(0)
 {
 	ECBChannel::SetLimite(app.GetConf()->DefLimite()); /* Limite par default */
 	app.NBchan++;
@@ -1383,7 +1406,7 @@ bool EChannel::CheckEndOfGame()
 		args += TypToStr(pl->Stats()->best_revenu);
 		sendto_players(0, pl, MSG_SCORE, args);
 
-		if(pl->IsIA())
+		if(pl->IsIA() || IsMission() || !Scoring())
 			continue;
 
 		app.MSet(pl, "+kdcsrg", args);
@@ -1825,6 +1848,7 @@ std::string EChannel::ModesStr() const
 	if(Map())       modes += "m", params += " " + TypToStr(Map()->Num());
 	                modes += "b", params += " " + TypToStr(begin_money);
 	if(FastGame())  modes += "r";
+	if(Scoring())   modes += "s";
 	                modes += "t", params += " " + TypToStr(TurnTime());
 
 	switch(State())

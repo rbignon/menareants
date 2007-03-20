@@ -319,9 +319,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 								if((*it)->Like(en->first) || !en->second)
 									continue;
 								(*it)->Owner()->Stats()->score += en->second;
-								if((*it)->Case() != en->first->Case() || en->second <= ents_init_nb[*it])
+								if((*it)->Case() != en->first->Case())
 									continue;
-								(*it)->Owner()->Stats()->score += en->second - ents_init_nb[*it];
+								(*it)->Owner()->Stats()->score += abs(en->second - ents_init_nb[*it]);
 							}
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
 						std::vector<ECBEntity*>::iterator fix = fixed.end();

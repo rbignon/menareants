@@ -45,6 +45,7 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 
 	strncpy(reguser->name, name, NICKLEN);
 	strncpy(reguser->passwd, passwd, PASSWDLEN);
+	reguser->cookie[0] = 0;
 	reguser->nb_games = nb_games;
 	reguser->deaths = deaths;
 	reguser->killed = killed;

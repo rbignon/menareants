@@ -121,6 +121,7 @@ protected:
 	int SendMetaServer(ECMessage s, ECArgs = ECArgs());
 	void ParseMetaServer();
 	static void ms_ping(ECServer* server, std::vector<std::string> parv);
+	static void ms_bye(ECServer* server, std::vector<std::string> parv);
 };
 
 extern ECServer app;

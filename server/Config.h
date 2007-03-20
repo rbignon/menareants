@@ -47,6 +47,7 @@ public:
 	std::string AdminPass() const;
 	std::string MSHost() const;
 	uint MSPort() const;
+	std::string MSPassword() const;
 	std::vector<std::string> Motd() const { return motd; }
 
 	bool IsBanned(const std::string& ip, const std::string& nick, std::string& reason);

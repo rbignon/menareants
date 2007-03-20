@@ -51,8 +51,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man6dir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_menareants_meta_server_OBJECTS = main.$(OBJEXT) database.$(OBJEXT) \
-	sockets.$(OBJEXT) servers.$(OBJEXT) clients.$(OBJEXT)
+am_menareants_meta_server_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) \
+	database.$(OBJEXT) sockets.$(OBJEXT) servers.$(OBJEXT) \
+	clients.$(OBJEXT)
 menareants_meta_server_OBJECTS = $(am_menareants_meta_server_OBJECTS)
 menareants_meta_server_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -195,6 +196,7 @@ target_vendor = @target_vendor@
 INCLUDES = -I$(top_srcdir)/lib
 menareants_meta_server_SOURCES = \
 	main.c \
+	config.c \
 	database.c \
 	sockets.c \
 	servers.c \
@@ -269,6 +271,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clients.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/database.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servers.Po@am__quote@

@@ -28,6 +28,7 @@
 #include "Resources.h"
 #include "Sockets.h"
 #include "Units.h"
+#include "Sound.h"
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
 #include "tools/Video.h"
@@ -103,6 +104,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		SetXY(c->Image()->X(), 0 - missile->GetHeight());
 		me->UnlockScreen();
+		Resources::SoundMissile()->Play();
 		return true;
 	}
 	SDL_Delay(20);
@@ -547,7 +549,9 @@ ECase* TBarreCase::ChangeCaseType(ECase* c, case_img_t* type)
 
 void TBarreCase::CheckAroundCase(ECase* c)
 {
-#undef INTELLIGENT_EDITOR
+#ifdef DEBUG
+#define INTELLIGENT_EDITOR
+#endif
 #ifdef INTELLIGENT_EDITOR
 	if(c->Selected() && (c->ImgID() == 'm' || c->ImgID() == 't'))
 	{
@@ -583,112 +587,6 @@ void TBarreCase::CheckAroundCase(ECase* c)
 						{ 'l', Resources::CaseCoinSudOuest,    'm' },
 					*/
 					char t = 0;
-					#if 0
-					if(acase == top)
-					{
-						if(type->c == 'm')
-						{
-							if(acase->MoveUp()->TypeID() == 'm')
-								t = 'm';
-							else
-								t = 'a';
-						}
-						else
-						{
-							if(acase->MoveUp()->TypeID() == 't')
-								t = 't';
-							else
-								t = 'b';
-						}
-					}
-					else if(acase == bottom)
-					{
-						if(type->c == 'm')
-						{
-							if(acase->MoveDown()->TypeID() == 'm')
-								t = 'm';
-							else
-								t = 'b';
-						}
-						else
-						{
-							if(acase->MoveDown()->TypeID() == 't')
-								t = 't';
-							else
-								t = 'a';
-						}
-					}
-					else if(acase == left)
-					{
-						if(type->c == 'm')
-						{
-							if(acase->MoveLeft()->TypeID() == 'm')
-								t = 'm';
-							else
-								t = 'c';
-						}
-						else
-						{
-							if(acase->MoveLeft()->TypeID() == 't')
-								t = 't';
-							else
-								t = 'd';
-						}
-					}
-					else if(acase == right)
-					{
-						if(type->c == 'm')
-						{
-							if(acase->MoveRight()->TypeID() == 'm')
-								t = 'm';
-							else
-								t = 'd';
-						}
-						else
-						{
-							if(acase->MoveRight()->TypeID() == 't')
-								t = 't';
-							else
-								t = 'c';
-						}
-					}
-					else if(acase == tl)
-					{
-						if(type->c == 'm')
-						{
-							if(acase->MoveLeft()->ImgID() == 'j' || acase->MoveLeft()->ImgID() == 'a')
-								t = 'a';
-							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 't')
-								t = 'a';
-							else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveUp()->TypeID() == 'm')
-								t = 'c';
-							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 'm')
-								t = acase->MoveLeft()->MoveUp()->TypeID() == 't' ? 'e' : 'm';
-							else
-								t = 'j';
-						}
-						else
-						{
-							if(acase->MoveLeft()->ImgID() == 'g' || acase->MoveLeft()->ImgID() == 'b')
-								t = 'b';
-							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 't')
-								t = 'a';
-							else if(acase->MoveLeft()->TypeID() == 't' && acase->MoveUp()->TypeID() == 'm')
-								t = 'c';
-							else if(acase->MoveLeft()->TypeID() == 'm' && acase->MoveUp()->TypeID() == 'm')
-								t = 'm';
-							if(acase->MoveLeft()->ImgID() == 'g' || acase->MoveLeft()->ImgID() == 'b')
-								t = 'b';
-							else if(acase->MoveLeft()->TypeID() == 't')
-								t = 't';
-							else
-								t = 'g';
-						}
-					}
-					else if(acase == tr) t = type->c == 'm' ? 'i' : 'h';
-					else if(acase == bl) t = type->c == 'm' ? 'l' : 'f';
-					else if(acase == br) t = type->c == 'm' ? 'k' : 'e';
-					#endif
 
 					if(c->ImgID() == 'm')
 					{

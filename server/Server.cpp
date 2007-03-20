@@ -382,6 +382,8 @@ void ECServer::delclient(TClient *del)
 		if((unsigned)del->GetFd() >= highsock)
 		{
 			highsock = sock;
+			if((unsigned)ms_sock > highsock)
+				highsock = ms_sock;
 			for(RealClientList::const_iterator it = myClients.begin(); it != myClients.end(); ++it)
 				if((unsigned)it->second->GetFd() > highsock)
 					highsock = it->second->GetFd();
@@ -461,6 +463,8 @@ int ECServer::SendMetaServer(ECMessage s, ECArgs args)
 	if(!args.Empty())
 		buf += " " + args.String();
 
+	Debug(W_ECHO|W_DEBUG, "[MS] S - %s", buf.c_str());
+
 	buf += "\r\n";
 
 	send(ms_sock, buf.c_str(), buf.size(), 0);
@@ -470,7 +474,10 @@ int ECServer::SendMetaServer(ECMessage s, ECArgs args)
 
 int ECServer::MSet(ECPlayer* pl, std::string c, ECArgs args)
 {
-	ECArgs s(pl->Nick());
+	if(pl->Cookie().empty())
+		return 0;
+
+	ECArgs s(pl->Nick() + ":" + pl->Cookie());
 	s += c;
 	s += args;
 
@@ -490,12 +497,22 @@ void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
 	server->SendMetaServer(MSG_PONG);
 }
 
+void ECServer::ms_bye(ECServer* server, std::vector<std::string> parv)
+{
+	close(server->ms_sock);
+	server->ms_sock = 0;
+}
+
 void ECServer::ParseMetaServer()
 {
 	if(!ms_sock) return;
 
+	static char RecvBuf[MAXBUFFER];
+	static size_t recvlen;
+
+	int len;
 	char buf[MAXBUFFER];
-	if(recv(ms_sock, buf, sizeof buf -1, 0) <= 0 && errno != EINTR)
+	if((len = recv(ms_sock, buf, sizeof buf -1, 0)) <= 0)
 	{
 		FD_CLR(ms_sock, &global_read_set);
 		close(ms_sock);
@@ -505,26 +522,51 @@ void ECServer::ParseMetaServer()
 		return;
 	}
 
-	static struct
+	char *ptr = buf;
+
+	buf[len] = 0;
+
+	while(*ptr)
 	{
-		ECMessage cmd;
-		void (*func) (ECServer*, std::vector<std::string>);
-	} cmds[] =
-	{
-		{ MSG_PING,  ms_ping }
-	};
-
-	ECMessage cmdname;
-	std::vector<std::string> parv;
-
-	SplitBuf(buf, &parv, &cmdname);
-
-	for(uint i = 0; i < ASIZE(cmds); ++i)
-		if(cmds[i].cmd == cmdname)
+		if(*ptr == '\n' || recvlen >= ECD_RECVSIZE)
 		{
-			cmds[i].func (this, parv);
-			return;
+			RecvBuf[recvlen-1] = 0;
+
+			static struct
+			{
+				ECMessage cmd;
+				void (*func) (ECServer*, std::vector<std::string>);
+			} cmds[] =
+			{
+				{ MSG_PING,  ms_ping },
+				{ MSG_BYE,   ms_bye  }
+			};
+
+			Debug(W_ECHO|W_DEBUG, "[MS] R - %s", RecvBuf);
+
+			ECMessage cmdname;
+			std::vector<std::string> parv;
+
+			SplitBuf(RecvBuf, &parv, &cmdname);
+
+			for(uint i = 0; i < ASIZE(cmds); ++i)
+				if(cmds[i].cmd == cmdname)
+				{
+					cmds[i].func (this, parv);
+					break;
+				}
+
+			if(recvlen >= ECD_RECVSIZE && !(ptr = strchr(ptr + 1, '\n')))
+			{ 	/* line exceeds size and no newline found */
+				recvlen = 0;
+				break; /* abort parsing */
+			}
+			recvlen = 0; /* go on on newline */
 		}
+		else RecvBuf[recvlen++] = *ptr; /* copy */
+		/*next char, Note that if line was to long but newline was found, it drops the \n */
+		++ptr;
+	}
 }
 
 bool ECServer::ConnectMetaServer()
@@ -579,7 +621,14 @@ bool ECServer::ConnectMetaServer()
 	if((unsigned)ms_sock > highsock)
 		highsock = ms_sock;
 
-	SendMetaServer(MSG_IAM, ECArgs(conf->ServerName(), SERV_SMALLNAME, APP_MSPROTO));
+	ECArgs args;
+	args += conf->ServerName();
+	args += SERV_SMALLNAME;
+	args += APP_MSPROTO;
+	if(conf->MSPassword() != " ")
+		args += conf->MSPassword();
+
+	SendMetaServer(MSG_IAM, args);
 	MSet("+iPGvVu", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION, APP_VERSION, TypToStr(uptime)));
 
 	return true;

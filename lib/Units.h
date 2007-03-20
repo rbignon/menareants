@@ -323,6 +323,8 @@ public:
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	virtual bool WantDeploy() { return true; }
 	virtual bool AddUnits(uint) { return false; }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const;
 };
 
 /********************************************************************************************
@@ -350,7 +352,7 @@ public:
 
 	virtual e_type Type() const { return E_MCDO; }
 	virtual uint Cost() const { return 10000; }
-	virtual uint InitNb() const { return 300; }
+	virtual uint InitNb() const { return 1000; }
 	virtual uint Step() const { return Deployed() ? 0 : 2; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }

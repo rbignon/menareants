@@ -384,7 +384,7 @@ public:
 	TImage*   Title;
 	TMemo*    Memo;
 
-	TButtonText* OkButton;
+	TButton* OkButton;
 
 	static void WantGoBack(TObject*, void*);
 
@@ -429,8 +429,8 @@ TCredits::TCredits(ECImage* w)
 	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label2->Y()+Label2->Height()+30,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
 	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label3->Y()+Label3->Height(),_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
 
-	OkButton = AddComponent(new TButtonText(SCREEN_WIDTH/2-75,SCREEN_HEIGHT-70, 150,50, _("Back"),
-	                                        Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButton(SCREEN_WIDTH/2-31,SCREEN_HEIGHT-100, 150,50));
+	OkButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, Label6->Y()+Label6->Height()+30, SCREEN_WIDTH-50-50,
 	                              SCREEN_HEIGHT-(Label6->Y()+Label6->Height()+30)-OkButton->Height()-20, 0, false));

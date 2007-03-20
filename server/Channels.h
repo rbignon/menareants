@@ -119,6 +119,9 @@ public:
 
 	void CalculBestRevenu(int revenu) { if(revenu > stats.best_revenu) stats.best_revenu = revenu; }
 
+	void SetCookie(std::string c) { cookie = c; }
+	std::string Cookie() const { return cookie; }
+
 /* Variables privées */
 private:
 	TClient *client;
@@ -127,6 +130,7 @@ private:
 	std::vector<BreakPoint> breakpoints;
 	ECList<ECEvent*> events;
 	int best_revenu;
+	std::string cookie;
 };
 typedef std::vector<ECPlayer*> PlayerVector;
 
@@ -151,6 +155,7 @@ public:
 		I_SHOOT,  // attaquant, attaqué, domage
 		I_JOUANO,  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
 		I_DEBUG,
+		I_JOUANO_FART, // jouano
 	};
 
 /* Methodes */
@@ -310,12 +315,15 @@ public:
 	bool FastGame() const { return fast_game; }
 	void SetFastGame(bool b = true) { fast_game = b; }
 
+	bool Scoring() const { return scoring; }
+	void SetScoring(bool s = true) { scoring = s; }
+
 	int& BeginMoney() { return begin_money; }
 
 /* Variables privées */
 protected:
 	ECPlayer* owner;
-	bool fast_game;
+	bool fast_game, scoring;
 	int begin_money;
 	uint first_playing, playing;
 };

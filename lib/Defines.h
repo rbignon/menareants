@@ -40,7 +40,7 @@
  * ï¿œincrï¿œenter en cas de modification du protocole
  */
 #define APP_PVERSION	"13"
-#define APP_MSPROTO	"2"
+#define APP_MSPROTO	"3"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
 #define APP_VERSION_ALPHA	"0"

@@ -61,6 +61,7 @@
 	R_RESOURCE(Sound,        SoundObelisque,   "bruits/laserfire.wav");
 	R_RESOURCE(Sound,        SoundMcDo,        "units/Gerbale.ogg");
 	R_RESOURCE(Sound,        SoundProut,       "units/prout.ogg");
+	R_RESOURCE(Sound,        SoundMissile,     "units/missile.ogg");
 
 /* IMAGES*/
 	R_RESOURCE(ECSpriteBase, Intro,            "intro");
@@ -120,6 +121,16 @@
 	R_RESOURCE(ECSpriteBase, MapEditorButton,  "mapeditorbutton");
 	R_RESOURCE(ECSpriteBase, CreditsButton,    "creditsbutton");
 	R_RESOURCE(ECSpriteBase, QuitButton,       "quitbutton");
+	R_RESOURCE(ECSpriteBase, AccountButton,    "buttons/account");
+	R_RESOURCE(ECSpriteBase, BackButton,       "buttons/back");
+	R_RESOURCE(ECSpriteBase, CancelButton,     "buttons/cancel");
+	R_RESOURCE(ECSpriteBase, MBackButton,      "buttons/mback");
+	R_RESOURCE(ECSpriteBase, MCancelButton,    "buttons/mcancel");
+	R_RESOURCE(ECSpriteBase, MOkButton,        "buttons/mok");
+	R_RESOURCE(ECSpriteBase, OkButton,         "buttons/ok");
+	R_RESOURCE(ECSpriteBase, RefreshButton,    "buttons/refresh");
+	R_RESOURCE(ECSpriteBase, SaveButton,       "buttons/save");
+	R_RESOURCE(ECSpriteBase, ScoresButton,     "buttons/scores");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");
@@ -228,6 +239,7 @@
 	R_RESOURCE(ECSpriteBase, Train_Dos,         "units/train/dos");
 	R_RESOURCE(ECImage,      Jouano_Icon,       PKGDATADIR_PICS "units/jouano_icon.png");
 	R_RESOURCE(ECSpriteBase, Jouano_Face,       "units/jouano/face");
+	R_RESOURCE(ECSpriteBase, Jouano_Fog,        "units/jouano/fog");
 	R_RESOURCE(ECImage,      Plane_Icon,        PKGDATADIR_PICS "units/plane_icon.png");
 	R_RESOURCE(ECSpriteBase, Plane_Face,        "units/plane/face");
 	R_RESOURCE(ECSpriteBase, Plane_Left,        "units/plane/left");

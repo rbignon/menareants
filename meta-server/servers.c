@@ -27,7 +27,7 @@
 
 struct Server* server_head = 0;
 
-/* USET <account> <modes> [<args> ..]                 :Paramètres d'un account
+/* USET <account>:<cookie> <modes> [<args> ..]        :Paramètres d'un account
  *     +k <killed>                                    :- unités tués
  *     +d <deaths>                                    :- unités perdues
  *     +s <score>                                     :- score
@@ -39,11 +39,13 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 {
 	int i = 3, add = 1;
 	const char *m = parv[2];
+	const char* nickname = strtok(parv[1], ":");
+	const char* cookie = strtok(NULL, ":");
 	struct RegUser* reg;
 
-	if(parc < 3) return 0;
+	if(parc < 3 || !cookie || !(cl->flags & CL_LOGGED)) return 0;
 
-	if(!(reg = find_reguser(parv[1])))
+	if(!(reg = find_reguser(nickname)) || strcmp(reg->cookie, cookie))
 		return 0;
 
 	for(; m && *m; ++m)
@@ -52,16 +54,20 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 			case '+': add = 1; break;
 			case '-': add = 0; break;
 			case 'k':
-				reg->killed = (i < parc && add) ? (reg->killed + atoi(parv[i++])) : 0;
+				if(i < parc && add)
+					reg->killed += atoi(parv[i++]);
 				break;
 			case 'd':
-				reg->deaths = (i < parc && add) ? (reg->deaths + atoi(parv[i++])) : 0;
+				if(i < parc && add)
+					reg->deaths += atoi(parv[i++]);
 				break;
 			case 's':
-				reg->score = (i < parc && add) ? (reg->score + atoi(parv[i++])) : 0;
+				if(i < parc && add)
+					reg->score += atoi(parv[i++]);
 				break;
 			case 'c':
-				reg->creations = (i < parc && add) ? (reg->creations + atoi(parv[i++])) : 0;
+				if(i < parc && add)
+					reg->creations += atoi(parv[i++]);
 				break;
 			case 'r':
 				if(add && i < parc)
@@ -79,14 +85,10 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 					reg->last_visit = Now;
 					reg->nb_games++;
 				}
-				else
-					reg->nb_games--;
 				break;
 			case 'v':
 				if(add)
 					reg->victories++;
-				else
-					reg->victories--;
 				break;
 		}
 

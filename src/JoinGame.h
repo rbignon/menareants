@@ -60,6 +60,7 @@ public:
 	TLabel*      Title;
 	TListBox*    MapList;
 	TCheckBox*   SpeedGame;
+	TCheckBox*   Scoring;
 	TSpinEdit*   BeginMoney;
 	TSpinEdit*   TurnTime;
 	TLabel*      MapTitle;

@@ -20,6 +20,7 @@
 
 #include <sys/resource.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
@@ -27,16 +28,21 @@
 #include <getopt.h>
 #include <unistd.h>
 #include "main.h"
+#include "config.h"
 #include "database.h"
 #include "sockets.h"
 #include "lib/Defines.h"
 #include "lib/Version.h"
 
 int myproto=0;
-int pingfreq = DEFPINGFREQ;
-int port = DEFPORT;
 char dbpath[50];
+char configpath[50];
 extern int running;
+
+void sig_rehash(int c)
+{
+	rehash_config(configpath);
+}
 
 void sig_die(int c)
 {
@@ -53,20 +59,15 @@ int main(int argc, char **argv)
 	struct rlimit rlim; /* used for core size */
 	int tmp;
 	int background = 1;
+	char mypath[50];
 
-	snprintf(dbpath, sizeof dbpath - 1, "%s/" DBPATH, getenv("HOME"));
+	snprintf(mypath, sizeof dbpath - 1, "%s/" MYPATH, getenv("HOME"));
 
 	while((tmp = getopt(argc, argv, "nvhd:p:f:")) != EOF)
 		switch(tmp)
 		{
 			case 'n':
 				background = 0;
-				break;
-			case 'f':
-				pingfreq = atoi(optarg);
-				break;
-			case 'p':
-				port = atoi(optarg);
 				break;
 			case 'v':
 				puts("MenAreAnts Meta Server v" APP_VERSION
@@ -87,13 +88,28 @@ int main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			default:
-				printf("Usage: %s [-nhv] [-d <database path>] [-p <port>] [-f <ping freq>]\n", argv[0]);
+				printf("Usage: %s [-nhv] [-c <config path>] [-p <port>] [-f <ping freq>]\n", argv[0]);
 				exit(EXIT_FAILURE);
 		}
 
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGTERM, &sig_die);
 	signal(SIGINT, &sig_restart);
+	signal(SIGHUP, &sig_rehash);
+
+	DIR *d;
+	if(!(d = opendir(mypath)))
+		mkdir(mypath, 0755 );
+	else closedir(d);
+
+	snprintf(configpath, sizeof configpath - 1, "%s/" CONFIGFILE, mypath);
+	snprintf(dbpath, sizeof dbpath - 1, "%s/" DBPATH, mypath);
+
+	if(load_config(configpath) < 0)
+	{
+		printf("ERROR: Unable to load configuration at %s\n", configpath);
+		exit(EXIT_FAILURE);
+	}
 
 	if((tmp = load_users(dbpath)) != 1)
 	{

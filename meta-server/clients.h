@@ -43,6 +43,7 @@ extern struct User* add_user(struct Client* cl, const char* name);
 extern void remove_user(struct User* user);
 
 extern int m_login (struct Client*, int, char**);
+extern int m_bye (struct Client* cl, int parc, char** parv);
 extern int m_pong (struct Client* cl, int parc, char** parv);
 extern int m_ping (struct Client* cl, int parc, char** parv);
 extern int m_serv_list (struct Client* cl, int parc, char** parv);

@@ -22,6 +22,7 @@
 #include "lib/Messages.h" /* Pour la liste des commandes */
 #include "sockets.h"
 #include "servers.h"
+#include "config.h"
 #include "clients.h"
 #include "main.h"
 #include "database.h"
@@ -50,15 +51,26 @@ extern char dbpath[50];
 static void check_pings()
 {
 	unsigned int i = 0;
+	struct RegUser* reg = reguser_head;
 
 	for(;i <= highsock;++i)
-		if(myClients[i].last_read + pingfreq > Now)
+		if(myClients[i].flags != CL_FREE && myClients[i].last_read + config.pingfreq < Now)
 		{
 			if(myClients[i].flags & CL_PING)
+			{
+				sendcmd(&myClients[i], MSG_BYE);
 				delclient(&myClients[i]);
+			}
 			else
+			{
+				myClients[i].flags |= CL_PING;
 				sendcmd(&myClients[i], MSG_PING);
+			}
 		}
+
+	for(; reg; reg = reg->next)
+		if(Now - reg->last_visit > 3*3600)
+			reg->cookie[0] = 0;
 
 	write_users(dbpath);
 }
@@ -69,6 +81,8 @@ int sendbuf(struct Client* cl, char* buf, int len)
 	buf[len++] = '\n';
 	buf[len] = 0;
 
+	printf("S - %s\n", buf);
+
 	send(cl->fd, buf, len, 0);
 
 	return 0;
@@ -78,6 +92,8 @@ int senderr(struct Client* cl, enum ECError err)
 {
 	char buf[] = {(char)MSG_ERROR, ' ', (char)err, '\r', '\n', '\0' };
 
+	printf("S - %s\n", buf);
+
 	send(cl->fd, buf, 5, 0);
 
 	return 0;
@@ -86,6 +102,8 @@ int senderr(struct Client* cl, enum ECError err)
 int sendcmd(struct Client* cl, enum ECMessage cmd)
 {
 	char buf[] = {(char)cmd, '\r', '\n', '\0' };
+
+	printf("S - %s\n", buf);
 
 	send(cl->fd, buf, 3, 0);
 
@@ -157,6 +175,7 @@ int parsemsg(struct Client* cl)
 	} cmds[] =
 	{
 		{MSG_IAM,      m_login,          0},
+		{MSG_BYE,      m_bye,            0},
 		{MSG_SET,      m_server_set,     CL_SERVER},
 		{MSG_USET,     m_user_set,       CL_SERVER},
 		{MSG_PONG,     m_pong,           0},
@@ -264,7 +283,7 @@ struct Client *addclient(int fd, struct in_addr *addr)
 	FD_SET(fd, &global_fd_set);
 	if((unsigned)fd > highsock) highsock = fd;
 
-	sendrpl(newC, MSG_HELLO, MS_SMALLNAME " " APP_MSPROTO);
+	sendrpl(newC, MSG_HELLO, "%s %s", MS_SMALLNAME, APP_MSPROTO);
 
 	return newC;
 }
@@ -315,11 +334,11 @@ int init_socket(void)
 
 	localhost.sin_family = AF_INET;
 	localhost.sin_addr.s_addr = INADDR_ANY;
-	localhost.sin_port = htons(port);
+	localhost.sin_port = htons(config.port);
 
 	if(bind(sock, (struct sockaddr *) &localhost, sizeof localhost) < 0)
 	{
-		printf("Unable to listen port %d.\n", port);
+		printf("Unable to listen port %d.\n", config.port);
 		close(sock);
 		return 0;
 	}
@@ -349,6 +368,8 @@ void clean_up(void)
 		{
 			struct Client* del = &myClients[i];
 
+			sendcmd(del, MSG_BYE);
+
 			FD_CLR(del->fd, &global_fd_set);
 			if(del->server)
 				remove_server(del->server);
@@ -375,14 +396,14 @@ int run_server(void)
 
 	while(running > 0)
 	{
-		if(last_call + pingfreq < Now)
+		if(last_call + config.pingfreq < Now)
 		{
 			check_pings();
 			last_call = Now;
 		}
 
 		tmp_fdset = global_fd_set; /* save */
-		if((timeout.tv_sec = last_call + pingfreq - Now) < 0) timeout.tv_sec = 0;
+		if((timeout.tv_sec = last_call + config.pingfreq - Now) < 0) timeout.tv_sec = 0;
 		timeout.tv_usec = 0;
 
 		if(select(highsock + 1, &tmp_fdset, NULL, NULL, &timeout) < 0)

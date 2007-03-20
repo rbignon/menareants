@@ -38,7 +38,7 @@ const struct nations_str_t nations_str[] = {
 	/* N_ALQUAIDA */   { gettext_noop("Al-Quaïda"),  gettext_noop("Al-Quaïda network and its diverted boïngs.") },
 	/* N_ESPAGNE  */   { gettext_noop("Spain"),    gettext_noop("The Spanish teacher who impose weak rules and fuck us .") },
 	/* N_JAPON    */   { gettext_noop("Japan"),      gettext_noop("Japanese tourists and the advantage of photography.") },
-	/* N_COLOMBIE */   { gettext_noop("Colombia"),   gettext_noop("Colombia producing cocaine.") },
+	/* N_COLOMBIE */   { gettext_noop("Colombia"),   gettext_noop("Colombia producer of cocaine.") },
 	/* N_MAX      */   { "",           "" }
 };
 

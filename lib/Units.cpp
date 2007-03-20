@@ -20,6 +20,7 @@
  */
 
 #include "Units.h"
+#include <assert.h>
 
 /********************************************************************************************
  *                               ECBContainer                                               *
@@ -59,6 +60,22 @@ bool ECBContainer::UnContain()
 
 	return true;
 }
+
+/********************************************************************************************
+ *                               ECBJouano                                                  *
+ ********************************************************************************************/
+
+bool ECBJouano::CanBeCreated(ECBPlayer* pl) const
+{
+	assert(pl);
+	std::vector<ECBEntity*> ents = pl->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if((*it)->Type() == E_JOUANO)
+			return false;
+
+	return true;
+}
+
 
 /********************************************************************************************
  *                               ECBMcDo                                                    *

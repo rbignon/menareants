@@ -62,6 +62,7 @@ uint Config::MaxConnexions() const { return conf->GetSection("server")->GetItem(
 std::string Config::AdminPass() const { return conf->GetSection("server")->GetItem("adminpass")->String(); }
 std::string Config::MSHost() const { return conf->GetSection("meta-server")->GetItem("host")->String(); }
 uint Config::MSPort() const { return conf->GetSection("meta-server")->GetItem("port")->Integer(); }
+std::string Config::MSPassword() const { return conf->GetSection("meta-server")->GetItem("password")->String(); }
 
 bool Config::IsBanned(const std::string& ip, const std::string& nick, std::string& reason)
 {
@@ -97,6 +98,7 @@ bool Config::load()
 
 		section = conf->AddSection("meta-server", "Meta-server settings", false);
 		section->AddItem(new ConfigItem_string("host", "Hostname of meta-server"));
+		section->AddItem(new ConfigItem_string("password", "Password of meta-server", " "));
 		section->AddItem(new ConfigItem_int("port", "Port of meta-server", 1, 65535));
 
 		section = conf->AddSection("games", "Rules of games", false);

@@ -1658,7 +1658,7 @@ void TBarreAct::ShowInfos()
 	if(entity->Porty())
 		HelpInfos->AddItem(StringF(_("Porty: %d cells"), entity->Porty()));
 	else if(entity->WantAttaq(0,0))
-		HelpInfos->AddItem(_("Porty: No, engagements from body to body"));
+		HelpInfos->AddItem(_("Porty: No, body-on-body fights"));
 
 	if(entity->MyUpgrade() != ECEntity::E_NONE)
 		HelpInfos->AddItem(_("Upgrade: ") + std::string(EntityList.Get(entity->MyUpgrade())->Name()));
@@ -2403,7 +2403,7 @@ void TPingingForm::OnClic(const Point2i& mouse, int button, bool&)
 TPingingForm::TPingingForm(ECImage* w, EC_Client* cl, EChannel* ch)
 	: TForm(w), channel(ch), client(cl)
 {
-	Title = AddComponent(new TLabel(60,(std::string(ch->GetName()) + _(" - Waiting reconnections")), white_color,
+	Title = AddComponent(new TLabel(60,(std::string(ch->GetName()) + _(" - Waiting for reconnection")), white_color,
 	                      Font::GetInstance(Font::Huge)));
 
 	Message = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,150,Window()->GetWidth()-200-50,150,30, false));
@@ -2531,9 +2531,9 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	Players = AddComponent(new TList(70, 250));
 	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Killed"), _("Creations"), _("Score")));
 
-	InitDate = AddComponent(new TLabel(150, _("Begin of engagements:  ") + ch->Map()->InitDate()->String(), white_color,
+	InitDate = AddComponent(new TLabel(150, _("Begin of fight:  ") + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
-	Date = AddComponent(new TLabel(180, _("End of engagements:  ") + ch->Map()->Date()->String(), white_color,
+	Date = AddComponent(new TLabel(180, _("End of fight:  ") + ch->Map()->Date()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
 	ECDate delta;
 	delta.SetDate(ch->Map()->NbDays()+1);

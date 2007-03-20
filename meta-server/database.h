@@ -24,9 +24,10 @@
 #include "lib/Defines.h"
 #include <time.h>
 
-#define DBPATH ".maams-db"
+#define DBPATH "maams-db"
 #define DBVERSION 3
 #define PASSWDLEN 16
+#define COOKIELEN 20
 
 struct User;
 
@@ -34,6 +35,7 @@ struct RegUser
 {
 	char name[NICKLEN+1];
 	char passwd[PASSWDLEN+1];
+	char cookie[COOKIELEN+1];
 
 	int killed, deaths, creations, score, best_revenu;
 	int nb_games, victories;

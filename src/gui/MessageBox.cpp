@@ -36,11 +36,12 @@ static struct ButtonList_t
 	char* label;
 	uint w;
 	uint h;
+	ECSpriteBase* (*spr) ();
 } ButtonList[] = {
-	{ BT_OK,        gettext_noop("OK"),       100,    30  },
-	{ BT_YES,       gettext_noop("Yes"),      100,    30  },
-	{ BT_NO,        gettext_noop("No"),       100,    30  },
-	{ BT_CANCEL,    gettext_noop("Cancel"),   100,    30  }
+	{ BT_CANCEL,    gettext_noop("Cancel"),   63,    63,  &Resources::MBackButton  },
+	{ BT_NO,        gettext_noop("No"),       63,    63,  &Resources::MCancelButton  },
+	{ BT_YES,       gettext_noop("Yes"),      63,    63,  &Resources::MOkButton  },
+	{ BT_OK,        gettext_noop("OK"),       63,    63,  &Resources::MOkButton  }
 };
 
 TMessageBox::TMessageBox(std::string _s, uint _b, TForm* form, bool transparence)
@@ -63,7 +64,7 @@ TMessageBox::TMessageBox(int _x, int _y, std::string _s, uint _b, TForm* form, b
 
 TMessageBox::~TMessageBox()
 {
-	for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+	for(std::vector<TButton*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 		delete *it;
 
 	delete edit;
@@ -169,7 +170,7 @@ void TMessageBox::Draw(uint mouse_x, uint mouse_y)
 
 	vert += 20;
 
-	for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+	for(std::vector<TButton*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 		(*it)->Draw(mouse);
 
 	if(Form)
@@ -251,7 +252,7 @@ void TMessageBox::Init(std::string s, bool transparence)
 	{
 		x = Video::GetInstance()->Width()/2 - w / 2;
 		y = Video::GetInstance()->Height()/2 - h / 2;
-		for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+		for(std::vector<TButton*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 			(*it)->SetXY((*it)->X() + x + 1, (*it)->Y() + y + 1);
 		if(edit)
 			edit->SetXY(edit->X() + x + 1, edit->Y() + y + 1);
@@ -262,27 +263,33 @@ void TMessageBox::SetButtons()
 {
 	if(!boutons.empty())
 	{
-		for(std::vector<TButtonText*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
+		for(std::vector<TButton*>::iterator it = boutons.begin(); it != boutons.end(); ++it)
 			delete *it;
 		boutons.clear();
 	}
-	h += 20;
+	h += 5;
 
 	/* Préparation des boutons */
-	uint tmpw = x + 15, tmph = 0;
+	uint tmpw = x + w - 15, tmph = 0;
 	for(uint i=0;i<ASIZE(ButtonList);i++)
 		if(b & ButtonList[i].flag)
 		{
-			TButtonText *bt = new TButtonText(tmpw, y+h, ButtonList[i].w, ButtonList[i].h,
-			                                  gettext(ButtonList[i].label), Font::GetInstance(Font::Normal));
+			TButton *bt = new TButton(tmpw - ButtonList[i].w, y+h, ButtonList[i].w, ButtonList[i].h);
 			MyComponent(bt);
+			bt->SetHint(gettext(ButtonList[i].label));
 			bt->Tag = ButtonList[i].flag;
-			bt->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+			bt->SetImage(new ECSprite(ButtonList[i].spr(), Video::GetInstance()->Window()));
 			boutons.push_back(bt);
-			tmpw += ButtonList[i].w + 1;
+			tmpw -= ButtonList[i].w;
 			if(tmph < ButtonList[i].h) tmph = ButtonList[i].h;
 		}
 
-	if(w < (tmpw-x + 20)) w = tmpw - x + 20;
-	h += tmph + 5;
+	if(w < (tmpw-x + 20))
+	{
+		int d = (tmpw - x + 20) - w;
+		w = tmpw - x + 20;
+		FOR(TButton*, boutons, bt)
+			bt->SetWidth(bt->Width() + d);
+	}
+	h += tmph;
 }

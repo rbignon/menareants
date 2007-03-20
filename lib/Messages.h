@@ -22,6 +22,26 @@
 #ifndef ECLIB_Messages_h
 #define ECLIB_Messages_h
 
+/**********************************
+ * _________
+ * < WARNING >
+ * ---------
+ *     \
+ *      \
+ *     ^__^         /
+ *     (oo)\_______/  _________
+ *     (__)\       )=(  ____|_ \_____
+ *         ||----w |  \ \     \_____ |
+ *         ||     ||   ||
+ *
+ **********************************
+ *
+ * PLEASE DON'T CHANGE ORDER OF COMMANDS
+ * TO PRESERV COMPATIBILITY.
+ *       THANKS
+ *
+ **********************************
+ */
 enum ECMessage
 {
 	MSG_NONE,

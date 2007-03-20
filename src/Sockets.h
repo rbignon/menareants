@@ -74,6 +74,9 @@ public:
 
 	int sendrpl(const ECMessage& cmd, ECArgs args = ECArgs());
 	int sendrpl(const ECError& err, ECArgs args = ECArgs());
+	int sendbuf(std::string s);
+
+	bool Request(const ECMessage& cmd, ECArgs args = ECArgs());
 
 	bool IsConnected() const { return connected; }
 	void SetConnected() { connected = true; }
@@ -107,6 +110,8 @@ public:
 	void SetPort(unsigned p) { port = p; }
 	unsigned Port() const { return port; }
 
+	std::string& Request () { return request; }
+
 /* Variables protégées */
 private:
 	SOCKET sock;
@@ -122,6 +127,7 @@ private:
 	unsigned int readQi;
 
 	std::string nick;
+	std::string request;
 
 	std::string cantconnect;
 	bool error;
@@ -132,7 +138,6 @@ private:
 	unsigned int port;
 
 	void Disconnect();
-	int sendbuf(std::string s);
 };
 
 extern EC_Client MetaServer;

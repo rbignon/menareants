@@ -1,3 +1,34 @@
+2007-03-20 Romain Bignon <progs@headfucking.net>
+
+	* lib/Colors.h, src/gui/ColorEdit.cpp: Utilisation d'une couleur rose au lieu de marron.
+
+	* meta-server/config.c: Utilisation d'une configuration.
+
+	* meta-server/clients.c, meta-server/server.c, server/Server.cpp: Les serveurs doivent maintenant être identifiés
+
+	* src/Map.cpp, src/data/sound/units/missile.ogg: Utilisation du son d'un missile.
+
+	* src/data/anims/buttons, src/Main.cpp, src/Config.cpp, src/Login.cpp, src/gui/MessageBox.cpp: Ajout des nouveaux boutons de yeKcim.
+
+	* server/Server.cpp: Correction d'un super bug qui faisait qu'une fois une connexion reçue, on ne reçoit plus les messages du meta-serveur.
+
+2007-03-17 Romain Bignon <progs@headfucking.net>
+
+	* server/Channel.cpp: Lorsqu'un user quitte, on supprime bien ses evenements.
+
+	* src/Units.cpp (ECJouano): Correction d'un bug qui faisait que si un prout était hors du champs de vision, l'écran freezait.
+
+	* meta-server/clients.c, src/Login.cpp, server/Channels.cpp: Système de cookie pour ne pas avoir à se réidentifier. Maintenant une connexion au meta-serveur depuis
+	  un client est breve (on fait une requette et on se barre). Le serveur doit donner le cookie.
+
+2007-03-14 Romain Bignon <progs@headfucking.net>
+
+	* lib/Units.h (ECJouano): Il ne peut plus y avoir qu'une seule instance de Jouano en même temps.
+
+	* src/Units.cpp (ECJouano): Lorsque Jouano pète, il y a un nuage de fumée autour de lui.
+
+	* src/Login.cpp: Prévient quand il y a une nouvelle version, ainsi que si il n'y a aucun serveur disponible.
+
 2007-03-12 Romain Bignon <progs@headfucking.net>
 
 	* Units.h (ECJouano): L'unité Jouano peut maintenant se deployer pour péter et faire des domages à l'infanterie environnante.

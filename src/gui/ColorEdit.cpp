@@ -30,7 +30,7 @@ Color color_eq[] = {
 	/* COLOR_RED    */          fred_color,
 	/* COLOR_GREEN  */          green_color,
 	/* COLOR_VIOLET */          violet_color,
-	/* COLOR_BROWN  */          fbrown_color,
+	/* COLOR_BROWN  */          pink_color,
 	/* COLOR_ORANGE */          orange_color,
 	/* COLOR_CYAN   */          cyan_color,
 	/* COLOR_BLACK  */          black_color

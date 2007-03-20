@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 #include <SDL.h>
-#include "BouttonText.h"
+#include "Boutton.h"
 #include "Form.h"
 #include "Edit.h"
 #include "tools/Images.h"
@@ -97,7 +97,7 @@ private:
 	uint b;
 	uint height_string;
 	std::vector<TLabel> message;
-	std::vector<TButtonText*> boutons;
+	std::vector<TButton*> boutons;
 	ECImage background;
 	ECImage *realbg;
 	TForm *Form;

@@ -135,7 +135,7 @@ static void send_stats(TClient *cl)
 
 /** Client send me several informations about him.
  *
- * Syntax: IAM nick prog version
+ * Syntax: IAM nick prog version [cookie]
  */
 int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 {
@@ -167,6 +167,9 @@ int IAMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	cl->SetNick(nick);
 	SetAuth(cl);
+
+	if(parv.size() > 4)
+		cl->SetCookie(parv[4]);
 
 	Debug(W_CONNS, ">> Connexion de %s@%s", cl->GetNick(), cl->GetIp());
 

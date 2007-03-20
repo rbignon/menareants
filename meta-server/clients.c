@@ -18,16 +18,19 @@
  * $Id$
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include "main.h"
 #include "clients.h"
+#include "config.h"
 #include "database.h"
 #include "servers.h"
 #include "sockets.h"
 #include "lib/Defines.h"
 
 #define PASS_HASH "la"
+
 extern char *crypt(const char *, const char *);
 
 struct User* user_head = 0;
@@ -133,6 +136,12 @@ int m_show_scores(struct Client* cl, int parc, char** parv)
 	return show_scores(cl);
 }
 
+int m_bye (struct Client* cl, int parc, char** parv)
+{
+	delclient(cl);
+	return 0;
+}
+
 int m_pong (struct Client* cl, int parc, char** parv)
 {
 	cl->flags &= ~CL_PING;
@@ -164,11 +173,32 @@ int m_reg_nick (struct Client* cl, int parc, char** parv)
 	return senderr(cl, ERR_LOGIN_SUCCESS);
 }
 
-/* LOGIN <pass> */
+static int client_login(struct Client* cl, struct RegUser* reg)
+{
+	struct User* user = user_head;
+
+	cl->flags = (CL_USER|CL_LOGGED);
+	cl->user->reguser = reg;
+	reg->user = cl->user;
+
+	while(user)
+		if(user != cl->user && !strcasecmp(user->name, reg->name))
+		{
+			struct User* save = user->next;
+			delclient(user->client);
+			user = save;
+		}
+		else user = user->next;
+
+	sendrpl(cl, MSG_LOGGED, "%s %s", cl->user->name, reg->cookie);
+	return senderr(cl, ERR_LOGIN_SUCCESS);
+}
+
+/* LOGIN <cookie|pass> */
 int m_login_nick (struct Client* cl, int parc, char** parv)
 {
 	struct RegUser* reg = 0;
-	struct User* user = user_head;
+	unsigned int len;
 
 	if(!cl->user || (cl->flags & CL_USER) || (cl->flags & CL_SERVER) || parc < 2)
 		return senderr(cl, ERR_LOGIN_BADPASS);
@@ -183,23 +213,19 @@ int m_login_nick (struct Client* cl, int parc, char** parv)
 		return 0;
 	}
 
-	cl->flags = (CL_USER|CL_LOGGED);
-	cl->user->reguser = reg;
-	reg->user = cl->user;
-	send_stats(cl);
-	list_servers(cl);
+	len = snprintf(reg->cookie, sizeof reg->cookie - 1, "%X%X%X%X", cl->ip[0], cl->ip[1], cl->ip[2], rand());
+	if(len > sizeof reg->cookie - 1) len = sizeof reg->cookie - 1;
+	reg->cookie[len] = 0;
 
-	while(user)
-		if(user != cl->user && !strcasecmp(user->name, reg->name))
-		{
-			struct User* save = user->next;
-			delclient(user->client);
-			user = save;
-		}
-		else user = user->next;
+	client_login(cl, reg);
 
-	sendrpl(cl, MSG_LOGGED, "%s", cl->user->name);
-	return senderr(cl, ERR_LOGIN_SUCCESS);
+	if(cl->proto < 3)
+	{
+		send_stats(cl);
+		list_servers(cl);
+	}
+
+	return 0;
 }
 
 static char *correct_nick(const char *nick)
@@ -217,7 +243,7 @@ static char *correct_nick(const char *nick)
 	return newnick;
 }
 
-/* IAM <name> <prog> <version> */
+/* IAM <name> <prog> <version> [passwd] */
 int m_login (struct Client* cl, int parc, char** parv)
 {
 	int proto = atoi(parv[3]);
@@ -254,15 +280,24 @@ int m_login (struct Client* cl, int parc, char** parv)
 
 			add_user(cl, nick);
 
-			for(; reg; reg = reg->next)
-				if(!strcasecmp(reg->name, nick))
+			for(; reg && strcasecmp(reg->name, nick); reg = reg->next);
+
+			if(reg)
+			{
+				if(parc > 4 && !strcmp(reg->cookie, parv[4]))
+					return client_login(cl, reg);
+				else
 					return senderr(cl, ERR_REGNICK);
+			}
 
 			sendrpl(cl, MSG_LOGGED, "%s", nick);
 		}
 		cl->flags = CL_USER;
-		send_stats(cl);
-		list_servers(cl);
+		if(proto < 3)
+		{
+			send_stats(cl);
+			list_servers(cl);
+		}
 		if(proto <= 1)
 			delclient(cl);
 	}
@@ -282,8 +317,21 @@ int m_login (struct Client* cl, int parc, char** parv)
 	}
 	else if(!strcmp(parv[2], SERV_SMALLNAME))
 	{
+		struct Server *server;
+
 		cl->flags = CL_SERVER;
-		add_server(cl, parv[1]);
+		server = add_server(cl, parv[1]);
+
+		if(parc > 4)
+		{
+			struct ServerConfig* cserv = config.servers;
+
+			for(; cserv && (strcmp(cserv->name, server->name) || strcmp(cserv->ip, cl->ip)
+			                || strcmp(cserv->password, crypt(parv[4], PASS_HASH)));
+			      cserv = cserv->next);
+			if(cserv)
+				cl->flags |= CL_LOGGED;
+		}
 	}
 	else
 	{
