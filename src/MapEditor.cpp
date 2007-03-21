@@ -1334,7 +1334,6 @@ TLoadMapFile::TLoadMapFile(ECImage* w)
 	Title = AddComponent(new TLabel(60,_("Map editor"), white_color, Font::GetInstance(Font::Huge)));
 
 	MapsList = AddComponent(new TListBox(Rectanglei(Width()/2-200,200,200,300)));
-	Refresh();
 
 	NewButton = AddComponent(new TButtonText(Width()/2+50,250,150,50, _("New map"), Font::GetInstance(Font::Normal)));
 	LoadButton = AddComponent(new TButtonText(Width()/2+50,300,150,50, _("Load a file"), Font::GetInstance(Font::Normal)));
@@ -1342,4 +1341,6 @@ TLoadMapFile::TLoadMapFile(ECImage* w)
 	RetourButton = AddComponent(new TButtonText(Width()/2+50,350,150,50, _("Back"), Font::GetInstance(Font::Normal)));
 
 	SetBackground(Resources::Titlescreen());
+
+	Refresh();
 }

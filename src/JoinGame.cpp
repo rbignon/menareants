@@ -1036,6 +1036,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				GameInfosForm->RecalcMemo();
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
+				GameInfosForm->RefreshPositions();
 				if(me->Player()->IsOwner())
 					pline->Nick->SetHint(StringF(_("Clic on his nickname to kick %s"), pl->GetNick()));
 			}
@@ -1497,6 +1498,8 @@ void TGameInfosForm::RefreshPositions()
 
 		ECPlayer* pl = pll->Player();
 
+		pll->Pos->SetCaption(TypToStr(i));
+
 		if(pl->Position())
 		{
 			TButtonText* bt = Positions[pl->Position()-1];
@@ -1546,7 +1549,7 @@ void TGameInfosForm::MapSetted()
 			TButtonText* bt = AddComponent(new TButtonText(Preview->X() + (begin_x+max_x)/2 * map->PixelSize(),
 			                                               Preview->Y() + (begin_y+max_y)/2 * map->PixelSize(),
 			                                               150,50, "", Font::GetInstance(Font::Normal), black_color));
-			bt->SetImage(new ECSprite(Resources::CheckBox(), Window()));
+			bt->SetImage(new ECSprite(Resources::RadioButton(), Window()));
 			bt->SetAlwaysRedraw();
 			Positions.push_back(bt);
 		}
@@ -1635,10 +1638,12 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 	Ready = 0;
 	Nick = 0;
 	Status = 0;
+	Pos = 0;
 }
 
 TPlayerLine::~TPlayerLine()
 {
+	delete Pos;
 	delete nation;
 	delete couleur;
 	delete Ready;
@@ -1654,6 +1659,7 @@ void TPlayerLine::SetXY (int px, int py)
 	if(nation) nation->SetXY(px+395, py);
 
 	if(Ready) Ready->SetXY(px, py);
+	if(Pos) Ready->SetXY(px+75, py+10);
 	if(Status) Status->SetXY(px+85, py);
 	if(Nick) Nick->SetXY(px+105, py);
 }
@@ -1672,6 +1678,7 @@ bool TPlayerLine::Test (const Point2i& mouse, int button) const
 void TPlayerLine::Init()
 {
 	assert(pl);
+	delete Pos;
 	delete couleur;
 	delete nation;
 	delete Ready;
@@ -1684,10 +1691,12 @@ void TPlayerLine::Init()
 	nation = new TComboBox(Font::GetInstance(Font::Small), X()+395, Y(), 120);
 	MyComponent(nation);
 
+	Pos = new TLabel(X()+75, Y()+10, " ", white_color, Font::GetInstance(Font::Normal));
 	Ready = new TLabel(X(), Y(), "OK", gray_color, Font::GetInstance(Font::Big));
 	Status = new TLabel(X()+85, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
 	Nick = new TLabel(X()+105, Y(), pl->GetNick(), white_color, Font::GetInstance(Font::Big));
 
+	MyComponent(Pos);
 	MyComponent(Ready);
 	MyComponent(Status);
 	MyComponent(Nick);
@@ -1710,6 +1719,7 @@ void TPlayerLine::Draw(const Point2i& mouse)
 	Status->SetCaption(pl->IsOp() ? "@" : pl->IsOwner() ? "*" : "");
 	Ready->SetColor(pl->Ready() ? red_color : gray_color);
 
+	Pos->Draw(mouse);
 	Ready->Draw(mouse);
 	Status->Draw(mouse);
 	Nick->Draw(mouse);

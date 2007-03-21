@@ -131,6 +131,7 @@
 	R_RESOURCE(ECSpriteBase, RefreshButton,    "buttons/refresh");
 	R_RESOURCE(ECSpriteBase, SaveButton,       "buttons/save");
 	R_RESOURCE(ECSpriteBase, ScoresButton,     "buttons/scores");
+	R_RESOURCE(ECSpriteBase, RadioButton,      "buttons/radio");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");

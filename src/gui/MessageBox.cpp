@@ -86,7 +86,7 @@ uint TMessageBox::Show()
 						{
 							case SDLK_RETURN:
 								if((!edit || edit->Focused()) && !boutons.empty())
-									return boutons[0]->Tag;
+									return boutons.at(boutons.size()-1)->Tag;
 								break;
 							default: break;
 						}

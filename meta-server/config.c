@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: CheckBox.h 907 2007-02-13 19:46:20Z progs $
+ * $Id$
  */
 
 #include <stdio.h>
@@ -175,6 +175,7 @@ static struct ConfigTab *get_tab(const char *item)
 static int readconf (FILE* fp)
 {
 	int line = 0;
+	int error = 1;
 	char buf[512], vreason[CF_REASONLEN + 1];
 	struct ConfigTab* section = 0;
 
@@ -193,12 +194,14 @@ static int readconf (FILE* fp)
 			if(!(section = get_tab(ptr)))
 			{
 				printf("conf(%d): Unknown section '%s'\n", line, ptr);
+				error = -1;
 				continue;
 			}
 			if((section->flags & CONF_READ) && !(section->flags & CONF_CLONE))
 			{
 				printf("conf(%d): Section '%s' is already read\n", line, ptr);
 				section = 0;
+				error = -1;
 				continue;
 			}
 			section->flags |= CONF_READ;
@@ -213,11 +216,13 @@ static int readconf (FILE* fp)
 			if(!item)
 			{
 				printf("conf(%d): Unknown item '%s'\n", line, label);
+				error = -1;
 				continue;
 			}
 			if(!*ptr)
 			{
 				printf("conf(%d): There isn't any value\n", line);
+				error = -1;
 				continue;
 			}
 			const char* value = strtok(NULL, "=\r\n");
@@ -225,6 +230,7 @@ static int readconf (FILE* fp)
 			if(!value || !*value)
 			{
 				printf("conf(%d): There isn't any value\n", line);
+				error = -1;
 				continue;
 			}
 
@@ -262,6 +268,7 @@ static int readconf (FILE* fp)
 			if(!section)
 			{
 				printf("conf(%d): a '}' out of a section !?\n", line);
+				error = -1;
 				continue;
 			}
 
@@ -275,7 +282,7 @@ static int readconf (FILE* fp)
 		return -1;
 	}
 
-	return 1;
+	return error;
 }
 
 int load_config(const char* path)

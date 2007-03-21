@@ -166,6 +166,7 @@ public:
 	R_RESOURCE(ECSpriteBase, RefreshButton);
 	R_RESOURCE(ECSpriteBase, SaveButton);
 	R_RESOURCE(ECSpriteBase, ScoresButton);
+	R_RESOURCE(ECSpriteBase, RadioButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);

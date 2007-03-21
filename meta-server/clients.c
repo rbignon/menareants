@@ -56,10 +56,10 @@ static void list_servers(struct Client* cl)
 	struct Server* s = server_head;
 	for(; s; s = s->next)
 	{
-		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d %s %d %d %ld", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
+		sendrpl(cl, MSG_SERVLIST, "%s:%d %s %c %d %d %d %d %d %d %s %d %d %ld %d", s->client->ip, s->port ? s->port : SERV_DEFPORT, s->name,
 		                   ((s->nb_games - s->nb_wait_games) >= s->max_games || s->nb_players >= s->max_players) ? '-' : '+',
 		                   s->nb_players, s->max_players, s->nb_games, s->max_games, s->nb_wait_games, s->proto, FormatStr(s->version),
-		                   s->tot_users, s->tot_games, s->uptime);
+		                   s->tot_users, s->tot_games, s->uptime, (s->client->flags & CL_LOGGED) ? 1 : 0);
 		if(cl->proto >= 2)
 		{
 			unsigned i;

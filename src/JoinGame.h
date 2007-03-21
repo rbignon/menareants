@@ -133,6 +133,7 @@ public:
 
 	TColorEdit  *couleur;
 	TComboBox   *nation;
+	TLabel*     Pos;
 	TLabel*     Ready;
 	TLabel*     Status;
 	TLabel*     Nick;

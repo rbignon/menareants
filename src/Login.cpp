@@ -162,6 +162,7 @@ void MenAreAntsApp::RefreshList()
 	ListServerForm->StatsButton->SetEnabled(false);
 	ListServerForm->RegisterButton->SetEnabled(false);
 	ListServerForm->AccountButton->SetEnabled(false);
+	ListServerForm->RetourButton->SetEnabled(false);
 	ListServerForm->ServerList->ClearItems();
 
 	MetaServer.Request(MSG_SERVLIST);
@@ -328,6 +329,7 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	ListServerForm->RefreshButton->SetEnabled();
 	ListServerForm->EscarmoucheButton->SetEnabled();
 	ListServerForm->MissionButton->SetEnabled();
+	ListServerForm->RetourButton->SetEnabled();
 	ListServerForm->StatsButton->SetEnabled();
 	ListServerForm->RegisterButton->SetEnabled();
 	ListServerForm->AccountButton->SetEnabled();

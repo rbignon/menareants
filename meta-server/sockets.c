@@ -81,8 +81,6 @@ int sendbuf(struct Client* cl, char* buf, int len)
 	buf[len++] = '\n';
 	buf[len] = 0;
 
-	printf("S - %s\n", buf);
-
 	send(cl->fd, buf, len, 0);
 
 	return 0;
@@ -92,8 +90,6 @@ int senderr(struct Client* cl, enum ECError err)
 {
 	char buf[] = {(char)MSG_ERROR, ' ', (char)err, '\r', '\n', '\0' };
 
-	printf("S - %s\n", buf);
-
 	send(cl->fd, buf, 5, 0);
 
 	return 0;
@@ -102,8 +98,6 @@ int senderr(struct Client* cl, enum ECError err)
 int sendcmd(struct Client* cl, enum ECMessage cmd)
 {
 	char buf[] = {(char)cmd, '\r', '\n', '\0' };
-
-	printf("S - %s\n", buf);
 
 	send(cl->fd, buf, 3, 0);
 
