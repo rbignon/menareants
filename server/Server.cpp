@@ -500,7 +500,10 @@ void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
 void ECServer::ms_bye(ECServer* server, std::vector<std::string> parv)
 {
 	close(server->ms_sock);
+	FD_CLR(server->ms_sock, &server->global_read_set);
 	server->ms_sock = 0;
+	Debug(W_CONNS|W_ECHO, "Disconnected from meta-server. Reconnecting...");
+	server->ConnectMetaServer();
 }
 
 void ECServer::ParseMetaServer()
