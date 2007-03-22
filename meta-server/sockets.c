@@ -69,7 +69,7 @@ static void check_pings()
 		}
 
 	for(; reg; reg = reg->next)
-		if(Now - reg->last_visit > 3*3600)
+		if(Now - reg->last_visit > 48*3600)
 			reg->cookie[0] = 0;
 
 	write_users(dbpath);

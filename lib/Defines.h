@@ -51,7 +51,7 @@
 
 /* Dï¿œinir un (seul) des "patch" suivant (ou aucun) */
 #if 1
-#define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
+#define	APP_VERSION_PATCH	"RC2"	/* en cours de developpement */
 #else
 #define	APP_VERSION_PATCH	"pre1"	/* premiï¿œe prï¿œrelease */
 #define	APP_VERSION_PATCH	"pre2"	/* seconde prï¿œrelease */

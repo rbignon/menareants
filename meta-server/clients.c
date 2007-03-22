@@ -180,6 +180,7 @@ static int client_login(struct Client* cl, struct RegUser* reg)
 	cl->flags = (CL_USER|CL_LOGGED);
 	cl->user->reguser = reg;
 	reg->user = cl->user;
+	reg->last_visit = Now;
 
 	while(user)
 		if(user != cl->user && !strcasecmp(user->name, reg->name))

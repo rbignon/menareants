@@ -1659,14 +1659,14 @@ void TPlayerLine::SetXY (int px, int py)
 	if(nation) nation->SetXY(px+395, py);
 
 	if(Ready) Ready->SetXY(px, py);
-	if(Pos) Ready->SetXY(px+75, py+10);
-	if(Status) Status->SetXY(px+85, py);
+	if(Pos) Ready->SetXY(px+75, py+7);
+	if(Status) Status->SetXY(px+88, py);
 	if(Nick) Nick->SetXY(px+105, py);
 }
 
 bool TPlayerLine::OwnZone(const Point2i& mouse, int button)
 {
-	return (button == SDL_BUTTON_LEFT && mouse.x > X()+75 && mouse.x < X()+95 && mouse.y > Y() && mouse.y < int(Y() + Height()));
+	return (button == SDL_BUTTON_LEFT && mouse.x > X()+88 && mouse.x < X()+104 && mouse.y > Y() && mouse.y < int(Y() + Height()));
 }
 
 bool TPlayerLine::Test (const Point2i& mouse, int button) const
@@ -1691,9 +1691,9 @@ void TPlayerLine::Init()
 	nation = new TComboBox(Font::GetInstance(Font::Small), X()+395, Y(), 120);
 	MyComponent(nation);
 
-	Pos = new TLabel(X()+75, Y()+10, " ", white_color, Font::GetInstance(Font::Normal));
+	Pos = new TLabel(X()+75, Y()+7, " ", white_color, Font::GetInstance(Font::Normal));
 	Ready = new TLabel(X(), Y(), "OK", gray_color, Font::GetInstance(Font::Big));
-	Status = new TLabel(X()+85, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
+	Status = new TLabel(X()+88, Y(), pl->IsOwner() ? "*" : "", red_color, Font::GetInstance(Font::Big));
 	Nick = new TLabel(X()+105, Y(), pl->GetNick(), white_color, Font::GetInstance(Font::Big));
 
 	MyComponent(Pos);
@@ -1732,6 +1732,8 @@ void TPlayerLine::Draw(const Point2i& mouse)
 		SetHint(nation->Hint());
 	else if(Nick->Test(mouse))
 		SetHint(Nick->Hint());
+	else if(OwnZone(mouse, SDL_BUTTON_LEFT) && !pl->IsOp() && !pl->IsOwner())
+		SetHint(Status->Hint());
 	else
 		SetHint("");
 }
