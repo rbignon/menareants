@@ -352,6 +352,11 @@ void EC_Client::Disconnect()
 #endif
 		FD_CLR(sock, &global_fd_set);
 		sock = 0;
+		highsock = 0;
+
+		FORit(EC_Client*, EC_Client::clients, cl)
+			if((*cl)->sock > highsock)
+				highsock = (*cl)->sock;
 
 		Debug(W_DEBUG, "Disconnected from %s", hostname.c_str());
 	}

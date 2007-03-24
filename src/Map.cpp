@@ -540,7 +540,10 @@ ECase* TBarreCase::ChangeCaseType(ECase* c, case_img_t* type)
 	country->AddCase(c);
 
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); entities.end() != enti; ++enti)
+	{
 		(*enti)->SetCase(c);
+		c->Entities()->Add(*enti);
+	}
 
 	(*me->Map->Map())(x,y) = c;
 

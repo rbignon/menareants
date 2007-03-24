@@ -1,3 +1,9 @@
+2007-03-24 Romain Bignon <progs@headfucking.net>
+
+	* server/maps/Islands.map: Ajout de la map Islands (pour 8 joueurs, première map aussi grosse).
+
+	* src/MapEditor.cpp: Utilisation de la touche "n" pour que les cases sélectionnées fassent partie d'un nouveau territoire neutre.
+
 2007-03-20 Romain Bignon <progs@headfucking.net>
 
 	* lib/Colors.h, src/gui/ColorEdit.cpp: Utilisation d'une couleur rose au lieu de marron.

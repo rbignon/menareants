@@ -188,7 +188,7 @@ bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
-		if(*it == this) continue;
+		if(*it == this || (*it)->Level() > L_GROUND) continue;
 		int a = rand()%2, i = rand()%100;
 		Shoot(*it, a ? (1000 + i) : (1000 - i));
 	}

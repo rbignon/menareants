@@ -184,9 +184,11 @@ bool EMap::RemoveCountry(const char* id)
 	return true;
 }
 
-void EMap::AddCountry(const char* id)
+ECBCountry* EMap::AddCountry(const char* id)
 {
-	map_countries.push_back(CreateCountry(this, id));
+	ECBCountry* c = CreateCountry(this, id);
+	map_countries.push_back(c);
+	return c;
 }
 
 EMap::EMap(std::string _filename, uint _x, uint _y, std::string d)
@@ -404,6 +406,41 @@ void TMapEditor::OnKeyUp(SDL_keysym key)
 				map->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 				break;
 			}
+			break;
+		}
+		case SDLK_n:
+		{
+			if(BarreCase->Cases().empty()) break;
+
+			char num[3] = { 'N', 'A', '\0' };
+
+			BCountriesVector cts = map->Countries();
+			bool unchecked = false;
+			do
+			{
+				BCountriesVector::iterator it;
+				for(it = cts.begin(); it != cts.end() && strcmp((*it)->ID(), num); it++);
+
+				if(it == cts.end())
+					unchecked = true;
+				else
+				{
+					cts.erase(it);
+					if(num[1] < 'Z') num[1]++;
+					else if(num[0] >= 'Z') break;
+					else
+					{
+						num[0]++;
+						num[1] = 'A';
+					}
+				}
+			} while(!unchecked);
+
+			if(!unchecked) break;
+
+			ECBCountry* country = map->AddCountry(num);
+			BarreCase->ChangeOwner(country);
+
 			break;
 		}
 		default: break;
@@ -709,14 +746,35 @@ void TBarreCase::UnSelect(bool update)
 		Update();
 }
 
-void TBarreCase::ChangeOwner(TObject* o, void*)
+void TBarreCase::ChangeOwner(ECBCountry* country)
+{
+	if(!country)
+	{
+		Debug(W_WARNING, "La country n'a pas été trouvée");
+		return;
+	}
+
+	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
+	{
+		if((*it)->Country())
+			(*it)->Country()->RemoveCase(*it);
+		(*it)->SetCountry(country);
+		country->AddCase(*it);
+	}
+
+	dynamic_cast<TMapEditor*>(Parent())->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+
+	Update();
+}
+
+void TBarreCase::ChangeOwner(TListBox* o)
 {
 	TBarreCase* bc = dynamic_cast<TBarreCase*>(o->Parent());
 
-	if(bc->Country->Selected() < 0)
+	if(o->Selected() < 0)
 		return;
 
-	const char* id =  bc->Country->SelectedItem()->Value().c_str();
+	const char* id =  o->SelectedItem()->Value().c_str();
 
 	ECBCountry* country = 0;
 
@@ -728,21 +786,7 @@ void TBarreCase::ChangeOwner(TObject* o, void*)
 			break;
 		}
 
-	if(!country)
-	{
-		Debug(W_WARNING, "La country %s n'a pas été trouvée", id);
-		return;
-	}
-
-	for(std::vector<ECase*>::iterator it = bc->cases.begin(); it != bc->cases.end(); ++it)
-	{
-		if((*it)->Country())
-			(*it)->Country()->RemoveCase(*it);
-		(*it)->SetCountry(country);
-		country->AddCase(*it);
-	}
-
-	dynamic_cast<TMapEditor*>(bc->Parent())->Map->Map()->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+	bc->ChangeOwner(country);
 }
 
 void TBarreCase::Update(ECase* c)
@@ -765,12 +809,14 @@ void TBarreCase::Update(ECase* c)
 		BCountriesVector cts = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->Countries();
 		for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
 		{
-			TListBoxItem* i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID());
+			TListBoxItem* i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID(), (*it)->Cases().empty() ? green_color : black_color);
 			if(*it == country) Country->ScrollTo(i);
 		}
 
 		Show();
-		dynamic_cast<TMapEditor*>(Parent())->ShowBarreAct(true, c);
+
+		if(c)
+			dynamic_cast<TMapEditor*>(Parent())->ShowBarreAct(true, c);
 	}
 	else
 	{
@@ -794,7 +840,7 @@ void TBarreCase::Init()
 	Icons->SetList();
 
 	Country = AddComponent(new TListBox(Rectanglei(2, 15, 100, Height()-40)));
-	Country->SetOnClick(TBarreCase::ChangeOwner, 0);
+	Country->SetOnChange(TBarreCase::ChangeOwner);
 
 	SetBackground(Resources::BarreAct());
 }

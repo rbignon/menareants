@@ -1659,7 +1659,7 @@ void TPlayerLine::SetXY (int px, int py)
 	if(nation) nation->SetXY(px+395, py);
 
 	if(Ready) Ready->SetXY(px, py);
-	if(Pos) Ready->SetXY(px+75, py+7);
+	if(Pos) Pos->SetXY(px+75, py+7);
 	if(Status) Status->SetXY(px+88, py);
 	if(Nick) Nick->SetXY(px+105, py);
 }

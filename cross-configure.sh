@@ -4,7 +4,7 @@ CONFIG_SHELL=/bin/sh
 export CONFIG_SHELL
 PREFIX=/usr/
 TARGET=i586-mingw32msvc
-PATH="$PREFIX/bin:$PREFIX/$TARGET/bin:$PATH"
+PATH="$PREFIX/$TARGET/bin:$PREFIX/bin:$PATH"
 export PATH
 if [ -f "$PREFIX/$TARGET/bin/$TARGET-sdl-config" ]; then
     SDL_CONFIG="$PREFIX/$TARGET/bin/$TARGET-sdl-config"

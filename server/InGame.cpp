@@ -63,7 +63,7 @@ void EChannel::InitAnims()
 					SendArm(event->Entity()->Owner()->ClientAllies(), event->Entity(), ARM_CREATE, event->Case()->X(), event->Case()->Y());
 			}
 			else
-				SendArm(0, event->Entity(), ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, event->Case()->X(),
+				SendArm(0, event->Entity(), ARM_CREATE|ARM_HIDE, event->Case()->X(),
 				                                                                 event->Case()->Y());
 
 			// false veut dire qu'on est dans un evenement, au moment où la création est propagée

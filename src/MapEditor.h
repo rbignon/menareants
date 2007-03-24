@@ -71,7 +71,7 @@ public:
 public:
 	void Save();
 
-	void AddCountry(const char* id);
+	ECBCountry* AddCountry(const char* id);
 	bool RemoveCountry(const char* id);
 	ECBCountry* GetCountry(const char* id);
 
@@ -156,10 +156,12 @@ public:
 	void UnSelect(bool update = true);
 	bool Select() const { return select; }
 
+	void ChangeOwner(ECBCountry* country);
+
 private:
 	std::vector<ECase*> cases;
 
-	static void ChangeOwner(TObject*, void*);
+	static void ChangeOwner(TListBox*);
 
 	bool select;
 };
