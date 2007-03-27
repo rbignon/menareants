@@ -441,7 +441,7 @@ void TMap::Draw(const Point2i& mouse)
 				continue;
 			}
 			c->Draw();
-			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe())
+			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe() && SelectedEntity()->Owner()->Ready() == false)
 			{
 				bool move, invest;
 				if(dynamic_cast<TForm*>(Parent()) && dynamic_cast<TForm*>(Parent())->IsPressed(SDLK_SPACE) &&

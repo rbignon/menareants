@@ -96,9 +96,7 @@ bool EC_Client::Request(const ECMessage& cmd, ECArgs args)
 	if(!args.Empty())
 		request += " " + args.String();
 
-	Connect(hostname.c_str(), port);
-
-	return true;
+	return Connect(hostname.c_str(), port);
 }
 
 /* [:parv[0]] CMD [parv[1] [parv[2] ... [parv[parv.size()-1]]]] */

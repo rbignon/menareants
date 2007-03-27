@@ -1249,7 +1249,7 @@ void EChannel::CheckReadys()
 								                                                       entity->Case()->Y());
 						}
 						else
-							SendArm(NULL, entity, ARM_CREATE|ARM_HIDE, entity->Case()->X(), entity->Case()->Y());
+							SendArm(NULL, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE), entity->Case()->X(), entity->Case()->Y());
 					}
 					if(pl == players.end())
 						break;
@@ -1896,14 +1896,14 @@ void EChannel::SendEntities(ECPlayer* pl)
 
 		if(entity->Parent())
 		{
-			SendArm(clients, entity, entity->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE),
+			SendArm(clients, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE),
 			                         entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
 			SendArm(clients, dynamic_cast<ECEntity*>(entity->Parent()), entity->Parent()->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE),
 			                                                            entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
 			SendArm(clients, entity, ARM_CONTENER);
 		}
 		else
-			SendArm(clients, entity, entity->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE), entity->Case()->X(), entity->Case()->Y());
+			SendArm(clients, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE), entity->Case()->X(), entity->Case()->Y());
 
 		entity->Resynch(pl);
 

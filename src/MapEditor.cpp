@@ -928,7 +928,11 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		Owner->AddItem(!e->Owner(), _("Neutral"), "*");
 		BMapPlayersVector mps = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->MapPlayers();
 		for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
-			Owner->AddItem(e->Owner() == dynamic_cast<EMapPlayer*>(*it), TypToStr((*it)->ID()), TypToStr((*it)->ID()));
+		{
+
+			TListBoxItem* i = Owner->AddItem(e->Owner() == dynamic_cast<EMapPlayer*>(*it), TypToStr((*it)->ID()), TypToStr((*it)->ID()));
+			if(dynamic_cast<EMapPlayer*>(*it) == e->Owner()) Owner->ScrollTo(i);
+		}
 
 		if(entity)
 			entity->Select(false);

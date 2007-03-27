@@ -223,8 +223,10 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 
 void ECEntity::Invest(ECBEntity* e)
 {
+	if(!Owner())
+		Debug(W_WARNING, "ECEntity::Invest(): A neutral unity (%d) invests an other entity (%s: %d) !?!?!?", Type(), e->LongName().c_str(), e->Type());
 	if(e->IsCountryMaker())
-		Case()->Country()->ChangeOwner(Owner()->MapPlayer());
+		Case()->Country()->ChangeOwner(Owner() ? Owner()->MapPlayer() : 0);
 	e->ChangeOwner(Owner());
 }
 

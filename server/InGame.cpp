@@ -217,7 +217,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 							ligne, mais theoriquement ils devraient l'ignorer. */
 							ECEntity *e = dynamic_cast<ECEntity*>(*it);
 							if(e->IsHidden())
-								SendArm(0, e, ARM_CREATE|ARM_HIDE|ARM_NOCONCERNED, e->Case()->X(), e->Case()->Y());
+								SendArm(0, e, ARM_CREATE|ARM_HIDE, e->Case()->X(), e->Case()->Y());
 
 							e->SetZombie();
 							e->Tag = T_CONTINUE;
@@ -341,6 +341,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 							(*it)->Move()->Clear((*it)->Case());
 							SendArm(NULL, *it, ARM_INVEST|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
 							SendArm(receivers, gobeur, ARM_NUMBER);
+							Debug(W_DEBUG, "Reste %d à %s", gobeur->Nb(), gobeur->LongName().c_str());
 							/* Pas besoin de mettre shadow, il l'est déjà.
 								* (*it)->SetZombie();
 								*/
@@ -348,9 +349,13 @@ bool EChannel::ShowAnim(ECEvent* event)
 						else
 						{
 							SendArm(receivers, *it, ARM_NUMBER);
+							Debug(W_DEBUG, "Reste %d à %s", (*it)->Nb(), (*it)->LongName().c_str());
 							EContainer* contain = dynamic_cast<EContainer*>(*it);
 							if(contain && contain->Containing())
-								SendArm(NULL, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
+							{
+								SendArm(receivers, dynamic_cast<ECEntity*>(contain->Containing()), ARM_NUMBER);
+								Debug(W_DEBUG, "Reste %d à %s", contain->Containing()->Nb(), contain->Containing()->LongName().c_str());
+							}
 							dynamic_cast<ECase*>((*it)->Case())->CheckInvests(*it);
 							(*it)->SetZombie(false);
 						}
@@ -359,6 +364,8 @@ bool EChannel::ShowAnim(ECEvent* event)
 				break;
 			}
 			case ARM_DEPLOY:
+				event->Entity()->SetDeployed(!event->Entity()->Deployed());
+				event->Entity()->DelEvent(ARM_DEPLOY);
 				SendArm(NULL, event->Entity(), ARM_DEPLOY);
 				break;
 			case ARM_CONTAIN:

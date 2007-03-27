@@ -165,7 +165,11 @@ void MenAreAntsApp::RefreshList()
 	ListServerForm->RetourButton->SetEnabled(false);
 	ListServerForm->ServerList->ClearItems();
 
-	MetaServer.Request(MSG_SERVLIST);
+	if(!MetaServer.Request(MSG_SERVLIST))
+	{
+		TMessageBox(_("Unable to connect to meta-server"), BT_OK, ListServerForm).Show();
+		ListServerForm->SetWantQuit();
+	}
 }
 
 void MenAreAntsApp::ServerList()

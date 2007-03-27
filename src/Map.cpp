@@ -253,13 +253,14 @@ void ECEntity::AfterDraw()
 			else life.SetValueColor(red_color);
 			life.Draw(Point2i());
 		}
-		if(AttaquedCase() && (EventType() & ARM_ATTAQ))
-			trajectoire.Draw(
+
+	}
+	if(Map()->Channel() && Map()->Channel()->State() != EChannel::ANIMING && AttaquedCase() && (EventType() & ARM_ATTAQ))
+		trajectoire.Draw(
 		         AttaquedCase()->X() < Case()->X() ? AttaquedCase()->Image()->X()+CASE_WIDTH /2
 		                                           : Image()->X()+CASE_WIDTH /2,
 		         AttaquedCase()->Y() < Case()->Y() ? AttaquedCase()->Image()->Y()+CASE_HEIGHT/2
 		                                           : Image()->Y()+CASE_HEIGHT/2);
-	}
 }
 
 bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)

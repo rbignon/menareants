@@ -305,6 +305,8 @@ void TIA::FirstMovements()
 			int t = 0;
 			switch((*enti)->Type())
 			{
+				case ECEntity::E_MCDO:
+					if(!(*enti)->Deployed()) break;
 				case ECEntity::E_CASERNE:
 					switch(rand()%7)
 					{

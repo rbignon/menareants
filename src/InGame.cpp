@@ -587,8 +587,8 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 				Cursor.SetCursor(TCursor::MaintainedAttaq);
 				return W_MATTAQ;
 			}
-			FOR(ECBEntity*, ents, enti)
-				if(entity->CanAttaq(enti) && !entity->Like(enti) && !entity->IsHiddenOnCase())
+			FOR(ECBEntity*, ents, victim)
+				if(entity->CanAttaq(victim) && !entity->Like(victim) && !dynamic_cast<ECEntity*>(victim)->IsHiddenOnCase())
 					return W_ATTAQ;
 		}
 		if(IsPressed(SDLK_LCTRL))
@@ -610,7 +610,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 			bool move, invest;
 			entity->CanWalkTo(acase, move, invest);
 
-			if(invest)
+			if(invest && !IsPressed(SDLK_LALT))
 				return W_INVEST;
 			else if(move)
 				return W_MOVE;

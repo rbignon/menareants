@@ -179,9 +179,14 @@ void TListBox::Draw(const Point2i &mousePosition)
 	Window()->BoxColor(rect, box_color);
 	//Window()->RectangleColor(rect, white_color);
 
-	if(scrolling && mousePosition.y < Y() + Height() - 12 && mousePosition.y > Y() + 12)
+	if(scrolling)
 	{
-		first_visible_item = (mousePosition.y - Y() - 10) * m_items.size() / (Height()-20);
+		if(mousePosition.y > Y() + Height() - 12)
+			first_visible_item = m_items.size()-1;
+		else if(mousePosition.y < Y() + 12)
+			first_visible_item = 0;
+		else
+			first_visible_item = (mousePosition.y - Y() - 10) * m_items.size() / (Height()-20);
 	}
 
 	// Draw items

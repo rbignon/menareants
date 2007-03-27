@@ -44,13 +44,12 @@ bool ECPlane::WantDeploy()
 			break;
 	}
 
-	SetDeployed(!Deployed());
 	return true;
 }
 
 bool ECPlane::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 {
-	if(!Deployed()) return false;
+	if(!Deployed() && !(EventType() & ARM_DEPLOY)) return false;
 
 	return EContainer::WantUnContain(x, y, moves);
 }
@@ -90,8 +89,6 @@ bool ECJouano::WantDeploy()
 {
 	if((EventType() & ARM_ATTAQ) || Deployed())
 		return false;
-
-	SetDeployed(true);
 
 	Debug(W_DEBUG, "Création d'un evenement ATTAQ");
 	ECEvent* event = new ECEvent(ARM_ATTAQ, this, DestCase());
@@ -205,6 +202,8 @@ void ECMcDo::Invest(ECBEntity* entity)
 
 	/* On enlève caserne de partout, mais on ne libère PAS la mémoire ! */
 	Map()->RemoveAnEntity(caserne);
+
+	caserne->SetZombie(false); // on sait jamais
 }
 
 void ECMcDo::Played()
@@ -221,16 +220,16 @@ void ECMcDo::Played()
 			// Suppression propagée de notre mcdo
 			Channel()->SendArm(0, this, ARM_REMOVE);
 
-			delete caserne; // on supprime la caserne qu'on avait gardé et qui n'est plus dans aucune liste
+			MyFree(caserne); // on supprime la caserne qu'on avait gardé et qui n'est plus dans aucune liste
 
 			/* On créé notre caserne avec les propriétés du McDo, et je rappelle que Owner() est bien l'owner
 			 * de l'ex caserne
 			 */
-			ECEntity* caserne = CreateAnEntity(E_CASERNE, Channel()->FindEntityName(Owner()), Owner(), Case());
-			Channel()->SendArm(0, caserne, ARM_CREATE, Case()->X(), Case()->Y());
-			caserne->SetNb(Nb());
+			ECEntity* new_caserne = CreateAnEntity(E_CASERNE, Channel()->FindEntityName(Owner()), Owner(), Case());
+			Channel()->SendArm(0, new_caserne, ARM_CREATE, Case()->X(), Case()->Y());
+			new_caserne->SetNb(Nb());
 			Map()->AddAnEntity(caserne);
-			caserne->Create(false);
+			new_caserne->Create(false);
 
 			SetZombie(); // Et on supprime notre brave McDo qui a rendu de mauvais services
 		}
@@ -476,18 +475,14 @@ bool ECMissiLauncher::WantDeploy()
 			break;
 	}
 
-	SetDeployed(!Deployed());
 	return true;
 }
 
 bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 {
-	/* Il faut:
-	 * - être déployé
-	 * - que ça soit notre première action
-	 * - qu'on n'ait pas déjà prévu une attaque
+	/* Il faut être déployé ou vouloir se deployer
 	 */
-	if(!Deployed())
+	if(!Deployed() ^ !!(EventType() & ARM_DEPLOY))
 		return false;
 
 	/* On n'attaque pas sur notre case */
@@ -514,7 +509,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 		return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb() && (*it)->Level() <= L_GROUND)
 		{
 			uint dx = 0, dy = 0;
 			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;
@@ -536,7 +531,8 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			uint killed = 0;
 			if((*it)->IsBuilding())                          killed = uint(Nb() * 3 * coef);
 			else if((*it)->IsInfantry())                     killed = uint(Nb() * coef);
-			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(Nb() * 2 * coef);
+			else if((*it)->IsVehicule() || (*it)->IsNaval()
+			        || (*it)->IsPlane())                     killed = uint(Nb() * 2 * coef);
 			else if((*it)->Type() == E_MISSILAUNCHER)        killed = uint(Nb() * coef);
 			else
 			{
@@ -600,7 +596,7 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() || !Case() || Locked() && !(flags & MOVE_FORCE))
+	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() ^ !!(EventType() & ARM_DEPLOY) || !Case() || Locked() && !(flags & MOVE_FORCE))
 		return false;
 
 	ECBCase *c = 0, *here = DestCase();

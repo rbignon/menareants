@@ -1,3 +1,33 @@
+2007-03-28 Romain Bignon <progs@headfucking.net>
+
+	* server/Map.cpp: Correction d'un crash (qui arrive bizarement d'ailleurs).
+
+	* src/InGame.cpp: On ne peut plus savoir si une unité se trouve dans une forêt grave à un curseur "attaquer".
+
+	* src/Sockets.cpp (EC_Client::Request): Retourne maintenant le retour de Connect().
+
+	* src/Login.cpp: Si jamais il n'arrive pas à se connecter (Request() retournant false), il affiche un message d'erreur et sort.
+
+	* src/ListBox.cpp: On scroll aussi maintenant quand le curseur est au dessus ou en dessous du widget (avec la scrollbar).
+
+	* src/MapEditor.cpp: On scroll le widget vers le propriétaire actuel.
+
+	* server/Channels.cpp: Lorsqu'on envoie la liste des unités, on donne le nombre pour les armées neutres.
+
+2007-03-27 Romain Bignon <progs@headfucking.net>
+
+	* server/Units.cpp (ECMcDo): Correction d'un crash lorsqu'un jouano ayant investis le McDo le détruit. La variable "caserne" n'était pas remise à 0.
+
+	* server/Units.cpp, server/InGame.cpp, lib/Units.h: Maintenant quand on fait un ARM_DEPLOY, on ne met *pas* Deployed() à !Deployed(), pour pouvoir faire un cancel. Ceci
+	  corrige le bug de l'annulation d'actions pour l'avion.
+
+	* server/Batiments.cpp, server/Units.cpp: Maintenant l'obélisque peut bien tirer sur l'avion en l'air, et la tour de défense et le lance missile peuvent tirer
+	  sur un avion à terre.
+
+	* server/InGame.cpp: Le restant dans un conteneur n'est envoyé qu'aux unités concernées.
+
+	* src/Map.cpp: On affiche maintenant la trajectoire d'un tir à distance que l'unité soit sélectionnée ou non.
+
 2007-03-24 Romain Bignon <progs@headfucking.net>
 
 	* server/maps/Islands.map: Ajout de la map Islands (pour 8 joueurs, première map aussi grosse).

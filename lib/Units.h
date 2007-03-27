@@ -191,14 +191,14 @@ public:
 	virtual uint Step() const { return 5; }
 	virtual uint Visibility() const { return 5; }
 	virtual bool CanWalkOn(ECBCase *c) const { return true; }
-	virtual e_level Level() const { return !Deployed() ? L_AIR : L_GROUND; }
+	virtual e_level Level() const { return (!Deployed() ^ !!(EventType() & ARM_DEPLOY)) ? L_AIR : L_GROUND; }
 
 	// Cet avion de transport ne peut PAS prendre une ville
 	virtual bool CanInvest(const ECBEntity* e) const { return false; }
 
 	virtual bool CanContain(const ECBEntity *et)
 	{
-		if(Containing() || et->Nb() > 100*Nb() || !Deployed() || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+		if(Containing() || et->Nb() > 100*Nb() || !Deployed() ^ !!(EventType() & ARM_DEPLOY) || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
 			return false;
 		return true;
 	}
@@ -247,7 +247,7 @@ public:
 	}
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool WantDeploy() { return !(EventType() & ARM_ATTAQ); } ///< Default = false
-	virtual bool WantAttaq(uint, uint, bool) { return Deployed(); }
+	virtual bool WantAttaq(uint, uint, bool) { return (Deployed() ^ !!(EventType() & ARM_DEPLOY)); }
 	bool IsVehicule() const { return true; }
 };
 

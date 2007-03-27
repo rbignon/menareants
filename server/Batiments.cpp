@@ -75,6 +75,7 @@ bool ECObelisk::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			if((*it)->IsBuilding())                          killed = uint(600 * coef);
 			else if((*it)->IsInfantry())                     killed = uint(500 * coef);
 			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(700 * coef);
+			else if((*it)->IsPlane())                        killed = uint(1000* coef);
 			else
 			{
 				FDebug(W_WARNING, "Shoot d'un type non supporté");
@@ -122,7 +123,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 		return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb() && (*it)->Level() <= L_GROUND)
 		{
 			uint dx = 0, dy = 0;
 			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;
@@ -142,6 +143,7 @@ bool ECDefenseTower::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 			uint killed = 0;
 			if((*it)->IsInfantry())                          killed = uint(300 * coef);
 			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(400 * coef);
+			else if((*it)->IsPlane())                        killed = uint(600 * coef);
 			else
 			{
 				FDebug(W_WARNING, "Shoot d'un type non supporté");
