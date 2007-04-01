@@ -101,7 +101,7 @@ public:
 	ECList<ECBEntity*> *Entities() { return &entities; }
 
 	BPlayerVector::size_type NbAllies() const { return allies.size(); }
-	void AddAllie(ECBPlayer*);
+	virtual void AddAllie(ECBPlayer*);
 	bool RemoveAllie(ECBPlayer*);
 	bool IsAllie(ECBPlayer*) const;
 	BPlayerVector Allies() const { return allies; }

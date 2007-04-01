@@ -104,7 +104,8 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		SetXY(c->Image()->X(), 0 - missile->GetHeight());
 		me->UnlockScreen();
-		Resources::SoundMissile()->Play();
+		if(c->Showed() > 0)
+			Resources::SoundMissile()->Play();
 		return true;
 	}
 	SDL_Delay(20);

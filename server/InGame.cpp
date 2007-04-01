@@ -463,6 +463,12 @@ bool EChannel::ShowAnim(ECEvent* event)
 						entity->Move()->GoTo(c);
 
 						dynamic_cast<ECase*>(c)->CheckInvests(entity);
+
+						if(entity->IsZombie())
+						{
+							end = true;
+							break;
+						}
 					}
 					else if(invest)
 					{
@@ -480,6 +486,12 @@ bool EChannel::ShowAnim(ECEvent* event)
 						entity->Move()->GoTo(c);
 
 						dynamic_cast<ECase*>(c)->CheckInvests(entity);
+
+						if(entity->IsZombie())
+						{
+							end = true;
+							break;
+						}
 					}
 				}
 				if(entity->Owner()) entity->Owner()->Stats()->score += score_to_add;
@@ -521,7 +533,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					dynamic_cast<ECase*>(entity->Case())->CheckInvests(entity);
 				}
 
-				if(entity->Move()->Empty())
+				if(!entity->IsZombie() && entity->Move()->Empty())
 				{
 					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->List();
 					std::vector<ECBEntity*>::iterator fix = fixed.end();
@@ -541,7 +553,11 @@ bool EChannel::ShowAnim(ECEvent* event)
 						entity->Move()->Clear(entity->Case());
 						SendArm(NULL, entity, ARM_INVEST|ARM_REMOVE, entity->Case()->X(), entity->Case()->Y());
 						if(entity->Owner())
+						{
 							SendArm(entity->Owner()->Client(), gobeur, ARM_NUMBER);
+							if(entity->Owner()->NbAllies() > 0)
+								SendArm(entity->Owner()->ClientAllies(), gobeur, ARM_NUMBER);
+						}
 						entity->SetZombie();
 					}
 				}
@@ -1059,8 +1075,6 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		}
 		default: return vDebug(W_WARNING, "BP: Invalide identifiant", VCName(ch) VName(parv[1]));
 	}
-
-	cl->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
 
 	std::vector<TClient*> allies = cl->Player()->ClientAllies();
 	for(std::vector<TClient*>::iterator it = allies.begin(); it != allies.end(); ++it)

@@ -898,7 +898,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						(*it)->SetPosition(0);
 
+				me->LockScreen();
 				GameInfosForm->RefreshPositions();
+				me->UnlockScreen();
 				break;
 			default:
 				Debug(W_DESYNCH|W_SEND, "SET %c%c: Reception d'un mode non supporté", add ? '+' : '-', *c);
@@ -1523,8 +1525,6 @@ void TGameInfosForm::MapSetted()
 		RemoveComponent(*bt);
 	Positions.clear();
 
-	LockScreen();
-
 	if(map)
 	{
 		std::vector<ECMapPlayer*> map_players = map->MapPlayers();
@@ -1555,7 +1555,6 @@ void TGameInfosForm::MapSetted()
 		}
 	}
 	RefreshPositions();
-	UnlockScreen();
 }
 
 TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)

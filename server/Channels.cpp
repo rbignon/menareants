@@ -1026,12 +1026,24 @@ void ECPlayer::HaveLost()
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+		EventVector& evts = Channel()->Map()->Events();
+		for(EventVector::iterator evti = evts.begin(); evti != evts.end(); ++evti)
+			if((*evti)->Entities()->Find(entity))
+			{
+				(*evti)->Entity()->CancelEvents();
+				evti = evts.begin();
+			}
+
 		entity->CancelEvents();
+
 		Channel()->SendArm(0, entity, ARM_REMOVE);
+
 		entity->SetOwner(0);
+
 		/* Ne pas passer par ECMap::RemoveAnEntity() pour éviter le temps perdu à le supprimer dans ECPlayer */
 		entity->Case()->Entities()->Remove(entity);
 		Channel()->Map()->Entities()->Remove(entity);
+
 		MyFree(entity);
 	}
 	if(MapPlayer())
@@ -1045,13 +1057,31 @@ void ECPlayer::HaveLost()
 	}
 	Entities()->Clear();
 
-	std::vector<ECEvent*> evts = Events()->List();
+	EventVector evts = Events()->List();
 	FOR(ECEvent*, evts, evti)
 		Channel()->Map()->RemoveEvent(evti, USE_DELETE);
 
 	Events()->Clear();
 
 	SetLost();
+}
+
+void ECPlayer::AddAllie(ECBPlayer* _pl)
+{
+	ECBPlayer::AddAllie(_pl);
+
+	ECPlayer* pl = dynamic_cast<ECPlayer*>(_pl);
+
+	if(!pl->Client() || pl->Client()->IsIA())
+		return;
+
+	std::vector<ECBEntity*> ents = Entities()->List();
+	std::vector<TClient*> cl = ToVec(pl->Client());
+	FORit(ECBEntity*, ents, enti)
+	{
+		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+		Channel()->SendArm(cl, entity, ARM_CREATE, entity->Case() ? entity->Case()->X() : 0, entity->Case() ? entity->Case()->Y() : 0);
+	}
 }
 
 /********************************************************************************************

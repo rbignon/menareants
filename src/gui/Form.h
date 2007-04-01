@@ -144,6 +144,7 @@ protected:
 	virtual void OnMouseMotion(const Point2i& mouse) {}
 	virtual void OnKeyDown(SDL_keysym key) {}
 	virtual void OnKeyUp(SDL_keysym key) {}
+	virtual void LockedBeforeDraw() {}
 
 /* Attributs */
 public:

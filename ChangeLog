@@ -1,3 +1,20 @@
+2007-04-01 Romain Bignon <progs@menareants.org>
+
+	* src/Form.cpp, src/InGame.cpp: Une fonction virtuelle LockedBeforeDraw() est appellée, et on vérifie après si want_quit est bien à faux pour continuer, ceci dans le cas où l'écran
+	  était locké et qu'entre temps on a décidé de partir.
+
+	* src/JoinGame.cpp: Correction d'un bug qui faisait crasher des fois lors d'un changement de maps (mutex).
+
+	* server/Channels.cpp: Maintenant le serveur envoie le nombre dans les unités à son nouvel allié.
+
+2007-03-31 Romain Bignon <progs@menareants.org>
+
+	* src/InGame.cpp: Le message "Une unité de %s bouge en dehors de votre champs de vision" s'affichait des fois avec son nom.. Corrigé
+
+	* server/Channels.cpp (ECPlayer::Havelost): Correction d'un crash lorsqu'un joueur partait et qu'un autre joueur avait mis une des unités de ce joueur dans sa ligne de mire.
+
+	* server/InGame.cpp (BPCommand): Correction du bug qui envoyait deux fois un message de Balise à celui qui la posait/l'enlevait.
+
 2007-03-28 Romain Bignon <progs@headfucking.net>
 
 	* server/Map.cpp: Correction d'un crash (qui arrive bizarement d'ailleurs).

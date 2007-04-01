@@ -263,6 +263,14 @@ void TForm::Draw()
 	if(mutex)
 		SDL_LockMutex(mutex);
 
+	LockedBeforeDraw();
+
+	if(want_quit)
+	{
+		SDL_UnlockMutex(mutex);
+		return;
+	}
+
 	if(background && MustRedraw())
 		Window()->Blit(background);
 

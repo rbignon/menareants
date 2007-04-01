@@ -105,6 +105,8 @@ public:
 	BPlayerVector::size_type Votes() const { return votes.size(); }
 	bool AddVote(ECBPlayer* pl);
 
+	void AddAllie(ECBPlayer*);
+
 	void SetDisconnected(bool b = true)
 	{
 		ECBPlayer::SetDisconnected(b);

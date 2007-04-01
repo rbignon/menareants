@@ -158,10 +158,14 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				std::string owner = stringtok(entity, "!");
 				ECPlayer* pl = chan->GetPlayer(owner.c_str());
 				if(!pl)
-					{ Debug(W_DESYNCH|W_SEND, "ARM ): Unable to find %s player", owner.c_str()); break; }
+				{
+					Debug(W_DESYNCH|W_SEND, "ARM ): Unable to find %s player", owner.c_str());
+					break;
+				}
+
 				ECBEntity* et = pl->Entities()->Find(entity.c_str());
 				if(!et || !(container = dynamic_cast<EContainer*>(et)))
-					{ Debug(W_DESYNCH|W_SEND, "ARM %s: Unable to find entity", parv[i].c_str()); break; }
+					Debug(W_DESYNCH|W_SEND, "ARM %s: Unable to find entity", parv[i].c_str());
 				break;
 			}
 			case '&':
@@ -186,6 +190,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	std::vector<ECEntity*> entities;
 	me->LockScreen();
 
+	/** @warning DON'T EXIT FUNCTION IN THIS LOOP, BECAUSE MUTEX IS LOCKED */
 	while(!parv[0].empty())
 	{
 		std::string et_name = stringtok(parv[0], ",");
@@ -294,13 +299,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			(*it)->Created();
 		if(flags & ARM_NUMBER)
 		{
-			if(nb != (*it)->Nb())
-			{
-				if(chan->CurrentEvent() & ARM_ATTAQ)
-					L_GREAT(StringF(_("It remains %d for %s's %s"), nb, (*it)->OwnerNick().c_str(), (*it)->Qual()));
-				else
-					L_INFO(StringF(_("%s's %s has now %d"), (*it)->OwnerNick().c_str(), (*it)->Qual(), nb));
-			}
+			if(nb != (*it)->Nb() && chan->CurrentEvent() & ARM_ATTAQ)
+				L_GREAT(StringF(_("It remains %d for %s's %s"), nb, (*it)->OwnerNick().c_str(), (*it)->Qual()));
+
 			(*it)->SetNb(nb);
 		}
 		if(flags & ARM_DEPLOY && (chan->State() == EChannel::ANIMING || chan->State() == EChannel::SENDING))
@@ -333,7 +334,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			chan->Map()->ShowWaitMessage.clear();
 			InGameForm->Map->ScrollTo((entities.size() > 1 ? event_case : entities.front()->Case()));
 		}
-		else chan->Map()->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : _("Neutral");
+		else if(entities.front()->Owner() != me->Player())
+			chan->Map()->ShowWaitMessage = entities.front()->Owner() ? entities.front()->Owner()->Nick() : _("Neutral");
 		for(event_moment = BEFORE_EVENT; event_moment <= AFTER_EVENT; event_moment++)
 		{
 			bool ok = false;
@@ -755,6 +757,12 @@ void TInGameForm::BeforeDraw()
 		              ((int)BarreLat->Radar->Height()/(int)chan->Map()->Height() *
 		              Map->Y()/CASE_HEIGHT));
 	SetMustRedraw();
+}
+
+void TInGameForm::LockedBeforeDraw()
+{
+	if(!client->IsConnected() || !client->Player() || client->Player()->Channel()->State() == EChannel::SCORING)
+		want_quit = true;
 }
 
 void TInGameForm::AfterDraw()
@@ -1672,9 +1680,9 @@ void TBarreAct::ShowInfos()
 
 void TBarreAct::SetEntity(ECEntity* e)
 {
-	ECAltThread::LockThread();
+	//ECAltThread::LockThread();
 	ECAltThread::Put(TBarreAct::vSetEntity, e);
-	ECAltThread::UnlockThread();
+	//ECAltThread::UnlockThread();
 }
 
 void TBarreAct::vSetEntity(void* _e)

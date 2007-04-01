@@ -310,7 +310,7 @@ void EContainer::Union(ECEntity* entity)
 
 	EContainer* container = dynamic_cast<EContainer*>(entity);
 
-	if(!container) return;
+	if(!container || !container->Containing()) return;
 
 	if(!Containing())
 	{

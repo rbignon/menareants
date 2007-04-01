@@ -271,6 +271,7 @@ private:
 	void OnKeyDown(SDL_keysym);
 	void AfterDraw();
 	void BeforeDraw();
+	void LockedBeforeDraw();
 
 private:
 	Timer timer;
