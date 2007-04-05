@@ -80,6 +80,7 @@ public:
 
 	int MSet(std::string, ECArgs = ECArgs());
 	int MSet(ECPlayer*, std::string, ECArgs = ECArgs());
+	int SendMetaServer(ECMessage s, ECArgs = ECArgs());
 
 	enum
 	{
@@ -118,7 +119,6 @@ protected:
 	std::vector<TClient*> Clients;
 
 	bool ConnectMetaServer();
-	int SendMetaServer(ECMessage s, ECArgs = ECArgs());
 	void ParseMetaServer();
 	static void ms_ping(ECServer* server, std::vector<std::string> parv);
 	static void ms_bye(ECServer* server, std::vector<std::string> parv);

@@ -255,6 +255,10 @@ Sommaire:
             +c <creations>                                 :- créations
             +v                                             :- victoire
 
+        JOI <name> <players> <map> <type>                  :Anonce la création d'une partie (servira à prévenir les services d'events, style un bot IRC)
+                                                            type=1=mission, type=2=escarmouche, type=3=multi
+        LEA <name> <map> <winers> <losers>                 :Anonce la fin d'une partie avec les gagnants et les perdants
+
      c) Meta-server <-> Client
 
         > HEL <prog> <version>                             :Dit bonjour, s'informe sur son type et sa version de protocole
@@ -265,6 +269,11 @@ Sommaire:
                      <version> <totusers> <totgames> <uptime>
         > EOL                                              :fin du listing
 
+        < SCORE
+        > SCORE <nick> <deaths> <killed> <creations>       :score
+                <scores> <best_revenu> <nbgames> <victories>
+                <regtime> <lastvisit>
+
         > ERR NICKUSED                                     :pseudo déjà utilisé
         > REJOIN <ip:port> <game>                          :le joueur peut rejoindre une partie
 
@@ -273,3 +282,17 @@ Sommaire:
 
         < REGNICK                                          :s'enregistrer
         > ERR LOGGED                                       :loggé
+
+     d) Meta-server <-> IRC Bot
+
+        > HEL <prog> <version>
+        < IAM <name> IRCBOT <version>
+
+        < STAT                                            :afficher les stats
+        < LSP                                             :afficher la liste des serveurs
+
+        > REGNICK                                         :event quand un user a reg son nick
+        > JOIN <serveur> <game> <players> <map> <type>    :evenements concernant les maps
+                                                           type=1=mission, type=2=escarmouche, type=3=multi
+        > LEA <server> <name> <map> <winers> <losers>     :Anonce la fin d'une partie avec les gagnants et les perdants
+

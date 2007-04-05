@@ -27,6 +27,56 @@
 
 struct Server* server_head = 0;
 
+static void FormatStr(const char* s, char* buf, int size)
+{
+	int j;
+	for(j=0; *s && j < size; ++s)
+	{
+		if(*s == '\\') buf[j++] = '\\';
+		else if(*s == ' ') buf[j++] = '\\';
+		buf[j++] = *s;
+	}
+	buf[j] = 0;
+}
+
+/* JOIN <name> <players> <map name> <type> */
+int ms_join (struct Client* cl, int parc, char** parv)
+{
+	char name[2*GAMELEN+1];
+	char players[10*(NICKLEN+1)+1];
+	char map[2*SERVERLEN+1];
+	if(parc < 5)
+		return 0;
+
+	FormatStr(parv[1], name, sizeof name - 1);
+	FormatStr(parv[2], players, sizeof players - 1);
+	FormatStr(parv[3], map, sizeof map - 1);
+
+	sendrpl_toflag(CL_BOT, MSG_JOIN, "%s %s %s %s %s", cl->server->name, name, players, map, parv[4]);
+
+	return 0;
+}
+
+/* LEA <name> <map> <winers> <losers> */
+int ms_part (struct Client* cl, int parc, char** parv)
+{
+	char name[2*GAMELEN+1];
+	char winers[10*(NICKLEN+1)+1];
+	char losers[10*(NICKLEN+1)+1];
+	char map[2*SERVERLEN+1];
+	if(parc < 5)
+		return 0;
+
+	FormatStr(parv[1], name, sizeof name - 1);
+	FormatStr(parv[2], map, sizeof map - 1);
+	FormatStr(parv[3], winers, sizeof winers - 1);
+	FormatStr(parv[4], losers, sizeof losers - 1);
+
+	sendrpl_toflag(CL_BOT, MSG_LEAVE, "%s %s %s %s %s", cl->server->name, name, map, winers, losers);
+
+	return 0;
+}
+
 /* USET <account>:<cookie> <modes> [<args> ..]        :Paramètres d'un account
  *     +k <killed>                                    :- unités tués
  *     +d <deaths>                                    :- unités perdues

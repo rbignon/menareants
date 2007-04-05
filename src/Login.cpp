@@ -1004,7 +1004,7 @@ TConnectedForm::TConnectedForm(ECImage* w)
  *                               TGlobalScoresForm                                          *
  ********************************************************************************************/
 
-// SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories>
+// SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories> <regtime> <lastvisit>
 int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	if(GlobalScoresForm)

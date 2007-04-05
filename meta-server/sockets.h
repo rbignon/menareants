@@ -44,6 +44,7 @@ struct in_addr;
 #define CL_USER    0x04
 #define CL_PING    0x08
 #define CL_LOGGED  0x10
+#define CL_BOT     0x20
 struct Client
 {
 	struct Server* server;
@@ -63,6 +64,7 @@ extern int delclient(struct Client *del);
 extern int senderr(struct Client* cl, enum ECError err);
 extern int sendcmd(struct Client* cl, enum ECMessage cmd);
 extern int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...);
+extern int sendrpl_toflag(unsigned int flag, enum ECMessage cmd, const char *pattern, ...);
 extern int run_server(void);
 extern int init_socket(void);
 extern void clean_up(void);

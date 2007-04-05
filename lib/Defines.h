@@ -32,6 +32,7 @@
 #define CLIENT_SMALLNAME "MenAreAnts"
 #define MS_SMALLNAME "MenAreAntsMS"
 #define WEB_SMALLNAME "MenAreInTheWeb"
+#define IRCBOT_SMALLNAME "IRCBOT"
 
 #define SERV_DEFPORT 5461
 #define MSERV_DEFPORT 5460

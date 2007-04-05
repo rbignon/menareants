@@ -845,7 +845,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		{
 			if((*it)->CanRejoin())
 				cl->sendrpl(*it, MSG_SET, "+w");
-			if((*it)->IsAllie(pl))
+			std::vector<ECBPlayer*> allies = (*it)->Allies();
+			FOR(ECBPlayer*, allies, pl)
 				cl->sendrpl(*it, MSG_SET, ECArgs("+a", pl->Nick()));
 		}
 		/* Et ceux avec qui vous etes alliés */
@@ -1243,6 +1244,17 @@ void EChannel::CheckReadys()
 				Map()->ClearMapPlayers();
 
 				Debug(W_CONNS, "-- Lancement de la partie %s sur la map %s", GetName(), Map()->Name().c_str());
+
+				{
+					std::string s;
+					FORit(ECBPlayer*, players, pl)
+					{
+						if(!s.empty()) s += " ";
+						s += (*pl)->Nick();
+					}
+					app.SendMetaServer(MSG_JOIN, ECArgs(GetName(), s, Map()->Name(), TypToStr(IsMission() ? 1 : NbHumains() == 1 ? 2 : 3)));
+				}
+
 				SetState(EChannel::SENDING);
 				sendto_players(0, app.ServerName(), MSG_SET, "-W+S");
 				app.NBwchan--;
@@ -1425,6 +1437,7 @@ bool EChannel::CheckEndOfGame()
 
 	SetState(EChannel::SCORING);
 	sendto_players(0, app.ServerName(), MSG_SET, "-A+E");
+	std::string winers, losers;
 	for(std::vector<ECBPlayer*>::iterator it = players.begin(); it != players.end(); ++it)
 	{
 		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
@@ -1436,6 +1449,17 @@ bool EChannel::CheckEndOfGame()
 		args += TypToStr(pl->Stats()->best_revenu);
 		sendto_players(0, pl, MSG_SCORE, args);
 
+		if(pl->Lost())
+		{
+			if(!losers.empty()) losers += " ";
+			losers += pl->Nick();
+		}
+		else
+		{
+			if(!winers.empty()) winers += " ";
+			winers += pl->Nick();
+		}
+
 		if(pl->IsIA() || IsMission() || !Scoring())
 			continue;
 
@@ -1443,6 +1467,8 @@ bool EChannel::CheckEndOfGame()
 		if(pl->Lost() == false)
 			app.MSet(pl, "+v");
 	}
+
+	app.SendMetaServer(MSG_LEAVE, ECArgs(GetName(), Map()->Name(), winers, losers));
 	return true;
 }
 

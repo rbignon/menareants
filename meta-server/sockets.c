@@ -104,6 +104,32 @@ int sendcmd(struct Client* cl, enum ECMessage cmd)
 	return 0;
 }
 
+int sendrpl_toflag(unsigned int flags, enum ECMessage cmd, const char *pattern, ...)
+{
+	unsigned i = 0;
+	static char buf[MAXBUFFER + 1];
+	va_list vl;
+	size_t len;
+
+	va_start(vl, pattern);
+	len = vsnprintf(buf, sizeof buf - 2, pattern, vl); /* format */
+	if(len > sizeof buf - 2) len = sizeof buf -2;
+
+	buf[len] = 0;
+	va_end(vl);
+
+	for(; i <= highsock; ++i)
+		if(myClients[i].flags & flags)
+		{
+			send(myClients[i].fd, (char*)&cmd, 1, 0);
+			send(myClients[i].fd, " ", 1, 0);
+
+			sendbuf(&myClients[i], buf, len);
+		}
+
+	return 0;
+}
+
 int sendrpl(struct Client* cl, enum ECMessage cmd, const char *pattern, ...)
 {
 	static char buf[MAXBUFFER + 1];
@@ -174,10 +200,12 @@ int parsemsg(struct Client* cl)
 		{MSG_USET,     m_user_set,       CL_SERVER},
 		{MSG_PONG,     m_pong,           0},
 		{MSG_PING,     m_ping,           0},
-		{MSG_SERVLIST, m_serv_list,      CL_USER},
+		{MSG_SERVLIST, m_serv_list,      CL_USER|CL_BOT},
 		{MSG_REGNICK,  m_reg_nick,       CL_USER},
 		{MSG_LOGIN,    m_login_nick,     0},
-		{MSG_SCORE,    m_show_scores,    CL_USER}
+		{MSG_SCORE,    m_show_scores,    CL_USER|CL_BOT},
+		{MSG_JOIN,     ms_join,          CL_SERVER},
+		{MSG_LEAVE,    ms_part,          CL_SERVER}
 	};
 
 	//printf("R - %s\n", cl->RecvBuf);

@@ -170,6 +170,8 @@ int m_reg_nick (struct Client* cl, int parc, char** parv)
 	cl->user->reguser = reg;
 	reg->user = cl->user;
 
+	sendrpl_toflag(CL_BOT, MSG_REGNICK, "%s", cl->user->name);
+
 	return senderr(cl, ERR_LOGIN_SUCCESS);
 }
 
@@ -302,6 +304,8 @@ int m_login (struct Client* cl, int parc, char** parv)
 		if(proto <= 1)
 			delclient(cl);
 	}
+	else if(!strcmp(parv[2], IRCBOT_SMALLNAME))
+		cl->flags = CL_BOT;
 	else if(!strcmp(parv[2], WEB_SMALLNAME))
 	{
 		switch(proto)

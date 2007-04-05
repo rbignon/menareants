@@ -1,3 +1,19 @@
+2007-04-03 Romain Bignon <progs@menareants.org>
+
+	* meta-server/database.c: Le meta-serveur stock dans la base de donnée le nombre de connexions et de chans.
+
+	* meta-server/server.c, meta-server/clients.c: Possibilité de connexion d'un robot, avec envoie d'event sur création de partie
+
+	* server/Channels.cpp: Envoie d'un message au meta-serveur lors de la création d'une partie.
+
+	* API: Mise à jour du protocole concernant la classe de connexion au meta-serveur de "robot irc", et les events du serveur.
+
+	* tools/maa_ircbot.py: Robot irc en python.
+
+2007-04-02 Romain Bignon <progs@menareants.org>
+
+	* server/Channels.cpp: On envoie bien maintenant TOUTES les alliances à un user qui rejoin.
+
 2007-04-01 Romain Bignon <progs@menareants.org>
 
 	* src/Form.cpp, src/InGame.cpp: Une fonction virtuelle LockedBeforeDraw() est appellée, et on vérifie après si want_quit est bien à faux pour continuer, ceci dans le cas où l'écran

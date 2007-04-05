@@ -125,6 +125,10 @@ int load_users(const char* file)
 			version = atoi(parv[1]);
 		else if(!version)
 			printf("WARNING[config]: Skip %s line, there isn't any version\n", buf);
+		else if(!strcmp(buf, "NBCHAN"))
+			nb_tchan = atoi(parv[1]);
+		else if(!strcmp(buf, "NBUSER"))
+			nb_tusers = atoi(parv[1]);
 		else if(!strcmp(buf, "NICK"))
 		{
 			/* parv[1] = name
@@ -175,6 +179,8 @@ int write_users(const char* file)
 		return 0;
 
 	fprintf(fp, "VERSION %d\n", DBVERSION);
+	fprintf(fp, "NBCHAN %d\n", nb_tchan);
+	fprintf(fp, "NBUSER %d\n", nb_tusers);
 
 	for(; reg; reg = reg->next)
 		fprintf(fp, "NICK %s %s %d %d %d %d %d %d %d %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
