@@ -117,6 +117,8 @@ static int show_scores(struct Client* cl)
 
 	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
 		max_show = 10;
+	else if((cl->flags & CL_BOT))
+		max_show = 5;
 
 	if(nb_tregs < max_show)
 		max_show = nb_tregs;

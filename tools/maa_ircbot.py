@@ -61,7 +61,6 @@ class MetaServer (asyncore.dispatcher):
 		self.SendMsg("E")
 
 	def m_hello(self, parv):
-		self.bot.SendMessage("Kikoo MS !! %s" % parv[1])
 		self.SendMsg("B dd IRCBOT 3")
 
 	def m_server(self, parv):
@@ -120,7 +119,6 @@ class MetaServer (asyncore.dispatcher):
 		for i in data:
 			if i == '\n':
 				self.recvbuf = self.recvbuf[:len(self.recvbuf)-1]
-				print 'R - [%s]' % self.recvbuf
 				s = SplitBuf(self.recvbuf)
 				if s[0] in self.commands:
 					self.commands[s[0]](s)
@@ -139,8 +137,6 @@ class MetaServer (asyncore.dispatcher):
 
 	def SendMsg(self, buf):
 		self.send('%s\r\n' % buf)
-		print 'S - %s' % buf
-
 
 class TestBot(SingleServerIRCBot):
 	def __init__(self, channel, nickname, server, port=6667):
@@ -150,7 +146,6 @@ class TestBot(SingleServerIRCBot):
 
 	def on_welcome(self, c, e):
 		c.join(self.channel)
-		self.send_privmsgu(self.channel, "Kikoo je suis un bot python")
 		self.joined = True
 
 	def send_privmsgu(self, nick, message):
@@ -162,23 +157,19 @@ class TestBot(SingleServerIRCBot):
 		self.send_privmsgu(self.channel, message)
 
 	def on_pubmsg(self, c, e):
-		if(e.arguments()[0] == "lol"):
-			self.send_privmsgu(self.channel, "loooooooooooooooooooool");
-		if(e.arguments()[0] == "bye"):
+		if(e.arguments()[0] == "!bye"):
 			self.SendMessage("bye !")
 			self.die()
 			return True
 		if(e.arguments()[0] == "!help"):
-			self.connection.notice(nick, "Commands: !servers !top10".encode("UTF-8"))
-		if(e.arguments()[0] == "!top10"):
+			self.connection.notice(nm_to_n(e.source()), "Commands: !servers !top5".encode("UTF-8"))
+		if(e.arguments()[0] == "!top5"):
 			self.metaserver.SendMsg("f")
 		if(e.arguments()[0] == "!servers"):
 			self.SendMessage("Servers:")
 			self.metaserver.SendMsg("g")
 
 def main():
-
-	print "Hello World"
 
 	bot = TestBot(irc_channel, irc_nickname, irc_server)
 
