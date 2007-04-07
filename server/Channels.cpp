@@ -1462,7 +1462,7 @@ bool EChannel::CheckEndOfGame()
 			winers += pl->Nick();
 		}
 
-		if(pl->IsIA() || IsMission() || !Scoring())
+		if(pl->IsIA() || IsMission() || !Scoring() || NbHumains(true) <= 1)
 			continue;
 
 		app.MSet(pl, "+kdcsrg", args);
@@ -1763,11 +1763,11 @@ void EChannel::SetLimite(unsigned int l)
 	return;
 }
 
-BPlayerVector::size_type EChannel::NbHumains() const
+BPlayerVector::size_type EChannel::NbHumains(bool all) const
 {
 	BPlayerVector::size_type s = 0;
 	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
-		if(!(*it)->IsIA() && dynamic_cast<ECPlayer*>(*it)->Client() != 0)
+		if(!(*it)->IsIA() && (all || dynamic_cast<ECPlayer*>(*it)->Client() != 0))
 			++s;
 	return s;
 }

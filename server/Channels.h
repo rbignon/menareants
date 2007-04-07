@@ -312,7 +312,7 @@ public:
 	void SetOwner(ECPlayer* _o) { owner = _o; }
 
 	/** Number of humans players in this channel */
-	BPlayerVector::size_type NbHumains() const;
+	BPlayerVector::size_type NbHumains(bool all = false) const;
 
 	bool FastGame() const { return fast_game; }
 	void SetFastGame(bool b = true) { fast_game = b; }

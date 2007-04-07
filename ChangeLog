@@ -1,5 +1,8 @@
 2007-04-07 Romain Bignon <progs@menareants.org>
 
+	* server/Channels.cpp: Les scores concernant les escarmouches (les parties donc avec un seul humain) ne sont PLUS envoyes au meta-serveur pour eviter que des abrutis comme pankkake et
+	  phh ne passent leur temps a ca.
+
 	* lib/Batiments.h: Le barbelé coute maintenant 1000$.
 
 	* server/Channels.cpp, src/JoinGame.cpp: On autorise maintenant que plusieurs personnes prennent la même nation.
