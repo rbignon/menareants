@@ -188,6 +188,9 @@ void ECMine::Played()
 
 bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 {
+	if(event->Case() != Case())
+		return false;
+
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 	{
 		if(*it == this || (*it)->Level() > L_GROUND) continue;

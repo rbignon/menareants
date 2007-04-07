@@ -152,6 +152,23 @@ bool EChannel::ShowAnim(ECEvent* event)
 	}
 #endif
 	bool ret = true;
+
+	/* On supprime l'evenement chez toutes les entités qui l'ont à priori */
+	/* On le fait au début car après il se peut que des unités changent d'owner, etc */
+	if(event->Entity())
+	{
+		event->Entity()->Events()->Remove(event);
+		if(event->Entity()->Owner())
+			event->Entity()->Owner()->Events()->Remove(event);
+	}
+	std::vector<ECEntity*> ents = event->Entities()->List();
+	FORit(ECEntity*, ents, it)
+	{
+		(*it)->Events()->Remove(event);
+		if((*it)->Owner())
+			(*it)->Owner()->Events()->Remove(event);
+	}
+
 	if(event->Entity() && event->Entity()->IsZombie())
 		ret = false;
 	else
@@ -327,7 +344,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 						std::vector<ECBEntity*>::iterator fix = fixed.end();
 						if(!fixed.empty())
 							for(fix = fixed.begin();
-							        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() ||
+							        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != (*it)->Level() ||
 							        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner() ||
 							        dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
 							        dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
@@ -539,7 +556,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					std::vector<ECBEntity*>::iterator fix = fixed.end();
 					if(!fixed.empty())
 						for(fix = fixed.begin();
-							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() ||
+							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != entity->Level() ||
 							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner() ||
 							dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
 							dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(entity)->Containing() &&
@@ -591,20 +608,6 @@ bool EChannel::ShowAnim(ECEvent* event)
 			default: Debug(W_WARNING, "Event '%s' isn't supported", SHOW_EVENT(event->Flags())); break;
 		}
 
-	/* On supprime l'evenement chez toutes les entités qui l'ont à priori */
-	if(event->Entity())
-	{
-		event->Entity()->Events()->Remove(event);
-		if(event->Entity()->Owner())
-			event->Entity()->Owner()->Events()->Remove(event);
-	}
-	std::vector<ECEntity*> ents = event->Entities()->List();
-	FORit(ECEntity*, ents, it)
-	{
-		(*it)->Events()->Remove(event);
-		if((*it)->Owner())
-			(*it)->Owner()->Events()->Remove(event);
-	}
 	Map()->RemoveEvent(event, USE_DELETE);
 
 	Debug(W_DEBUG|W_ECHO, "=== End of event ===");

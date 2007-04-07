@@ -79,7 +79,7 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		/* 02 */ { I_SHIT, gettext_noop("%0Eo's %0Et invests %1s's McPuke installed in %2Eo's barracks!! He's going to eat everything! "
 		                   "That will take %3s days for him!") }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
 		/* 03 */ { I_INFO, gettext_noop("DEBUGINFO: %0s") },
-		/* 04 */ { I_SHIT, gettext_noop("%0eo's %0Et is farting!!! Every infantry next to him will be damaged because of stink!!") }
+		/* 04 */ { I_SHIT, gettext_noop("%0Eo's %0Et is farting!!! Every infantry next to him will be damaged because of stink!!") }
 	};
 	if(InGameForm)
 	{
@@ -845,15 +845,12 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(add)
 				{
 					if(j<parv.size())
+					{
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
-						{
-							if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
-								GameInfosForm->MyNation->Item((*it)->Nation())->SetEnabled();
-							if(!(*it)->SetNation(StrToTyp<uint>(parv[j++])))
+							if(!(*it)->SetNation(StrToTyp<uint>(parv[j])))
 								Debug(W_DESYNCH|W_SEND, "SET +n: couleur trop grande !?");
-							else if(!(*it)->IsMe() && (*it)->Nation() > 0 && GameInfosForm->MyNation)
-								GameInfosForm->MyNation->Item((*it)->Nation())->SetEnabled(false);
-						}
+						j++;
+					}
 					else Debug(W_DESYNCH|W_SEND, "SET +n: sans couleur");
 				}
 				else
@@ -869,15 +866,18 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if(add)
 				{
 					if(j<parv.size())
+					{
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
 						{
 							if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
 								GameInfosForm->MyColor->DelBadValue((*it)->Color());
-							if(!(*it)->SetColor(StrToTyp<uint>(parv[j++])))
+							if(!(*it)->SetColor(StrToTyp<uint>(parv[j])))
 								Debug(W_DESYNCH|W_SEND, "SET +c: couleur trop grande !?");
 							else if(!(*it)->IsMe() && (*it)->Color() > 0 && GameInfosForm->MyColor)
 								GameInfosForm->MyColor->AddBadValue((*it)->Color());
 						}
+						j++;
+					}
 					else Debug(W_DESYNCH|W_SEND, "SET +c: sans couleur");
 				}
 				else
@@ -895,8 +895,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(j<parv.size())
 					{
 						for(PlayerList::iterator it=players.begin(); it != players.end(); ++it)
-							if(!(*it)->SetPosition(StrToTyp<uint>(parv[j++])))
+							if(!(*it)->SetPosition(StrToTyp<uint>(parv[j])))
 								Debug(W_DESYNCH|W_SEND, "SET +p: position hors limite");
+						j++;
 					}
 					else Debug(W_DESYNCH|W_SEND, "SET +p: sans position");
 				}

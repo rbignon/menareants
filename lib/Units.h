@@ -353,7 +353,7 @@ public:
 	virtual e_type Type() const { return E_MCDO; }
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1000; }
-	virtual uint Step() const { return Deployed() ? 0 : 2; }
+	virtual uint Step() const { return Deployed() ? 0 : 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
 

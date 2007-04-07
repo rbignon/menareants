@@ -78,8 +78,9 @@ class MetaServer (asyncore.dispatcher):
 
 	def m_regnick(self, parv):
 		""" SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories> <regtime> <lastvisit> """
-		self.bot.SendMessage("\002%-15s\002 %10s (\0033+%02d\003|\0034\002\002%02d-\003) (\0033\002\002%7s\003 lost |\0033\002\002%7s\003 killed |\0033\002\002%7s\003 created |\0033\002\002%6s\003 $/t max)"
-		                     % (parv[1], parv[5], int(parv[8]), (int(parv[7])-int(parv[8])), parv[2], parv[3], parv[4], parv[6]))
+		self.bot.top5_nb += 1
+		self.bot.SendMessage("%d. \002%-15s\002 \0032\002\002%10s\003 (\0033+%02d\003|\0034\002\002%02d-\003) (\0033\002\002%7s\003 lost |\0033\002\002%7s\003 killed |\0033\002\002%7s\003 created |\0033\002\002%6s\003 $/t max)"
+		                     % (self.bot.top5_nb, parv[1], parv[5], int(parv[8]), (int(parv[7])-int(parv[8])), parv[2], parv[3], parv[4], parv[6]))
 
 
 	def m_newgame(self, parv):
@@ -155,6 +156,7 @@ class TestBot(SingleServerIRCBot):
 		SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname + "`")
 		self.channel = channel
 		self.joined = False
+		self.top5_nb = 0
 
 	def on_welcome(self, c, e):
 		c.join(self.channel)
@@ -176,6 +178,9 @@ class TestBot(SingleServerIRCBot):
 		if(e.arguments()[0] == "!help"):
 			self.connection.notice(nm_to_n(e.source()), "Commands: !servers !top5".encode("UTF-8"))
 		if(e.arguments()[0] == "!top5"):
+			if(self.top5_nb != 0 and self.top5_nb != 5):
+				return True
+			self.top5_nb = 0
 			self.metaserver.SendMsg("f")
 		if(e.arguments()[0] == "!servers"):
 			self.SendMessage("Servers:")

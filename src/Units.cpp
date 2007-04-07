@@ -125,6 +125,7 @@ void ECMcDo::RecvData(ECData data)
 		case DATA_EXOWNER:
 		{
 			ex_owner = Channel()->GetPlayer(data.data.c_str());
+			SetShowedCases(true, true);
 			break;
 		}
 		case DATA_JOUANO:
@@ -138,8 +139,8 @@ void ECMcDo::RecvData(ECData data)
 
 ECMcDo::~ECMcDo()
 {
-	if(Deployed() && ex_owner && ex_owner->IsMe())
-		SetShowedCases(false);
+	if(Deployed())
+		SetShowedCases(false, true);
 }
 
 std::string ECMcDo::SpecialInfo()

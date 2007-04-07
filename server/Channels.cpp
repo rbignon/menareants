@@ -521,15 +521,13 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 							Debug(W_DESYNCH, "SET +n %d >= %d(maxcouleur)", nation, ECPlayer::N_MAX);
 							break;
 						}
-						BPlayerVector::iterator it;
-						BPlayerVector plv = sender->Channel()->Players();
-						for(it = plv.begin(); it != plv.end() && (*it)->Nation() != nation; ++it);
-						if(it != plv.end())
-							break; /* Nation déjà utilisée */
+
+						/* WE ALLOW EVERYONE TO USE A NATION ALREADY USED */
+
+						sender->SetNation(nation);
+						if(!need_ready) need_ready = NEEDREADY_ME;
+						changed = YES_WITHPARAM;
 					}
-					sender->SetNation(nation);
-					if(!need_ready) need_ready = NEEDREADY_ME;
-					changed = YES_WITHPARAM;
 				}
 				else
 				{
@@ -560,10 +558,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						for(it = plv.begin(); it != plv.end() && (*it)->Color() != color; ++it);
 						if(it != plv.end())
 							break; /* Couleur déjà utilisée */
+
+						sender->SetColor(color);
+						if(!need_ready) need_ready = NEEDREADY_ME;
+						changed = YES_WITHPARAM;
 					}
-					sender->SetColor(color);
-					if(!need_ready) need_ready = NEEDREADY_ME;
-					changed = YES_WITHPARAM;
 				}
 				else
 				{
@@ -605,10 +604,11 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
 						if(it != plv.end())
 							break; /* Position déjà prise */
+
+						sender->SetPosition(place);
+						if(!need_ready) need_ready = NEEDREADY_ME;
+						changed = YES_WITHPARAM;
 					}
-					sender->SetPosition(place);
-					if(!need_ready) need_ready = NEEDREADY_ME;
-					changed = YES_WITHPARAM;
 				}
 				else
 				{

@@ -76,10 +76,17 @@ void ECJouano::Invest(ECBEntity* entity)
 
 	mcdo->RestDestroy() = JOUANO_DESTROYTURN + 1;
 
-	/* >  Channel()->SendArm(0, entity, ARM_DATA, 0, 0, ECData(DATA_JOUANO, entity->RestDestroy()));
-	 * Inutile: à la fin du tour, ECMcDo::Played() sera appellé et l'enverra de lui même.
+	ECMcDo* mc_do = dynamic_cast<ECMcDo*>(entity);
+
+	if(!mc_do)
+		FDebug(W_WARNING, "Le Mcdo n'en est pas un !!");
+	else
+		Channel()->SendArm(0, mc_do, ARM_DATA, 0, 0, ECData(ECMcDo::DATA_JOUANO, TypToStr(mc_do->RestDestroy())));
+	/* Inutile: à la fin du tour, ECMcDo::Played() sera appellé et l'enverra de lui même.
 	 * C'est d'ailleurs pour cela que l'on fait JOUANO_DESTROYTURN + 1, car la fonction en question
 	 * va decrementer la variable.
+	 * > Sauf que si on veut que le client affiche l'image tout de suite, autant envoyer ça maintenant, même
+	 *   si il va etre réenvoyé à la fin du tour.
 	 */
 
 	SetZombie();
@@ -228,7 +235,7 @@ void ECMcDo::Played()
 			ECEntity* new_caserne = CreateAnEntity(E_CASERNE, Channel()->FindEntityName(Owner()), Owner(), Case());
 			Channel()->SendArm(0, new_caserne, ARM_CREATE, Case()->X(), Case()->Y());
 			new_caserne->SetNb(Nb());
-			Map()->AddAnEntity(caserne);
+			Map()->AddAnEntity(new_caserne);
 			new_caserne->Create(false);
 
 			SetZombie(); // Et on supprime notre brave McDo qui a rendu de mauvais services

@@ -1,5 +1,20 @@
 2007-04-07 Romain Bignon <progs@menareants.org>
 
+	* lib/Batiments.h: Le barbelé coute maintenant 1000$.
+
+	* server/Channels.cpp, src/JoinGame.cpp: On autorise maintenant que plusieurs personnes prennent la même nation.
+
+	* lib/Units.h (ECMcDo): Un Ronald avance maintenant de 4 cases.
+
+	* server/InGame.cpp: On ne peut plus unir deux unités qui ne sont pas sur le meme niveau.
+
+	* server/Units.cpp: Correction de bugs concernant McGerbale et Jouano.
+
+	* server/InGame.cpp (ShowAnim): Correction d'un bug qui faisait que si une unité actrice d'un event changeait de propriétaire, ben l'evenement était tenté d'être enlevé
+	  du nouveau propriétaire, et plus de l'ancien (pour McGerbale par exemple). Du coup, crash.
+
+	* server/Units.cpp (ECMine): La mine n'attaque que si l'evenement est sur sa case (problème avec Jouano par exemple).
+
 	* API, meta-server/server.c, server/Channels.cpp, tools/maa_ircbot.py: On est maintenant prévenu lorsqu'une partie se créée (avant qu'elle se lance).
 
 	* src/gui/Memo.cpp: Maintenant lorsqu'un Memo est redimensionné, la taille du contenu l'est aussi (on ne voit plus de texte dépasser), et on est bien amené à la fin du texte.

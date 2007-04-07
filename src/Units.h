@@ -339,7 +339,7 @@ public:
 /********************************************************************************************
  *                                ECMcDo                                                    *
  ********************************************************************************************/
-#define MCDO_VISUAL_STEP 2
+#define MCDO_VISUAL_STEP 4
 class ECMcDo : public ECUnit, public ECBMcDo
 {
 /* Constructeur/Destructeur */
