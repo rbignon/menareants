@@ -247,8 +247,6 @@ void TForm::Update(bool flip)
 	if(sleep_fps >= SDL_TIMESLICE)
 		SDL_Delay(sleep_fps);
 
-	SetMustRedraw(false);
-
 	AfterDraw();
 
 	//SDL_Delay(15);
@@ -299,6 +297,8 @@ void TForm::Draw()
 		if(first) first = false;
 		else break;
 	}
+
+	SetMustRedraw(false);
 
 	if(mutex)
 		SDL_UnlockMutex(mutex);

@@ -1,3 +1,19 @@
+2007-04-07 Romain Bignon <progs@menareants.org>
+
+	* API, meta-server/server.c, server/Channels.cpp, tools/maa_ircbot.py: On est maintenant prévenu lorsqu'une partie se créée (avant qu'elle se lance).
+
+	* src/gui/Memo.cpp: Maintenant lorsqu'un Memo est redimensionné, la taille du contenu l'est aussi (on ne voit plus de texte dépasser), et on est bien amené à la fin du texte.
+
+	* src/Resources.h, src/data/anims/buttons/*: Quelques autres boutons nouveau style.
+
+	* src/Config.cpp, src/Login.cpp, src/JoinGame.cpp: Des boutons nouveaux styles mis.
+
+	* src/Login.cpp: Il affiche bien les deux boutons "rehash" et "kill" quand on se loggue en admin.
+
+	* src/JoinGame.cpp: La liste des cartes est affichée chez le client également (disabled).
+
+	* src/JoinGame.cpp, src/gui/Form.cpp: Il redesssine bien tout quand il y a eu une nouvelle map ou un user qui part.
+
 2007-04-03 Romain Bignon <progs@menareants.org>
 
 	* meta-server/database.c: Le meta-serveur stock dans la base de donnée le nombre de connexions et de chans.

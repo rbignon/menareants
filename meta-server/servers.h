@@ -53,6 +53,7 @@ extern int m_server_set (struct Client*, int, char**);
 extern int m_user_set (struct Client* cl, int parc, char** parv);
 extern int ms_join (struct Client* cl, int parc, char** parv);
 extern int ms_part (struct Client* cl, int parc, char** parv);
+extern int ms_create (struct Client* cl, int parc, char** parv);
 
 extern struct Server* add_server(struct Client* cl, const char* name);
 extern void remove_server(struct Server* server);

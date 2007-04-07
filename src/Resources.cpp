@@ -132,6 +132,16 @@
 	R_RESOURCE(ECSpriteBase, SaveButton,       "buttons/save");
 	R_RESOURCE(ECSpriteBase, ScoresButton,     "buttons/scores");
 	R_RESOURCE(ECSpriteBase, RadioButton,      "buttons/radio");
+	R_RESOURCE(ECSpriteBase, AddButton,        "buttons/add");
+	R_RESOURCE(ECSpriteBase, RemoveButton,     "buttons/remove");
+	R_RESOURCE(ECSpriteBase, RefreshConfButton,"buttons/refreshconf");
+	R_RESOURCE(ECSpriteBase, AIButton,         "buttons/AI");
+	R_RESOURCE(ECSpriteBase, HostButton,       "buttons/host");
+	R_RESOURCE(ECSpriteBase, CreateButton,     "buttons/create");
+	R_RESOURCE(ECSpriteBase, JoinButton,       "buttons/join");
+	R_RESOURCE(ECSpriteBase, KillButton,       "buttons/kill");
+	R_RESOURCE(ECSpriteBase, MPlayButton,      "buttons/mplay");
+	R_RESOURCE(ECSpriteBase, ReadyButton,      "buttons/ready");
 	R_RESOURCE(ECSpriteBase, CheckBox,         "checkbox");
 	R_RESOURCE(ECSpriteBase, CaseMer,          "cases/mer");
 	R_RESOURCE(ECSpriteBase, CaseTerre,        "cases/terre");

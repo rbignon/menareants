@@ -11,7 +11,7 @@ from threading import Thread
 
 irc_server = "irc.freenode.org"
 irc_channel = "#menareants"
-irc_nickname = "MenAreAnts"
+irc_nickname = "MenAreAnts2"
 ms_server = "localhost"
 ms_port = 5460
 
@@ -67,12 +67,19 @@ class MetaServer (asyncore.dispatcher):
 		"""LSP <ip:port> <nom> <+/-> <nbjoueurs>                                """
                 """     <nbmax> <nbgames> <maxgames> <proto>                            """
                 """     <version> <totusers> <totgames> <uptime>                        """
-		self.bot.SendMessage("\002%s\002 (\0033\002\002%s/%s\003 players) (\0033\002\002%s/%s\003 games)" % (parv[2], parv[4], parv[5], parv[6], parv[7]))
+		if(int(parv[6]) >= int(parv[7]) or int(parv[4]) >= int(parv[5])):
+			color = 4
+		if(int(parv[6])):
+			color = 2
+		else:
+			color = 3
+		self.bot.SendMessage("\002%-25s\002 (\003%d\002\002%s/%s\003 players) (\003%d\002\002%s/%s\003 games)"
+		                     % (parv[2], color, parv[4], parv[5], color, parv[6], parv[7]))
 
 	def m_regnick(self, parv):
 		""" SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories> <regtime> <lastvisit> """
-		self.bot.SendMessage("\002%s\002 - %s (\0033+%s\003|\0034\002\002%d-\003) (\0033\002\002%s\003 lost|\0033\002\002%s\003 killed|\0033\002\002%s\003 created|\0033\002\002%s\003 $/t max)"
-		                     % (parv[1], parv[5], parv[8], (int(parv[7])-int(parv[8])), parv[2], parv[3], parv[4], parv[6]))
+		self.bot.SendMessage("\002%-15s\002 %10s (\0033+%02d\003|\0034\002\002%02d-\003) (\0033\002\002%7s\003 lost |\0033\002\002%7s\003 killed |\0033\002\002%7s\003 created |\0033\002\002%6s\003 $/t max)"
+		                     % (parv[1], parv[5], int(parv[8]), (int(parv[7])-int(parv[8])), parv[2], parv[3], parv[4], parv[6]))
 
 
 	def m_newgame(self, parv):
@@ -93,6 +100,10 @@ class MetaServer (asyncore.dispatcher):
 		""" i <nickname> """
 		self.bot.SendMessage("Welcome to new registered player \002%s\002!" % parv[1])
 
+	def m_creategame(self, parv):
+		""" T <server> <name> <player> """
+		self.bot.SendMessage("\002%s\002 - \0033%s\003 have created \002%s\002" % (parv[1], parv[3], parv[2]))
+
 	def __init__(self, host, bot):
 		asyncore.dispatcher.__init__(self)
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -105,7 +116,8 @@ class MetaServer (asyncore.dispatcher):
 				 "f": self.m_regnick,
 				 "P": self.m_newgame,
 				 "Q": self.m_endgame,
-				 "i": self.m_regged}
+				 "i": self.m_regged,
+				 "T": self.m_creategame}
 
 	def handle_connect(self):
 		pass

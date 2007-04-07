@@ -46,19 +46,23 @@ TMemo::~TMemo()
 
 void TMemo::Init()
 {
-  MyComponent(&m_up);
-  MyComponent(&m_down);
-  // Load images
-  m_up.SetImage (new ECSprite(Resources::UpButton(), Window()));
-  m_down.SetImage (new ECSprite(Resources::DownButton(), Window()));
+	MyComponent(&m_up);
+	MyComponent(&m_down);
+	// Load images
+	m_up.SetImage (new ECSprite(Resources::UpButton(), Window()));
+	m_down.SetImage (new ECSprite(Resources::DownButton(), Window()));
 
-  nb_visible_items_max = Height()/height_item;
+	nb_visible_items_max = Height()/height_item;
+	if (nb_visible_items_max < nb_visible_items)
+		nb_visible_items = nb_visible_items_max;
 
-  SDL_Rect r_back = {0,0,Width(), show_background ? Height() : height_item};
+	first_visible_item = m_items.size() - nb_visible_items;
 
-  background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), show_background ? Height() : height_item,
-				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-  background.FillRect(r_back, show_background ? background.MapColor(BoxColor) : background.MapColor(BoxShadowColor));
+	SDL_Rect r_back = {0,0,Width(), show_background ? Height() : height_item};
+
+	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), show_background ? Height() : height_item,
+					32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+	background.FillRect(r_back, show_background ? background.MapColor(BoxColor) : background.MapColor(BoxShadowColor));
 
 }
 

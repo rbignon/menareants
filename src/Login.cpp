@@ -98,6 +98,8 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			break;
 		case ERR_ADMIN_SUCCESS:
 			ErrMessage = ("Done.");
+			ConnectedForm->RehashButton->SetVisible(true);
+			ConnectedForm->KillButton->SetVisible(true);
 			break;
 		case ERR_REGNICK:
 			if(Config::GetInstance()->passwd.empty() == false)
@@ -536,8 +538,9 @@ TListServerForm::TListServerForm(ECImage* w)
 	ConnectButton->SetHint(_("Join selected server"));
 	ConnectButton->SetEnabled(false);
 
-	ConnectToButton = AddComponent(new TButtonText(ConnectButton->X()+ConnectButton->Width(), ConnectButton->Y(), 150,50, _("Enter a server"),
-	                                            Font::GetInstance(Font::Normal)));
+	ConnectToButton = AddComponent(new TButton(ConnectButton->X()+ConnectButton->Width(), ConnectButton->Y(), 150,50));
+	ConnectToButton->SetImage(new ECSprite(Resources::HostButton(), Video::GetInstance()->Window()));
+	ConnectToButton->SetHint(_("Connect to a specific server"));
 
 	RegisterButton = AddComponent(new TButton(button_x, ConnectButton->Y()+ConnectButton->Height(), 150,50));
 	RegisterButton->SetImage(new ECSprite(Resources::SaveButton(), Video::GetInstance()->Window()));
@@ -970,25 +973,29 @@ TConnectedForm::TConnectedForm(ECImage* w)
 
 	Welcome = AddComponent(new TLabel(Motd->Y()/2,"You are connected", white_color, Font::GetInstance(Width() < 1000 ? Font::Big : Font::Large)));
 
-	int button_x = GList->X() + GList->Width() + 10;
+	int button_x = GList->X() + GList->Width();
 
-	JoinButton = AddComponent(new TButtonText(button_x, GList->Y(), 150,50, _("Join game"),
-	                                            Font::GetInstance(Font::Normal)));
+	JoinButton = AddComponent(new TButton(button_x, GList->Y(), 150,50));
 	JoinButton->SetEnabled(false);
-	CreerButton = AddComponent(new TButtonText(button_x,JoinButton->Y()+JoinButton->Height(), 150,50, _("Create a game"),
-	                                            Font::GetInstance(Font::Normal)));
-	RefreshButton = AddComponent(new TButton(button_x,CreerButton->Y()+CreerButton->Height(),150,50));
+	JoinButton->SetImage(new ECSprite(Resources::JoinButton(), Video::GetInstance()->Window()));
+	JoinButton->SetHint(_("Join a game"));
+	CreerButton = AddComponent(new TButton(button_x+JoinButton->Width(),GList->Y(), 150,50));
+	CreerButton->SetImage(new ECSprite(Resources::CreateButton(), Video::GetInstance()->Window()));
+	CreerButton->SetHint(_("Create a game"));
+	RefreshButton = AddComponent(new TButton(button_x,JoinButton->Y()+JoinButton->Height(),150,50));
 	RefreshButton->SetImage(new ECSprite(Resources::RefreshButton(), Video::GetInstance()->Window()));
 	RefreshButton->SetHint(_("Refresh list"));
-	DisconnectButton = AddComponent(new TButton(button_x,RefreshButton->Y()+RefreshButton->Height(),150,50));
+	DisconnectButton = AddComponent(new TButton(button_x+RefreshButton->Width(),JoinButton->Y()+JoinButton->Height(),150,50));
 	DisconnectButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 	DisconnectButton->SetHint(_("Disconnect from server"));
-	RehashButton = AddComponent(new TButtonText(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50, _("Rehash config."),
-	                                                Font::GetInstance(Font::Normal)));
+	RehashButton = AddComponent(new TButton(button_x,DisconnectButton->Y()+DisconnectButton->Height(),150,50));
 	RehashButton->SetVisible(false);
-	KillButton = AddComponent(new TButtonText(button_x,RehashButton->Y()+RehashButton->Height(),150,50, _("To kill an user"),
-	                                                Font::GetInstance(Font::Normal)));
+	RehashButton->SetImage(new ECSprite(Resources::RefreshConfButton(), Video::GetInstance()->Window()));
+	RehashButton->SetHint(_("Rehash configuration"));
+	KillButton = AddComponent(new TButton(button_x+RehashButton->Width(),DisconnectButton->Y()+DisconnectButton->Height(),150,50));
 	KillButton->SetVisible(false);
+	KillButton->SetImage(new ECSprite(Resources::KillButton(), Video::GetInstance()->Window()));
+	KillButton->SetHint(_("Kill a player"));
 
 	Uptime =    AddComponent(new TLabel(75,Window()->GetHeight()-90," ", white_color, Font::GetInstance(Font::Normal)));
 	UserStats = AddComponent(new TLabel(75,Uptime->Y()+Uptime->Height()," ", white_color, Font::GetInstance(Font::Normal)));

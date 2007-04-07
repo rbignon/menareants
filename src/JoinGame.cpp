@@ -238,8 +238,8 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			map = new ECMap(TGameInfosForm::RecvMap);
 			map->Init();
 			if(GameInfosForm)
-				map->CreatePreview(GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 85,
-				                   GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 85,
+				map->CreatePreview(GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 30,
+				                   GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 30,
 				                   0);
 		}
 		catch(TECExcept &e)
@@ -552,13 +552,19 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					if(GameInfosForm)
 					{
 						GameInfosForm->MapList->Select(StrToTyp<uint>(parv[j])); // pas incr j ici, lire avant le break;
+						if(sender != me->Player())
+							GameInfosForm->MapList->ScrollTo(StrToTyp<uint>(parv[j]));
 						GameInfosForm->PretButton->SetEnabled(true);
+						me->LockScreen();
+						GameInfosForm->SetMustRedraw();
+						me->UnlockScreen();
 					}
 				}
 				else
 					Debug(W_DESYNCH|W_SEND, "SET -m: theoriquement impossible");
 
 				// On le fait ici car il a pu y avoir des erreurs ou surtout, il est possible qu'on ait recover une partie
+				// (ce qui fait que GameInfosForm == 0)
 				j++;
 				break;
 			case '@':
@@ -1264,8 +1270,9 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, int flags)
 		GameInfosForm->Title->SetCaption((flags & G_MISSION) ? _("Alone game") : chan->GetName());
 		if(client->Player()->IsOwner())
 		{
-			GameInfosForm->PretButton->SetCaption(_("Start game"));
 			GameInfosForm->PretButton->SetEnabled();
+			GameInfosForm->PretButton->SetImage(new ECSprite(Resources::MPlayButton(), Video::GetInstance()->Window()));
+			GameInfosForm->PretButton->SetHint(_("Launch game"));
 		}
 
 		GameInfosForm->ChangeStatus(client->Player()->IsPriv());
@@ -1332,7 +1339,7 @@ void TGameInfosForm::AfterDraw()
 		want_quit = true;
 		return;
 	}
-	if(!MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
+	if(client->Player()->IsPriv() && !MapList->Enabled() && listmapclick.time_elapsed(true) > 2)
 		MapList->SetEnabled();
 }
 
@@ -1469,7 +1476,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 
 void TGameInfosForm::ChangeStatus(bool add)
 {
-	MapList->SetVisible(add);
+	MapList->SetEnabled(add);
 	SpeedGame->SetEnabled(add);
 	Scoring->SetEnabled(add);
 	BeginMoney->SetEnabled(add);
@@ -1570,39 +1577,44 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	SendMessage = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,Window()->GetHeight()-45,chat_width,
 	                                     MAXBUFFER-20));
 
-	MapTitle = AddComponent(new TLabel(50 + chat_width + 40, 345, "", white_color, Font::GetInstance(Font::Big)));
-	Preview = AddComponent(new TImage(50 + chat_width + 40, 380));
+	MapTitle = AddComponent(new TLabel(50 + chat_width + 40, 345, "", white_color, Window()->GetWidth() < 1000 ? Font::GetInstance(Font::Normal) : Font::GetInstance(Font::Big)));
+	Preview = AddComponent(new TImage(50 + chat_width + 30, 380));
 
-	int right_x = Window()->GetWidth() - 175;
+	int right_x = Window()->GetWidth() - 200;
 
-	MapList = AddComponent(new TListBox(Rectanglei(right_x, 270, 150, 80)));
+	PretButton = AddComponent(new TButton(right_x,110, 150,50));
+	PretButton->SetEnabled(false);
+	PretButton->SetImage(new ECSprite(Resources::ReadyButton(), Video::GetInstance()->Window()));
+	PretButton->SetHint(_("Are you ready ?"));
+	RetourButton = AddComponent(new TButton(right_x+PretButton->Width(),110,150,50));
+	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
+	RetourButton->SetHint(_("Leave game"));
+	CreateIAButton = AddComponent(new TButton(right_x,210,150,50));
+	CreateIAButton->Hide();
+	CreateIAButton->SetImage(new ECSprite(Resources::AIButton(), Video::GetInstance()->Window()));
+	CreateIAButton->SetHint(_("Add an artificial player (an AI) in game"));
+
+	MapList = AddComponent(new TListBox(Rectanglei(right_x, CreateIAButton->Y()+CreateIAButton->Height(), 200, 160)));
 	MapList->SetOnChange(TGameInfosForm::MapListChange);
-	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 360, _("Quick game"), white_color));
+	SpeedGame = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, MapList->Y()+MapList->Height()+5, _("Quick game"), white_color));
 	SpeedGame->SetHint(_("A player has lost when he hasn't got any building."));
 	SpeedGame->Check();
 
-	Scoring = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, 435, _("Scoring"), white_color));
+	Scoring = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, SpeedGame->Y()+SpeedGame->Height()+5, _("Scoring"), white_color));
 	Scoring->SetHint(_("Do you want to send to meta-server scoring of game ?"));
 	Scoring->Check();
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, 385, 150, 0, 50000, 5000,
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, Scoring->Y()+Scoring->Height()+5, 150, 0, 50000, 5000,
 	15000));
 	BeginMoney->SetHint(_("Money earned by each players at begin of game"));
 	BeginMoney->SetOnChange(TGameInfosForm::SpinEditChange);
 
-	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Turn durat.: "),  right_x, 405, 150, /*min*/mission ? 0 : 15, 360, 15,
+	TurnTime = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Turn durat.: "),  right_x, BeginMoney->Y()+BeginMoney->Height()+5, 150, /*min*/mission ? 0 : 15, 360, 15,
 	60));
 	TurnTime->SetHint(_("Maximal time in seconds of each turn"));
 	TurnTime->SetOnChange(TGameInfosForm::SpinEditChange);
-
-	PretButton = AddComponent(new TButtonText(right_x,110, 150,50, _("Ready"), Font::GetInstance(Font::Normal)));
-	PretButton->SetEnabled(false);
-	RetourButton = AddComponent(new TButtonText(right_x,160,150,50, _("Back"), Font::GetInstance(Font::Normal)));
-	CreateIAButton = AddComponent(new TButtonText(right_x,210,150,50, _("Add an AI"), Font::GetInstance(Font::Normal)));
-	CreateIAButton->Hide();
-	CreateIAButton->SetHint(_("Add an artificial player (an AI) in game"));
 
 	SetBackground(Resources::Titlescreen());
 
@@ -1631,7 +1643,7 @@ TPlayerLine::TPlayerLine(ECPlayer *_pl)
 {
 	pl = _pl;
 	size.y = 30;
-	size.x = 565;
+	size.x = 530;
 	couleur = 0;
 	nation = 0;
 	Ready = 0;
@@ -1744,7 +1756,7 @@ void TPlayerLine::Draw(const Point2i& mouse)
 TPlayerLineHeader::TPlayerLineHeader()
 {
 	size.y = 30;
-	size.x = 560;
+	size.x = 530;
 	label = 0;
 }
 

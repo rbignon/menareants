@@ -633,6 +633,7 @@ bool ECServer::ConnectMetaServer()
 
 	SendMetaServer(MSG_IAM, args);
 	MSet("+iPGvVu", ECArgs(TypToStr(conf->Port()), TypToStr(conf->MaxConnexions()), TypToStr(conf->MaxGames()), APP_PVERSION, APP_VERSION, TypToStr(uptime)));
+	app.MSet("+pwg", ECArgs(TypToStr(NBco), TypToStr(NBwchan), TypToStr(NBchan)));
 
 	return true;
 }

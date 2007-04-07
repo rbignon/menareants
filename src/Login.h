@@ -65,12 +65,12 @@ public:
 public:
 
 	TMemo*       Motd;
-	TButtonText* CreerButton;
-	TButtonText* JoinButton;
+	TButton*     CreerButton;
+	TButton*     JoinButton;
 	TButton*     RefreshButton;
 	TButton*     DisconnectButton;
-	TButtonText* RehashButton;
-	TButtonText* KillButton;
+	TButton*     RehashButton;
+	TButton*     KillButton;
 	TLabel*      Welcome;
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
@@ -110,7 +110,7 @@ public:
 	TButton*     RetourButton;
 	TButton*     RefreshButton;
 	TButton*     ConnectButton;
-	TButtonText* ConnectToButton;
+	TButton*     ConnectToButton;
 	TButton*     RegisterButton;
 	TButton*     StatsButton;
 	TButton*     AccountButton;

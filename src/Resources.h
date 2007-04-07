@@ -167,6 +167,16 @@ public:
 	R_RESOURCE(ECSpriteBase, SaveButton);
 	R_RESOURCE(ECSpriteBase, ScoresButton);
 	R_RESOURCE(ECSpriteBase, RadioButton);
+	R_RESOURCE(ECSpriteBase, AddButton);
+	R_RESOURCE(ECSpriteBase, RemoveButton);
+	R_RESOURCE(ECSpriteBase, RefreshConfButton);
+	R_RESOURCE(ECSpriteBase, AIButton);
+	R_RESOURCE(ECSpriteBase, HostButton);
+	R_RESOURCE(ECSpriteBase, CreateButton);
+	R_RESOURCE(ECSpriteBase, JoinButton);
+	R_RESOURCE(ECSpriteBase, KillButton);
+	R_RESOURCE(ECSpriteBase, MPlayButton);
+	R_RESOURCE(ECSpriteBase, ReadyButton);
 	R_RESOURCE(ECSpriteBase, CheckBox);
 	R_RESOURCE(ECSpriteBase, CaseMer);
 	R_RESOURCE(ECSpriteBase, CaseTerre);

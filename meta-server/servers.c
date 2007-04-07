@@ -77,6 +77,22 @@ int ms_part (struct Client* cl, int parc, char** parv)
 	return 0;
 }
 
+/* JIA <name> <players> */
+int ms_create (struct Client* cl, int parc, char** parv)
+{
+	char name[2*GAMELEN+1];
+	char player[2*NICKLEN+1];
+	if(parc < 3)
+		return 0;
+
+	FormatStr(parv[1], name, sizeof name - 1);
+	FormatStr(parv[2], player, sizeof player - 1);
+
+	sendrpl_toflag(CL_BOT, MSG_IA_JOIN, "%s %s %s", cl->server->name, name, player);
+
+	return 0;
+}
+
 /* USET <account>:<cookie> <modes> [<args> ..]        :Paramètres d'un account
  *     +k <killed>                                    :- unités tués
  *     +d <deaths>                                    :- unités perdues

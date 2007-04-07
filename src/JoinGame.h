@@ -53,9 +53,9 @@ public:
 
 	TMemo*       Chat;
 	TEdit*       SendMessage;
-	TButtonText* RetourButton;
-	TButtonText* PretButton;
-	TButtonText* CreateIAButton;
+	TButton*     RetourButton;
+	TButton*     PretButton;
+	TButton*     CreateIAButton;
 	TList*       Players;
 	TLabel*      Title;
 	TListBox*    MapList;

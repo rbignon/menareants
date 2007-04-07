@@ -292,6 +292,7 @@ Sommaire:
         < LSP                                             :afficher la liste des serveurs
 
         > REGNICK                                         :event quand un user a reg son nick
+        > MSG_IA_JOIN <serveur> <game> <player>           :creation de partie
         > JOIN <serveur> <game> <players> <map> <type>    :evenements concernant les maps
                                                            type=1=mission, type=2=escarmouche, type=3=multi
         > LEA <server> <name> <map> <winers> <losers>     :Anonce la fin d'une partie avec les gagnants et les perdants

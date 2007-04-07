@@ -205,7 +205,8 @@ int parsemsg(struct Client* cl)
 		{MSG_LOGIN,    m_login_nick,     0},
 		{MSG_SCORE,    m_show_scores,    CL_USER|CL_BOT},
 		{MSG_JOIN,     ms_join,          CL_SERVER},
-		{MSG_LEAVE,    ms_part,          CL_SERVER}
+		{MSG_LEAVE,    ms_part,          CL_SERVER},
+		{MSG_IA_JOIN,  ms_create,        CL_SERVER}
 	};
 
 	//printf("R - %s\n", cl->RecvBuf);

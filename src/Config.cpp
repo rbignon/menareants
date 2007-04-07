@@ -202,8 +202,8 @@ public:
 	TLabel*         NickInfo;
 	TLabel*         NationInfo;
 	TEdit*          NewServer;
-	TButtonText*    AddServerButton;
-	TButtonText*    DelServerButton;
+	TButton*        AddServerButton;
+	TButton*        DelServerButton;
 	TLabel*         ResolutionInfo;
 	TComboBox*      Resolution;
 	TCheckBox*      FullScreen;
@@ -446,11 +446,11 @@ TConfigForm::TConfigForm(ECImage *w)
 	NewServer = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50,510,208));
 	NewServer->SetHint(_("Server to add in form \"host[:port]\""));
 
-	DelServerButton = AddComponent(new TButtonText(280,460,100,30, _("Delete"), Font::GetInstance(Font::Small)));
-	DelServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	DelServerButton = AddComponent(new TButton(270,417,100,30));
+	DelServerButton->SetImage(new ECSprite(Resources::RemoveButton(), Window()));
 	DelServerButton->SetHint(_("Delete selected server in list."));
-	AddServerButton = AddComponent(new TButtonText(280,500,100,30, _("Add"), Font::GetInstance(Font::Small)));
-	AddServerButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	AddServerButton = AddComponent(new TButton(270,480,100,30));
+	AddServerButton->SetImage(new ECSprite(Resources::AddButton(), Window()));
 	AddServerButton->SetHint(_("Add a server in this list."));
 
 	NickInfo = AddComponent(new TLabel(300,200,_("Nickname:"), white_color, Font::GetInstance(Font::Normal)));

@@ -37,41 +37,42 @@ class Font;
 class TMemo : public TComponent
 {
 private:
-  // for the placement
-  int visible_height;
-  uint nb_visible_items, nb_visible_items_max;
-  uint height_item;
-  uint maxitems;
+	// for the placement
+	int visible_height;
+	uint nb_visible_items, nb_visible_items_max;
+	uint height_item;
+	uint maxitems;
 
-  // what are the items ?
-  uint first_visible_item;
-  std::vector<TLabel*> m_items;
+	// what are the items ?
+	uint first_visible_item;
+	std::vector<TLabel*> m_items;
 
-  // Buttons
-  TButton m_up, m_down;
+	// Buttons
+	TButton m_up, m_down;
 
-  bool show_background;
+	bool show_background;
 
-  ECImage background;
+	ECImage background;
 
-  Font* font;
+	Font* font;
 
-  bool shadowed;
+	bool shadowed;
 
 public:
-  TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
-  ~TMemo();
-  void Init ();
-  void Draw (const Point2i& mouse);
-  bool Clic (const Point2i& mouse, int button);
-  void AddItem (const std::string &label, Color _color = black_color);
-  void ScrollUp() { first_visible_item = 0; };
-  void RemoveItem (uint index);
-  uint NbItems() const { return m_items.size(); }
-  void ClearItems();
-  bool Empty() const { return m_items.empty(); }
-  void SetShadowed(bool b = true) { shadowed = b; }
-  int RealHeight() const { return m_items.size() * height_item; }
+	TMemo (Font* font, int _x, int _y, uint _width, uint _height, uint max_items = 0, bool show_background = true);
+	~TMemo();
+	void Init ();
+	void Draw (const Point2i& mouse);
+	bool Clic (const Point2i& mouse, int button);
+	void AddItem (const std::string &label, Color _color = black_color);
+	void ScrollUp() { first_visible_item = 0; };
+	void RemoveItem (uint index);
+	uint NbItems() const { return m_items.size(); }
+	void ClearItems();
+	bool Empty() const { return m_items.empty(); }
+	void SetShadowed(bool b = true) { shadowed = b; }
+	int RealHeight() const { return m_items.size() * height_item; }
+
 };
 
 #endif /* EC_MEMO_H */

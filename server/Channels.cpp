@@ -742,6 +742,8 @@ int JOICommand::Exec(TClient *cl, std::vector<std::string> parv)
 		pl = new ECPlayer(cl, chan, true, false);
 		ChanList.push_back(chan);
 		chan->SetOwner(pl);
+		if(!mission)
+			app.SendMetaServer(MSG_IA_JOIN, ECArgs(parv[1], cl->Nick()));
 	}
 	else
 	{ /* Rejoins un salon existant */
