@@ -64,6 +64,7 @@ public:
 		ECase* c;
 		std::string message;
 		ECSprite *sprite;
+		ECImage text;
 	};
 
 /* Attributs */

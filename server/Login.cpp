@@ -73,8 +73,8 @@ int ADMINCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		if(!(victim = app.FindClient(parv[2].c_str())))
 			return cl->sendrpl(ERR_ADMIN_NOSUCHVICTIM, parv[2]);
 
+		cl->sendrpl(ERR_ADMIN_SUCCESS); // We send it before exit victim, because victim can be equal than cl !
 		victim->exit(MSG_BYE);
-		cl->sendrpl(ERR_ADMIN_SUCCESS);
 		return 0;
 	}
 

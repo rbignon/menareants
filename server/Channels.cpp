@@ -495,7 +495,7 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				changed = YES_WITHPARAM;
 				if(add)
 				{
-					if(sender->IsAllie(pl))
+					if(sender == pl || sender->IsAllie(pl))
 						changed = 0;
 					else
 						sender->AddAllie(pl);
@@ -514,20 +514,15 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				{
 					if(j>=parv.size()) { Debug(W_DESYNCH, "SET +n: sans nation"); break; }
 					uint nation = StrToTyp<uint>(parv[j++]);
-					if(nation > 0 && nation != sender->Nation())
+					if(nation >= ECPlayer::N_MAX)
 					{
-						if(nation >= ECPlayer::N_MAX)
-						{
-							Debug(W_DESYNCH, "SET +n %d >= %d(maxcouleur)", nation, ECPlayer::N_MAX);
-							break;
-						}
-
-						/* WE ALLOW EVERYONE TO USE A NATION ALREADY USED */
-
-						sender->SetNation(nation);
-						if(!need_ready) need_ready = NEEDREADY_ME;
-						changed = YES_WITHPARAM;
+						Debug(W_DESYNCH, "SET +n %d >= %d(maxcouleur)", nation, ECPlayer::N_MAX);
+						break;
 					}
+
+					sender->SetNation(nation);
+					if(!need_ready) need_ready = NEEDREADY_ME;
+					changed = YES_WITHPARAM;
 				}
 				else
 				{
@@ -558,11 +553,10 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						for(it = plv.begin(); it != plv.end() && (*it)->Color() != color; ++it);
 						if(it != plv.end())
 							break; /* Couleur déjà utilisée */
-
-						sender->SetColor(color);
-						if(!need_ready) need_ready = NEEDREADY_ME;
-						changed = YES_WITHPARAM;
 					}
+					sender->SetColor(color);
+					if(!need_ready) need_ready = NEEDREADY_ME;
+					changed = YES_WITHPARAM;
 				}
 				else
 				{
@@ -604,11 +598,10 @@ int SETCommand::Exec(TClient *cl, std::vector<std::string> parv)
 						for(it = plv.begin(); it != plv.end() && (*it)->Position() != place; ++it);
 						if(it != plv.end())
 							break; /* Position déjà prise */
-
-						sender->SetPosition(place);
-						if(!need_ready) need_ready = NEEDREADY_ME;
-						changed = YES_WITHPARAM;
 					}
+					sender->SetPosition(place);
+					if(!need_ready) need_ready = NEEDREADY_ME;
+					changed = YES_WITHPARAM;
 				}
 				else
 				{
@@ -1388,7 +1381,13 @@ void EChannel::CheckReadys()
 						else
 						{
 							pl->CalculBestRevenu(money[*it]);
-							pl->UpMoney(money[*it]);
+							if(pl->Money() + money[*it] > MAX_MONEY)
+								pl->SetMoney(MAX_MONEY);
+							else
+								pl->UpMoney(money[*it]);
+
+							/* On ajoute l'argent nouvellement possédé moins la moitier de ce qu'on vient de gagner */
+							pl->Stats()->score += pl->Money() - money[*it]/2;
 						}
 					}
 
@@ -1930,7 +1929,8 @@ void EChannel::send_info (ECPlayer* pl, info_messages id, ECArgs args)
 
 	if(pl)
 	{
-		assert(pl->Client());
+		if(!pl->Client())
+			return;
 		pl->Client()->sendrpl(MSG_INFO, real_args);
 	}
 	else

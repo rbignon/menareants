@@ -280,7 +280,7 @@ bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 	{
 		EContainer* container = 0;
 		if((container = dynamic_cast<EContainer*>(enti)) && container->CanContain(this) && this->Owner() &&
-		   this->Owner()->IsMe())
+		   this->Owner()->IsMe() && container->Owner() && dynamic_cast<ECPlayer*>(container->Owner())->IsMe())
 			can_invest = 2;
 		if(can_invest >= 0 && this->CanInvest(enti))
 			can_invest = 1;
@@ -310,17 +310,17 @@ void ECEntity::SetNb(uint n)
 
 ECPlayer* ECEntity::Owner() const
 {
-	return dynamic_cast<ECPlayer*>(owner);
+	return dynamic_cast<ECPlayer*>(ECBEntity::Owner());
 }
 
 ECase* ECEntity::Case() const
 {
-	return dynamic_cast<ECase*>(acase);
+	return dynamic_cast<ECase*>(ECBEntity::Case());
 }
 
 ECMap* ECEntity::Map() const
 {
-	return dynamic_cast<ECMap*>(map);
+	return dynamic_cast<ECMap*>(ECBEntity::Map());
 }
 
 EChannel* ECEntity::Channel() const
@@ -378,8 +378,8 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	image = new ECSprite(spr, Video::GetInstance()->Window());
 	image->SetAnim(anim);
 	if(Case() && Map() && Map()->ShowMap())
-		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
-		           Map()->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * Case()->X()),
+		           Map()->ShowMap()->Y() + (CASE_HEIGHT * Case()->Y()));
 }
 
 void ECEntity::ChangeCase(ECBCase* newcase)
@@ -391,8 +391,8 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 	SetShowedCases(true);
 
 	if(Case() && Map() && Map()->ShowMap())
-		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * acase->X()),
-		           Map()->ShowMap()->Y() + (CASE_HEIGHT * acase->Y()));
+		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * Case()->X()),
+		           Map()->ShowMap()->Y() + (CASE_HEIGHT * Case()->Y()));
 }
 
 void ECEntity::SetShowedCases(bool show, bool forced)

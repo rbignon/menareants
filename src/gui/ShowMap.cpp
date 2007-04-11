@@ -450,7 +450,8 @@ void TMap::Draw(const Point2i& mouse)
 				{
 					if((SelectedEntity()->DestCase()->X() == c->X() && (SelectedEntity()->DestCase()->Y() == c->Y()+1 || SelectedEntity()->DestCase()->Y() == c->Y()-1) ||
 					    SelectedEntity()->DestCase()->Y() == c->Y() && (SelectedEntity()->DestCase()->X() == c->X()+1 || SelectedEntity()->DestCase()->X() == c->X()-1))
-					   && dynamic_cast<EContainer*>(SelectedEntity())->Containing()->CanWalkOn(c))
+					   && dynamic_cast<EContainer*>(SelectedEntity())->Containing()->CanWalkOn(c)
+					   && SelectedEntity()->Move()->Size() < SelectedEntity()->MyStep())
 					{
 						ECImage background;
 						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
@@ -461,33 +462,30 @@ void TMap::Draw(const Point2i& mouse)
 						Window()->Blit(background, &r_back2);
 					}
 				}
-				else
+				if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
+				   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
 				{
-					if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
-					   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
-					{
-						if(SelectedEntity()->CanWalkTo(c, move, invest))
-						{
-							ECImage background;
-							SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
-							background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
-												32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-							background.FillRect(r_back, background.MapRGBA(255, 249, 126, 255*3/10));
-							SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
-							Window()->Blit(background, &r_back2);
-						}
-					}
-					if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
-					   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
+					if(SelectedEntity()->CanWalkTo(c, move, invest))
 					{
 						ECImage background;
 						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
 						background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-						background.FillRect(r_back, background.MapRGBA(255, 0, 0, 255*3/10));
+						background.FillRect(r_back, background.MapRGBA(255, 249, 126, 255*3/10));
 						SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
 						Window()->Blit(background, &r_back2);
 					}
+				}
+				if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
+				   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
+				{
+					ECImage background;
+					SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};
+					background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, CASE_WIDTH, CASE_HEIGHT,
+										32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
+					background.FillRect(r_back, background.MapRGBA(255, 0, 0, 255*3/10));
+					SDL_Rect r_back2 = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
+					Window()->Blit(background, &r_back2);
 				}
 			}
 			if(CreateEntity() && c->Test(mouse.x, mouse.y))
@@ -568,6 +566,8 @@ void TMap::Draw(const Point2i& mouse)
 					bp->sprite->set(bp->c->Image()->X() + CASE_WIDTH/2  - bp->sprite->GetWidth()/2,
 					                bp->c->Image()->Y() + CASE_HEIGHT/2 - bp->sprite->GetHeight()/2);
 					bp->sprite->draw();
+					bp->text.Draw(bp->c->Image()->X() + CASE_WIDTH/2 - bp->text.GetWidth()/2,
+					              bp->c->Image()->Y() + CASE_HEIGHT - bp->text.GetHeight());
 					bp->c->SetMustRedraw();
 				}
 		}

@@ -1,3 +1,45 @@
+2007-04-11 Romain Bignon <progs@menareants.org>
+
+	* server/Channels.cpp (SETCommand): On empêche un joueur de s'allier à lui même.
+	(BPCommand): Correction d'un bug qui n'envoyait pas la balise aux joueurs alliés.
+
+	* src/Channels.cpp, src/gui/ShowMap.cpp, src/InGame.cpp: Maintenant on peut afficher du texte dans la balise (c'était déjà supporté dans le protocole).
+
+	* lib/Units.h, server/Units.cpp (ECPlane): On ne peut plus le faire atterir n'importe où (uniquement terre et pont).
+
+	* server/Channels.cpp (send_info): Correction d'un crash si on cherchait à envoyer l'info à un player déconnecté.
+
+2007-04-10 Romain Bignon <progs@menareants.org>
+
+	* lib/Units.h, server/Units.cpp, server/InGame.cpp, src/ShowMap.cpp, src/Map.cpp: On peut maintenant entrer une unité dans un conteneur qui en contient déjà une.
+
+	* test/combats.cpp: Petit programme permettant de simuler des combats 1v1 dans le but de tester différents algorithmes. Il y a une vingtaine de cas, qui sont executés
+	  un grand nombre de fois (à spécifier en argument), et pour chaque cas il fait pour chaque joueur le pourcentage de fois où il a gagné, et la moyenne des restes non nuls.
+
+	* server/Map.cpp (ECEntity::Attaq): Utilisation de l'amélioration de Thomas concernant l'algorithme, qui donne de meilleurs resultats. (voir http://kouak.org/~progs/maa.html).
+
+	* lib/Map.h (ECBEntity): Les membres protégés de cette classe se retrouvent privés pour améliorer l'encapsulation.
+
+2007-04-09 Romain Bignon <progs@menareants.org>
+
+	* src/InGame.cpp, src/Map.cpp: Le curseur indique qu'on peut entrer uniquement si c'est MON conteneur, et quand on clique il prends le plus adapté.
+
+	* server/Login.cpp (ADMINCommand): Envoie un message de confirmation du kill AVANT de killer l'user.
+
+	* src/Units.cpp (ECJouano): On ne met la case "terre dead" seulement si on est sur de la terre !
+
+	* server/Units.cpp (EContainer): Si jamais l'unité contenue est détruite, on porte le reste de l'attaque au conteneur.
+
+	* server/Units.cpp (ECJouano): Il n'y a plus dans les unités attaquées que les unités attaquables (pour ne plus faire surgir une mine par exemple).
+
+	* server/Map.cpp (ECEntity::Attaq): Correction d'un bug qui traine depuis UN AN.. une simple histoire de parenthèses mal placées.
+
+	* server/InGame.cpp (InitAnim): Correction du bug #8891 des unités ennemies qui restent sur la même case en cas de combat à la création.
+
+	* lib/Batiments.h (ECShipYard): Maintenant il n'y a plus de combat avec le chantier naval.
+
+	* server/Channels.cpp: L'argent emmagasiné compte dans le score. Protection contre le dépassement de l'entier qui stock l'argent possédé.
+
 2007-04-07 Romain Bignon <progs@menareants.org>
 
 	* server/Channels.cpp: Les scores concernant les escarmouches (les parties donc avec un seul humain) ne sont PLUS envoyes au meta-serveur pour eviter que des abrutis comme pankkake et

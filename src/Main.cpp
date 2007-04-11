@@ -443,7 +443,7 @@ TCredits::TCredits(ECImage* w)
 	                "\n"
 	                "=Others=\n"
 	                "- Anicée: for her voice.\n"
-	                "- Zic, Spouize, Nico, Mathieu and Thomas who have tested the game."), white_color);
+	                "- pankkake, Zic, Nico, Mathieu and Thomas who have tested the game."), white_color);
 
 	Memo->ScrollUp();
 

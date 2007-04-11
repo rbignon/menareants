@@ -601,7 +601,7 @@ public:
 	virtual uint Cost() const { return 4000; }
 	virtual uint InitNb() const { return 200; }
 
-	virtual bool CanAttaq(const ECBEntity* e) { return !e->CanInvest(this) && e->Level() == L_SEA; }
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
 	virtual bool IsBuilding() const { return true; }
 	virtual bool IsNaval() const { return true; }

@@ -24,6 +24,7 @@
 #include "Resources.h"
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
+#include "tools/Font.h"
 
 /********************************************************************************************
  *                               EPlayer                                                    *
@@ -51,8 +52,10 @@ ECPlayer::ECPlayer(std::string _nick, EChannel *_chan, bool _owner, bool _op, bo
 void ECPlayer::AddBreakPoint(BreakPoint bp)
 {
 	assert(Channel()->Map()->ShowMap()->Window());
-	bp.sprite = new ECSprite(Resources::Balise(), Channel()->Map()->ShowMap()->Window());
-	bp.sprite->ChangeColor(white_color, color_eq[Color()]);
+	ECSpriteBase* sprbase = new ECSpriteBase(Resources::Balise()->path.c_str());
+	sprbase->ChangeColor(white_color, color_eq[Color()]);
+	bp.sprite = new ECSprite(sprbase, Channel()->Map()->ShowMap()->Window());
+	bp.text = Font::GetInstance(Font::Normal)->CreateSurface(bp.message, black_color);
 	breakpoints.push_back(bp);
 }
 
@@ -62,6 +65,7 @@ bool ECPlayer::RemoveBreakPoint(ECBCase* c)
 	{
 		if (it->c == c)
 		{
+			delete it->sprite->SpriteBase();
 			delete it->sprite;
 			it = breakpoints.erase(it);
 			return true;

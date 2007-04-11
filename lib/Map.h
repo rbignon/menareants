@@ -411,7 +411,7 @@ public:
 	ECBMove* Move() { return &move; }
 
 /* Variables protégées */
-protected:
+private:
 	ECBPlayer* owner;
 	Entity_ID name;
 	ECBCase *acase;

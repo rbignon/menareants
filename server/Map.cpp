@@ -296,7 +296,7 @@ void ECEntity::Shoot(ECEntity* e, uint k)
 
 void ECEntity::ReleaseShoot()
 {
-	SetNb(Nb() - (shooted > nb ? nb : shooted));
+	SetNb(Nb() - (shooted > Nb() ? Nb() : shooted));
 	if(Owner())
 		Owner()->Stats()->killed += shooted;
 	shooted = 0;
@@ -366,8 +366,12 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(*it != this && (*it)->Case() == Case() && !Like(*it) && (CanAttaq(*it) || Parent() && Parent()->CanAttaq(*it)))
 		{
-			uint killed = rand() % (nb/2+enemies);
-			if(killed < nb/(4+enemies)) killed = nb/(4+enemies);
+			// Thomas' adaptation
+			uint attaq_nb = Nb() > 1000 ? 1000 : Nb();
+
+			uint killed = rand() % (attaq_nb/(2+enemies)+1); // +1 pour pas risquer d'avoir un modulo 0 (possible si nb < 2+enemies).
+
+			if(killed < attaq_nb/(4+enemies)) killed = attaq_nb/(4+enemies);
 			if(!killed)
 				return false;
 			Shoot(*it, killed);

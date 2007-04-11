@@ -76,18 +76,6 @@ void EChannel::InitAnims()
 
 			Debug(W_DEBUG|W_ECHO, "= envoie d'un CREATE =");
 
-			std::vector<ECBEntity*> entities = event->Entity()->Case()->Entities()->List();
-			FORit(ECBEntity*, entities, e)
-				if(!(*e)->IsZombie() && ThereIsAttaq(event->Entity(), *e))
-				{
-					ECEvent* attaq_event = new ECEvent(ARM_ATTAQ, 0, event->Entity()->Case());
-
-					ShowAnim(attaq_event);
-
-					MyFree(attaq_event);
-					break;
-				}
-
 			/* On ne cherche pas à supprimer dans la liste d'evenements de l'entité car,
 			 * par définition, un ARM_CREATE n'est pas listée à l'intérieur, à cause
 			 * de son status particulier.
@@ -99,6 +87,24 @@ void EChannel::InitAnims()
 		}
 		else if(event->Entity()->Owner() == 0)
 			ShowAnim(event);
+	}
+	std::vector<ECBEntity*> ents = Map()->Entities()->List();
+	FORit(ECBEntity*, ents, entity)
+	{
+		if((*entity)->IsZombie() || (*entity)->Parent())
+			continue;
+
+		std::vector<ECBEntity*> entities = (*entity)->Case()->Entities()->List();
+		FORit(ECBEntity*, entities, e)
+			if(!(*e)->IsZombie() && !(*e)->Parent() && ThereIsAttaq(*entity, *e))
+			{
+				ECEvent* attaq_event = new ECEvent(ARM_ATTAQ, 0, (*entity)->Case());
+
+				ShowAnim(attaq_event);
+
+				MyFree(attaq_event);
+				break;
+			}
 	}
 	playing = first_playing++;
 	if(first_playing >= players.size())
@@ -545,6 +551,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 						event->Entity()->ChangeCase(event->Move()->Dest());
 
 					SendArm(NULL, entity, event->Flags(), event->Case()->X(), event->Case()->Y(), 0, ev);
+
+					if(entity->IsZombie())
+						SendArm(0, entity, ARM_REMOVE|ARM_INVEST);
 
 					event->Entity()->Move()->GoTo(entity->Case());
 					dynamic_cast<ECase*>(entity->Case())->CheckInvests(entity);
@@ -1079,9 +1088,11 @@ int BPCommand::Exec(TClient *cl, std::vector<std::string> parv)
 		default: return vDebug(W_WARNING, "BP: Invalide identifiant", VCName(ch) VName(parv[1]));
 	}
 
+	cl->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
+
 	std::vector<TClient*> allies = cl->Player()->ClientAllies();
 	for(std::vector<TClient*>::iterator it = allies.begin(); it != allies.end(); ++it)
-		cl->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
+		(*it)->sendrpl(cl->Nick(), MSG_BREAKPOINT, ECArgs(ch + TypToStr(c->X()) + "," + TypToStr(c->Y()), message));
 
 	return 0;
 }

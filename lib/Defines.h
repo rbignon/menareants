@@ -64,6 +64,7 @@
 /* Tailles de variables */
 const unsigned int NICKLEN=10;
 const unsigned int GAMELEN=20;
+const int MAX_MONEY=2000000000;
 
 #else
 

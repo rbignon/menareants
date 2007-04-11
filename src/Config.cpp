@@ -70,7 +70,7 @@ Config::Config()
 
 bool Config::set_defaults(bool want_save)
 {
-	hostname = "game.coderz.info";
+	hostname = DEF_METASERVER;
 	port = 5460;
 #ifdef WIN32
 	nick = getenv("USERNAME");
@@ -86,7 +86,7 @@ bool Config::set_defaults(bool want_save)
 	color = 0;
 	nation = 0;
 	server_list.clear();
-	server_list.push_back("game.coderz.info:5460");
+	server_list.push_back(DEF_METASERVER ":5460");
 	music = true;
 	effect = true;
 	if(want_save)

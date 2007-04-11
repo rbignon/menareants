@@ -471,6 +471,8 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
  */
 int BPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
+	assert(!players.empty());
+
 	ECPlayer *pl = players.front();
 
 	EChannel* chan = pl->Channel();
@@ -938,6 +940,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					{
 						std::string s = SendMessage->GetString();
 						bool send_message = true;
+						#ifdef DEBUG
 						if(IsPressed(SDLK_LSHIFT) && IsPressed(SDLK_LALT))
 						{
 							send_message = false;
@@ -953,6 +956,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 							}
 							else send_message = true;
 						}
+						#endif
 						if(send_message)
 						{
 							client->sendrpl(MSG_MSG, s);
@@ -1132,18 +1136,14 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 	{
 		if(mywant == TInGameForm::W_ADDBP)
 		{
-		#if 0 /* TODO: Gestion du texte dans l'image */
 			TMessageBox mb("Entrez le texte de la balise :",
 							HAVE_EDIT|BT_OK|BT_CANCEL, InGameForm, false);
 			if(mb.Show() == BT_OK)
 			{
 				std::string msg = mb.EditText();
-				client->sendrpl(client->rpl(EC_Client::BREAKPOINT),
-						'+', acase->X(), acase->Y(), msg.c_str());
+				client->sendrpl(MSG_BREAKPOINT, ECArgs( "+" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()), msg));
 			}
-		#else
-			client->sendrpl(MSG_BREAKPOINT, "+" + TypToStr(acase->X()) + "," + TypToStr(acase->Y()));
-		#endif
+
 			want = TInGameForm::W_NONE;
 			WantBalise = false;
 			Map->SetMustRedraw();
@@ -1167,7 +1167,8 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 					std::vector<ECBEntity*> ents = acase->Entities()->List();
 					for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
 						if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
-						   contener->CanContain(selected_entity))
+						   contener->CanContain(selected_entity) && contener->Owner() && dynamic_cast<ECPlayer*>(contener->Owner())->IsMe() &&
+						   contener->Move()->Empty())
 							break;
 						else
 							contener = 0;

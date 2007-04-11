@@ -41,6 +41,8 @@ bool ECPlane::WantDeploy()
 				return false;
 			break;
 		case true:
+			if(!ECBPlane::WantDeploy())
+				return false;
 			break;
 	}
 
@@ -141,7 +143,10 @@ std::vector<ECBEntity*> ECJouano::GetAttaquedEntities(ECBCase* c) const
 		for(; j <= 2*Porty(); ++j)
 		{
 			std::vector<ECBEntity*> ents = cc->Entities()->List();
-			entities.insert(entities.end(), ents.begin(), ents.end());
+
+			FORit(ECBEntity*, ents, enti)
+				if((*enti)->IsInfantry())
+					entities.push_back(*enti);
 
 			if(cc->X() == cc->Map()->Width()-1)
 				break;
@@ -337,9 +342,18 @@ bool EContainer::Contain(ECBEntity* entity)
 {
 	if(Containing())
 	{
+		if(entity->Type() != Containing()->Type())
+		{
+			Debug(W_WARNING, "EContainer::Contain(): %d veut entrer dans un %d qui contient un %d !", entity->Type(), Type(), Containing()->Type());
+			return false;
+		}
 		Containing()->SetNb(Containing()->Nb() + entity->Nb());
 		dynamic_cast<ECEntity*>(entity)->SetZombie();
-		Channel()->SendArm(0, dynamic_cast<ECEntity*>(entity), ARM_REMOVE|ARM_INVEST);
+		/*
+		 * Channel()->SendArm(0, dynamic_cast<ECEntity*>(entity), ARM_REMOVE|ARM_INVEST);
+		 *
+		 * On l'envoie par la suite
+		 */
 		if(Owner() && Owner()->Client())
 			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
 
@@ -351,7 +365,7 @@ bool EContainer::Contain(ECBEntity* entity)
 
 bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 {
-	if(Containing() || entity->Locked() || entity->IsZombie() || !CanContain(entity))
+	if(Containing() && Containing()->Type() != entity->Type() || entity->Locked() || entity->IsZombie() || !CanContain(entity))
 		return false;
 
 	ECMove::E_Move move;
@@ -378,6 +392,19 @@ bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 	else
 		return false;
 
+	std::vector<ECEvent*> events = Events()->List();
+	uint contened = Containing() ? Containing()->Nb() : 0;
+	FORit(ECEvent*, events, event)
+		if((*event)->Flags() & ARM_CONTENER)
+		{
+			if((*event)->Entity()->Type() != entity->Type())
+				return false;
+			contened += (*event)->Entity()->Nb();
+		}
+
+	if(contened + entity->Nb() > UnitaryCapacity() * Nb())
+		return false;
+
 	if(!entity->WantMove(move, MOVE_FORCE))
 		return false;
 
@@ -388,7 +415,7 @@ bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 
 bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 {
-	if(!Containing() || !restStep || !Containing()->RestStep())
+	if(!Containing() || !RestStep() || !Containing()->RestStep())
 		return false;
 
 	ECMove::E_Move move;
@@ -416,7 +443,7 @@ bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 		return false;
 
 	Containing()->SetCase(c);
-	if(!Containing()->WantMove(move, MOVE_FORCE))
+	if(!Containing()->CanWalkOn((*Map())(x,y)) || !Containing()->WantMove(move, MOVE_FORCE))
 		return false;
 
 	moves.push_back(move);
@@ -429,6 +456,7 @@ void EContainer::ReleaseShoot()
 	if(Containing())
 	{
 		ECEntity* contained = dynamic_cast<ECEntity*>(Containing());
+		int contained_nb = contained->Nb();
 		contained->Shooted(shooted);
 		contained->ReleaseShoot();
 
@@ -437,6 +465,10 @@ void EContainer::ReleaseShoot()
 			Channel()->SendArm(NULL, contained, ARM_REMOVE);
 			contained->SetZombie();
 			SetContaining(0);
+
+			/* Si jamais ce qu'on contenait est détruit, on reporte sur le bateau */
+			shooted -= contained_nb;
+			ECEntity::ReleaseShoot();
 		}
 		shooted = 0;
 	}
@@ -603,7 +635,7 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!restStep && !(flags & MOVE_SIMULE) || Deployed() ^ !!(EventType() & ARM_DEPLOY) || !Case() || Locked() && !(flags & MOVE_FORCE))
+	if(!RestStep() && !(flags & MOVE_SIMULE) || Deployed() ^ !!(EventType() & ARM_DEPLOY) || !Case() || Locked() && !(flags & MOVE_FORCE))
 		return false;
 
 	ECBCase *c = 0, *here = DestCase();
@@ -637,7 +669,7 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 	if(flags & MOVE_SIMULE)
 		return true;
 
-	restStep--;
+	SetRestStep(RestStep() - 1);
 
 	if(Move()->Empty())
 		Move()->SetFirstCase(Case());

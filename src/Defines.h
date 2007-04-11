@@ -29,8 +29,9 @@
 /* Nom complet de nom court du jeu */
 #define APP_NAME "Men Are Ants"
 
-#define APP_SITE "http://menareants.coderz.info/"
+#define APP_SITE "http://menareants.org"
 #define MAIN_FONT "FreeMonoBold.ttf"
+#define DEF_METASERVER "game.menareants.org"
 
 /* Defines */
 #undef  BUGUED_INTRO

@@ -48,7 +48,7 @@ void ECBatiment::RefreshColor(Color last)
 
 bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
-	if(event_type & ARM_ATTAQ)
+	if(EventType() & ARM_ATTAQ)
 	{
 		if(Case()->Showed() > 0 && explosion)
 		{
@@ -308,7 +308,7 @@ std::string ECSilo::SpecialInfo()
 
 bool ECSilo::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return missile.AttaqFirst(c, me);
@@ -319,7 +319,7 @@ bool ECSilo::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cl
 
 bool ECSilo::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return missile.AttaqSecond(c, me);
@@ -330,7 +330,7 @@ bool ECSilo::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Clie
 
 bool ECSilo::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 		{
@@ -452,7 +452,7 @@ void ECDefenseTower::AfterDraw()
 
 bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			if(c != Case() && (c->Showed() > 0 || Case()->Showed() > 0))
@@ -467,7 +467,7 @@ bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* 
 
 bool ECDefenseTower::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			if(cible)
@@ -483,7 +483,7 @@ bool ECDefenseTower::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c,
 
 bool ECDefenseTower::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return true;
@@ -507,7 +507,7 @@ void ECObelisk::AfterDraw()
 
 bool ECObelisk::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			if(Case()->Showed() <= 0 || c == Case()) return true;
@@ -525,7 +525,7 @@ bool ECObelisk::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC
 
 bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 		{
@@ -559,7 +559,7 @@ bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_C
 
 bool ECObelisk::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			if(c == Case()) return true;

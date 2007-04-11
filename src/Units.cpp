@@ -52,7 +52,7 @@ std::string ECJouano::SpecialInfo()
 
 bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 		{
@@ -70,7 +70,8 @@ bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_
 			SDL_Delay(1000);
 			SetAttaqImg(0,0,0);
 
-			Case()->SetImage(Resources::CaseTerreDead());
+			if((Case()->Flags() & C_TERRE) && Case()->Image()->SpriteBase() == Resources::CaseTerre())
+				Case()->SetImage(Resources::CaseTerreDead());
 
 			return true;
 		}
@@ -82,7 +83,7 @@ bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_
 
 bool ECJouano::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 		{
@@ -96,7 +97,7 @@ bool ECJouano::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Cl
 
 bool ECJouano::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return true;
@@ -125,7 +126,8 @@ void ECMcDo::RecvData(ECData data)
 		case DATA_EXOWNER:
 		{
 			ex_owner = Channel()->GetPlayer(data.data.c_str());
-			SetShowedCases(true, true);
+			if(ex_owner && ex_owner->IsMe())
+				SetShowedCases(true, true);
 			break;
 		}
 		case DATA_JOUANO:
@@ -139,7 +141,7 @@ void ECMcDo::RecvData(ECData data)
 
 ECMcDo::~ECMcDo()
 {
-	if(Deployed())
+	if(ex_owner && ex_owner->IsMe())
 		SetShowedCases(false, true);
 }
 
@@ -234,7 +236,7 @@ std::string ECBoat::SpecialInfo()
 
 bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			if(!missile.Missile() && c != Case()) // c'est pas une attaque sur moi donc je tire
@@ -250,7 +252,7 @@ bool ECMissiLauncher::BeforeEvent(const std::vector<ECEntity*>& entities, ECase*
 
 bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return missile.AttaqSecond(c, me);
@@ -262,7 +264,7 @@ bool ECMissiLauncher::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c
 
 bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_ATTAQ:
 			return true;
@@ -300,10 +302,10 @@ ECUnit::~ECUnit()
 
 bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&, ECase*, EC_Client*)
 {
-	if(event_type & ARM_MOVE)
+	if(EventType() & ARM_MOVE)
 	{
-		if(!move.Empty())
-			SetImage(images[(imgs_t)move.First()]);
+		if(!Move()->Empty())
+			SetImage(images[(imgs_t)Move()->First()]);
 		SetAnim(true);
 	}
 	return true;
@@ -312,7 +314,7 @@ bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&, ECase*, EC_Client*)
 bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 {
 	ECMap* map = dynamic_cast<ECMap*>(Case()->Map());
-	if(move.Empty())
+	if(Move()->Empty())
 	{
 		if(move_anim)
 			Image()->SetAnim(false);
@@ -322,7 +324,7 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	if(move_anim)
 		Image()->SetAnim(true);
 
-	ECMove::E_Move m = move.First();
+	ECMove::E_Move m = Move()->First();
 	switch(m)
 	{
 		case ECMove::Right: ImageSetXY(Image()->X() + visual_step, Image()->Y()); break;
@@ -336,38 +338,38 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	switch(m)
 	{
 		case ECMove::Right:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()+1)) <= Image()->X())
-				ChangeCase(acase->MoveRight()), move.RemoveFirst(), changed_case = true;
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()+1)) <= Image()->X())
+				ChangeCase(Case()->MoveRight()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Left:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(acase->X()-1)) >= Image()->X())
-				ChangeCase(acase->MoveLeft()), move.RemoveFirst(), changed_case = true;
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()-1)) >= Image()->X())
+				ChangeCase(Case()->MoveLeft()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Down:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()+1)) <= Image()->Y())
-				ChangeCase(acase->MoveDown()), move.RemoveFirst(), changed_case = true;
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()+1)) <= Image()->Y())
+				ChangeCase(Case()->MoveDown()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Up:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(acase->Y()-1)) >= Image()->Y())
-				ChangeCase(acase->MoveUp()), move.RemoveFirst(), changed_case = true;
+			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()-1)) >= Image()->Y())
+				ChangeCase(Case()->MoveUp()), Move()->RemoveFirst(), changed_case = true;
 			break;
 	}
 	if(changed_case && entities.size() == 1 && (!Map()->Brouillard() || Case()->Showed() > 0) &&
-	   dynamic_cast<ECMap*>(acase->Map())->ShowMap() && !IsHiddenOnCase())
+	   dynamic_cast<ECMap*>(Case()->Map())->ShowMap() && !IsHiddenOnCase())
 	{
-		dynamic_cast<ECMap*>(acase->Map())->ShowMap()->CenterTo(this);
+		dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->CenterTo(this);
 		Map()->ShowWaitMessage.clear();
 	}
 
-	if(!move.Empty() && m != move.First())
-		SetImage(images[(imgs_t)move.First()]);
+	if(!Move()->Empty() && m != Move()->First())
+		SetImage(images[(imgs_t)Move()->First()]);
 
 	return false;
 }
 
 bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client*)
 {
-	switch(event_type)
+	switch(EventType())
 	{
 		case ARM_DEPLOY:
 		{
@@ -428,7 +430,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			break;
 		}
 		default:
-			if(event_type & ARM_MOVE || event_type & ARM_ATTAQ)
+			if(EventType() & ARM_MOVE || EventType() & ARM_ATTAQ)
 				return MoveEffect(entities);
 			break;
 
@@ -438,7 +440,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 
 bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
-	if(event_type & ARM_ATTAQ)
+	if(EventType() & ARM_ATTAQ)
 	{
 		if(Case()->Showed() > 0 && images[I_Attaq])
 		{
@@ -460,7 +462,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 			Resources::SoundMitraillette()->Stop();
 		}
 	}
-	if(event_type & ARM_MOVE)
+	if(EventType() & ARM_MOVE)
 			SetAnim(false);
 	return true;
 }

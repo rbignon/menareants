@@ -65,6 +65,18 @@ public:
 
 	virtual uint RealNb() const { return unit ? (unit->Nb() + Nb()) : Nb(); }
 
+	virtual bool CanContainThisEntity(const ECBEntity* et) = 0;
+	virtual uint UnitaryCapacity() const = 0;
+
+	virtual bool CanContain(const ECBEntity* et)
+	{
+		if(Containing() && (Containing()->Type() != et->Type() || (Containing()->Nb() + et->Nb()) > UnitaryCapacity() * Nb()) ||
+		   !Containing() && et->Nb() > UnitaryCapacity() * Nb() || !CanContainThisEntity(et))
+			return false;
+		else
+			return true;
+	}
+
 /* Variables privées */
 private:
 	ECBEntity* unit;
@@ -91,10 +103,11 @@ public:
 	virtual uint InitNb() const { return 5; }
 	virtual uint Step() const { return 8; }
 	virtual uint Visibility() const { return 4; }
+	virtual uint UnitaryCapacity() const { return 100; }
 
-	virtual bool CanContain(const ECBEntity* et)
+	virtual bool CanContainThisEntity(const ECBEntity* et)
 	{
-		if(Containing() || et->Nb() > 100*Nb() || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+		if(!et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
 			return false;
 		else
 			return true;
@@ -140,10 +153,11 @@ public:
 	virtual uint Step() const { return 4; }
 	virtual uint Visibility() const { return 4; }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_MER)); }
+	virtual uint UnitaryCapacity() const { return 100; }
 
-	virtual bool CanContain(const ECBEntity* et)
+	virtual bool CanContainThisEntity(const ECBEntity* et)
 	{
-		if(Containing() || et->Nb() > 100*Nb() || !et->IsInfantry())
+		if(!et->IsInfantry())
 			return false;
 		else
 			return true;
@@ -192,13 +206,14 @@ public:
 	virtual uint Visibility() const { return 5; }
 	virtual bool CanWalkOn(ECBCase *c) const { return true; }
 	virtual e_level Level() const { return (!Deployed() ^ !!(EventType() & ARM_DEPLOY)) ? L_AIR : L_GROUND; }
+	virtual uint UnitaryCapacity() const { return 100; }
 
 	// Cet avion de transport ne peut PAS prendre une ville
 	virtual bool CanInvest(const ECBEntity* e) const { return false; }
 
-	virtual bool CanContain(const ECBEntity *et)
+	virtual bool CanContainThisEntity(const ECBEntity *et)
 	{
-		if(Containing() || et->Nb() > 100*Nb() || !Deployed() ^ !!(EventType() & ARM_DEPLOY) || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+		if(!Deployed() ^ !!(EventType() & ARM_DEPLOY) || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
 			return false;
 		return true;
 	}
@@ -210,7 +225,7 @@ public:
 
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsPlane() const { return true; }
-	virtual bool WantDeploy() { return true; }
+	virtual bool WantDeploy() { return (DestCase()->Flags() & (C_TERRE|C_PONT)); }
 };
 
 /********************************************************************************************
