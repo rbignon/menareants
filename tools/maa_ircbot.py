@@ -73,8 +73,8 @@ class MetaServer (asyncore.dispatcher):
 			color = 2
 		else:
 			color = 3
-		self.bot.SendMessage("\002%-25s\002 (\003%d\002\002%s/%s\003 players) (\003%d\002\002%s/%s\003 games)"
-		                     % (parv[2], color, parv[4], parv[5], color, parv[6], parv[7]))
+		self.bot.SendMessage("\002%-25s\002 (\003%d\002\002%s/%s\003 players) (\003%d\002\002%s/%s\003 games) %s"
+		                     % (parv[2], color, parv[4], parv[5], color, parv[6], parv[7], parv[9]))
 
 	def m_regnick(self, parv):
 		""" SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories> <regtime> <lastvisit> """

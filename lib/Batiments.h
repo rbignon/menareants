@@ -197,6 +197,8 @@ public:
 
 	virtual ~ECBNuclearSearch();
 
+	void Init();
+
 /* Constantes */
 public:
 
@@ -277,7 +279,7 @@ public:
 public:
 
 	ECBNuclearSearch* NuclearSearch() const { return nuclear_search; }
-	void ClearNuclearSearch() { nuclear_search = 0; }
+	void SetNuclearSearch(ECBNuclearSearch* ns) { nuclear_search = ns; }
 
 	uint RestBuild() const { return restBuild; }
 

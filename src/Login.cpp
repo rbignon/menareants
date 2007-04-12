@@ -845,21 +845,22 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ConnectedForm));
 
 	me->LockScreen();
+	bool enabled = (parv.size() <= 4 || StrToTyp<int>(parv[3]) >= StrToTyp<int>(parv[4]));
 	if(parv[2][0] == '+')
 	{
-		if(parv[3] == "0")
-			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[2].c_str()), parv[1],
+		if(parv[4] == "0")
+			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[3].c_str()), parv[1],
 			                              black_color, true);
 		else if(parv.size() > 5)
 			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s %s", parv[1].c_str(), parv[3].c_str(),
 			                                                                 parv[4].c_str(), parv[5].c_str()), parv[1],
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
+			                              enabled ? black_color : red_color,
+			                              enabled ? true : false);
 		else
 			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s", parv[1].c_str(), parv[3].c_str(),
 			                                                              parv[4].c_str()), parv[1],
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? black_color : red_color,
-			                              (parv.size() <= 4 || parv[3] != parv[4]) ? true : false);
+			                              enabled ? black_color : red_color,
+			                              enabled ? true : false);
 	}
 	else
 		ConnectedForm->GList->AddItem(false, StringF(_("%-8s  Playing: %s"), parv[1].c_str(), parv[5].c_str()), parv[1],

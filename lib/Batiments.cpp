@@ -27,6 +27,19 @@
  *                               ECBNuclearSearch                                           *
  ********************************************************************************************/
 
+void ECBNuclearSearch::Init()
+{
+	if(!Owner()) return;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+	{
+		ECBSilo* silo;
+		if((silo = dynamic_cast<ECBSilo*>(*it)))
+			silo->SetNuclearSearch(this);
+	}
+}
+
 ECBNuclearSearch::~ECBNuclearSearch()
 {
 	if(!Owner()) return;
@@ -36,7 +49,7 @@ ECBNuclearSearch::~ECBNuclearSearch()
 	{
 		ECBSilo* silo;
 		if((silo = dynamic_cast<ECBSilo*>(*it)))
-			silo->ClearNuclearSearch();
+			silo->SetNuclearSearch(0);
 	}
 }
 

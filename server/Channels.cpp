@@ -1162,8 +1162,6 @@ void EChannel::CheckReadys()
 				*/
 				std::list<uint> colors;
 				for(uint i = 1; i < COLOR_MAX; ++i) colors.push_back(i);
-				std::list<uint> nations;
-				for(uint i = 1; i < ECPlayer::N_MAX; ++i) nations.push_back(i);
 				std::list<uint> positions;
 				for(uint i = 1; i <= Map()->MaxPlayers(); i++) positions.push_back(i);
 
@@ -1188,7 +1186,6 @@ void EChannel::CheckReadys()
 					{
 						if((*it)->Position()) positions.remove((*it)->Position());
 						if((*it)->Color()) colors.remove((*it)->Color());
-						if((*it)->Nation()) nations.remove((*it)->Nation());
 						++it;
 					}
 				for(BPlayerVector::iterator it=players.begin(); it != players.end(); ++it)
@@ -1219,15 +1216,9 @@ void EChannel::CheckReadys()
 					}
 					if(!(*it)->Nation())
 					{
-						uint p = rand() % nations.size();
-						std::list<uint>::iterator nat = nations.begin();
-						for(uint i = 0; i != p && nat != nations.end(); ++nat, ++i);
-						if(nat != nations.end())
-							(*it)->SetNation(*nat);
-						else
-							throw ECExcept(0, "Impossible d'attribuer une nation aleatoirement !?");
-						sendto_players(0, *it, MSG_SET, ECArgs("+n", TypToStr(*nat)));
-						nations.erase(nat);
+						uint p = 1 + rand() % (ECPlayer::N_MAX-1);
+						(*it)->SetNation(p);
+						sendto_players(0, *it, MSG_SET, ECArgs("+n", TypToStr(p)));
 					}
 					BMapPlayersVector::iterator mpi;
 					for(mpi = mpv.begin(); mpi != mpv.end() && (*it)->Position() != (*mpi)->Num(); ++mpi);
@@ -1287,6 +1278,8 @@ void EChannel::CheckReadys()
 						}
 						else
 							SendArm(NULL, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE), entity->Case()->X(), entity->Case()->Y());
+
+						entity->Created(true);
 					}
 					if(pl == players.end())
 						break;
@@ -1680,10 +1673,15 @@ const char* EChannel::FindEntityName(ECPlayer* pl)
 		{
 			ev.erase(it);
 			if(num[1] < 'Z') num[1]++;
-			else if(num[0] >= 'Z') break;
+			else if(num[1] < 'a')
+				num[1] = 'a';
+			else if(num[1] < 'z') num[1]++;
+			else if(num[0] >= 'z') break;
 			else
 			{
-				num[0]++;
+				if(num[0] < 'Z') num[0]++;
+				else if(num[0] < 'a') num[0] = 'a';
+				else num[0]++;
 				num[1] = 'A';
 			}
 		}

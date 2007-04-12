@@ -1,3 +1,16 @@
+2007-04-12 Romain Bignon <progs@menareants.org>
+
+	* server/Channels.cpp (FindEntityName): On prends maintenant également les caractères minuscules (donc [A..Z][a..z] * 2). On passe de 576 unités max par joueurs à 2304 !
+
+	* lib/Batiments.cpp (ECBNuclearSearch): À l'initialisation du centre de recherche, on cherche les silos déjà présents pour les lier à soit.
+
+	* server/Batiments.cpp (ECBNuclearSearch): Correction d'un crash dans le cas où un centre de recherches est neutre.
+
+	* server/maps/foret_fabuleuse.map: Nouvelle carte de nameless 4 joueurs. Comme son nom l'indique, il y a beaucoup de forêt, des iles au milieu, un nombre moyen de villes.
+	  Non orienté équipes.
+
+	* server/maps/civil_war.map: Nouvelle carte de nameless 2 joueurs. Très grand nombre de villes, map bourrin !
+
 2007-04-11 Romain Bignon <progs@menareants.org>
 
 	* server/Channels.cpp (SETCommand): On empêche un joueur de s'allier à lui même.
