@@ -34,8 +34,8 @@ void strip_newline(char *string)
    *p = '\0';
 }
 
-struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, int deaths, int killed,
-                            int creations, int score, int best_revenu, int victories, time_t reg_timestamp,
+struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, ullint deaths, ullint killed,
+                            ullint creations, ullint score, ullint best_revenu, int victories, time_t reg_timestamp,
                             time_t last_visit)
 {
 	struct RegUser *reguser = calloc(1, sizeof* reguser), *head = reguser_head;
@@ -160,8 +160,8 @@ int load_users(const char* file)
 				reg_timestamp = atoi(parv[10]);
 				last_game = atoi(parv[11]);
 			}
-			add_reguser(parv[1], parv[2], atoi(parv[3]), atoi(parv[4]), atoi(parv[5]), atoi(parv[6]), atoi(parv[7]), atoi(parv[8]),
-			            victories, reg_timestamp, last_game);
+			add_reguser(parv[1], parv[2], atoi(parv[3]), strtoull(parv[4], 0, 10), strtoull(parv[5], 0, 10), strtoull(parv[6], 0, 10),
+			            strtoull(parv[7], 0, 10), strtoull(parv[8], 0, 10), victories, reg_timestamp, last_game);
 		}
 		else
 			printf("WARNING[config]: Unable to recognize %s line\n", buf);
@@ -183,9 +183,9 @@ int write_users(const char* file)
 	fprintf(fp, "NBUSER %d\n", nb_tusers);
 
 	for(; reg; reg = reg->next)
-		fprintf(fp, "NICK %s %s %d %d %d %d %d %d %d %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
-		                                                         reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories,
-		                                                         reg->reg_timestamp, reg->last_visit);
+		fprintf(fp, "NICK %s %s %u %llu %llu %llu %llu %llu %u %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
+		                                                                   reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories,
+		                                                                   reg->reg_timestamp, reg->last_visit);
 
 	fclose(fp);
 

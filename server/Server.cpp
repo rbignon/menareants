@@ -492,6 +492,11 @@ int ECServer::MSet(std::string c, ECArgs args)
 	return SendMetaServer(MSG_SET, s);
 }
 
+void ECServer::ms_logged(ECServer* server, std::vector<std::string> parv)
+{
+	server->flags |= F_LOGGED;
+}
+
 void ECServer::ms_ping(ECServer* server, std::vector<std::string> parv)
 {
 	server->SendMetaServer(MSG_PONG);
@@ -542,7 +547,8 @@ void ECServer::ParseMetaServer()
 			} cmds[] =
 			{
 				{ MSG_PING,  ms_ping },
-				{ MSG_BYE,   ms_bye  }
+				{ MSG_BYE,   ms_bye  },
+				{ MSG_LOGGED,ms_logged}
 			};
 
 			Debug(W_ECHO|W_DEBUG, "[MS] R - %s", RecvBuf);

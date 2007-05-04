@@ -333,7 +333,7 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 		case ECMove::Up:    ImageSetXY(Image()->X(), Image()->Y() - visual_step); break;
 	}
 
-	SDL_Delay(20/entities.size());
+	SDL_Delay(5/entities.size());
 	bool changed_case = false;
 	switch(m)
 	{

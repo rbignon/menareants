@@ -111,6 +111,7 @@ public:
 	TButtonText*    UpgradeButton;
 	TButtonText*    HelpButton;
 	TButtonText*    GiveButton;
+	TButtonText*    SellButton;
 	TBarreActIcons* Icons;
 
 	TImage*         ChildIcon;

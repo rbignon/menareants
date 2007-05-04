@@ -121,29 +121,43 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 			case '-': add = 0; break;
 			case 'k':
 				if(i < parc && add)
-					reg->killed += atoi(parv[i++]);
+				{
+					int c = atoi(parv[i++]);
+					if(c > 0)
+						reg->killed += c;
+				}
 				break;
 			case 'd':
 				if(i < parc && add)
-					reg->deaths += atoi(parv[i++]);
+				{
+					int c = atoi(parv[i++]);
+					if(c > 0)
+						reg->deaths += c;
+				}
 				break;
 			case 's':
 				if(i < parc && add)
-					reg->score += atoi(parv[i++]);
+				{
+					int c = atoi(parv[i++]);
+					if(c > 0)
+						reg->score += c;
+				}
 				break;
 			case 'c':
 				if(i < parc && add)
-					reg->creations += atoi(parv[i++]);
+				{
+					int c = atoi(parv[i++]);
+					if(c > 0)
+						reg->creations += c;
+				}
 				break;
 			case 'r':
 				if(add && i < parc)
 				{
-					int nb = atoi(parv[i++]);
+					unsigned int nb = atoi(parv[i++]);
 					if(reg->best_revenu < nb)
 						reg->best_revenu = nb;
 				}
-				else
-					reg->best_revenu = 0;
 				break;
 			case 'g':
 				if(add)

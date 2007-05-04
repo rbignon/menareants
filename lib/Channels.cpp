@@ -140,7 +140,7 @@ void ECBPlayer::SetDisconnected(bool b) { SetFlag(P_DISCONNECTED, b); }
  ********************************************************************************************/
 
 ECBChannel::ECBChannel(std::string _name, bool _mission)
-	: name(_name), state(WAITING), limite(0), map(0), turn_time(_mission ? 0 : 120), mission(_mission)
+	: name(_name), state(WAITING), limite(0), map(0), turn_time(_mission ? 0 : 120), mission(_mission), scoring(true)
 {
 
 }
@@ -181,6 +181,14 @@ bool ECBChannel::RemovePlayer(ECBPlayer* pl, bool use_delete)
 	return false;
 }
 
+BPlayerVector::size_type ECBChannel::NbHumains(bool all) const
+{
+	BPlayerVector::size_type s = 0;
+	for(BPlayerVector::const_iterator it=players.begin(); it != players.end(); ++it)
+		if(!(*it)->IsIA())
+			++s;
+	return s;
+}
 
 /** \attention En cas de modification de la syntaxe, modifier à tout prix API paragraphe 5. PLS
  * \note il faut éviter les incompatibilités à tous prix, et ne pas oublier, dans le cas

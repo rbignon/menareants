@@ -124,10 +124,10 @@ static int show_scores(struct Client* cl)
 		max_show = nb_tregs;
 
 	for(i=0; i < max_show; ++i)
-		sendrpl(cl, MSG_SCORE, "%s %d %d %d %d %d %d %d %ld %ld", list[i]->name, list[i]->deaths, list[i]->killed,
-		                                                          list[i]->creations, list[i]->score, list[i]->best_revenu,
-		                                                          list[i]->nb_games, list[i]->victories,
-		                                                          list[i]->reg_timestamp, list[i]->last_visit);
+		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", list[i]->name, list[i]->deaths, list[i]->killed,
+		                                                                    list[i]->creations, list[i]->score, list[i]->best_revenu,
+		                                                                    list[i]->nb_games, list[i]->victories,
+		                                                                    list[i]->reg_timestamp, list[i]->last_visit);
 
 	return 0;
 
@@ -337,7 +337,10 @@ int m_login (struct Client* cl, int parc, char** parv)
 			                || strcmp(cserv->password, crypt(parv[4], PASS_HASH)));
 			      cserv = cserv->next);
 			if(cserv)
+			{
 				cl->flags |= CL_LOGGED;
+				sendcmd(cl, MSG_LOGGED);
+			}
 		}
 	}
 	else

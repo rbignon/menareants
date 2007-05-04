@@ -1076,7 +1076,10 @@ void ECPlayer::AddAllie(ECBPlayer* _pl)
 	FORit(ECBEntity*, ents, enti)
 	{
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-		Channel()->SendArm(cl, entity, ARM_CREATE, entity->Case() ? entity->Case()->X() : 0, entity->Case() ? entity->Case()->Y() : 0);
+		if(entity->EventType() & ARM_SELL)
+			Channel()->SendArm(cl, entity, ARM_REMOVE);
+		else
+			Channel()->SendArm(cl, entity, ARM_CREATE, entity->Case() ? entity->Case()->X() : 0, entity->Case() ? entity->Case()->Y() : 0);
 	}
 }
 
@@ -1085,7 +1088,7 @@ void ECPlayer::AddAllie(ECBPlayer* _pl)
  ********************************************************************************************/
 
 EChannel::EChannel(std::string _name, bool mission)
-	: ECBChannel(_name, mission), owner(0), fast_game(true), scoring(true), begin_money(20000), first_playing(0), playing(0)
+	: ECBChannel(_name, mission), owner(0), fast_game(true), begin_money(20000), first_playing(0), playing(0)
 {
 	ECBChannel::SetLimite(app.GetConf()->DefLimite()); /* Limite par default */
 	app.NBchan++;
@@ -1243,6 +1246,7 @@ void EChannel::CheckReadys()
 
 				SetState(EChannel::SENDING);
 				sendto_players(0, app.ServerName(), MSG_SET, "-W+S");
+
 				app.NBwchan--;
 				app.NBachan++;
 				app.MSet("+w", ECArgs(TypToStr(app.NBwchan)));
@@ -1299,6 +1303,13 @@ void EChannel::CheckReadys()
 					*/
 				SetState(EChannel::PLAYING);
 				sendto_players(0, app.ServerName(), MSG_SET, "-S+P");
+
+				if(Scoring() && (!app.HasFlag(ECServer::F_LOGGED) || NbHumains(true) <= 1))
+				{
+					SetScoring(false);
+					sendto_players(0, app.ServerName(), MSG_SET, "-s");
+				}
+
 				NeedReady();
 				break;
 			}
@@ -1947,19 +1958,19 @@ void EChannel::SendEntities(ECPlayer* pl)
 
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
-		if((*enti)->IsHidden() && (*enti)->Owner() != pl) continue;
+		if((*enti)->IsHidden() && (*enti)->Owner() != pl || (*enti)->EventType() & ARM_SELL) continue;
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 
+		int flags = (entity->Owner() && (entity->Owner() == pl || entity->Owner()->IsAllie(pl))) ? ARM_CREATE : ARM_CREATE|ARM_HIDE;
 		if(entity->Parent())
 		{
-			SendArm(clients, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE),
-			                         entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
-			SendArm(clients, dynamic_cast<ECEntity*>(entity->Parent()), entity->Parent()->Owner() == pl ? ARM_CREATE : (ARM_CREATE|ARM_HIDE),
-			                                                            entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
+			SendArm(clients, entity, flags, entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
+			SendArm(clients, dynamic_cast<ECEntity*>(entity->Parent()), flags,
+			                 entity->Parent()->Case()->X(), entity->Parent()->Case()->Y());
 			SendArm(clients, entity, ARM_CONTENER);
 		}
 		else
-			SendArm(clients, entity, (entity->Owner() ? (ARM_CREATE|ARM_HIDE) : ARM_CREATE), entity->Case()->X(), entity->Case()->Y());
+			SendArm(clients, entity, flags, entity->Case()->X(), entity->Case()->Y());
 
 		entity->Resynch(pl);
 

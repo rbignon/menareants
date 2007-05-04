@@ -711,7 +711,7 @@ int JIACommand::Exec(TClient *cl, std::vector<std::string> parv)
 	if(!cl->Player() || cl->IsIA() || cl->Player()->Channel()->IsMission())
 	{
 		vDebug(cl->IsIA() ? W_WARNING : W_DESYNCH, "JIA: Appel incorrect", VPName(cl->Player()) VBName(cl->IsIA())
-		                                           VName(cl->Player()->Channel()->Name()));
+		                                           VName(cl->Nick()));
 		return cl->sendrpl(ERR_UNKNOWN);
 	}
 	if(!cl->Player()->IsPriv())

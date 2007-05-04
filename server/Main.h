@@ -86,7 +86,8 @@ public:
 	{
 		F_RELOAD  = 1 << 0,
 		F_RESTART = 1 << 1,
-		F_SILENT  = 1 << 2
+		F_SILENT  = 1 << 2,
+		F_LOGGED  = 1 << 3
 	};
 	bool HasFlag(int i) { return flags & i; }
 
@@ -122,6 +123,7 @@ protected:
 	void ParseMetaServer();
 	static void ms_ping(ECServer* server, std::vector<std::string> parv);
 	static void ms_bye(ECServer* server, std::vector<std::string> parv);
+	static void ms_logged(ECServer* server, std::vector<std::string> parv);
 };
 
 extern ECServer app;

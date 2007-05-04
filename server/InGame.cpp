@@ -57,6 +57,15 @@ void EChannel::InitAnims()
 		ECEvent* event = *eventit;
 		if(event->Flags() == ARM_CREATE)
 		{
+			/* Ceci signifie que l'unité a été crée et vendue dans le même tour ! Donc on n'envoie pas l'info de création, et
+			 * on met en zombie pour pas que le ARM_REMOVE soit envoyé plus bas.
+			 * Le bâtiment n'a jamais existé pour les joueurs ennemies.
+			 */
+			if(event->Entity()->EventType() & ARM_SELL)
+			{
+				event->Entity()->SetZombie();
+				continue;
+			}
 			if(event->Entity()->IsHidden())
 			{
 				if(event->Entity()->Owner() && event->Entity()->Owner()->NbAllies() > 0)
@@ -93,6 +102,19 @@ void EChannel::InitAnims()
 	{
 		if((*entity)->IsZombie() || (*entity)->Parent())
 			continue;
+
+		/* En cas de vente du batiment, on prévient tous les joueurs qui n'ont pas reçu en +Playing
+		 * l'info que l'unité est détruite
+		 */
+		if((*entity)->EventType() & ARM_SELL)
+		{
+			dynamic_cast<ECEntity*>(*entity)->SetZombie();
+			/* ARM_HIDE|ARM_NOCONCERNED permet de n'envoyer qu'au joueurs non concernés, c'est à dire
+			 * ceux qui ne sont ni propriétaire de l'unité ni alliés, et donc qui n'ont pas reçu en +P le message
+			 */
+			SendArm(0, dynamic_cast<ECEntity*>(*entity), ARM_REMOVE|ARM_INVEST|ARM_HIDE|ARM_NOCONCERNED);
+			continue;
+		}
 
 		std::vector<ECBEntity*> entities = (*entity)->Case()->Entities()->List();
 		FORit(ECBEntity*, entities, e)
@@ -798,6 +820,12 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 					flags |= ARM_UPGRADE;
 				break;
 			}
+			case '$':
+			{
+				if(entity && entity->CanBeSold())
+					flags |= ARM_SELL;
+				break;
+			}
 			case '/':
 			default: Debug(W_DESYNCH, "ARM: Flag %c non supporté (%s)", parv[i][0], parv[i].c_str());
 		}
@@ -890,6 +918,23 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			else
 				flags = 0;
+		}
+		if(flags & ARM_SELL)
+		{
+			/**************************
+			 *   GESTION DES VENTES   *
+			 **************************/
+
+			/*  entity->Nb()           entity->Cost()
+			 *  ----------------   *   --------------
+			 *  entity->InitNb()             2
+			 */
+			cl->Player()->UpMoney((entity->Nb() * entity->Cost())/(2 * entity->InitNb()));
+
+			// L'utilisation de ARM_RECURSE fera que ça ne sera envoyé QUE à l'owner et aux alliés
+			chan->SendArm(0, entity, ARM_REMOVE|ARM_RECURSE);
+			entity->Lock();
+			entity->AddEvent(flags);
 		}
 		if(flags & ARM_UPGRADE)
 		{

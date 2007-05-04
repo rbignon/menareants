@@ -432,6 +432,12 @@ void TMap::Draw(const Point2i& mouse)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
 		if(!c) continue;
+
+		if(c->Image()->X() > X()+Width() ||
+		   c->Image()->X()+c->Image()->GetWidth() < X() ||
+		   c->Image()->Y() > Y()+Height() ||
+		   c->Image()->Y()+c->Image()->GetHeight() < Y())
+			continue;
 		if(MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity() || SelectedEntity())
 		{
 			if(HaveBrouillard() && c->Showed() < 0)

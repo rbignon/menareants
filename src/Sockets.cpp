@@ -78,6 +78,9 @@ int EC_Client::sendrpl(const ECMessage& cmd, ECArgs args)
 
 int EC_Client::sendbuf(std::string buf)
 {
+
+	if(!sock || !connected && !logging) return -1;
+
 	buf += "\r\n";
 
 #ifdef DEBUG
@@ -265,6 +268,17 @@ EC_Client::EC_Client()
 
 }
 
+/** Enable this if you want to use a proxy.
+ * You have to configure PROXY_HOST and PROXY_PORT.
+ * @todo support proxy's configuration in game
+ */
+#undef PROXY
+
+// Configure proxy server and port
+#ifdef PROXY
+#define PROXY_HOST "192.168.0.1"
+#define PROXY_PORT 9999
+#endif
 bool EC_Client::Connect(const char *hostname, unsigned int port)
 {
 	if(connected || sock) return false;
@@ -310,8 +324,13 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 #endif
 
 	fsocket.sin_family = AF_INET;
+#ifdef PROXY
+	fsocket.sin_addr.s_addr = inet_addr(PROXY_HOST);
+	fsocket.sin_port = htons(PROXY_PORT);
+#else
 	fsocket.sin_addr.s_addr = inet_addr(ip);
 	fsocket.sin_port = htons(port);
+#endif
 
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
@@ -335,6 +354,10 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 
 	if(sock > highsock)
 		highsock = sock;
+
+#ifdef PROXY
+	sendbuf(std::string(ip) + " " + TypToStr(port));
+#endif
 
 	return true;
 }

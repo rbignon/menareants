@@ -6,8 +6,8 @@ PLAYER B  0
 X 25
 Y 25
 MAP
-tNN*ttNN*ttNN*ttOB*ttOB*ttOB*ttOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNK*ttNK*ttNJ*ttNJ*ttNAAttNAAttNBBttNBBttNBBttNBBttNBBttNBBt
-tNN*tmNN*jmNN*amNN*itOB*ttOB*ttOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNR*ttNR*ttNJ*ttNJ*ttNAAttNAAttNBBttNBBttNBBttNBBttNBBttNBBt
+tNN*ttNN*ttNN*ttOB*ttOB*ttOB*ttOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNK*ttNK*ttNJ*ttNJ*ttPC*ttPC*ttNBBttNBBttNBBttNBBttNBBttNBBt
+tNN*tmNN*jmNN*amNN*itOB*ttOB*ttOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNR*ttNR*ttNJ*ttNJ*ttPC*ttPC*ttNBBttNBBttNBBttNBBttNBBttNBBt
 tNN*tmNN*cmNN*mmNN*fmNN*itOB*ttOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNR*ttNR*ttNJ*ttNJ*ttNI*ttNI*ttNC*ttNC*ttNBBttNBBttNBBttNBBt
 tOT*tmNN*lmNN*hmNN*mmNN*fmNN*itOB*ttOB*ttOA*ttOA*ttOA*ttNS*ttNS*ttNR*ttNR*ttNQ*ttNQ*ttNI*ttNI*ttNC*ttNC*ttNBBttNBBttNBBttNBBt
 tOT*ttOT*tmNN*lmNN*hmNN*mmNN*fmNN*itOB*ttOA*ttOA*ttNZ*ttNZ*ttNZ*ttNR*ttNR*ttNQ*ttNQ*ttNI*ttNI*ttNH*ttNH*ttND*ttND*ttNBBttNBBt

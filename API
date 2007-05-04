@@ -123,6 +123,7 @@ Sommaire:
          (<pos>      :sortir d'une unité conteneur (voir 8. Entités Conteneurs)
          U           :upgrader
          C           :annuler les déplacements
+         $           :vendre une unité
 
 4) Modes
       La commande SET nécessite l'utilisation de modes, semblables à l'IRC.
@@ -232,6 +233,8 @@ Sommaire:
 
      a) Meta-server -> Serveur
          HEL <prog> <version>                              :Dit bonjour, s'informe sur son type et sa version de protocole
+
+         LOGGED                                            :L'infnorme qu'il est loggé comme serveur officiel
 
      b) Serveur -> Meta-server
 

@@ -1,3 +1,29 @@
+2007-05-02 Romain Bignon <progs@menareants.org>
+
+	* server/Channels.cpp: Correction d'un bug qui n'envoyait pas le nombre dans une armée dont le joueur est propriétaire, lors d'un rejoin.
+
+	* lib/Map.h, lib/Batiments.h: Attribut virtuel CanBeSold() qui définie si l'entité peut etre vendue.
+
+	* server/Channels.cpp, server/InGame.cpp, src/InGame.cpp, API: Possibilité de vendre une entité.
+
+2007-04-25 Romain Bignon <progs@menareants.org>
+
+	* meta-server/database.c, meta-server/server.c, meta-server/clients.c: Utilisation d'unsigned long long int pour stocker les scores etc. Ça a l'air overkill mais sait-on jamais ! Les
+	scores augmentent de plus en plus. (soit 18 446 744 073 709 551 615, bon ok pour le moment le meilleurs score est de 4 087 589, mais sait-on jamais, anticipation !).
+
+	* src/Sockets.cpp: Programmation du support d'une connexion à un proxy.
+
+	* src/JoinGame.cpp: Si jamais l'option scoring était active et que le serveur l'enlève au début de la partie, c'est que celui-ci considère que la partie ne sera *pas* scorifiée.
+	Du coup, on envoie un message au joueur.
+
+	* tools/proxy.c: Petit proxy.
+
+2007-04-19 Loiseau Lucien <loiseau.lucien@gmail.com>
+	* src/Login.cpp (LSPCommand::Exec) : bugfix
+
+2007-04-19 Loiseau Lucien <loiseau.lucien@gmail.com>
+	* src/Sockets.cpp (EC_Client::sendbuf) : on verifie qu'on est connecté avant d'envoyer sur le sock.
+
 2007-04-12 Romain Bignon <progs@menareants.org>
 
 	* server/Channels.cpp (FindEntityName): On prends maintenant également les caractères minuscules (donc [A..Z][a..z] * 2). On passe de 576 unités max par joueurs à 2304 !

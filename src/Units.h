@@ -88,7 +88,7 @@ private:
  *                                ECMissiLauncher                                           *
  ********************************************************************************************/
 #define MISSILAUNCHER_VISUAL_STEP  1
-#define MISSILAUNCHER_MISSILE_STEP 7
+#define MISSILAUNCHER_MISSILE_STEP 10
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
 {
 /* Constructeur/Destructeur */

@@ -26,7 +26,7 @@
 #include <string>
 
 /* - Client */
-#define SetFlush(x) 	(x)->SetFlag(ECD_FLUSH)
+#define SetFlush(x)		(x)->SetFlag(ECD_FLUSH)
 #define SetPing(x)		(x)->SetFlag(ECD_PING)
 #define SetAuth(x)		(x)->SetFlag(ECD_AUTH)
 #define DelFlush(x)		(x)->DelFlag(ECD_FLUSH)

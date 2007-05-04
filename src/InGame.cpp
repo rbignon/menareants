@@ -1087,7 +1087,12 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 			Map->SetMustRedraw();
 			return;
 		}
-		if(IsPressed(SDLK_PLUS) || BarreAct->UpButton->Test(mouse, button))
+		if(BarreAct->SellButton->Test(mouse, button))
+		{
+			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "$"));
+			return;
+		}
+		if(BarreAct->UpButton->Test(mouse, button))
 		{
 			client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "+"));
 			return;
@@ -1232,7 +1237,7 @@ void TInGameForm::AddInfo(int flags, std::string line, ECPlayer* pl)
 	if(!Chat) return;
 
 	Color c = white_color;
-	if(flags & I_WARNING) c = orange_color;
+	if(flags & I_WARNING) c = brown_color;
 	else if(flags & I_INFO) c = fblue_color;
 	else if(flags & I_ECHO) c = white_color;
 	else if(flags & I_SHIT) c = fred_color;
@@ -1607,6 +1612,7 @@ void TBarreAct::ShowInfos()
 	ExtractButton->Hide();
 	DeployButton->Hide();
 	GiveButton->Hide();
+	SellButton->Hide();
 	UpButton->Hide();
 	UpgradeButton->Hide();
 	ChildIcon->Hide();
@@ -1736,6 +1742,14 @@ void TBarreAct::vSetEntity(void* _e)
 			}
 			else
 				InGameForm->BarreAct->GiveButton->Hide();
+
+			if(e->CanBeSold())
+			{
+				InGameForm->BarreAct->SellButton->Show();
+				InGameForm->BarreAct->SellButton->SetX((x -= InGameForm->BarreAct->SellButton->Width()));
+			}
+			else
+				InGameForm->BarreAct->SellButton->Hide();
 			/* On subterfuge avec ces fonctions WantDeploy, AddUnits et WantAttaq qui, dans le client,
 			 * ne font que renvoyer true ou false. Mais comme elles sont virtuelles et
 			 * surchargées sur le serveur, on se tape les arguments.
@@ -1784,6 +1798,7 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->UpButton->Hide();
 			InGameForm->BarreAct->UpgradeButton->Hide();
 			InGameForm->BarreAct->GiveButton->Hide();
+			InGameForm->BarreAct->SellButton->Hide();
 		}
 
 		EContainer* container = dynamic_cast<EContainer*>(e);
@@ -1881,6 +1896,9 @@ void TBarreAct::Init()
 	GiveButton = AddComponent(new TButtonText(500,15,100,30, _("Give Country"), Font::GetInstance(Font::Small)));
 	GiveButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
 	GiveButton->SetHint(_("Give this country to an other player."));
+	SellButton = AddComponent(new TButtonText(500,15,100,30, _("Sell"), Font::GetInstance(Font::Small)));
+	SellButton->SetImage(new ECSprite(Resources::LitleButton(), Window()));
+	SellButton->SetHint(_("Sell this building."));
 
 	Owner = AddComponent(new TLabel(60,40, "", black_color, Font::GetInstance(Font::Normal)));
 

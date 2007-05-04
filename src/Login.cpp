@@ -239,7 +239,8 @@ int REJOINmsCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
 
 /** Receive a server name in the list from meta-server
  *
- * Syntax: LSP ip nom +/- nbjoueurs nbmax nbgames maxgames nbwgames proto
+ * Syntax: LSP ip:port nom +/- nbjoueurs nbmax nbgame> maxgames proto
+ *             version totusers totgames uptime
  *
  * parv[1] = ip
  * parv[2] = name
@@ -250,6 +251,10 @@ int REJOINmsCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
  * parv[7] = maxgames
  * parv[8] = nbwgames
  * parv[9] = proto
+ * parv[10]= version
+ * parv[11]= totusers
+ * parv[12]= totgames
+ * parv[13]= uptime
  */
 int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -311,7 +316,7 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	close(sock);
 #endif
 
-	if(StrToTyp<int>(parv[9]) > atoi(APP_PVERSION) && parv[2].find(".DEV.") == std::string::npos)
+	if(StrToTyp<int>(parv[9]) > atoi(APP_PVERSION) && parv[10].find("-dev") == std::string::npos)
 #ifdef WIN32
 		TForm::Message = StringF(_("There is a more recent version of this game. Download it on %s"), APP_SITE);
 #else
@@ -845,7 +850,7 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		vDebug(W_DESYNCH|W_SEND, "Reception d'un LSP hors de la fenêtre de liste des chans", VPName(ConnectedForm));
 
 	me->LockScreen();
-	bool enabled = (parv.size() <= 4 || StrToTyp<int>(parv[3]) >= StrToTyp<int>(parv[4]));
+	bool enabled = (parv.size() <= 4 || StrToTyp<int>(parv[3]) < StrToTyp<int>(parv[4]));
 	if(parv[2][0] == '+')
 	{
 		if(parv[4] == "0")
@@ -1023,7 +1028,7 @@ int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 		int defeats = StrToTyp<int>(parv[7]) - StrToTyp<int>(parv[8]);
 		GlobalScoresForm->ListBox->AddItem(false,
-		                      StringF("%-15s%9s %12s %9d   %-11s %9s", parv[1].c_str(), parv[5].c_str(), parv[8].c_str(),
+		                      StringF("%-15s%10s %11s %9d   %-11s %9s", parv[1].c_str(), parv[5].c_str(), parv[8].c_str(),
 		                                                                defeats, parv[3].c_str(), StringF(_("$%s"), parv[6].c_str()).c_str()),
 		                      parv[1]);
 

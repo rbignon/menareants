@@ -712,6 +712,15 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			{
 				if(GameInfosForm)
 					GameInfosForm->Scoring->Check(add);
+				chan->SetScoring(add);
+				if(chan->State() == EChannel::PLAYING)
+				{
+					WAIT_EVENT_T(InGameForm, i, 5);
+					if(InGameForm)
+						InGameForm->AddInfo(I_WARNING, _("*** You have selected \"Scoring\" Option, but game's scores will not be counted because:\n"
+						                                 "    - You are playing only with AIs players.\n"
+						                                 "    - Or you are playing on a non-official server.\n"));
+				}
 				break;
 			}
 			case '_':
@@ -1046,6 +1055,9 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				pline->couleur->SetEnabled(false);
 				pline->nation->SetEnabled(false);
 				GameInfosForm->RefreshPositions();
+				if(!me->Player()->Channel()->IsMission() && !pl->IsIA())
+					GameInfosForm->CheckScoringEnable();
+
 				if(me->Player()->IsOwner())
 					pline->Nick->SetHint(StringF(_("Clic on his nickname to kick %s"), pl->GetNick()));
 			}
@@ -1148,6 +1160,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				vDebug(W_DESYNCH|W_SEND, "LEA - Impossible de supprimer un player", VPName(*playersi));
 				playersi++;
 			}
+			GameInfosForm->CheckScoringEnable();
 		}
 	}
 	me->UnlockScreen();
@@ -1475,6 +1488,19 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 	client->UnlockScreen();
 }
 
+void TGameInfosForm::CheckScoringEnable()
+{
+	EChannel* chan = client->Player()->Channel();
+
+	if(chan->IsMission())
+		return;
+
+	bool only_ia = !(chan->NbHumains() == chan->NbPlayers() && chan->NbPlayers() > 1);
+
+	Scoring->SetEnabled(client->Player()->IsPriv() && !only_ia);
+	Scoring->Check(!only_ia && chan->Scoring());
+}
+
 void TGameInfosForm::ChangeStatus(bool add)
 {
 	MapList->SetEnabled(add);
@@ -1486,6 +1512,7 @@ void TGameInfosForm::ChangeStatus(bool add)
 	if(mission) return;
 
 	CreateIAButton->SetVisible(add);
+	CheckScoringEnable();
 }
 
 void TGameInfosForm::RefreshPositions()
@@ -1603,7 +1630,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 
 	Scoring = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), right_x, SpeedGame->Y()+SpeedGame->Height()+5, _("Scoring"), white_color));
 	Scoring->SetHint(_("Do you want to send to meta-server scoring of game ?"));
-	Scoring->Check();
+	Scoring->SetEnabled(false);
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */

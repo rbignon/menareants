@@ -317,15 +317,12 @@ public:
 	bool FastGame() const { return fast_game; }
 	void SetFastGame(bool b = true) { fast_game = b; }
 
-	bool Scoring() const { return scoring; }
-	void SetScoring(bool s = true) { scoring = s; }
-
 	int& BeginMoney() { return begin_money; }
 
 /* Variables privées */
 protected:
 	ECPlayer* owner;
-	bool fast_game, scoring;
+	bool fast_game;
 	int begin_money;
 	uint first_playing, playing;
 };

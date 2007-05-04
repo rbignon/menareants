@@ -215,8 +215,11 @@ public:
 	 */
 	virtual bool RemovePlayer(ECBPlayer* pl, bool use_delete);
 
+	/** Return the number of humans players */
+	virtual BPlayerVector::size_type NbHumains(bool all = true) const;
+
 	/** Return number of players in channel. */
-	unsigned int NbPlayers() const { return players.size(); }
+	BPlayerVector::size_type NbPlayers() const { return players.size(); }
 
 	/** Return aformated list of players.
 	 * It is used to send to client a player list when it joined.
@@ -233,6 +236,9 @@ public:
 	bool IsMission() const { return mission; }
 	void SetMission(bool m = true) { mission = m; }
 
+	bool Scoring() const { return scoring; }
+	void SetScoring(bool s = true) { scoring = s; }
+
 /* Variables privées */
 protected:
 	BPlayerVector players;
@@ -245,6 +251,7 @@ private:
 	ECBMap *map;
 	uint turn_time;
 	bool mission;
+	bool scoring;
 };
 
 #endif /* ECLIB_CHANNELS_H */

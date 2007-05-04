@@ -88,6 +88,8 @@ public:
 
 	void MapSetted();
 
+	void CheckScoringEnable();
+
 /* Evenements */
 private:
 

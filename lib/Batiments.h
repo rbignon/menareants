@@ -205,6 +205,7 @@ public:
 	virtual e_type Type() const { return E_NUCLEARSEARCH; }
 	virtual uint Cost() const { return 50000; }
 	virtual uint InitNb() const { return 3000;}
+	virtual bool CanBeSold() const { return true; }
 
 	enum data_t {
 		DATA_NBMISSILES,
@@ -255,6 +256,7 @@ public:
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 500;}
 	virtual uint Porty() const { return 10; }
+	virtual bool CanBeSold() const { return true; }
 
 	enum data_t {
 		DATA_RESTBUILD
@@ -435,6 +437,7 @@ public:
 	virtual uint Visibility() const { return 4; }
 	virtual uint Porty() const { return 3; }
 	virtual e_type MyUpgrade() const { return E_OBELISK; }
+	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
@@ -475,6 +478,7 @@ public:
 	virtual uint InitNb() const { return 2000; }
 	virtual uint Visibility() const { return 4; }
 	virtual uint Porty() const { return 5; }
+	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
@@ -512,6 +516,7 @@ public:
 	virtual uint Cost() const { return 20000; }
 	virtual uint InitNb() const { return 1000; }
 	virtual bool IsCity() const { return true; }
+	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
@@ -557,6 +562,7 @@ public:
 	virtual uint Cost() const { return 9000; }
 	virtual uint InitNb() const { return 500; }
 	virtual bool IsCity() const { return true; }
+	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
@@ -602,6 +608,7 @@ public:
 	virtual e_type Type() const { return E_SHIPYARD; }
 	virtual uint Cost() const { return 4000; }
 	virtual uint InitNb() const { return 200; }
+	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 

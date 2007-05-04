@@ -379,7 +379,7 @@ void ConfigSection::AddItem(ConfigItem* item, bool is_name) throw(MyConfig::erro
 
 		item->config = config;
 		item->parent = this;
-	
+
 		items[item->Label()] = item;
 		if(is_name)
 			name_item = item;
