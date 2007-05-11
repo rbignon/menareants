@@ -925,11 +925,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			 *   GESTION DES VENTES   *
 			 **************************/
 
-			/*  entity->Nb()           entity->Cost()
-			 *  ----------------   *   --------------
-			 *  entity->InitNb()             2
+			/*  entity->Nb()           2 * entity->Cost()
+			 *  ----------------   *   ------------------
+			 *  entity->InitNb()               3
 			 */
-			cl->Player()->UpMoney((entity->Nb() * entity->Cost())/(2 * entity->InitNb()));
+			cl->Player()->UpMoney((entity->Nb() * 2 * entity->Cost())/(3 * entity->InitNb()));
 
 			// L'utilisation de ARM_RECURSE fera que ça ne sera envoyé QUE à l'owner et aux alliés
 			chan->SendArm(0, entity, ARM_REMOVE|ARM_RECURSE);

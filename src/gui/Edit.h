@@ -76,6 +76,9 @@ public:
 	void SetFocus();
 	void DelFocus();
 
+	bool IsPassword() const { return passwd; }
+	void SetPassword(bool b = true) { passwd = b; }
+
 /* Variables privées */
 private:
 	ECImage background;
@@ -91,6 +94,7 @@ private:
 	uint EDIT_HEIGHT;
 	Font* font;
 	Color color;
+	bool passwd;
 };
 
 #endif /* EC_EDIT_H */

@@ -12,14 +12,14 @@ PLAYER H  0
 X 50
 Y 50
 MAP
-mNN*emNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*tmNI*cmNK*mmNK*mmNK*mmNK*mmNK*mmNN*mmNN*mmDADmmDADdtDADttDADttDADt
-mNN*mmNN*mmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*tmNI*lmNK*bmNK*bmNK*bmNK*hmNK*mmNN*mmNN*mmDADmmDADdtDADttDADttDADt
-mNN*mmNN*mmAAAmmAAAgmAAAbmAAAbmAAAbmAAAhmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*ttNI*ttNK*ttNK*ttNK*tmNK*cmNK*mmNN*mmNN*mmDADmmDADfmDADamDADamDADa
-mNN*mmNN*mmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*ttNB*ttNB*ttNN*ttNN*tmNN*cmNN*mmNN*mmHAHfmHAHamHAHamHAHemNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*ttNK*ttNK*ttNK*ttNK*tmNK*cmNK*mmNN*mmNN*mmDADmmDADmmDADmmDADmmDADm
-mNN*mmNN*mmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*tmNB*jmNB*amNN*amNN*amNN*emNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNI*mmNI*fmNI*amNI*itNI*ttNJ*ttNK*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*m
-mNN*mmNN*mmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*tMNC*MtNB*tmNB*cmNB*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*gmNL*bmNL*bmNL*bmNL*hmNL*m
-mNN*mmNN*mmAAAmmAAAfmAAAamAAAamAAAamAAAemAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*tmNB*cmNB*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*dtNL*ttNL*ttNL*tmNL*cmNL*m
-mNN*mmNN*mmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmNN*mmNN*mmNN*mmND*gmND*bmND*bmND*ktND*ttNC*ttNB*tmNB*lmNB*bmNE*bmNE*bmNE*bmNE*hmNE*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNJ*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*dtNL*ttNL*ttNL*tmNL*cmNL*m
+mAAAemAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*tmNI*cmNK*mmNK*mmNK*mmNK*mmNK*mmNN*mmNN*mmDADmmDADdtDADttDADttDADt
+mAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*tmNI*lmNK*bmNK*bmNK*bmNK*hmNK*mmNN*mmNN*mmDADmmDADdtDADttDADttDADt
+mAAAmmAAAmmAAAgmAAAbmAAAbmAAAbmAAAhmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNA*mmNA*dtNA*ttNA*ttNA*ttNA*ttNA*ttNA*ttNA*tmNA*cmNA*mmNN*mmHAHdtHAHttHAHtmHAHcmNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*ttNI*ttNK*ttNK*ttNK*tmNK*cmNK*mmNN*mmNN*mmDADmmDADfmDADamDADamDADa
+mAAAmmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*ttNB*ttNB*ttNN*ttNN*tmNN*cmNN*mmNN*mmHAHfmHAHamHAHamHAHemNN*mmNI*mmNI*dtNI*ttNI*ttNI*ttNI*ttNK*ttNK*ttNK*ttNK*tmNK*cmNK*mmNN*mmNN*mmDADmmDADmmDADmmDADmmDADm
+mAAAmmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*tmNB*jmNB*amNN*amNN*amNN*emNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNI*mmNI*fmNI*amNI*itNI*ttNJ*ttNK*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*m
+mAAAmmAAAmmAAAdtAAAttAAAttAAAtmAAAcmAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*tMNC*MtNB*tmNB*cmNB*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*gmNL*bmNL*bmNL*bmNL*hmNL*m
+mAAAmmAAAmmAAAfmAAAamAAAamAAAamAAAemAAAmmAAAmmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNC*dtNC*ttNC*ttNB*tmNB*cmNB*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNK*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*dtNL*ttNL*ttNL*tmNL*cmNL*m
+mPD*mmPD*mmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmAAAmmNN*mmNN*mmNN*mmND*gmND*bmND*bmND*ktND*ttNC*ttNB*tmNB*lmNB*bmNE*bmNE*bmNE*bmNE*hmNE*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNN*mmNJ*mmNJ*dtNJ*ttNJ*ttNJ*ttNJ*ttNK*ttNK*tmNK*cmNK*mmNL*mmNL*dtNL*ttNL*ttNL*tmNL*cmNL*m
 mPD*gmPD*bmPD*bmPD*bmPC*bmPC*bmPC*bmPC*bmPC*bmPC*bmPC*hmPC*mmND*dtND*ttND*ttND*ttND*ttNC*ttNB*ttNB*ttNE*ttNE*ttNE*ttNE*tmNE*cmNE*mmPJ*mmPJ*mmNH*mmNH*mmNH*mmNH*mmNH*mmNH*mmNJ*fmNJ*amNJ*amNJ*amNJ*amNK*amNK*amNK*emNK*mmNL*mmNL*dtNL*ttNL*ttNL*tmNL*cmNL*m
 mPD*ktPD*ttPD*ttPD*ttPC*ttPC*ttPC*ttPC*ttPC*ttPC*tmPC*cmPC*mmND*dtND*ttND*ttND*ttND*ttNF*ttNF*ttNF*ttNE*ttNE*ttNE*ttNE*tmNE*lmNE*bmPJ*bmPJ*bmNH*bmNH*bmNH*bmNH*bmNH*hmNH*mmNJ*mmNJ*mmNJ*mmNM*mmNM*mmNM*mmNM*mmNM*mmNN*mmNL*mmNL*fmNL*amNL*amNL*amNL*emNL*m
 tPD*ttPD*ttPD*ttPD*ttPC*ttPC*ttPC*ttPC*ttPC*ttPC*tmPC*cmPC*mmND*dtND*ttND*ttND*ttND*ttNF*ttNF*ttNF*ttNE*ttNE*ttNE*ttNE*ttNE*ttNE*ttPJ*ttPJ*ttNH*ttNH*ttNH*ttNH*tmNH*cmNH*mmNM*gmNM*bmNM*bmNM*bmNM*bmNM*bmNM*hmNM*mmNN*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*mmNL*m
@@ -34,12 +34,12 @@ mBABmmBABmmBABmmBABmmPA*dtPA*ttPA*ttPA*ttOZ*ttOZ*tmOZ*jmPB*amPB*amPB*apPB*rmPB*e
 mBABbmBABbmBABhmBABmmPA*dtPA*ttPA*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*gmOX*bpOX*smOX*bmOX*bmOW*bmOW*bmOW*bmOW*bmOW*hmOW*mmPF*dtPF*ttPF*ttPI*ttPI*ttPI*ttPI*ttPI*ttPG*ttPG*ttPG*ttPG*tmPG*cmPG*mmNR*dtNR*ttNR*tmNR*cmNR*mmNQ*dtNQ*ttNQ*ttNQ*tMNQ*MMNQ*MMNQ*MMNQ*M
 tBABttBABtmBABcmBABmmOZ*dtOZ*ttOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOX*ttOX*ttOX*ttOW*ttOW*ttOW*ttOW*tmOW*cmOW*mmPF*dtPF*ttPF*ttPI*ttPI*ttPI*ttPI*ttPI*ttPG*ttPG*ttPG*ttPG*tmPG*cmPG*mmNR*dtNR*ttNR*tmNR*cmNR*mmNQ*fmNQ*amNQ*amNQ*amNQ*amNQ*amNQ*amNQ*a
 tBABttBABtmBABcmBABmmOZ*dtOZ*ttOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOX*ttOX*ttOX*ttOW*ttOW*ttOW*ttOW*tmOW*cmOW*mmPF*dtPF*ttPF*ttPI*ttPI*ttPI*ttPI*ttPI*ttPG*ttPG*ttPG*ttPG*tmPG*cmPG*mmNR*fmNR*amNR*amNR*emNR*mmNS*mmNS*mmNS*mmNS*mmNN*mmNN*mmNN*mmNN*m
-mBABamBABamBABemBABmmOZ*fmOZ*itOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOX*ttOX*ttOX*ttOW*ttOW*ttOW*ttOW*tmOW*cmOW*mmPF*dtPF*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPG*ttPG*ttPG*tmPG*cmPG*mmPG*mmPG*mmNS*gmNS*bmNS*bmNS*bmNS*bmNS*hmNS*mmNN*mmNN*mmNN*mmNN*m
-mBABmmBABmmBABmmBABmmOZ*mmOZ*dtOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOY*tMOY*MMOY*MMPK*MMPK*MtPK*ttOW*tpOW*ppOW*npPF*qtPF*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPG*ttPG*ttPG*tmPG*cmPG*mmPG*mmPG*mmNS*dtNS*ttNS*ttNS*ttNS*tmNS*cmNS*mmNN*mmNN*mmNN*mmNN*m
+tBABttBABtmBABcmBABmmOZ*fmOZ*itOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOX*ttOX*tMOX*MMOW*MMOW*MtOW*ttOW*tmOW*cmOW*mmPF*dtPF*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPG*ttPG*ttPG*tmPG*cmPG*mmPG*mmPG*mmNS*gmNS*bmNS*bmNS*bmNS*bmNS*hmNS*mmNN*mmNN*mmNN*mmNN*m
+mBABamBABamBABemBABmmOZ*mmOZ*dtOZ*ttOZ*ttOZ*ttOZ*tmOZ*cmOX*mmOX*dtOX*ttOY*tMOY*MMOY*MtPK*tMPK*MtPK*ttOW*tpOW*ppOW*npPF*qtPF*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPH*ttPG*ttPG*ttPG*tmPG*cmPG*mmPG*mmPG*mmNS*dtNS*ttNS*ttNS*ttNS*tmNS*cmNS*mmNN*mmNN*mmNN*mmNN*m
 mBABmmBABmmBABmmBABmmOM*mmOM*dtOM*ttOM*ttOM*ttOZ*tmOZ*cmOY*mmOY*dtOY*ttOY*ttOY*tMOY*MtPK*ttPK*tMPK*MtOW*tmOW*cmOW*mmPF*fmPF*amPH*amPH*amPH*amPH*apPH*rmPH*amPH*amPG*amPG*amPG*amPG*emNT*mmNT*mmNT*mmNT*dtNS*ttNS*ttNS*ttNS*tmNS*cmNS*mmNN*mmNN*mmNN*mmNN*m
 mOL*mmOL*mmOL*mmOL*mmOM*mmOM*dtOM*ttOM*ttOM*ttOM*tmOM*cmOM*mmOY*dtOY*ttOY*ttOY*tMOY*MMOY*MMOV*MMOV*MtOV*tmOV*cmOT*mmOT*gmOT*bmOT*bmOT*bmOT*bmOT*bpOU*smOU*bmOU*bmOU*hmOU*mmOU*mmOU*mmNT*gmNT*bmNT*bmNT*ktNS*ttNS*ttNS*ttNS*tmNS*cmNS*mmNN*mmNN*mmNN*mmNN*m
-mOL*mmOL*mmOL*mmOL*mmOM*mmOM*dtOM*ttOM*ttOM*ttOM*tmOM*cmOM*mmOY*dtOY*ttOY*ttOY*ttOY*ttOY*ttOV*ttOV*ttOV*tmOV*cmOT*mmOT*dtOT*ttOT*ttOT*ttOT*ttOT*ttOU*ttOU*ttOU*tmOU*cmOU*mmOU*mmOU*mmNT*dtNT*ttNT*ttNT*ttNT*ttNS*ttNS*ttNS*tmNS*cmNS*mmEAEmmEAEmmEAEmmEAEm
-mOL*mmOL*mmOL*mmOL*mmOM*mmOM*fmOM*amOM*amOM*amOM*amOM*emOM*mmOY*dtOY*ttOY*ttOY*ttOY*ttOV*ttOV*ttOV*ttOV*tmOV*cmOV*mmOT*dtOT*ttOT*ttOT*ttOT*ttOT*ttOU*ttOU*ttOU*tmOU*cmOU*mmOU*mmOU*mmNT*dtNT*ttNT*ttNT*ttNT*tmNT*jmNN*amNN*amNN*emNN*mmEAEmmEAEgmEAEbmEAEb
+mOL*mmOL*mmOL*mmOL*mmOM*mmOM*dtOM*ttOM*ttOM*ttOM*tmOM*cmOM*mmOY*dtOY*ttOY*ttOY*ttOY*ttOY*ttOV*ttOV*ttOV*tmOV*cmOT*mmOT*dtOT*ttOT*ttOT*ttOT*ttOT*ttOU*ttOU*ttOU*tmOU*cmOU*mmOU*mmOU*mmNT*dtNT*ttNT*ttNT*ttNT*ttNS*ttNS*ttNS*tmNS*cmNS*mmEAEmmEAEgmEAEbmEAEb
+mOL*mmOL*mmOL*mmOL*mmOM*mmOM*fmOM*amOM*amOM*amOM*amOM*emOM*mmOY*dtOY*ttOY*ttOY*ttOY*ttOV*ttOV*ttOV*ttOV*tmOV*cmOV*mmOT*dtOT*ttOT*ttOT*ttOT*ttOT*ttOU*ttOU*ttOU*tmOU*cmOU*mmOU*mmOU*mmNT*dtNT*ttNT*ttNT*ttNT*tmNT*jmNN*amNN*amNN*emNN*mmEAEmmEAEdtEAEttEAEt
 mOL*bmOL*bmOL*bmOL*bmOL*bmOL*bmON*bmON*bmON*bmON*hmOY*mmOY*mmOY*dtOY*ttOY*ttOY*ttOV*ttOV*ttOV*ttOV*ttOV*tmOV*cmOV*mmOT*dtOT*ttOT*ttOT*ttOT*ttOT*ttOU*ttOU*ttOU*tmOU*cmOU*mmNU*mmNU*gmNU*ktNU*ttNU*ttNU*ttNV*tmNV*cmNN*mmNN*mmNN*mmNN*mmEAEmmEAEdtEAEttEAEt
 tOL*ttOL*ttOL*ttOL*ttOL*ttOL*ttON*ttON*ttON*tmON*cmOY*mmOY*mmOY*fmOY*amOY*amOV*amOV*amOV*amOV*amOV*amOV*amOV*emOV*mmOT*dtOT*tmOS*jmOS*amOS*amOS*amOS*amOS*itOU*tmOU*cmOU*mmNU*mmNU*dtNU*ttNU*ttNU*ttNV*ttNV*tmNV*cmNN*mmNN*mmNN*mmNN*mmEAEmmEAEdtEAEttEAEt
 tOL*ttOL*ttOL*ttOL*ttOL*ttOL*ttON*ttON*ttON*tmON*cmOY*mmOY*mmOY*mmOY*mmOY*mmOV*mmOV*mmOV*mmOV*mmOV*mmOV*mmOV*mmOV*mmOT*dtOT*tmOS*cmOS*gmOS*bmOS*hmOS*mmOS*dtOU*tmOU*cmOU*mmNU*mmNU*dtNU*ttNU*ttNU*ttNV*ttNV*tmNV*cmNW*mmNW*mmNW*mmNW*mmEAEmmEAEfmEAEamEAEa
@@ -47,7 +47,7 @@ tOL*ttOL*ttOL*ttOL*ttOL*ttON*ttON*ttON*ttON*tmON*cmOO*mmOO*mmOO*mmOO*mmOO*mmOO*m
 tOL*ttOL*ttOL*ttOL*ttOL*ttON*ttON*ttON*ttON*tmON*cmOO*mmOO*mmOO*mmOO*mmOO*mmOO*mmOV*mmOV*mmOQ*gmOQ*bmOQ*bmOQ*bmOQ*bmOQ*ktOQ*tmOS*lmOS*ktOS*tmOS*lmOS*ktOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmOR*mmNV*dtNV*ttNV*ttNV*tmNV*cmNW*dtNW*ttNW*ttNW*tmNW*cmNX*mmNX*mmNX*m
 tOK*tMOK*MMOK*MMOK*MtON*ttON*ttON*ttON*ttON*tmON*lmOO*bmOO*bmOO*bmOO*bmOO*bmOO*bmOP*bmOP*hmOQ*dtOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOS*ttOS*ttOS*ttOS*ttOS*ttOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmOR*mmNV*fmNV*amNV*amNV*amNV*emNW*dtNW*ttNW*ttNW*tmNW*lmNX*bmNX*bmNX*b
 MOK*MMOK*MMOK*MMOK*MMON*MtON*ttON*ttON*ttON*ttON*ttOO*ttOO*ttOO*ttOO*ttOO*ttOP*ttOP*tmOP*cmOQ*dtOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOS*ttOS*ttOS*ttOS*ttOS*ttOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmOR*mmNV*mmNV*mmNV*mmNV*mmNV*mmNW*fmNW*amNW*itNW*ttNW*ttNX*ttNX*ttNX*t
-tOK*ttOK*tMOK*MMOK*MMON*MtON*ttON*ttON*ttON*ttON*ttOO*ttOO*ttOO*ttOO*ttOP*ttOP*ttOP*tmOP*cmOQ*dtOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOR*ttOR*ttOR*ttOR*ttOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNW*mmNW*mmNW*dtNW*ttNX*ttNX*ttNX*ttNX*t
+tOK*ttOK*ttOK*tMOK*MMON*MtON*ttON*ttON*ttON*ttON*ttOO*ttOO*ttOO*ttOO*ttOP*ttOP*ttOP*tmOP*cmOQ*dtOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOQ*ttOR*ttOR*ttOR*ttOR*ttOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNW*mmNW*mmNW*dtNW*ttNX*ttNX*ttNX*ttNX*t
 tOK*ttOK*tMOK*MMOK*MMOJ*MtOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOO*ttOO*ttOO*ttOP*ttOP*ttOP*tmOP*cmOQ*fmOQ*amOQ*amOQ*amOQ*amOQ*itOQ*ttOQ*ttOR*ttOR*ttOR*ttOR*ttOR*ttOR*tmOR*cmOR*mmOR*mmOR*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNZ*mmNY*dMNY*MMNX*MMNX*MMNX*MmNX*j
 MOK*MMOK*MMOK*MtOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOP*ttOP*ttOP*ttOP*ttOP*tmOP*cmOQ*mmOQ*mmOQ*mmOQ*mmOQ*mmOQ*fmOQ*amOQ*amOR*amOR*amOR*amOR*amOR*amOR*amOR*emOR*mmOR*mmOR*mmNZ*gmNZ*bmNZ*bmNZ*bmNZ*bmNZ*bmNZ*bmNZ*hmNY*dtNY*tMNX*MMNX*MMNX*MmNX*c
 tOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOJ*ttOP*ttOP*ttOP*ttOP*ttOP*tmOP*cmOP*mmOP*mmOP*mmOH*mmOH*mmOH*mmOH*mmOH*mmOH*mmOH*mmOB*mmOB*mmOB*mmOB*mmOB*mmOB*mmOB*mmOB*mmNZ*dtNZ*ttNZ*ttNZ*ttNZ*ttNZ*ttNZ*tmNZ*cmNY*dtNY*ttNY*tMNY*MMNY*MmNY*l
@@ -586,3 +586,13 @@ UNIT 18 * 19,23 1
 UNIT 18 * 18,24 1
 UNIT 18 * 17,24 1
 UNIT 16 * 18,24 2000
+UNIT 25 * 2,35 500
+UNIT 25 * 17,23 500
+UNIT 25 H 27,2 500
+UNIT 25 A 3,3 500
+UNIT 25 B 0,22 500
+UNIT 25 C 1,47 500
+UNIT 25 G 23,47 500
+UNIT 25 F 46,47 500
+UNIT 25 E 49,27 500
+UNIT 25 D 49,1 500

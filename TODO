@@ -30,7 +30,6 @@ Note: Lire le fichier DEVELOPPEURS pour participer à des discussions.
 ** Unités
 - Tout le monde
   - char qui permet de tirer à une ou deux cases d'interval..
-  - batiment qui permet de ne pas avoir le semi brouillard (premiere version, toutes les cases -1 passent en 0, et upgrade pour tout tout voir)
   - upgrades de la caserne et de l'usine d'armement
   - unité Dorian qui vend de l'alcool: les unités touchées se dirigent n'importe comment !
   - unité Gay

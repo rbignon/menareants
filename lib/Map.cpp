@@ -387,7 +387,7 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 		 * cohabiter sur la meme case
 		 */
 		if((!(*enti)->IsTerrain() || !IsTerrain() || Type() == (*enti)->Type()) &&
-		   (*enti)->IsBuilding() && this->IsBuilding() && *enti != this)
+		   (*enti)->IsBuilding() && this->IsBuilding() && *enti != this && !((*enti)->EventType() & ARM_SELL))
 			return false;
 	}
 

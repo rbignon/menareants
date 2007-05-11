@@ -193,6 +193,66 @@ private:
 };
 
 /********************************************************************************************
+ *                                ECEiffelTower                                             *
+ ********************************************************************************************/
+
+class ECEiffelTower : public ECBatiment, public ECBEiffelTower
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECEiffelTower) {}
+
+	ENTITY_CONSTRUCTOR(ECEiffelTower), ECBatiment(Resources::EiffelTower_Face()) {}
+
+	virtual void Init();
+
+	~ECEiffelTower();
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("Eiffel Tower"); }
+	virtual const char* Qual() const { return _("eiffel tower"); }
+	virtual const char* Infos() const { return _("Show all units on map."); }
+	virtual const char* Description() const
+	{
+		return _("Eiffel Tower shows all units on the map.");
+	}
+	virtual ECImage* Icon() const { return Resources::EiffelTower_Icon(); }
+};
+
+/********************************************************************************************
+ *                                ECRadar                                                   *
+ ********************************************************************************************/
+
+class ECRadar : public ECBatiment, public ECBRadar
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECRadar) {}
+
+	ENTITY_CONSTRUCTOR(ECRadar), ECBatiment(Resources::Radar_Face()) {}
+
+	virtual void Init();
+
+	~ECRadar();
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("Radar"); }
+	virtual const char* Qual() const { return _("radar"); }
+	virtual const char* Infos() const { return _("Show all map."); }
+	virtual const char* Description() const
+	{
+		return _("This radar shows all the map. If you want to see all units on the map, upgrade it.");
+	}
+	virtual ECImage* Icon() const { return Resources::Radar_Icon(); }
+};
+
+/********************************************************************************************
  *                                ECNuclearSearch                                           *
  ********************************************************************************************/
 
@@ -507,6 +567,32 @@ public:
 	}
 	virtual ECImage* Icon() const { return Resources::Caserne_Icon(); }
 	//virtual ECSpriteBase* DeadCase() const { return Resources::CaseCitySODead(); }
+};
+
+/********************************************************************************************
+ *                                ECAirPort                                                 *
+ ********************************************************************************************/
+
+class ECAirPort : public ECBatiment, public ECBAirPort
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECAirPort) {}
+
+	ENTITY_CONSTRUCTOR(ECAirPort), ECBatiment(Resources::AirPort_Face()) {}
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("AirPort"); }
+	virtual const char* Qual() const { return _("airport"); }
+	virtual const char* Infos() const { return _("Can build planes."); }
+	virtual const char* Description() const
+	{
+		return _("The airport can be used to create planes.");
+	}
+	virtual ECImage* Icon() const { return Resources::AirPort_Icon(); }
 };
 
 /********************************************************************************************

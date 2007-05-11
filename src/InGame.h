@@ -525,7 +525,7 @@ class TScoresPlayerLine : public TComponent
 public:
 
 	TScoresPlayerLine(std::string nick, Color, std::string killed, std::string shooted, std::string created,
-	                  std::string score);
+	                  std::string score, std::string best_revenu);
 	virtual ~TScoresPlayerLine();
 
 /* Methodes */
@@ -548,6 +548,7 @@ private:
 	std::string nick;
 	Color color;
 	std::string killed, shooted, created, score;
+	std::string best_revenu;
 };
 
 #endif /* EC_INGAME_H */

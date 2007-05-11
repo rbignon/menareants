@@ -657,10 +657,13 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 					{
 						if(money > players[0]->Money())
 						{
-							InGameForm->BarreLat->TurnMoney->SetCaption(StringF(_("$%d/t"), (money - players[0]->Money())));
-							InGameForm->BarreLat->TurnMoney->SetX(
-							                                   InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
-							                                   InGameForm->BarreLat->TurnMoney->Width() - 15);
+							if(chan->State() == EChannel::ANIMING)
+							{
+								InGameForm->BarreLat->TurnMoney->SetCaption(StringF(_("$%d/t"), (money - players[0]->Money())));
+								InGameForm->BarreLat->TurnMoney->SetX(
+								                                InGameForm->BarreLat->X() + InGameForm->BarreLat->Width() -
+								                                InGameForm->BarreLat->TurnMoney->Width() - 15);
+							}
 							InGameForm->AddInfo(I_INFO, StringF(_("*** You earn $%d"), (money - players[0]->Money())));
 						}
 						SDL_Delay(50);
@@ -1634,7 +1637,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 
 	                                                                     /*  label        x    y    w  min   max  step */
 	/* defvalue */
-	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, Scoring->Y()+Scoring->Height()+5, 150, 0, 50000, 5000,
+	BeginMoney = AddComponent(new TSpinEdit(Font::GetInstance(Font::Normal), _("Money: "),  right_x, Scoring->Y()+Scoring->Height()+5, 150, 0, 100000, 5000,
 	15000));
 	BeginMoney->SetHint(_("Money earned by each players at begin of game"));
 	BeginMoney->SetOnChange(TGameInfosForm::SpinEditChange);

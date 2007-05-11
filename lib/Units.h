@@ -129,6 +129,7 @@ public:
 	}
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsVehicule() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -176,6 +177,7 @@ public:
 	}
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsNaval() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -201,9 +203,9 @@ public:
 
 	virtual e_type Type() const { return E_PLANE; }
 	virtual uint Cost() const { return 5000; }
-	virtual uint InitNb() const { return 5; }
-	virtual uint Step() const { return 5; }
-	virtual uint Visibility() const { return 5; }
+	virtual uint InitNb() const { return 10; }
+	virtual uint Step() const { return 7; }
+	virtual uint Visibility() const { return 7; }
 	virtual bool CanWalkOn(ECBCase *c) const { return true; }
 	virtual e_level Level() const { return (!Deployed() ^ !!(EventType() & ARM_DEPLOY)) ? L_AIR : L_GROUND; }
 	virtual uint UnitaryCapacity() const { return 100; }
@@ -225,7 +227,8 @@ public:
 
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool IsPlane() const { return true; }
-	virtual bool WantDeploy() { return (DestCase()->Flags() & (C_TERRE|C_PONT)); }
+	virtual bool WantDeploy() { return (DestCase()->Entities()->Find(E_AIRPORT).empty() == false); }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -298,6 +301,7 @@ public:
 	}
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsVehicule() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 
@@ -322,7 +326,7 @@ public:
 	virtual uint InitNb() const { return 1; }
 	virtual uint Step() const { return 2; }
 	virtual uint Porty() const { return 2; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
@@ -370,7 +374,7 @@ public:
 	virtual uint InitNb() const { return 1000; }
 	virtual uint Step() const { return Deployed() ? 0 : 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
 	bool CanInvest(const ECBEntity* e) const
 	{
@@ -422,7 +426,7 @@ public:
 	virtual uint Step() const { return 4; }
 	virtual uint Visibility() const { return 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
 	bool CanInvest(const ECBEntity* e) const { return false; }
 	bool CanAttaq(const ECBEntity* e) { return (e->IsInfantry()); }
@@ -460,8 +464,8 @@ public:
 	virtual e_type Type() const { return E_ENGINER; }
 	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1; }
-	virtual uint Step() const { return 1; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE).empty(); }
+	virtual uint Step() const { return 2; }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
@@ -505,10 +509,10 @@ public:
 public:
 
 	virtual e_type Type() const { return E_ARMY; }
-	virtual uint Cost() const { return 2000; }
+	virtual uint Cost() const { return 1000; }
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 2; }
-	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && (c->Entities()->Find(E_BARBEDWIRE).empty() == true); }
+	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && (c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty() == true); }
 
 	bool CanAttaq(const ECBEntity* e)
 	{
@@ -520,6 +524,7 @@ public:
 	}
 	bool CanCreate(const ECBEntity*) { return false; }
 	bool IsInfantry() const { return true; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 /* Methodes */
 public:

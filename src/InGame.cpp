@@ -286,7 +286,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	me->UnlockScreen();
 
 	/* On en est à la première ligne de l'evenement. */
-	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL))
+	if(chan->State() == EChannel::ANIMING && (!chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL) || (flags & ARM_ATTAQ)))
 		chan->SetCurrentEvent(flags);
 
 	if(entities.empty())
@@ -443,10 +443,11 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		}
 	if(InGameForm && chan->State() == EChannel::PLAYING)
 	{
-		if(flags & ARM_TYPE)
+		if(flags & ARM_TYPE || flags & ARM_REMOVE)
 		{
 			me->LockScreen();
 			InGameForm->Map->Map()->CreatePreview(120,120, P_ENTITIES);
+			InGameForm->Map->SetMustRedraw();
 			me->UnlockScreen();
 		}
 		if(!(flags & ARM_REMOVE) && !(flags & ARM_INVEST))
@@ -2495,7 +2496,7 @@ TScoresForm* ScoresForm = 0;
 
 /** Scores of a player
  *
- * Syntax: nick SCO killed shooted created score
+ * Syntax: nick SCO killed shooted created score best_revenu
  */
 int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -2504,7 +2505,7 @@ int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 	std::string nick = (players.front()->Lost() ? "(-)" : "(+)") + players.front()->Nick();
 	ScoresForm->Players->AddLine(new TScoresPlayerLine(nick, color_eq[players[0]->Color()],
-	                                                   parv[1], parv[2], parv[3], parv[4]));
+	                                                   parv[1], parv[2], parv[3], parv[4], parv[5]));
 	return 0;
 }
 
@@ -2556,7 +2557,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	                      Font::GetInstance(Font::Huge)));
 
 	Players = AddComponent(new TList(70, 250));
-	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Killed"), _("Creations"), _("Score")));
+	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Killed"), _("Creations"), _("Score"), ""));
 
 	InitDate = AddComponent(new TLabel(150, _("Begin of fight:  ") + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));
@@ -2582,8 +2583,8 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
  ********************************************************************************************/
 
 TScoresPlayerLine::TScoresPlayerLine(std::string n, Color col, std::string _k, std::string _s, std::string _c,
-                                     std::string _sc)
-	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc)
+                                     std::string _sc, std::string _best_revenu)
+	: nick(n), color(col), killed(_k), shooted(_s), created(_c), score(_sc), best_revenu(_best_revenu)
 {
 	size.y = 40;
 	size.x = 650;
@@ -2611,6 +2612,8 @@ void TScoresPlayerLine::Init()
 	MyComponent(Shooted);
 	MyComponent(Score);
 	MyComponent(Created);
+
+	SetHint(StringF(_("Best income: $%s"), best_revenu.c_str()));
 }
 
 void TScoresPlayerLine::Draw(const Point2i& mouse)

@@ -181,6 +181,72 @@ protected:
 };
 
 /********************************************************************************************
+ *                               ECBEiffelTower                                             *
+ ********************************************************************************************/
+/** This is a radar */
+class ECBEiffelTower : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBEiffelTower) {}
+
+	ENTITY_CONSTRUCTOR(ECBEiffelTower) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_EIFFELTOWER; }
+	virtual uint Cost() const { return 70000; }
+	virtual uint InitNb() const { return 3000;}
+	virtual bool CanBeSold() const { return true; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+};
+
+
+/********************************************************************************************
+ *                               ECBRadar                                                   *
+ ********************************************************************************************/
+/** This is a radar */
+class ECBRadar : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBRadar) {}
+
+	ENTITY_CONSTRUCTOR(ECBRadar) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_RADAR; }
+	virtual uint Cost() const { return 30000; }
+	virtual uint InitNb() const { return 1000;}
+	virtual bool CanBeSold() const { return true; }
+	virtual e_type MyUpgrade() const { return E_EIFFELTOWER; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	bool CanCreate(const ECBEntity*) { return false; }
+
+	virtual bool CanBeCreated(ECBPlayer* pl) const;
+};
+
+/********************************************************************************************
  *                               ECBNuclearSearch                                           *
  ********************************************************************************************/
 #define NUCLEARSEARCH_BUILDTIME             10
@@ -534,7 +600,6 @@ public:
 			case ECBEntity::E_CHAR:
 			case ECBEntity::E_MISSILAUNCHER:
 			case ECBEntity::E_TRAIN:
-			case ECBEntity::E_PLANE:
 				return true;
 			default:
 				return false;
@@ -582,6 +647,47 @@ public:
 			case E_TOURIST:
 			case E_MCDO:
 			case E_JOUANO:
+				return true;
+			default:
+				return false;
+		}
+	}
+};
+
+/********************************************************************************************
+ *                               ECBAirPort                                                 *
+ ********************************************************************************************/
+/** This is an airport */
+class ECBAirPort : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBAirPort) {}
+
+	ENTITY_CONSTRUCTOR(ECBAirPort) {}
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_AIRPORT; }
+	virtual uint Cost() const { return 1000; }
+	virtual uint InitNb() const { return 500; }
+	virtual bool IsCity() const { return true; }
+	virtual bool CanBeSold() const { return true; }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+
+	virtual bool CanCreate(const ECBEntity* e)
+	{
+		switch(e->Type())
+		{
+			case ECBEntity::E_PLANE:
 				return true;
 			default:
 				return false;

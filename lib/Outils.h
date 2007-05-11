@@ -217,11 +217,16 @@ public:
 		return 0;
 	}
 
-	std::vector<T> Find(int type)
+	/** Find in list an entity of type \b type
+	 * @param type type of entity searched
+	 * @param not_flag if setted, it's a flag may not setted on this entity
+	 * @return a vector of entities found.
+	 */
+	std::vector<T> Find(int type, int not_flag = 0)
 	{
 		std::vector<T> l;
 		for(iterator it = list.begin(); it != list.end();++it)
-			if((*it)->Type() == type)
+			if((*it)->Type() == type && (!not_flag || !((*it)->EventType() & not_flag)))
 				l.push_back(*it);
 		return l;
 	}

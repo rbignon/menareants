@@ -27,7 +27,7 @@
 
 TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool _show_bg)
   : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f),
-    color(black_color)
+    color(black_color), passwd(false)
 {
 	assert(font);
 
@@ -107,6 +107,10 @@ void TEdit::Redraw()
 		first_char = 0;
 		caret = chaine.size();
 	}
+
+	if(passwd)
+		for(std::string::iterator it = substring.begin(); it != substring.end(); ++it)
+			*it = '*';
 
 	/* Le " " est nécessaire sinon il se peut que la surface soit trop petite et que caret_x en sorte */
 	edit = font->CreateSurface(substring + " ", color);

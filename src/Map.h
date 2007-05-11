@@ -231,7 +231,7 @@ public:
 	 * o >0 = showed
 	 */
 	int Showed() const { return showed; }
-	void SetShowed(uint s) { showed = s; }
+	void SetShowed(int s) { showed = s; }
 	bool Visible() const { return (showed > 0); }
 
 	bool MustRedraw() const { return must_redraw; }

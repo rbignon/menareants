@@ -309,6 +309,12 @@ public:
 	R_RESOURCE(ECSpriteBase, BarbedWire_NordEst);
 	R_RESOURCE(ECSpriteBase, BarbedWire_SudOuest);
 	R_RESOURCE(ECSpriteBase, BarbedWire_SudEst);
+	R_RESOURCE(ECImage,      AirPort_Icon);
+	R_RESOURCE(ECSpriteBase, AirPort_Face);
+	R_RESOURCE(ECImage,      Radar_Icon);
+	R_RESOURCE(ECSpriteBase, Radar_Face);
+	R_RESOURCE(ECImage,      EiffelTower_Icon);
+	R_RESOURCE(ECSpriteBase, EiffelTower_Face);
 };
 
 #undef R_RESOURCE

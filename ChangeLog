@@ -1,4 +1,40 @@
+2007-05-11 Romain Bignon <progs@menareants.org>
+
+	* Version 0.4 releasée.
+
+	* lib/Batiments.h: Le radar coûte maintenant 30 000 $ et la Tour Eiffel 70 000 $.
+
+	* lib/Units.h: Correction du bug qui empêchait une infanterie d'avancer sur une case possédant un barbelé construit par un ennemie pendant ce même tour, alors qu'il n'apparaît pas
+	  chez nous.
+
+	* lib/Outils.h (ECList): La fonction Find(uint type, int not_flag) prends l'argument facultatif not_flag en plus pour retourner uniquement les unités du type en question
+	  ne possédant pas le flag passé.
+
+	* src/InGame.cpp: Anonce bien les chiffres d'un combat même si il y a eu quelques lignes d'introduction, notament pour anoncer une unité qui était cachée et qui participe au combat.
+
+	* lib/Units.h (ECBEnginer): L'ingénieur avance de 2 cases par tours maintenant.
+	(ECBPlane): L'avion contient 10 directement au lieu de 5, pour le même prix (5 000 $), ce qui en gros réduit son coût de moitier. Augmentation de sa vitesse et de sa visibilité.
+
+	* server/maps/*: Adaptation des maps pour rajouter des aéroports dans les villes entourées de montagnes (et donc impossible à prendre sans avions), du fait qu'il est maintenant nécessaire
+	d'attérir sur une piste.
+
+2007-05-10 Romain Bignon <progs@menareants.org>
+
+	* src/gui/Edit.cpp, src/Login.cpp: TEdit affiche des '*' lorsque c'est un mot de passe.
+
+	* lib/Defines.h: Passage en protocole version 14.
+
+	* lib/Units.h (ECArmy): IMPORTANT: le prix de l'armée passe de 2 000 $ à 1 000 $ pour 100 hommes.
+
 2007-05-02 Romain Bignon <progs@menareants.org>
+
+	* lib/UnitsList.h, Batiments.h: Création du bâtiment AirPort pour créer les avions. Ces derniers ne peuvent décoller et atterir que sur ceux-ci.
+
+	* lib/UnitsList.h, Batiments.h: Création du bâtiment Radar qui permet de voir le terrain de toute la map.
+
+	* lib/UnitsList.h, Batiments.h: Création du bâtiment Tour Eiffel, upgrade du Radar, qui permet, en plus de voir tout le terrain de toute la map, voir toutes les unités.
+
+2007-05-01 Romain Bignon <progs@menareants.org>
 
 	* server/Channels.cpp: Correction d'un bug qui n'envoyait pas le nombre dans une armée dont le joueur est propriétaire, lors d'un rejoin.
 

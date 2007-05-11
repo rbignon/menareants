@@ -205,6 +205,9 @@ public:
 		/*22*/E_PLANE,
 		/*23*/E_JOUANO,
 		/*24*/E_BARBEDWIRE,
+		/*25*/E_AIRPORT,
+		/*26*/E_RADAR,
+		/*27*/E_EIFFELTOWER,
 		/*XX*/E_END
 	};
 

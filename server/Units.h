@@ -75,6 +75,8 @@ class ECTrain : public EContainer, public ECBTrain
 public:
 
 	ENTITY_CONSTRUCTOR(ECTrain) {}
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -86,6 +88,8 @@ class ECBoat : public EContainer, public ECBBoat
 public:
 
 	ENTITY_CONSTRUCTOR(ECBoat) {}
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -103,6 +107,8 @@ public:
 	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
 
 	virtual int TurnMoney(ECBPlayer*);
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 /********************************************************************************************
@@ -134,6 +140,8 @@ class EChar : public ECUnit, public ECBChar
 public:
 
 	ENTITY_CONSTRUCTOR(EChar) {}
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 
 };
 
@@ -238,6 +246,8 @@ class ECArmy : public ECUnit, public ECBArmy
 public:
 
 	ENTITY_CONSTRUCTOR(ECArmy) {}
+
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };
 
 #endif /* ECD_UNITS_H */

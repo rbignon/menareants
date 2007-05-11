@@ -24,6 +24,22 @@
 #include <assert.h>
 
 /********************************************************************************************
+ *                               ECBRadar                                                   *
+ ********************************************************************************************/
+
+bool ECBRadar::CanBeCreated(ECBPlayer* pl) const
+{
+	assert(pl);
+	std::vector<ECBEntity*> ents = pl->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if(((*it)->Type() == E_RADAR || (*it)->Type() == E_EIFFELTOWER) &&
+		   !((*it)->EventType() & ARM_SELL))
+			return false;
+
+	return true;
+}
+
+/********************************************************************************************
  *                               ECBNuclearSearch                                           *
  ********************************************************************************************/
 
@@ -58,7 +74,7 @@ bool ECBNuclearSearch::CanBeCreated(ECBPlayer* pl) const
 	assert(pl);
 	std::vector<ECBEntity*> ents = pl->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		if(dynamic_cast<ECBNuclearSearch*>(*it))
+		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() && ARM_SELL))
 			return false;
 
 	return true;
@@ -84,7 +100,7 @@ bool ECBSilo::CanBeCreated(ECBPlayer* pl) const
 	assert(pl);
 	std::vector<ECBEntity*> ents = pl->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		if(dynamic_cast<ECBNuclearSearch*>(*it))
+		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() && ARM_SELL))
 			return true;
 
 	return false;

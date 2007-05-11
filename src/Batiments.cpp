@@ -78,6 +78,67 @@ ECBatiment::~ECBatiment()
 }
 
 /********************************************************************************************
+ *                                ECEiffelTower                                             *
+ ********************************************************************************************/
+void ECEiffelTower::Init()
+{
+	if(Owner() && Owner()->IsMe())
+	{
+		std::vector<ECBCase*> cases = Map()->Cases();
+		FORit(ECBCase*, cases, c)
+		{
+			ECase* acase = dynamic_cast<ECase*>(*c);
+			acase->SetShowed(acase->Showed() + 2);
+		}
+	}
+}
+
+ECEiffelTower::~ECEiffelTower()
+{
+	if(Owner() && Owner()->IsMe())
+	{
+		std::vector<ECBCase*> cases = Map()->Cases();
+		FORit(ECBCase*, cases, c)
+		{
+			ECase* acase = dynamic_cast<ECase*>(*c);
+			acase->SetShowed(acase->Showed() - 2);
+		}
+	}
+}
+
+
+/********************************************************************************************
+ *                                ECRadar                                                   *
+ ********************************************************************************************/
+void ECRadar::Init()
+{
+	if(Owner() && Owner()->IsMe())
+	{
+		std::vector<ECBCase*> cases = Map()->Cases();
+		FORit(ECBCase*, cases, c)
+		{
+			ECase* acase = dynamic_cast<ECase*>(*c);
+			if(acase->Showed() < 0)
+				acase->SetShowed(0);
+		}
+	}
+}
+
+ECRadar::~ECRadar()
+{
+	if(Owner() && Owner()->IsMe())
+	{
+		std::vector<ECBCase*> cases = Map()->Cases();
+		FORit(ECBCase*, cases, c)
+		{
+			ECase* acase = dynamic_cast<ECase*>(*c);
+			if(acase->Showed() == 0)
+				acase->SetShowed(-1);
+		}
+	}
+}
+
+/********************************************************************************************
  *                                         ECBarbedWire                                     *
  ********************************************************************************************/
 void ECBarbedWire::Created()

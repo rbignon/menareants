@@ -38,9 +38,9 @@
 #define MSERV_DEFPORT 5460
 
 /* Version protocolaire
- * ï¿œincrï¿œenter en cas de modification du protocole
+ * incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"13"
+#define APP_PVERSION	"14"
 #define APP_MSPROTO	"3"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
@@ -50,13 +50,13 @@
 /* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
 #undef UNSTABLE
 
-/* Dï¿œinir un (seul) des "patch" suivant (ou aucun) */
-#if 1
+/* Définir un (seul) des "patch" suivant (ou aucun) */
+#if 0
 #define	APP_VERSION_PATCH	"RC2"	/* en cours de developpement */
-#else
-#define	APP_VERSION_PATCH	"pre1"	/* premiï¿œe prï¿œrelease */
-#define	APP_VERSION_PATCH	"pre2"	/* seconde prï¿œrelease */
-#define	APP_VERSION_PATCH	"pre3"	/* troisiï¿œe prï¿œrelease */
+//#else
+#define	APP_VERSION_PATCH	"pre1"
+#define	APP_VERSION_PATCH	"pre2"
+#define	APP_VERSION_PATCH	"pre3"
 #endif
 
 #ifdef __cplusplus

@@ -33,4 +33,7 @@ U_DECL(ECTrain)
 U_DECL(ECPlane)
 U_DECL(ECJouano)
 U_DECL(ECBarbedWire)
+U_DECL(ECAirPort)
+U_DECL(ECRadar)
+U_DECL(ECEiffelTower)
 U_END

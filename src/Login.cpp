@@ -374,6 +374,7 @@ void TListServerForm::AskForRegister()
 	                  "The password will be saved on your computer and you will not have to enter it each times you want to "
 	                  "play.\n\n"
 	                  "Enter a password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
+	msg.Edit()->SetPassword();
 	if(msg.Show() == BT_OK && msg.Edit()->Text().empty() == false)
 	{
 		Config::GetInstance()->passwd = msg.Edit()->Text().c_str();
@@ -397,6 +398,7 @@ void TListServerForm::AfterDraw()
 	if(login && Config::GetInstance()->passwd.empty())
 	{
 		TMessageBox mb(_("This nickname is registered.\n\nEnter the password:"), BT_OK|BT_CANCEL|HAVE_EDIT, this);
+		mb.Edit()->SetPassword();
 		if(mb.Show() == BT_OK && mb.Edit()->Text().empty() == false)
 		{
 			Config::GetInstance()->passwd = mb.Edit()->Text().c_str();

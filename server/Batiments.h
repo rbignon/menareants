@@ -101,6 +101,39 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECEiffelTower                                              *
+ ********************************************************************************************/
+class ECEiffelTower : public ECEntity, public ECBEiffelTower
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECEiffelTower) {}
+
+/* Methodes */
+public:
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+
+/********************************************************************************************
+ *                               ECRadar                                                    *
+ ********************************************************************************************/
+class ECRadar : public ECEntity, public ECBRadar
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECRadar) {}
+
+/* Methodes */
+public:
+
+	virtual void Union(ECEntity*) { return; }
+};
+
+/********************************************************************************************
  *                               ECNuclearSearch                                            *
  ********************************************************************************************/
 class ECNuclearSearch : public ECEntity, public ECBNuclearSearch
@@ -307,6 +340,23 @@ public:
 
 	virtual void Union(ECEntity*) { return; }
 };
+
+/********************************************************************************************
+ *                               ECAirPort                                                  *
+ ********************************************************************************************/
+class ECAirPort : public ECEntity, public ECBAirPort
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECAirPort) {}
+
+/* Methodes */
+public:
+
+	virtual void Union(ECEntity*) { return; }
+};
+
 
 /********************************************************************************************
  *                               ECShipyard                                                 *

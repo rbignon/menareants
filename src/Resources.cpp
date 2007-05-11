@@ -274,6 +274,12 @@
 	R_RESOURCE(ECSpriteBase, BarbedWire_NordEst,      "units/barbedwire/nordest");
 	R_RESOURCE(ECSpriteBase, BarbedWire_SudOuest,     "units/barbedwire/sudouest");
 	R_RESOURCE(ECSpriteBase, BarbedWire_SudEst,       "units/barbedwire/sudest");
+	R_RESOURCE(ECImage,      AirPort_Icon,       PKGDATADIR_PICS "units/airport_icon.png");
+	R_RESOURCE(ECSpriteBase, AirPort_Face,       "units/airport");
+	R_RESOURCE(ECImage,      Radar_Icon,         PKGDATADIR_PICS "units/radar_icon.png");
+	R_RESOURCE(ECSpriteBase, Radar_Face,         "units/radar");
+	R_RESOURCE(ECImage,      EiffelTower_Icon,   PKGDATADIR_PICS "units/eiffel_icon.png");
+	R_RESOURCE(ECSpriteBase, EiffelTower_Face,   "units/eiffel");
 #undef R_RESOURCE
 #undef R_RESOURCE_P
 #define R_TYPE(type) std::vector<type*> Resources::type##_objects
