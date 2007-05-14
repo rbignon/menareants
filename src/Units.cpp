@@ -56,7 +56,7 @@ bool ECJouano::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_
 	{
 		case ARM_ATTAQ:
 		{
-			if(c != Case() || c->Showed() <= 0) break;
+			if(c != Case() || !c->Visible()) break;
 
 			Case()->SetImage(Anim.anim);
 			Case()->Image()->SetAnim(true);
@@ -338,23 +338,23 @@ bool ECUnit::MoveEffect(const std::vector<ECEntity*>& entities)
 	switch(m)
 	{
 		case ECMove::Right:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()+1)) <= Image()->X())
+			if(!Case()->Visible() || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()+1)) <= Image()->X())
 				ChangeCase(Case()->MoveRight()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Left:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()-1)) >= Image()->X())
+			if(!Case()->Visible() || map->ShowMap()->X() + (CASE_WIDTH * int(Case()->X()-1)) >= Image()->X())
 				ChangeCase(Case()->MoveLeft()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Down:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()+1)) <= Image()->Y())
+			if(!Case()->Visible() || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()+1)) <= Image()->Y())
 				ChangeCase(Case()->MoveDown()), Move()->RemoveFirst(), changed_case = true;
 			break;
 		case ECMove::Up:
-			if(Map()->Brouillard() && Case()->Showed() <= 0 || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()-1)) >= Image()->Y())
+			if(!Case()->Visible() || map->ShowMap()->Y() + (CASE_HEIGHT * int(Case()->Y()-1)) >= Image()->Y())
 				ChangeCase(Case()->MoveUp()), Move()->RemoveFirst(), changed_case = true;
 			break;
 	}
-	if(changed_case && entities.size() == 1 && (!Map()->Brouillard() || Case()->Showed() > 0) &&
+	if(changed_case && entities.size() == 1 && Case()->Visible() &&
 	   dynamic_cast<ECMap*>(Case()->Map())->ShowMap() && !IsHiddenOnCase())
 	{
 		dynamic_cast<ECMap*>(Case()->Map())->ShowMap()->CenterTo(this);
@@ -378,7 +378,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 				ECSpriteBase* sprite = images[I_Deployed];
 				if(!sprite) break;
 				SetImage(sprite);
-				if(Case()->Showed() <= 0)
+				if(!Case()->Visible())
 					Image()->SetFrame(Image()->NbFrames()-1);
 				else
 				{
@@ -392,7 +392,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			/* C'est le reploiement alors que je viens de tirer, donc il n'y a plus de missile sur la rampe */
 			else if(dynamic_cast<EChannel*>(Case()->Map()->Channel())->CurrentEvent() & ARM_ATTAQ)
 			{
-				if(Case()->Showed() > 0)
+				if(Case()->Visible())
 				{
 					ECSpriteBase* sprite = images[I_Reployed];
 					if(!sprite) break;
@@ -410,7 +410,7 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 			 * inverse */
 			else
 			{
-				if(Case()->Showed() > 0)
+				if(Case()->Visible())
 				{
 					ECSpriteBase* sprite = images[I_Deployed];
 					if(!sprite) break;
@@ -442,7 +442,7 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
 	if(EventType() & ARM_ATTAQ)
 	{
-		if(Case()->Showed() > 0 && images[I_Attaq])
+		if(Case()->Visible() && images[I_Attaq])
 		{
 			if(!AttaqImg())
 			{

@@ -50,7 +50,7 @@ bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 {
 	if(EventType() & ARM_ATTAQ)
 	{
-		if(Case()->Showed() > 0 && explosion)
+		if(Case()->Visible() && explosion)
 		{
 			if(!AttaqImg())
 			{
@@ -84,12 +84,8 @@ void ECEiffelTower::Init()
 {
 	if(Owner() && Owner()->IsMe())
 	{
-		std::vector<ECBCase*> cases = Map()->Cases();
-		FORit(ECBCase*, cases, c)
-		{
-			ECase* acase = dynamic_cast<ECase*>(*c);
-			acase->SetShowed(acase->Showed() + 2);
-		}
+		Map()->SetBrouillard(false);
+		Map()->ShowMap()->SetBrouillard(false);
 	}
 }
 
@@ -97,11 +93,14 @@ ECEiffelTower::~ECEiffelTower()
 {
 	if(Owner() && Owner()->IsMe())
 	{
+		Map()->SetBrouillard(true);
+		Map()->ShowMap()->SetBrouillard(true);
 		std::vector<ECBCase*> cases = Map()->Cases();
 		FORit(ECBCase*, cases, c)
 		{
 			ECase* acase = dynamic_cast<ECase*>(*c);
-			acase->SetShowed(acase->Showed() - 2);
+			if(acase->Showed() == 0)
+				acase->SetShowed(-1);
 		}
 	}
 }
@@ -496,7 +495,7 @@ void ECDefenseTower::AfterDraw()
 
 		Resources::DefenseTower_Missile()->Draw((int)x, (int)y);
 
-		if(cible->Showed() > 0 && t - t0 < duration/2 &&
+		if(cible->Visible() && t - t0 < duration/2 &&
 		   (cible->Image()->X() < 0 || cible->Image()->X()+CASE_WIDTH > (int)SCREEN_WIDTH))
 			Map()->ShowMap()->CenterTo(cible);
 
@@ -516,7 +515,7 @@ bool ECDefenseTower::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* 
 	switch(EventType())
 	{
 		case ARM_ATTAQ:
-			if(c != Case() && (c->Showed() > 0 || Case()->Showed() > 0))
+			if(c != Case() && (c->Visible() || Case()->Visible()))
 			{
 				Map()->ShowMap()->CenterTo(this);
 				cible = c;
@@ -571,7 +570,7 @@ bool ECObelisk::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC
 	switch(EventType())
 	{
 		case ARM_ATTAQ:
-			if(Case()->Showed() <= 0 || c == Case()) return true;
+			if(!Case()->Visible() || c == Case()) return true;
 
 			Image()->SetRepeat(false);
 			Image()->SetAnim(true);

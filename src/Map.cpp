@@ -84,7 +84,7 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 		SetMissile(missile_up);
 		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		me->UnlockScreen();
-		if(Entity()->Case()->Showed() > 0)
+		if(Entity()->Case()->Visible())
 		{
 			dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(Entity());
 			SetXY(Entity()->Image()->X(), Entity()->Image()->Y());
@@ -94,17 +94,17 @@ bool ECMissile::AttaqFirst(ECase* c, EC_Client* me)
 	}
 	SetXY(Entity()->Image()->X(), missile->Y() - step);
 
-	if((missile->Y() + (int)missile->GetHeight()) <= 0 || Entity()->Case()->Showed() <= 0)
+	if((missile->Y() + (int)missile->GetHeight()) <= 0 || !Entity()->Case()->Visible())
 	{
 		me->LockScreen();
-		if(c->Showed() > 0)
+		if(c->Visible())
 			dynamic_cast<ECMap*>(Entity()->Case()->Map())->ShowMap()->CenterTo(c);
 		Entity()->Map()->ShowMap()->RemoveAfterDraw(Missile());
 		SetMissile(missile_down);
 		Entity()->Map()->ShowMap()->AddAfterDraw(Missile());
 		SetXY(c->Image()->X(), 0 - missile->GetHeight());
 		me->UnlockScreen();
-		if(c->Showed() > 0)
+		if(c->Visible())
 			Resources::SoundMissile()->Play();
 		return true;
 	}
@@ -117,7 +117,7 @@ bool ECMissile::AttaqSecond(ECase* c, EC_Client* me)
 	if(c == Entity()->Case() || !missile) return true;
 
 	SetXY(missile->X(), missile->Y() + step);
-	if(missile->Y() >= c->Image()->Y() || c->Showed() <= 0)
+	if(missile->Y() >= c->Image()->Y() || !c->Visible())
 	{
 		me->LockScreen();
 		Entity()->Map()->ShowMap()->RemoveAfterDraw(Missile());
@@ -225,19 +225,19 @@ bool ECEntity::IsHiddenOnCase()
 
 void ECEntity::Draw()
 {
-	if(image && !Parent() && (!Map()->ShowMap()->HaveBrouillard() || Case()->Showed() > 0))
+	if(image && !Parent() && (!Map()->ShowMap()->HaveBrouillard() || Case()->Visible()))
 	{
 		if(!IsHiddenOnCase())
 			image->draw();
-
-		if(attaq)
-			attaq->draw();
 	}
 }
 
 void ECEntity::AfterDraw()
 {
-	if(!image || Map()->ShowMap()->HaveBrouillard() && Case() && Case()->Showed() <= 0)
+	if(attaq)
+		attaq->draw();
+
+	if(!image || Map()->ShowMap()->HaveBrouillard() && (!Case() || !Case()->Visible()))
 		return;
 
 	if(Selected())
@@ -411,9 +411,10 @@ void ECEntity::SetShowedCases(bool show, bool forced)
 		{
 			ECase* cc = dynamic_cast<ECase*>(c);
 			if(show)
-				cc->SetShowed(cc->Showed() < 0 ? 1 : cc->Showed() + 1);
+				cc->SetShowed((cc->Showed() < 0) ? 1 : (cc->Showed() + 1));
 			else if(cc->Showed() > 0)
 				cc->SetShowed(cc->Showed()-1);
+
 			cc->SetMustRedraw();
 			if(c->X() == Case()->X())
 				j = Visibility();
@@ -445,6 +446,16 @@ ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
 ECase::~ECase()
 {
 	delete image;
+}
+
+int ECase::Showed() const
+{
+	return showed;
+}
+
+bool ECase::Visible() const
+{
+	return (showed > 0 || !dynamic_cast<ECMap*>(Map())->Brouillard());
 }
 
 bool ECase::Test(int souris_x, int souris_y)

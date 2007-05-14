@@ -81,6 +81,8 @@ typedef unsigned int   uint;
 #define PKGDATADIR_SOUND PKGDATADIR PATH_SEPARATOR "sound" PATH_SEPARATOR
 #define INGAME_MUSIC "ingame" PATH_SEPARATOR
 #define MENU_MUSIC "menu" PATH_SEPARATOR
+#define WINER_MUSIC "winer" PATH_SEPARATOR
+#define LOSER_MUSIC "loser" PATH_SEPARATOR
 
 #define WAIT_EVENT(x,y) for(int y=0; !(x) && (y)<2000; SDL_Delay(1), (y++))
 #define WAIT_EVENT_T(x,y, t) for(int y=0; !(x) && (y)<((t)*1000); SDL_Delay(1), (y++))

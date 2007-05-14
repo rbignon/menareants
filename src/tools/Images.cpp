@@ -825,7 +825,7 @@ ECImage* ECImage::Shadow()
 	shadowed->Blit(this);
 	SDL_Rect r_back = {0,0,GetWidth(), GetHeight()};
 	ECImage brouillard;
-	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, GetWidth(), GetHeight(),
+	brouillard.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, GetWidth(), GetHeight(),
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 	brouillard.FillRect(r_back, brouillard.MapRGBA(0, 0, 0, 255*5/10));
 	shadowed->Blit(brouillard);

@@ -1,3 +1,15 @@
+2007-05-12 Romain Bignon <progs@menareants.org>
+
+	* src/Units.cpp (ECEiffelTower): La tour Eiffel maintenant passe la variable HaveBrouillard à false plutot que d'ajouter 2 à toutes les cases.
+
+	* src/Map.cpp: Correction d'un bug sur l'incrémentation de la variable Showed des ECase.
+
+	* src/Map.cpp, src/Units.cpp, src/Batiments.cpp: Tout marche convenablement maintenant quand HaveBrouillard = false.
+
+	* src/gui/ShowMap.cpp: Essais d'optimisations de l'affichage.
+
+	* src/JoinGame.cpp: Message lors de la déconnexion d'un joueur.
+
 2007-05-11 Romain Bignon <progs@menareants.org>
 
 	* Version 0.4 releasée.

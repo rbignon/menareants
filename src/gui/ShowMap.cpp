@@ -36,7 +36,10 @@
 
 void TMap::Init()
 {
+	/* L'appel à cette fonction va permettre de placer correctement toutes les unités (voir la fonction en question) */
 	SetPosition(X(), Y(), true);
+
+	/* On définie la taille de la carte graphiquement */
 	size.y = CASE_HEIGHT * map->Height();
 	size.x = CASE_WIDTH  * map->Width();
 
@@ -45,6 +48,7 @@ void TMap::Init()
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		dynamic_cast<ECEntity*>(*enti)->SetAttaquedCase(dynamic_cast<ECEntity*>(*enti)->AttaquedCase());
 
+	/* On dit que ce composant est toujours redessiné */
 	SetAlwaysRedraw();
 	SetMustRedraw();
 }
@@ -211,7 +215,7 @@ void TMap::ScrollTo(int x2, int y2)
 				py += sdy;
 			}
 			px += sdx;
-			if(px < 0 || px%30)
+			if(px < 0 || px%50)
 				continue;
 			CenterTo(px, py);
 			SDL_Delay(20);
@@ -228,7 +232,7 @@ void TMap::ScrollTo(int x2, int y2)
 				px += sdx;
 			}
 			py += sdy;
-			if(py < 0 || py%30)
+			if(py < 0 || py%50)
 				continue;
 			CenterTo(px, py);
 			SDL_Delay(20);
@@ -240,9 +244,11 @@ void TMap::SetPosition(int _x, int _y, bool force)
 {
 	if(!map) return;
 
+	/* On major ou minor _x si jamais ça souhaite placer la map inconvenablement */
 	if(_x > 0) _x = 0;
 	if(Xmin() <= 0 && _x < Xmin()) _x = Xmin();
 	if(Xmin() > 0) _x = X();
+
 	if(_y > 0) _y = 0;
 	if(Ymin() <= 0 && _y < Ymin()) _y = Ymin();
 	if(Ymin() > 0) _y = Y();
@@ -252,12 +258,14 @@ void TMap::SetPosition(int _x, int _y, bool force)
 	position.x = _x;
 	position.y = _y;
 
+	/* On redéfinie la position à l'écran de toutes les cases */
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 		if(*casi)
 			dynamic_cast<ECase*>(*casi)->Image()->set(X()+(CASE_WIDTH  * (*casi)->X()),
 		                                                  Y()+(CASE_HEIGHT * (*casi)->Y()));
 
+	/* On redéfini à l'écran la position de toutes les unités */
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
 		if((*enti)->Case())
@@ -303,32 +311,39 @@ void TMap::DrawFog(ECase* c)
 	if(c->Showed() < 0 || !HaveBrouillard())
 		return;
 
+	/* La fonction dessine juste les contours du brouillard noir. */
+
+	ECase* up = dynamic_cast<ECase*>(c->MoveUp());
+	ECase* down = dynamic_cast<ECase*>(c->MoveDown());
+	ECase* left = dynamic_cast<ECase*>(c->MoveLeft());
+	ECase* right = dynamic_cast<ECase*>(c->MoveRight());
+
 	// Side borders
-	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() < 0)
+	if(up->Showed() < 0)
 		Resources::FogTop()->Draw(c->Image()->X(), c->Image()->Y());
-	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() < 0)
+	if(down->Showed() < 0)
 		Resources::FogBottom()->Draw(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - Resources::FogBottom()->GetHeight());
-	if((dynamic_cast<ECase*>(c->MoveRight()))->Showed() < 0)
+	if(right->Showed() < 0)
 		Resources::FogRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogRight()->GetWidth(), c->Image()->Y());
-	if((dynamic_cast<ECase*>(c->MoveLeft()))->Showed() < 0)
+	if(left->Showed() < 0)
 		Resources::FogLeft()->Draw(c->Image()->X(), c->Image()->Y());
 	// Corner borders
-	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveLeft()->MoveUp()))->Showed() < 0)
+	if(up->Showed() >= 0
+	   && left->Showed() >= 0
+	   && (dynamic_cast<ECase*>(left->MoveUp()))->Showed() < 0)
 		Resources::FogTopLeft()->Draw(c->Image()->X(), c->Image()->Y());
-	if((dynamic_cast<ECase*>(c->MoveUp()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveRight()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveRight()->MoveUp()))->Showed() < 0)
+	if(up->Showed() >= 0
+	   && right->Showed() >= 0
+	   && (dynamic_cast<ECase*>(right->MoveUp()))->Showed() < 0)
 		Resources::FogTopRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogTopRight()->GetWidth(), c->Image()->Y());
-	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveLeft()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveLeft()->MoveDown()))->Showed() < 0)
+	if(down->Showed() >= 0
+	   && left->Showed() >= 0
+	   && (dynamic_cast<ECase*>(left->MoveDown()))->Showed() < 0)
 		Resources::FogBottomLeft()->Draw(c->Image()->X(),
 		                                 c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomLeft()->GetHeight());
-	if((dynamic_cast<ECase*>(c->MoveDown()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveRight()))->Showed() >= 0
-	   && (dynamic_cast<ECase*>(c->MoveRight()->MoveDown()))->Showed() < 0)
+	if(down->Showed() >= 0
+	   && right->Showed() >= 0
+	   && (dynamic_cast<ECase*>(right->MoveDown()))->Showed() < 0)
 		Resources::FogBottomRight()->Draw(c->Image()->X() + CASE_WIDTH - Resources::FogBottomRight()->GetWidth(),
 		                                  c->Image()->Y() + CASE_HEIGHT - Resources::FogBottomRight()->GetHeight());
 }
@@ -336,7 +351,7 @@ void TMap::DrawFog(ECase* c)
 void TMap::DrawCountries(ECase* c)
 {
 	const int LINE_WIDTH = 10;
-	if(c->Showed() <= 0 && HaveBrouillard())
+	if(!c->Visible() <= 0)
 		return;
 
 	if(map->Channel() && (!c->Country()->Owner() || !c->Country()->Owner()->Player()))
@@ -402,10 +417,11 @@ void TMap::Draw(const Point2i& mouse)
 
 	if(Enabled())
 	{
+		/* Si la carte est active, on peut scroller dessus.*/
 		int xx = X(), yy = Y();
 
 		if(move_map)
-		{
+		{ /* Le joueur avait fait un clic molette appuyé et du coup on bouge par rapport à ce point de départ */
 			xx += move_point.x - mouse.x;
 			yy += move_point.y - mouse.y;
 		}
@@ -427,29 +443,39 @@ void TMap::Draw(const Point2i& mouse)
 	}
 	else move_map = false;
 
+	/* Boucle sur les cases pour les dessiner */
 	BCaseVector cases = map->Cases();
 	for(BCaseVector::iterator casi = cases.begin(); casi != cases.end(); ++casi)
 	{
 		ECase* c = dynamic_cast<ECase*>(*casi);
 		if(!c) continue;
 
+		/* Si le dessin de la case sort de l'écran, on passe */
 		if(c->Image()->X() > X()+Width() ||
 		   c->Image()->X()+c->Image()->GetWidth() < X() ||
 		   c->Image()->Y() > Y()+Height() ||
 		   c->Image()->Y()+c->Image()->GetHeight() < Y())
 			continue;
+
+		/* Uniquement si on doit redessiner la case, ou que l'image de la case est animée, ou autres excuses */
 		if(MustRedraw() || c->MustRedraw() || c->Image()->Anim() || CreateEntity() || SelectedEntity())
 		{
+			/* Si brouillard et que le Showed de la case est à -1, donc que la case est noir, on dessine un rectangle noir */
 			if(HaveBrouillard() && c->Showed() < 0)
 			{
 				SDL_Rect r_back = {c->Image()->X(),c->Image()->Y(),CASE_WIDTH,CASE_HEIGHT};
 				Window()->FillRect(r_back, 0);
 				continue;
 			}
+
 			c->Draw();
+
+			/* Trucs dessinés si il y a une unité sélectionnée */
 			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe() && SelectedEntity()->Owner()->Ready() == false)
 			{
 				bool move, invest;
+
+				/* Si l'unité sélectionnée est un conteneur et contient quelqu'un, on colorie la case si c'est une case de destination */
 				if(dynamic_cast<TForm*>(Parent()) && dynamic_cast<TForm*>(Parent())->IsPressed(SDLK_SPACE) &&
 				   dynamic_cast<EContainer*>(SelectedEntity()) &&
 				   dynamic_cast<EContainer*>(SelectedEntity())->Containing())
@@ -468,6 +494,8 @@ void TMap::Draw(const Point2i& mouse)
 						Window()->Blit(background, &r_back2);
 					}
 				}
+
+				/* Si l'unité sélectionnée peut bouger sur la case, on la colorie */
 				if(SelectedEntity()->Case() != c && SelectedEntity()->Case()->Delta(c) <= SelectedEntity()->MyStep() &&
 				   (!SelectedEntity()->Deployed() ^ !!(SelectedEntity()->EventType() & ARM_DEPLOY)))
 				{
@@ -482,6 +510,8 @@ void TMap::Draw(const Point2i& mouse)
 						Window()->Blit(background, &r_back2);
 					}
 				}
+
+				/* Si l'unité sélectionnée peut tirer sur cette case,on la colorie */
 				if(SelectedEntity()->WantAttaq(0,0) && !(SelectedEntity()->EventType() & ARM_ATTAQ) &&
 				   c->Delta(SelectedEntity()->Case()) <= SelectedEntity()->Porty())
 				{
@@ -494,10 +524,14 @@ void TMap::Draw(const Point2i& mouse)
 					Window()->Blit(background, &r_back2);
 				}
 			}
+
+			/* CreateEntity() pointe vers une entité qu'on veut créer. On dessine donc sur la case les hashures blanches ou rouges */
 			if(CreateEntity() && c->Test(mouse.x, mouse.y))
 					((!CreateEntity()->Owner() || CreateEntity()->CanBeCreated(c)) ? Resources::GoodHashure()
 					                                                               : Resources::BadHashure())
 					                     ->Draw(c->Image()->X(), c->Image()->Y());
+
+			/* En mode schema on dessine le quadrillage et le contour des territoires */
 			if(schema)
 			{
 				Resources::Case()->Draw(c->Image()->X(), c->Image()->Y());
@@ -509,6 +543,8 @@ void TMap::Draw(const Point2i& mouse)
 
 			DrawFog(c);
 		}
+
+		/* Si il y a des unités sur cette case, on boucle et on dessine les bâtiments */
 		if(!c->Entities()->Empty())
 		{
 			std::vector<ECBEntity*> ents = c->Entities()->List();
@@ -518,6 +554,7 @@ void TMap::Draw(const Point2i& mouse)
 		}
 	}
 
+	/* Maintenant on va dessiner les autres unités */
 	std::vector<ECBEntity*> entities = map->Entities()->List();
 	for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end();)
 		if(!(*enti))
@@ -530,6 +567,12 @@ void TMap::Draw(const Point2i& mouse)
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 			if(!entity) continue;
 
+			if(entity->Image()->X() > X()+Width() ||
+			   entity->Image()->X()+entity->Image()->GetWidth() < X() ||
+			   entity->Image()->Y() > Y()+Height() ||
+			   entity->Image()->Y()+entity->Image()->GetHeight() < Y())
+				continue;
+
 			if(!entity->IsBuilding() && !entity->OnTop())
 				entity->Draw();
 			if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
@@ -537,14 +580,24 @@ void TMap::Draw(const Point2i& mouse)
 			++enti;
 		}
 
+	/* Troisième boucle pour maintenant dessiner les unités qui sont au dessus des autres (arbres, etc) */
 	FORit(ECBEntity*, entities, enti)
 	{
 		ECEntity* e = dynamic_cast<ECEntity*>(*enti);
 		if(e->OnTop())
-			e->Draw();
+		{
+			if(e->Image()->X() > X()+Width() ||
+			   e->Image()->X()+e->Image()->GetWidth() < X() ||
+			   e->Image()->Y() > Y()+Height() ||
+			   e->Image()->Y()+e->Image()->GetHeight() < Y())
+			{}
+			else
+				e->Draw();
+		}
 		e->AfterDraw();
 	}
 
+	/* On dessine les after_draw qui sont des images stockées par les unités pour les dessiner après */
 	FOR(ECSprite*, after_draw, it)
 		if(it)
 			it->draw();
@@ -563,6 +616,8 @@ void TMap::Draw(const Point2i& mouse)
 	if(map->Channel())
 	{
 		BPlayerVector pls = map->Channel()->Players();
+
+		/* Dessin des balises */
 		FORit(ECBPlayer*, pls, pl)
 		{
 			std::vector<ECPlayer::BreakPoint> bps = dynamic_cast<ECPlayer*>(*pl)->BreakPoints();
@@ -577,16 +632,13 @@ void TMap::Draw(const Point2i& mouse)
 					bp->c->SetMustRedraw();
 				}
 		}
-		for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
-		{
-			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-			if(!entity->Move()->Empty())
-			{
-				if(map->Channel()->State() == EChannel::ANIMING)
-				{
 
-				}
-				else if(map->Channel()->State() == EChannel::PLAYING)
+		/* En mode PLAYING, on dessine toutes les fleches */
+		if(map->Channel()->State() == EChannel::PLAYING)
+			for(std::vector<ECBEntity*>::iterator enti = entities.begin(); enti != entities.end(); ++enti)
+			{
+				ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
+				if(!entity->Move()->Empty())
 				{
 					ECase* c = dynamic_cast<ECase*>((*enti)->Case());
 					if(c != entity->Move()->FirstCase())
@@ -673,8 +725,8 @@ void TMap::Draw(const Point2i& mouse)
 
 				}
 			}
-		}
 	}
+
 	if(move_map)
 	{
 		ECImage* surf = Resources::MoveMapPoint();

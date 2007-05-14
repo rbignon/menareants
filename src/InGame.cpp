@@ -1859,7 +1859,8 @@ void TBarreAct::vSetEntity(void* _e)
 			InGameForm->BarreAct->entity = 0;
 			while(InGameForm->BarreAct->Y() < int(SCREEN_HEIGHT))
 			{
-				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+4), SDL_Delay(10);
+				InGameForm->BarreAct->SetXY(InGameForm->BarreAct->X(), InGameForm->BarreAct->Y()+5);
+				SDL_Delay(10);
 				InGameForm->Map->ToRedraw(InGameForm->BarreAct);
 			}
 			InGameForm->BarreAct->Hide();
@@ -2532,6 +2533,11 @@ void MenAreAntsApp::Scores(EChannel* chan)
 
 		ScoresForm->SetMutex(mutex);
 		ScoresForm->RetourButton->SetOnClick(TScoresForm::WantLeave, &Server);
+
+		if(Server.Player()->Lost())
+			Sound::SetMusicList(LOSER_MUSIC);
+		else
+			Sound::SetMusicList(WINER_MUSIC);
 		do
 		{
 			ScoresForm->Actions();

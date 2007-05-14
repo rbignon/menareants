@@ -759,7 +759,11 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			case 'w':
 			{
 				if(sender)
+				{
 					sender->SetDisconnected(add);
+					if(InGameForm)
+						InGameForm->AddInfo(I_SHIT, StringF(_("*** %s has leave game"), sender->GetNick()));
+				}
 
 				if(PingingForm)
 				{

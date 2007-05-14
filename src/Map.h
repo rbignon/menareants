@@ -230,9 +230,9 @@ public:
 	 * o 0  = shadowed
 	 * o >0 = showed
 	 */
-	int Showed() const { return showed; }
+	int Showed() const;
 	void SetShowed(int s) { showed = s; }
-	bool Visible() const { return (showed > 0); }
+	bool Visible() const;
 
 	bool MustRedraw() const { return must_redraw; }
 	void SetMustRedraw(bool b = true) { must_redraw = b; }
