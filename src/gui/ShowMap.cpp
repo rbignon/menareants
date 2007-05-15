@@ -351,7 +351,7 @@ void TMap::DrawFog(ECase* c)
 void TMap::DrawCountries(ECase* c)
 {
 	const int LINE_WIDTH = 10;
-	if(!c->Visible() <= 0)
+	if(!c->Visible())
 		return;
 
 	if(map->Channel() && (!c->Country()->Owner() || !c->Country()->Owner()->Player()))
