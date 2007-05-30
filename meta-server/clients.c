@@ -100,10 +100,18 @@ static int show_scores(struct Client* cl)
 	if(!u)
 		return 0;
 
-	for(i=0;i<50 && u;i++, u=u->next)
+	for(i=0;i< max_show && u;i++, u=u->next)
 		list[i] = u;
 
-	for(i=1; i < nb_tregs;i++)
+	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
+                max_show = 10;
+	else if((cl->flags & CL_BOT))
+		max_show = 5;
+
+	if(nb_tregs < max_show)
+		max_show = nb_tregs;
+
+	for(i=1; i < max_show;i++)
 	{
 		k=i;
 		while(k && list[k]->score > list[k-1]->score)
@@ -114,14 +122,6 @@ static int show_scores(struct Client* cl)
 			k--;
 		}
 	}
-
-	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
-		max_show = 10;
-	else if((cl->flags & CL_BOT))
-		max_show = 5;
-
-	if(nb_tregs < max_show)
-		max_show = nb_tregs;
 
 	for(i=0; i < max_show; ++i)
 		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", list[i]->name, list[i]->deaths, list[i]->killed,

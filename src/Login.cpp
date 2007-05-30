@@ -240,7 +240,7 @@ int REJOINmsCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
 /** Receive a server name in the list from meta-server
  *
  * Syntax: LSP ip:port nom +/- nbjoueurs nbmax nbgame> maxgames proto
- *             version totusers totgames uptime
+ *             version totusers totgames uptime official
  *
  * parv[1] = ip
  * parv[2] = name
@@ -255,10 +255,14 @@ int REJOINmsCommand::Exec(PlayerList, EC_Client* me, ParvList parv)
  * parv[11]= totusers
  * parv[12]= totgames
  * parv[13]= uptime
+ * parv[14] = official? (1|0)
  */
 int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
 	assert(ListServerForm);
+
+	if(ListServerForm->OnlyOfficials->Checked() && (parv.size() <= 14 || parv[14] != "1"))
+		return 0;
 
 	int sock;
 	static struct sockaddr_in fsocket_init;
@@ -505,6 +509,15 @@ void TListServerForm::OnClic(const Point2i& mouse, int button, bool& stop)
 	}
 }
 
+void TListServerForm::SetOnlyOfficials(TObject* obj, void* forminst)
+{
+	TCheckBox* CheckBox = dynamic_cast<TCheckBox*>(obj);
+	TListServerForm* form = static_cast<TListServerForm*>(forminst);
+	if(!CheckBox || !form) return;
+
+	MenAreAntsApp::GetInstance()->RefreshList();
+}
+
 TListServerForm::TListServerForm(ECImage* w)
 	: TForm(w), nb_chans(0), nb_wchans(0), nb_users(0), nb_tchans(0), nb_tusers(0), nb_tregs(0), login(false)
 {
@@ -569,6 +582,10 @@ TListServerForm::TListServerForm(ECImage* w)
 
 	RetourButton = AddComponent(new TButton(RefreshButton->X()+RefreshButton->Width(),RegisterButton->Y()+RegisterButton->Height(),150,50));
 	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
+
+	OnlyOfficials = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), button_x, ServerList->Y()+ServerList->Height()-20, _("Show only official servers"), white_color));
+	OnlyOfficials->SetOnClick(TListServerForm::SetOnlyOfficials, this);
+	OnlyOfficials->Check();
 
 	SetBackground(Resources::Titlescreen());
 }

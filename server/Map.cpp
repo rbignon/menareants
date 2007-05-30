@@ -403,7 +403,7 @@ void ECEntity::CancelEvents(bool send_message)
 	for(EventVector::iterator evti = events.begin(); evti != events.end(); ++evti)
 	{
 		std::vector<ECEntity*> ents = (*evti)->Entities()->List();
-		if((*evti)->Entity() != this)
+		if((*evti)->Entity() != this && (*evti)->Entity()->Owner() == Owner())
 		{
 			(*evti)->Entity()->Events()->Remove(*evti);
 			if((*evti)->Entity()->Owner())
@@ -411,7 +411,7 @@ void ECEntity::CancelEvents(bool send_message)
 			entities.push_back((*evti)->Entity());
 		}
 		FORit(ECEntity*, ents, enti)
-			if(*enti != this)
+			if(*enti != this && (*enti)->Owner() == Owner())
 			{
 				(*enti)->Events()->Remove(*evti);
 				if((*enti)->Owner())

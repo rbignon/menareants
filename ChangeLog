@@ -1,3 +1,13 @@
+2007-05-22 Romain Bignon <progs@menareants.org>
+
+	* server/Maps.cpp (ECEntity::CancelEvents): Correction d'une faille qui permettait a un joueur de faire annuler les actions d'une unite ennemie.
+
+	* src/data/anims/units/boat/*: Nouvelles images de bateau envoyes par Luc Leger, merci a lui.
+
+2007-05-21 Romain Bignon <progs@menareants.org>
+
+	* src/Login.cpp: Case à cocher "Show only official servers" cochée par défaut qui cache les serveurs non officiels.
+
 2007-05-12 Romain Bignon <progs@menareants.org>
 
 	* src/Units.cpp (ECEiffelTower): La tour Eiffel maintenant passe la variable HaveBrouillard à false plutot que d'ajouter 2 à toutes les cases.

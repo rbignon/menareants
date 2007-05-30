@@ -26,6 +26,7 @@
 #include "gui/ListBox.h"
 #include "gui/Memo.h"
 #include "gui/Label.h"
+#include "gui/CheckBox.h"
 #include "Timer.h"
 
 class EC_Client;
@@ -121,6 +122,7 @@ public:
 	TLabel*      UserStats;
 	TLabel*      ChanStats;
 	TLabel*      Welcome;
+	TCheckBox*   OnlyOfficials;
 
 	uint nb_chans, nb_wchans, nb_users, nb_tchans, nb_tusers, nb_tregs;
 
@@ -133,5 +135,7 @@ private:
 	void AfterDraw();
 	void AskForRegister();
 	void OnClic(const Point2i& position, int button, bool& stop);
+
+	static void SetOnlyOfficials(TObject* obj, void* forminst);
 };
 #endif
