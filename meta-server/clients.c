@@ -251,10 +251,12 @@ static char *correct_nick(const char *nick)
 /* IAM <name> <prog> <version> [passwd] */
 int m_login (struct Client* cl, int parc, char** parv)
 {
-	int proto = atoi(parv[3]);
+	int proto = 0;
 
 	if(cl->flags) return 0; /* Réidentification. */
 	if(parc < 4) return delclient(cl);
+
+	proto = atoi(parv[3]);
 
 	if(proto > myproto || proto < 1)
 		return delclient(cl);
