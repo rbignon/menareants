@@ -109,7 +109,7 @@ MenAreAntsApp* MenAreAntsApp::GetInstance()
 	return singleton;
 }
 
-char* MenAreAntsApp::get_title()
+const char* MenAreAntsApp::get_title()
 {
 	return APP_NAME;
 }

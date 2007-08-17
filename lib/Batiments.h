@@ -674,6 +674,8 @@ public:
 	virtual uint Cost() const { return 1000; }
 	virtual uint InitNb() const { return 500; }
 	virtual bool IsCity() const { return true; }
+
+	/* We DON'T allow someone to sell his airport, to prevent of selling when an enemy plane come on */
 	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }

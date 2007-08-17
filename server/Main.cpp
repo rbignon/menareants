@@ -29,6 +29,8 @@
 #include <iostream>
 #include <signal.h>
 #include <sys/resource.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #ifdef WIN32
 #error Do not compile this server under windows !!!
 #endif

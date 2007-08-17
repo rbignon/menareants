@@ -1435,7 +1435,7 @@ void TGameInfosForm::OnClic(const Point2i& mouse, int button, bool&)
 				TMessageBox(_("Please select a map!"), BT_OK, this).Show();
 				ok = false;
 			}
-			else if(chan->NbPlayers() < chan->Map()->MinPlayers())
+			else if(chan->NbPlayers() < chan->Map()->MinPlayers() && !chan->IsMission())
 			{
 				TMessageBox(StringF(_("There are not sufficient players. This map requires between %d and %d players."),
 				                      chan->Map()->MinPlayers(), chan->Map()->MaxPlayers()), BT_OK, this).Show();

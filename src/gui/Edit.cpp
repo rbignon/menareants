@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <SDL.h>
 
-TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, char* av, bool _show_bg)
+TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, const char* av, bool _show_bg)
   : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f),
     color(black_color), passwd(false)
 {

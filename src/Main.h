@@ -70,7 +70,7 @@ private:
 
 public:
 	int main(int argc, char** argv);
-	char *get_title();
+	const char *get_title();
 
 	void UnLoad();
 

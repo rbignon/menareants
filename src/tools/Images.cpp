@@ -468,7 +468,7 @@ ECImage* ECSpriteBase::First()
  *                                      ECImage                                         *
  ****************************************************************************************/
 
-ECImage::ECImage(char* fichier, bool _alpha)
+ECImage::ECImage(const char* fichier, bool _alpha)
 	: Img(0), shadowed(0), pause(0), autofree(true), alpha(_alpha), x(0), y(0)
 {
 	Load(fichier, _alpha);
@@ -480,7 +480,7 @@ ECImage::ECImage(const Point2i &size, Uint32 flags, bool useAlpha)
 	NewSurface(size, flags, useAlpha);
 }
 
-void ECImage::Load(char *fichier, bool _alpha)
+void ECImage::Load(const char *fichier, bool _alpha)
 {
 	SDL_Surface *tmp = 0;
 	if(!(tmp = IMG_Load(fichier)))

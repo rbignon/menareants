@@ -65,7 +65,7 @@ class MetaServer (asyncore.dispatcher):
 
 	def m_server(self, parv):
 		"""LSP <ip:port> <nom> <+/-> <nbjoueurs>                                """
-                """     <nbmax> <nbgames> <maxgames> <proto>                            """
+                """     <nbmax> <nbgames> <maxgames> <nbwaitgames> <proto>              """
                 """     <version> <totusers> <totgames> <uptime>                        """
 		if(int(parv[6]) >= int(parv[7]) or int(parv[4]) >= int(parv[5])):
 			color = 4
@@ -73,8 +73,8 @@ class MetaServer (asyncore.dispatcher):
 			color = 2
 		else:
 			color = 3
-		self.bot.SendMessage("\002%-25s\002 (\003%d\002\002%s/%s\003 players) (\003%d\002\002%s/%s\003 games) %s"
-		                     % (parv[2], color, parv[4], parv[5], color, parv[6], parv[7], parv[9]))
+		self.bot.SendMessage("\002%-25s\002 (\003%d\002\002%s/%s\003 players) (\003%d\002\002%s/%s\003 games) v%s"
+		                     % (parv[2], color, parv[4], parv[5], color, parv[6], parv[7], parv[10]))
 
 	def m_regnick(self, parv):
 		""" SCORE <nick> <deaths> <killed> <creations> <scores> <best_revenu> <nbgames> <victories> <regtime> <lastvisit> """

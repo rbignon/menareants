@@ -39,7 +39,7 @@ class TEdit : public TComponent
 /* Constructeur/Deconstructeur */
 public:
 
-	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, char* av = 0,
+	TEdit(Font* font, int _x, int _y, uint _width, uint _maxlen = 0, const char* av = 0,
 	      bool show_background = true);
 
 /* Methodes */
@@ -67,7 +67,7 @@ public:
 	bool Empty() const { return chaine.empty(); }
 
 	const char* AvailChars() const { return avail_chars; }
-	void SetAvailChars(char* c) { avail_chars = c; }
+	void SetAvailChars(const char* c) { avail_chars = c; }
 
 	void SetMaxLen(uint m) { maxlen = m; }
 
@@ -89,7 +89,7 @@ private:
 	std::string chaine;
 	bool show_background;
 	std::string::size_type caret;
-	char* avail_chars;
+	const char* avail_chars;
 	bool have_redraw;
 	uint EDIT_HEIGHT;
 	Font* font;

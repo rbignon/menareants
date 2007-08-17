@@ -36,6 +36,8 @@
 #include <errno.h>
 #include <cstdarg>
 #include <netdb.h>
+/* For BSD */
+#include <netinet/in.h>
 
 /********************************************************************************************
  *                               TRealClient                                                *

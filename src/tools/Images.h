@@ -175,7 +175,7 @@ class ECImage
 public:
 	ECImage(SDL_Surface* _Img) : Img(_Img), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 	ECImage(const ECImage&);
-	ECImage(char* fichier, bool alpha = false);
+	ECImage(const char* fichier, bool alpha = false);
 	ECImage() : Img(0), shadowed(0), pause(0), autofree(true), alpha(false), x(0), y(0) {}
 	explicit ECImage(const Point2i &size, Uint32 flags, bool useAlpha = true);
 
@@ -185,7 +185,7 @@ public:
 public:
 
 	/** Charge l'image à partir d'un fichier */
-	void Load(char *fichier, bool alpha = false);
+	void Load(const char *fichier, bool alpha = false);
 
 	/** Dessin à la taille originale à la position (x,y) */
 	void Draw(int x, int y);

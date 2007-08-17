@@ -33,7 +33,7 @@
 static struct ButtonList_t
 {
 	uint flag;
-	char* label;
+	const char* label;
 	uint w;
 	uint h;
 	ECSpriteBase* (*spr) ();

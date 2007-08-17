@@ -1,5 +1,9 @@
 2007-05-31 Romain Bignon <progs@menareants.org>
 
+	* server/Main.cpp, server/Server.cpp: Portage pour OpenBSD.
+
+2007-05-31 Romain Bignon <progs@menareants.org>
+
 	* meta-server/client.c: Correction d'un crash dans le cas où il y a plus de 50 comptes enregistrés
 
 	* meta-server/client.c: Correction d'un crash si le message d'identification du client ne comporte pas au moins 3 mots.
