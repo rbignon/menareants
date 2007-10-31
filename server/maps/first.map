@@ -1,6 +1,6 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
-NAME 4 sans mercis
+NAME Tug of war
 PLAYER A A
 PLAYER B B
 PLAYER C C
@@ -35,7 +35,7 @@ CITY 1000
 MIN 2
 MAX 4
 DATE 28/4/2006
-INFO Map pour quatre joueurs, 2v2
+INFO Map for four players, 2v2
 UNIT 7 A 3,9 2000
 UNIT 1 A 3,9 1000
 UNIT 6 A 6,2 1000

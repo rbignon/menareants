@@ -1,6 +1,6 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
-NAME Iles sanglantes
+NAME Bloody islands
 PLAYER A
 PLAYER B
 X 20
@@ -26,7 +26,7 @@ CITY 1000
 MIN 2
 MAX 2
 DATE 20/5/2006
-INFO Carte pour deux joueurs sur deux petites iles
+INFO 1v1 map on two little islands.
 UNIT 6 A 3,2 1000
 UNIT 1 A 3,2 1000
 UNIT 7 A 2,7 2000

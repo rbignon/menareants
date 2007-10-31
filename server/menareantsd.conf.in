@@ -18,8 +18,6 @@
 # Veuillez prendre le temps de bien configurer chaque section, chaque
 # sous section et chaque champ.
 #
-# Dernière modification :
-# $Id$
 ##########################################################################
 
 # «server»
@@ -58,7 +56,7 @@ meta-server {
 	# Important: si le meta serveur est en local, veuillez à entrer
 	# l'IP d'accès par Internet, sinon le meta-server renverra aux
 	# clients l'ip 127.0.0.1...
-	host = game.coderz.info
+	host = game.menareants.org
 
 	# Port du meta-serveur
 	port = 5460

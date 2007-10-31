@@ -424,7 +424,7 @@ TCredits::TCredits(ECImage* w)
 	Label2 = AddComponent(new TLabel(Label1->Y()+Label1->Height(),_("* Programmer"), red_color, Font::GetInstance(Font::Big)));
 
 	Label3 = AddComponent(new TLabel(50,Label2->Y()+Label2->Height()+30,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
-	Label4 = AddComponent(new TLabel(50,Label3->Y()+Label3->Height(),_("* \"Graphiste\""), fgreen_color, Font::GetInstance(Font::Big)));
+	Label4 = AddComponent(new TLabel(50,Label3->Y()+Label3->Height(),_("* \"Graphic artist\""), fgreen_color, Font::GetInstance(Font::Big)));
 
 	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label2->Y()+Label2->Height()+30,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
 	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label3->Y()+Label3->Height(),_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));

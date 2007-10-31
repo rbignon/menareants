@@ -28,7 +28,7 @@ CITY 2000
 MIN 2
 MAX 4
 DATE 18/12/1986
-INFO Map created by Progs
+INFO Three players are against a single one protected in a castle.
 UNIT 19 A 5,1 5000
 UNIT 3 A 5,2 1000
 UNIT 2 A 4,2 500

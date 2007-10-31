@@ -474,7 +474,7 @@ void ECEntity::SetShowedCases(bool show, bool forced)
  ********************************************************************************************/
 
 ECase::ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id)
-	: ECBCase(_map, _x, _y, _flags, _type_id), image(0), selected(0), showed(-1), must_redraw(true)
+	: image(0), selected(0), showed(-1), must_redraw(true)
 {
 
 }

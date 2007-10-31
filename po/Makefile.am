@@ -52,9 +52,9 @@ POTFILES = \
 
 DOMAIN = $(PACKAGE)
 
-COPYRIGHT_HOLDER = CoderZ
+COPYRIGHT_HOLDER = Romain Bignon
 
-MSGID_BUGS_ADDRESS = progs@coderz.info
+MSGID_BUGS_ADDRESS = romain@menareants.org
 
 localedir=@LOCALEDIR@
 

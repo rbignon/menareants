@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 
-AC_INIT([MenAreAnts], [0.1], [bugs@coderz.info], [menareants])
+AC_INIT([MenAreAnts], [0.1], [romain@menareants.org], [menareants])
 
 AM_CONFIG_HEADER(config.h)
 

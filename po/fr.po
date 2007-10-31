@@ -1,12 +1,11 @@
 # translation of fr.po to
-# Romain Bignon <progs@headfucking.net>, 2007.
-# Romain Bignon <progs@menareants.org>, 2007.
-# Copyright (C) 2007 CoderZ
-# This file is distributed under the same license as the PACKAGE package.
+# Romain Bignon <romain@menareants.org>, 2007.
+# Copyright (C) 2007 Romain Bignon
+# This file is distributed under the same license as the menareants package.
 msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
-"Report-Msgid-Bugs-To: progs@coderz.info\n"
+"Report-Msgid-Bugs-To: romain@menareants.org\n"
 "PO-Revision-Date: 2007-05-21 00:08+0200\n"
 "Last-Translator: Romain Bignon <progs@menareants.org>\n"
 "Language-Team:  <en@li.org>\n"

@@ -3,9 +3,6 @@
                    *******************
                         [ ADMINS ]
 
-Dernière modification:
-$Id$
-
 AVANT PROPOS
 
 	Ce document est destiné aux administrateurs de serveurs MenAreAnts.
@@ -27,7 +24,7 @@ Sommaire:
 	savoir à quoi correspondent chaque paramètre.
 
 	server {
-	
+
 		# Veuillez choisir comme nom une dns permettant d'accéder à la machine.
 		name = personnal.server
 
@@ -40,55 +37,55 @@ Sommaire:
 		fping = 25
 
 		# Ceci est laissé au choix de l'administrateur, suivant le traffic qu'il
-		# souhaite avoir sur sa machine.	
+		# souhaite avoir sur sa machine.
 		maxcons = 10
 
 		# Le mot de passe administrateur doit être suffisament complexe pour ne
 		# pas être trouvé. Veuillez y mettre au moins six caractères, et de
-		# préférence au moins un chiffre.	
+		# préférence au moins un chiffre.
 		adminpass = azerty
 	}
-	
+
 	meta-server {
 		# Ceci est l'hostname et le port du meta-serveur du réseau. C'est lui qui
 		# recense tous les serveurs du réseau MenAreAnts. Veuillez laisser ça ainsi.
 		# Si jamais menareants-server indique qu'il n'arrive pas à s'y connecter,
 		# vérifier votre connexion, puis prévenez un développeur.
-		host = game.coderz.info
+		host = game.menareants.org
 		port = 5460
 	}
 
 	games {
-	
+
 		# Ce nombre doit être au minimum de 2 et pour un confort d'utilisation ne
 		# dépassez pas 10.
 		maxgames = 3
-	
+
 		# Ce nombre maximal de joueurs dans un même partie est à laisser par défault
 		# à 8, sauf si vous introduisez une carte comprenant plus de 8 joueurs.
 		deflimite = 8
 	}
-	
+
 2) Logs
 
 	Les logs se trouvent par défaut dans ~/.menareantsserver/.
-	
+
 	Vous avez deux fichiers, connexions.log et errors.log.
 	Le premier permet d'avoir un historique de toutes les connexions et deconnexions
 	au serveur, de tous les joueurs qui ont joins ou quittés une partie, et toutes
 	les parties lancées.
 	Le second fichier affiche les erreurs obtenues en cours de partie, et devrait être
 	envoyé frequement aux développeurs.
-	
+
 3) Administration
 
 	Pour administrer votre serveur, vous devez lancer le jeu MenAreAnts.
 	Connectez-vous sur votre serveur. Sur l'écran "vous êtes bien connecté", cliquez
 	en haut à gauche.
 	Un message devrait vous demander votre mot de passe.
-	
+
 	Après l'avoir saisis et l'avoir confirmé, deux bouttons apparaitront à droite :
-	
+
 	- Actu. Config.       Ce bouton permet d'actualiser la configuration sur le serveur.
 	                      Il recharge également le MOTD.
 	- Tuer un joueur      Vous pouvez déconnecter un joueur du serveur grâce à ce bouton.
@@ -97,21 +94,21 @@ Sommaire:
 	D'autres outils d'administration viendront peut être par la suite.
 	Il est à noter que vous voyez en bas trois lignes concernant l'état du serveur (nombre
 	de parties jouées ou en cours, nombre de connexions actuelles ou totales, etc.).
-	
+
 4) Signaux
 
 	Vous avez trois signaux à envoyer au processus avec la commande "kill" pour effectuer
 	les actions suivantes :
-	
+
 	HUP              Recharge la configuration
 	INT              Relance le serveur
 	TERM             Arrête le serveur
-	
+
 5) Conclusion
 
 	Si vous avez besoin d'aide par rapport à l'administration de votre serveur, n'hesitez pas
 	à contacter un développeur via la mailing list ou directement par mail.
-	
-	Visitez http://menareants.coderz.info
-	
-	Romain Bignon <progs@coderz.info>
+
+	Visitez http://menareants.org
+
+	Romain Bignon <romain@menareants.org>

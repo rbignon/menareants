@@ -226,8 +226,6 @@ class ECase : public virtual ECBCase
 /* Constructeur/Destructeur */
 public:
 
-	ECase() : image(0), selected(0), showed(-1), must_redraw(true) { }
-
 	ECase(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id);
 
 	virtual ~ECase();
@@ -271,7 +269,7 @@ class ECTerre : public ECBTerre, public ECase
 {
 /* Constructeur/Destructeur */
 public:
-	ECTerre(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECTerre(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id), ECase(_map, _x, _y, _flags, _type_id) {}
 
 /* Methodes */
 public:
@@ -284,7 +282,7 @@ class ECMer : public ECBMer, public ECase
 {
 /* Constructeur/Destructeur */
 public:
-	ECMer(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECMer(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id), ECase(_map, _x, _y, _flags, _type_id) {}
 
 /* Methodes */
 public:
@@ -297,7 +295,7 @@ class ECPont : public ECBPont, public ECase
 {
 /* Constructeur/Destructeur */
 public:
-	ECPont(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECPont(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id), ECase(_map, _x, _y, _flags, _type_id) {}
 
 /* Methodes */
 public:
@@ -310,7 +308,7 @@ class ECMontain : public ECBMontain, public ECase
 {
 /* Constructeur/Destructeur */
 public:
-	ECMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
+	ECMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id), ECase(_map, _x, _y, _flags, _type_id) {}
 
 /* Methodes */
 public:

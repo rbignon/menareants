@@ -1,6 +1,6 @@
 # Veuillez ne pas éditer le fichier map à la main.
 # Utilisez plutôt l'éditeur de carte intégré au jeu.
-NAME Trois joueurs
+NAME Threesome
 PLAYER A A
 PLAYER B B
 PLAYER C C
@@ -33,7 +33,7 @@ CITY 1000
 MIN 2
 MAX 3
 DATE 2/6/2006
-INFO Map pour trois joueurs sur trois îles
+INFO 1v1v1 map on three islands.
 UNIT 6 A 9,1 1000
 UNIT 1 A 9,1 1000
 UNIT 7 A 14,1 2000

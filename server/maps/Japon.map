@@ -1,6 +1,6 @@
 # Please don't edit this file by hand.
 # Use the game's map editor.
-NAME Japon
+NAME Japan
 PLAYER A  0
 PLAYER B  0
 PLAYER C  0
@@ -41,7 +41,7 @@ CITY 1000
 MIN 2
 MAX 3
 DATE 20/11/2005
-INFO Map créée par Progs
+INFO Tokyo is menaced by Shanghai and Pyongyang.
 UNIT 6 * 22,18 1000
 UNIT 13 * 21,18 1000
 UNIT 3 * 21,19 1000

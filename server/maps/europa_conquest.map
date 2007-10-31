@@ -45,10 +45,9 @@ CITY 1000
 MIN 2
 MAX 6
 DATE 3/9/1939
-INFO Carte de l'Europe lors de la guerre froide.
-INFO Ce conflit se déroule de part et d'autre du rideau de fer.
-INFO 
-INFO Map créée par zorkis
+INFO The map represents Europa during the cold war. This conflict takes place on both sides of the iron curtain.
+INFO
+INFO Map created by zorkis
 UNIT 6 A 5,12 1000
 UNIT 6 A 7,8 1000
 UNIT 7 A 10,10 2000
