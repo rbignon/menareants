@@ -152,6 +152,12 @@ ECEntity::~ECEntity()
 	delete attaq;
 }
 
+void ECEntity::Init()
+{
+	ECBEntity::Init();
+	UpdateImages();
+}
+
 ECSpriteBase* ECEntity::DeadCase() const
 {
 	return 0;
@@ -380,6 +386,35 @@ void ECEntity::SetImage(ECSpriteBase* spr)
 	if(Case() && Map() && Map()->ShowMap())
 		ImageSetXY(Map()->ShowMap()->X() +(CASE_WIDTH  * Case()->X()),
 		           Map()->ShowMap()->Y() + (CASE_HEIGHT * Case()->Y()));
+}
+
+void ECEntity::SetOwner(ECBPlayer* player)
+{
+	images.clear();
+
+	ECBEntity::SetOwner(player);
+
+	UpdateImages(); // Call the virtual method to update image list.
+}
+
+void ECEntity::PutImage(imgs_t i, ECSpriteBase* b)
+{
+	if (Owner())
+	{
+		if(Owner()->HasSprite(Type(), i))
+			b = Owner()->GetSprite(Type(), i);
+		else
+		{
+			b = new ECSpriteBase(b->path.c_str());
+			Owner()->SetSprite(Type(), i, b);
+		}
+	}
+	images.insert(ImgList::value_type(i, b));
+
+	if(Owner() && Owner()->Color())
+		images[i]->ChangeColor(white_color, color_eq[Owner()->Color()]);
+
+	if(images.size() == 1) SetImage(b);
 }
 
 void ECEntity::ChangeCase(ECBCase* newcase)

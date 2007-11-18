@@ -278,28 +278,6 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
  *                                ECUnit                                                     *
  ********************************************************************************************/
 
-void ECUnit::PutImage(imgs_t i, ECSpriteBase* b)
-{
-	images.insert(ImgList::value_type(i, new ECSpriteBase(b->path.c_str())));
-
-	if(Owner() && Owner()->Color())
-		images[i]->ChangeColor(white_color, color_eq[Owner()->Color()]);
-
-	if(i == I_Down) SetImage(images[i]);
-}
-
-void ECUnit::RefreshColor(Color last)
-{
-	for(ImgList::iterator it = images.begin(); it != images.end(); ++it)
-		it->second->ChangeColor(last, Owner() ? color_eq[Owner()->Color()] : white_color);
-}
-
-ECUnit::~ECUnit()
-{
-	for(ImgList::iterator it = images.begin(); it != images.end(); ++it)
-		delete it->second;
-}
-
 bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&, ECase*, EC_Client*)
 {
 	if(EventType() & ARM_MOVE)

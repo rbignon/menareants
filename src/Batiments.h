@@ -39,10 +39,9 @@ class ECBatiment : public ECEntity
 /* Constructeur/Destructeur */
 public:
 
-	ECBatiment() : img(0), explosion(0) {}
+	ECBatiment() : explosion(0) {}
 
-	ECBatiment(ECSpriteBase* b, ECSpriteBase* explosion = 0);
-	virtual ~ECBatiment();
+	ECBatiment(ECSpriteBase* explosion);
 
 /* Methodes */
 public:
@@ -53,10 +52,7 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	virtual void RefreshColor(Color last);
-
 private:
-	ECSpriteBase *img;
 	ECSpriteBase *explosion;
 };
 
@@ -71,7 +67,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECBarbedWire) {}
 
-	ENTITY_CONSTRUCTOR(ECBarbedWire), ECBatiment(Resources::BarbedWire_Horiz()) {}
+	ENTITY_CONSTRUCTOR(ECBarbedWire) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::BarbedWire_Horiz())); }
 
 	virtual void Created();
 
@@ -103,7 +101,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECRail) {}
 
-	ENTITY_CONSTRUCTOR(ECRail), ECBatiment(Resources::Rail_Horiz()) {}
+	ENTITY_CONSTRUCTOR(ECRail) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Rail_Horiz())); }
 
 	virtual void Created();
 
@@ -135,7 +135,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECTrees) {}
 
-	ENTITY_CONSTRUCTOR(ECTrees), ECBatiment(Resources::Trees_Face()) {}
+	ENTITY_CONSTRUCTOR(ECTrees) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Trees_Face())); }
 
 /* Infos */
 public:
@@ -166,7 +168,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECMine) : activeimg(0) {}
 
-	ENTITY_CONSTRUCTOR(ECMine), ECBatiment(Resources::Mine_DesactFace(), Resources::Brouillard()), activeimg(0) {}
+	ENTITY_CONSTRUCTOR(ECMine), ECBatiment(Resources::Brouillard()), activeimg(0) {}
+
+	void UpdateImages() { PutImage(I_Down, Resources::Mine_DesactFace()); }
 
 	~ECMine();
 
@@ -203,7 +207,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECEiffelTower) {}
 
-	ENTITY_CONSTRUCTOR(ECEiffelTower), ECBatiment(Resources::EiffelTower_Face()) {}
+	ENTITY_CONSTRUCTOR(ECEiffelTower) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::EiffelTower_Face())); }
 
 	virtual void Init();
 
@@ -233,7 +239,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECRadar) {}
 
-	ENTITY_CONSTRUCTOR(ECRadar), ECBatiment(Resources::Radar_Face()) {}
+	ENTITY_CONSTRUCTOR(ECRadar) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Radar_Face())); }
 
 	virtual void Init();
 
@@ -263,7 +271,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECNuclearSearch) {}
 
-	ENTITY_CONSTRUCTOR(ECNuclearSearch), ECBatiment(Resources::NuclearSearch_Face()) {}
+	ENTITY_CONSTRUCTOR(ECNuclearSearch) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::NuclearSearch_Face())); }
 
 	virtual void Init();
 
@@ -298,10 +308,21 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECSilo) : missile(this, SILO_MISSILE_STEP) {}
 
-	ENTITY_CONSTRUCTOR(ECSilo), ECBatiment(Resources::Silo_Face()), missile(this, SILO_MISSILE_STEP)
+	ENTITY_CONSTRUCTOR(ECSilo), ECBatiment(), missile(this, SILO_MISSILE_STEP)
 	{
 		missile.SetMissileUp(Resources::Silo_Missile_Up());
 		missile.SetMissileDown(Resources::Silo_Missile_Down());
+	}
+
+	void UpdateImages()
+	{
+		PutImage(I_Down, Resources::Silo_Face());
+	}
+
+	void Init()
+	{
+		ECEntity::Init();
+		ECBSilo::Init();
 	}
 
 /* Infos */
@@ -345,7 +366,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECMegalopole) {}
 
-	ENTITY_CONSTRUCTOR(ECMegalopole), ECBatiment(Resources::Megalopole_Face()) {}
+	ENTITY_CONSTRUCTOR(ECMegalopole) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Megalopole_Face())); }
 
 	virtual void Init()
 	{
@@ -380,7 +403,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECapitale) {}
 
-	ENTITY_CONSTRUCTOR(ECapitale), ECBatiment(Resources::Capitale_Face()) {}
+	ENTITY_CONSTRUCTOR(ECapitale) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Capitale_Face())); }
 
 /* Infos */
 public:
@@ -408,7 +433,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECity) {}
 
-	ENTITY_CONSTRUCTOR(ECity), ECBatiment(Resources::City_Face()) {}
+	ENTITY_CONSTRUCTOR(ECity) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::City_Face())); }
 
 /* Infos */
 public:
@@ -436,11 +463,16 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECDefenseTower) : missile(this, DEFENSETOWER_MISSILE_STEP), miss(0), cible(0) {}
 
-	ENTITY_CONSTRUCTOR(ECDefenseTower), ECBatiment(Resources::DefenseTower_Face()),
+	ENTITY_CONSTRUCTOR(ECDefenseTower), ECBatiment(),
 	                                    missile(this, DEFENSETOWER_MISSILE_STEP), miss(0), cible(0)
 	{
 		missile.SetMissileUp(Resources::MissiLauncher_Missile_Up());
 		missile.SetMissileDown(Resources::MissiLauncher_Missile_Down());
+	}
+
+	void UpdateImages()
+	{
+		PutImage(I_Down, Resources::DefenseTower_Face());
 	}
 
 /* Infos */
@@ -481,7 +513,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECObelisk) : victim(0) {}
 
-	ENTITY_CONSTRUCTOR(ECObelisk), ECBatiment(Resources::Obelisk_Face()), victim(0) {}
+	ENTITY_CONSTRUCTOR(ECObelisk), victim(0) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Obelisk_Face())); }
 
 /* Infos */
 public:
@@ -520,7 +554,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECharFact) {}
 
-	ENTITY_CONSTRUCTOR(ECharFact), ECBatiment(Resources::CharFact_Face()) {}
+	ENTITY_CONSTRUCTOR(ECharFact) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::CharFact_Face())); }
 
 	virtual void Init()
 	{
@@ -553,7 +589,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECaserne) {}
 
-	ENTITY_CONSTRUCTOR(ECaserne), ECBatiment(Resources::Caserne_Face()) {}
+	ENTITY_CONSTRUCTOR(ECaserne) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Caserne_Face())); }
 
 /* Infos */
 public:
@@ -580,7 +618,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECAirPort) {}
 
-	ENTITY_CONSTRUCTOR(ECAirPort), ECBatiment(Resources::AirPort_Face()) {}
+	ENTITY_CONSTRUCTOR(ECAirPort) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::AirPort_Face())); }
 
 /* Infos */
 public:
@@ -606,7 +646,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECShipyard) {}
 
-	ENTITY_CONSTRUCTOR(ECShipyard), ECBatiment(Resources::Shipyard_Face()) {}
+	ENTITY_CONSTRUCTOR(ECShipyard) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Shipyard_Face())); }
 
 /* Infos */
 public:

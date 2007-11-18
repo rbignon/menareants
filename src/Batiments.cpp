@@ -30,20 +30,9 @@
  *                                ECBatiment                                                *
  ********************************************************************************************/
 
-ECBatiment::ECBatiment(ECSpriteBase* b, ECSpriteBase* explos)
+ECBatiment::ECBatiment(ECSpriteBase* explos)
 	: explosion(explos)
 {
-	img = new ECSpriteBase(b->path.c_str());
-
-	if(Owner() && Owner()->Color())
-		img->ChangeColor(white_color, color_eq[Owner()->Color()]);
-
-	SetImage(img);
-}
-
-void ECBatiment::RefreshColor(Color last)
-{
-	img->ChangeColor(last, Owner() ? color_eq[Owner()->Color()] : white_color);
 }
 
 bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
@@ -71,17 +60,12 @@ bool ECBatiment::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 	return true;
 }
 
-ECBatiment::~ECBatiment()
-{
-	if(img)
-		delete img;
-}
-
 /********************************************************************************************
  *                                ECEiffelTower                                             *
  ********************************************************************************************/
 void ECEiffelTower::Init()
 {
+	ECEntity::Init();
 	if(Owner() && Owner()->IsMe())
 	{
 		Map()->SetBrouillard(false);
@@ -111,6 +95,7 @@ ECEiffelTower::~ECEiffelTower()
  ********************************************************************************************/
 void ECRadar::Init()
 {
+	ECEntity::Init();
 	if(Owner() && Owner()->IsMe())
 	{
 		std::vector<ECBCase*> cases = Map()->Cases();
@@ -265,7 +250,7 @@ ECMine::~ECMine()
 
 void ECMine::Init()
 {
-	ECBEntity::Init();
+	ECEntity::Init();
 
 	activeimg = new ECSpriteBase(Resources::Mine_ActFace()->path.c_str());
 
@@ -302,6 +287,7 @@ std::string ECMine::SpecialInfo()
 void ECNuclearSearch::Init()
 {
 	ECBNuclearSearch::Init();
+	ECEntity::Init();
 	Image()->SetAnim(true);
 	if(Owner() && Channel() && !Owner()->IsMe())
 		Channel()->Print(StringF(_("WARNING!! %s has got nuclear technologie, with his nuclear search"), Owner()->GetNick()), 0x008);

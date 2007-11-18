@@ -95,6 +95,17 @@ class ECEntity : public virtual ECBEntity
 /* Constructeur/Destructeur */
 public:
 
+	enum imgs_t {
+		I_Up=ECMove::Up,
+		I_Down=ECMove::Down,
+		I_Left=ECMove::Left,
+		I_Right=ECMove::Right,
+		I_Attaq,
+		I_Deployed,
+		I_Reployed
+	};
+	typedef std::map<imgs_t, ECSpriteBase*> ImgList;
+
 	ECEntity();
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
@@ -125,8 +136,6 @@ public:
 
 	virtual void ChangeCase(ECBCase* new_case);
 
-	virtual void RefreshColor(Color) = 0;
-
 	virtual void SetShowedCases(bool show, bool forced = false);
 
 	virtual void Played();
@@ -145,6 +154,10 @@ public:
 	virtual void Created() {}
 
 	bool CanWalkTo(ECase* c, bool &move, bool &invest);
+
+	virtual void UpdateImages() = 0;
+
+	virtual void Init();
 
 /* Attributs */
 public:
@@ -172,6 +185,9 @@ public:
 	ECase* Case() const;
 	ECPlayer* Owner() const;
 
+	virtual void SetOwner(ECBPlayer*);
+
+
 	ECase* AttaquedCase() const { return attaqued_case; }
 	void SetAttaquedCase(ECase* c);
 
@@ -194,6 +210,11 @@ protected:
 	bool selected;
 	ECase* attaqued_case;
 	uint max_nb;
+
+	ImgList images;
+	void PutImage(imgs_t i, ECSpriteBase* b);
+
+	ECSpriteBase* GetSprite(imgs_t t) { return images[t]; }
 };
 
 /********************************************************************************************

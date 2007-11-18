@@ -24,6 +24,7 @@
 
 #include "../lib/Channels.h"
 #include "Map.h"
+#include <map>
 
 class EChannel;
 
@@ -54,6 +55,8 @@ public:
 	 * @param IsIA say if this player is an Artificial Intelligence.
 	 */
 	ECPlayer(std::string nick, EChannel* chan, bool owner, bool op, bool IsMe, bool IsIA);
+
+	~ECPlayer();
 
 	struct BreakPoint
 	{
@@ -90,11 +93,18 @@ public:
 	void AddBreakPoint(BreakPoint bp);
 	bool RemoveBreakPoint(ECBCase *c);
 
+	typedef std::map<ECBEntity::e_type, std::map<int, ECSpriteBase*> > SpriteMap;
+	SpriteMap Sprites() const { return sprites; }
+	ECSpriteBase* GetSprite(ECBEntity::e_type e, int id) { return sprites[e][id]; }
+	bool HasSprite(ECBEntity::e_type e, int id) { return sprites.find(e) != sprites.end() && sprites[e].find(id) != sprites[e].end(); }
+	void SetSprite(ECBEntity::e_type e, int id, ECSpriteBase* sb) { sprites[e][id] = sb; }
+
 /* Variables privées */
 private:
 	bool isme;
 	bool is_ia;
 	uint votes;
+	SpriteMap sprites;
 	std::vector<BreakPoint> breakpoints;
 };
 typedef std::vector<ECPlayer*> PlayerVector;

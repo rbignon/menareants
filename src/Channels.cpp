@@ -49,6 +49,13 @@ ECPlayer::ECPlayer(std::string _nick, EChannel *_chan, bool _owner, bool _op, bo
 
 }
 
+ECPlayer::~ECPlayer()
+{
+	for(SpriteMap::iterator it = sprites.begin(); it != sprites.end(); ++it)
+	    for(std::map<int, ECSpriteBase*>::iterator sb = it->second.begin(); sb != it->second.end(); ++sb)
+		delete sb->second;
+}
+
 void ECPlayer::AddBreakPoint(BreakPoint bp)
 {
 	assert(Channel()->Map()->ShowMap()->Window());

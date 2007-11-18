@@ -39,22 +39,9 @@ class ECUnit : public ECEntity
 /* Constructeur/Destructeur */
 public:
 
-	enum imgs_t {
-		I_Up=ECMove::Up,
-		I_Down=ECMove::Down,
-		I_Left=ECMove::Left,
-		I_Right=ECMove::Right,
-		I_Attaq,
-		I_Deployed,
-		I_Reployed
-	};
-	typedef std::map<imgs_t, ECSpriteBase*> ImgList;
-
 	ECUnit() : visual_step(0) {}
 
 	ECUnit(uint vs, bool m = false) : move_anim(m), visual_step(vs) {}
-
-	virtual ~ECUnit();
 
 /* Methodes */
 public:
@@ -65,23 +52,17 @@ public:
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
-	void RefreshColor(Color last);
-
 	virtual void SetDeployed(bool d = true);
 
-/* Mathodes prot��s */
+/* Mathodes protégées */
 protected:
 	bool MoveEffect(const std::vector<ECEntity*>&);
 
-	void PutImage(imgs_t, ECSpriteBase*);
 
-	ECSpriteBase* GetSprite(imgs_t t) { return images[t]; }
-
-/* Variables prot��s */
+/* Variables protégées */
 private:
 	bool move_anim;
 	uint visual_step;
-	ImgList images;
 };
 
 /********************************************************************************************
@@ -98,7 +79,9 @@ public:
 		: ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(this, MISSILAUNCHER_MISSILE_STEP)
 	{}
 
-	ENTITY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(this, MISSILAUNCHER_MISSILE_STEP)
+	ENTITY_CONSTRUCTOR(ECMissiLauncher), ECUnit(MISSILAUNCHER_VISUAL_STEP), missile(this, MISSILAUNCHER_MISSILE_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::MissiLauncher_Dos());
 		PutImage(I_Down, Resources::MissiLauncher_Face());
@@ -152,7 +135,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECTrain) {}
 
-	ENTITY_CONSTRUCTOR(ECTrain), ECUnit(TRAIN_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECTrain), ECUnit(TRAIN_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Train_Dos());
 		PutImage(I_Down, Resources::Train_Face());
@@ -187,7 +172,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECBoat) {}
 
-	ENTITY_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECBoat), ECUnit(BOAT_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Boat_Dos());
 		PutImage(I_Down, Resources::Boat_Face());
@@ -222,7 +209,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECPlane) {}
 
-	ENTITY_CONSTRUCTOR(ECPlane), ECUnit(PLANE_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECPlane), ECUnit(PLANE_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Plane_Dos());
 		PutImage(I_Down, Resources::Plane_Face());
@@ -232,6 +221,12 @@ public:
 		PutImage(I_Deployed, Resources::Plane_Deployed());
 		PutImage(I_Reployed, Resources::Plane_Reployed());
 		SetImage(GetSprite(I_Deployed));
+	}
+
+	void Init()
+	{
+		ECEntity::Init();
+		ECBPlane::Init();
 	}
 
 public:
@@ -255,7 +250,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(EChar) {}
 
-	ENTITY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP, true)
+	ENTITY_CONSTRUCTOR(EChar), ECUnit(CHAR_VISUAL_STEP, true) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Char_Dos());
 		PutImage(I_Down, Resources::Char_Face());
@@ -289,7 +286,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECJouano) {}
 
-	ENTITY_CONSTRUCTOR(ECJouano), ECUnit(JOUANO_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECJouano), ECUnit(JOUANO_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Jouano_Face());
 		PutImage(I_Down, Resources::Jouano_Face());
@@ -347,7 +346,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECMcDo) : invested(ECEntity::E_NONE), ex_owner(0) {}
 
-	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(MCDO_VISUAL_STEP), invested(ECEntity::E_NONE), ex_owner(0)
+	ENTITY_CONSTRUCTOR(ECMcDo), ECUnit(MCDO_VISUAL_STEP), invested(ECEntity::E_NONE), ex_owner(0) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::McDo_Dos());
 		PutImage(I_Down, Resources::McDo_Face());
@@ -409,7 +410,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECTourist) {}
 
-	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(TOURIST_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECTourist), ECUnit(TOURIST_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Tourist_Dos());
 		PutImage(I_Down, Resources::Tourist_Face());
@@ -447,7 +450,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECEnginer) {}
 
-	ENTITY_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECEnginer), ECUnit(ENGINER_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Enginer_Dos());
 		PutImage(I_Down, Resources::Enginer_Face());
@@ -479,7 +484,9 @@ public:
 
 	ENTITY_EMPTY_CONSTRUCTOR(ECArmy) {}
 
-	ENTITY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP)
+	ENTITY_CONSTRUCTOR(ECArmy), ECUnit(ARMY_VISUAL_STEP) {}
+
+	void UpdateImages()
 	{
 		PutImage(I_Up, Resources::Army_Dos());
 		PutImage(I_Down, Resources::Army_Face());

@@ -912,7 +912,6 @@ void TBarreEntity::SetEntity(ECEntity* e)
 						break;
 					}
 			}
-			entity->RefreshColor(last_color);
 			dynamic_cast<EMap*>(entity->Case()->Map())->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
 		}
 	}
