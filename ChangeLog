@@ -1,3 +1,6 @@
+2007-11-25 Serge Martin
+	* src/Sound.cpp : switch to 44100 Hz.
+
 2007-05-31 Romain Bignon <progs@menareants.org>
 
 	* server/Main.cpp, server/Server.cpp: Portage pour OpenBSD.

@@ -30,7 +30,7 @@
  *                                          STATIC                                               *
  *************************************************************************************************/
 bool Sound::init = false;
-int Sound::frequency = 22050; //MIX_DEFAULT_FREQUENCY;
+int Sound::frequency = 44100; //MIX_DEFAULT_FREQUENCY;
 int Sound::channels = 2; // stereo
 std::map<int, Sound*> Sound::chunks;
 std::vector<Sound*> Sound::musics;
