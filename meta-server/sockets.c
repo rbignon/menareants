@@ -419,7 +419,7 @@ int run_server(void)
 
 	while(running > 0)
 	{
-		if(last_call + config.pingfreq < Now)
+		if(last_call + config.pingfreq <= Now)
 		{
 			check_pings();
 			last_call = Now;
