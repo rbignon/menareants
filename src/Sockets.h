@@ -29,6 +29,8 @@ typedef struct fd_set {
         unsigned int   fd_count;
         SOCKET  fd_array[FD_SETSIZE];
 } fd_set;
+#else
+#include <sys/select.h>
 #endif
 
 const int MAXBUFFER=1024;
