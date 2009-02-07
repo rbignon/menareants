@@ -27,6 +27,7 @@
 #include "Units.h"
 #include "Batiments.h"
 #include "Main.h"
+#include <stdlib.h>
 
 #define SHOW_EVENT(x) ((x) == ARM_DEPLOY ? "deploy" : (x) == ARM_UNION ? "union" : (x) == ARM_MOVE ? "move" : (x) == ARM_ATTAQ ? "attaq" : (x) == ARM_CREATE ? "create" : (x) == ARM_NUMBER ? "number" : (x) == ARM_CONTAIN ? "contain" : (x) == ARM_UNCONTAIN ? "uncontain" : (x) == ARM_UPGRADE ? "upgrade" : "no")
 void EChannel::InitAnims()

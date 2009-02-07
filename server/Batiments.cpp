@@ -22,6 +22,7 @@
 #include "Batiments.h"
 #include "Channels.h"
 #include "Debug.h"
+#include <stdlib.h>
 
 /********************************************************************************************
  *                                        ECObelisk                                         *

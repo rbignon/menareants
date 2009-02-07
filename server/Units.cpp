@@ -23,6 +23,7 @@
 #include "Debug.h"
 #include "Channels.h"
 #include "InGame.h"
+#include <stdlib.h>
 
 /********************************************************************************************
  *                               ECPlane                                                    *

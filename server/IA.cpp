@@ -25,6 +25,8 @@
 #include "Channels.h"
 #include "Debug.h"
 #include "Units.h"
+#include <stdlib.h>
+#include <string.h>
 
 /********************************************************************************************
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *

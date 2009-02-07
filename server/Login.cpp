@@ -27,6 +27,8 @@
 #include "Version.h"
 #include <string>
 #include <fstream>
+#include <stdlib.h>
+#include <string.h>
 
 /** Administration commands.
  *

@@ -36,6 +36,8 @@
 #include <errno.h>
 #include <cstdarg>
 #include <netdb.h>
+#include <string.h>
+#include <algorithm>
 /* For BSD */
 #include <netinet/in.h>
 

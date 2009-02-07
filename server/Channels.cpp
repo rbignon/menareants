@@ -33,6 +33,8 @@
 #include <cstdarg>
 #include <list>
 #include <map>
+#include <string.h>
+#include <stdlib.h>
 
 ChannelVector ChanList;
 

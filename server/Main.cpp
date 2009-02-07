@@ -35,6 +35,7 @@
 #error Do not compile this server under windows !!!
 #endif
 #include <dirent.h>
+#include <stdlib.h>
 
 ECServer app;
 

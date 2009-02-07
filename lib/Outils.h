@@ -22,6 +22,7 @@
 #define Outils_hpp
 #include <sstream>
 #include <vector>
+#include <string.h>
 #include "Messages.h"
 
 typedef unsigned int   uint;
