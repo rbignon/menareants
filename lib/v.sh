@@ -12,7 +12,7 @@ fi
 
 generation=`expr $generation + 1`
 
-version=`svn info | sed -n 's/R.vision.\?: \(.*\)/\1/p'`
+version=`git log --pretty=format:%h --max-count=1`
 
 if [ -f "Version.h" ]; then
 	currentv=`sed -n 's/^#define SVNVERSION \" SVN-\(.*\)\"/\1/p' < Version.h`
