@@ -24,6 +24,7 @@
 #include <string>
 #include <cstdarg>
 #include <iostream>
+#include <cstdio>
 
 int Debug(unsigned int flags, const char* format, ...)
 {

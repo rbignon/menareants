@@ -27,6 +27,7 @@
 #include "Debug.h"
 #include <string>
 #include <iostream>
+#include <cstdio>
 #include <signal.h>
 #include <sys/resource.h>
 #include <unistd.h>
