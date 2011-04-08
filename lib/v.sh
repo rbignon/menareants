@@ -15,20 +15,20 @@ generation=`expr $generation + 1`
 version=`git log --pretty=format:%h --max-count=1`
 
 if [ -f "Version.h" ]; then
-	currentv=`sed -n 's/^#define SVNVERSION \" SVN-\(.*\)\"/\1/p' < Version.h`
+	currentv=`sed -n 's/^#define GITVERSION \" Git-\(.*\)\"/\1/p' < Version.h`
 else
 	currentv=0
 fi
 
 if [ "$version" != "$currentv" ]; then
 	if [ "$version" != "" ]; then
-		version=" SVN-$version"
+		version=" Git-$version"
 	fi
 
 /bin/cat > Version.h <<!SUB!THIS!
 /* lib/Version.h - CVS Version
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@symlink.me>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,11 +50,11 @@ if [ "$version" != "$currentv" ]; then
 
 #include "Defines.h"
 
-#define SVNVERSION "$version"
+#define GITVERSION "$version"
 #define GENERATION "$generation"
 
 #ifdef APP_VERSION_PATCH
-#define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH " P" APP_PVERSION SVNVERSION
+#define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA "-" APP_VERSION_PATCH " P" APP_PVERSION GITVERSION
 #else
 #define APP_VERSION APP_VERSION_ALPHA "." APP_VERSION_BETA " P" APP_PVERSION
 #endif /* APP_VERSION_PATCH */
