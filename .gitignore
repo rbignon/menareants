@@ -1,0 +1,15 @@
+*.o
+*.a
+po/*.pot
+po/*.gmo
+.deps
+Version.h
+Makefile
+config.h
+config.log
+config.status
+stamp-h1
+src/menareants
+server/menareants-server
+server/menareantsd.conf
+meta-server/menareants-meta-server
