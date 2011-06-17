@@ -228,7 +228,7 @@ std::string ECBDate::String()
 
 void ECBDate::CheckDate()
 {
-	if(!d || !m || d > 31 || d > 28 && m == 2 || m > 12)
+	if(!d || !m || d > 31 || (d > 28 && m == 2) || m > 12)
 		throw ECExcept(VIName(d) VIName(m), "Date incorrecte");
 
 	switch(m)
@@ -338,7 +338,7 @@ void ECBEntity::SetID(const char* _name)
 
 bool ECBEntity::Like(const ECBEntity* e) const
 {
-	return (owner == e->Owner() || owner && owner->IsAllie(e->Owner()));
+	return (owner == e->Owner() || (owner && owner->IsAllie(e->Owner())));
 }
 
 void ECBEntity::Played()

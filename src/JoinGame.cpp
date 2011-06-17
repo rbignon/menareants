@@ -593,7 +593,7 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
 						if(InGameForm && !update &&
-						   (players[0]->IsMe() || players[0]->IsAllie(me->Player()) || last_owner && last_owner->IsAllie(me->Player())))
+						   (players[0]->IsMe() || players[0]->IsAllie(me->Player()) || (last_owner && last_owner->IsAllie(me->Player()))))
 						{
 							if(add)
 								InGameForm->AddInfo(I_INFO, StringF(_("%s is now owned by %s"), ident, players[0]->GetNick()));
@@ -949,11 +949,11 @@ int PLSCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		bool owner = false, ready = false, op = false;
 
 		if(*nick == '*')
-			owner = true, *nick++;
+			owner = true, nick++;
 		if(*nick == '@')
-			op = true, *nick++;
+			op = true, nick++;
 		if(*nick == '!')
-			ready = true, *nick++;
+			ready = true, nick++;
 
 		std::string nb;
 		int pos = 0, col = 0, nat = 0;

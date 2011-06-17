@@ -131,7 +131,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 	if(m_down.Visible())
 	//if(first_visible_item > 0 || first_visible_item+1 < m_items.size()/*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/)
 	{
-		if(button == SDL_BUTTON_WHEELDOWN || button == SDL_BUTTON_LEFT && m_down.Mouse(mousePosition))
+		if(button == SDL_BUTTON_WHEELDOWN || (button == SDL_BUTTON_LEFT && m_down.Mouse(mousePosition)))
 		{
 			// bottom button
 			if( first_visible_item+1 < m_items.size() /*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/ )
@@ -139,7 +139,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 
 			return true;
 		}
-		else if(button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_LEFT && m_up.Mouse(mousePosition))
+		else if(button == SDL_BUTTON_WHEELUP || (button == SDL_BUTTON_LEFT && m_up.Mouse(mousePosition)))
 		{
 			// top button
 			if( first_visible_item > 0 )

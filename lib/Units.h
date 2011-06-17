@@ -70,8 +70,8 @@ public:
 
 	virtual bool CanContain(const ECBEntity* et)
 	{
-		if(Containing() && (Containing()->Type() != et->Type() || (Containing()->Nb() + et->Nb()) > UnitaryCapacity() * Nb()) ||
-		   !Containing() && et->Nb() > UnitaryCapacity() * Nb() || !CanContainThisEntity(et))
+		if((Containing() && (Containing()->Type() != et->Type() || (Containing()->Nb() + et->Nb()) > UnitaryCapacity() * Nb())) ||
+		   (!Containing() && et->Nb() > UnitaryCapacity() * Nb()) || !CanContainThisEntity(et))
 			return false;
 		else
 			return true;
@@ -107,7 +107,7 @@ public:
 
 	virtual bool CanContainThisEntity(const ECBEntity* et)
 	{
-		if(!et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+		if((!et->IsInfantry() && !et->IsVehicule()) || et->Type() == Type())
 			return false;
 		else
 			return true;
@@ -215,7 +215,7 @@ public:
 
 	virtual bool CanContainThisEntity(const ECBEntity *et)
 	{
-		if(!Deployed() ^ !!(EventType() & ARM_DEPLOY) || !et->IsInfantry() && !et->IsVehicule() || et->Type() == Type())
+		if(!Deployed() ^ !!(EventType() & ARM_DEPLOY) || (!et->IsInfantry() && !et->IsVehicule()) || et->Type() == Type())
 			return false;
 		return true;
 	}
@@ -257,8 +257,8 @@ public:
 	bool CanAttaq(const ECBEntity* e)
 	{
 		if(e->Case() == Case() || e->IsCountryMaker() || e->Level() > L_GROUND ||
-		   !e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval() &&
-		   !e->IsPlane())
+		   (!e->IsVehicule() && !e->IsInfantry() && !e->IsBuilding() && !e->IsNaval() &&
+		   !e->IsPlane()))
 			return false;
 		else
 			return true;
@@ -293,8 +293,8 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((Parent() && Parent()->CanAttaq(e)) || e->Level() == Level() && !e->IsHidden() ||
-		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain() || e->Type() == E_BARBEDWIRE)
+		if((Parent() && Parent()->CanAttaq(e)) || (e->Level() == Level() && !e->IsHidden()) ||
+		   (e->IsBuilding() && !e->IsCity() && !e->IsTerrain()) || e->Type() == E_BARBEDWIRE)
 			return true;
 		else
 			return false;
@@ -469,7 +469,7 @@ public:
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || e->Owner() == Owner() && e->Nb() < e->InitNb()) && !e->IsTerrain())
+		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || (e->Owner() == Owner() && e->Nb() < e->InitNb())) && !e->IsTerrain())
 			return true;
 		else
 			return false;
@@ -516,8 +516,8 @@ public:
 
 	bool CanAttaq(const ECBEntity* e)
 	{
-		if((Parent() && Parent()->CanAttaq(e)) || e->Level() == Level() && !e->IsHidden() && e->Type() != E_MCDO ||
-		   e->IsBuilding() && !e->IsCity() && !e->IsTerrain())
+		if((Parent() && Parent()->CanAttaq(e)) || (e->Level() == Level() && !e->IsHidden() && e->Type() != E_MCDO) ||
+		   (e->IsBuilding() && !e->IsCity() && !e->IsTerrain()))
 			return true;
 		else
 			return false;

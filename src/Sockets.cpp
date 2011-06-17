@@ -49,7 +49,7 @@ SOCKET EC_Client::highsock = 0;
 
 int EC_Client::sendrpl(const ECError& err, ECArgs args)
 {
-	if(!sock || !connected && !logging) return -1;
+	if(!sock || (!connected && !logging)) return -1;
 
 	std::string buf;
 
@@ -64,7 +64,7 @@ int EC_Client::sendrpl(const ECError& err, ECArgs args)
 
 int EC_Client::sendrpl(const ECMessage& cmd, ECArgs args)
 {
-	if(!sock || !connected && !logging) return -1;
+	if(!sock || (!connected && !logging)) return -1;
 
 	std::string buf;
 
@@ -79,7 +79,7 @@ int EC_Client::sendrpl(const ECMessage& cmd, ECArgs args)
 int EC_Client::sendbuf(std::string buf)
 {
 
-	if(!sock || !connected && !logging) return -1;
+	if(!sock || (!connected && !logging)) return -1;
 
 	buf += "\r\n";
 

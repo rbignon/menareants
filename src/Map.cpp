@@ -237,7 +237,7 @@ void ECEntity::AfterDraw()
 	if(attaq)
 		attaq->draw();
 
-	if(!image || Map()->ShowMap()->HaveBrouillard() && (!Case() || !Case()->Visible()))
+	if(!image || (Map()->ShowMap()->HaveBrouillard() && (!Case() || !Case()->Visible())))
 		return;
 
 	if(Selected())
@@ -294,7 +294,7 @@ bool ECEntity::CanWalkTo(ECase* c, bool &move, bool &invest)
 		}
 	}
 
-	if(can_invest >= 2 || can_invest >= 1 && this->CanWalkOn(c))
+	if(can_invest >= 2 || (can_invest >= 1 && this->CanWalkOn(c)))
 		return (invest = true);
 	else if(this->CanWalkOn(c))
 		return (move = true);
@@ -397,8 +397,9 @@ void ECEntity::ChangeCase(ECBCase* newcase)
 
 void ECEntity::SetShowedCases(bool show, bool forced)
 {
-	if(!Case() || !Owner() || !Visibility() || !forced && (Parent() ||
-	   !dynamic_cast<ECPlayer*>(Owner())->IsMe() && !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe())))
+	if(!Case() || !Owner() || !Visibility() ||
+	   (!forced && (Parent() || (!dynamic_cast<ECPlayer*>(Owner())->IsMe() &&
+	                             !Owner()->IsAllie(dynamic_cast<EChannel*>(Owner()->Channel())->GetMe())))))
 		return;
 
 	ECBCase* c = Case()->MoveLeft(Visibility());
@@ -571,15 +572,7 @@ void TBarreCase::CheckAroundCase(ECase* c)
 #ifdef INTELLIGENT_EDITOR
 	if(c->Selected() && (c->ImgID() == 'm' || c->ImgID() == 't'))
 	{
-		ECBCase *top = c->MoveUp(),
-		        *bottom = c->MoveDown(),
-		        *left = c->MoveLeft(),
-		        *right = c->MoveRight(),
-		        *tl = top->MoveLeft(),
-		        *tr = top->MoveRight(),
-		        *bl = bottom->MoveLeft(),
-		        *br = bottom->MoveRight(),
-		        *acase = tl;
+		ECBCase *acase = c->MoveUp()->MoveLeft();
 
 		for(uint i=0; i <= 2; ++i)
 		{
@@ -810,7 +803,7 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 		{
 			ECBCase* cc = map[ _y * x + _x ];
 			ECase *c = dynamic_cast<ECase*>(cc);
-			if(!c || Brouillard() && c->Showed() < 0) continue;
+			if(!c || (Brouillard() && c->Showed() < 0)) continue;
 			Color color;
 			switch(c->TypeID())
 			{
@@ -865,10 +858,10 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
 				for(uint _xx = xx; _xx < xx+size_x; _xx++)
 				{
-					Color col = (marge & MARGE_TOP && _yy == yy ||
-					             marge & MARGE_LEFT && _xx == xx ||
-					             marge & MARGE_BOTTOM && _yy == yy+size_y-1 ||
-					             marge & MARGE_RIGHT && _xx == xx+size_x-1) ? marge_color : color;
+					Color col = ((marge & MARGE_TOP && _yy == yy) ||
+					             (marge & MARGE_LEFT && _xx == xx) ||
+					             (marge & MARGE_BOTTOM && _yy == yy+size_y-1) ||
+					             (marge & MARGE_RIGHT && _xx == xx+size_x-1)) ? marge_color : color;
 					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
 					         (Brouillard() && c->Showed()<=0) ? (col.GetRed()>60) ? col.GetRed() - 60 : 0 : col.GetRed(),
 					         (Brouillard() && c->Showed()<=0) ? (col.GetGreen()>60) ? col.GetGreen() - 60 : 0 : col.GetGreen(),
@@ -881,8 +874,8 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 		std::vector<ECBEntity*> ents = entities.List();
 		for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 		{
-			if(!(*enti)->Case() || (*enti)->Parent() || Brouillard() &&
-			   dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0 ||
+			if(!(*enti)->Case() || (*enti)->Parent() ||
+			   (Brouillard() && dynamic_cast<ECase*>((*enti)->Case())->Showed() <= 0) ||
 			   dynamic_cast<ECEntity*>(*enti)->IsHiddenOnCase() ||
 			   !dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
 				continue;

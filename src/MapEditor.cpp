@@ -571,7 +571,7 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		{
 			BarreEntity->UnSelect();
 			if(!BarreCase->RemoveCase(c, false) ||
-			   BarreCase->Cases().size() > 1 && !IsPressed(SDLK_LCTRL))
+			   (BarreCase->Cases().size() > 1 && !IsPressed(SDLK_LCTRL)))
 			{
 				if(IsPressed(SDLK_LSHIFT) && !BarreCase->Empty())
 				{

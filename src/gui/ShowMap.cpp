@@ -281,7 +281,7 @@ ECEntity* TMap::TestEntity(const Point2i& mouse)
 
 	ECase* c = TestCase(mouse);
 
-	if(c->Entities()->Empty() || Map()->Channel() && !ECMap::CanSelect(c)) return 0;
+	if(c->Entities()->Empty() || (Map()->Channel() && !ECMap::CanSelect(c))) return 0;
 
 	ECEntity* e = dynamic_cast<ECEntity*>(c->Entities()->First());
 
@@ -362,51 +362,51 @@ void TMap::DrawCountries(ECase* c)
 	 *           Merci.
 	 */
 
-	if(map->Channel() && (!c->MoveUp()->Country()->Owner() || !c->MoveUp()->Country()->Owner()->Player()
-	                      || c->MoveUp()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveUp()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveUp()->Country()->Owner() || !c->MoveUp()->Country()->Owner()->Player()
+	                       || c->MoveUp()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveUp()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), CASE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveDown()->Country()->Owner() || !c->MoveDown()->Country()->Owner()->Player()
-	                      || c->MoveDown()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveDown()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveDown()->Country()->Owner() || !c->MoveDown()->Country()->Owner()->Player()
+	                       || c->MoveDown()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveDown()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, CASE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveLeft()->Country()->Owner() || !c->MoveLeft()->Country()->Owner()->Player()
-	                      || c->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveLeft()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveLeft()->Country()->Owner() || !c->MoveLeft()->Country()->Owner()->Player()
+	                       || c->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveRight()->Country()->Owner() || !c->MoveRight()->Country()->Owner()->Player()
-	                      || c->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveRight()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveRight()->Country()->Owner() || !c->MoveRight()->Country()->Owner()->Player()
+	                       || c->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveUp()->MoveRight()->Country()->Owner() || !c->MoveUp()->MoveRight()->Country()->Owner()->Player()
-	                      || c->MoveUp()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveUp()->MoveRight()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveUp()->MoveRight()->Country()->Owner() || !c->MoveUp()->MoveRight()->Country()->Owner()->Player()
+	                       || c->MoveUp()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveUp()->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveUp()->MoveLeft()->Country()->Owner() || !c->MoveUp()->MoveLeft()->Country()->Owner()->Player()
-	                      || c->MoveUp()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveUp()->MoveLeft()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveUp()->MoveLeft()->Country()->Owner() || !c->MoveUp()->MoveLeft()->Country()->Owner()->Player()
+	                       || c->MoveUp()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveUp()->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveDown()->MoveRight()->Country()->Owner() || !c->MoveDown()->MoveRight()->Country()->Owner()->Player()
-	                      || c->MoveDown()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveDown()->MoveRight()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveDown()->MoveRight()->Country()->Owner() || !c->MoveDown()->MoveRight()->Country()->Owner()->Player()
+	                       || c->MoveDown()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveDown()->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
-	if(map->Channel() && (!c->MoveDown()->MoveLeft()->Country()->Owner() || !c->MoveDown()->MoveLeft()->Country()->Owner()->Player()
-	                      || c->MoveDown()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player())
-	   || !map->Channel() && c->MoveDown()->MoveLeft()->Country() != c->Country())
+	if((map->Channel() && (!c->MoveDown()->MoveLeft()->Country()->Owner() || !c->MoveDown()->MoveLeft()->Country()->Owner()->Player()
+	                       || c->MoveDown()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	   || (!map->Channel() && c->MoveDown()->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 }
@@ -480,8 +480,8 @@ void TMap::Draw(const Point2i& mouse)
 				   dynamic_cast<EContainer*>(SelectedEntity()) &&
 				   dynamic_cast<EContainer*>(SelectedEntity())->Containing())
 				{
-					if((SelectedEntity()->DestCase()->X() == c->X() && (SelectedEntity()->DestCase()->Y() == c->Y()+1 || SelectedEntity()->DestCase()->Y() == c->Y()-1) ||
-					    SelectedEntity()->DestCase()->Y() == c->Y() && (SelectedEntity()->DestCase()->X() == c->X()+1 || SelectedEntity()->DestCase()->X() == c->X()-1))
+					if(((SelectedEntity()->DestCase()->X() == c->X() && (SelectedEntity()->DestCase()->Y() == c->Y()+1 || SelectedEntity()->DestCase()->Y() == c->Y()-1)) ||
+					    (SelectedEntity()->DestCase()->Y() == c->Y() && (SelectedEntity()->DestCase()->X() == c->X()+1 || SelectedEntity()->DestCase()->X() == c->X()-1)))
 					   && dynamic_cast<EContainer*>(SelectedEntity())->Containing()->CanWalkOn(c)
 					   && SelectedEntity()->Move()->Size() < SelectedEntity()->MyStep())
 					{

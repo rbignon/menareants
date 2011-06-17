@@ -286,7 +286,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	me->UnlockScreen();
 
 	/* On en est à la première ligne de l'evenement. */
-	if(chan->State() == EChannel::ANIMING && (!chan->CurrentEvent() && !(flags & ARM_NOPRINCIPAL) || (flags & ARM_ATTAQ)))
+	if(chan->State() == EChannel::ANIMING && !chan->CurrentEvent() && (!(flags & ARM_NOPRINCIPAL) || (flags & ARM_ATTAQ)))
 		chan->SetCurrentEvent(flags);
 
 	if(entities.empty())
@@ -328,7 +328,9 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		const char AFTER_EVENT = 3;
 		char event_moment;
 		ECase* event_case = x < 0 ? 0 : dynamic_cast<ECase*>((*map)(x,y));
-		if(InGameForm && (!InGameForm->Map->HaveBrouillard() || event_case && event_case->Showed() > 0 || entities.front()->Case()->Showed() > 0) &&
+		if(InGameForm && (!InGameForm->Map->HaveBrouillard() ||
+		                  (event_case && event_case->Showed() > 0) ||
+		                  entities.front()->Case()->Showed() > 0) &&
 		   !(flags & (ARM_DATA|ARM_NUMBER|ARM_UPGRADE)) && flags != ARM_REMOVE && !entities.front()->IsHiddenOnCase())
 		{
 			chan->Map()->ShowWaitMessage.clear();
@@ -563,7 +565,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 
 	ECase* acase = Map->TestCase(Cursor.GetPosition());
 
-	if(!acase || acase->Showed() <= 0 && Map->HaveBrouillard())
+	if(!acase || (acase->Showed() <= 0 && Map->HaveBrouillard()))
 		return W_NONE;
 
 	if(WantBalise || IsPressed(SDLK_b))
