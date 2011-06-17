@@ -1059,7 +1059,7 @@ void TEditBarreLat::Init()
 	editor->Map->Map()->CreatePreview(120,120, P_FRONTMER|P_ENTITIES);
 	int _x = 40 + 60 - editor->Map->Map()->Preview()->GetWidth() / 2 ;
 	int _y = 55 + 60 - editor->Map->Map()->Preview()->GetHeight() / 2 ;
-	Radar = AddComponent(new TImage(_x, _y, false));
+	Radar = AddComponent(new TImage(_x, _y, NULL, false));
 	Radar->SetImage(editor->Map->Map()->Preview(), false);
 	Radar->SetOnClickPos(TEditBarreLat::RadarClick);
 
