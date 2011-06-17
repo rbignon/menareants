@@ -926,7 +926,11 @@ void TConnectedForm::AfterDraw()
 		client->sendrpl(MSG_GLIST);
 		WAIT_EVENT(EOL, j);
 		if(!EOL)
+		{
+			TMessageBox(_("Server is too slow. Disconnecting..."), BT_OK, this).Show();
+			want_quit = true;
 			return;
+		}
 
 		refresh = false;
 		timer.reset();
