@@ -81,10 +81,7 @@ bool Timer::Pause(bool set)
 float Timer::time_elapsed(bool update)
 {
 	if (update)
-	{
-		elapsed = (float(Timer::get_time()) - float(begin_time))/1000.0f;
-//		begin_time = Timer::get_time();
-	}
+		elapsed = float(get_time() - begin_time)/1000.0f;
 
 	return pause ? pause : elapsed;
 }
