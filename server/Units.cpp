@@ -529,9 +529,7 @@ bool ECMissiLauncher::WantAttaq(uint mx, uint my, bool force)
 	if(DestCase()->X() == mx && DestCase()->Y() == my)
 		return false;
 
-	uint d = 0;
-	for(uint x=DestCase()->X(); x != mx; d++) x < mx ? ++x : --x;
-	for(uint y=DestCase()->Y(); y != my; d++) y < my ? ++y : --y;
+	uint d = abs(DestCase()->X() - mx) + abs(DestCase()->Y() - my);
 
 	/* On ne tire que dans un rayon de quatre cases. */
 	if(d > Porty())
@@ -551,10 +549,7 @@ bool ECMissiLauncher::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb() && (*it)->Level() <= L_GROUND)
 		{
-			uint dx = 0, dy = 0;
-			for(uint x=Case()->X(); x != (*it)->Case()->X(); dx++) x < (*it)->Case()->X() ? ++x : --x;
-			for(uint y=Case()->Y(); y != (*it)->Case()->Y(); dy++) y < (*it)->Case()->Y() ? ++y : --y;
-			uint d = dx + dy;
+			uint d = abs(Case()->X() - (*it)->Case()->X()) + abs(Case()->Y() - (*it)->Case()->Y());
 			float coef = 0;
 			switch(d)
 			{
