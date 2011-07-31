@@ -60,6 +60,7 @@ Font* Font::FONT_ARRAY[] = {NULL, NULL, NULL, NULL, NULL, NULL};
 #define NEW_FONT
 
 const int Font::FONT_SIZE[] = {40, 32, 24, 14, 12, 9};
+SDL_mutex* Font::m_mutex = NULL;
 
 Font* Font::GetInstance(int type)
 {
@@ -72,6 +73,8 @@ Font* Font::GetInstance(int type)
 Font::Font(int size)
 {
   m_font = NULL;
+  if (!Font::m_mutex)
+    Font::m_mutex = SDL_CreateMutex();
 
   bool ok = Load(PKGDATADIR_FONTS_MAIN, size);
 
@@ -162,14 +165,17 @@ void Font::WriteCenterTop(int x, int y, const std::string &txt, const Color &col
 
 ECImage Font::CreateSurface(const std::string &txt, const Color &color)
 {
-  return ECImage( TTF_RenderUTF8_Blended(m_font, txt.c_str(), color.GetSDLColor()) );
+  SDL_LockMutex(Font::m_mutex);
+  ECImage img = ECImage( TTF_RenderUTF8_Blended(m_font, txt.c_str(), color.GetSDLColor()) );
+  SDL_UnlockMutex(Font::m_mutex);
+  return img;
 }
 
 ECImage Font::Render(const std::string &txt, const Color &color, bool cache)
 {
   ECImage surface;
 
-  if( 0 )
+  if(cache)
   {
     txt_iterator p = surface_text_table.find(txt);
     if( p == surface_text_table.end() )
@@ -182,8 +188,8 @@ ECImage Font::Render(const std::string &txt, const Color &color, bool cache)
     }
     else
     {
-      txt_iterator p = surface_text_table.find( txt );
-      surface = p->second;
+      txt_iterator p2 = surface_text_table.find( txt );
+      surface = p2->second;
     }
   }
   else

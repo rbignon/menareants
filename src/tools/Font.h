@@ -36,7 +36,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  ******************************************************************************/
- 
+
 #ifndef EC_FONT_H
 #define EC_FONT_H
 
@@ -56,6 +56,7 @@ private:
 
   static const int FONT_SIZE[];
   static Font* FONT_ARRAY[6];
+  static SDL_mutex* m_mutex;
 
   std::map<std::string, ECImage> surface_text_table;
   TTF_Font *m_font;
@@ -83,7 +84,7 @@ public:
   void WriteRight(int x, int y, const std::string &txt, const Color &color);
   void WriteCenterTop(int x, int y, const std::string &txt, const Color &color);
   void WriteCenter(int x, int y, const std::string &txt, const Color &color);
-  
+
   int GetWidth(const std::string &txt);
   int GetHeight();
   int GetHeight(const std::string &txt);
