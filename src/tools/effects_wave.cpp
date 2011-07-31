@@ -26,18 +26,18 @@
 const float tmin = 100.0;
 const float tmax = 300.0;
 
-const float WaveEffect::t(const unsigned int frame)
+float WaveEffect::t(const unsigned int frame)
 {
   return tmin + ((float)frame/(float)nbr_frames) * (tmax-tmin);
 }
 
-const float WaveEffect::Wave(const float d, const unsigned int frame)
+float WaveEffect::Wave(const float d, const unsigned int frame)
 {
   // Wave shape
   return cos(cos(d) * nbr_wave * t(frame) * M_PI / tmax);
 }
 
-const float WaveEffect::Gaussian(const float d, const unsigned int frame)
+float WaveEffect::Gaussian(const float d, const unsigned int frame)
 {
   // Gaussian shape (flat at t=0, increase linearly until t=tmax/2,
   // then dicrease to flat until t=tmax)
@@ -45,7 +45,7 @@ const float WaveEffect::Gaussian(const float d, const unsigned int frame)
          ( (t(frame)<tmax/2) ? (t(frame)*2/tmax) : ((tmax-t(frame))*2/tmax) );
 }
 
-const float WaveEffect::CenterDst(int x, int y)
+float WaveEffect::CenterDst(int x, int y)
 {
   // Returns the distance from (x,y) to the center of the image
   // (aka pythagore..)
@@ -60,14 +60,14 @@ const float WaveEffect::CenterDst(int x, int y)
   return d;
 }
 
-const float WaveEffect::Height(const float d, const unsigned int frame)
+float WaveEffect::Height(const float d, const unsigned int frame)
 {
   float h = ((Wave(d, frame) * Gaussian(d, frame))/2.0) + 0.5;
   assert( h>=0.0 && h<=1.0 );
   return h;
 }
 
-const float WaveEffect::Length(const float d, const unsigned int frame)
+float WaveEffect::Length(const float d, const unsigned int frame)
 {
   float delta = 1.0 / radius;
   float d0 = 0.0;

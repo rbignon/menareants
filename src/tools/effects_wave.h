@@ -34,12 +34,12 @@ class WaveEffect
 	int size_x;
 	int size_y;
 
-	const float t(const unsigned int frame);
-	const float Wave(const float d, const unsigned int frame);
-	const float Gaussian(const float d, const unsigned int frame);
-	const float CenterDst(int x, int y);
-	const float Height(const float d, const unsigned int frame);
-	const float Length(const float d, const unsigned int frame);
+	float t(const unsigned int frame);
+	float Wave(const float d, const unsigned int frame);
+	float Gaussian(const float d, const unsigned int frame);
+	float CenterDst(int x, int y);
+	float Height(const float d, const unsigned int frame);
+	float Length(const float d, const unsigned int frame);
 public:
 	ECSpriteBase* Wave3dSurface(ECImage &a, unsigned int _nbr_frames, unsigned int _duration, float _nbr_wave);
 };
