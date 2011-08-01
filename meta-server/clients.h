@@ -33,7 +33,7 @@ struct User
 
 	char name[NICKLEN+1];
 
-	struct User *last;
+	struct User *prev;
 	struct User *next;
 };
 

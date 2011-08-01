@@ -46,7 +46,7 @@ struct Server
 	char rejoins[MAXREJOINS][NICKLEN+1];
 
 	struct Server* next;
-	struct Server* last;
+	struct Server* prev;
 };
 
 extern int m_server_set (struct Client*, int, char**);

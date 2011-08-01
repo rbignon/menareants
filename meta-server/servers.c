@@ -140,7 +140,12 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 				{
 					int c = atoi(parv[i++]);
 					if(c > 0)
+					{
+						struct RegUser* u;
 						reg->score += c;
+						for (u = reg->prev; u && u->score < reg->score; u = reg->prev)
+							switch_regusers(u, reg);
+					}
 				}
 				break;
 			case 'c':
@@ -303,7 +308,7 @@ struct Server* add_server(struct Client* cl, const char* name)
 	server_head = server;
 	server->next = head;
 	if(head)
-		head->last = server;
+		head->prev = server;
 
 	return server;
 }
@@ -314,8 +319,8 @@ void remove_server(struct Server* server)
 
 	server->client->server = 0;
 
-	if(server->next) server->next->last = server->last;
-	if(server->last) server->last->next = server->next;
+	if(server->next) server->next->prev = server->prev;
+	if(server->prev) server->prev->next = server->next;
 	else server_head = server->next;
 
 	free(server);

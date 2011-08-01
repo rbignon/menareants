@@ -46,7 +46,7 @@ struct RegUser
 
 	struct User* user;
 
-	struct RegUser* last;
+	struct RegUser* prev;
 	struct RegUser* next;
 };
 
@@ -66,6 +66,7 @@ extern struct RegUser* add_reguser(const char* nick, const char* passwd, int nb_
                                    ullint score, ullint best_revenu, int victories, time_t reg_timestamp, time_t last_game);
 extern void remove_reguser(struct RegUser* reguser);
 extern struct RegUser* find_reguser(const char* nick);
+extern void switch_regusers(struct RegUser* u1, struct RegUser* u2);
 
 
 #endif /* ECMS_DATABASE_H */

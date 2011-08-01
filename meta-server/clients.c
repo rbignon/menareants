@@ -92,42 +92,19 @@ int m_serv_list (struct Client* cl, int parc, char** parv)
 
 static int show_scores(struct Client* cl)
 {
-	struct RegUser* list[50];
-
-	unsigned int i, k, max_show = 50;
+	unsigned int i, max_show = 50;
 	struct RegUser *u = reguser_head;
-
-	if(!u)
-		return 0;
-
-	for(i=0;i< max_show && u;i++, u=u->next)
-		list[i] = u;
 
 	if((cl->flags & CL_USER) && !(cl->flags & CL_LOGGED))
                 max_show = 10;
 	else if((cl->flags & CL_BOT))
 		max_show = 5;
 
-	if(nb_tregs < max_show)
-		max_show = nb_tregs;
-
-	for(i=1; i < max_show;i++)
-	{
-		k=i;
-		while(k && list[k]->score > list[k-1]->score)
-		{
-			u = list[k-1];
-			list[k-1] = list[k];
-			list[k] = u;
-			k--;
-		}
-	}
-
-	for(i=0; i < max_show; ++i)
-		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", list[i]->name, list[i]->deaths, list[i]->killed,
-		                                                                    list[i]->creations, list[i]->score, list[i]->best_revenu,
-		                                                                    list[i]->nb_games, list[i]->victories,
-		                                                                    list[i]->reg_timestamp, list[i]->last_visit);
+	for(i=0; u && i < max_show; ++i, u = u->next)
+		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", u->name, u->deaths, u->killed,
+		                                                                    u->creations, u->score, u->best_revenu,
+		                                                                    u->nb_games, u->victories,
+		                                                                    u->reg_timestamp, u->last_visit);
 
 	return 0;
 
@@ -375,7 +352,7 @@ struct User* add_user(struct Client* cl, const char* name)
 	user_head = user;
 	user->next = head;
 	if(head)
-		head->last = user;
+		head->prev = user;
 
 	return user;
 }
@@ -388,8 +365,8 @@ void remove_user(struct User* user)
 	if(user->reguser)
 		user->reguser->user = 0;
 
-	if(user->next) user->next->last = user->last;
-	if(user->last) user->last->next = user->next;
+	if(user->next) user->next->prev = user->prev;
+	if(user->prev) user->prev->next = user->next;
 	else user_head = user->next;
 
 	free(user);

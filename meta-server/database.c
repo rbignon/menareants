@@ -38,7 +38,7 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
                             ullint creations, ullint score, ullint best_revenu, int victories, time_t reg_timestamp,
                             time_t last_visit)
 {
-	struct RegUser *reguser = calloc(1, sizeof* reguser), *head = reguser_head;
+	struct RegUser *reguser = calloc(1, sizeof* reguser), *head = reguser_head, *u;
 
 	if(!reguser)
 		return 0;
@@ -58,14 +58,33 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 
 	reguser->user = 0;
 
-	reguser_head = reguser;
-	reguser->next = head;
-	if(head)
-		head->last = reguser;
+	for (u = head; u && u->score > score; u = u->next)
+		;
+	if (u == head)
+		reguser_head = reguser;
+	reguser->next = u;
+	if (u) reguser->prev = u->prev;
+	if (reguser->prev) reguser->prev->next = reguser;
+	if (reguser->next) reguser->next->prev = reguser;
 
 	nb_tregs++;
 
 	return reguser;
+}
+
+void switch_regusers(struct RegUser* u1, struct RegUser* u2)
+{
+	struct RegUser *prev, *next;
+
+	prev = u1->prev;
+	next = u2->next;
+
+	if (prev) prev->next = u2;
+	u2->prev = prev;
+	u2->next = u1;
+	u1->prev = u2;
+	u1->next = next;
+	if (next) next->prev = u1;
 }
 
 struct RegUser* find_reguser(const char* nick)
@@ -85,8 +104,8 @@ void remove_reguser(struct RegUser* reguser)
 	if(reguser->user)
 		reguser->user->reguser = 0;
 
-	if(reguser->next) reguser->next->last = reguser->last;
-	if(reguser->last) reguser->last->next = reguser->next;
+	if(reguser->next) reguser->next->prev = reguser->prev;
+	if(reguser->prev) reguser->prev->next = reguser->next;
 	else reguser_head = reguser->next;
 
 	nb_tregs--;
