@@ -1,0 +1,211 @@
+From ec4a59696944d589011d1de3168b2720c5c0fdeb Mon Sep 17 00:00:00 2001
+From: progs <progs@6832cf7c-ce15-0410-9f4e-c008ec2580bf>
+Date: Sun, 18 Nov 2007 12:15:25 +0000
+Subject: [PATCH] now we change all gray colors to player colors on entities,
+ and not only white pixels. Best render
+
+---
+ src/Batiments.cpp    |    2 +-
+ src/Channels.cpp     |    2 +-
+ src/Map.cpp          |    4 +++-
+ src/tools/Color.cpp  |    4 ++--
+ src/tools/Color.h    |    1 +
+ src/tools/Images.cpp |   38 +++++++++++++++++++++++++++++++++-----
+ src/tools/Images.h   |   10 +++++++---
+ 7 files changed, 48 insertions(+), 13 deletions(-)
+
+diff --git a/src/Batiments.cpp b/src/Batiments.cpp
+index 228e5c4..86cf6f8 100644
+--- a/src/Batiments.cpp
++++ b/src/Batiments.cpp
+@@ -255,7 +255,7 @@ void ECMine::Init()
+ 	activeimg = new ECSpriteBase(Resources::Mine_ActFace()->path.c_str());
+ 
+ 	if(Owner() && Owner()->Color())
+-		activeimg->ChangeColor(white_color, color_eq[Owner()->Color()]);
++		activeimg->Gray2Color(color_eq[Owner()->Color()]);
+ }
+ 
+ void ECMine::RecvData(ECData data)
+diff --git a/src/Channels.cpp b/src/Channels.cpp
+index d956b34..e2583dd 100644
+--- a/src/Channels.cpp
++++ b/src/Channels.cpp
+@@ -60,7 +60,7 @@ void ECPlayer::AddBreakPoint(BreakPoint bp)
+ {
+ 	assert(Channel()->Map()->ShowMap()->Window());
+ 	ECSpriteBase* sprbase = new ECSpriteBase(Resources::Balise()->path.c_str());
+-	sprbase->ChangeColor(white_color, color_eq[Color()]);
++	sprbase->Gray2Color(color_eq[Color()]);
+ 	bp.sprite = new ECSprite(sprbase, Channel()->Map()->ShowMap()->Window());
+ 	bp.text = Font::GetInstance(Font::Normal)->CreateSurface(bp.message, black_color);
+ 	breakpoints.push_back(bp);
+diff --git a/src/Map.cpp b/src/Map.cpp
+index dabb652..871b7a3 100644
+--- a/src/Map.cpp
++++ b/src/Map.cpp
+@@ -406,7 +406,9 @@ void ECEntity::PutImage(imgs_t i, ECSpriteBase* b)
+ 		else
+ 		{
+ 			b = new ECSpriteBase(b->path.c_str());
+-			Owner()->SetSprite(Type(), i, b);
++			b->Gray2Color(color_eq[Owner()->Color()]);
++			if(Owner()->Color())
++				Owner()->SetSprite(Type(), i, b);
+ 		}
+ 	}
+ 	images.insert(ImgList::value_type(i, b));
+diff --git a/src/tools/Color.cpp b/src/tools/Color.cpp
+index f3f32e0..dc6d3ba 100644
+--- a/src/tools/Color.cpp
++++ b/src/tools/Color.cpp
+@@ -51,8 +51,8 @@ Color::Color(Uint8 r, Uint8 g, Uint8 b, Uint8 a){
+ }
+ 
+ bool Color::operator==(const Color &color) const{
+-	return red == color.red 
+-		&& green == color.green 
++	return red == color.red
++		&& green == color.green
+ 		&& blue == color.blue /*
+ 		&& alpha == color.alpha*/;
+ }
+diff --git a/src/tools/Color.h b/src/tools/Color.h
+index de75fae..c853c64 100644
+--- a/src/tools/Color.h
++++ b/src/tools/Color.h
+@@ -59,6 +59,7 @@ public:
+ 	bool operator==(const Color &color) const;
+ 
+ 	void SetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
++	void SetAlpha(Uint8 a) { alpha = a; }
+ 
+ 	Uint8 GetRed() const;
+ 	Uint8 GetGreen() const;
+diff --git a/src/tools/Images.cpp b/src/tools/Images.cpp
+index ac83742..2f72a77 100644
+--- a/src/tools/Images.cpp
++++ b/src/tools/Images.cpp
+@@ -151,15 +151,13 @@ SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
+   return surface;
+ }
+ 
+-void ChangePixelColor(ECImage* surf, Color last_color, Color new_color)
++void ChangePixelColor(ECImage* surf, const Color& last_color, const Color& new_color)
+ {
+ 	SLOCK(surf->Img);
+ 	for(int x = 0; x < surf->GetWidth(); x++)
+ 		for(int y = 0; y < surf->GetHeight(); y++)
+ 		{
+ 			Uint32 col = getpixel(surf->Img, x, y);
+-			/*Uint8 r, g, b;
+-			SDL_GetRGB(col, surf->Img->format, &r, &g, &b);*/
+ 			if(last_color == surf->GetColor(col))
+ 				putpixel(surf->Img, x, y, surf->MapColor(new_color));
+ 		}
+@@ -330,11 +328,16 @@ int ECSprite::GetHeight()
+ 	return (mSpriteBase ? mSpriteBase->mH : 0);
+ }
+ 
+-void ECSprite::ChangeColor(Color first, Color to)
++void ECSprite::ChangeColor(const Color& first, const Color& to)
+ {
+ 	mSpriteBase->ChangeColor(first, to);
+ }
+ 
++void ECSprite::Gray2Color(const Color& to)
++{
++	mSpriteBase->Gray2Color(to);
++}
++
+ void ECSprite::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
+ {
+ 	mSpriteBase->RotoZoom(angle, zoomx, zoomy, smooth);
+@@ -431,12 +434,18 @@ int ECSpriteBase::init(const char *dir)
+ 	return 0;
+ }
+ 
+-void ECSpriteBase::ChangeColor(Color from, Color to)
++void ECSpriteBase::ChangeColor(const Color& from, const Color& to)
+ {
+ 	for(uint i=0; i < NumFrames(); ++i)
+ 		ChangePixelColor(&surfaces[i], from, to);
+ }
+ 
++void ECSpriteBase::Gray2Color(const Color& to)
++{
++	for(uint i=0; i < NumFrames(); ++i)
++		surfaces[i].Gray2Color(to);
++}
++
+ void ECSpriteBase::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
+ {
+ 	for(uint i=0; i < NumFrames(); ++i)
+@@ -891,3 +900,22 @@ void ECImage::PutPixel(int x, int y, Uint32 pixel){
+         break;
+     }
+ }
++
++void ECImage::Gray2Color(const Color& new_color)
++{
++	for(int x = 0; x < GetWidth(); ++x)
++		for(int y = 0; y < GetHeight(); ++y)
++		{
++			Uint32 col = GetPixel(x, y);
++			Uint8 r, g, b, a;
++			SDL_GetRGBA(col, Img->format, &r, &g, &b, &a);
++			if(r == g && g == b)
++			{
++				Color newc = Color(r * new_color.GetRed() / 255,
++				                   g * new_color.GetGreen() / 255,
++						   b * new_color.GetBlue() / 255,
++						   a);
++				PutPixel(x, y, MapColor(newc));
++			}
++		}
++}
+diff --git a/src/tools/Images.h b/src/tools/Images.h
+index 8e36413..83293ba 100644
+--- a/src/tools/Images.h
++++ b/src/tools/Images.h
+@@ -32,7 +32,7 @@ class ECSpriteBase;
+ class Color;
+ class ECImage;
+ 
+-void ChangePixelColor(ECImage* surf, Color last_color, Color new_color);
++void ChangePixelColor(ECImage* surf, const Color& last_color, const Color& new_color);
+ Uint32 getpixel(SDL_Surface * surface, int x, int y);
+ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+ void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
+@@ -112,7 +112,8 @@ public:
+ 
+ 	ECImage* First() const;
+ 
+-	void ChangeColor(Color first, Color to);
++	void ChangeColor(const Color& first, const Color& to);
++	void Gray2Color(const Color& to);
+ 
+ 	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
+ 	void Zoom(double zoomx, double zoomy, bool smooth);
+@@ -144,7 +145,8 @@ public:
+ 	 */
+ 	int init(const char *dir);
+ 
+-	void ChangeColor(Color from, Color to);
++	void ChangeColor(const Color& from, const Color& to);
++	void Gray2Color(const Color& to);
+ 
+ 	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
+ 	void Zoom(double zoomx, double zoomy, bool smooth);
+@@ -255,6 +257,8 @@ public:
+ 	Uint32 GetPixel(int x, int y);
+ 	void PutPixel(int x, int y, Uint32 pixel);
+ 
++	void Gray2Color(const Color& new_color);
++
+ /* Attributs */
+ public:
+ 
+-- 
+1.7.5.4
+
