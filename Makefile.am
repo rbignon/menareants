@@ -11,7 +11,7 @@ doxygen:
 
 update:
 	@echo "Updating.."
-	@svn update
+	@git pull --rebase
 	@echo "Compilation.."
 	@./config.status --recheck > /dev/null > /dev/null
 	@make
