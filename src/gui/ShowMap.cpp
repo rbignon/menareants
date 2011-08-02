@@ -565,18 +565,18 @@ void TMap::Draw(const Point2i& mouse)
 		else
 		{
 			ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
-			if(!entity) continue;
+			if(entity &&
+			   entity->Image()->X() <= Window()->GetWidth() &&
+			   entity->Image()->X()+entity->Image()->GetWidth() >= 0 &&
+			   entity->Image()->Y() <= Window()->GetHeight() &&
+			   entity->Image()->Y()+entity->Image()->GetHeight() >= 0)
+			{
+				if(!entity->IsBuilding() && !entity->OnTop())
+					entity->Draw();
+				if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
+					entity->Case()->SetMustRedraw();
 
-			if(entity->Image()->X() > X()+Width() ||
-			   entity->Image()->X()+entity->Image()->GetWidth() < X() ||
-			   entity->Image()->Y() > Y()+Height() ||
-			   entity->Image()->Y()+entity->Image()->GetHeight() < Y())
-				continue;
-
-			if(!entity->IsBuilding() && !entity->OnTop())
-				entity->Draw();
-			if(entity->Case() && entity->Image() && (entity->Image()->Anim() || entity->Image()->SpriteBase()->Alpha()))
-				entity->Case()->SetMustRedraw();
+			}
 			++enti;
 		}
 
@@ -586,13 +586,14 @@ void TMap::Draw(const Point2i& mouse)
 		ECEntity* e = dynamic_cast<ECEntity*>(*enti);
 		if(e->OnTop())
 		{
-			if(e->Image()->X() > X()+Width() ||
-			   e->Image()->X()+e->Image()->GetWidth() < X() ||
-			   e->Image()->Y() > Y()+Height() ||
-			   e->Image()->Y()+e->Image()->GetHeight() < Y())
-			{}
-			else
+			if(e &&
+			   e->Image()->X() <= Window()->GetWidth() &&
+			   e->Image()->X()+e->Image()->GetWidth() >= 0 &&
+			   e->Image()->Y() <= Window()->GetHeight() &&
+			   e->Image()->Y()+e->Image()->GetHeight() >= 0)
+			{
 				e->Draw();
+			}
 		}
 		e->AfterDraw();
 	}
