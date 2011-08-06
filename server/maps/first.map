@@ -1,10 +1,38 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Please don't edit this file by hand.
+# Use the game's map editor.
 NAME Tug of war
-PLAYER A A
-PLAYER B B
-PLAYER C C
-PLAYER D D
+PLAYER A  0
+PLAYER B  0
+PLAYER C  0
+PLAYER D  0
+COUNTRY AA A
+COUNTRY AB *
+COUNTRY NA *
+COUNTRY NE *
+COUNTRY DA *
+COUNTRY DB D
+COUNTRY DC D
+COUNTRY AD A
+COUNTRY AC A
+COUNTRY NB *
+COUNTRY NF *
+COUNTRY DE D
+COUNTRY AE *
+COUNTRY DD *
+COUNTRY BA B
+COUNTRY NC *
+COUNTRY NG *
+COUNTRY BD *
+COUNTRY CA *
+COUNTRY CC C
+COUNTRY BB B
+COUNTRY CB C
+COUNTRY BC B
+COUNTRY BE *
+COUNTRY ND *
+COUNTRY NH *
+COUNTRY CD *
+COUNTRY CE C
 X 36
 Y 22
 MAP

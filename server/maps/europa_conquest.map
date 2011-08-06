@@ -1,12 +1,79 @@
-# Veuillez ne pas éditer le fichier map à la main.
-# Utilisez plutôt l'éditeur de carte intégré au jeu.
+# Please don't edit this file by hand.
+# Use the game's map editor.
 NAME Europa Conquest
-PLAYER A A
-PLAYER B B
-PLAYER C C
-PLAYER D D
-PLAYER F F
-PLAYER E E
+PLAYER A  0
+PLAYER B  0
+PLAYER C  0
+PLAYER D  0
+PLAYER F  0
+PLAYER E  0
+COUNTRY AA * 
+COUNTRY AD A Liverpool
+COUNTRY XL * Oslo
+COUNTRY XM * Gävle
+COUNTRY XN * Pori
+COUNTRY XO * Kuopio
+COUNTRY XQ * Cherepovets
+COUNTRY XR * Kotlas
+COUNTRY XK * Stavanger
+COUNTRY XJ * Edinburgh
+COUNTRY DA D Stockholm
+COUNTRY XA * Dublin
+COUNTRY DD D Göteborg
+COUNTRY XP * Helsinki
+COUNTRY XS * Kostroma
+COUNTRY YS * Sankt-Peterburg
+COUNTRY YL * Aalborg
+COUNTRY XT * Yaroslavi'
+COUNTRY DB D Malmo
+COUNTRY YR * Tallinn
+COUNTRY AB A London
+COUNTRY YM * Koszalin
+COUNTRY ZX * Odense
+COUNTRY FA F Moskva
+COUNTRY AC A Bristol
+COUNTRY YK * Hamburg
+COUNTRY YQ * Navapolack
+COUNTRY YJ * Amsterdam
+COUNTRY FB F Smolensk
+COUNTRY XU * Penza
+COUNTRY YN * Bydgoszcz
+COUNTRY YO * Berlin
+COUNTRY BA B Paris
+COUNTRY YI * Frankfürt
+COUNTRY YE * Gomel
+COUNTRY FF F Kaluga
+COUNTRY XB * Brest
+COUNTRY YP * Bratislava
+COUNTRY XV * Kharkiv
+COUNTRY BB * Genève
+COUNTRY YH * Nümberg
+COUNTRY XW * Odessa
+COUNTRY YD * Venezia
+COUNTRY XH * Gijòn
+COUNTRY XC * Bayonne
+COUNTRY ZZ B Lyon
+COUNTRY YC * Budapest
+COUNTRY XY * Constanta
+COUNTRY EA E Sochi
+COUNTRY BC B Marseille
+COUNTRY YG * Pisa
+COUNTRY CB C Ancona
+COUNTRY XG * Madrid
+COUNTRY EB E Istanbul
+COUNTRY XI * Lisboa
+COUNTRY XD * Valencia
+COUNTRY YF * Bastia
+COUNTRY CA C Roma
+COUNTRY YB * Sarajevo
+COUNTRY XZ * Athina
+COUNTRY EE E Antalya
+COUNTRY XE * Cartagena
+COUNTRY XF * Gibraltar
+COUNTRY CC C Catanzaro
+COUNTRY YT * Lecce
+COUNTRY YA * Tiranë
+COUNTRY XX * Irakleio
 X 40
 Y 30
 MAP
@@ -27,14 +94,14 @@ mACAmmACAmmACAmmACAdtACAttACAttACAttACAtmABAjmABAapABAomYJ*bmYJ*ktYJ*ttYJ*ttYJ*t
 mACAmmACAmmACAmmACAfmACAamACAamACAamACAamACAemBABgpBABstBABttBABttYJ*ttYJ*ttYJ*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYO*ttYO*ttYN*ttYN*ttYN*ttYN*ttYE*ttYE*tMFBFMMFBFMtFBFttFFFttFFFttFFFttFFFttXU*ttXU*ttXU*t
 mACAmmACAmmACAmmACAmmXB*mmXB*mmXB*gmXB*bmXB*bmXB*ktBABttBABttBABttBABttYI*ttYI*ttYI*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYO*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*ttFBFttFFFttFFFttFFFttFFFttXU*ttXU*ttXV*t
 mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*dtXB*ttXB*ttXB*ttBABttBABttBABttBABttYI*ttYI*ttYI*ttYI*ttYI*ttYO*ttYO*ttYO*ttYO*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*tMYE*MtFFFttFFFttFFFttFFFttXV*ttXV*ttXV*t
-mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*fmXB*amXB*itXB*ttBABttBABttBABttBABttBBBttBBBtMBBBMMYH*MtYH*tMYH*MMYH*MtYP*ttYP*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*tMXW*MtXW*tMXW*MMXW*MtXV*ttXV*ttXV*ttXV*t
-mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*mmXB*mmXB*dtXB*ttBABttBABttBABttBBBttBBBttBBBtMBBBMtYH*ttYH*ttYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYE*ttYE*ttYE*ttYE*ttYE*ttXW*ttXW*ttXW*ttXW*ttXW*ttXV*ttXV*ttXV*t
-mAA*mmAA*mmAA*mmXH*mmXH*mmXH*mmXH*mmXC*mmXC*dtXC*ttXC*ttZZ*ttZZ*ttZZ*ttBBBtMBBBMMBBBMtYH*tMYH*MtYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*ttXW*tmXW*jmXW*amXW*amXV*amXV*itEAEt
-mAA*mmAA*mmAA*gmXH*bmXH*bmXH*bmXH*hmXC*mmXC*dtXC*ttXC*ttZZ*ttZZ*ttBCBttBCBtMBCBMtBCBttYG*ttYG*ttYG*ttYG*tMYG*MtCBCtmYD*jmYD*amYD*itYC*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*tmXY*jmXW*emXW*mmXW*mmEAEmmEAEdtEAEt
+mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*fmXB*amXB*itXB*ttBABttBABttBABttBABttBB*ttBB*tMBB*MMYH*MtYH*tMYH*MMYH*MtYP*ttYP*ttYP*ttYP*ttYP*ttYP*ttYE*ttYE*ttYE*ttYE*ttYE*tMXW*MtXW*tMXW*MMXW*MtXV*ttXV*ttXV*ttXV*t
+mAA*mmAA*mmAA*mmAA*mmXB*mmXB*mmXB*mmXB*mmXB*dtXB*ttBABttBABttBABttBB*ttBB*ttBB*tMBB*MtYH*ttYH*ttYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYE*ttYE*ttYE*ttYE*ttYE*ttXW*ttXW*ttXW*ttXW*ttXW*ttXV*ttXV*ttXV*t
+mAA*mmAA*mmAA*mmXH*mmXH*mmXH*mmXH*mmXC*mmXC*dtXC*ttXC*ttZZBttZZBttZZBttBB*tMBB*MMBB*MtYH*tMYH*MtYH*ttYH*ttYD*ttYD*ttYD*ttYD*ttYD*ttYD*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*ttXW*tmXW*jmXW*amXW*amXV*amXV*itEAEt
+mAA*mmAA*mmAA*gmXH*bmXH*bmXH*bmXH*hmXC*mmXC*dtXC*ttXC*ttZZBttZZBttBCBttBCBtMBCBMtBCBttYG*ttYG*ttYG*ttYG*tMYG*MtCBCtmYD*jmYD*amYD*itYC*ttYC*ttYC*ttYC*ttYC*ttXY*ttXY*tmXY*jmXW*emXW*mmXW*mmEAEmmEAEdtEAEt
 mAA*mmAA*mmAA*dMXH*MtXH*ttXH*tmXH*lmXG*bmXC*ktXC*ttXC*ttBCBttBCBttBCBttBCBttBCBttBCBttYG*ttYG*ttYG*ttYG*ttYG*ttCBCtmCBClmCBChmYD*fmYC*itYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmXY*mmEBEmmEBEmmEBEgmEAEktEAEt
-mXI*mmXI*mmXI*dtXI*ttXH*ttXH*ttXG*ttXG*ttXG*ttXC*tMXC*MMXD*MMBCBMtBCBttBCBtmBCBjmBCBamYG*amYG*amYG*iMYG*MtYG*ttCBCttCBCtmCBCcmCBCmmYC*dtYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmEBEgmEBEbmEBEbmEBEktEAEttEAEt
-mXI*mmXI*mmXI*dtXI*ttXI*ttXG*ttXG*ttXG*ttXG*tMXG*MMXD*MtXD*ttXD*ttBCBtmBCBjmYF*emYF*gmYF*bmYF*hmCACfmCACitCACttCACttCACtmCAClmCAChmYB*fmYB*itYB*ttYB*ttYB*ttXZ*ttXZ*tpXZ*ppEBEqtEBEttEBEttEBEttEBEttEAEt
-mXI*mmXI*mmXI*dtXI*ttXI*tMXG*MtXG*ttXG*ttXG*ttXD*ttXD*ttXD*tmXD*jmAA*amYF*emYF*gmYF*ktYF*tmYF*cmCACmmCACdtCACttCACttCACttCACtmCACcmYB*mmYB*dtYB*ttYB*ttYB*ttXZ*ttXZ*tmXZ*cmEBEdtEBEttEBEttEBEttEBEttEEEt
+mXI*mmXI*mmXI*dtXI*ttXH*ttXH*ttXG*ttXG*ttXG*ttXC*tMXC*MMXD*MtBCBtmBCBjmBCBamBCBamBCBamYG*amYG*amYG*iMYG*MtYG*ttCBCttCBCtmCBCcmCBCmmYC*dtYC*ttYC*ttYC*ttXY*ttXY*ttXY*tmXY*cmEBEgmEBEbmEBEbmEBEktEAEttEAEt
+mXI*mmXI*mmXI*dtXI*ttXI*ttXG*ttXG*ttXG*ttXG*tMXG*MMXD*MtXD*ttXD*tmBCBcmBCBmmYF*mmYF*gmYF*bmYF*hmCACfmCACitCACttCACttCACtmCAClmCAChmYB*fmYB*itYB*ttYB*ttYB*ttXZ*ttEBEtpEBEppEBEqtEBEttEBEttEBEttEBEttEAEt
+mXI*mmXI*mmXI*dtXI*ttXI*tMXG*MtXG*ttXG*ttXG*ttXD*ttXD*ttXD*tmXD*jmAA*emYF*mmYF*gmYF*ktYF*tmYF*cmCACmmCACdtCACttCACttCACttCACtmCACcmYB*mmYB*dtYB*ttYB*ttYB*ttXZ*ttXZ*tmXZ*cmEBEdtEBEttEBEttEBEttEBEttEEEt
 mXI*mmXI*gmXI*ktXI*ttXI*ttXI*ttXG*ttXG*ttXE*ttXE*ttXD*tmXD*jmXD*emAA*mmYF*mmYF*dMYF*MtYF*tmYF*cmCACmmCACdMCACMMCACMtCACttCACtmCACcmYB*mmYB*dMYB*MMYB*MtYB*ttXZ*ttXZ*tmXZ*cmEBEfmEBEamEBEitEBEttEEEttEEEt
 mXI*mmXI*dtXI*ttXI*tMXF*MMXF*MtXE*ttXE*ttXE*ttXE*tmXE*jmXD*emXD*mmAA*mmYF*mmYF*dtYF*ttYF*tmYF*cmCCCmmCCCdMCCCMtCCCttYT*ttYT*tmYT*lmYT*hmYA*fmYA*iMYA*MtYA*ttXZ*ttXZ*tmXZ*cmXZ*mmEBEmmEBEfmEBEamEEEitEEEt
 mXF*mmXF*dtXF*ttXF*ttXF*ttXF*ttXE*ttXE*tmXE*jmXE*amXE*emAA*mmAA*mmAA*mmYF*mmYF*fmYF*amYF*amYF*emCCCgmCCCktCCCttCCCttYT*ttYT*ttYT*tmYT*cmYT*mmYA*dtYA*ttYA*ttYA*tMXZ*MmXZ*cmXX*mmXX*mmXX*mmEEEmmEEEfmEEEi
@@ -46,7 +113,7 @@ MIN 2
 MAX 6
 DATE 3/9/1939
 INFO The map represents Europa during the cold war. This conflict takes place on both sides of the iron curtain.
-INFO
+INFO 
 INFO Map created by zorkis
 UNIT 6 A 5,12 1000
 UNIT 6 A 7,8 1000
@@ -57,14 +124,14 @@ UNIT 13 A 9,10 1000
 UNIT 1 A 7,8 1000
 UNIT 1 A 10,10 1000
 UNIT 1 A 5,12 1000
-UNIT 6 B 15,18 1000
+UNIT 6 * 15,18 1000
 UNIT 6 B 14,21 1000
 UNIT 7 B 12,16 2000
 UNIT 2 B 11,17 500
 UNIT 3 B 12,17 1000
 UNIT 13 B 11,16 1000
 UNIT 1 B 12,16 1000
-UNIT 1 B 15,18 1000
+UNIT 1 * 15,18 1000
 UNIT 1 B 14,21 1000
 UNIT 6 C 21,28 1000
 UNIT 6 C 23,22 1000
@@ -95,13 +162,8 @@ UNIT 1 F 35,11 1000
 UNIT 1 F 34,15 1000
 UNIT 6 E 39,26 1000
 UNIT 6 E 39,21 1000
-UNIT 7 E 36,23 2000
-UNIT 2 E 35,24 500
 UNIT 1 E 39,26 1000
-UNIT 1 E 36,23 1000
 UNIT 1 E 39,21 1000
-UNIT 3 E 35,23 1000
-UNIT 13 E 36,24 1000
 UNIT 6 * 4,8 1000
 UNIT 6 * 10,6 1000
 UNIT 6 * 7,16 1000
@@ -114,7 +176,6 @@ UNIT 6 * 25,27 1000
 UNIT 6 * 18,18 1000
 UNIT 6 * 14,13 1000
 UNIT 6 * 14,3 1000
-UNIT 6 * 17,1 1000
 UNIT 6 * 22,0 1000
 UNIT 6 * 21,15 1000
 UNIT 6 * 16,15 1000
@@ -203,7 +264,6 @@ UNIT 1 * 19,21 1000
 UNIT 1 * 16,15 1000
 UNIT 1 * 14,3 1000
 UNIT 1 * 22,0 1000
-UNIT 1 * 17,1 1000
 UNIT 1 * 21,15 1000
 UNIT 1 * 23,11 1000
 UNIT 1 * 25,13 1000
@@ -263,8 +323,8 @@ UNIT 6 * 19,10 1000
 UNIT 1 * 19,10 1000
 UNIT 1 * 38,13 100
 UNIT 6 * 38,13 1000
-UNIT 6 * 13,19 1000
-UNIT 1 * 13,19 1000
+UNIT 6 B 13,19 1000
+UNIT 1 B 13,19 1000
 UNIT 15 * 26,16 1
 UNIT 20 * 10,12 1
 UNIT 20 * 10,13 1
@@ -285,3 +345,10 @@ UNIT 20 * 30,5 1
 UNIT 20 * 31,5 1
 UNIT 20 * 32,5 1
 UNIT 20 * 23,4 1
+UNIT 3 E 32,23 1000
+UNIT 13 E 35,24 1000
+UNIT 2 E 36,23 500
+UNIT 7 E 35,23 2000
+UNIT 1 E 35,23 1000
+UNIT 6 * 18,2 1000
+UNIT 1 * 18,2 1000
