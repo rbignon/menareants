@@ -1167,7 +1167,8 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				vDebug(W_DESYNCH|W_SEND, "LEA - Impossible de supprimer un player", VPName(*playersi));
 				playersi++;
 			}
-			GameInfosForm->CheckScoringEnable();
+			if (GameInfosForm)
+				GameInfosForm->CheckScoringEnable();
 		}
 	}
 	me->UnlockScreen();
