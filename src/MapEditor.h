@@ -1,6 +1,6 @@
 /* src/MapEditor.h - Header of MapEditor.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,6 +177,8 @@ public:
 	TImage*         Icon;
 	TLabel*         Name;
 	TEdit*          Nb;
+	TLabel*         CountryNameLabel;
+	TEdit*          CountryName;
 	TListBox*       Owner;
 	TButtonText*    RemoveButton;
 
@@ -275,13 +277,6 @@ public:
 	TListBox*    Players;
 	TButtonText* AddPlayerButton;
 	TButtonText* DelPlayerButton;
-	TLabel*      CountriesLabel;
-	TListBox*    Countries;
-	TEdit*       AddCountryEdit;
-	TButtonText* AddCountryButton;
-	TButtonText* DelCountryButton;
-	TLabel*      CountryPlayerLabel;
-	TComboBox*   CountryPlayer;
 
 	TLabel*      NameLabel;
 	TEdit*       Name;

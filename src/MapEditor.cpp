@@ -1,6 +1,6 @@
 /* src/MapEditor.cpp - This is a map editor
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -240,13 +240,11 @@ void EMap::Save()
 bool TMapEditor::Editor(const char *path, TForm* form)
 {
 	std::string name;
-	bool create = false;
 
 	EMap* map = NULL;
 
 	if(!path)
 	{
-		create = true;
 		{
 			TMessageBox mb(_("Enter filename for this map"),
 							HAVE_EDIT|BT_OK|BT_CANCEL, form);
@@ -657,6 +655,7 @@ TMapEditor::TMapEditor(ECImage* w, EMap *m)
 	m->SetShowMap(Map);
 	Map->SetBrouillard(false);
 	Map->SetContraintes(SCREEN_WIDTH - int(Map->Width()), SCREEN_HEIGHT - int(Map->Height()));
+	Map->ToggleSchema();
 
 	BarreEntity = AddComponent(new TBarreEntity);
 	BarreEntity->Hide();
@@ -809,7 +808,10 @@ void TBarreCase::Update(ECase* c)
 		BCountriesVector cts = dynamic_cast<TMapEditor*>(Parent())->Map->Map()->Countries();
 		for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
 		{
-			TListBoxItem* i = Country->AddItem(country && *it == country, (*it)->ID(), (*it)->ID(), (*it)->Cases().empty() ? green_color : black_color);
+			TListBoxItem* i = Country->AddItem(country && *it == country,
+			                                   (*it)->Name().empty() ? (*it)->ID() : (*it)->Name(),
+							   (*it)->ID(),
+							   (*it)->Cases().empty() ? green_color : black_color);
 			if(*it == country) Country->ScrollTo(i);
 		}
 
@@ -874,12 +876,12 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		}
 		entity->SetNb(StrToTyp<uint>(Nb->Text()));
 
-		bool dont_check = false;
+		bool owner_changed = true;
 		Color last_color = white_color;
 		if(entity->Owner())
 		{
 			if(dynamic_cast<EMapPlayer*>(entity->Owner())->ID() == Owner->SelectedItem()->Value()[0])
-				dont_check = true;
+				owner_changed = false;
 			else
 			{
 				entity->Owner()->Entities()->Remove(entity);
@@ -889,17 +891,19 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		else
 		{
 			if(Owner->SelectedItem()->Value()[0] == '*')
-				dont_check = true;
+				owner_changed = false;
 			else
 				entity->Case()->Map()->Neutres()->Remove(entity);
 		}
 
-		if(!dont_check)
+		if(owner_changed)
 		{
 			if(Owner->SelectedItem()->Value()[0] == '*')
 			{
 				entity->SetOwner(0);
 				entity->Case()->Map()->Neutres()->Add(entity);
+				if (entity->IsCountryMaker())
+					entity->Case()->Country()->ChangeOwner(0);
 			}
 			else
 			{
@@ -909,10 +913,19 @@ void TBarreEntity::SetEntity(ECEntity* e)
 					{
 						entity->SetOwner(dynamic_cast<EMapPlayer*>(*it));
 						dynamic_cast<EMapPlayer*>(*it)->Entities()->Add(entity);
+						if (entity->IsCountryMaker())
+							entity->Case()->Country()->ChangeOwner(*it);
 						break;
 					}
 			}
 			dynamic_cast<EMap*>(entity->Case()->Map())->CreatePreview(120,120,P_FRONTMER|P_ENTITIES);
+		}
+
+		if (entity->IsCountryMaker())
+		{
+			ECountryMaker* cm = dynamic_cast<ECountryMaker*>(entity);
+			cm->Case()->Country()->SetName(CountryName->Text());
+			cm->SetLabel();
 		}
 	}
 
@@ -922,6 +935,18 @@ void TBarreEntity::SetEntity(ECEntity* e)
 		Name->SetCaption(e->Name());
 		Nb->SetString(TypToStr(e->Nb()));
 		Icon->SetImage(e->Icon(), false);
+		if (e->IsCountryMaker())
+		{
+			ECountryMaker* cm = dynamic_cast<ECountryMaker*>(e);
+			CountryNameLabel->SetVisible(true);
+			CountryName->SetString(cm->Case()->Country()->Name());
+			CountryName->SetVisible(true);
+		}
+		else
+		{
+			CountryNameLabel->SetVisible(false);
+			CountryName->SetVisible(false);
+		}
 
 		Owner->ClearItems();
 		Owner->AddItem(!e->Owner(), _("Neutral"), "*");
@@ -979,6 +1004,10 @@ void TBarreEntity::Init()
 
 	Nb = AddComponent(new TEdit(Font::GetInstance(Font::Small), 5,65,100));
 	Nb->SetAvailChars("0123456789");
+
+	CountryNameLabel = AddComponent(new TLabel(120, 50, _("Country name:"), black_color, Font::GetInstance(Font::Small)));
+	CountryName = AddComponent(new TEdit(Font::GetInstance(Font::Small), 120, 65, 100));
+	CountryName->SetMaxLen(20);
 
 	SetBackground(Resources::BarreAct());
 }
@@ -1121,8 +1150,6 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 			TMessageBox(_("Please give a name to this map!"), BT_OK, this).Show();
 		else if(Players->Size() < 2)
 			TMessageBox(_("This map might have at least two players"), BT_OK, this).Show();
-		else if(Countries->Empty())
-			TMessageBox(_("This map might have at least one country"), BT_OK, this).Show();
 		else if(City->Empty())
 			TMessageBox(_("You have to put how many give cities"),
 					BT_OK, this).Show();
@@ -1141,7 +1168,6 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 		}
 	}
 
-	const char* id = 0;
 	char m_id = 0;
 	if(AddPlayerButton->Test(mouse, button))
 	{
@@ -1157,90 +1183,15 @@ void TOptionsMap::OnClic(const Point2i& mouse, int button, bool&)
 		map->RemovePlayer(m_id);
 		Refresh();
 	}
-
-	if(AddCountryButton->Test(mouse, button))
-	{
-		std::string c_id = AddCountryEdit->Text();
-		if(c_id.empty() || c_id.size() != 2)
-		{
-			TMessageBox mb(_("ID might have 2 characters"), BT_OK, this);
-			mb.Show();
-		}
-		else if(map->GetCountry(c_id.c_str()))
-		{
-			TMessageBox mb(_("This ID is already used"), BT_OK, this);
-			mb.Show();
-		}
-		else
-		{
-			map->AddCountry(c_id.c_str());
-			AddCountryEdit->ClearString();
-			Refresh();
-		}
-	}
-	else if(Countries->Selected() < 0 || !(id = Countries->SelectedItem()->Value().c_str()))
-	{
-		CountryPlayer->SetEnabled(false);
-		DelCountryButton->SetEnabled(false);
-	}
-	else if(Countries->Test(mouse, button))
-	{
-		ECBCountry* country = 0;
-
-		BCountriesVector cts = map->Countries();
-		for(BCountriesVector::iterator it = cts.begin(); it != cts.end(); ++it)
-			if(!strcmp((*it)->ID(), id))
-			{
-				country = *it;
-				break;
-			}
-		if(!country) return;
-
-		DelCountryButton->SetEnabled(country->Cases().empty());
-
-		CountryPlayer->SetEnabled();
-		CountryPlayer->ClearItems();
-		CountryPlayer->AddItem(true, _("Neutral"), "*");
-		BMapPlayersVector mps = map->MapPlayers();
-		for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
-			CountryPlayer->AddItem(*it == country->Owner(), TypToStr((*it)->ID()),
-			                       TypToStr((*it)->ID()));
-	}
-	else if(DelCountryButton->Test(mouse, button))
-	{
-		map->RemoveCountry(id);
-		Refresh();
-	}
-	else if(CountryPlayer->Selected() != -1)
-	{
-		const char map_id = CountryPlayer->SelectedItem()->Value()[0];
-		ECBMapPlayer* mp = map_id == '*' ? 0 : map->GetPlayer(map_id);
-		if(!mp && map_id != '*') return;
-
-		ECBCountry* country = map->GetCountry(id);
-		if(!country) return;
-
-		country->ChangeOwner(mp);
-	}
 }
 
 void TOptionsMap::Refresh()
 {
-	Countries->ClearItems();
-	BCountriesVector cts = map->Countries();
-	for(BCountriesVector::reverse_iterator it = cts.rbegin(); it != cts.rend(); ++it)
-		Countries->AddItem(false, (*it)->ID(), (*it)->ID(), (*it)->Cases().empty() ? green_color : black_color);
-
 	Players->ClearItems();
-	CountryPlayer->ClearItems();
 	BMapPlayersVector mps = map->MapPlayers();
 	for(BMapPlayersVector::iterator it = mps.begin(); it != mps.end(); ++it)
-	{
 		Players->AddItem(false, TypToStr((*it)->ID()), TypToStr((*it)->ID()));
-		CountryPlayer->AddItem(false, TypToStr((*it)->ID()), TypToStr((*it)->ID()));
-	}
 
-	DelCountryButton->SetEnabled(false);
 	DelPlayerButton->SetEnabled(false);
 
 	MinPlayers->SetMax(map->MapPlayers().size());
@@ -1254,56 +1205,38 @@ TOptionsMap::TOptionsMap(ECImage* w, EMap* m)
 {
 	map = m;
 
-	OkButton = AddComponent(new TButtonText(600,500,150,50, _("OK"), Font::GetInstance(Font::Normal)));
+	OkButton = AddComponent(new TButtonText(Window()->GetWidth() - 200,
+	                                        Window()->GetHeight() - 100,
+						150, 50,
+						_("OK"), Font::GetInstance(Font::Normal)));
 
-	PlayersLabel = AddComponent(new TLabel(100, 130, _("Players:"), white_color, Font::GetInstance(Font::Normal)));
-	Players = AddComponent(new TListBox(Rectanglei(100,150,150,200)));
-	Players->SetNoItemHint();
-	Players->SetHint(_("These are players played.\nEach countries and unities can be linked to a player."));
-
-	AddPlayerButton = AddComponent(new TButtonText(255, 150, 100, 30, _("Add"), Font::GetInstance(Font::Normal)));
-	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-
-	DelPlayerButton = AddComponent(new TButtonText(255, 180, 100, 30, _("Delete"), Font::GetInstance(Font::Normal)));
-	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-
-	CountriesLabel = AddComponent(new TLabel(400, 130, _("Countries:"), white_color, Font::GetInstance(Font::Normal)));
-	Countries = AddComponent(new TListBox(Rectanglei(400,150,150,200)));
-	Countries->SetNoItemHint();
-	Countries->SetHint(_("List of countries. You can assign a cell to a country.\n"
-	                     "You only can delete green countries, no cell are linked to them"));
-
-	AddCountryEdit = AddComponent(new TEdit(Font::GetInstance(Font::Small), 400,360,150, 2, COUNTRY_CHARS));
-
-	AddCountryButton = AddComponent(new TButtonText(555, 350, 100, 30, _("Add"), Font::GetInstance(Font::Normal)));
-	AddCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-
-	DelCountryButton = AddComponent(new TButtonText(555, 320, 100, 30, _("Delete"), Font::GetInstance(Font::Normal)));
-	DelCountryButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
-
-	CountryPlayerLabel = AddComponent(new TLabel(560, 150, _("Owned by:"), white_color, Font::GetInstance(Font::Small)));
-	CountryPlayer = AddComponent(new TComboBox(Font::GetInstance(Font::Small), 560 + CountryPlayerLabel->Width(), 150, 70));
-	CountryPlayer->SetEnabled(false);
-	CountryPlayer->SetNoItemHint();
-	CountryPlayer->SetHint(_("Owner of selected country.\n"
-	                       "A neutral country isn't owner at begin of the game."));
-
-	NameLabel = AddComponent(new TLabel(50,380, _("Map name"), white_color, Font::GetInstance(Font::Normal)));
-	Name = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 400, 150, 50, EDIT_CHARS));
+	NameLabel = AddComponent(new TLabel(50,150, _("Map name"), white_color, Font::GetInstance(Font::Normal)));
+	Name = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 170, 150, 50, EDIT_CHARS));
 
 	                                                                           // label    x  y  width min
 	                                                                                        // max                step def
-	MinPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Min players"), 50,420,150,1,
+	MinPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Min players"), 50,190,150,1,
 	                                                                                         map->MapPlayers().size(),1,1));
-	MaxPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Max players"), 50, 440, 150, 1,
+	MaxPlayers = AddComponent(new TSpinEdit(Font::GetInstance(Font::Small),_("Max players"), 50, 210, 150, 1,
 	                                                                                         map->MapPlayers().size(), 1, 1));
 
-	CityLabel = AddComponent(new TLabel(50,460, _("Money for cities"), white_color, Font::GetInstance(Font::Normal)));
-	City = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 480, 150, 5, "0123456789"));
+	CityLabel = AddComponent(new TLabel(50,230, _("Money for cities"), white_color, Font::GetInstance(Font::Normal)));
+	City = AddComponent(new TEdit(Font::GetInstance(Font::Small), 50, 250, 150, 5, "0123456789"));
 
-	Mission = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 50, 500, _("Mission"), white_color));
+	Mission = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), 50, 270, _("Mission"), white_color));
 	Mission->SetHint(_("If checked, this map is a mission and the player will be the first in the list.\n"
 	                  "This editor can't configure special characteristics of missions"));
+
+	PlayersLabel = AddComponent(new TLabel(400, 130, _("Players:"), white_color, Font::GetInstance(Font::Normal)));
+	Players = AddComponent(new TListBox(Rectanglei(400,150,150,200)));
+	Players->SetNoItemHint();
+	Players->SetHint(_("These are players played.\nEach countries and unities can be linked to a player."));
+
+	AddPlayerButton = AddComponent(new TButtonText(555, 150, 100, 30, _("Add"), Font::GetInstance(Font::Normal)));
+	AddPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
+
+	DelPlayerButton = AddComponent(new TButtonText(555, 180, 100, 30, _("Delete"), Font::GetInstance(Font::Normal)));
+	DelPlayerButton->SetImage(new ECSprite(Resources::LitleButton(), Video::GetInstance()->Window()));
 
 	SetBackground(Resources::Titlescreen());
 }
