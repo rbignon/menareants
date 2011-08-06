@@ -545,10 +545,10 @@ void ECObelisk::AfterDraw()
 {
 	ECEntity::AfterDraw();
 	if(victim)
-		img.Draw(victim->X() < Case()->X() ? victim->Image()->X()+53
-				                           : Image()->X()+53,
-				 victim->Y() < Case()->Y() ? victim->Image()->Y()+2
-				                           : Image()->Y()+2);
+		img.Draw(victim->X() < Case()->X() ? victim->Image()->X()
+		                                   : Image()->X(),
+		         victim->Y() < Case()->Y() ? victim->Image()->Y()
+		                                   : Image()->Y());
 }
 
 bool ECObelisk::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
@@ -577,24 +577,24 @@ bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_C
 		{
 			if(c == Case()) return true;
 
-			int dx = abs(c->Image()->X() - Image()->X() + 3);
-			int dy = abs(c->Image()->Y() - Image()->Y() + 3);
+			int dx = CASE_WIDTH * (abs(c->X() - Case()->X()) + 1);
+			int dy = CASE_HEIGHT * (abs(c->Y() - Case()->Y()) + 1);
 			img.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, dx, dy,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-			DrawLargeLine(img.Img,       c->X() < Case()->X() ? 0 : dx-1,
-			                             c->Y() < Case()->Y() ? 0 : dy-1,
-			                             c->X() < Case()->X() ? dx-1 : 0,
-			                             c->Y() < Case()->Y() ? dy-1 : 0,
-			                             img.MapColor(red_color));
+			DrawLargeLine(img.Img, c->X() < Case()->X() ? (dx - CASE_WIDTH + 53) : 53,
+			                       c->Y() < Case()->Y() ? (dy - CASE_HEIGHT + 2) : 2,
+			                       c->X() < Case()->X() ? CASE_WIDTH/2 : (dx - CASE_WIDTH/2),
+			                       c->Y() < Case()->Y() ? CASE_HEIGHT-30 : (dy - 30),
+			                       img.MapColor(red_color));
 			Resources::SoundObelisque()->Play();
 			victim = c;
 			SDL_Delay(1500);
 			victim = 0;
 			Map()->ShowMap()->ToRedraw(Rectanglei(c->X() < Case()->X() ? c->Image()->X()+CASE_WIDTH /2
-				                                            : Image()->X()+CASE_WIDTH /2,
-				                       c->Y() < Case()->Y() ? c->Image()->Y()+CASE_HEIGHT/2
-				                                            : Image()->Y()+CASE_HEIGHT/2,
-				                       img.GetWidth(), img.GetHeight()));
+			                                                           : Image()->X()+CASE_WIDTH /2,
+			                                      c->Y() < Case()->Y() ? c->Image()->Y()+CASE_HEIGHT/2
+			                                                           : Image()->Y()+CASE_HEIGHT/2,
+			                           img.GetWidth(), img.GetHeight()));
 			img.SetImage(0);
 			return true;
 		}
