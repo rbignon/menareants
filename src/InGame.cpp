@@ -664,16 +664,14 @@ void TInGameForm::FindIdling()
 {
 	static int i;
 	std::vector<ECBEntity*> ents = player->Entities()->List(), idle_ents;
-	FORit(ECBEntity*, ents, enti)
-		if((*enti)->EventType() == 0 && (*enti)->Parent() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected())
+	FORit(ECBEntity*, ents, enti) {
+		EContainer* container = dynamic_cast<EContainer*>(*enti);
+		if((*enti)->EventType() == 0 && (*enti)->Parent() == 0 && (*enti)->IsBuilding() == false && dynamic_cast<ECEntity*>(*enti)->CanBeSelected() && (!container || container->Containing()))
 			idle_ents.push_back(*enti);
+	}
 
 	if(idle_ents.empty())
-	{
-		TMessageBox mb(_("There aren't any idling unity."), BT_OK, InGameForm, false);
-		mb.Show();
-		Map->ToRedraw(Rectanglei(mb.X(), mb.Y(), mb.Width(), mb.Height()));
-	}
+		InGameForm->AddInfo(I_WARNING, _("There aren't any idling unity."));
 	else
 	{
 		ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[++i % idle_ents.size()]);
