@@ -1,6 +1,6 @@
 /* lib/Map.h - Header of Map.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -683,7 +683,7 @@ class ECBCountry
 /* Constructeur/Destructeur */
 public:
 
-	ECBCountry(ECBMap* map, const Country_ID ident);
+	ECBCountry(ECBMap* map, const Country_ID ident, const std::string& name = std::string());
 	virtual ~ECBCountry() {}
 
 /* Attributs */
@@ -695,6 +695,10 @@ public:
 
 	/** Return country ID (two chars) */
 	const char* ID() const { return ident; }
+
+	/** Name of country */
+	const std::string& Name() const { return name; }
+	void SetName(const std::string& _name) { name = _name; }
 
 	/** Return Owner of country */
 	ECBMapPlayer* Owner() const { return owner; }
@@ -708,16 +712,17 @@ public:
 	virtual bool ChangeOwner(ECBMapPlayer* mp);
 
 	std::vector<ECBCase*> Cases() const { return cases; }
+	uint NbCases() { return cases.size(); }
 
 	ECBMap* Map() const { return map; }
 
 /* Variables privées */
 protected:
-	friend void ECBCase::SetCountry(ECBCountry *mc); /* Il touche à mes flags */
 	std::vector<ECBCase*> cases;
 	ECBMapPlayer *owner;
 	Country_ID ident;
 	ECBMap *map;
+	std::string name;
 };
 
 /********************************************************************************************
@@ -904,7 +909,7 @@ protected:
 	/** This function have to be redefined by client to set attributs of images in case */
 	virtual void SetCaseAttr(ECBCase* c, char id) { c->SetImgID(id); }
 
-	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECBCountry(m, ident); }
+	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident, const std::string& name = "") { return new ECBCountry(m, ident, name); }
 
 	virtual ECBMapPlayer* CreateMapPlayer(char _id, uint _num) { return new ECBMapPlayer(_id, _num); }
 	virtual void VirtualAddUnit(std::string line) { return; }

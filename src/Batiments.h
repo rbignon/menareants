@@ -1,6 +1,6 @@
 /* src/Units.h - Header of Units.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -356,10 +356,28 @@ private:
 };
 
 /********************************************************************************************
+ *                                 ECountryMaker                                            *
+ ********************************************************************************************/
+
+class ECountryMaker : public ECBatiment
+{
+public:
+	ECountryMaker();
+
+	virtual void AfterDraw();
+
+	void SetLabel();
+
+private:
+
+	ECImage label;
+};
+
+/********************************************************************************************
  *                                ECMegalopole                                              *
  ********************************************************************************************/
 
-class ECMegalopole : public ECBatiment, public ECBMegalopole
+class ECMegalopole : public ECountryMaker, public ECBMegalopole
 {
 /* Constructeur/Destructeur */
 public:
@@ -396,7 +414,7 @@ public:
  *                                ECapitale                                                 *
  ********************************************************************************************/
 
-class ECapitale : public ECBatiment, public ECBCapitale
+class ECapitale : public ECountryMaker, public ECBCapitale
 {
 /* Constructeur/Destructeur */
 public:
@@ -426,7 +444,7 @@ public:
  *                                ECity                                                     *
  ********************************************************************************************/
 
-class ECity : public ECBatiment, public ECBCity
+class ECity : public ECountryMaker, public ECBCity
 {
 /* Constructeur/Destructeur */
 public:

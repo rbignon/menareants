@@ -1,6 +1,6 @@
 /* src/Units.cpp - Code of units
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,8 +150,8 @@ std::string ECMcDo::SpecialInfo()
 	if(!invested || !ex_owner)
 		return "";
 	else if(restDestroy > 0)
-		return StringF(ngettext("Jouano is eating all Big Mac ! He will finish it in %d day",
-		                        "Jouano is eating all Big Mac ! He will finish it in %d days", restDestroy),
+		return StringF(ngettext("Jouano is eating all Big Macs! He will finish it in %d day",
+		                        "Jouano is eating all Big Macs! He will finish it in %d days", restDestroy),
 		                        restDestroy);
 	else if(ex_owner == Owner())
 		return StringF(_("Free orders of McPuke for %s"), ex_owner->GetNick());

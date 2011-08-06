@@ -1,6 +1,6 @@
 /* lib/Map.cpp - Map classes
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -630,8 +630,8 @@ bool ECBEntity::FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& move, E
  *                               ECBCountry                                                 *
  ********************************************************************************************/
 
-ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident)
-	: cases(), owner(0), map(_map)
+ECBCountry::ECBCountry(ECBMap* _map, const Country_ID _ident, const std::string& _name)
+	: cases(), owner(0), map(_map), name(_name)
 {
 	strcpy(ident, _ident);
 }
@@ -722,6 +722,7 @@ ECBMap::ECBMap(std::string _filename)
  * <pre>
  *   NAME [name]
  *   PLAYER [identificator]
+ *   COUNTRY [id] [owner] [name]
  *   X [x]
  *   Y [y]
  *   MAP
@@ -758,15 +759,19 @@ ECBMap::ECBMap(std::string _filename)
  *   <pre>
  *   It's a player. Identificator is an unik number ('A' to 'Z').
  *   </pre>
- *  3) X [x]
+ *  3) COUNTRY [id] [owner] [name]
+ *   <pre>
+ *   Define a country. ID is on two chars, from 'AA' to 'ZZ'.
+ *   </pre>
+ *  4) X [x]
  *   <pre>
  *   This is the maximal number of horizontal cases.
  *   </pre>
- *  4) Y [y]
+ *  5) Y [y]
  *   <pre>
  *   This is the maximal number of vertical cases.
  *   </pre>
- *  5) MAP
+ *  6) MAP
  *   <pre>
  *   This is the body of map. After this message, and until have a "EOM" message,
  *   there is map body where identificators. All cases are identified like this :
@@ -782,43 +787,44 @@ ECBMap::ECBMap(std::string _filename)
  *   Z = Type of architecture (only for image, so not used by server)
  *   </pre>
  *
- *  6) BEGIN [begining money]
+ *  7) BEGIN [begining money]
  *   <pre>
  *   Here we define money that all players have when they begin game.
  *   </pre>
  *
- *  7) CITY [money by city]
+ *  8) CITY [money for city]
  *   <pre>
- *   Here we put money win by each city.
+ *   Here we put money win for each city.
  *   </pre>
  *
- *  8) MIN [min]
+ *  9) MIN [min]
  *   <pre>
  *   Min players.
  *   </pre>
  *
- *  6) MAX [max]
+ * 10) MAX [max]
  *   <pre>
  *   Max players. It's channel limit.
  *   </pre>
  *
- *  7) DATE [jour] [mois] [année]
+ * 11) DATE [jour] [mois] [année]
  *   <pre>
  *   Initial date of game.
  *   </pre>
  *
- *  8) INFO [ligne]
+ * 12) INFO [ligne]
  *   <pre>
  *   This is one of lines who is a short text of map.
  *   </pre>
  *
- *  9) UNIT [type] [owner] [x],[y] [number]
+ * 12) UNIT [type] [owner] [x],[y] [number]
  *   <pre>
  *   Put an unit on the map, on a case, to one player.
  *   </pre>
  *
  * @author Progs
  * @date 15/02/2006
+ * @updated 06/08/2011 (add 'COUNTRY')
  */
 void ECBMap::Init()
 {
@@ -882,6 +888,35 @@ void ECBMap::Init()
 				if(!ligne.empty())
 					mp->SetNick(ligne);
 			}
+			else if(key == "COUNTRY")
+			{
+				std::string id = stringtok(ligne, " ");
+				std::string owner = stringtok(ligne, " ");
+				std::string name = stringtok(ligne, " ");
+				if (id.size() != 2 || owner.empty())
+					throw ECExcept(VName(id) VName(owner), "Not enough parameters for this country");
+
+				std::vector<ECBCountry*>::iterator it;
+				for(it = map_countries.begin();
+				    it != map_countries.end() && id != (*it)->ID(); ++it);
+				if(it != map_countries.end())
+					throw ECExcept(VName(id) VName(owner), "The country is defined several times");
+
+				ECBCountry* country = CreateCountry(this, id.c_str(), name);
+				map_countries.push_back(country);
+
+				if (owner != "*")
+				{
+					std::vector<ECBMapPlayer*>::iterator it;
+					for(it=map_players.begin();
+					    it != map_players.end() && (*it)->ID() != owner[0]; it++);
+					if(it == map_players.end())
+						throw ECExcept(VName(owner) VIName(map_players.size()), "Unable to find player");
+
+					(*it)->AddCountry(country);
+					country->SetOwner(*it);
+				}
+			}
 			else if(key == "MAP") recv_map = true;
 			else if(key == "START_SCRIPTING") recv_scripting = true;
 			else if(key == "BEGIN") {} // compatibilité
@@ -929,7 +964,7 @@ void ECBMap::Init()
 			for(uint i=0; i<size; ++i)
 			{
 				if(_x >= x)
-						throw ECExcept(VIName(_x) VIName(x), "Trop de cases");
+					throw ECExcept(VIName(_x) VIName(x), "Too many squares");
 
 				/* WXXYZ
 				 * W(terrain), XX(country), Y(owner), Z(architecture)
@@ -1008,7 +1043,7 @@ void ECBMap::Init()
 						break;
 					}
 					default:
-						throw ECExcept(VIName(counter), "Compteur anormal !?");
+						throw ECExcept(VIName(counter), "Strange counter!?");
 				}
 
 				if(counter >= 4)
@@ -1020,7 +1055,7 @@ void ECBMap::Init()
 				else counter++;
 			}
 			if(_x < x)
-				throw ECExcept(VIName(_y) VIName(_x) VIName(x), "Il n'y a pas assez de case sur cette ligne");
+				throw ECExcept(VIName(_y) VIName(_x) VIName(x), "There isn't enough squares on this line");
 			_y++;
 		}
 	}
@@ -1029,7 +1064,7 @@ void ECBMap::Init()
 	   !min || !max || map_players.size() != max || min > max)
 		throw ECExcept(VIName(map_players.size()) VIName(city_money) VIName(x) VIName(y) VIName(map.size()) VIName(min)
 		               VIName(max) VIName(map_countries.size()),
-		               "Fichier incorrect !");
+		               "Incorrect file!");
 
 	/* La map est *bien* initialisée !! */
 	initialised = true;
@@ -1131,7 +1166,7 @@ void ECBMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 void ECBMap::Save(std::vector<std::string>& fp)
 {
 	if(map_players.empty())
-		throw ECExcept("", "Veuillez créer des joueurs !");
+		throw ECExcept("", "Please create players!");
 
 	fp.push_back ("# Please don't edit this file by hand.");
 	fp.push_back ("# Use the game's map editor.");
@@ -1144,10 +1179,19 @@ void ECBMap::Save(std::vector<std::string>& fp)
 	for(BMapPlayersVector::const_iterator it = map_players.begin(); it != map_players.end(); ++it)
 	{
 		if((*it)->Player())
-			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " + (*it)->Player()->Nick() + " " + TypToStr((*it)->Player()->Money()));
+			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " +
+			                          (*it)->Player()->Nick() + " " +
+			                          TypToStr((*it)->Player()->Money()));
 		else
-			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " + (*it)->Nick());
+			fp.push_back ("PLAYER " + TypToStr((*it)->ID()) + " " +
+		                                  (*it)->Nick());
 	}
+
+	for(BCountriesVector::const_iterator it = map_countries.begin(); it != map_countries.end(); ++it)
+		if ((*it)->NbCases() > 0)
+			fp.push_back ("COUNTRY " + TypToStr((*it)->ID()) + " "
+			                         + ((*it)->Owner() ? (*it)->Owner()->ID() : '*') + " "
+			                         + (*it)->Name());
 
 	fp.push_back ("X " + TypToStr(x));
 	fp.push_back ("Y " + TypToStr(y));
@@ -1161,7 +1205,7 @@ void ECBMap::Save(std::vector<std::string>& fp)
 		{
 			ECBCase *c = dynamic_cast<ECBCase*>(map[ _y * x + _x ]);
 			if(!c)
-				throw ECExcept(VPName(c), "Veuillez ne pas enregistrer une carte non achevée");
+				throw ECExcept(VPName(c), "Please do not save a non achieved map");
 			line += TypToStr(c->TypeID()) + c->Country()->ID();
 			line += TypToStr(c->Country()->Owner() ? c->Country()->Owner()->ID() : '*') + c->ImgID();
 		}
@@ -1178,9 +1222,10 @@ void ECBMap::Save(std::vector<std::string>& fp)
 
 	std::vector<ECBEntity*> n = entities.List();
 	for(std::vector<ECBEntity*>::iterator st = n.begin(); st != n.end(); ++st)
-		fp.push_back ("UNIT " + TypToStr((*st)->Type()) + " " + TypToStr((*st)->Owner() ? (*st)->Owner()->MapPlayer()->ID() : '*')
-		   + " " + TypToStr((*st)->Case()->X()) + "," + TypToStr((*st)->Case()->Y())
-		   + " " + TypToStr((*st)->Nb()) );
+		fp.push_back ("UNIT " + TypToStr((*st)->Type()) + " " +
+		                        TypToStr((*st)->Owner() ? (*st)->Owner()->MapPlayer()->ID() : '*') + " " +
+		                        TypToStr((*st)->Case()->X()) + "," + TypToStr((*st)->Case()->Y()) + " " +
+		                        TypToStr((*st)->Nb()) );
 
 	if(scripting.empty() == false)
 	{

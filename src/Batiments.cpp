@@ -1,6 +1,6 @@
 /* src/Batiments.cpp - Code for buildings.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "gui/ColorEdit.h"
 #include "gui/ShowMap.h"
 #include "tools/Video.h" // Pour obtenir SCREEN_WIDTH
+#include "tools/Font.h"
 
 /********************************************************************************************
  *                                ECBatiment                                                *
@@ -409,6 +410,41 @@ std::string ECapitale::SpecialInfo()
 		return "";
 	else
 		return StringF(_("$%d income each turn"), TurnMoney(Owner()));
+}
+
+/********************************************************************************************
+ *                                 ECountryMaker                                            *
+ ********************************************************************************************/
+
+ECountryMaker::ECountryMaker()
+{
+	SetLabel();
+}
+
+void ECountryMaker::SetLabel()
+{
+	if (!Case())
+		return;
+	const std::string& name = Case()->Country()->Name();
+	if (!name.empty())
+	{
+		ECImage text = Font::GetInstance(Font::Normal)->CreateSurface(name, white_color);
+		label.NewSurface(text.GetSize(), SDL_HWSURFACE, false);
+		label.Fill(brown_color);
+		label.LineColor(0, label.GetWidth()-1, 0, 0, white_color);
+		label.LineColor(0, 0, 0, label.GetHeight()-1, white_color);
+		label.LineColor(0, label.GetWidth()-1, label.GetHeight()-1, label.GetHeight()-1, black_color);
+		label.LineColor(label.GetWidth()-1, label.GetWidth()-1, 0, label.GetHeight()-1, black_color);
+		label.Blit(text);
+	}
+}
+
+void ECountryMaker::AfterDraw()
+{
+	if (!label.IsNull())
+		label.Draw(Case()->Image()->X()+CASE_WIDTH/2-label.GetWidth()/2,
+		           Case()->Image()->Y());
+	ECEntity::AfterDraw();
 }
 
 /********************************************************************************************

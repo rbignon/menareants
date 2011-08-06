@@ -1,6 +1,6 @@
 /* src/tools/Images.h - Header of Images.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -201,6 +201,8 @@ public:
 
 	/** Obtenir la hauteur */
 	int GetHeight() const { return (Img ? Img->h : 0); }
+
+	Point2i GetSize() const { return Img ? Point2i(Img->w, Img->h) : Point2i(0,0); }
 
 	void SetColorKey(unsigned int, unsigned int, unsigned int);
 
