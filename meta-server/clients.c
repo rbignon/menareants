@@ -101,7 +101,7 @@ static int show_scores(struct Client* cl)
 		max_show = 5;
 
 	for(i=0; u && i < max_show; ++i, u = u->next)
-		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", u->name, u->deaths, u->killed,
+		sendrpl(cl, MSG_SCORE, "%s %llu %llu %llu %llu %llu %u %u %lu %lu", u->name, u->losses, u->killed,
 		                                                                    u->creations, u->score, u->best_revenu,
 		                                                                    u->nb_games, u->victories,
 		                                                                    u->reg_timestamp, u->last_visit);

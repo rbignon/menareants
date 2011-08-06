@@ -132,7 +132,7 @@ int m_user_set (struct Client* cl, int parc, char** parv)
 				{
 					int c = atoi(parv[i++]);
 					if(c > 0)
-						reg->deaths += c;
+						reg->losses += c;
 				}
 				break;
 			case 's':

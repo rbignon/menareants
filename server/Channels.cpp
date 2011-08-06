@@ -1449,8 +1449,8 @@ bool EChannel::CheckEndOfGame()
 	{
 		ECPlayer* pl = dynamic_cast<ECPlayer*>(*it);
 		ECArgs args;
+		args += TypToStr(pl->Stats()->losses);
 		args += TypToStr(pl->Stats()->killed);
-		args += TypToStr(pl->Stats()->shooted);
 		args += TypToStr(pl->Stats()->created);
 		args += TypToStr(pl->Stats()->score);
 		args += TypToStr(pl->Stats()->best_revenu);

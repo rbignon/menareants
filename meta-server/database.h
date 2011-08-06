@@ -39,7 +39,7 @@ struct RegUser
 	char passwd[PASSWDLEN+1];
 	char cookie[COOKIELEN+1];
 
-	ullint killed, deaths, creations, score, best_revenu;
+	ullint killed, losses, creations, score, best_revenu;
 	int nb_games, victories;
 
 	time_t reg_timestamp, last_visit;
@@ -62,7 +62,7 @@ extern struct RegUser* reguser_head;
 extern int load_users(const char* file);
 extern int write_users(const char* file);
 
-extern struct RegUser* add_reguser(const char* nick, const char* passwd, int nb_games, ullint deaths, ullint killed, ullint creations,
+extern struct RegUser* add_reguser(const char* nick, const char* passwd, int nb_games, ullint losses, ullint killed, ullint creations,
                                    ullint score, ullint best_revenu, int victories, time_t reg_timestamp, time_t last_game);
 extern void remove_reguser(struct RegUser* reguser);
 extern struct RegUser* find_reguser(const char* nick);

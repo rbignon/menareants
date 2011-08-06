@@ -89,9 +89,9 @@ public:
 
 	struct stats_t
 	{
-		stats_t() : killed(0), shooted(0), created(0), score(0), best_revenu(0) {}
+		stats_t() : killed(0), losses(0), created(0), score(0), best_revenu(0) {}
 		uint killed;
-		uint shooted;
+		uint losses;
 		uint created;
 		int score;
 		int best_revenu;

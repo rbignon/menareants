@@ -288,7 +288,7 @@ ECEntity::~ECEntity()
 void ECEntity::Shoot(ECEntity* e, uint k)
 {
 	if(Owner())
-		dynamic_cast<ECPlayer*>(Owner())->Stats()->shooted += k;
+		dynamic_cast<ECPlayer*>(Owner())->Stats()->killed += k;
 
 	Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), e->LongName().c_str(), k);
 	e->Shooted(k);
@@ -298,7 +298,7 @@ void ECEntity::ReleaseShoot()
 {
 	SetNb(Nb() - (shooted > Nb() ? Nb() : shooted));
 	if(Owner())
-		Owner()->Stats()->killed += shooted;
+		Owner()->Stats()->losses += shooted;
 	shooted = 0;
 }
 

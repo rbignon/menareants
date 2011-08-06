@@ -250,7 +250,7 @@ Sommaire:
 
         USET <account> <modes> [<args> ..]                 :Paramètres d'un account
             +k <killed>                                    :- unités tués
-            +d <deaths>                                    :- unités perdues
+            +d <losses>                                    :- unités perdues
             +s <score>                                     :- score
             +c <creations>                                 :- créations
             +v                                             :- victoire
@@ -270,7 +270,7 @@ Sommaire:
         > EOL                                              :fin du listing
 
         < SCORE
-        > SCORE <nick> <deaths> <killed> <creations>       :score
+        > SCORE <nick> <losses> <killed> <creations>       :score
                 <scores> <best_revenu> <nbgames> <victories>
                 <regtime> <lastvisit>
 

@@ -2499,7 +2499,7 @@ TScoresForm* ScoresForm = 0;
 
 /** Scores of a player
  *
- * Syntax: nick SCO killed shooted created score best_revenu
+ * Syntax: nick SCO losses killed created score best_revenu
  */
 int SCOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 {
@@ -2565,7 +2565,7 @@ TScoresForm::TScoresForm(ECImage* w, EChannel* ch)
 	                      Font::GetInstance(Font::Huge)));
 
 	Players = AddComponent(new TList(70, 250));
-	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Deaths"), _("Killed"), _("Creations"), _("Score"), ""));
+	Players->AddLine(new TScoresPlayerLine(_("Players"), white_color, _("Losses"), _("Killed"), _("Creations"), _("Score"), ""));
 
 	InitDate = AddComponent(new TLabel(150, _("Begin of fight:  ") + ch->Map()->InitDate()->String(), white_color,
 	                               Font::GetInstance(Font::Big)));

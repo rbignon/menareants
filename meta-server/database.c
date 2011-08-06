@@ -34,7 +34,7 @@ void strip_newline(char *string)
    *p = '\0';
 }
 
-struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, ullint deaths, ullint killed,
+struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, ullint losses, ullint killed,
                             ullint creations, ullint score, ullint best_revenu, int victories, time_t reg_timestamp,
                             time_t last_visit)
 {
@@ -47,7 +47,7 @@ struct RegUser* add_reguser(const char* name, const char* passwd, int nb_games, 
 	strncpy(reguser->passwd, passwd, PASSWDLEN);
 	reguser->cookie[0] = 0;
 	reguser->nb_games = nb_games;
-	reguser->deaths = deaths;
+	reguser->losses = losses;
 	reguser->killed = killed;
 	reguser->creations = creations;
 	reguser->score = score;
@@ -140,7 +140,7 @@ int load_users(const char* file)
 
 		strip_newline(parv[parc-1]);
 
-		// NICK <name> <pass> <nb_games> <deaths> <killed> <creations> <score> <meilleurs revenu> <victoires> <reg_timestamp> <last_game>
+		// NICK <name> <pass> <nb_games> <losses> <killed> <creations> <score> <meilleurs revenu> <victoires> <reg_timestamp> <last_game>
 		if(!strcmp(buf, "VERSION"))
 			version = atoi(parv[1]);
 		else if(!version)
@@ -154,8 +154,8 @@ int load_users(const char* file)
 			/* parv[1] = name
 			 * parv[2] = passws
 			 * parv[3] = nb_games
-			 * parv[4] = deaths
-			 * parv[5] = killed
+			 * parv[4] = killed
+			 * parv[5] = losses
 			 * parv[6] = creations
 			 * parv[7] = score
 			 * parv[8] = best income
@@ -180,7 +180,7 @@ int load_users(const char* file)
 				reg_timestamp = atoi(parv[10]);
 				last_game = atoi(parv[11]);
 			}
-			add_reguser(parv[1], parv[2], atoi(parv[3]), strtoull(parv[4], 0, 10), strtoull(parv[5], 0, 10), strtoull(parv[6], 0, 10),
+			add_reguser(parv[1], parv[2], atoi(parv[3]), strtoull(parv[5], 0, 10), strtoull(parv[4], 0, 10), strtoull(parv[6], 0, 10),
 			            strtoull(parv[7], 0, 10), strtoull(parv[8], 0, 10), victories, reg_timestamp, last_game);
 		}
 		else
@@ -203,8 +203,8 @@ int write_users(const char* file)
 	fprintf(fp, "NBUSER %d\n", nb_tusers);
 
 	for(; reg; reg = reg->next)
-		fprintf(fp, "NICK %s %s %u %llu %llu %llu %llu %llu %u %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->deaths,
-		                                                                   reg->killed, reg->creations, reg->score, reg->best_revenu, reg->victories,
+		fprintf(fp, "NICK %s %s %u %llu %llu %llu %llu %llu %u %ld %ld\n", reg->name, reg->passwd, reg->nb_games, reg->killed,
+		                                                                   reg->losses, reg->creations, reg->score, reg->best_revenu, reg->victories,
 		                                                                   reg->reg_timestamp, reg->last_visit);
 
 	fclose(fp);
