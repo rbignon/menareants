@@ -468,7 +468,9 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		        !BarreCase->Test(mouse, button) &&
 		        (acase = Map->TestCase(mouse)))
 		{
-			ECEntity* et = entities_type[entity->Type()].create ("**", 0, acase, entity->Type() == ECEntity::E_ARMY ? 1000 : entity->InitNb(), map);
+			EMapPlayer* owner = dynamic_cast<EMapPlayer*>(acase->Country()->Owner());
+			ECEntity* et = entities_type[entity->Type()].create ("**", owner, acase,
+			                     entity->Type() == ECEntity::E_ARMY ? 1000 : entity->InitNb(), map);
 			map->AddAnEntity(et);
 
 			BarreCase->UnSelect();
