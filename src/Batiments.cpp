@@ -421,6 +421,12 @@ ECountryMaker::ECountryMaker()
 	SetLabel();
 }
 
+void ECountryMaker::ChangeCase(ECBCase* c)
+{
+	ECBatiment::ChangeCase(c);
+	SetLabel();
+}
+
 void ECountryMaker::SetLabel()
 {
 	if (!Case())
@@ -441,7 +447,7 @@ void ECountryMaker::SetLabel()
 
 void ECountryMaker::AfterDraw()
 {
-	if (!label.IsNull())
+	if (!label.IsNull() && (!Map()->ShowMap()->HaveBrouillard() || Case()->Visible()))
 		label.Draw(Case()->Image()->X()+CASE_WIDTH/2-label.GetWidth()/2,
 		           Case()->Image()->Y());
 	ECEntity::AfterDraw();

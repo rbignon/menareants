@@ -367,6 +367,7 @@ public:
 	virtual void AfterDraw();
 
 	void SetLabel();
+	virtual void ChangeCase(ECBCase* new_case);
 
 private:
 
