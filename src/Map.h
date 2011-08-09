@@ -1,6 +1,6 @@
 /* src/Map.h - Header of Map.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ class ECEntity;
 class EC_Client;
 class Color;
 class ECPlayer;
+class ECBContainer;
 class ECMap;
 
 struct case_img_t
@@ -255,6 +256,9 @@ public:
 
 	bool MustRedraw() const { return must_redraw; }
 	void SetMustRedraw(bool b = true) { must_redraw = b; }
+
+	/** Get container for this entity */
+	ECBContainer* GetContainer(ECEntity* entity);
 
 /* Variables privées */
 protected:

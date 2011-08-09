@@ -1,5 +1,5 @@
 /* src/InGame.cpp - Functions in game !
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -660,7 +660,7 @@ void TInGameForm::SetCursor()
 
 }
 
-void TInGameForm::FindIdling()
+void TInGameForm::FindIdling(bool next)
 {
 	static int i;
 	std::vector<ECBEntity*> ents = player->Entities()->List(), idle_ents;
@@ -671,10 +671,14 @@ void TInGameForm::FindIdling()
 	}
 
 	if(idle_ents.empty())
-		InGameForm->AddInfo(I_WARNING, _("There aren't any idling unity."));
+		InGameForm->AddInfo(I_WARNING, _("There aren't any idling unit."));
 	else
 	{
-		ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[++i % idle_ents.size()]);
+		if(next)
+			++i;
+		else
+			--i;
+		ECEntity* e = dynamic_cast<ECEntity*>(idle_ents[i % idle_ents.size()]);
 		Map->CenterTo(e);
 		BarreAct->SetEntity(e);
 	}
@@ -833,6 +837,10 @@ void TInGameForm::AfterDraw()
 	}
 }
 
+#define CASE_KEY_UP    case SDLK_UP:    case 's': case 'k'
+#define CASE_KEY_DOWN  case SDLK_DOWN:  case 't': case 'j'
+#define CASE_KEY_LEFT  case SDLK_LEFT:  case 'c': case 'h'
+#define CASE_KEY_RIGHT case SDLK_RIGHT: case 'r': case 'l'
 void TInGameForm::OnKeyDown(SDL_keysym key)
 {
 	if(SendMessage->Focused())
@@ -844,21 +852,47 @@ void TInGameForm::OnKeyDown(SDL_keysym key)
 	if(chan->State() == EChannel::PLAYING && !client->Player()->Ready())
 		SetCursor();
 
+	if (BarreAct->Entity() && BarreAct->Entity()->Owner() && BarreAct->Entity()->Owner()->IsMe())
+	{
+		std::string move;
+		ECEntity* entity = BarreAct->Entity();
+		ECBCase* acase = entity->Move()->Dest();
+		switch(key.sym)
+		{
+			CASE_KEY_UP: move = "^"; acase = acase->MoveUp(); break;
+			CASE_KEY_DOWN: move = "v"; acase = acase->MoveDown(); break;
+			CASE_KEY_LEFT: move = "<"; acase = acase->MoveLeft(); break;
+			CASE_KEY_RIGHT: move = ">"; acase = acase->MoveRight(); break;
+			default: break;
+		}
+		if (move.empty() == false)
+		{
+			EContainer* container = NULL;
+			if (GetWant(entity, SDL_BUTTON_LEFT) == TInGameForm::W_EXTRACT)
+				client->sendrpl(MSG_ARM, ECArgs(entity->ID(), "(" + TypToStr(acase->X()) + "," + TypToStr(acase->Y())));
+			if(!IsPressed(SDLK_LALT) && (container = dynamic_cast<ECase*>(acase)->GetContainer(entity)))
+				client->sendrpl(MSG_ARM, ECArgs(entity->ID(), std::string(")") + container->ID()));
+			else
+				client->sendrpl(MSG_ARM, ECArgs(entity->ID(), move));
+			SetCursor();
+			return;
+		}
+	}
 	switch(key.sym)
 	{
-		case SDLK_UP:
+		CASE_KEY_UP:
 			Map->SetPosition(Map->X(), Map->Y()+40);
 			break;
-		case SDLK_DOWN:
+		CASE_KEY_DOWN:
 			Map->SetPosition(Map->X(), Map->Y()-40);
 			break;
-		case SDLK_LEFT:
+		CASE_KEY_LEFT:
 			Map->SetPosition(Map->X()+40, Map->Y());
 			break;
-		case SDLK_RIGHT:
+		CASE_KEY_RIGHT:
 			Map->SetPosition(Map->X()-40, Map->Y());
 			break;
-		case SDLK_c:
+		case SDLK_m:
 			Map->ToRedraw(ChatHistory);
 			ChatHistory->SetVisible(true);
 			Chat->SetVisible(false);
@@ -871,13 +905,26 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 {
 	switch (key.sym)
 	{
+		CASE_KEY_UP:
+		CASE_KEY_DOWN:
+		CASE_KEY_LEFT:
+		CASE_KEY_RIGHT:
+			/* does nothing, but it prevents conflicts. */
+			break;
+		case SDLK_p:
+			if(IsPressed(SDLK_LCTRL) && BarreLat->PretButton->Enabled())
+			{
+				BarreLat->PretButton->SetEnabled(false);
+				client->sendrpl(MSG_SET, "+!");
+			}
+			break;
 		case SDLK_n:
 		{
 			if(!SendMessage->Focused())
 				Sound::NextMusic();
 			break;
 		}
-		case SDLK_c:
+		case SDLK_m:
 		{
 			Map->ToRedraw(ChatHistory);
 			ChatHistory->SetVisible(false);
@@ -917,7 +964,7 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					}
 			}
 			else
-				FindIdling();
+				FindIdling(IsPressed(SDLK_LSHIFT));
 			break;
 		case SDLK_ESCAPE:
 			if(!SendMessage->Focused())
@@ -940,11 +987,9 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 					else
 					{
 						std::string s = SendMessage->GetString();
-						bool send_message = true;
 						#ifdef DEBUG
 						if(IsPressed(SDLK_LSHIFT) && IsPressed(SDLK_LALT))
 						{
-							send_message = false;
 							if(s == "show_map on")
 							{
 								chan->Map()->SetBrouillard(false);
@@ -955,10 +1000,8 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 								chan->Map()->SetBrouillard(true);
 								InGameForm->Map->SetBrouillard(true);
 							}
-							else send_message = true;
-						}
+						} else
 						#endif
-						if(send_message)
 						{
 							client->sendrpl(MSG_MSG, s);
 							AddInfo(I_CHAT, "<" + client->GetNick() + "> " + s, client->Player());
@@ -1167,18 +1210,10 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 			{
 				ECBCase* init_case = selected_entity->Move()->Dest() ? selected_entity->Move()->Dest()
 				                                                     : selected_entity->Case();
-				EContainer* contener = 0;
+				EContainer* container = 0;
 				if(!IsPressed(SDLK_LALT))
-				{
-					std::vector<ECBEntity*> ents = acase->Entities()->List();
-					for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
-						if(*it && !(*it)->Locked() && (contener = dynamic_cast<EContainer*>(*it)) &&
-						   contener->CanContain(selected_entity) && contener->Owner() && dynamic_cast<ECPlayer*>(contener->Owner())->IsMe() &&
-						   contener->Move()->Empty())
-							break;
-						else
-							contener = 0;
-				}
+					container = acase->GetContainer(selected_entity);
+
 				std::stack<ECBMove::E_Move> moves;
 				if(selected_entity->FindFastPath(acase, moves, init_case))
 				{
@@ -1187,7 +1222,7 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 					{
 						ECBMove::E_Move m = moves.top();
 						moves.pop();
-						if(contener && moves.empty()) break;
+						if(container && moves.empty()) break;
 						switch(m)
 						{
 							case ECBMove::Up: args += "^"; break;
@@ -1205,9 +1240,9 @@ void TInGameForm::OnClic(const Point2i& mouse, int button, bool&)
 						else
 							client->sendrpl(MSG_ARM, args);
 					}
-					if(contener)
+					if(container)
 					{
-						client->sendrpl(MSG_ARM, ECArgs(selected_entity->ID(), std::string(")") + contener->ID()));
+						client->sendrpl(MSG_ARM, ECArgs(selected_entity->ID(), std::string(")") + container->ID()));
 						SetCursor();
 						return;
 					}

@@ -251,7 +251,11 @@ public:
 	#define I_GREAT    0x020
 	void AddInfo(int flags, std::string line, ECPlayer* = 0);
 
-	void FindIdling();
+	/** Find and select the next idling unit.
+	 *
+	 * @param next  if true, select the next one, otherwise the previous one.
+	 */
+	void FindIdling(bool next = true);
 
 /* Attributs */
 public:

@@ -1,6 +1,6 @@
 /* src/Map.cpp - Map classes
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -526,6 +526,21 @@ void ECase::SetImage(ECSpriteBase* spr)
 		image->set(dynamic_cast<ECMap*>(map)->ShowMap()->X() +(CASE_WIDTH   * X()),
 		           dynamic_cast<ECMap*>(map)->ShowMap()->Y() + (CASE_HEIGHT * Y()));
 	SetMustRedraw();
+}
+
+ECBContainer* ECase::GetContainer(ECEntity* entity)
+{
+	EContainer* container = NULL;
+
+	std::vector<ECBEntity*> ents = this->Entities()->List();
+	for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+		if(*it && !(*it)->Locked() && (container = dynamic_cast<EContainer*>(*it)) &&
+		   container->CanContain(entity) && container->Owner() == entity->Owner() &&
+		   container->Move()->Empty())
+			break;
+		else
+			container = 0;
+	return container;
 }
 
 /********************************************************************************************
