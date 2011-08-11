@@ -24,12 +24,34 @@
 #include <assert.h>
 
 /********************************************************************************************
+ *                               ECBEiffelTower                                             *
+ ********************************************************************************************/
+
+bool ECBEiffelTower::CanBeCreated(ECBPlayer* pl) const
+{
+	assert(pl);
+	if (pl->Nation() != ECBPlayer::N_FRANCE)
+		return false;
+
+	std::vector<ECBEntity*> ents = pl->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		if(((*it)->Type() == E_RADAR || (*it)->Type() == E_EIFFELTOWER) &&
+		   !((*it)->EventType() & ARM_SELL))
+			return false;
+
+	return true;
+}
+
+/********************************************************************************************
  *                               ECBRadar                                                   *
  ********************************************************************************************/
 
 bool ECBRadar::CanBeCreated(ECBPlayer* pl) const
 {
 	assert(pl);
+	if (pl->Nation() == ECBPlayer::N_FRANCE)
+		return false;
+
 	std::vector<ECBEntity*> ents = pl->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
 		if(((*it)->Type() == E_RADAR || (*it)->Type() == E_EIFFELTOWER) &&

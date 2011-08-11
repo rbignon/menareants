@@ -1,6 +1,6 @@
 /* lib/Units.h - Header of Units.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@
 
 /********************************************************************
  *
- *             FOR HACKERS
+ *             DEAR CHEATERS
  *
  * It's useless to change this values in your client, because this
  * is the server who decide if an action is accepted or not.
  * For example, if you change a price, your client will show you
- * this new price, but the server will use the REAL price !
+ * this new price, but the server will use the REAL price!
  * Idem for Initial Number, Visibility, Porty, etc.
  *
  * Regards.

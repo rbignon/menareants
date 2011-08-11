@@ -1,6 +1,6 @@
 /* lib/Batiments.h - Header of Batiments.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@
 
 /********************************************************************
  *
- *             FOR HACKERS
+ *            DEAR CHEATERS
  *
  * It's useless to change this values in your client, because this
  * is the server who decides if an action is accepted or not.
  * For example, if you change a price, your client will show you
- * this new price, but the server will use the REAL price !
+ * this new price, but the server will use the REAL price!
  * Idem for Initial Number, Visibility, Porty, etc.
  *
  * Regards.
@@ -209,7 +209,7 @@ public:
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	bool CanCreate(const ECBEntity*) { return false; }
 
-	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
+	virtual bool CanBeCreated(ECBPlayer* pl) const;
 };
 
 
@@ -233,7 +233,6 @@ public:
 	virtual uint Cost() const { return 30000; }
 	virtual uint InitNb() const { return 1000;}
 	virtual bool CanBeSold() const { return true; }
-	virtual e_type MyUpgrade() const { return E_EIFFELTOWER; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 

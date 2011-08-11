@@ -1,6 +1,6 @@
 /* src/Channels.cpp - Channels functions
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ const struct nations_str_t nations_str[] = {
 	/* N_NONE     */   { gettext_noop("Random"),     gettext_noop("Your nation will be selected by random.") },
 	/* N_NOISY    */   { gettext_noop("Noisy"),      gettext_noop("Region of Noisy and its caves.") },
 	/* N_USA      */   { gettext_noop("USA"),        gettext_noop("The United States invests the world with of McDonalds.") },
-	/* N_FRANCE   */   { gettext_noop("France"),     gettext_noop("France of Dominique de Villepin.") },
+	/* N_FRANCE   */   { gettext_noop("France"),     gettext_noop("France and its Eiffel Tower to see all map.") },
 	/* N_URSS     */   { gettext_noop("URSS"),       gettext_noop("The USSR and its goulags...") },
 	/* N_ALQUAIDA */   { gettext_noop("Al-Quaïda"),  gettext_noop("Al-Quaïda network and its diverted boïngs.") },
 	/* N_ESPAGNE  */   { gettext_noop("Spain"),    gettext_noop("The Spanish teacher who impose weak rules and fuck us .") },

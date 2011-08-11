@@ -223,7 +223,7 @@ public:
 	virtual const char* Infos() const { return _("Show all units on map."); }
 	virtual const char* Description() const
 	{
-		return _("Eiffel Tower shows all units on the map.");
+		return _("Eiffel Tower shows all the map including units.");
 	}
 	virtual ECImage* Icon() const { return Resources::EiffelTower_Icon(); }
 };
@@ -255,7 +255,7 @@ public:
 	virtual const char* Infos() const { return _("Show all map."); }
 	virtual const char* Description() const
 	{
-		return _("This radar shows all the map. If you want to see all units on the map, upgrade it.");
+		return _("This radar shows all the map.");
 	}
 	virtual ECImage* Icon() const { return Resources::Radar_Icon(); }
 };
