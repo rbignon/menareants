@@ -1,6 +1,6 @@
 /* lib/Batiments.cpp - Base structures of batiments in game.
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ bool ECBNuclearSearch::CanBeCreated(ECBPlayer* pl) const
 	assert(pl);
 	std::vector<ECBEntity*> ents = pl->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() && ARM_SELL))
+		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() & ARM_SELL))
 			return false;
 
 	return true;
@@ -100,7 +100,7 @@ bool ECBSilo::CanBeCreated(ECBPlayer* pl) const
 	assert(pl);
 	std::vector<ECBEntity*> ents = pl->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
-		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() && ARM_SELL))
+		if(dynamic_cast<ECBNuclearSearch*>(*it) && !((*it)->EventType() & ARM_SELL))
 			return true;
 
 	return false;
