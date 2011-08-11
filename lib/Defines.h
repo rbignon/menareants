@@ -1,6 +1,6 @@
 /* lib/Defines.h - A lot of defines
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,20 +40,20 @@
 /* Version protocolaire
  * incrémenter en cas de modification du protocole
  */
-#define APP_PVERSION	"14"
+#define APP_PVERSION	"15"
 #define APP_MSPROTO	"3"
 
 /* Version du jeu (forme alpha.beta[-patch]) */
-#define APP_VERSION_ALPHA	"0"
-#define APP_VERSION_BETA	"4"
+#define APP_VERSION_ALPHA	"1"
+#define APP_VERSION_BETA	"0"
 
 /* Definir si c'est une version instable (ne peut compiler qu'avec --enable-debug) */
 #undef UNSTABLE
 
 /* Définir un (seul) des "patch" suivant (ou aucun) */
-#if 0
-#define	APP_VERSION_PATCH	"RC2"	/* en cours de developpement */
-//#else
+#if 1
+#define	APP_VERSION_PATCH	"dev"	/* en cours de developpement */
+#else
 #define	APP_VERSION_PATCH	"pre1"
 #define	APP_VERSION_PATCH	"pre2"
 #define	APP_VERSION_PATCH	"pre3"
