@@ -54,11 +54,17 @@ private:
 
 public:
 	Color();
+	Color(const Color&);
 	Color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 	bool operator==(const Color &color) const;
 
 	void SetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+	void SetRed(Uint8 r) { red = r; }
+	void SetGreen(Uint8 g) { green = g; }
+	void SetBlue(Uint8 b) { blue = b; }
+	void SetAlpha(Uint8 a) { alpha = a; }
+	Color WithAlpha(Uint8 a) const;
 
 	Uint8 GetRed() const;
 	Uint8 GetGreen() const;

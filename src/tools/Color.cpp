@@ -50,9 +50,14 @@ Color::Color(Uint8 r, Uint8 g, Uint8 b, Uint8 a){
 	SetColor(r, g, b, a);
 }
 
+Color::Color(const Color& c)
+{
+	SetColor(c.red, c.green, c.blue, c.alpha);
+}
+
 bool Color::operator==(const Color &color) const{
-	return red == color.red 
-		&& green == color.green 
+	return red == color.red
+		&& green == color.green
 		&& blue == color.blue /*
 		&& alpha == color.alpha*/;
 }
@@ -78,6 +83,14 @@ Uint8 Color::GetBlue() const{
 
 Uint8 Color::GetAlpha() const{
 	return alpha;
+}
+
+
+Color Color::WithAlpha(Uint8 a) const
+{
+	Color c(*this);
+	c.SetAlpha(a);
+	return c;
 }
 
 SDL_Color Color::GetSDLColor() const{
