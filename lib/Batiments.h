@@ -329,7 +329,7 @@ public:
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
-		return e->Level() <= L_GROUND;
+		return (e->Level() <= L_GROUND && !e->IsCountryMaker());
 	}
 
 	virtual void Init();
@@ -689,6 +689,7 @@ public:
 		switch(e->Type())
 		{
 			case ECBEntity::E_PLANE:
+			case ECBEntity::E_BOEING:
 				return true;
 			default:
 				return false;

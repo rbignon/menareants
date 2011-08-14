@@ -19,6 +19,7 @@
  * $Id$
  */
 
+#include "Debug.h"
 #include "Units.h"
 #include "gui/ShowMap.h"
 #include "gui/ColorEdit.h"
@@ -187,6 +188,77 @@ void ECTourist::ChangeCase(ECBCase* newcase)
 }
 
 /********************************************************************************************
+ *                                ECBoeing                                                  *
+ ********************************************************************************************/
+std::string ECBoeing::SpecialInfo()
+{
+	return !Deployed() ? _("Flying") : _("On ground");
+}
+
+bool ECBoeing::BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me)
+{
+	if (EventType() & ARM_ATTAQ)
+	{
+		int dx = c->X() - Case()->X() + 1;
+		int dy = c->Y() - Case()->Y();
+
+		if (!Case()->Visible() && !c->Visible())
+			return true;
+
+		switch(anim_state)
+		{
+		case AN_NONE:
+			if (dx > 0) {
+				if (dy > 0)
+					SetImage(GetSprite(dx >= dy ? I_Right : I_Down));
+				else
+					SetImage(GetSprite(dx >= -dy ? I_Right : I_Up));
+			} else {
+				if (dy > 0)
+					SetImage(GetSprite(-dx >= dy ? I_Left : I_Down));
+				else
+					SetImage(GetSprite(-dx >= -dy ? I_Left : I_Up));
+			}
+			SetAnim(true);
+			anim_state = AN_MOVING;
+		case AN_MOVING:
+			ImageSetXY(Image()->X() + dx, Image()->Y() + dy);
+			SDL_Delay(10);
+			if ((dx >= 0 ? (Image()->X() >= (c->Image()->X() + CASE_WIDTH)) : (Image()->X() < (c->Image()->X() + CASE_WIDTH))) &&
+			    (dy >= 0 ? (Image()->Y() >= c->Image()->Y()) : (Image()->Y() < c->Image()->Y())))
+			{
+				anim_state = AN_DOWN;
+				if(c->Visible() && dynamic_cast<ECMap*>(c->Map())->ShowMap())
+					dynamic_cast<ECMap*>(c->Map())->ShowMap()->CenterTo(c);
+
+				SetImage(GetSprite(I_Left));
+				Image()->CopySpriteBase();
+				Image()->Gray2Color(color_eq[Owner()->Color()]);
+				ImageSetXY(c->Image()->X() + CASE_WIDTH, c->Image()->Y());
+			}
+			break;
+		case AN_DOWN:
+			Image()->RotoZoom(5, (double)CASE_WIDTH / Image()->GetWidth(),
+			                      (double)CASE_HEIGHT / Image()->GetHeight(),
+			                      true);
+			ImageSetXY(Image()->X() - 10, Image()->Y());
+			SDL_Delay(50);
+
+			if (Image()->X() < c->Image()->X())
+			{
+				anim_state = AN_NONE;
+				return true;
+			}
+			break;
+		}
+
+		return false;
+	}
+
+	return ECUnit::BeforeEvent(entities, c, me);
+}
+
+/********************************************************************************************
  *                                ECPlane                                                   *
  ********************************************************************************************/
 std::string ECPlane::SpecialInfo()
@@ -275,7 +347,7 @@ bool ECMissiLauncher::AfterEvent(const std::vector<ECEntity*>& entities, ECase* 
 }
 
 /********************************************************************************************
- *                                ECUnit                                                     *
+ *                                ECUnit                                                    *
  ********************************************************************************************/
 
 bool ECUnit::BeforeEvent(const std::vector<ECEntity*>&, ECase*, EC_Client*)
@@ -382,7 +454,6 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 					Image()->SetAnim(false);
 					SDL_Delay(20);
 				}
-				SetImage(images[I_Right]);
 			}
 			/* C'est un reploiement sans tirer, donc on utilise l'image du déploiement avec missile, mais dans l'ordre
 			 * inverse */
@@ -403,7 +474,6 @@ bool ECUnit::MakeEvent(const std::vector<ECEntity*>& entities, ECase*, EC_Client
 					Image()->SetOrder(true);
 					SDL_Delay(20);
 				}
-				SetImage(images[I_Right]);
 			}
 			break;
 		}
@@ -443,11 +513,4 @@ bool ECUnit::AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*)
 	if(EventType() & ARM_MOVE)
 			SetAnim(false);
 	return true;
-}
-
-void ECUnit::SetDeployed(bool d)
-{
-	ECBEntity::SetDeployed(d);
-	if(Deployed() && images[I_Deployed])
-		SetImage(images[I_Deployed]);
 }

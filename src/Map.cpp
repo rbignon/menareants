@@ -397,7 +397,7 @@ void ECEntity::SetOwner(ECBPlayer* player)
 	UpdateImages(); // Call the virtual method to update image list.
 }
 
-void ECEntity::PutImage(imgs_t i, ECSpriteBase* b)
+void ECEntity::PutImage(imgs_t i, ECSpriteBase* b, ECEntity::colorize_t colorize)
 {
 	if (Owner())
 	{
@@ -405,14 +405,20 @@ void ECEntity::PutImage(imgs_t i, ECSpriteBase* b)
 			b = Owner()->GetSprite(Type(), i);
 		else
 		{
-			b = new ECSpriteBase(b->path.c_str());
+			b = b->Copy();
+			if(Owner()->Color())
+				switch(colorize) {
+				case GRAY2COLOR:
+					b->Gray2Color(color_eq[Owner()->Color()]);
+					break;
+				case WHITE2COLOR:
+					b->ChangeColor(white_color, color_eq[Owner()->Color()]);
+					break;
+				}
 			Owner()->SetSprite(Type(), i, b);
 		}
 	}
 	images.insert(ImgList::value_type(i, b));
-
-	if(Owner() && Owner()->Color())
-		images[i]->ChangeColor(white_color, color_eq[Owner()->Color()]);
 
 	if(images.size() == 1) SetImage(b);
 }

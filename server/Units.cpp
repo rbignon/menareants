@@ -1,6 +1,6 @@
 /* server/Units.cpp - Units in server
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,87 @@ int ECPlane::TurnMoney(ECBPlayer* pl)
 	if(Deployed() || !Containing() || Owner() != pl) return 0;
 
 	return - (Containing()->Nb() * VolCost());
+}
+
+/********************************************************************************************
+ *                               ECBoeing                                                   *
+ ********************************************************************************************/
+
+bool ECBoeing::WantDeploy()
+{
+	if(EventType() & (ARM_DEPLOY|ARM_ATTAQ))
+		return false;
+
+	/** \note On switch sur ce qu'on VEUT mettre */
+	switch(!Deployed())
+	{
+		case false:
+			if(EventType() & ARM_ATTAQ)
+				return false;
+			break;
+		case true:
+			if(!ECBBoeing::WantDeploy())
+				return false;
+			break;
+	}
+
+	return true;
+}
+
+bool ECBoeing::WantAttaq(uint mx, uint my, bool force)
+{
+	if (Level() != L_AIR)
+		return false;
+
+	/* On n'attaque pas sur notre case */
+	if(DestCase()->X() == mx && DestCase()->Y() == my)
+		return false;
+
+	uint d = abs(DestCase()->X() - mx) + abs(DestCase()->Y() - my);
+
+	if(d > Porty())
+		return false;
+
+	return true;
+}
+
+std::vector<ECBEntity*> ECBoeing::GetAttaquedEntities(ECBCase* c)
+{
+	std::vector<ECBEntity*> ents = ECEntity::GetAttaquedEntities(c);
+	ents.push_back(this);
+	return ents;
+}
+
+bool ECBoeing::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	if (Level() != L_AIR)
+		return false;
+
+	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
+		if(*it != this && !Like(*it) && CanAttaq(*it) && (*it)->Case() != Case() && (*it)->Nb())
+		{
+			uint killed = 0;
+			if((*it)->IsBuilding())                          killed = uint(Nb() * 50);
+			else if((*it)->IsInfantry())                     killed = uint(Nb() * 100);
+			else if((*it)->IsPlane())                        killed = uint(Nb() * 80);
+			else if((*it)->IsVehicule() || (*it)->IsNaval()) killed = uint(Nb() * 30);
+			else
+			{
+				FDebug(W_WARNING, "Shoot d'un type non supporté");
+				continue;
+			}
+
+			Shoot(*it, killed);
+			if(Owner())
+				Channel()->send_info(Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
+			if((*it)->Owner())
+				Channel()->send_info((*it)->Owner(), EChannel::I_SHOOT, ECArgs(LongName(), (*it)->LongName(), TypToStr(killed)));
+		}
+
+	/* Suicide */
+	SetNb(0);
+
+	return false;
 }
 
 /********************************************************************************************
@@ -134,7 +215,7 @@ bool ECJouano::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	return false;
 }
 
-std::vector<ECBEntity*> ECJouano::GetAttaquedEntities(ECBCase* c) const
+std::vector<ECBEntity*> ECJouano::GetAttaquedEntities(ECBCase* c)
 {
 	std::vector<ECBEntity*> entities;
 	ECBCase* cc = c->MoveLeft(Porty())->MoveUp(Porty());
@@ -242,7 +323,7 @@ void ECMcDo::Played()
 			Channel()->SendArm(0, new_caserne, ARM_CREATE, Case()->X(), Case()->Y());
 			new_caserne->SetNb(Nb());
 			Map()->AddAnEntity(new_caserne);
-			new_caserne->Create(false);
+			new_caserne->Created(false);
 
 			SetZombie(); // Et on supprime notre brave McDo qui a rendu de mauvais services
 		}
@@ -366,7 +447,7 @@ bool EContainer::Contain(ECBEntity* entity)
 
 bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
 {
-	if(Containing() && Containing()->Type() != entity->Type() || entity->Locked() || entity->IsZombie() || !CanContain(entity))
+	if((Containing() && Containing()->Type() != entity->Type()) || entity->Locked() || entity->IsZombie() || !CanContain(entity))
 		return false;
 
 	ECMove::E_Move move;
@@ -631,7 +712,10 @@ bool ECUnit::WantMove(ECBMove::E_Move move, int flags)
 {
 	/* J'ai déjà fait tous mes pas
 	 * Si on est deployé on ne peut pas bouger */
-	if(!RestStep() && !(flags & MOVE_SIMULE) || Deployed() ^ !!(EventType() & ARM_DEPLOY) || !Case() || Locked() && !(flags & MOVE_FORCE))
+	if((!RestStep() && !(flags & MOVE_SIMULE)) ||
+	   (Deployed() ^ !!(EventType() & ARM_DEPLOY)) ||
+	   !Case() ||
+	   (Locked() && !(flags & MOVE_FORCE)))
 		return false;
 
 	ECBCase *c = 0, *here = DestCase();

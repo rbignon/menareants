@@ -1,6 +1,6 @@
 /* src/Resources.h - Header of Resources.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -293,6 +293,13 @@ public:
 	R_RESOURCE(ECSpriteBase, Plane_Dos);
 	R_RESOURCE(ECSpriteBase, Plane_Deployed);
 	R_RESOURCE(ECSpriteBase, Plane_Reployed);
+	R_RESOURCE(ECImage,      Boeing_Icon);
+	R_RESOURCE(ECSpriteBase, Boeing_Face);
+	R_RESOURCE(ECSpriteBase, Boeing_Left);
+	R_RESOURCE(ECSpriteBase, Boeing_Right);
+	R_RESOURCE(ECSpriteBase, Boeing_Dos);
+	R_RESOURCE(ECSpriteBase, Boeing_Deployed);
+	R_RESOURCE(ECSpriteBase, Boeing_Reployed);
 	R_RESOURCE(ECImage,      BarbedWire_Icon);
 	R_RESOURCE(ECSpriteBase, BarbedWire_Horiz);
 	R_RESOURCE(ECSpriteBase, BarbedWire_Verti);

@@ -1,6 +1,6 @@
 /* server/Units.h - Header of Units.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,6 +112,24 @@ public:
 };
 
 /********************************************************************************************
+ *                               ECBoeing                                                   *
+ ********************************************************************************************/
+class ECBoeing: public ECUnit, public ECBBoeing
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECBoeing) {}
+
+	virtual bool WantDeploy();
+
+	virtual bool WantMove(ECBMove::E_Move m, int i) { return Level() >= L_AIR ? ECUnit::WantMove(m,i) : false; }
+	virtual bool WantAttaq(uint x, uint y, bool);
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
+	std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c);
+};
+
+/********************************************************************************************
  *                               ECMissiLauncher                                            *
  ********************************************************************************************/
 class ECMissiLauncher : public ECUnit, public ECBMissiLauncher
@@ -164,7 +182,7 @@ public:
 	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
 	virtual void Invest(ECBEntity* e);
 
-	std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) const;
+	std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c);
 };
 
 /********************************************************************************************

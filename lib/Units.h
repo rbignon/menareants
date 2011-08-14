@@ -205,7 +205,7 @@ public:
 	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 10; }
 	virtual uint Step() const { return 7; }
-	virtual uint Visibility() const { return 7; }
+	virtual uint Visibility() const { return 5; }
 	virtual bool CanWalkOn(ECBCase *c) const { return true; }
 	virtual e_level Level() const { return (!Deployed() ^ !!(EventType() & ARM_DEPLOY)) ? L_AIR : L_GROUND; }
 	virtual uint UnitaryCapacity() const { return 100; }
@@ -229,6 +229,45 @@ public:
 	virtual bool IsPlane() const { return true; }
 	virtual bool WantDeploy() { return (DestCase()->Entities()->Find(E_AIRPORT).empty() == false); }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+};
+
+/********************************************************************************************
+ *                               ECBBoeing                                                  *
+ ********************************************************************************************/
+class ECBBoeing : public virtual ECBEntity
+{
+public:
+	ENTITY_EMPTY_CONSTRUCTOR(ECBBoeing) {}
+
+	ENTITY_CONSTRUCTOR(ECBBoeing) {}
+
+	virtual void Init() { ECBEntity::Init(); SetDeployed(true); }
+
+	virtual e_type Type() const { return E_BOEING; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 10; }
+	virtual uint Step() const { return 5; }
+	virtual uint Visibility() const { return 5; }
+	virtual bool CanWalkOn(ECBCase *c) const { return true; }
+	virtual e_level Level() const { return (!Deployed() ^ !!(EventType() & ARM_DEPLOY)) ? L_AIR : L_GROUND; }
+	virtual uint Porty() const { return 5; }
+	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_ALQUAIDA); }
+
+	virtual bool CanInvest(const ECBEntity* e) const { return false; }
+
+	bool CanAttaq(const ECBEntity *e)
+	{
+		if(e->IsCountryMaker() || e->Case() == Case())
+			return false;
+		else
+			return true;
+	}
+
+	bool CanCreate(const ECBEntity*) { return false; }
+	virtual bool IsPlane() const { return true; }
+	virtual bool WantDeploy() { return (DestCase()->Entities()->Find(E_AIRPORT).empty() == false); }
+	virtual bool WantAttaq(uint, uint, bool) { return Level() >= L_AIR; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return !(EventType() & ARM_ATTAQ); }
 };
 
 /********************************************************************************************

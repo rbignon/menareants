@@ -1,6 +1,6 @@
 /* src/Units.h - Header of Units.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@ public:
 	virtual bool MakeEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
 
 	virtual bool AfterEvent(const std::vector<ECEntity*>&, ECase* c, EC_Client*);
-
-	virtual void SetDeployed(bool d = true);
 
 /* Mathodes protégées */
 protected:
@@ -201,7 +199,7 @@ public:
 /********************************************************************************************
  *                                ECPlane                                                   *
  ********************************************************************************************/
-#define PLANE_VISUAL_STEP 5
+#define PLANE_VISUAL_STEP 4
 class ECPlane : public ECUnit, public ECBPlane
 {
 /* Constructeur */
@@ -221,6 +219,7 @@ public:
 		PutImage(I_Deployed, Resources::Plane_Deployed());
 		PutImage(I_Reployed, Resources::Plane_Reployed());
 		SetImage(GetSprite(I_Deployed));
+		Image()->SetFrame(Image()->NbFrames()-1);
 	}
 
 	void Init()
@@ -237,6 +236,57 @@ public:
 	virtual ECImage *Icon() const { return Resources::Plane_Icon(); }
 	virtual std::string SpecialInfo();
 	virtual std::string DeployButton() { return Deployed() ? _("Taking off") : _("Landing"); }
+};
+
+/********************************************************************************************
+ *                                ECBoeing                                                  *
+ ********************************************************************************************/
+#define BOEING_VISUAL_STEP 3
+class ECBoeing : public ECUnit, public ECBBoeing
+{
+/* Constructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBoeing) : anim_state(ECBoeing::AN_NONE) {}
+
+	ENTITY_CONSTRUCTOR(ECBoeing), ECUnit(BOEING_VISUAL_STEP), anim_state(ECBoeing::AN_NONE) {}
+
+	void UpdateImages()
+	{
+		PutImage(I_Up, Resources::Boeing_Dos(),            GRAY2COLOR);
+		PutImage(I_Down, Resources::Boeing_Face(),         GRAY2COLOR);
+		PutImage(I_Right, Resources::Boeing_Right(),       GRAY2COLOR);
+		PutImage(I_Left, Resources::Boeing_Left(),         GRAY2COLOR);
+		PutImage(I_Attaq, Resources::Brouillard(),         GRAY2COLOR);
+		PutImage(I_Deployed, Resources::Boeing_Deployed(), GRAY2COLOR);
+		PutImage(I_Reployed, Resources::Boeing_Reployed(), GRAY2COLOR);
+		SetImage(GetSprite(I_Deployed));
+		Image()->SetFrame(Image()->NbFrames()-1);
+	}
+
+	void Init()
+	{
+		ECEntity::Init();
+		ECBBoeing::Init();
+	}
+
+public:
+	virtual const char *Name() const { return _("Boeing 767"); }
+	virtual const char* Qual() const { return _("boeing 767"); }
+	virtual const char *Infos() const { return _("Boeing 767 (suicide plane)"); }
+	virtual const char *Description() const { return _("Throw this suicide-plane on enemies to explode."); }
+	virtual ECImage *Icon() const { return Resources::Boeing_Icon(); }
+	virtual std::string SpecialInfo();
+	virtual std::string DeployButton() { return Deployed() ? _("Taking off") : _("Landing"); }
+	bool BeforeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_Client* me);
+
+private:
+	enum
+	{
+		AN_NONE,
+		AN_MOVING,
+		AN_DOWN
+	} anim_state;
 };
 
 /********************************************************************************************
@@ -338,7 +388,7 @@ public:
 /********************************************************************************************
  *                                ECMcDo                                                    *
  ********************************************************************************************/
-#define MCDO_VISUAL_STEP 4
+#define MCDO_VISUAL_STEP 3
 class ECMcDo : public ECUnit, public ECBMcDo
 {
 /* Constructeur/Destructeur */
@@ -402,7 +452,7 @@ public:
 /********************************************************************************************
  *                                ECTourist                                                 *
  ********************************************************************************************/
-#define TOURIST_VISUAL_STEP 4
+#define TOURIST_VISUAL_STEP 3
 class ECTourist : public ECUnit, public ECBTourist
 {
 /* Constructeur/Destructeur */

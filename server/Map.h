@@ -1,6 +1,6 @@
 /* server/Map.h - Header of Map.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public:
 	 * @param c attaqued case
 	 * @return a vector of entities I will attaq
 	 */
-	virtual std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) const { return c->Entities()->List(); }
+	virtual std::vector<ECBEntity*> GetAttaquedEntities(ECBCase* c) { return c->Entities()->List(); }
 
 	/** Get an array of owners of there entities */
 	static std::nrvector<TClient*> EntitiesToClients(std::vector<ECEntity*>);

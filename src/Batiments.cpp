@@ -256,7 +256,7 @@ void ECMine::Init()
 	activeimg = new ECSpriteBase(Resources::Mine_ActFace()->path.c_str());
 
 	if(Owner() && Owner()->Color())
-		activeimg->ChangeColor(white_color, color_eq[Owner()->Color()]);
+		activeimg->Gray2Color(color_eq[Owner()->Color()]);
 }
 
 void ECMine::RecvData(ECData data)

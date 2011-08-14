@@ -142,8 +142,8 @@ protected:
  *                               ECBEntity                                                  *
  ********************************************************************************************/
 /* Documentation is in server/Channels.h:EChannel::SendArm() */
-#define ThereIsAttaq(a, b) ((a)->CanAttaq(b) && !(a)->Like(b) || \
-                            (b)->CanAttaq(a) && !(b)->Like(a))
+#define ThereIsAttaq(a, b) (((a)->CanAttaq(b) && !(a)->Like(b)) || \
+                            ((b)->CanAttaq(a) && !(b)->Like(a)))
 #define ARM_MOVE        0x0001
 #define ARM_UNUSED      0x0002         /* ARM_UNUSED is unused */
 #define ARM_ATTAQ       0x0004
@@ -208,6 +208,7 @@ public:
 		/*25*/E_AIRPORT,
 		/*26*/E_RADAR,
 		/*27*/E_EIFFELTOWER,
+		/*28*/E_BOEING,
 		/*XX*/E_END
 	};
 

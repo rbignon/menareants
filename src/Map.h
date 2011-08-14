@@ -107,6 +107,11 @@ public:
 	};
 	typedef std::map<imgs_t, ECSpriteBase*> ImgList;
 
+	enum colorize_t {
+		GRAY2COLOR,
+		WHITE2COLOR
+	};
+
 	ECEntity();
 	ECEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
@@ -213,7 +218,7 @@ protected:
 	uint max_nb;
 
 	ImgList images;
-	void PutImage(imgs_t i, ECSpriteBase* b);
+	void PutImage(imgs_t i, ECSpriteBase* b, colorize_t colorize = WHITE2COLOR);
 
 	ECSpriteBase* GetSprite(imgs_t t) { return images[t]; }
 };

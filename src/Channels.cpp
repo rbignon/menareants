@@ -60,7 +60,7 @@ void ECPlayer::AddBreakPoint(BreakPoint bp)
 {
 	assert(Channel()->Map()->ShowMap()->Window());
 	ECSpriteBase* sprbase = new ECSpriteBase(Resources::Balise()->path.c_str());
-	sprbase->ChangeColor(white_color, color_eq[Color()]);
+	sprbase->Gray2Color(color_eq[Color()]);
 	bp.sprite = new ECSprite(sprbase, Channel()->Map()->ShowMap()->Window());
 	bp.text = Font::GetInstance(Font::Normal)->CreateSurface(bp.message, black_color);
 	breakpoints.push_back(bp);

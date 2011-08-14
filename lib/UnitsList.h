@@ -36,4 +36,5 @@ U_DECL(ECBarbedWire)
 U_DECL(ECAirPort)
 U_DECL(ECRadar)
 U_DECL(ECEiffelTower)
+U_DECL(ECBoeing)
 U_END

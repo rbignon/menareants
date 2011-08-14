@@ -1,6 +1,6 @@
 /* src/Resources.cpp - Struct which define all resources.
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -258,6 +258,13 @@
 	R_RESOURCE(ECSpriteBase, Plane_Dos,         "units/plane/dos");
 	R_RESOURCE(ECSpriteBase, Plane_Deployed,    "units/plane/deployed");
 	R_RESOURCE(ECSpriteBase, Plane_Reployed,    "units/plane/reployed");
+	R_RESOURCE(ECImage,      Boeing_Icon,        PKGDATADIR_PICS "units/boeing_icon.png");
+	R_RESOURCE(ECSpriteBase, Boeing_Face,        "units/boeing/face");
+	R_RESOURCE(ECSpriteBase, Boeing_Left,        "units/boeing/left");
+	R_RESOURCE(ECSpriteBase, Boeing_Right,       "units/boeing/right");
+	R_RESOURCE(ECSpriteBase, Boeing_Dos,         "units/boeing/dos");
+	R_RESOURCE(ECSpriteBase, Boeing_Deployed,    "units/boeing/deployed");
+	R_RESOURCE(ECSpriteBase, Boeing_Reployed,    "units/boeing/reployed");
 	R_RESOURCE(ECImage,      BarbedWire_Icon,   PKGDATADIR_PICS "units/barbedwire_icon.png");
 	R_RESOURCE(ECSpriteBase, BarbedWire_Horiz,        "units/barbedwire/horiz");
 	R_RESOURCE(ECSpriteBase, BarbedWire_Verti,        "units/barbedwire/verti");
