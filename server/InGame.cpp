@@ -250,7 +250,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 					event->Entity()->Tag = T_CONTINUE;
 				}
 				std::map<ECEntity*, int> ents_init_nb;
-				/* On rends zombie temporairement toutes les entités. Les vainqueurs seront délockés */
+				/* On rends zombie temporairement toutes les entités. Les vainqueurs seront dézombifiés */
 				{
 					std::vector<ECBEntity*> case_entities = event->Entity() ?
 					                                                event->Entity()->GetAttaquedEntities(event->Case())
@@ -265,6 +265,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 							if(e->IsHidden())
 								SendArm(0, e, ARM_CREATE|ARM_HIDE, e->Case()->X(), e->Case()->Y());
 
+							Debug(W_DEBUG, "- %s est dans le mouve", e->LongName().c_str());
 							e->SetZombie();
 							e->Tag = T_CONTINUE;
 							ents_init_nb[e] = e->RealNb();
@@ -352,9 +353,10 @@ bool EChannel::ShowAnim(ECEvent* event)
 					if(!(*it)->Nb())
 					{
 						SendArm(NULL, *it, ARM_REMOVE);
-						/* On ne remove pas car il est shadowed et sera supprimé lors du
-							* passage de la boucle principale.
-							*/
+						(*it)->SetZombie();
+						/* On ne remove pas car il est zombie et sera supprimé lors du
+						 * passage de la boucle principale.
+						 */
 						//map->RemoveAnEntity(*it, USE_DELETE);
 					}
 					else
@@ -370,15 +372,15 @@ bool EChannel::ShowAnim(ECEvent* event)
 								(*it)->Owner()->Stats()->score += abs(en->second - ents_init_nb[*it]);
 							}
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
-						std::vector<ECBEntity*>::iterator fix = fixed.end();
-						if(!fixed.empty())
-							for(fix = fixed.begin();
-							        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != (*it)->Level() ||
-							        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner() ||
-							        dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
-							        dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
-							        dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(*it)->Type());
-							    ++fix);
+						std::vector<ECBEntity*>::iterator fix;
+						for(fix = fixed.begin();
+						        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != (*it)->Level() ||
+						        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner() ||
+						        (dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
+						        dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
+						        dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(*it)->Type()));
+						    ++fix)
+							;
 
 						if(fix != fixed.end() && (*it)->Move()->Empty())
 						{
@@ -388,9 +390,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 							SendArm(NULL, *it, ARM_INVEST|ARM_REMOVE, event->Case()->X(), event->Case()->Y());
 							SendArm(receivers, gobeur, ARM_NUMBER);
 							Debug(W_DEBUG, "Reste %d à %s", gobeur->Nb(), gobeur->LongName().c_str());
-							/* Pas besoin de mettre shadow, il l'est déjà.
-								* (*it)->SetZombie();
-								*/
+							(*it)->SetZombie();
 						}
 						else
 						{
@@ -590,9 +590,9 @@ bool EChannel::ShowAnim(ECEvent* event)
 						for(fix = fixed.begin();
 							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != entity->Level() ||
 							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner() ||
-							dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
+							(dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
 							dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(entity)->Containing() &&
-							dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(entity)->Type() );
+							dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(entity)->Type()));
 							++fix);
 
 					if(fix != fixed.end())
@@ -703,7 +703,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			                          VPName(entity->Parent()));
 	}
 
-	uint y = 0, x = 0, type = 0, nb = 0;
+	uint y = 0, x = 0, type = 0;
 	ECMove::Vector moves;
 	ECBCase* last_case = (entity ? entity->DestCase() : 0);
 	EContainer* container = 0;
@@ -881,7 +881,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				map->AddEvent(event);
 				if(entity->Owner())
 					entity->Owner()->Events()->Add(event);
-				nb = event->Nb();
 				entity->AddEvent(flags);
 				if(creator)
 					creator->Create(entity);
@@ -915,7 +914,6 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 				******************************/
 				cl->Player()->Stats()->created += entity->InitNb();
 				cl->Player()->DownMoney(entity->Cost());
-				nb = entity->Nb();
 			}
 			else
 				flags = 0;
@@ -1007,7 +1005,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			else
 			{
-				Debug(W_DEBUG, "On créé un nouvel event MOVE");
+				Debug(W_DEBUG, "On créé un nouvel event MOVE en %d,%d", entity->DestCase()->X(), entity->DestCase()->Y());
 				event = new ECEvent(flags, entity, entity->DestCase());
 				event->Move()->SetMoves(moves);
 				event->Move()->SetEntity(entity);
