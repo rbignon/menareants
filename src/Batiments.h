@@ -639,7 +639,7 @@ public:
 
 	ENTITY_CONSTRUCTOR(ECAirPort) {}
 
-	void UpdateImages() { PutImage(I_Down, (Resources::AirPort_Face())); }
+	void UpdateImages() { PutImage(I_Down, Resources::AirPort_Face(), GRAY2COLOR); }
 
 /* Infos */
 public:
