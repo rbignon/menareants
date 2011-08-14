@@ -32,7 +32,7 @@ class ECSpriteBase;
 class Color;
 class ECImage;
 
-void ChangePixelColor(ECImage* surf, Color last_color, Color new_color);
+void ChangePixelColor(ECImage* surf, const Color& last_color, const Color& new_color);
 Uint32 getpixel(SDL_Surface * surface, int x, int y);
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 void DrawRect(SDL_Surface * screen, int x1, int y1, int x2, int y2, Uint32 color);
@@ -112,13 +112,16 @@ public:
 
 	ECImage* First() const;
 
-	void ChangeColor(Color first, Color to);
+	void ChangeColor(const Color& first, const Color& to);
+	void Gray2Color(const Color& to);
 
 	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
 	void Zoom(double zoomx, double zoomy, bool smooth);
 
 	ECImage* Window() const { return mScreen; }
 	ECSpriteBase* SpriteBase() const { return mSpriteBase; }
+
+	void CopySpriteBase();
 
 /* Variables privées */
 private:
@@ -130,6 +133,7 @@ private:
 	long mLastupdate;
 	bool order, repeat;
 	ECSpriteBase *mSpriteBase;
+	bool autofree;
 	ECImage *mScreen;
 };
 
@@ -144,7 +148,8 @@ public:
 	 */
 	int init(const char *dir);
 
-	void ChangeColor(Color from, Color to);
+	void ChangeColor(const Color& from, const Color& to);
+	void Gray2Color(const Color& to);
 
 	void RotoZoom(double angle, double zoomx, double zoomy, bool smooth);
 	void Zoom(double zoomx, double zoomy, bool smooth);
@@ -152,6 +157,8 @@ public:
 	ECSpriteBase(const char *dir);
 	ECSpriteBase();
 	~ECSpriteBase();
+
+	ECSpriteBase* Copy() const;
 
 	ECImage* First();
 
@@ -256,6 +263,8 @@ public:
 
 	Uint32 GetPixel(int x, int y);
 	void PutPixel(int x, int y, Uint32 pixel);
+
+	void Gray2Color(const Color& new_color);
 
 /* Attributs */
 public:

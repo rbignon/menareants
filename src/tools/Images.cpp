@@ -151,17 +151,16 @@ SDL_Surface* CreateRGBASurface (int width, int height, Uint32 flags){
   return surface;
 }
 
-void ChangePixelColor(ECImage* surf, Color last_color, Color new_color)
+void ChangePixelColor(ECImage* surf, const Color& last_color, const Color& new_color)
 {
 	SLOCK(surf->Img);
 	for(int x = 0; x < surf->GetWidth(); x++)
 		for(int y = 0; y < surf->GetHeight(); y++)
 		{
 			Uint32 col = getpixel(surf->Img, x, y);
-			/*Uint8 r, g, b;
-			SDL_GetRGB(col, surf->Img->format, &r, &g, &b);*/
-			if(last_color == surf->GetColor(col))
-				putpixel(surf->Img, x, y, surf->MapColor(new_color));
+			Color pixcolor = surf->GetColor(col);
+			if(last_color == pixcolor)
+				putpixel(surf->Img, x, y, surf->MapColor(new_color.WithAlpha(pixcolor.GetAlpha())));
 		}
 	SUNLOCK(surf->Img);
 }
@@ -244,6 +243,7 @@ int ECSprite::init(ECSpriteBase *base, ECImage *screen)
   order = true;
   repeat = true;
   mX = 0; mY = 0; mOldX = 0; mOldY = 0;
+  autofree = false;
 
   //mSpriteBase = new ECSpriteBase(base->path.c_str());
   mSpriteBase = base;
@@ -256,7 +256,8 @@ int ECSprite::init(ECSpriteBase *base, ECImage *screen)
 
 ECSprite::~ECSprite()
 {
-
+	if (autofree)
+		delete mSpriteBase;
 }
 
 bool ECSprite::Anim() const { return (mSpriteBase->animation && mAnimating); }
@@ -330,9 +331,24 @@ int ECSprite::GetHeight()
 	return (mSpriteBase ? mSpriteBase->mH : 0);
 }
 
-void ECSprite::ChangeColor(Color first, Color to)
+void ECSprite::ChangeColor(const Color& first, const Color& to)
 {
 	mSpriteBase->ChangeColor(first, to);
+}
+
+void ECSprite::CopySpriteBase()
+{
+	ECSpriteBase* spr = mSpriteBase;
+	mSpriteBase = spr->Copy();
+	mSpriteBase->animation = spr->animation;
+	if (autofree)
+		delete spr;
+	autofree = true;
+}
+
+void ECSprite::Gray2Color(const Color& to)
+{
+	mSpriteBase->Gray2Color(to);
 }
 
 void ECSprite::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
@@ -365,6 +381,13 @@ ECSpriteBase::ECSpriteBase(const char *dir)
 ECSpriteBase::~ECSpriteBase()
 {
 
+}
+
+ECSpriteBase* ECSpriteBase::Copy() const
+{
+	ECSpriteBase* sb = new ECSpriteBase();
+	sb->init(path.c_str());
+	return sb;
 }
 
 int ECSpriteBase::init(const char *dir)
@@ -431,10 +454,16 @@ int ECSpriteBase::init(const char *dir)
 	return 0;
 }
 
-void ECSpriteBase::ChangeColor(Color from, Color to)
+void ECSpriteBase::ChangeColor(const Color& from, const Color& to)
 {
 	for(uint i=0; i < NumFrames(); ++i)
 		ChangePixelColor(&surfaces[i], from, to);
+}
+
+void ECSpriteBase::Gray2Color(const Color& to)
+{
+	for(uint i=0; i < NumFrames(); ++i)
+		surfaces[i].Gray2Color(to);
 }
 
 void ECSpriteBase::RotoZoom(double angle, double zoomx, double zoomy, bool smooth)
@@ -890,4 +919,27 @@ void ECImage::PutPixel(int x, int y, Uint32 pixel){
         *(Uint32 *)p = pixel;
         break;
     }
+}
+
+#if !defined(min) || !defined(max)
+#define min(a, b) (a < b ? a : b)
+#define max(a, b) (a > b ? a : b)
+#endif
+void ECImage::Gray2Color(const Color& new_color)
+{
+	for(int x = 0; x < GetWidth(); ++x)
+		for(int y = 0; y < GetHeight(); ++y)
+		{
+			Uint32 col = GetPixel(x, y);
+			Uint8 r, g, b, a;
+			SDL_GetRGBA(col, Img->format, &r, &g, &b, &a);
+			if (min(r, min(g, b)) > max(r, max(g, b)) - 20)
+			{
+				Color newc = Color(r * new_color.GetRed() / 255,
+				                   g * new_color.GetGreen() / 255,
+						   b * new_color.GetBlue() / 255,
+						   a);
+				PutPixel(x, y, MapColor(newc));
+			}
+		}
 }
