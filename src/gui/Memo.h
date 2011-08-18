@@ -64,7 +64,7 @@ public:
 	void Init ();
 	void Draw (const Point2i& mouse);
 	bool Clic (const Point2i& mouse, int button);
-	void AddItem (const std::string &label, Color _color = black_color);
+	void AddItem (const std::string &label, Color _color = white_color);
 	void ScrollUp() { first_visible_item = 0; };
 	void RemoveItem (uint index);
 	uint NbItems() const { return m_items.size(); }

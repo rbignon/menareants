@@ -51,7 +51,7 @@ public:
 	TListBoxItem* AddItem (bool selected,
 	                       const std::string &label,
 	                       const std::string &value,
-	                       const Color& _color = black_color,
+	                       const Color& _color = white_color,
 	                       bool _enabled = true,
 	                       Font& font = *Font::GetInstance(Font::Small),
 	                       const std::string& name = "");

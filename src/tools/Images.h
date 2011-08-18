@@ -252,6 +252,8 @@ public:
 	int Fill(const Color &color);
 	int FillRect(SDL_Rect &dstRect, Uint32 color);
 	int FillRect(SDL_Rect &dstRect, const Color color);
+	int FillRect(const Rectanglei &dstRect, Uint32 color);
+	int FillRect(const Rectanglei &dstRect, const Color color);
 
 	void NewSurface(const Point2i& size, Uint32 flags, bool useAlpha);
 

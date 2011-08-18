@@ -525,7 +525,7 @@ TListServerForm::TListServerForm(ECImage* w)
 	ServerList->SetXY(Window()->GetWidth()/2 - ServerList->Width()/2 - 50, Window()->GetHeight()/2 - ServerList->Height()/2 + 70);
 	ServerList->SetGrayDisable(false);
 
-	Welcome = AddComponent(new TLabel(30,StringF(_("Men Are Ants is for YOU, %s!"), Config::GetInstance()->nick.c_str()),
+	Welcome = AddComponent(new TLabel(30,StringF(_("Welcome to Men Are Ants, %s!"), Config::GetInstance()->nick.c_str()),
 	                                  white_color, Font::GetInstance(Width() <= 800 ? Font::Large : Font::Huge)));
 
 	Label1 = AddComponent(new TLabel(ServerList->Y()-60, _("Please select a server in this list:"), white_color, Font::GetInstance(Font::Big)));
@@ -824,7 +824,7 @@ int MOTDCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ConnectedForm->Motd->ClearItems();
 	}
 
-	ConnectedForm->Motd->AddItem(parv.size() > 1 ? parv[1] : "", black_color);
+	ConnectedForm->Motd->AddItem(parv.size() > 1 ? parv[1] : "", white_color);
 	return 0;
 }
 
@@ -874,16 +874,16 @@ int LSPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	{
 		if(parv[4] == "0")
 			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s", parv[1].c_str(), parv[3].c_str()), parv[1],
-			                              black_color, true);
+			                              white_color, true);
 		else if(parv.size() > 5)
 			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s %s", parv[1].c_str(), parv[3].c_str(),
 			                                                                 parv[4].c_str(), parv[5].c_str()), parv[1],
-			                              enabled ? black_color : red_color,
+			                              enabled ? white_color : red_color,
 			                              enabled ? true : false);
 		else
 			ConnectedForm->GList->AddItem(false, StringF("%-8s %2s/%-2s", parv[1].c_str(), parv[3].c_str(),
 			                                                              parv[4].c_str()), parv[1],
-			                              enabled ? black_color : red_color,
+			                              enabled ? white_color : red_color,
 			                              enabled ? true : false);
 	}
 	else

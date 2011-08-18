@@ -285,7 +285,7 @@ int LSMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			GameInfosForm->RecvMapList = true;
 			GameInfosForm->MapList->ClearItems();
 		}
-		TListBoxItem* i = GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], black_color,
+		TListBoxItem* i = GameInfosForm->MapList->AddItem(false, parv[1] + " (" + parv[2] + "-" + parv[3] + ")", parv[1], white_color,
 		                                         true);
 		if(parv.size() > 4)
 			i->SetHint(parv[4].c_str());
@@ -318,7 +318,7 @@ int AMSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	{
 		me->LockScreen();
 		GameInfosForm->Chat->AddItem("[private] <" + parv[0] + "> " + parv[1],
-	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : white_color);
 		me->UnlockScreen();
 	}
 
@@ -337,7 +337,7 @@ int MSGCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? 0 : *(players.begin()));
 	else if(GameInfosForm)
 		GameInfosForm->Chat->AddItem("<" + parv[0] + "> " + parv[1],
-	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : black_color);
+	                     strstr(parv[1].c_str(), me->GetNick().c_str()) ? red_color : white_color);
 	me->UnlockScreen();
 
 	return 0;
@@ -1055,7 +1055,7 @@ int JOICommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			                            (parv[0][0] == IA_CHAR));
 			if(GameInfosForm)
 			{
-				GameInfosForm->Chat->AddItem(StringF(_("*** %s has joined game"), parv[0].c_str()), green_color);
+				GameInfosForm->Chat->AddItem(StringF(_("*** %s has joined game"), parv[0].c_str()), fgreen_color);
 				TPlayerLine *pline;
 				GameInfosForm->Players->AddLine((pline = new TPlayerLine(pl)));
 				GameInfosForm->RecalcMemo();
@@ -1117,7 +1117,7 @@ int LEACommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				if((*playersi)->Nation() && GameInfosForm->MyNation)
 					GameInfosForm->MyNation->Item((*playersi)->Nation())->SetEnabled();
 
-				GameInfosForm->Chat->AddItem(StringF(_("*** %s has leave game"), (*playersi)->GetNick()), green_color);
+				GameInfosForm->Chat->AddItem(StringF(_("*** %s has leave game"), (*playersi)->GetNick()), fgreen_color);
 				std::vector<TComponent*> plrs = GameInfosForm->Players->GetList();
 				for(std::vector<TComponent*>::iterator it=plrs.begin(); it!=plrs.end(); ++it)
 				{
@@ -1248,7 +1248,7 @@ bool MenAreAntsApp::GameInfos(const char *cname, TForm* form, int flags)
 
 	/* Déclaration membres fixes */
 	GameInfosForm = new TGameInfosForm(Video::GetInstance()->Window(), client, (flags & G_MISSION));
-	GameInfosForm->Chat->AddItem(StringF(_("*** You have rejoin %s"), cname), green_color);
+	GameInfosForm->Chat->AddItem(StringF(_("*** You have rejoin %s"), cname), fgreen_color);
 
 	JOINED = 0;
 	if(create)
@@ -1346,7 +1346,7 @@ void TGameInfosForm::OnKeyUp(SDL_keysym key)
 			if(SendMessage->Focused() && !SendMessage->Empty())
 			{
 				client->sendrpl(MSG_MSG, SendMessage->GetString());
-				Chat->AddItem("<" + client->GetNick() + "> " + SendMessage->GetString(), black_color);
+				Chat->AddItem("<" + client->GetNick() + "> " + SendMessage->GetString(), white_color);
 				SendMessage->ClearString();
 			}
 			break;

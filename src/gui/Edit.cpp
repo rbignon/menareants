@@ -27,7 +27,7 @@
 
 TEdit::TEdit (Font* f, int _x, int _y, uint _width, uint _maxlen, const char* av, bool _show_bg)
   : TComponent(_x, _y, _width, f->GetHeight()), show_background(_show_bg), caret(0), have_redraw(true), font(f),
-    color(black_color), passwd(false)
+    color(white_color), passwd(false)
 {
 	assert(font);
 
@@ -46,11 +46,12 @@ void TEdit::Init()
 
 	if(!show_background) return;
 
-	SDL_Rect r_back = {0,0,Width(), Height()};
+	Rectanglei r(0, 0, Width(), Height());
 
 	background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width(), Height(),
 						32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-	background.FillRect(r_back, background.MapColor(BoxColor));
+	background.FillRect(r, background.MapColor(BoxColor));
+	background.RectangleColor(r, white_color);
 }
 
 void TEdit::SetFocus()

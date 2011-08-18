@@ -93,8 +93,8 @@ const Color fwhite_color(0xcb, 0xcb, 0xcb, 0xff);
 const Color fbrown_color(0x3b, 0x2b, 0x1e, 0xff);
 const Color fblue_color(0x0e, 0x0e, 0x55, 0xff);
 
-const Color BoxColor(172, 183, 255, 255*5/10);
-const Color BoxShadowColor(172, 183, 255, 255*6/10);
+const Color BoxColor(74, 79, 110, 255*5/10);
+const Color BoxShadowColor(74, 79, 110, 255*6/10);
 const Color BoxColorSelected(0, 0, 255*6/10, 255*8/10);
 const Color BoxColorMoused(0, 0, 255*6/10, 255*4/10);
 

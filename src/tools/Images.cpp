@@ -733,6 +733,20 @@ int ECImage::FillRect(SDL_Rect &dstRect, const Color color)
 	return SDL_FillRect( Img, &dstRect, MapColor(color));
 }
 
+int ECImage::FillRect(const Rectanglei &dstRect, Uint32 color)
+{
+	if(!Img) return 0;
+	SDL_Rect rect = GetSDLRect(dstRect);
+	return SDL_FillRect( Img, &rect, color);
+}
+
+int ECImage::FillRect(const Rectanglei &dstRect, const Color color)
+{
+	if(!Img) return 0;
+	SDL_Rect rect = GetSDLRect(dstRect);
+	return SDL_FillRect( Img, &rect, MapColor(color));
+}
+
 void ECImage::NewSurface(const Point2i& size, Uint32 flags, bool useAlpha)
 {
 	Uint32 alphaMask;

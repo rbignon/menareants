@@ -88,8 +88,14 @@ void TListBox::Init()
 	MyComponent(&m_down);
 	// Load images
 	m_up.SetImage (new ECSprite(Resources::UpButton(), Window()));
-	m_up.SetXY(X() + Width() - 12, Y() + 2);
 	m_down.SetImage (new ECSprite(Resources::DownButton(), Window()));
+	SetXY(X(), Y());
+}
+
+void TListBox::SetXY (int _x, int _y)
+{
+	TComponent::SetXY(_x, _y);
+	m_up.SetXY(X() + Width() - 12, Y() + 2);
 	m_down.SetXY(X() + Width() - 12, Y() + Height() - 12);
 }
 
@@ -177,7 +183,6 @@ void TListBox::Draw(const Point2i &mousePosition)
 
 	// Draw border and bg color
 	Window()->BoxColor(rect, box_color);
-	//Window()->RectangleColor(rect, white_color);
 
 	if(scrolling)
 	{
@@ -245,6 +250,7 @@ void TListBox::Draw(const Point2i &mousePosition)
 	}
 	else
 		m_down.Hide();
+	Window()->RectangleColor(rect, white_color);
 }
 
 Rectanglei TListBox::ScrollBarPos() const

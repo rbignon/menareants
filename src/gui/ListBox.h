@@ -105,6 +105,7 @@ public:
 
 	void ScrollTo(uint id);
 	void ScrollTo(TListBoxItem* item);
+	void SetXY (int _x, int _y);
 
 /* Attributs */
 public:

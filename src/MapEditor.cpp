@@ -1312,7 +1312,7 @@ void TLoadMapFile::Refresh()
 
 	for(std::vector<std::string>::const_iterator it = file_list.begin(); it != file_list.end(); ++it)
 		MapsList->AddItem(false, it->substr(0, it->size() - 4), MenAreAntsApp::GetInstance()->GetPath() + *it,
-			                             black_color, true);
+			                             white_color, true);
 }
 
 TLoadMapFile::TLoadMapFile(ECImage* w)

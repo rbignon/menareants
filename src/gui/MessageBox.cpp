@@ -196,7 +196,7 @@ void TMessageBox::SetText(std::string __s)
 		   * MSGBOX_MAXWIDTH + 20 on coupe net.
 		   */
 		    s[i] = '\0';
-			message.push_back(TLabel(x,y,s,black_color,Font::GetInstance(Font::Normal)));
+			message.push_back(TLabel(x,y,s,white_color,Font::GetInstance(Font::Normal)));
 			MyComponent(&(*(message.end()-1)));
 			i=0;
 
@@ -233,20 +233,21 @@ void TMessageBox::Init(std::string s, bool transparence)
 		SetEdit();
 	SetButtons();
 
-	SDL_Rect r_back = {0,0,w,h};
+	Rectanglei r(0, 0, w, h);
 
 	if(transparence)
 	{
 		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, w, h,
 		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-		background.FillRect(r_back, background.MapRGBA(172, 183, 255, 255*6/10));
+		background.FillRect(r, BoxShadowColor.WithAlpha(0xdd));
 	}
 	else
 	{
 		background.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE, w, h,
 		                                          32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-		background.FillRect(r_back, background.MapRGBA(172, 183, 255, 255));
+		background.FillRect(r, BoxColor.WithAlpha(0xff));
 	}
+	background.RectangleColor(r, white_color);
 
 	if(x == -1 && y == -1)
 	{

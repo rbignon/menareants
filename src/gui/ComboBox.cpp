@@ -27,7 +27,7 @@
 
 TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
 	: TListBox(Rectanglei(_x, _y, _width, f->GetHeight())), real_y(_y), opened(false), visible_len(0),
-		  chaine(_x+5, _y, "", black_color, f), COMBOBOX_HEIGHT(f->GetHeight()), font(f)
+		  chaine(_x+5, _y, "", white_color, f), COMBOBOX_HEIGHT(f->GetHeight()), font(f)
 {
 
 }
@@ -45,13 +45,14 @@ void TComboBox::Init()
   m_open.SetXY(X()+Width()-12, Y());
 
   // FIXME: What does 13 mean ?
-  SDL_Rect r_back = {0,0,Width()-13,COMBOBOX_HEIGHT};
+  Rectanglei r(0, 0, Width()-13, COMBOBOX_HEIGHT);
 
   edit_bg.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width()-13, COMBOBOX_HEIGHT,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
-  edit_bg.FillRect(r_back, edit_bg.MapColor(BoxColor));
+  edit_bg.FillRect(r, edit_bg.MapColor(BoxColor));
+  edit_bg.RectangleColor(r, white_color);
 
-  box_color = Color(172, 183, 255, 255);
+  box_color = BoxColor;
 
   TListBox::Init();
 }

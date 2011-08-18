@@ -238,7 +238,7 @@ void Config::WantAddServer(TObject* OkButton, void* configinst)
 	}
 	host = host + ":" + port;
 	conf->server_list.push_back(host);
-	form->ServerList->AddItem(true, host, host, black_color, true);
+	form->ServerList->AddItem(true, host, host, white_color, true);
 	form->NewServer->ClearString();
 	return;
 }
@@ -386,11 +386,11 @@ void Config::Configuration(bool first)
 		std::string p = *it;
 		std::string h = stringtok(p, ":");
 
-		ConfigForm->ServerList->AddItem((h == hostname && p == TypToStr(port)), *it, *it, black_color, true);
+		ConfigForm->ServerList->AddItem((h == hostname && p == TypToStr(port)), *it, *it, white_color, true);
 		if(h == hostname && p == TypToStr(port)) found = true;
 	}
 	if(!found)
-		ConfigForm->ServerList->AddItem(true, hostname + ":" + TypToStr(port), hostname, black_color, true);
+		ConfigForm->ServerList->AddItem(true, hostname + ":" + TypToStr(port), hostname, white_color, true);
 
 	want_quit_config = false;
 	do
