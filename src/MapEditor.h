@@ -224,8 +224,12 @@ public:
 public:
 	static void RadarClick(TObject*, const Point2i&);
 
-protected:
+private:
 	static void SelectUnit(TObject* o, void* e);
+	ECEntity* last_created_entity;
+
+public:
+	ECEntity* GetLastCreatedEntity() const { return last_created_entity; }
 };
 
 class TMapEditor : public TForm

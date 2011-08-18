@@ -441,6 +441,9 @@ void TMapEditor::OnKeyUp(SDL_keysym key)
 
 			break;
 		}
+		case SDLK_a:
+			Map->SetCreateEntity(BarreLat->GetLastCreatedEntity());
+			break;
 		default: break;
 	}
 }
@@ -1034,7 +1037,8 @@ void TEditBarreLat::SelectUnit(TObject* o, void* e)
 	if(!editor)
 		return;
 
-	editor->Map->SetCreateEntity(static_cast<ECEntity*>(e));
+	editor->BarreLat->last_created_entity = static_cast<ECEntity*>(e);
+	editor->Map->SetCreateEntity(editor->BarreLat->last_created_entity);
 }
 
 void TEditBarreLat::RadarClick(TObject* m, const Point2i& mouse)
@@ -1057,7 +1061,7 @@ void TEditBarreLat::RadarClick(TObject* m, const Point2i& mouse)
 }
 
 TEditBarreLat::TEditBarreLat()
-	: TChildForm(SCREEN_WIDTH-200, 0, 200, SCREEN_HEIGHT)
+	: TChildForm(SCREEN_WIDTH-200, 0, 200, SCREEN_HEIGHT), last_created_entity(0)
 {
 
 }
