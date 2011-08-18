@@ -892,7 +892,7 @@ void ECBMap::Init()
 			{
 				std::string id = stringtok(ligne, " ");
 				std::string owner = stringtok(ligne, " ");
-				std::string name = stringtok(ligne, " ");
+				std::string name = ligne;
 				if (id.size() != 2 || owner.empty())
 					throw ECExcept(VName(id) VName(owner), "Not enough parameters for this country");
 
