@@ -528,27 +528,47 @@ TListServerForm::TListServerForm(ECImage* w)
 	Welcome = AddComponent(new TLabel(30,StringF(_("Welcome to Men Are Ants, %s!"), Config::GetInstance()->nick.c_str()),
 	                                  white_color, Font::GetInstance(Width() <= 800 ? Font::Large : Font::Huge)));
 
-	Label1 = AddComponent(new TLabel(ServerList->Y()-60, _("Please select a server in this list:"), white_color, Font::GetInstance(Font::Big)));
+	Label1 = AddComponent(new TLabel(ServerList->Y()-50, _("Please select a server in this list:"), white_color, Font::GetInstance(Font::Big)));
 
 	Label2 = AddComponent(new TLabel(ServerList->X(), ServerList->Y()-20, "", white_color, Font::GetInstance(Font::Normal)));
 	Label2->SetCaption(_("Ping  Name                 Proto   Players   Games  On Standby"));
 
-	int f = (Label1->Y()-(Welcome->Y()+Welcome->Height()))/2+20;
-	if(f < Welcome->Y()+Welcome->Height())
-		f = Welcome->Y()+Welcome->Height();
-	MissionButton = AddComponent(new TButton(Window()->GetWidth()/2, f, 220,50));
+	MissionButton = AddComponent(new TButton(0, 0, 220,50));
 	MissionButton->SetHint(_("Mission"));
 	MissionButton->SetImage(new ECSprite(Resources::MissionButton(), Video::GetInstance()->Window()));
-
-	MissionButton->SetX(MissionButton->X() - 200);
-	if(MissionButton->Y()+MissionButton->Height() > Label1->Y())
-		Label1->Hide();
-	EscarmoucheButton = AddComponent(new TButton(MissionButton->X()+MissionButton->Width()+100, MissionButton->Y(), 220,50));
+	EscarmoucheButton = AddComponent(new TButton(0, 0, 220,50));
 	EscarmoucheButton->SetHint(_("Skirmich against computer"));
 	EscarmoucheButton->SetImage(new ECSprite(Resources::EscarmoucheButton(), Video::GetInstance()->Window()));
 
-	UserStats = AddComponent(new TLabel(ServerList->X()-25, ServerList->Y()+ServerList->Height()+10, " ", white_color, Font::GetInstance(Font::Normal)));
+	int bottom = Label1->Y();
+	if (Label1->Y() - (Welcome->Y() + Welcome->Height()) < MissionButton->Height())
+	{
+		Label1->Hide();
+		bottom = ServerList->Y();
+	}
 
+	int f = bottom/2 + (Welcome->Y() + Welcome->Height())/2;
+	Debug(W_ERR, "%d vs %d", bottom - (Welcome->Y() + Welcome->Height()), MissionButton->Height() + EscarmoucheButton->Height());
+	if (bottom - (Welcome->Y() + Welcome->Height()) >= MissionButton->Height() + EscarmoucheButton->Height())
+	{
+		MissionButton->SetXY(Window()->GetWidth()/3, f - MissionButton->Height());
+		MissionLabel = AddComponent(new TLabel(MissionButton->X() + MissionButton->Width() + 10,
+		                                       MissionButton->Y() + MissionButton->Height()/2 - Font::GetInstance(Font::Big)->GetHeight()/2,
+		                                       _("Mission"), white_color, Font::GetInstance(Font::Big)));
+		EscarmoucheButton->SetXY(Window()->GetWidth()/3, f);
+		EscarmoucheLabel = AddComponent(new TLabel(EscarmoucheButton->X() + EscarmoucheButton->Width() + 10,
+		                                           EscarmoucheButton->Y() + EscarmoucheButton->Height()/2 - Font::GetInstance(Font::Big)->GetHeight()/2,
+		                                           _("Skirmich"), white_color, Font::GetInstance(Font::Big)));
+	}
+	else
+	{
+		MissionButton->SetXY(ServerList->X() + 75, f-MissionButton->Height()/2);
+		MissionLabel = NULL;
+		EscarmoucheButton->SetXY(ServerList->X() + ServerList->Width() - EscarmoucheButton->Width() - 75, f-EscarmoucheButton->Height()/2);
+		EscarmoucheLabel = NULL;
+	}
+
+	UserStats = AddComponent(new TLabel(ServerList->X()-25, ServerList->Y()+ServerList->Height()+10, " ", white_color, Font::GetInstance(Font::Normal)));
 	ChanStats = AddComponent(new TLabel(ServerList->X()-25, UserStats->Y()+UserStats->Height(), " ", white_color, Font::GetInstance(Font::Normal)));
 
 	int button_x = ServerList->X() + ServerList->Width();
@@ -728,7 +748,7 @@ int AIMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(parv.size() > 2)
 			Config::GetInstance()->cookie = parv[2];
 		Config::GetInstance()->nick = parv[1];
-		ListServerForm->Welcome->SetCaption(StringF(_("Men Are Ants is for YOU, %s!"), me->GetNick().c_str()));
+		ListServerForm->Welcome->SetCaption(StringF(_("Welcome to Men Are Ants, %s!"), me->GetNick().c_str()));
 
 		if(me->Request().empty() == false)
 		{

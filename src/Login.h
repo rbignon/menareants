@@ -116,7 +116,9 @@ public:
 	TButton*     StatsButton;
 	TButton*     AccountButton;
 	TButton*     MissionButton;
+	TLabel*      MissionLabel;
 	TButton*     EscarmoucheButton;
+	TLabel*      EscarmoucheLabel;
 	TLabel*      Label1;
 	TLabel*      Label2;
 	TLabel*      UserStats;
