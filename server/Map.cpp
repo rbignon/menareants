@@ -242,8 +242,6 @@ void ECEntity::Invest(ECBEntity* e)
 {
 	if(!Owner())
 		Debug(W_WARNING, "ECEntity::Invest(): A neutral unity (%d) invests an other entity (%s: %d) !?!?!?", Type(), e->LongName().c_str(), e->Type());
-	if(e->IsCountryMaker())
-		Case()->Country()->ChangeOwner(Owner() ? Owner()->MapPlayer() : 0);
 	e->ChangeOwner(Owner());
 }
 
@@ -278,6 +276,9 @@ void ECEntity::ChangeOwner(ECBPlayer* pl)
 		if(Owner())
 			Owner()->Events()->Add(*evti);
 	}
+
+	if(IsCountryMaker())
+		Case()->Country()->ChangeOwner(Owner() ? Owner()->MapPlayer() : 0);
 }
 
 bool ECEntity::AreFriends(std::vector<ECEntity*> list)
