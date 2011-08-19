@@ -1,6 +1,6 @@
 /* src/Sockets.h- Header of Sockets.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,16 @@
 
 /* Ça peut parraitre bizare mais c'est pour éviter une inclusion de winsock2.h qui cause des merdes */
 typedef unsigned int SOCKET;
-#if defined(WIN32) && !defined(WINSOCK2_H) && !defined(FD_SETSIZE)
-#define FD_SETSIZE      64
+#ifdef WIN32
+# if !defined(WINSOCK2_H) && !defined(FD_SETSIZE)
+#  define FD_SETSIZE      64
 typedef struct fd_set {
         unsigned int   fd_count;
         SOCKET  fd_array[FD_SETSIZE];
 } fd_set;
+# endif
 #else
-#include <sys/select.h>
+# include <sys/select.h>
 #endif
 
 const int MAXBUFFER=1024;

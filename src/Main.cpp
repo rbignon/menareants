@@ -1,6 +1,6 @@
 /* src/main.cpp - Main file
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
 #include <functional>
 
 #if !defined(DEBUG) && defined(UNSTABLE)
-#error Vous tentez de compiler une version instable. Si vous Ãªtes certain de vouloir la compiler, rajoutez --enable-debug dans les options du script ./configure
+#error You are tring to compile an unstable version. If you are sure, run ./configure with --enable-debug
 #endif
 
 #ifdef WIN32
@@ -437,9 +437,9 @@ TCredits::TCredits(ECImage* w)
 	Memo->SetShadowed();
 	Memo->AddItem(_("Contributors:\n"
 	                "\n"
-	                "=Programmation=\n"
+	                "=Programming=\n"
 	                "- lodesi: patches for defense tower and other effects.\n"
-	                "- phh: patche for the plane.\n"
+	                "- phh: patch for the plane.\n"
 	                "\n"
 	                "=Others=\n"
 	                "- Anicée: for her voice.\n"
