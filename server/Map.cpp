@@ -1,6 +1,6 @@
 /* server/Map.cpp - Map classes
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,6 +107,21 @@ void ECMap::RemoveAnEntity(ECBEntity* e, bool use_delete)
 		if(dynamic_cast<ECPlayer*>(*pl)->Client())
 			dynamic_cast<ECPlayer*>(*pl)->Client()->RemoveEntity(e);
 
+	if(Channel() && e->Case() && e->IsCountryMaker() && e->Case()->Country()->Owner() != NULL)
+	{
+		std::vector<ECBCase*> cases = e->Case()->Country()->Cases();
+		size_t nb_makers = 0;
+		for(BCaseVector::iterator c = cases.begin(); c != cases.end(); ++c)
+		{
+			std::vector<ECBEntity*> ents = (*c)->Entities()->List();
+			for(std::vector<ECBEntity*>::iterator it = ents.begin(); it != ents.end(); ++it)
+				if(*it != e && !(*it)->IsZombie() && (*it)->IsCountryMaker())
+					nb_makers++;
+		}
+		if(nb_makers == 0)
+			e->Case()->Country()->ChangeOwner(NULL);
+	}
+
 	ECBMap::RemoveAnEntity(e, use_delete);
 }
 
@@ -211,6 +226,8 @@ bool ECountry::ChangeOwner(ECBMapPlayer* mp)
 			EChannel* chan = dynamic_cast<EChannel*>(last_owner->Player()->Channel());
 			chan->sendto_players(0, last_owner->Player(), MSG_SET, ECArgs("-@", ident));
 		}
+		else
+			Debug(W_WARNING, "Country %s changed from nobody to nobody??", ID());
 		return true;
 	}
 	return false;
@@ -358,13 +375,13 @@ bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
 	uint enemies = 0;
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
 		if(this != *it && (*it)->Case() == Case() && !Like(*it) && (*it)->Nb() &&
-		   (CanAttaq(*it) || Parent() && Parent()->CanAttaq(*it)))
+		   (CanAttaq(*it) || (Parent() && Parent()->CanAttaq(*it))))
 			enemies++;
 
 	if(!enemies) return false;
 
 	for(std::vector<ECEntity*>::iterator it = entities.begin(); it != entities.end(); ++it)
-		if(*it != this && (*it)->Case() == Case() && !Like(*it) && (CanAttaq(*it) || Parent() && Parent()->CanAttaq(*it)))
+		if(*it != this && (*it)->Case() == Case() && !Like(*it) && (CanAttaq(*it) || (Parent() && Parent()->CanAttaq(*it))))
 		{
 			// Thomas' adaptation
 			uint attaq_nb = Nb() > 1000 ? 1000 : Nb();
