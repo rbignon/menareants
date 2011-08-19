@@ -264,7 +264,7 @@ class ECountry : public ECBCountry
 {
 /* Constructeur/Destructeur */
 public:
-	ECountry(ECBMap* map, const Country_ID ident) : ECBCountry(map, ident) {}
+	ECountry(ECBMap* map, const Country_ID ident, const std::string& name) : ECBCountry(map, ident, name) {}
 
 /* Methodes */
 public:
@@ -314,7 +314,7 @@ public:
 protected:
 	EventVector map_events;
 	uint i;
-	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident) { return new ECountry(m, ident); }
+	virtual ECBCountry* CreateCountry(ECBMap* m, const Country_ID ident, const std::string& name = "") { return new ECountry(m, ident, name); }
 };
 
 typedef std::vector<ECMap*> MapVector;
