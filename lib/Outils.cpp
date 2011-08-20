@@ -64,31 +64,30 @@ std::vector<std::string> GetFileList(std::string path, std::string ext)
 #ifdef WIN32
 	WIN32_FIND_DATA File;
 	HANDLE hSearch;
-	BOOL re;
 	char dir[MAX_PATH];
-	GetCurrentDirectory(sizeof dir, dir);
+	std::string pattern = path + "*.";
 
-	if(!path.empty())
-		SetCurrentDirectory (path.c_str());
-
-	if(!ext.empty())
-		hSearch=FindFirstFile(("*." + ext).c_str(), &File);
+	if (ext.empty())
+		pattern += '*';
 	else
-		hSearch=FindFirstFile("*.*", &File);
+		pattern += ext;
 
-	if(hSearch ==  INVALID_HANDLE_VALUE)
-		return file_list;
+	hSearch=FindFirstFile(pattern.c_str(), &File);
 
-	re=TRUE;
-	for(re=TRUE; re; re = FindNextFile(hSearch, &File))
+	if(hSearch !=  INVALID_HANDLE_VALUE)
 	{
-		if(File.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			continue;
-		file_list.push_back(File.cFileName);
+		for(BOOL re=TRUE; re; re = FindNextFile(hSearch, &File))
+		{
+			const char *name = (File.cAlternateFileName && File.cAlternateFileName[0])
+				                 ? File.cAlternateFileName : File.cFileName;
+
+			if(File.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				continue;
+			file_list.push_back(File.cFileName);
+		}
 	}
 
 	FindClose(hSearch);
-	SetCurrentDirectory(dir);
 #else
 	struct dirent *lecture;
 	DIR *rep;
