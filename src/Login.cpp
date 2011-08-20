@@ -548,7 +548,6 @@ TListServerForm::TListServerForm(ECImage* w)
 	}
 
 	int f = bottom/2 + (Welcome->Y() + Welcome->Height())/2;
-	Debug(W_ERR, "%d vs %d", bottom - (Welcome->Y() + Welcome->Height()), MissionButton->Height() + EscarmoucheButton->Height());
 	if (bottom - (Welcome->Y() + Welcome->Height()) >= MissionButton->Height() + EscarmoucheButton->Height())
 	{
 		MissionButton->SetXY(Window()->GetWidth()/3, f - MissionButton->Height());

@@ -62,7 +62,7 @@ public:
 /* Methodes */
 public:
 
-	void Play(bool repeat = false);
+	bool Play(bool repeat = false);
 	int Stop();
 	void Free();
 

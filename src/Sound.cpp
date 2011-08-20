@@ -127,17 +127,28 @@ void Sound::NextMusic(std::vector<Sound*>::iterator s)
 {
 	if(!Config::GetInstance()->music || !playing_music) return;
 
-	Sound* next;
-	if((s+1) == musics.end())
-		s = musics.begin();
-	else
-		++s;
+	Sound* next = NULL;
+	do {
+		if (next)
+		{
+			delete next;
+			s = musics.erase(s);
+		}
+		else
+			++s;
 
-	next = *s;
+		if (s == musics.end())
+			s = musics.begin();
 
-	next->Play();
-	if(!next->Playing())
-		NextMusic(s);
+		/* no more music in list */
+		if (s == musics.end())
+		{
+			StopMusic();
+			return;
+		}
+
+		next = *s;
+	} while (!next->Play());
 }
 
 void Sound::NextMusic()
@@ -156,10 +167,20 @@ void Sound::PlayMusic()
 
 	if(musics.empty() || !Config::GetInstance()->music) return;
 
-	int r = rand()%musics.size();
-	musics[r]->Play();
-	if(!musics[r]->Playing())
-		PlayMusic(); // Si on arrive pas à lire on réexecute la fonction en reprenant un autre nombre aléatoire.
+	std::vector<Sound*>::iterator it = musics.end();
+	do {
+		if (it != musics.end())
+		{
+			delete *it;
+			it = musics.erase(it);
+		}
+		else
+			it = musics.begin() + rand()%musics.size();
+
+		if (it == musics.end())
+			return;
+
+	} while	(!(*it)->Play());
 }
 
 void Sound::EraseMusicList()
@@ -180,6 +201,7 @@ void Sound::SetMusicList(std::string path)
 	if(path.empty()) return;
 
 	std::vector<std::string> file_list = GetFileList(PKGDATADIR_SOUND + path);
+	Debug(W_DEBUG, "Listing dir %s%s", PKGDATADIR_SOUND, path.c_str());
 
 	for(std::vector<std::string>::const_iterator it = file_list.begin(); it != file_list.end(); ++it)
 		musics.push_back(new Sound(path + *it, true));
@@ -224,45 +246,46 @@ int Sound::Stop()
 	return IsMusic() ? Mix_HaltMusic() : Mix_HaltChannel(channel);
 }
 
-void Sound::Play(bool repeat)
+bool Sound::Play(bool repeat)
 {
-	if(Playing() || !Sound::init) { return; }
+	if(Playing() || !Sound::init) { return false; }
 
 	if(IsMusic())
 	{
-		if(!Config::GetInstance()->music) return;
+		if(!Config::GetInstance()->music) return false;
 
 		if(!music)
 			music = Mix_LoadMUS(path.c_str());
 		if(!music)
 		{
-			// Why do I send an exception ??
-			throw ECExcept("", "Sound::Play(" + path + ") :" + Mix_GetError());
+			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(),Mix_GetError());
+			return false;
 		}
 		channel = Mix_PlayMusic(music, repeat ? -1 : 0);
 	}
 	else
 	{
-		if(!Config::GetInstance()->effect) return;
+		if(!Config::GetInstance()->effect) return false;
 
 		if(!chunk)
 			chunk = Mix_LoadWAV(path.c_str());
 		if(!chunk)
 		{
 			Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
-			return;
+			return false;
 		}
 		channel = Mix_PlayChannel(-1, chunk, repeat ? -1 : 0);
 	}
 
 	if (channel == -1)
-		Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
-	else
 	{
-		playing = true;
-		if(!IsMusic()) /* La musique n'a pas de channel */
-			Sound::chunks[channel] = this;
-		else
-			playing_music = true;
+		Debug(W_WARNING, "Sound::Play(%s): %s", path.c_str(), Mix_GetError());
+		return false;
 	}
+	playing = true;
+	if(!IsMusic()) /* La musique n'a pas de channel */
+		Sound::chunks[channel] = this;
+	else
+		playing_music = true;
+	return true;
 }
