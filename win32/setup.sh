@@ -1,16 +1,19 @@
 #!/bin/bash
 
+set -e
+set -x
+
 PREFIX=$PWD/mingw
 
 [ -d $PREFIX ] && rm -rf $PREFIX
 
-mkdir $PREFIX
+cp -r /usr/i586-mingw32msvc $PREFIX
 export PATH=$PREFIX/bin:$PATH CPATH=$PREFIX/include \
        LD_LIBRARY_PATH=$PREFIX/lib LD_RUN_PATH=$PREFIX/lib \
        PKG_CONFIG_LIBDIR=$PREFIX/lib/pkgconfig
 
-cat "PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config \$*" > $PREFIX/bin/i586-mingw32msvc-pkg-config
-chmod o+x g+rwx $PREFIX/bin/i586-mingw32msvc-pkg-config
+echo "PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig pkg-config \$*" > $PREFIX/bin/i586-mingw32msvc-pkg-config
+chmod +x $PREFIX/bin/i586-mingw32msvc-pkg-config
 
 # SDL
 
@@ -18,7 +21,9 @@ SDL_VERSION=1.2.14
 SDL_FILENAME=SDL-devel-$SDL_VERSION-mingw32.tar.gz
 wget http://www.libsdl.org/release/$SDL_FILENAME
 tar xvf $SDL_FILENAME
-mv SDL-$SDL_VERSION/* $PREFIX/
+mv SDL-$SDL_VERSION/bin/* $PREFIX/bin
+mv SDL-$SDL_VERSION/include/* $PREFIX/include
+mv SDL-$SDL_VERSION/lib/* $PREFIX/lib
 rm -rf SDL-*
 
 sed -e "s#^prefix=.*#prefix=$PREFIX#g" $PREFIX/bin/sdl-config > $PREFIX/bin/sdl-config.new
@@ -47,23 +52,22 @@ mv SDL_mixer-$SDL_MIXER_VERSION/include/* $PREFIX/include/SDL/
 rm -rf SDL_mixer-$SDL_MIXER_VERSION
 rm -f $SDL_MIXER_FILENAME
 
-rm $PREFIX/lib/SDL_*.lib $PREFIX/lib/libSDL_*.la
 for f in $PREFIX/lib/SDL_*.dll; do var=${f//dll/a}; cp $f ${var//SDL_/libSDL_}; mv $f $PREFIX/bin/; done
 
 # MINGW LIBS
 cd $PREFIX
-wget http://downloads.sourceforge.net/project/gnuwin32/tiff/3.8.2-1/tiff-3.8.2-1-lib.zip
-unzip tiff-3.8.2-1-lib.zip
-wget http://downloads.sourceforge.net/project/gnuwin32/zlib/1.2.3/zlib-1.2.3-lib.zip
-unzip zlib-1.2.3-lib.zip
-wget http://downloads.sourceforge.net/project/gnuwin32/jpeg/6b-4/jpeg-6b-4-lib.zip
-unzip jpeg-6b-4-lib.zip
-wget http://downloads.sourceforge.net/project/gnuwin32/libpng/1.2.37/libpng-1.2.37-lib.zip
-unzip libpng-1.2.37-lib.zip
-wget http://downloads.sourceforge.net/project/gnuwin32/libintl/0.14.4/libintl-0.14.4-lib.zip
-unzip libintl-0.14.4-lib.zip
+for archive in "tiff-3.8.2-1" "zlib-1.2.3" "jpeg-6b-4" "libpng-1.2.37" "libintl-0.14.4" "libiconv-1.9.2-1"
+do
+	prj=`echo $archive | cut -d"-" -f1`
+	ver=`echo $archive | cut -d"-" -f2-`
+	for what in "lib" "bin"
+	do
+		wget http://downloads.sourceforge.net/project/gnuwin32/$prj/$ver/$prj-$ver-$what.zip
+		unzip $prj-$ver-$what.zip
+		rm -f $prj-$ver-$what.zip
+	done
+done
 rm -f $PREFIX/lib/*.lib $PREFIX/lib/*.la
-rm -f *.zip
 cd ..
 
 SDL_IMAGE_VERSION=1.2.10
@@ -92,6 +96,8 @@ make install
 cd ../
 rm -rf SDL_gfx-$SDL_GFX_VERSION/
 rm -rf $SDL_GFX_FILENAME
+
+set +x
 
 echo ""
 echo "Now you can run ./build.sh to build the win32 version of MenAreAnts."

@@ -3,11 +3,15 @@
 PREFIX=$PWD/mingw
 SRC=$PWD/maa-src
 TARGET=$PWD/MenAreAnts
+EXTRA=$PWD/extra
 
 if [ ! -d $PREFIX ]; then
 	echo "Please run ./setup.sh before."
 	exit 1
 fi
+
+set -e
+set -x
 
 export PATH=$PREFIX/bin:$PATH CPATH=$PREFIX/include \
        LD_LIBRARY_PATH=$PREFIX/lib LD_RUN_PATH=$PREFIX/lib \
@@ -18,8 +22,10 @@ mkdir $SRC/
 cd ..
 cp -r aclocal.m4 config* Make* lib m4 server meta-server po src $SRC
 cd $SRC
-make clean
-./configure --target=i586-mingw32msvc --host=i586-mingw32msvc \
+set +e
+make clean || make clean
+set -e
+./configure --target=i586-mingw32msvc --host=i586-mingw32msvc --enable-debug \
             --with-sdl-prefix=$PREFIX --enable-game --disable-server --disable-meta-server
 make
 
@@ -39,11 +45,20 @@ for i in $(ls *.gmo); do
 done
 
 cd ../
-
 rm -rf $SRC
 
+cp $PREFIX/lib/*.dll $TARGET/
+cp $PREFIX/bin/*.dll $TARGET/
+
+if [ -d $EXTRA ]; then
+	cp $EXTRA/* $TARGET/
+fi
+
 [ -f $TARGET.zip ] && rm -f $TARGET.zip
-zip -r $TARGET.zip $TARGET
+cd `dirname $TARGET`
+zip -r $TARGET.zip `basename $TARGET`
+
+set +x
 
 echo ""
 echo "Men Are Ants has been built."
