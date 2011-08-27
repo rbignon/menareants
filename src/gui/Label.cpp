@@ -24,14 +24,12 @@
 TLabel::TLabel()
 	: font(0), shadowed(0), bg_offset(0), auto_set(false), gray_disable(false)
 {
-	caption = "";
 }
 
 TLabel::TLabel(const TLabel& label)
 	: TComponent(label), font(label.font), color(label.color),
 	  shadowed(label.shadowed), bg_offset(label.bg_offset), auto_set(label.auto_set), gray_disable(label.gray_disable)
 {
-	caption = "";
 	SetCaption(label.caption);
 }
 
@@ -39,14 +37,6 @@ TLabel::TLabel(int x, int y, const std::string& new_txt, Color new_color, Font* 
 	: TComponent(x, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(false), gray_disable(false)
 {
 	assert(new_font!=NULL);
-	caption = "";
-	if(shadowed)
-	{
-		int width = font->GetWidth("x");
-		bg_offset = (unsigned int)width/8; // shadow offset = 0.125ex
-		if (bg_offset < 1) bg_offset = 1;
-	}
-
 	SetCaption(new_txt);
 }
 
@@ -54,19 +44,19 @@ TLabel::TLabel(int y, const std::string& new_txt, Color new_color, Font* new_fon
 	: TComponent(0, y), font(new_font), color(new_color), shadowed(_shadowed), bg_offset(0), auto_set(true), gray_disable(false)
 {
 	assert(new_font!=NULL);
-	caption = "";
-	if(shadowed)
-	{
-		int width = font->GetWidth("x");
-		bg_offset = (unsigned int)width/8; // shadow offset = 0.125ex
-		if (bg_offset < 1) bg_offset = 1;
-	}
-
 	SetCaption(new_txt);
 }
 
 void TLabel::Init()
 {
+	if (shadowed) {
+		int width = font->GetWidth("x");
+		bg_offset = (uint)(width>>3); // shadow offset = 0.125ex
+		if (bg_offset < 1) {
+			bg_offset = 1;
+		}
+	}
+
 	if(auto_set && Window())
 		SetX(Window()->GetWidth()/2 - font->GetWidth(caption)/2);
 }
@@ -117,10 +107,12 @@ void TLabel::Reinit()
 		return;
 	}
 
-	surf = font->CreateSurface(caption, (!Enabled() && gray_disable) ? gray_color : color);
+	Color txt_color = (!Enabled() && gray_disable) ? gray_color : color;
+
+	surf = font->CreateSurface(caption, txt_color);
 
 	if(shadowed)
-		background = font->CreateSurface(caption, white_color);
+		background = font->CreateSurface(caption, txt_color == white_color ? black_color : white_color);
 
 	SetHeight(surf.GetHeight());
 	SetWidth(surf.GetWidth());
@@ -136,8 +128,12 @@ void TLabel::Draw(const Point2i& mouse)
 
 	assert(Window());
 
-	if(shadowed && !background.IsNull())
+	if(shadowed && !background.IsNull()) {
+		Window()->Blit(background, Point2i(X()-bg_offset, Y()-bg_offset));
+		Window()->Blit(background, Point2i(X()-bg_offset, Y()+bg_offset));
 		Window()->Blit(background, Point2i(X()+bg_offset, Y()+bg_offset));
+		Window()->Blit(background, Point2i(X()+bg_offset, Y()-bg_offset));
+	}
 
 	Window()->Blit(surf, Point2i(X(), Y()));
 }
