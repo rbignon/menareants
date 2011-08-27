@@ -19,7 +19,6 @@
  */
 
 #include "Form.h"
-#include "Memo.h"
 #include "gui/Cursor.h"
 #include "MessageBox.h"
 #include <SDL.h>
@@ -269,11 +268,17 @@ void TForm::Draw()
 		return;
 	}
 
-	if(background && MustRedraw())
-		Window()->Blit(background);
-
 	if(background)
-		Window()->Blit(background, Cursor, Cursor.GetPosition());
+	{
+		if (MustRedraw())
+			Window()->Blit(background);
+		else
+		{
+			Window()->Blit(background, Cursor, Cursor.GetPosition());
+			if (Hint.Visible())
+				Window()->Blit(background, Hint, Hint.GetPosition());
+		}
+	}
 
 	SDL_GetMouseState( &_x, &_y);
 
@@ -286,7 +291,8 @@ void TForm::Draw()
 			// Affiche seulement à la fin les composants sélectionnés
 			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
 			   (MustRedraw() || (*it)->AlwaysRedraw() || (*it)->WantRedraw() || (*it)->Intersect(Cursor) ||
-			    ((*it)->Mouse(lastmpos) && !(*it)->Mouse(pos))))
+			    ((*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)) ||
+			    (Hint.Visible() && (*it)->Intersect(Hint.GetRectangle()))))
 			{
 				if(background && (*it)->RedrawBackground())
 					Window()->Blit(background, **it, (*it)->GetPosition());
