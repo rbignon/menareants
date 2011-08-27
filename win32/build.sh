@@ -22,8 +22,9 @@ mkdir $SRC/
 cd ..
 cp -r aclocal.m4 config* Make* lib m4 server meta-server po src $SRC
 cd $SRC
+find . -iname "*.o" -delete
 set +e
-make clean || make clean
+make clean
 set -e
 ./configure --target=i586-mingw32msvc --host=i586-mingw32msvc --enable-debug \
             --with-sdl-prefix=$PREFIX --enable-game --disable-server --disable-meta-server
