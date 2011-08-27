@@ -103,3 +103,12 @@ SDL_Color Color::GetSDLColor() const{
 
 	return sdlColor;
 }
+
+Color Color::Invert() const
+{
+	Color c(0xff - red,
+	        0xff - green,
+		0xff - blue,
+		alpha);
+	return c;
+}

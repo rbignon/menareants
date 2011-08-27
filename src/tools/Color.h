@@ -71,6 +71,8 @@ public:
 	Uint8 GetBlue() const;
 	Uint8 GetAlpha() const;
 
+	Color Invert() const;
+
 	SDL_Color GetSDLColor() const;
 };
 
