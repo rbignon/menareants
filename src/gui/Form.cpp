@@ -295,25 +295,42 @@ void TForm::Draw()
 
 	Point2i pos(_x, _y);
 
-	bool first = focus_order ? true : false;
-	while(1)
+#define S_REDRAW_BACKGROUND 0
+#define S_DRAW              1
+#define S_FOCUS             2
+#define S_END               3
+	int step;
+	for(step = 0; step < S_END; ++step)
 	{
+		if (step == S_FOCUS && !focus_order)
+			continue;
 		for(std::vector<TComponent*>::iterator it = composants.begin(); it != composants.end(); ++it)
 			// Affiche seulement à la fin les composants sélectionnés
-			if((*it)->Visible() && (!focus_order || (*it)->Focused() == (first ? false : true)) &&
+			if((*it)->Visible() &&
 			   (MustRedraw() || (*it)->AlwaysRedraw() || (*it)->WantRedraw() || (*it)->Intersect(Cursor) ||
 			    ((*it)->Mouse(lastmpos) && !(*it)->Mouse(pos)) ||
 			    (Hint.Visible() && (*it)->Intersect(Hint.GetRectangle()))))
 			{
-				if(background && (*it)->RedrawBackground())
-					Window()->Blit(background, **it, (*it)->GetPosition());
-				if((*it)->OnMouseOn() && (*it)->Mouse(pos))
-					(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
-				(*it)->Draw(pos);
-				(*it)->SetWantRedraw(false);
+				switch(step)
+				{
+				case S_REDRAW_BACKGROUND:
+					if(background && (*it)->RedrawBackground())
+						Window()->Blit(background, **it, (*it)->GetPosition());
+					break;
+				case S_FOCUS:
+					if (!(*it)->Focused())
+						continue;
+				case S_DRAW:
+					if (focus_order && step == S_DRAW && (*it)->Focused())
+						continue;
+					if((*it)->OnMouseOn() && (*it)->Mouse(pos))
+						(*(*it)->OnMouseOn()) (*it, (*it)->OnMouseOnParam());
+					(*it)->Draw(pos);
+					(*it)->SetWantRedraw(false);
+				default:
+					break;
+				}
 			}
-		if(first) first = false;
-		else break;
 	}
 
 	SetMustRedraw(false);
