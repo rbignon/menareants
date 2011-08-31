@@ -153,23 +153,34 @@ void TForm::Actions(SDL_Event event, uint a)
 		case SDL_MOUSEBUTTONDOWN:
 		{
 			if(a & ACTION_NOMOUSE) break;
-			bool click = false, stop = false;
+			bool stop = false;
+			TComponent* clicked = NULL;
 			Point2i mouse(event.button.x, event.button.y);
-			/* Va dans l'ordre inverse */
-			for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
-				if((*it)->Visible() && (a & ACTION_NOCLIC) ? (*it)->Test(mouse, event.button.button)
-				                                           : (*it)->Clic(mouse, event.button.button) && !click)
+
+			/* firstly loop on focused widgets, then on others, in reverse orders. */
+			bool first = focus_order;
+			while (1)
+			{
+				for(std::vector<TComponent*>::reverse_iterator it = composants.rbegin(); it != composants.rend(); ++it)
 				{
-					if(!(a & ACTION_NOFOCUS))
-						(*it)->SetFocus();
-					if((*it)->OnClick() && !(a & ACTION_NOCALL))
-						(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
-					if((*it)->OnClickPos() && !(a & ACTION_NOCALL))
-						(*(*it)->OnClickPos()) (*it, mouse);
-					click = true;
+					if((*it)->Visible() && (!focus_order || (*it)->Focused() == first) && !clicked &&
+					   ((a & ACTION_NOCLIC) ? (*it)->Test(mouse, event.button.button)
+					                        : (*it)->Clic(mouse, event.button.button)))
+					{
+						if(!(a & ACTION_NOFOCUS))
+							(*it)->SetFocus();
+						if((*it)->OnClick() && !(a & ACTION_NOCALL))
+							(*(*it)->OnClick()) (*it, (*it)->OnClickParam());
+						if((*it)->OnClickPos() && !(a & ACTION_NOCALL))
+							(*(*it)->OnClickPos()) (*it, mouse);
+						clicked = *it;
+					}
+					else if(!first && clicked != *it && !(*it)->ForceFocus())
+						(*it)->DelFocus();
 				}
-				else if(!(*it)->ForceFocus())
-					(*it)->DelFocus();
+				if(first) first = false;
+				else break;
+			}
 
 			OnClic(mouse, event.button.button, stop);
 			SetMustRedraw();
