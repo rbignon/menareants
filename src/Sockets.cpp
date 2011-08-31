@@ -283,14 +283,6 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 {
 	if(connected || sock) return false;
 
-	/* Création du socket
-	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
-	 * valeur d'une variable statique qui s'initialise elle toute seule.
-	 */
-	static struct sockaddr_in fsocket_init;
-	struct sockaddr_in fsocket = fsocket_init;
-	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-
 	const char* ip = hostname;
 
 	error = false;
@@ -310,6 +302,14 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 
 		ip = inet_ntoa(*(struct in_addr *)(*(hp->h_addr_list)));
 	}
+
+	/* Création du socket
+	 * Note: pour l'initialisation, comme = {0} n'est pas compatible partout, on va attribuer la
+	 * valeur d'une variable statique qui s'initialise elle toute seule.
+	 */
+	static struct sockaddr_in fsocket_init;
+	struct sockaddr_in fsocket = fsocket_init;
+	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	// Set the timeout
 	struct timeval timeout;
@@ -337,9 +337,12 @@ bool EC_Client::Connect(const char *hostname, unsigned int port)
 	{
 #ifdef WIN32
 		SetCantConnect(std::string("API WinSock #" + TypToStr(WSAGetLastError())));
+		closesocket(sock);
 #else
 		SetCantConnect(strerror(errno));
+		close(sock);
 #endif
+		sock = 0;
 		return false;
 	}
 

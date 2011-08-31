@@ -294,6 +294,11 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{
 		Debug(W_DEBUG, "Unable to connect to %s (%d: %s)", parv[2].c_str(), errno, strerror(errno));
+#ifdef WIN32
+		closesocket(sock);
+#else
+		close(sock);
+#endif
 		return 0;
 	}
 
