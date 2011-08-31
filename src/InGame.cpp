@@ -974,6 +974,10 @@ void TInGameForm::OnKeyUp(SDL_keysym key)
 			if(BarreAct->Entity() && !SendMessage->Focused())
 				client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "C"));
 			break;
+		case SDLK_PLUS:
+			if(BarreAct->Entity() && !SendMessage->Focused())
+				client->sendrpl(MSG_ARM, ECArgs(BarreAct->Entity()->ID(), "+"));
+			break;
 		case SDLK_RETURN:
 			if(SendMessage->Focused())
 			{
