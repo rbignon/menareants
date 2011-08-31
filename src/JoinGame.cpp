@@ -1622,13 +1622,16 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	PretButton->SetEnabled(false);
 	PretButton->SetImage(new ECSprite(Resources::ReadyButton(), Video::GetInstance()->Window()));
 	PretButton->SetHint(_("Are you ready ?"));
+	PretButton->SetAlwaysRedraw();
 	RetourButton = AddComponent(new TButton(right_x+PretButton->Width(),110,150,50));
 	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 	RetourButton->SetHint(_("Leave game"));
-	CreateIAButton = AddComponent(new TButton(right_x,210,150,50));
+	RetourButton->SetAlwaysRedraw();
+	CreateIAButton = AddComponent(new TButton(right_x + PretButton->Width()/2,110+4*PretButton->Height()/5,150,50));
 	CreateIAButton->Hide();
 	CreateIAButton->SetImage(new ECSprite(Resources::AIButton(), Video::GetInstance()->Window()));
 	CreateIAButton->SetHint(_("Add an artificial player (an AI) in game"));
+	CreateIAButton->SetAlwaysRedraw();
 
 	MapList = AddComponent(new TListBox(Rectanglei(right_x, CreateIAButton->Y()+CreateIAButton->Height(), 200, 160)));
 	MapList->SetOnChange(TGameInfosForm::MapListChange);

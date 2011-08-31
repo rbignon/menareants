@@ -606,7 +606,7 @@ TListServerForm::TListServerForm(ECImage* w)
 	RetourButton = AddComponent(new TButton(RefreshButton->X()+RefreshButton->Width(),RegisterButton->Y()+RegisterButton->Height(),150,50));
 	RetourButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
 
-	OnlyOfficials = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), button_x, ServerList->Y()+ServerList->Height()-20, _("Show only official servers"), white_color));
+	OnlyOfficials = AddComponent(new TCheckBox(Font::GetInstance(Font::Normal), button_x, ServerList->Y()+ServerList->Height()-20, _("Official servers only"), white_color));
 	OnlyOfficials->SetOnClick(TListServerForm::SetOnlyOfficials, this);
 	OnlyOfficials->Check();
 

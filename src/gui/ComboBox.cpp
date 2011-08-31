@@ -47,12 +47,12 @@ void TComboBox::Init()
   // FIXME: What does 13 mean ?
   Rectanglei r(0, 0, Width()-13, COMBOBOX_HEIGHT);
 
+  box_color = BoxColor.WithAlpha(0xff);
+
   edit_bg.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, Width()-13, COMBOBOX_HEIGHT,
 				     32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
   edit_bg.FillRect(r, edit_bg.MapColor(BoxColor));
   edit_bg.RectangleColor(r, white_color);
-
-  box_color = BoxColor;
 
   TListBox::Init();
 }
@@ -146,7 +146,7 @@ bool TComboBox::Clic (const Point2i& mouse, int button)
 		r = true;
 	}
 
-	if(opened && (want_close || (!r && !Mouse(mouse))))
+	if(opened && (want_close || !r))
 		SetOpened(false), r = true;
 
 	return r;

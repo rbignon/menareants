@@ -332,22 +332,27 @@ TMainForm::TMainForm(ECImage* w)
 	CreditsButton = AddComponent(new TButton(300,390, 150,50));
 	CreditsButton->SetImage(new ECSprite(Resources::CreditsButton(), Video::GetInstance()->Window()));
 	CreditsButton->SetHint(_("Credits"));
+	CreditsButton->SetAlwaysRedraw();
 
 	QuitterButton = AddComponent(new TButton(300,470, 150,50));
 	QuitterButton->SetImage(new ECSprite(Resources::QuitButton(), Video::GetInstance()->Window()));
 	QuitterButton->SetHint(_("Exit"));
+	QuitterButton->SetAlwaysRedraw();
 
 	PlayButton = AddComponent(new TButton(300,150, 150,50));
 	PlayButton->SetImage(new ECSprite(Resources::PlayButton(), Video::GetInstance()->Window()));
 	PlayButton->SetHint(_("Play a game"));
+	PlayButton->SetAlwaysRedraw();
 
 	OptionsButton = AddComponent(new TButton(300,230, 150,50));
 	OptionsButton->SetImage(new ECSprite(Resources::OptionsButton(), Video::GetInstance()->Window()));
 	OptionsButton->SetHint(_("Options"));
+	OptionsButton->SetAlwaysRedraw();
 
 	MapEditorButton = AddComponent(new TButton(300,310, 150,50));
 	MapEditorButton->SetImage(new ECSprite(Resources::MapEditorButton(), Video::GetInstance()->Window()));
 	MapEditorButton->SetHint(_("Map Editor"));
+	MapEditorButton->SetAlwaysRedraw();
 
 	Title = AddComponent(new TImage(300, 100, Resources::Title(), false));
 
@@ -421,13 +426,13 @@ TCredits::TCredits(ECImage* w)
 	Title->SetXY(Width()/2 - Title->Width()/2, 50);
 
 	Label1 = AddComponent(new TLabel(Title->Y()+Title->Height()+10,"Romain Bignon", red_color, Font::GetInstance(Font::Big)));
-	Label2 = AddComponent(new TLabel(Label1->Y()+Label1->Height(),_("* Programmer"), red_color, Font::GetInstance(Font::Big)));
+	Label2 = AddComponent(new TLabel(Label1->Y()+Label1->Height(),_("* Main developer"), red_color, Font::GetInstance(Font::Big)));
 
 	Label3 = AddComponent(new TLabel(50,Label2->Y()+Label2->Height()+30,"Thomas Tourrette", fgreen_color, Font::GetInstance(Font::Big)));
 	Label4 = AddComponent(new TLabel(50,Label3->Y()+Label3->Height(),_("* \"Graphic artist\""), fgreen_color, Font::GetInstance(Font::Big)));
 
 	Label5 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label2->Y()+Label2->Height()+30,"Mathieu Nicolas", fwhite_color, Font::GetInstance(Font::Big)));
-	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label3->Y()+Label3->Height(),_("* Idea"), fwhite_color, Font::GetInstance(Font::Big)));
+	Label6 = AddComponent(new TLabel(SCREEN_WIDTH-300,Label3->Y()+Label3->Height(),_("* Concept"), fwhite_color, Font::GetInstance(Font::Big)));
 
 	OkButton = AddComponent(new TButton(SCREEN_WIDTH/2-31,SCREEN_HEIGHT-100, 150,50));
 	OkButton->SetImage(new ECSprite(Resources::BackButton(), Video::GetInstance()->Window()));
@@ -435,14 +440,10 @@ TCredits::TCredits(ECImage* w)
 	Memo = AddComponent(new TMemo(Font::GetInstance(Font::Normal), 50, Label6->Y()+Label6->Height()+30, SCREEN_WIDTH-50-50,
 	                              SCREEN_HEIGHT-(Label6->Y()+Label6->Height()+30)-OkButton->Height()-20, 0, false));
 	Memo->SetShadowed();
-	Memo->AddItem(_("Contributors:\n"
+	Memo->AddItem(_("Thanks to:\n"
 	                "\n"
-	                "=Programming=\n"
 	                "- lodesi: patches for defense tower and other effects.\n"
 	                "- phh: patch for the plane.\n"
-	                "\n"
-	                "=Others=\n"
-	                "- Anicée: for her voice.\n"
 	                "- pankkake, Zic, Nico, Mathieu and Thomas who have tested the game."), white_color);
 
 	Memo->ScrollUp();

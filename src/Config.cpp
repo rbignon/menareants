@@ -410,7 +410,7 @@ void TConfigForm::SetRelativePositions()
 	CancelButton->SetXY(Window()->GetWidth() - OkButton->Width() - 20,
 	                    OkButton->Y() + OkButton->Height());
 
-	int x = Window()->GetWidth()/2 - 100;
+	int x = Window()->GetWidth()/2 - 50;
 	NickInfo->SetX(x);
 	Nick->SetX(x);
 	Color->SetX(x);
