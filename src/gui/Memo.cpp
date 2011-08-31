@@ -113,7 +113,7 @@ void TMemo::Draw (const Point2i& mouse)
 	if (m_items.size() > nb_visible_items_max)
 	{
 		m_up.SetXY(X()+Width()-12, Y()+2);
-		m_down.SetXY(X()+Width()-12, Y()+Height()-7);
+		m_down.SetXY(X()+Width()-12, Y()+Height()-m_down.Height()-2);
 
 		m_up.Draw (mouse);
 		m_down.Draw (mouse);
