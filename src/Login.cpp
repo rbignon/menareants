@@ -117,6 +117,7 @@ int ERRORCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			MenAreAntsApp::GetInstance()->FirstRunDone();
 			ListServerForm->RegisterButton->Hide();
 			ListServerForm->AccountButton->Show();
+			ListServerForm->AccountButton->SetEnabled(false);
 			break;
 		case ERR_LOGIN_BADPASS:
 			Config::GetInstance()->passwd.clear();
@@ -303,17 +304,13 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	}
 
 	me->LockScreen();
-	if(parv[3][0] == '+' && parv[9] == APP_PVERSION && StrToTyp<int>(parv[4]) > 0)
-		ListServerForm->ServerList->AddItem(false,
-		                      StringF("%3d  %-23s %2s   %3s/%-3s   %3s/%-3s     %-3s", SDL_GetTicks()-t0, parv[2].substr(0,23).c_str(), parv[9].c_str(),
-		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], fgreen_color, true, parv[2]);
-	else
-		ListServerForm->ServerList->AddItem(false,
-		                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
-		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? white_color : red_color,
-		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION), parv[2]);
+	ListServerForm->ServerList->AddItem(false,
+	                  StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
+	                          parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
+	                  parv[1],
+	                  (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? StrToTyp<int>(parv[4]) > 0 ? fgreen_color : white_color : red_color,
+	                  (parv[3][0] == '+' && parv[9] == APP_PVERSION),
+	                  parv[2]);
 
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
 	ListServerForm->nb_wchans += StrToTyp<uint>(parv[8]);
@@ -352,10 +349,12 @@ int EOLmsCommand::Exec(PlayerList players, EC_Client* me, ParvList parv)
 	ListServerForm->RetourButton->SetEnabled();
 	ListServerForm->StatsButton->SetEnabled();
 	ListServerForm->RegisterButton->SetEnabled();
-	ListServerForm->AccountButton->SetEnabled();
+	ListServerForm->AccountButton->SetEnabled(false);
 
 	if(ListServerForm->ServerList->Empty())
 		TForm::Message = _("There is no server available. Try later or check your firewall.");
+	else
+		ListServerForm->ServerList->Sort();
 
 	return 0;
 }
