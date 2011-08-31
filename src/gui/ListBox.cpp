@@ -45,8 +45,8 @@
 
 #define SCROLLBAR
 
-TListBoxItem::TListBoxItem(const std::string& _name, const std::string& _label, Font& _font, const std::string& _value, const Color& color)
-	: TLabel(0,0, _label, color, &_font), value(_value), name(_name)
+TListBoxItem::TListBoxItem(const std::string& _name, const std::string& _label, Font* _font, const std::string& _value, const Color& color)
+	: TLabel(0,0, _label, color, _font), value(_value), name(_name)
 {
 
 }
@@ -66,20 +66,21 @@ const std::string& TListBoxItem::Name() const
 	return name;
 }
 
-// struct CompareItems
-// {
-//      bool operator()(const ListBoxItem& a, const ListBoxItem& b)
-//      {
-//        return a.GetLabel() < b.GetLabel();
-//      }
-// };
+struct CompareItems
+{
+     bool operator()(const TListBoxItem* a, const TListBoxItem* b)
+     {
+       return a->Label() < b->Label();
+     }
+};
 
-TListBox::TListBox (const Rectanglei &rect, bool always_one_selected_b)
-	: TComponent(rect), no_item_hint(false), scrolling(false), box_color(BoxColor), on_change(0), gray_disable(true)
+TListBox::TListBox (const Rectanglei &rect, bool always_one_selected_b, Font* _font)
+	: TComponent(rect), no_item_hint(false), scrolling_delta(-1), box_color(BoxColor), on_change(0), gray_disable(true), font(_font)
 {
 	first_visible_item = 0;
 	selected_item = -1;
 	always_one_selected = always_one_selected_b;
+	nb_visible_items_max = Height() / font->GetHeight();
 }
 
 void TListBox::Init()
@@ -120,7 +121,7 @@ int TListBox::MouseIsOnWhichItem(const Point2i &mousePosition) const
 
 void TListBox::ClicUp (const Point2i& pos, int button)
 {
-	scrolling = false;
+	scrolling_delta = -1;
 }
 
 bool TListBox::Clic(const Point2i &mousePosition, int button)
@@ -131,7 +132,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 		return false;
 
 	if(button == SDL_BUTTON_LEFT && ScrollBarPos().Contains(mousePosition))
-		scrolling = true;
+		scrolling_delta = mousePosition.y - ScrollBarPos().Y();
 
 	// buttons for listbox with more items than visible (first or last item not visible)
 	if(m_down.Visible())
@@ -140,7 +141,7 @@ bool TListBox::Clic(const Point2i &mousePosition, int button)
 		if(button == SDL_BUTTON_WHEELDOWN || (button == SDL_BUTTON_LEFT && m_down.Mouse(mousePosition)))
 		{
 			// bottom button
-			if( first_visible_item+1 < m_items.size() /*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/ )
+			if( first_visible_item < (m_items.size() - nb_visible_items_max) /*m_items.back()->Y() + m_items.back()->Height() > Y() + Height()*/ )
 				first_visible_item++ ;
 
 			return true;
@@ -180,18 +181,20 @@ void TListBox::Draw(const Point2i &mousePosition)
 {
 	int item = MouseIsOnWhichItem(mousePosition);
 	Rectanglei rect (X(), Y(), Width()-12, Height());
+	Rectanglei scrollbar = ScrollBarPos();
 
 	// Draw border and bg color
 	Window()->BoxColor(rect, box_color);
 
-	if(scrolling)
+	if(scrolling_delta >= 0)
 	{
-		if(mousePosition.y > Y() + Height() - 12)
-			first_visible_item = m_items.size()-1;
-		else if(mousePosition.y < Y() + 12)
+		int y = mousePosition.y - scrolling_delta;
+		if(y + scrollbar.Height() > Y() + Height() - 12)
+			first_visible_item = m_items.size() - nb_visible_items_max;
+		else if(y < Y() + 12)
 			first_visible_item = 0;
 		else
-			first_visible_item = (mousePosition.y - Y() - 10) * m_items.size() / (Height()-20);
+			first_visible_item = (y - Y() - 10) * m_items.size() / (Height()-20);
 	}
 
 	// Draw items
@@ -243,10 +246,8 @@ void TListBox::Draw(const Point2i &mousePosition)
 		m_down.Show();
 		m_up.Draw(mousePosition);
 		m_down.Draw(mousePosition);
-#ifdef SCROLLBAR
-		Rectanglei scrollbar = ScrollBarPos();
-		Window()->BoxColor(scrollbar, (scrolling || scrollbar.Contains(mousePosition)) ? white_color : gray_color);
-#endif
+		Window()->BoxColor(scrollbar, (scrolling_delta >= 0 || scrollbar.Contains(mousePosition)) ? white_color : gray_color);
+		Window()->RectangleColor(scrollbar, /*(scrolling_delta >= 0 || scrollbar.Contains(mousePosition)) ? gray_color : */white_color);
 	}
 	else
 		m_down.Hide();
@@ -255,12 +256,15 @@ void TListBox::Draw(const Point2i &mousePosition)
 
 Rectanglei TListBox::ScrollBarPos() const
 {
+	if(m_items.empty())
+		return Rectanglei(0,0,0,0);
+
 	uint tmp_y, tmp_h;
 	tmp_y = Y()+10+ first_visible_item* (Height()-20) / m_items.size();
-	tmp_h = /*nb_visible_items_max * */(Height()-20) / m_items.size();
+	tmp_h = nb_visible_items_max * (Height()-20) / m_items.size();
 	if (tmp_h < 5) tmp_h =5;
 
-	return Rectanglei(X()+Width()-11, tmp_y, 9,  /*tmp_y+*/tmp_h);
+	return Rectanglei(X()+Width()-11, tmp_y, 9, tmp_h);
 }
 
 TListBoxItem* TListBox::AddItem (bool selected,
@@ -268,7 +272,7 @@ TListBoxItem* TListBox::AddItem (bool selected,
                         const std::string &value,
                         const Color& color,
                         bool enabled,
-                        Font& font, const std::string& name)
+                        const std::string& name)
 {
 	uint pos = m_items.size();
 
@@ -290,44 +294,31 @@ TListBoxItem* TListBox::AddItem (bool selected,
 
 void TListBox::Sort()
 {
-  //std::sort( m_items.begin(), m_items.end(), CompareItems() );
+  std::sort( m_items.begin(), m_items.end(), CompareItems() );
   SetWantRedraw();
 }
 
 void TListBox::ScrollTo(TListBoxItem* item)
 {
 	uint i = 0;
-	for(std::vector<TListBoxItem*>::const_iterator it = m_items.begin(); it != m_items.end() && *it != item; ++it) i++;
+	for(std::vector<TListBoxItem*>::const_iterator it = m_items.begin(); it != m_items.end() && *it != item; ++it)
+		i++;
 	ScrollTo(i);
 }
 
-/* TODO améliorer ce code moche */
 void TListBox::ScrollTo(uint id)
 {
 	if(id == first_visible_item || id >= m_items.size())
 		return;
 
-	first_visible_item = id;
-	/*else if(id > first_visible_item)
-		while(1)
-		{
-			 if(m_items.back()->Y() + m_items.back()->Height() > Y() + Height())
-			 	first_visible_item++;
-			 else
-			 	break;
-			 if(first_visible_item == id)
-			 	break;
-		}
+	if (nb_visible_items_max > m_items.size())
+		first_visible_item = 0;
+	else if (id > (m_items.size() - nb_visible_items_max/2))
+		first_visible_item = m_items.size() - nb_visible_items_max;
+	else if (id < nb_visible_items_max/2)
+		first_visible_item = 0;
 	else
-		while(1)
-		{
-			if(first_visible_item > 0)
-				first_visible_item--;
-			else
-				break;
-			if(first_visible_item == id)
-				break;
-		}*/
+		first_visible_item = id - nb_visible_items_max/2;
 
 	SetWantRedraw();
 }

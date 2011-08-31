@@ -58,7 +58,7 @@ private:
   std::string name;
 
 public:
-  TListBoxItem(const std::string& _name, const std::string& _label, Font& _font, const std::string& value,
+  TListBoxItem(const std::string& _name, const std::string& _label, Font* _font, const std::string& value,
 	      const Color& color = white_color);
 
   const std::string& Label() const;
@@ -70,7 +70,7 @@ class TListBox : public TComponent
 {
 /* Constructeurs */
 public:
-	TListBox (const Rectanglei &rect, bool always_one_selected_b = true);
+	TListBox (const Rectanglei &rect, bool always_one_selected_b = true, Font* font = Font::GetInstance(Font::Small));
 	~TListBox();
 
 	typedef void (*OnChangeFunc) (TListBox*);
@@ -89,7 +89,7 @@ public:
 	TListBoxItem* AddItem(bool selected, const std::string &label,
 	                      const std::string &value,
 	                      const Color& color = white_color, bool enabled = true,
-	                      Font& font = *Font::GetInstance(Font::Small), const std::string& name = "");
+	                      const std::string& name = "");
 
 	void Sort();
 
@@ -142,9 +142,13 @@ public:
 
 /* Variables privées */
 private:
+	void Recalculate();
+	uint nb_visible_items_max;
+
+	uint total_height;
 	bool always_one_selected;
 	bool no_item_hint;
-	bool scrolling;
+	int scrolling_delta;
 	Point2i scroll_point;
 
 protected:
@@ -161,6 +165,7 @@ protected:
 	OnChangeFunc on_change;
 
 	bool gray_disable;
+	Font* font;
 };
 
 #endif

@@ -26,8 +26,8 @@
 #include <assert.h>
 
 TComboBox::TComboBox(Font* f, int _x, int _y, uint _width)
-	: TListBox(Rectanglei(_x, _y, _width, f->GetHeight())), real_y(_y), opened(false), visible_len(0),
-		  chaine(_x+5, _y, "", white_color, f), COMBOBOX_HEIGHT(f->GetHeight()), font(f)
+	: TListBox(Rectanglei(_x, _y, _width, f->GetHeight()), true, f), real_y(_y), opened(false), visible_len(0),
+		  chaine(_x+5, _y, "", white_color, f), COMBOBOX_HEIGHT(f->GetHeight())
 {
 
 }
@@ -91,10 +91,9 @@ TListBoxItem* TComboBox::AddItem (bool selected,
                          const std::string &value,
                          const Color& color,
                          bool enabled,
-                         Font& font,
                          const std::string& name)
 {
-	TListBoxItem* item = TListBox::AddItem(selected, label, value, color, enabled, font, name);
+	TListBoxItem* item = TListBox::AddItem(selected, label, value, color, enabled, name);
 	item->SetGrayDisable();
 	if(opened)
 		size.y = CalculateHeight();
@@ -130,16 +129,24 @@ bool TComboBox::Clic (const Point2i& mouse, int button)
 {
 	if(!Enabled()) return false;
 
-	bool r = false;
+	bool r = false, want_close = false;
+
+	if(opened && MouseIsOnWhichItem(mouse) != -1)
+	{
+		want_close = true;
+		r = true;
+	}
 
 	if(opened)
 		r = TListBox::Clic(mouse, button);
-	else if(Mouse(mouse)) // We can clic everywhere on the label and the button to open
-		SetOpened(!opened), r = true;
-	if(opened && MouseIsOnWhichItem(mouse) != -1)
-		SetOpened(false), r = true;
+	else if(Mouse(mouse))
+	{
+		// We can clic everywhere on the label and the button to open
+		SetOpened(!opened);
+		r = true;
+	}
 
-	if(!r && opened && !Mouse(mouse))
+	if(opened && (want_close || (!r && !Mouse(mouse))))
 		SetOpened(false), r = true;
 
 	return r;

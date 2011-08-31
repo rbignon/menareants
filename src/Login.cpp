@@ -307,13 +307,13 @@ int LSPmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%3d  %-23s %2s   %3s/%-3s   %3s/%-3s     %-3s", SDL_GetTicks()-t0, parv[2].substr(0,23).c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
-		                      parv[1], fgreen_color, true, *Font::GetInstance(Font::Normal), parv[2]);
+		                      parv[1], fgreen_color, true, parv[2]);
 	else
 		ListServerForm->ServerList->AddItem(false,
 		                      StringF("%4d %-27s %2s    %3s/%-3s    %3s/%-3s       %-3s", SDL_GetTicks()-t0, parv[2].c_str(), parv[9].c_str(),
 		                              parv[4].c_str(), parv[5].c_str(), parv[6].c_str(), parv[7].c_str(), parv[8].c_str()),
 		                      parv[1], (parv[3][0] == '+' && parv[9] == APP_PVERSION) ? white_color : red_color,
-		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION), *Font::GetInstance(Font::Small), parv[2]);
+		                      (parv[3][0] == '+' && parv[9] == APP_PVERSION), parv[2]);
 
 	ListServerForm->nb_chans += StrToTyp<uint>(parv[6]);
 	ListServerForm->nb_wchans += StrToTyp<uint>(parv[8]);
@@ -1070,7 +1070,7 @@ int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 	if(GlobalScoresForm)
 	{
 		if(GlobalScoresForm->ListBox->Empty())
-			GlobalScoresForm->BestPlayer->SetCaption(StringF(_("And the better player is.... %s with %s points!"),
+			GlobalScoresForm->BestPlayer->SetCaption(StringF(_("And the best player is.... %s with %s points!"),
 			                                                   parv[1].c_str(), parv[5].c_str()));
 
 		int defeats = StrToTyp<int>(parv[7]) - StrToTyp<int>(parv[8]);
@@ -1082,7 +1082,7 @@ int SCOREmsCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		if(GlobalScoresForm->best_incomes < StrToTyp<int>(parv[6]))
 		{
 			GlobalScoresForm->best_incomes = StrToTyp<int>(parv[6]);
-			GlobalScoresForm->BestIncomes->SetCaption(StringF(_("The one who incomes the must of money is %s with $%s per turn!"),
+			GlobalScoresForm->BestIncomes->SetCaption(StringF(_("The one who won the most money is %s with $%s per turn!"),
 			                                                   parv[1].c_str(), parv[6].c_str()));
 		}
 		if(GlobalScoresForm->best_kills < StrToTyp<int>(parv[3]))

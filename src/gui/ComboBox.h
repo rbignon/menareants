@@ -53,7 +53,6 @@ public:
 	                       const std::string &value,
 	                       const Color& _color = white_color,
 	                       bool _enabled = true,
-	                       Font& font = *Font::GetInstance(Font::Small),
 	                       const std::string& name = "");
 	void ClearItems();
 	virtual void Deselect (uint index);
@@ -78,7 +77,6 @@ protected:
 	void SetOpened(bool _o);
 	TLabel chaine;
 	uint COMBOBOX_HEIGHT;
-	Font* font;
 
 	int CalculateHeight();
 };
