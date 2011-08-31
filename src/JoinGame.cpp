@@ -240,7 +240,7 @@ int EOSMAPCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 			if(GameInfosForm)
 				map->CreatePreview(GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 30,
 				                   GameInfosForm->PretButton->X() - GameInfosForm->Preview->X() - 30,
-				                   0);
+				                   P_BORDER);
 		}
 		catch(TECExcept &e)
 		{
@@ -1616,7 +1616,7 @@ TGameInfosForm::TGameInfosForm(ECImage* w, EC_Client* cl, bool _mission)
 	MapTitle = AddComponent(new TLabel(50 + chat_width + 40, 345, "", white_color, Window()->GetWidth() < 1000 ? Font::GetInstance(Font::Normal) : Font::GetInstance(Font::Big)));
 	Preview = AddComponent(new TImage(50 + chat_width + 30, 380));
 
-	int right_x = Window()->GetWidth() - 200;
+	int right_x = Window()->GetWidth() - 220;
 
 	PretButton = AddComponent(new TButton(right_x,110, 150,50));
 	PretButton->SetEnabled(false);

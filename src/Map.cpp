@@ -849,7 +849,14 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 	else size_y = size_x;
 	pixel_size = size_y;
 
-	SDL_Surface *surf = CreateRGBASurface(x*size_x, y*size_y, SDL_HWSURFACE|SDL_SRCALPHA);
+	uint dx = 0, dy = 0;
+	if (flags & P_BORDER)
+	{
+		dx = 3;
+		dy = 3;
+	}
+
+	SDL_Surface *surf = CreateRGBASurface(x*size_x + 2*dx, y*size_y + 2*dy, SDL_HWSURFACE|SDL_SRCALPHA);
 
 	SLOCK(surf);
 	/* Dessine la preview */
@@ -918,7 +925,7 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 					             (marge & MARGE_LEFT && _xx == xx) ||
 					             (marge & MARGE_BOTTOM && _yy == yy+size_y-1) ||
 					             (marge & MARGE_RIGHT && _xx == xx+size_x-1)) ? marge_color : color;
-					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
+					putpixel(surf, dx +_xx, dy + _yy, SDL_MapRGB(surf->format,
 					         (Brouillard() && c->Showed()<=0) ? (col.GetRed()>60) ? col.GetRed() - 60 : 0 : col.GetRed(),
 					         (Brouillard() && c->Showed()<=0) ? (col.GetGreen()>60) ? col.GetGreen() - 60 : 0 : col.GetGreen(),
 					         (Brouillard() && c->Showed()<=0) ? (col.GetBlue()>60) ? col.GetBlue() - 60 : 0 : col.GetBlue()));
@@ -940,11 +947,26 @@ void ECMap::CreatePreview(uint width, uint height, int flags)
 			xx = (*enti)->Case()->X() * size_x;
 			for(uint _yy = yy; _yy < yy+size_y; _yy++)
 				for(uint _xx = xx; _xx < xx+size_x; _xx++)
-					putpixel(surf, _xx, _yy, SDL_MapRGB(surf->format,
+					putpixel(surf, dx + _xx, dy + _yy, SDL_MapRGB(surf->format,
 					                                          (col.GetRed()>  100) ? col.GetRed() - 30 : col.GetRed() + 30,
 					                                          (col.GetGreen()>100) ? col.GetGreen() - 30 : col.GetGreen() + 30,
 					                                          (col.GetBlue()> 100) ? col.GetBlue() - 30 : col.GetBlue() + 30));
 		}
+	}
+
+	if(flags & P_BORDER)
+	{
+		DrawLine(surf, 0, 0, surf->w-1, 0, SDL_MapRGB(surf->format, 0xff, 0xff, 0xff));
+		DrawLine(surf, 0, 0, 0, surf->h-1, SDL_MapRGB(surf->format, 0xff, 0xff, 0xff));
+		DrawLine(surf, 0, surf->h-1, surf->w-1, surf->h-1, SDL_MapRGB(surf->format, 0x00, 0x00, 0x00));
+		DrawLine(surf, surf->w-1, surf->h-1, surf->w-1, 0, SDL_MapRGB(surf->format, 0x00, 0x00, 0x00));
+
+		DrawRect(surf, 1, 1, surf->w-2, surf->h-2, SDL_MapRGB(surf->format, 0x99, 0x99, 0x99));
+
+		DrawLine(surf, 2, 2, surf->w-3, 2, SDL_MapRGB(surf->format, 0x00, 0x00, 0x00));
+		DrawLine(surf, 2, 2, 2, surf->h-3, SDL_MapRGB(surf->format, 0x00, 0x00, 0x00));
+		DrawLine(surf, 2, surf->h-3, surf->w-3, surf->h-3, SDL_MapRGB(surf->format, 0xff, 0xff, 0xff));
+		DrawLine(surf, surf->w-3, surf->h-3, surf->w-3, 2, SDL_MapRGB(surf->format, 0xff, 0xff, 0xff));
 	}
 
 	SUNLOCK(surf);

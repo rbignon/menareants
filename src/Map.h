@@ -346,6 +346,7 @@ public:
 
 	#define P_FRONTMER  0x001
 	#define P_ENTITIES  0x002
+	#define P_BORDER    0x004
 	void CreatePreview(uint width, uint height, int flags);
 
 	virtual ECBCase* CreateCase(uint x, uint y, char type_id);
