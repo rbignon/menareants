@@ -49,6 +49,8 @@ typedef ECBMapPlayer   ECMapPlayer;
 typedef ECBCountry     ECountry;
 typedef ECBDate        ECDate;
 typedef ECBMove        ECMove;
+typedef ECBContainer   EContainer;
+
 
 class ECMissile
 {
@@ -144,7 +146,7 @@ public:
 
 	virtual void SetShowedCases(bool show, bool forced = false);
 
-	virtual void Played();
+	virtual void CancelEvents();
 
 	virtual void RecvData(ECData) { return; }
 

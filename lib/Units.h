@@ -39,53 +39,8 @@
 #include "Channels.h"
 
 /********************************************************************************************
- *                               ECBContainer                                               *
- ********************************************************************************************/
-class ECBContainer : public virtual ECBEntity
-{
-/* Constructeur/Destructeur */
-public:
-	ECBContainer()
-		: unit(0)
-	{}
-
-	virtual ~ECBContainer();
-
-/* Methodes */
-public:
-
-	virtual bool Contain(ECBEntity*);
-	bool UnContain();
-
-/* Attributs */
-public:
-
-	ECBEntity* Containing() const { return unit; }
-	void SetContaining(ECBEntity* e) { unit = e; }
-
-	virtual uint RealNb() const { return unit ? (unit->Nb() + Nb()) : Nb(); }
-
-	virtual bool CanContainThisEntity(const ECBEntity* et) = 0;
-	virtual uint UnitaryCapacity() const = 0;
-
-	virtual bool CanContain(const ECBEntity* et)
-	{
-		if((Containing() && (Containing()->Type() != et->Type() || (Containing()->Nb() + et->Nb()) > UnitaryCapacity() * Nb())) ||
-		   (!Containing() && et->Nb() > UnitaryCapacity() * Nb()) || !CanContainThisEntity(et))
-			return false;
-		else
-			return true;
-	}
-
-/* Variables privées */
-private:
-	ECBEntity* unit;
-};
-
-/********************************************************************************************
  *                               ECBTrain                                                   *
  ********************************************************************************************/
-/** This is a boat. */
 class ECBTrain : public virtual ECBContainer
 {
 /* Constructeur/Destructeur */
@@ -105,7 +60,7 @@ public:
 	virtual uint Visibility() const { return 4; }
 	virtual uint UnitaryCapacity() const { return 100; }
 
-	virtual bool CanContainThisEntity(const ECBEntity* et)
+	virtual bool CanContainThisEntity(const ECBEntity* et) const
 	{
 		if((!et->IsInfantry() && !et->IsVehicule()) || et->Type() == Type())
 			return false;
@@ -156,7 +111,7 @@ public:
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_MER)); }
 	virtual uint UnitaryCapacity() const { return 100; }
 
-	virtual bool CanContainThisEntity(const ECBEntity* et)
+	virtual bool CanContainThisEntity(const ECBEntity* et) const
 	{
 		if(!et->IsInfantry())
 			return false;
@@ -213,7 +168,7 @@ public:
 	// Cet avion de transport ne peut PAS prendre une ville
 	virtual bool CanInvest(const ECBEntity* e) const { return false; }
 
-	virtual bool CanContainThisEntity(const ECBEntity *et)
+	virtual bool CanContainThisEntity(const ECBEntity *et) const
 	{
 		if(!Deployed() ^ !!(EventType() & ARM_DEPLOY) || (!et->IsInfantry() && !et->IsVehicule()) || et->Type() == Type())
 			return false;
@@ -229,6 +184,8 @@ public:
 	virtual bool IsPlane() const { return true; }
 	virtual bool WantDeploy() { return (DestCase()->Entities()->Find(E_AIRPORT).empty() == false); }
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+
+	int TurnMoney(ECBPlayer* pl);
 };
 
 /********************************************************************************************
@@ -409,7 +366,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_MCDO; }
-	virtual uint Cost() const { return 10000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1000; }
 	virtual uint Step() const { return Deployed() ? 0 : 4; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_USA); }
@@ -508,7 +465,7 @@ public:
 
 	virtual bool CanInvest(const ECBEntity* e) const
 	{
-		if(e->IsBuilding() && !e->IsNaval() && (!Like(e) || (e->Owner() == Owner() && e->Nb() < e->InitNb())) && !e->IsTerrain())
+		if(e->IsBuilding() && !e->IsNaval() && !e->CanContain(this) && (!Like(e) || (e->Owner() == Owner() && e->Nb() < e->InitNb())) && !e->IsTerrain())
 			return true;
 		else
 			return false;

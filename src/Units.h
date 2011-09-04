@@ -28,8 +28,6 @@
 #include "Resources.h"
 #include <map>
 
-typedef ECBContainer   EContainer;
-
 /********************************************************************************************
  *                                ECUnit                                                    *
  ********************************************************************************************/
@@ -426,10 +424,10 @@ public:
 		if(Deployed())
 			return _("This barrack is populated by a McPuke !!!");
 		else
-			return _("The MkPuke Donald must take over an ennemi barrack to build a McPuke. Then, any units "
-			       "created by this barrack will have his movment divided by two, units with only one square initial movment"
+			return _("The MkPuke Donald can take oven an enemy's barracks to build a McPuke. Then all units "
+			       "created by this barrack will have their movements limit divided by two. Units with only one square per turn"
 			       "will be definitely trapped because of their fat and profuse food.\n"
-			       "Furthemore, the barrack owner will given money every turn to MkPuke builder to pay all this food.\n"
+			       "Furthermore, the barracks owner will give money each turn to the MkPuke builder to pay all this food.\n"
 			       "The only way to destroy a McPuke is to send a Jouano");
 	}
 	virtual ECImage* Icon() const { return Deployed() ? Resources::Caserne_Icon() : Resources::McDo_Icon(); }

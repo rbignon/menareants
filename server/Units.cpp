@@ -57,13 +57,6 @@ bool ECPlane::WantUnContain(uint x, uint y, ECMove::Vector& moves)
 	return EContainer::WantUnContain(x, y, moves);
 }
 
-int ECPlane::TurnMoney(ECBPlayer* pl)
-{
-	if(Deployed() || !Containing() || Owner() != pl) return 0;
-
-	return - (Containing()->Nb() * VolCost());
-}
-
 /********************************************************************************************
  *                               ECBoeing                                                   *
  ********************************************************************************************/
@@ -328,7 +321,6 @@ void ECMcDo::Played()
 			SetZombie(); // Et on supprime notre brave McDo qui a rendu de mauvais services
 		}
 	}
-	ECEntity::Played();
 }
 
 bool ECMcDo::CanCreate(const ECBEntity* entity)
@@ -394,187 +386,6 @@ void ECEnginer::Invest(ECBEntity* entity)
 	/* On attend de se faire purger */
 }
 
-/********************************************************************************************
- *                               EContainer                                                 *
- ********************************************************************************************/
-
-void EContainer::Union(ECEntity* entity)
-{
-	ECEntity::Union(entity);
-
-	EContainer* container = dynamic_cast<EContainer*>(entity);
-
-	if(!container || !container->Containing()) return;
-
-	if(!Containing())
-	{
-		Contain(container->Containing());
-		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_CONTENER);
-	}
-	else if(container->Containing())
-	{
-		dynamic_cast<ECEntity*>(Containing())->Union(dynamic_cast<ECEntity*>(container->Containing()));
-		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_REMOVE|ARM_INVEST);
-		if(Owner() && Owner()->Client())
-			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
-	}
-}
-
-bool EContainer::Contain(ECBEntity* entity)
-{
-	if(Containing())
-	{
-		if(entity->Type() != Containing()->Type())
-		{
-			Debug(W_WARNING, "EContainer::Contain(): %d veut entrer dans un %d qui contient un %d !", entity->Type(), Type(), Containing()->Type());
-			return false;
-		}
-		Containing()->SetNb(Containing()->Nb() + entity->Nb());
-		dynamic_cast<ECEntity*>(entity)->SetZombie();
-		/*
-		 * Channel()->SendArm(0, dynamic_cast<ECEntity*>(entity), ARM_REMOVE|ARM_INVEST);
-		 *
-		 * On l'envoie par la suite
-		 */
-		if(Owner() && Owner()->Client())
-			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
-
-		return true;
-	}
-
-	return ECBContainer::Contain(entity);
-}
-
-bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
-{
-	if((Containing() && Containing()->Type() != entity->Type()) || entity->Locked() || entity->IsZombie() || !CanContain(entity))
-		return false;
-
-	ECMove::E_Move move;
-	ECBCase* c = DestCase();
-
-	if(entity->DestCase()->X() == c->X())
-	{
-		if(entity->DestCase()->Y() == c->Y()-1)
-			move = ECMove::Down;
-		else if(entity->DestCase()->Y() == c->Y()+1)
-			move = ECMove::Up;
-		else
-			return false;
-	}
-	else if(entity->DestCase()->Y() == c->Y())
-	{
-		if(entity->DestCase()->X() == c->X()-1)
-			move = ECMove::Right;
-		else if(entity->DestCase()->X() == c->X()+1)
-			move = ECMove::Left;
-		else
-			return false;
-	}
-	else
-		return false;
-
-	std::vector<ECEvent*> events = Events()->List();
-	uint contened = Containing() ? Containing()->Nb() : 0;
-	FORit(ECEvent*, events, event)
-		if((*event)->Flags() & ARM_CONTENER)
-		{
-			if((*event)->Entity()->Type() != entity->Type())
-				return false;
-			contened += (*event)->Entity()->Nb();
-		}
-
-	if(contened + entity->Nb() > UnitaryCapacity() * Nb())
-		return false;
-
-	if(!entity->WantMove(move, MOVE_FORCE))
-		return false;
-
-	moves.push_back(move);
-
-	return true;
-}
-
-bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
-{
-	if(!Containing() || !RestStep() || !Containing()->RestStep())
-		return false;
-
-	ECMove::E_Move move;
-	ECBCase* c = DestCase();
-
-	if(x == c->X())
-	{
-		if(y == c->Y()-1)
-			move = ECMove::Up;
-		else if(y == c->Y()+1)
-			move = ECMove::Down;
-		else
-			return false;
-	}
-	else if(y == c->Y())
-	{
-		if(x == c->X()-1)
-			move = ECMove::Left;
-		else if(x == c->X()+1)
-			move = ECMove::Right;
-		else
-			return false;
-	}
-	else
-		return false;
-
-	Containing()->SetCase(c);
-	if(!Containing()->CanWalkOn((*Map())(x,y)) || !Containing()->WantMove(move, MOVE_FORCE))
-		return false;
-
-	moves.push_back(move);
-
-	return true;
-}
-
-void EContainer::ReleaseShoot()
-{
-	if(Containing())
-	{
-		ECEntity* contained = dynamic_cast<ECEntity*>(Containing());
-		int contained_nb = contained->Nb();
-		contained->Shooted(shooted);
-		contained->ReleaseShoot();
-
-		if(!contained->Nb())
-		{
-			Channel()->SendArm(NULL, contained, ARM_REMOVE);
-			contained->SetZombie();
-			SetContaining(0);
-
-			/* Si jamais ce qu'on contenait est détruit, on reporte sur le bateau */
-			shooted -= contained_nb;
-			ECEntity::ReleaseShoot();
-		}
-		shooted = 0;
-	}
-	else
-		ECEntity::ReleaseShoot();
-}
-
-void EContainer::ChangeCase(ECBCase* new_case)
-{
-	ECEntity::ChangeCase(new_case);
-	if(Containing())
-		Containing()->SetCase(Case());
-}
-
-bool EContainer::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
-{
-	if(Containing())
-	{
-		Containing()->SetCase(Case());
-		return dynamic_cast<ECEntity*>(Containing())->Attaq(entities, event);
-	}
-	else
-		return ECEntity::Attaq(entities, event);
-}
 
 /********************************************************************************************
  *                               ECMissiLauncher                                            *

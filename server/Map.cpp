@@ -24,7 +24,7 @@
 #include "Debug.h"
 #include "Channels.h"
 #include "Main.h"
-#include "Units.h"
+#include "Batiments.h"
 #include <fstream>
 #include <algorithm>
 
@@ -290,14 +290,6 @@ bool ECEntity::AreFriends(std::vector<ECEntity*> list)
 	return true;
 }
 
-void ECEntity::Played()
-{
-	/// @note this function is called by ECEntity::Return()
-	ECBEntity::Played();
-	Move()->Clear(Case());
-	Events()->Clear();
-}
-
 ECEntity::~ECEntity()
 {
 
@@ -305,11 +297,34 @@ ECEntity::~ECEntity()
 
 void ECEntity::Shoot(ECEntity* e, uint k)
 {
-	if(Owner())
-		dynamic_cast<ECPlayer*>(Owner())->Stats()->killed += k;
-
 	Debug(W_DEBUG, "%s shoot %s de %d", LongName().c_str(), e->LongName().c_str(), k);
 	e->Shooted(k);
+
+	if (!Owner())
+		return;
+
+	if (k > e->Nb())
+		k = e->Nb();
+
+	Owner()->Stats()->killed += k;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+	{
+		ECGulag* gulag = dynamic_cast<ECGulag*>(*it);
+		if (!gulag)
+			continue;
+		if (gulag->NbPrisoners() + k > gulag->MaxPrisoners())
+		{
+			k -= gulag->MaxPrisoners() - gulag->NbPrisoners();
+			gulag->AddPrisoners(gulag->MaxPrisoners() - gulag->NbPrisoners());
+		}
+		else
+		{
+			gulag->AddPrisoners(k);
+			return;
+		}
+	}
 }
 
 void ECEntity::ReleaseShoot()
@@ -363,12 +378,8 @@ void ECEntity::Union(ECEntity* entity)
 	}
 }
 
-bool ECEntity::Return()
+void ECEntity::Played()
 {
-	// On en revient à l'état après une partie.
-	Played();
-
-	return true;
 }
 
 bool ECEntity::Attaq(std::vector<ECEntity*> entities, ECEvent*)
@@ -413,7 +424,7 @@ std::nrvector<TClient*> ECEntity::EntitiesToClients(std::vector<ECEntity*> entit
 	return players;
 }
 
-void ECEntity::CancelEvents(bool send_message)
+void ECEntity::CancelEvents()
 {
 	ECMap* map = dynamic_cast<ECMap*>(Map());
 	EventVector events = Events()->List();
@@ -442,13 +453,200 @@ void ECEntity::CancelEvents(bool send_message)
 		map->RemoveEvent(*evti, USE_DELETE);
 	}
 
+	Move()->Clear(Case());
 	Events()->Clear();
-	Return();
 
-	if(send_message && Owner() && Owner()->Client())
-		Channel()->SendArm(Owner()->Client(), this, ARM_RETURN, Case()->X(), Case()->Y());
+	ECBEntity::CancelEvents();
 
 	// On annule les evenements des unités liées à ces evenements
-	FORit(ECEntity*, entities, enti)
-		(*enti)->CancelEvents(true); // true signifie qu'on va envoyer un ARM_RETURN
+	FOR(ECEntity*, entities, enti)
+	{
+		enti->CancelEvents();
+		if (enti->Owner() && enti->Owner()->Client())
+			Channel()->SendArm(enti->Owner()->Client(), enti, ARM_RETURN,
+			                   enti->Case()->X(), enti->Case()->Y());
+	}
 }
+
+/********************************************************************************************
+ *                               EContainer                                                 *
+ ********************************************************************************************/
+
+void EContainer::Union(ECEntity* entity)
+{
+	ECEntity::Union(entity);
+
+	EContainer* container = dynamic_cast<EContainer*>(entity);
+
+	if(!container || !container->Containing()) return;
+
+	if(!Containing())
+	{
+		Contain(container->Containing());
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_CONTENER);
+	}
+	else if(container->Containing())
+	{
+		dynamic_cast<ECEntity*>(Containing())->Union(dynamic_cast<ECEntity*>(container->Containing()));
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_REMOVE|ARM_INVEST);
+		if(Owner() && Owner()->Client())
+			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
+	}
+}
+
+bool EContainer::Contain(ECBEntity* entity)
+{
+	if(Containing())
+	{
+		if(entity->Type() != Containing()->Type())
+		{
+			Debug(W_WARNING, "EContainer::Contain(): %d veut entrer dans un %d qui contient un %d !", entity->Type(), Type(), Containing()->Type());
+			return false;
+		}
+		Containing()->SetNb(Containing()->Nb() + entity->Nb());
+		dynamic_cast<ECEntity*>(entity)->SetZombie();
+		/*
+		 * Channel()->SendArm(0, dynamic_cast<ECEntity*>(entity), ARM_REMOVE|ARM_INVEST);
+		 *
+		 * On l'envoie par la suite
+		 */
+		if(Owner() && Owner()->Client())
+			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
+
+		return true;
+	}
+
+	return ECBContainer::Contain(entity);
+}
+
+bool EContainer::WantContain(ECEntity* entity, ECMove::Vector& moves)
+{
+	if((Containing() && Containing()->Type() != entity->Type()) || entity->Locked() || entity->IsZombie() || !CanContain(entity))
+		return false;
+
+	ECMove::E_Move move;
+	ECBCase* c = DestCase();
+
+	if(entity->DestCase()->X() == c->X())
+	{
+		if(entity->DestCase()->Y() == c->Y()-1)
+			move = ECMove::Down;
+		else if(entity->DestCase()->Y() == c->Y()+1)
+			move = ECMove::Up;
+		else
+			return false;
+	}
+	else if(entity->DestCase()->Y() == c->Y())
+	{
+		if(entity->DestCase()->X() == c->X()-1)
+			move = ECMove::Right;
+		else if(entity->DestCase()->X() == c->X()+1)
+			move = ECMove::Left;
+		else
+			return false;
+	}
+	else
+		return false;
+
+	std::vector<ECEvent*> events = Events()->List();
+	uint contened = Containing() ? Containing()->Nb() : 0;
+	FORit(ECEvent*, events, event)
+		if((*event)->Flags() & ARM_CONTENER)
+		{
+			if((*event)->Entity()->Type() != entity->Type())
+				return false;
+			contened += (*event)->Entity()->Nb();
+		}
+
+	if(contened + entity->Nb() > UnitaryCapacity() * Nb())
+		return false;
+
+	if(!entity->WantMove(move, MOVE_FORCE))
+		return false;
+
+	moves.push_back(move);
+
+	return true;
+}
+
+bool EContainer::WantUnContain(uint x, uint y, ECMove::Vector& moves)
+{
+	if(!Containing() || !Containing()->RestStep())
+		return false;
+
+	ECMove::E_Move move;
+	ECBCase* c = DestCase();
+
+	if(x == c->X())
+	{
+		if(y == c->Y()-1)
+			move = ECMove::Up;
+		else if(y == c->Y()+1)
+			move = ECMove::Down;
+		else
+			return false;
+	}
+	else if(y == c->Y())
+	{
+		if(x == c->X()-1)
+			move = ECMove::Left;
+		else if(x == c->X()+1)
+			move = ECMove::Right;
+		else
+			return false;
+	}
+	else
+		return false;
+
+	Containing()->SetCase(c);
+	if(!Containing()->CanWalkOn((*Map())(x,y)) || !Containing()->WantMove(move, MOVE_FORCE))
+		return false;
+
+	moves.push_back(move);
+
+	return true;
+}
+
+void EContainer::ReleaseShoot()
+{
+	if(Containing())
+	{
+		ECEntity* contained = dynamic_cast<ECEntity*>(Containing());
+		int contained_nb = contained->Nb();
+		contained->Shooted(shooted);
+		contained->ReleaseShoot();
+
+		if(!contained->Nb())
+		{
+			Channel()->SendArm(NULL, contained, ARM_REMOVE);
+			contained->SetZombie();
+			UnContain();
+
+			/* Si jamais ce qu'on contenait est détruit, on reporte sur le bateau */
+			shooted -= contained_nb;
+			ECEntity::ReleaseShoot();
+		}
+		shooted = 0;
+	}
+	else
+		ECEntity::ReleaseShoot();
+}
+
+void EContainer::ChangeCase(ECBCase* new_case)
+{
+	ECEntity::ChangeCase(new_case);
+	if(Containing())
+		Containing()->SetCase(Case());
+}
+
+bool EContainer::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
+{
+	if(Containing())
+	{
+		Containing()->SetCase(Case());
+		return dynamic_cast<ECEntity*>(Containing())->Attaq(entities, event);
+	}
+	else
+		return ECEntity::Attaq(entities, event);
+}
+

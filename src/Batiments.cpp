@@ -133,8 +133,6 @@ void ECBarbedWire::Created()
 
 void ECBarbedWire::Played()
 {
-	ECEntity::Played();
-
 	FindMyImage();
 }
 
@@ -212,8 +210,6 @@ void ECRail::Created()
 
 void ECRail::Played()
 {
-	ECEntity::Played();
-
 	FindMyImage();
 }
 
@@ -279,6 +275,67 @@ std::string ECMine::SpecialInfo()
 	if(!Owner() || !Owner()->IsMe()) return "";
 	else if(restBuild) return StringF(_("Active in %d days."), restBuild);
 	else return _("Mine actived");
+}
+
+/********************************************************************************************
+ *                                ECavern                                                   *
+ ********************************************************************************************/
+ECavern::~ECavern()
+{
+	/* Prevent uncontain unit from other caverns */
+	SetContaining(NULL);
+}
+
+std::string ECavern::SpecialInfo()
+{
+	if(Containing()) return _(" - Contain:");
+	else if(Owner() && Owner()->IsMe()) return StringF(_(" - Capacity: %d"),100 * Nb());
+	else return "";
+}
+
+/********************************************************************************************
+ *                                ECGulag                                                   *
+ ********************************************************************************************/
+void ECGulag::Created()
+{
+	FindMyImage();
+}
+
+void ECGulag::Played()
+{
+	FindMyImage();
+}
+
+void ECGulag::FindMyImage()
+{
+	if (NbPrisoners() == 0)
+		SetImage(GetSprite(I_Down));
+	else if (NbPrisoners() < MaxPrisoners())
+		SetImage(GetSprite(I_Right));
+	else
+		SetImage(GetSprite(I_Up));
+}
+
+void ECGulag::RecvData(ECData data)
+{
+	switch(data.type)
+	{
+		case DATA_NB_PRISONERS:
+		{
+			nb_prisoners = static_cast<ECEntity::e_type>(StrToTyp<uint>(data.data));
+			break;
+		}
+	}
+}
+
+std::string ECGulag::SpecialInfo()
+{
+	if (NbPrisoners() == 0)
+		return StringF(_("This camp is empty."));
+	else if (NbPrisoners() < MaxPrisoners())
+		return StringF(_("There are %d prisoners (%d remaining places)"), NbPrisoners(), MaxPrisoners()-NbPrisoners());
+	else
+		return StringF(_("This camp is full (%d prisoners)"), NbPrisoners());
 }
 
 /********************************************************************************************

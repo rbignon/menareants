@@ -36,6 +36,7 @@
  ********************************************************************/
 
 #include "Map.h"
+#include "Channels.h"
 
 /********************************************************************************************
  *                                        ECBarbedWire                                      *
@@ -285,6 +286,7 @@ public:
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 	bool CanCreate(const ECBEntity*) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
+	virtual void SetOwner(ECBPlayer* _p);
 
 /* Attributs */
 public:
@@ -341,6 +343,7 @@ public:
 
 	virtual bool CanCreate(const ECBEntity* e) { return false; }
 	virtual bool CanBeCreated(ECBPlayer* pl) const;
+	virtual void SetOwner(ECBPlayer* _p);
 
 /* Attributs */
 public:
@@ -356,6 +359,48 @@ private:
 
 protected:
 	uint restBuild;
+};
+
+/********************************************************************************************
+ *                               ECBGulag                                                   *
+ ********************************************************************************************/
+class ECBGulag : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBGulag) : nb_prisoners(0) {}
+
+	ENTITY_CONSTRUCTOR(ECBGulag), nb_prisoners(0) {}
+
+/* Constantes */
+public:
+
+	enum data_t {
+		DATA_NB_PRISONERS
+	};
+
+	virtual e_type Type() const { return E_GULAG; }
+	virtual uint Cost() const { return 20000; }
+	virtual uint InitNb() const { return 200; }
+	virtual bool CanBeSold() const { return true; }
+	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_URSS); }
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+	virtual bool CanCreate(const ECBEntity* e) { return false; }
+
+	virtual bool IsBuilding() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+
+	int TurnMoney(ECBPlayer* pl) { return (pl == Owner()) ? nb_prisoners/2 : 0; }
+
+	uint NbPrisoners() const { return nb_prisoners; }
+	uint MaxPrisoners() const { return 10000; }
+
+protected:
+	uint nb_prisoners;
 };
 
 /********************************************************************************************
@@ -700,7 +745,6 @@ public:
 /********************************************************************************************
  *                               ECBShipyard                                                *
  ********************************************************************************************/
-/** This is a char factory */
 class ECBShipyard : public virtual ECBEntity
 {
 /* Constructeur/Destructeur */
@@ -738,5 +782,54 @@ public:
 	}
 };
 
+/********************************************************************************************
+ *                               ECBCavern                                                  *
+ ********************************************************************************************/
+class ECBCavern : public virtual ECBContainer
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECBCavern) {}
+
+	ENTITY_CONSTRUCTOR(ECBCavern) {}
+
+	virtual ~ECBCavern();
+
+	void Init();
+
+/* Constantes */
+public:
+
+	virtual e_type Type() const { return E_CAVERN; }
+	virtual uint Cost() const { return 10000; }
+	virtual uint InitNb() const { return 200; }
+	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_NOISY); }
+	virtual bool CanBeSold() const { return false; }
+
+	virtual uint UnitaryCapacity() const { return 10000; }
+
+	virtual bool CanContainThisEntity(const ECBEntity* et) const
+	{
+		return (et->IsInfantry() || et->IsVehicule());
+	}
+
+	virtual bool Contain(ECBEntity* e);
+	virtual bool UnContain();
+
+	virtual bool CanAttaq(const ECBEntity* e) { return false; }
+
+	virtual bool IsBuilding() const { return true; }
+	virtual bool IsOnMontain() const { return true; }
+	virtual bool AddUnits(uint) { return false; }
+	virtual bool WantMove(ECBMove::E_Move, int) { return false; }
+	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
+	virtual bool CanCreate(const ECBEntity* e) { return false; }
+	virtual void SetOwner(ECBPlayer* _p);
+
+protected:
+	/* Set this contained entity on every caverns. */
+	void BroadcastContaining(ECBEntity* e);
+};
 
 #endif /* ECLIB_BATIMENTS_H */

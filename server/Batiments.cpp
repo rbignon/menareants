@@ -1,6 +1,6 @@
 /* server/Batiments.cpp - Buildings in server
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,24 @@
 #include "Channels.h"
 #include "Debug.h"
 #include <stdlib.h>
+
+/********************************************************************************************
+ *                                        ECavern                                           *
+ ********************************************************************************************/
+bool ECavern::Contain(ECBEntity* entity)
+{
+	if (Containing())
+		return EContainer::Contain(entity);
+	else
+		return ECBCavern::Contain(entity);
+}
+
+void ECavern::ReleaseShoot()
+{
+	EContainer::ReleaseShoot();
+	/*if (!Containing())
+		BroadcastContaining(NULL);*/
+}
 
 /********************************************************************************************
  *                                        ECObelisk                                         *
@@ -184,7 +202,6 @@ void ECMine::Played()
 			Channel()->SendArm(sdrs, this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
 		}
 	}
-	ECEntity::Played();
 }
 
 bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
@@ -202,6 +219,21 @@ bool ECMine::Attaq(std::vector<ECEntity*> entities, ECEvent* event)
 	Shoot(this, Nb());
 
 	return false;
+}
+
+/********************************************************************************************
+ *                               ECGulag                                                    *
+ ********************************************************************************************/
+void ECGulag::Resynch(ECPlayer* pl)
+{
+	Channel()->SendArm(pl->Client(), this, ARM_DATA, 0, 0, ECData(DATA_NB_PRISONERS, TypToStr(nb_prisoners)));
+}
+
+void ECGulag::Played()
+{
+	Channel()->SendArm(NULL, this, ARM_DATA, 0, 0, ECData(DATA_NB_PRISONERS, TypToStr(nb_prisoners)));
+	if (Owner() && TurnMoney(Owner()) > 0)
+		Channel()->send_info(Owner(), EChannel::I_GULAG_GAIN, ECArgs(LongName(), TypToStr(TurnMoney(Owner()))));
 }
 
 /********************************************************************************************
@@ -226,7 +258,6 @@ void ECNuclearSearch::Played()
 	}
 	if(Owner() && Owner()->Client())
 		Channel()->SendArm(Owner()->Client(), this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
-	ECEntity::Played();
 }
 
 void ECNuclearSearch::RemoveOneMissile()
@@ -258,7 +289,6 @@ void ECSilo::Played()
 			Channel()->SendArm(sdrs, this, ARM_DATA, 0,0, ECData(DATA_RESTBUILD, TypToStr(restBuild)));
 		}
 	}
-	ECEntity::Played();
 }
 
 bool ECSilo::WantAttaq(uint mx, uint my, bool force)

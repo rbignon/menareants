@@ -1,6 +1,6 @@
 /* src/JoinGame.cpp - Functions to list game and join/create a game.
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ bool RECOVERING = false;
  * - All format tags begin with '%' character
  * - There is a number between 0 and 9 in second position to identifiat number of argument in list
  * - After, there is a list of formaters :
- *    * 's' show as test argument
+ *    * 's' show as text argument
  *    * 'E' in form "Player!ID", this is an entity. There is an other formater :
  *          -> 'o' is this owner of entity
  *          -> 't' is the string type of entity (like "boat", it calls ECEntity::Qual() function)
@@ -79,7 +79,8 @@ int INFOCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 		/* 02 */ { I_SHIT, gettext_noop("%0Eo's %0Et invests %1s's McPuke installed in %2Eo's barracks!! He's going to eat everything! "
 		                   "That will take %3s days for him!") }, // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
 		/* 03 */ { I_INFO, gettext_noop("DEBUGINFO: %0s") },
-		/* 04 */ { I_SHIT, gettext_noop("%0Eo's %0Et is farting!!! Every infantry next to him will be damaged because of stink!!") }
+		/* 04 */ { I_SHIT, gettext_noop("%0Eo's %0Et is farting!!! Every infantry next to him will be damaged because of stink!!") },
+		/* 05 */ { I_INFO, gettext_noop("Your %0Et brings you $%1s today.") } // gulag, how many
 	};
 	if(InGameForm)
 	{
@@ -418,7 +419,10 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						chan->Map()->CreatePreview(120,120, P_ENTITIES);
 						std::vector<ECBEntity*> ents = chan->Map()->Entities()->List();
 						for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
+						{
 							(*enti)->Played();
+							(*enti)->CancelEvents();
+						}
 						if(InGameForm)
 						{
 							InGameForm->BarreLat->Icons->SetList(EntityList.Buildings(me->Player()), TBarreLat::SelectUnit);

@@ -1,6 +1,6 @@
 /* server/Batiments.h - Header of Batiments.cpp
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,11 +86,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
 
 	virtual void Played();
@@ -146,11 +141,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
 
 	virtual void Played();
@@ -190,6 +180,48 @@ public:
 };
 
 /********************************************************************************************
+ *                                 ECGulag                                                  *
+ ********************************************************************************************/
+class ECGulag: public ECEntity, public ECBGulag
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECGulag) {}
+
+/* Methodes */
+public:
+
+	virtual void Union(ECEntity*) { return; }
+
+	virtual void Played();
+
+	void Resynch(ECPlayer* pl);
+
+/* Attributes */
+public:
+	void AddPrisoners(uint nb) { nb_prisoners += nb; }
+};
+
+/********************************************************************************************
+ *                                 ECCavern                                                  *
+ ********************************************************************************************/
+class ECavern: public EContainer, public ECBCavern
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_CONSTRUCTOR(ECavern) {}
+
+/* Methodes */
+public:
+
+	virtual bool Contain(ECBEntity* e);
+	void ReleaseShoot();
+
+};
+
+/********************************************************************************************
  *                               ECMegalopole                                               *
  ********************************************************************************************/
 class ECMegalopole : public ECEntity, public ECBMegalopole
@@ -201,11 +233,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
-
-	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
 };
@@ -223,11 +250,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
 };
 
@@ -244,11 +266,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
 };
 
@@ -264,9 +281,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
 
 	virtual void Union(ECEntity*) { return; }
 
@@ -287,9 +301,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
 
 	virtual void Union(ECEntity*) { return; }
 
@@ -312,11 +323,6 @@ public:
 /* Methodes */
 public:
 
-
-
-
-	virtual void CreateLast() {}
-
 	virtual void Union(ECEntity*) { return; }
 };
 
@@ -332,11 +338,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
-
-	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
 };
@@ -370,11 +371,6 @@ public:
 
 /* Methodes */
 public:
-
-
-
-
-	virtual void CreateLast() {}
 
 	virtual void Union(ECEntity*) { return; }
 };

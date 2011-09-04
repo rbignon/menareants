@@ -1,6 +1,6 @@
 /* server/InGame.cpp - Commands called in a game.
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -794,7 +794,7 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			case ')':
 			{
 				container = dynamic_cast<EContainer*>(cl->Player()->Entities()->Find(parv[i].substr(1).c_str()));
-				if(entity && container && container->WantContain(entity, moves))
+				if(entity && !(entity->EventType() & ARM_CONTENER) && container && container->WantContain(entity, moves))
 					flags |= ARM_CONTAIN;
 				break;
 			}

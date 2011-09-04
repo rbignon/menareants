@@ -1,6 +1,6 @@
 /* server/IA.cpp - Functions about Artificial Intelligence
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,11 +63,12 @@ public:
 			{ /* On prend dans nos bateaux le plus proche */
 				uint d = 0;
 				for(std::vector<ECBEntity*>::iterator e = entities.begin(); e != entities.end(); ++e)
-						if(!IA()->recruted[*e] && !dynamic_cast<ECBoat*>(*e)->Containing() &&
-						   (!boat && unit->Case()->Delta((*e)->Case()) < 20 || d > unit->Case()->Delta((*e)->Case())))
-							boat = dynamic_cast<ECBoat*>(*e),
-							d = boat->Case()->Delta((*e)->Case());
-
+					if(!IA()->recruted[*e] && !dynamic_cast<ECBoat*>(*e)->Containing() &&
+					   ((!boat && unit->Case()->Delta((*e)->Case()) < 20) || d > unit->Case()->Delta((*e)->Case())))
+					{
+						boat = dynamic_cast<ECBoat*>(*e);
+						d = boat->Case()->Delta((*e)->Case());
+					}
 				if(boat)
 					AddEntity(boat);
 				// Sinon, si jamais il n'y a que des bateaux recrutés ou qui contiennent déjà quelqu'un,
@@ -300,7 +301,7 @@ void TIA::FirstMovements()
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		if((*enti)->IsZombie() || (*enti)->Locked() || !(*enti)->Owner() ||
-		   !(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner())
+		   (!(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner()))
 			continue;
 		if((*enti)->IsBuilding())
 		{
@@ -392,11 +393,15 @@ void TIA::FirstMovements()
 			ECBEntity* victim = 0;
 			uint d = 0;
 			for(std::vector<ECBEntity*>::iterator e = all_entities.begin(); e != all_entities.end(); ++e)
-				if(!(*e)->IsHidden() && !(*e)->IsTerrain() && !(*enti)->Like(*e) &&
-				   ((*enti)->CanAttaq(*e) || (*enti)->CanInvest(*e) && !(*enti)->Deployed()) &&
+				if(!(*e)->IsHidden() &&
+				   !(*e)->IsTerrain() &&
+				   !(*enti)->Like(*e) &&
+				   ((*enti)->CanAttaq(*e) || ((*enti)->CanInvest(*e) && !(*enti)->Deployed())) &&
 				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
 				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
+				{
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
+				}
 
 			if(!victim) continue; // étonnant !
 
@@ -604,7 +609,7 @@ bool TIA::Join(EChannel* chan)
 	assert(chan);
 	assert(!Player());
 
-	if(!chan->Joinable() || chan->Limite() && chan->NbPlayers() >= chan->Limite())
+	if(!chan->Joinable() || (chan->Limite() && chan->NbPlayers() >= chan->Limite()))
 	{
 		app.delclient(this);
 		return false;

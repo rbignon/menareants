@@ -194,9 +194,9 @@ void ECEntity::SetAttaquedCase(ECase* c)
 	}
 }
 
-void ECEntity::Played()
+void ECEntity::CancelEvents()
 {
-	ECBEntity::Played();
+	ECBEntity::CancelEvents();
 	SetAttaquedCase(0);
 	Move()->Clear(Case());
 }

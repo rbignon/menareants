@@ -1,6 +1,6 @@
 /* server/Channels.cpp - Channels functions
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -900,7 +900,7 @@ int LEACommand::Exec(TClient *cl, std::vector<std::string> parv)
 
 	Debug(W_CONNS, "<- %s@%s quitte la partie %s", cl->GetNick(), cl->GetIp(), chan->GetName());
 
-	if(chan->Joinable() && cl->Player()->IsOwner() || chan->NbHumains() == 1)
+	if((chan->Joinable() && cl->Player()->IsOwner()) || chan->NbHumains() == 1)
 	{ /* L'owner s'en vas, le chan se clos,
 	   * ou alors il n'y a plus que des IA sur le chan
 	   */
@@ -1345,6 +1345,7 @@ void EChannel::CheckReadys()
 						else
 						{
 							(*enti)->Played(); /* On marque bien qu'il a été joué */
+							(*enti)->CancelEvents();
 							for(BPlayerVector::iterator it = players.begin(); it != players.end(); ++it)
 								money[*it] += (*enti)->TurnMoney(*it);
 						}
@@ -1368,7 +1369,8 @@ void EChannel::CheckReadys()
 							/* Si le jeu est en fastgame, seules les batiments qui ne sont pas cachés et qui ne sont
 							 * pas dans l'eau comptent pour rester en vie. Une fois qu'on les a perdu on a perdu.
 							 */
-							if(!(*enti)->IsHidden() && !(*enti)->IsTerrain() && ((*enti)->IsBuilding() && !(*enti)->IsNaval() || !FastGame()))
+							if((*enti)->IsBuilding() &&
+							   (!FastGame() || (*enti)->IsCountryMaker()))
 								nb_units++;
 						}
 						if(!nb_units)
@@ -1582,7 +1584,7 @@ void EChannel::SendArm(std::vector<TClient*> cl, std::vector<ECEntity*> et, uint
 		to_send += "-";
 	if(flag & ARM_NOPRINCIPAL)
 		to_send += "&";
-	if(flag & ARM_DEPLOY || (flag & ARM_TYPE) && et.front()->Deployed())
+	if(flag & ARM_DEPLOY || ((flag & ARM_TYPE) && et.front()->Deployed()))
 		to_send += (et.front()->Deployed()) ? "{" : "}";
 	if(flag & ARM_CONTENER && !et.empty())
 	{
@@ -1960,7 +1962,9 @@ void EChannel::SendEntities(ECPlayer* pl)
 
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
-		if((*enti)->IsHidden() && (*enti)->Owner() != pl || (*enti)->EventType() & ARM_SELL) continue;
+		if(((*enti)->IsHidden() && (*enti)->Owner() != pl) ||
+		   (*enti)->EventType() & ARM_SELL)
+			continue;
 		ECEntity* entity = dynamic_cast<ECEntity*>(*enti);
 
 		int flags = (entity->Owner() && (entity->Owner() == pl || entity->Owner()->IsAllie(pl))) ? ARM_CREATE : ARM_CREATE|ARM_HIDE;
@@ -1976,7 +1980,7 @@ void EChannel::SendEntities(ECPlayer* pl)
 
 		entity->Resynch(pl);
 
-		if(entity->Owner() == pl || entity->Owner() && entity->Owner()->IsAllie(pl))
+		if(entity->Owner() == pl || (entity->Owner() && entity->Owner()->IsAllie(pl)))
 		{
 			std::vector<ECEvent*> events = entity->Events()->List();
 			FOR(ECEvent*, events, event)

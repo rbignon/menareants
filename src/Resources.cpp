@@ -204,6 +204,12 @@
 	R_RESOURCE(ECSpriteBase, Boat_Left,        "units/boat/left");
 	R_RESOURCE(ECSpriteBase, Boat_Right,       "units/boat/right");
 	R_RESOURCE(ECSpriteBase, Boat_Dos,         "units/boat/dos");
+	R_RESOURCE(ECImage,      Cavern_Icon,      PKGDATADIR_PICS "units/cavern_icon.png");
+	R_RESOURCE(ECSpriteBase, Cavern_Face,      "units/cavern");
+	R_RESOURCE(ECImage,      Gulag_Icon,       PKGDATADIR_PICS "units/gulag_icon.png");
+	R_RESOURCE(ECSpriteBase, Gulag_Empty,      "units/gulag/empty");
+	R_RESOURCE(ECSpriteBase, Gulag_Normal,     "units/gulag/normal");
+	R_RESOURCE(ECSpriteBase, Gulag_Full,       "units/gulag/full");
 	R_RESOURCE(ECImage,      NuclearSearch_Icon,PKGDATADIR_PICS "units/nuclearsearch_icon.png");
 	R_RESOURCE(ECSpriteBase, NuclearSearch_Face,"units/nuclearsearch");
 	R_RESOURCE(ECImage,      Silo_Icon,         PKGDATADIR_PICS "units/silo_icon.png");

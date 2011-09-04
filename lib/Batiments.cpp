@@ -24,6 +24,72 @@
 #include <assert.h>
 
 /********************************************************************************************
+ *                               ECBCavern                                                  *
+ ********************************************************************************************/
+void ECBCavern::Init()
+{
+	ECBEntity::Init();
+
+	SetContaining(NULL);
+	if(!Owner()) return;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+	{
+		ECBCavern* cavern = dynamic_cast<ECBCavern*>(*it);
+		if (!cavern || !cavern->Containing())
+			continue;
+		SetContaining(cavern->Containing());
+	}
+}
+
+ECBCavern::~ECBCavern()
+{
+	UnContain();
+}
+
+void ECBCavern::SetOwner(ECBPlayer* p)
+{
+	ECBEntity::SetOwner(p);
+	Init();
+}
+
+bool ECBCavern::Contain(ECBEntity* entity)
+{
+	if (!ECBContainer::Contain(entity))
+		return false;
+
+	BroadcastContaining(entity);
+
+	return true;
+}
+
+bool ECBCavern::UnContain()
+{
+	if(!ECBContainer::UnContain())
+		return false;
+
+	BroadcastContaining(NULL);
+
+	return true;
+}
+
+void ECBCavern::BroadcastContaining(ECBEntity* e)
+{
+	if (!Owner())
+		return;
+
+	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+	{
+		ECBCavern* cavern = dynamic_cast<ECBCavern*>(*it);
+		if (!cavern)
+			continue;
+		cavern->SetContaining(e);
+	}
+}
+
+/********************************************************************************************
  *                               ECBEiffelTower                                             *
  ********************************************************************************************/
 
@@ -67,6 +133,7 @@ bool ECBRadar::CanBeCreated(ECBPlayer* pl) const
 
 void ECBNuclearSearch::Init()
 {
+	ECBEntity::Init();
 	if(!Owner()) return;
 
 	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
@@ -76,6 +143,24 @@ void ECBNuclearSearch::Init()
 		if((silo = dynamic_cast<ECBSilo*>(*it)))
 			silo->SetNuclearSearch(this);
 	}
+}
+
+void ECBNuclearSearch::SetOwner(ECBPlayer* p)
+{
+	if (Owner())
+	{
+		std::vector<ECBEntity*> ents = Owner()->Entities()->List();
+		for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
+		{
+			ECBSilo* silo;
+			if((silo = dynamic_cast<ECBSilo*>(*it)))
+				silo->SetNuclearSearch(NULL);
+		}
+	}
+
+	ECBEntity::SetOwner(p);
+
+	Init();
 }
 
 ECBNuclearSearch::~ECBNuclearSearch()
@@ -109,12 +194,21 @@ bool ECBNuclearSearch::CanBeCreated(ECBPlayer* pl) const
 void ECBSilo::Init()
 {
 	ECBEntity::Init();
-	if(!Owner()) return;
+	nuclear_search = NULL;
+	if(!Owner())
+		return;
 
 	std::vector<ECBEntity*> ents = Owner()->Entities()->List();
 	for(std::vector<ECBEntity*>::const_iterator it = ents.begin(); it != ents.end(); ++it)
 		if((nuclear_search = dynamic_cast<ECBNuclearSearch*>(*it)))
 			break;
+}
+
+void ECBSilo::SetOwner(ECBPlayer* p)
+{
+	ECBEntity::SetOwner(p);
+
+	Init();
 }
 
 bool ECBSilo::CanBeCreated(ECBPlayer* pl) const

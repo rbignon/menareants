@@ -1,6 +1,6 @@
 /* src/gui/ShowMap.cpp - This is a component to show the map
  *
- * Copyright (C) 2005 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -471,7 +471,8 @@ void TMap::Draw(const Point2i& mouse)
 			c->Draw();
 
 			/* Trucs dessinés si il y a une unité sélectionnée */
-			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe() && SelectedEntity()->Owner()->Ready() == false)
+			if(SelectedEntity() && SelectedEntity()->Owner() && SelectedEntity()->Owner()->IsMe() && SelectedEntity()->Owner()->Ready() == false &&
+			   !(SelectedEntity()->EventType() & ARM_CONTENER))
 			{
 				bool move, invest;
 
@@ -483,7 +484,7 @@ void TMap::Draw(const Point2i& mouse)
 					if(((SelectedEntity()->DestCase()->X() == c->X() && (SelectedEntity()->DestCase()->Y() == c->Y()+1 || SelectedEntity()->DestCase()->Y() == c->Y()-1)) ||
 					    (SelectedEntity()->DestCase()->Y() == c->Y() && (SelectedEntity()->DestCase()->X() == c->X()+1 || SelectedEntity()->DestCase()->X() == c->X()-1)))
 					   && dynamic_cast<EContainer*>(SelectedEntity())->Containing()->CanWalkOn(c)
-					   && SelectedEntity()->Move()->Size() < SelectedEntity()->MyStep())
+					   && SelectedEntity()->Move()->Size() <= SelectedEntity()->MyStep())
 					{
 						ECImage background;
 						SDL_Rect r_back = {0,0,CASE_WIDTH,CASE_HEIGHT};

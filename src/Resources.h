@@ -239,6 +239,12 @@ public:
 	R_RESOURCE(ECSpriteBase, Boat_Left);
 	R_RESOURCE(ECSpriteBase, Boat_Right);
 	R_RESOURCE(ECSpriteBase, Boat_Dos);
+	R_RESOURCE(ECImage,      Cavern_Icon);
+	R_RESOURCE(ECSpriteBase, Cavern_Face);
+	R_RESOURCE(ECImage,      Gulag_Icon);
+	R_RESOURCE(ECSpriteBase, Gulag_Empty);
+	R_RESOURCE(ECSpriteBase, Gulag_Normal);
+	R_RESOURCE(ECSpriteBase, Gulag_Full);
 	R_RESOURCE(ECImage,      NuclearSearch_Icon);
 	R_RESOURCE(ECSpriteBase, NuclearSearch_Face);
 	R_RESOURCE(ECImage,      Silo_Icon);

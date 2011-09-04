@@ -28,7 +28,7 @@
 /********************************************************************************************
  *                               ECUnit                                                     *
  ********************************************************************************************/
-class ECUnit : public ECEntity
+class ECUnit : public virtual ECEntity
 {
 /* Methodes */
 public:
@@ -39,37 +39,9 @@ public:
 };
 
 /********************************************************************************************
- *                               EContainer                                                 *
- ********************************************************************************************/
-class EContainer : public virtual ECBContainer, public ECUnit
-{
-/* Constructeur/Destructeur */
-public:
-
-	virtual ~EContainer() {}
-
-/* Methodes */
-public:
-
-	virtual void ChangeCase(ECBCase* new_case);
-
-	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
-
-	virtual bool WantContain(ECEntity*, ECMove::Vector&);
-
-	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
-
-	virtual void Union(ECEntity*);
-
-	virtual bool Contain(ECBEntity* entity);
-
-	void ReleaseShoot();
-};
-
-/********************************************************************************************
  *                               ECTrain                                                    *
  ********************************************************************************************/
-class ECTrain : public EContainer, public ECBTrain
+class ECTrain : public EContainer, public ECUnit, public ECBTrain
 {
 /* Constructeur/Destructeur */
 public:
@@ -82,7 +54,7 @@ public:
 /********************************************************************************************
  *                               ECBoat                                                     *
  ********************************************************************************************/
-class ECBoat : public EContainer, public ECBBoat
+class ECBoat : public EContainer, public ECUnit, public ECBBoat
 {
 /* Constructeur/Destructeur */
 public:
@@ -95,7 +67,7 @@ public:
 /********************************************************************************************
  *                               ECPlane                                                    *
  ********************************************************************************************/
-class ECPlane : public EContainer, public ECBPlane
+class ECPlane : public EContainer, public ECUnit, public ECBPlane
 {
 /* Constructeur/Destructeur */
 public:
@@ -105,8 +77,6 @@ public:
 	virtual bool WantDeploy();
 
 	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
-
-	virtual int TurnMoney(ECBPlayer*);
 
 	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
 };

@@ -209,6 +209,8 @@ public:
 		/*26*/E_RADAR,
 		/*27*/E_EIFFELTOWER,
 		/*28*/E_BOEING,
+		/*29*/E_CAVERN,
+		/*30*/E_GULAG,
 		/*XX*/E_END
 	};
 
@@ -227,7 +229,7 @@ public:
 
 	ECBEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 
-	virtual ~ECBEntity() {}
+	virtual ~ECBEntity();
 
 /* Constantes */
 public:
@@ -254,6 +256,7 @@ public:
 	virtual bool IsCity() const { return false; }            /**< This building is a part of a city */
 	virtual bool IsBuilding() const { return false; }
 	virtual bool IsNaval() const { return false; }
+	virtual bool IsOnMontain() const { return false; }
 	virtual bool IsInfantry() const { return false; }
 	virtual bool IsVehicule() const { return false; }
 	virtual bool IsHidden() const { return false; }          /**< This unit can be views only by his owner and his allies */
@@ -277,9 +280,9 @@ public:
 	 */
 	virtual bool CanBeCreated(uint nation) const { return true; }
 
-	virtual bool CanContain(const ECBEntity*) { return false; }
+	virtual bool CanContain(const ECBEntity*) const { return false; }
 
-	virtual bool CanInvest(const ECBEntity* e) const { return (e->IsCountryMaker() && !Like(e)); }
+	virtual bool CanInvest(const ECBEntity* e) const { return e->IsCountryMaker() && !Like(e); }
 
 	/** Use this function to know if this entity is able to attaq an other entity */
 	virtual bool CanAttaq(const ECBEntity* e) = 0;
@@ -332,7 +335,9 @@ public:
 	virtual void ChangeCase(ECBCase* new_case);
 
 	/** Use this function when an entity have played. */
-	virtual void Played();
+	virtual void CancelEvents();
+
+	virtual void Played() {};
 
 	virtual void Init();
 
@@ -362,7 +367,7 @@ public:
 
 	/** Owner of this entity (return a \a player !) */
 	ECBPlayer* Owner() const { return owner; }
-	void SetOwner(ECBPlayer* _p) { owner = _p; }
+	virtual void SetOwner(ECBPlayer* _p) { owner = _p; }
 
 	/** This is an identificator of this entity (xy, x € [A..z], y € [A..z]) */
 	const char* ID() const { return name; }
@@ -430,6 +435,50 @@ private:
 	ECBEntity* parent;
 	ECBMap* map;
 	ECBMove move;
+};
+
+/********************************************************************************************
+ *                               ECBContainer                                               *
+ ********************************************************************************************/
+class ECBContainer : public virtual ECBEntity
+{
+/* Constructeur/Destructeur */
+public:
+	ECBContainer()
+		: unit(0)
+	{}
+
+	virtual ~ECBContainer();
+
+/* Methodes */
+public:
+
+	virtual bool Contain(ECBEntity*);
+	virtual bool UnContain();
+
+/* Attributs */
+public:
+
+	ECBEntity* Containing() const { return unit; }
+	void SetContaining(ECBEntity* e) { unit = e; }
+
+	virtual uint RealNb() const { return unit ? (unit->Nb() + Nb()) : Nb(); }
+
+	virtual bool CanContainThisEntity(const ECBEntity* et) const = 0;
+	virtual uint UnitaryCapacity() const = 0;
+
+	virtual bool CanContain(const ECBEntity* et) const
+	{
+		if((Containing() && (Containing()->Type() != et->Type() || (Containing()->Nb() + et->Nb()) > UnitaryCapacity() * Nb())) ||
+		   (!Containing() && et->Nb() > UnitaryCapacity() * Nb()) || !CanContainThisEntity(et))
+			return false;
+		else
+			return true;
+	}
+
+/* Variables privées */
+private:
+	ECBEntity* unit;
 };
 
 /********************************************************************************************
@@ -571,7 +620,7 @@ public:
 public:
 
 	/** ECBTerre can create all buildings */
-	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && !e->IsNaval()); }
+	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && !e->IsNaval() && !e->IsOnMontain()); }
 };
 
 /** This class is a derived class from ECBCase whose is sea */
@@ -595,6 +644,11 @@ class ECBMontain : public virtual ECBCase
 public:
 	ECBMontain(ECBMap* _map, uint _x, uint _y, uint _flags, char _type_id) : ECBCase(_map, _x, _y, _flags, _type_id) {}
 	ECBMontain() {}
+
+/* Methodes */
+public:
+
+	virtual bool CanCreate(const ECBEntity* e) { return (e->IsBuilding() && e->IsOnMontain()); }
 };
 
 /** This class is a derived class from ECBCase whose is a bridge */

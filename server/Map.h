@@ -59,9 +59,6 @@ public:
 /* Methodes */
 public:
 
-	/** Use this function to cancel an action of this entity */
-	virtual bool Return();
-
 	/** Use this function to make an union with an other entity */
 	virtual void Union(ECEntity*);
 
@@ -98,8 +95,8 @@ public:
 	void Shooted(uint n) { shooted += n; }
 	virtual void ReleaseShoot();
 
-	/** Cancel all events and send a message to client */
-	void CancelEvents(bool send_message = false);
+	/** Cancel all events */
+	virtual void CancelEvents();
 
 	/** This function return a vector of entities who will be attaqued by me if I want to attaq this case
 	 * @param c attaqued case
@@ -132,6 +129,34 @@ protected:
 	ECList<ECEvent*> events;
 	uint shooted;
 	bool zombie;
+};
+
+/********************************************************************************************
+ *                               EContainer                                                 *
+ ********************************************************************************************/
+class EContainer : public virtual ECBContainer, public virtual ECEntity
+{
+/* Constructeur/Destructeur */
+public:
+
+	virtual ~EContainer() {}
+
+/* Methodes */
+public:
+
+	virtual void ChangeCase(ECBCase* new_case);
+
+	virtual bool Attaq(std::vector<ECEntity*> entities, ECEvent* event);
+
+	virtual bool WantContain(ECEntity*, ECMove::Vector&);
+
+	virtual bool WantUnContain(uint x, uint y, ECMove::Vector&);
+
+	virtual void Union(ECEntity*);
+
+	virtual bool Contain(ECBEntity* entity);
+
+	void ReleaseShoot();
 };
 
 /********************************************************************************************

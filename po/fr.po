@@ -1389,6 +1389,10 @@ msgstr "Montre toutes les unités de la carte."
 msgid "Show delimitation of territories on the map."
 msgstr "Montre la délimitation des territoires."
 
+#: src/Login.cpp:609
+msgid "Show only official servers"
+msgstr "N'afficher que les serveurs officiels"
+
 #: src/InGame.cpp:2045
 msgid "Show options (alliances, etc.)"
 msgstr "Afficher les options (notamment les alliances)"

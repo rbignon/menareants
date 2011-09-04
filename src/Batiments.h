@@ -261,6 +261,96 @@ public:
 };
 
 /********************************************************************************************
+ *                                ECavern                                                   *
+ ********************************************************************************************/
+
+class ECavern : public ECBatiment, public ECBCavern
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECavern) {}
+
+	ENTITY_CONSTRUCTOR(ECavern) {}
+
+	void UpdateImages() { PutImage(I_Down, (Resources::Cavern_Face()), GRAY2COLOR); }
+
+	virtual void Init()
+	{
+		ECBCavern::Init();
+		ECEntity::Init();
+		Image()->SetAnim(true);
+	}
+
+	virtual ~ECavern();
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("Cavern"); }
+	virtual const char* Qual() const { return _("cavern"); }
+	virtual const char* Infos() const { return _("Build cavern on montains to transfer units."); }
+	virtual const char* Description() const
+	{
+		return _("This cavern built on montain can be used to transport units to another cavern.");
+	}
+	virtual ECImage* Icon() const { return Resources::Cavern_Icon(); }
+
+/* Methodes */
+public:
+	virtual std::string SpecialInfo();
+	virtual void SetOwner(ECBPlayer* p)
+	{
+		ECBatiment::SetOwner(p);
+		ECBCavern::SetOwner(p);
+	}
+
+};
+
+/********************************************************************************************
+ *                                ECGulag                                                   *
+ ********************************************************************************************/
+
+class ECGulag : public ECBatiment, public ECBGulag
+{
+/* Constructeur/Destructeur */
+public:
+
+	ENTITY_EMPTY_CONSTRUCTOR(ECGulag) {}
+
+	ENTITY_CONSTRUCTOR(ECGulag) {}
+
+	void UpdateImages() {
+		PutImage(I_Down,  (Resources::Gulag_Empty()),  GRAY2COLOR);
+		PutImage(I_Right, (Resources::Gulag_Normal()), GRAY2COLOR);
+		PutImage(I_Up,    (Resources::Gulag_Full()),   GRAY2COLOR);
+	}
+
+	void Played();
+	void Created();
+
+/* Infos */
+public:
+
+	virtual const char* Name() const { return _("Gulag"); }
+	virtual const char* Qual() const { return _("gulag"); }
+	virtual const char* Infos() const { return _("Forced labor camp to gain money."); }
+	virtual const char* Description() const
+	{
+		return _("The forced labor camp is used to concentrate prisoners and gain money.");
+	}
+	virtual ECImage* Icon() const { return Resources::Gulag_Icon(); }
+
+/* Methodes */
+public:
+
+	void RecvData(ECData data);
+	virtual std::string SpecialInfo();
+
+	void FindMyImage();
+};
+
+/********************************************************************************************
  *                                ECNuclearSearch                                           *
  ********************************************************************************************/
 
@@ -295,6 +385,11 @@ public:
 	virtual void RecvData(ECData);
 
 	virtual std::string SpecialInfo();
+	virtual void SetOwner(ECBPlayer* p)
+	{
+		ECBNuclearSearch::SetOwner(p);
+		ECBatiment::SetOwner(p);
+	}
 };
 
 /********************************************************************************************
@@ -349,6 +444,12 @@ public:
 	virtual std::string SpecialInfo();
 
 	virtual void RecvData(ECData);
+
+	virtual void SetOwner(ECBPlayer* p)
+	{
+		ECBSilo::SetOwner(p);
+		ECBatiment::SetOwner(p);
+	}
 
 /* Variables priv�s */
 private:

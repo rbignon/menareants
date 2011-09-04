@@ -32,12 +32,12 @@
 
 const struct nations_str_t nations_str[] = {
 	/* N_NONE     */   { gettext_noop("Random"),     gettext_noop("Your nation will be selected by random.") },
-	/* N_NOISY    */   { gettext_noop("Noisy"),      gettext_noop("Region of Noisy and its caves.") },
+	/* N_NOISY    */   { gettext_noop("Noisy"),      gettext_noop("Region of Noisy and its caverns.") },
 	/* N_USA      */   { gettext_noop("USA"),        gettext_noop("The United States invests the world with of McDonalds.") },
-	/* N_FRANCE   */   { gettext_noop("France"),     gettext_noop("France and its Eiffel Tower to see all map.") },
+	/* N_FRANCE   */   { gettext_noop("France"),     gettext_noop("France and its Eiffel Tower to see all the map.") },
 	/* N_URSS     */   { gettext_noop("URSS"),       gettext_noop("The USSR and its goulags...") },
 	/* N_ALQUAIDA */   { gettext_noop("Al-Quaïda"),  gettext_noop("Al-Quaïda network and its diverted boïngs.") },
-	/* N_ESPAGNE  */   { gettext_noop("Spain"),    gettext_noop("The Spanish teacher who impose weak rules and fuck us .") },
+	/* N_ESPAGNE  */   { gettext_noop("Spain"),      gettext_noop("The Spanish teacher who impose weak rules and fuck us .") },
 	/* N_JAPON    */   { gettext_noop("Japan"),      gettext_noop("Japanese tourists and the advantage of photography.") },
 	/* N_COLOMBIE */   { gettext_noop("Colombia"),   gettext_noop("Colombia producer of cocaine.") },
 	/* N_MAX      */   { "",           "" }
@@ -52,8 +52,8 @@ ECPlayer::ECPlayer(std::string _nick, EChannel *_chan, bool _owner, bool _op, bo
 ECPlayer::~ECPlayer()
 {
 	for(SpriteMap::iterator it = sprites.begin(); it != sprites.end(); ++it)
-	    for(std::map<int, ECSpriteBase*>::iterator sb = it->second.begin(); sb != it->second.end(); ++sb)
-		delete sb->second;
+		for(std::map<int, ECSpriteBase*>::iterator sb = it->second.begin(); sb != it->second.end(); ++sb)
+			delete sb->second;
 }
 
 void ECPlayer::AddBreakPoint(BreakPoint bp)

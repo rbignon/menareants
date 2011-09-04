@@ -1,6 +1,6 @@
 /* lib/Units.cpp - Units in game
  *
- * Copyright (C) 2005-2006 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,45 +21,6 @@
 
 #include "Units.h"
 #include <assert.h>
-
-/********************************************************************************************
- *                               ECBContainer                                               *
- ********************************************************************************************/
-
-ECBContainer::~ECBContainer()
-{
-
-}
-
-bool ECBContainer::Contain(ECBEntity* entity)
-{
-	if(!entity)
-		return false;
-
-	entity->ChangeCase(0);
-	entity->SetCase(Case());
-
-	SetContaining(entity);
-	entity->Lock();
-	entity->SetParent(this);
-
-	return true;
-}
-
-bool ECBContainer::UnContain()
-{
-	if(!Containing())
-		return false;
-
-	Containing()->Unlock();
-	Containing()->SetParent(0);
-	Containing()->SetCase(0);
-	Containing()->ChangeCase(Case());
-
-	SetContaining(0);
-
-	return true;
-}
 
 /********************************************************************************************
  *                               ECBJouano                                                  *
@@ -86,4 +47,14 @@ void ECBMcDo::Create(ECBEntity* e)
 
 	e->SetMyStep(e->Step()/2);
 	e->SetRestStep(e->RestStep()/2);
+}
+
+/********************************************************************************************
+ *                               ECBPlane                                                   *
+ ********************************************************************************************/
+int ECBPlane::TurnMoney(ECBPlayer* pl)
+{
+	if(Deployed() || !Containing() || Owner() != pl) return 0;
+
+	return - (Containing()->Nb() * VolCost());
 }

@@ -329,6 +329,13 @@ void ECBEntity::Init()
 	restStep = Step();
 }
 
+ECBEntity::~ECBEntity()
+{
+	ECBContainer* contain;
+	if((contain = dynamic_cast<ECBContainer*>(Parent())))
+		contain->UnContain();
+}
+
 void ECBEntity::SetID(const char* _name)
 {
 	if(strlen(_name) != (sizeof name)-1)
@@ -341,7 +348,7 @@ bool ECBEntity::Like(const ECBEntity* e) const
 	return (owner == e->Owner() || (owner && owner->IsAllie(e->Owner())));
 }
 
-void ECBEntity::Played()
+void ECBEntity::CancelEvents()
 {
 	restStep = myStep;
 	event_type = 0;
@@ -622,6 +629,45 @@ bool ECBEntity::FindFastPath(ECBCase* dest, std::stack<ECBMove::E_Move>& move, E
 	if(fastpath.FindPath() == false) return false;
 
 	move = fastpath.Moves();
+
+	return true;
+}
+
+/********************************************************************************************
+ *                               ECBContainer                                               *
+ ********************************************************************************************/
+
+ECBContainer::~ECBContainer()
+{
+	UnContain();
+}
+
+bool ECBContainer::Contain(ECBEntity* entity)
+{
+	if(!entity)
+		return false;
+
+	entity->ChangeCase(0);
+	entity->SetCase(Case());
+
+	SetContaining(entity);
+	entity->Lock();
+	entity->SetParent(this);
+
+	return true;
+}
+
+bool ECBContainer::UnContain()
+{
+	if(!Containing())
+		return false;
+
+	Containing()->Unlock();
+	Containing()->SetParent(0);
+	Containing()->SetCase(0);
+	Containing()->ChangeCase(Case());
+
+	SetContaining(0);
 
 	return true;
 }
@@ -1098,6 +1144,9 @@ void ECBMap::Reload()
 
 void ECBMap::Destruct()
 {
+	/* Libération des entitées */
+	entities.Clear(USE_DELETE);
+
 	/* Libération des MapPlayers */
 	for(std::vector<ECBMapPlayer*>::iterator it=map_players.begin(); it != map_players.end(); ++it)
 		delete *it;
@@ -1112,9 +1161,6 @@ void ECBMap::Destruct()
 	for(std::vector<ECBCountry*>::iterator it=map_countries.begin(); it != map_countries.end(); ++it)
 		delete *it;
 	map_countries.clear();
-
-	/* Libération des entitées */
-	entities.Clear(USE_DELETE);
 
 	initialised = false;
 }

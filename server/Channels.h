@@ -1,6 +1,6 @@
 /* server/Channels.h - Header of Channels.cpp
  *
- * Copyright (C) 2005-2007 Romain Bignon  <Progs@headfucking.net>
+ * Copyright (C) 2005-2011 Romain Bignon  <romain@menareants.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,6 +158,7 @@ public:
 		I_JOUANO,  // jouano, nom_exowner_du_mcdo, caserne_investie, nb_de_tours
 		I_DEBUG,
 		I_JOUANO_FART, // jouano
+		I_GULAG_GAIN, // gulag
 	};
 
 /* Methodes */

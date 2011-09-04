@@ -431,7 +431,7 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 
 			EContainer* contain;
 			if((contain = dynamic_cast<EContainer*>((*it)->Parent())))
-				contain->SetContaining(0);
+				contain->UnContain();
 
 			(*it)->SetShowedCases(false);
 			if(InGameForm)
@@ -607,6 +607,7 @@ TInGameForm::Wants TInGameForm::GetWant(ECEntity* entity, int button_type)
 			return W_EXTRACT;
 
 		if(entity->Move()->Size() < entity->MyStep() &&
+		   !(entity->EventType() & ARM_CONTENER) &&
 #if 0
 		   (e_case->X() == acase->X() ^ e_case->Y() == acase->Y()) &&
 #endif
@@ -2475,6 +2476,7 @@ TPingingForm::TPingingForm(ECImage* w, EC_Client* cl, EChannel* ch)
 	                      Font::GetInstance(Font::Huge)));
 
 	Message = AddComponent(new TMemo(Font::GetInstance(Font::Small), 50,150,Window()->GetWidth()-200-50,150,30, false));
+	Message->SetShadowed();
 	Message->AddItem(_("The players below were disconnected from the server abnormally, probably because of "
 	                   "the planting of their Internet connection.\n"
 	                   "\n"

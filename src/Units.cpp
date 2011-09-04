@@ -270,11 +270,11 @@ std::string ECPlane::SpecialInfo()
 		if(Containing())
 		{
 			if(!Deployed())
-				s = StringF(_("You pay $%d each turn"), Containing()->Nb() * VolCost());
+				s = StringF(_("You pay $%d each turn"), TurnMoney(Owner()));
 			else
 				s += _(" - Contain:");
 		}
-		else s += StringF(_(" - Capacity: %d"),100 * Nb());
+		else s += StringF(_(" - Capacity: %d"), 100 * Nb());
 	}
 	else if(Containing())
 		s += _(" - Contain:");
