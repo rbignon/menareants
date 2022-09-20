@@ -676,8 +676,8 @@ bool ECObelisk::MakeEvent(const std::vector<ECEntity*>& entities, ECase* c, EC_C
 		{
 			if(c == Case()) return true;
 
-			int dx = CASE_WIDTH * (abs(c->X() - Case()->X()) + 1);
-			int dy = CASE_HEIGHT * (abs(c->Y() - Case()->Y()) + 1);
+			int dx = CASE_WIDTH * (abs((int)c->X() - (int)Case()->X()) + 1);
+			int dy = CASE_HEIGHT * (abs((int)c->Y() - (int)Case()->Y()) + 1);
 			img.SetImage(SDL_CreateRGBSurface( SDL_HWSURFACE|SDL_SRCALPHA, dx, dy,
 											32, 0x000000ff, 0x0000ff00, 0x00ff0000,0xff000000));
 			DrawLargeLine(img.Img, c->X() < Case()->X() ? (dx - CASE_WIDTH + 53) : 53,

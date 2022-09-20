@@ -33,6 +33,8 @@ if test "x${prefix}" = "xNONE"; then
   prefix="${ac_default_prefix}"
 fi
 
+CXXFLAGS="$CXXFLAGS -std=c++98"
+
 # COMPILER ET INSTALLER LE SERVEUR
 
 AC_ARG_ENABLE(  server,
@@ -184,7 +186,8 @@ if test "x$GCC" = "xyes"; then
 #             -Wold-style-cast (prohibe les anciens styles de conversions)
       GCC_FLAGS="-Wall"
       CFLAGS="$CFLAGS -D_GNU_SOURCE=1 -std=c99"
-      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel -ansi"
+      #CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel -ansi"
+      CXXFLAGS="$CXXFLAGS -Wstrict-null-sentinel"
 
       dnl Enable *more* warnings
       if test "$gccvernum" -ge "400"; then

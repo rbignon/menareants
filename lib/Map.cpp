@@ -274,7 +274,7 @@ ECBCase* ECBCase::MoveRight(uint c) const { return x < map->Width()-c-1 ? (*map)
 
 uint ECBCase::Delta(ECBCase* c) const
 {
-	return (abs(X() - c->X()) + abs(Y() - c->Y()));
+	return ((int)abs((int)X() - (int)c->X()) + abs((int)Y() - (int)c->Y()));
 }
 
 void ECBCase::SetCountry(ECBCountry *mc)

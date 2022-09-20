@@ -580,8 +580,8 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 				{
 					ECase* first = BarreCase->Cases().front();
 					ECBCase* next = first;
-					uint t_x = abs(first->X() - c->X());
-					uint t_y = abs(first->Y() - c->Y());
+					uint t_x = abs((int)first->X() - (int)c->X());
+					uint t_y = abs((int)first->Y() - (int)c->Y());
 					BarreCase->UnSelect(false);
 					BarreCase->AddCase(first, false);
 					if(c->Y() < first->Y())
