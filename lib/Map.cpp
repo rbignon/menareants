@@ -647,6 +647,10 @@ bool ECBContainer::Contain(ECBEntity* entity)
 	if(!entity)
 		return false;
 
+	if (entity->Parent()) {
+	    dynamic_cast<ECBContainer*>(entity->Parent())->UnContain();
+	}
+
 	entity->ChangeCase(0);
 	entity->SetCase(Case());
 
