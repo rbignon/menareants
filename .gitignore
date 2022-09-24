@@ -13,3 +13,9 @@ src/menareants
 server/menareants-server
 server/menareantsd.conf
 meta-server/menareants-meta-server
+*.in
+aclocal.m4
+autom4te.cache/
+compile
+configure
+debug_info

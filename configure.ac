@@ -1,6 +1,6 @@
-AC_PREREQ(2.59)
+AC_PREREQ([2.59])
 
-AC_INIT([MenAreAnts], [0.1], [romain@menareants.org], [menareants])
+AC_INIT([MenAreAnts],[0.1],[romain@menareants.org],[menareants])
 
 AM_CONFIG_HEADER(config.h)
 
@@ -38,7 +38,7 @@ CXXFLAGS="$CXXFLAGS -std=c++98"
 # COMPILER ET INSTALLER LE SERVEUR
 
 AC_ARG_ENABLE(  server,
-                [AC_HELP_STRING([--enable-server],[compilation of Men Are Ants' server])],
+                [AS_HELP_STRING([--enable-server],[compilation of Men Are Ants' server])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 INSTALL_SERVER=server
@@ -48,7 +48,7 @@ AC_ARG_ENABLE(  server,
         )
 
 AC_ARG_ENABLE(  meta-server,
-                [AC_HELP_STRING([--enable-meta-server],[compilation of Men Are Ants' meta-server])],
+                [AS_HELP_STRING([--enable-meta-server],[compilation of Men Are Ants' meta-server])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 INSTALL_META_SERVER=meta-server
@@ -62,7 +62,7 @@ AC_ARG_ENABLE(  meta-server,
 INSTALL_GAME_Q=1
 
 AC_ARG_ENABLE(  game,
-                [AC_HELP_STRING([--disable-game],[compilation without Men Are Ants' game])],
+                [AS_HELP_STRING([--disable-game],[compilation without Men Are Ants' game])],
                 [
                         if test "x${enableval}" = "xno"; then
                                 INSTALL_GAME_Q=0
@@ -131,7 +131,7 @@ fi
 
 #  FULL-WARNINGS
 #AC_ARG_ENABLE(  full-warnings,
-#                [AC_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
+#                [AS_HELP_STRING([--enable-full-warnings],[enable warnings during compilation (-W -Wall)])],
 #                [
 #                        if test "x${enableval}" != "xno"; then
 #                                CXXFLAGS="$CXXFLAGS -W -Wall"
@@ -141,7 +141,7 @@ fi
 
 #  WARNINGS
 AC_ARG_ENABLE(  warnings,
-                [AC_HELP_STRING([--enable-warnings],[enable warnings during compilation (-Wall)])],
+                [AS_HELP_STRING([--enable-warnings],[enable warnings during compilation (-Wall)])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 WARNINGS=1
@@ -151,7 +151,7 @@ AC_ARG_ENABLE(  warnings,
 
 # GPROF
 AC_ARG_ENABLE(  gprof,
-                [AC_HELP_STRING([--enable-gprof],[used to have some cpu's informations])],
+                [AS_HELP_STRING([--enable-gprof],[used to have some cpu's informations])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 CXXFLAGS="$CXXFLAGS -pg"
@@ -161,7 +161,7 @@ AC_ARG_ENABLE(  gprof,
 
 #  DEBUG
 AC_ARG_ENABLE(  debug,
-                [AC_HELP_STRING([--enable-debug],[enable debug])],
+                [AS_HELP_STRING([--enable-debug],[enable debug])],
                 [
                         if test "x${enableval}" != "xno"; then
                                 DEBUG=1
