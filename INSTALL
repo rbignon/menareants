@@ -23,7 +23,11 @@ Sommaire:
 	Il est d'ailleurs à noter que vous pouvez compiler et installer soit le jeu, soit le
 	serveur, soit les deux. Voir les options du script configure (./configure --help).
 
-2) ./configure
+2) ./autogen.sh
+
+	Pour cela il est nécessaire d'avoir les autotools installés
+
+3) ./configure
 	Veuillez lancer la commande suivante:
 	$ ./configure
 	Vous pouvez utiliser --help pour voir les différentes options proposées:
@@ -34,17 +38,17 @@ Sommaire:
 	auquel Men Are Ants est dépendant pour fonctionner. Dans ce cas veuillez l'installer
 	et relancer le script.
 
-3) make
+4) make
 	Veuillez utiliser la simple commande:
 	$ make
 	Si il y a une erreur de compilation, veuillez voir le fichier BUGS
 
-4) sudo make install
-	Pour finir d'installer le jeu, veuillez tapez:
+5) [sudo] make install
+	Pour finir d'installer le jeu, veuillez tapez :
 	$ sudo make install
 	Il risque de vous être demandé un mot de passe, veuillez entrer celui du root (administrateur).
 
-5) Jouer
+6) Jouer
 	Maintenant vous pouvez jouer tout simplement en tapant à n'importe quelle moment en console:
 	$ menareants
 
