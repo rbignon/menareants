@@ -72,8 +72,7 @@ int TRealClient::flush()
 int TRealClient::sendbuf(std::string buf)
 {
 #ifdef DEBUG
-	if(buf != "PIG" && buf != "POG")
-		Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
+	Debug(W_ECHO|W_DEBUG, "S(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
 #endif
 
 	buf += "\r\n";
@@ -220,6 +219,10 @@ int TClient::parsemsg(const ECPacket& pack)
 	parv.push_back(pack.From());
 	parv.insert(parv.end(), temp.begin(), temp.end());
 
+#ifdef DEBUG
+	Debug(W_ECHO|W_DEBUG, "R(%s@%s) - %s", GetNick(), GetIp(), pack.Buffer().c_str());
+#endif
+
 	return parsemsg(pack.Command(), parv);
 }
 
@@ -229,8 +232,7 @@ int TClient::parsemsg(std::string buf)
 	std::vector<std::string> parv;
 
 #ifdef DEBUG
-	if(strncmp(buf.c_str(), "PIG", 3) && strncmp(buf.c_str(), "POG", 3))
-		Debug(W_ECHO|W_DEBUG, "R(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
+	Debug(W_ECHO|W_DEBUG, "R(%s@%s) - %s", GetNick(), GetIp(), buf.c_str());
 #endif
 
 	SplitBuf(buf, &parv, &cmdname);
@@ -586,7 +588,8 @@ bool ECServer::ConnectMetaServer()
 {
 	if(ms_sock != 0) return false;
 
-	const char *hostname = conf->MSHost().c_str();
+	std::string hostname_str = conf->MSHost();
+	const char *hostname = hostname_str.c_str();
 	unsigned short port = conf->MSPort();
 
 	/* Création du socket

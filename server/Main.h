@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #include <vector>
 #include <map>
+#include <sys/select.h>
 
 class EC_ACommand;
 
@@ -55,7 +56,7 @@ public:
 	uint NBwchan;
 	uint NBtotchan;
 
-	const char* ServerName() { return conf ? conf->ServerName().c_str() : 0; }
+	const char* ServerName() { return conf ? conf->ServerName().c_str() : ""; }
 
 	std::vector<EC_ACommand*> GetCommands() const { return Commands; }
 

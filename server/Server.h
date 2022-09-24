@@ -24,6 +24,7 @@
 #include "Defines.h"
 #include "lib/Messages.h"
 #include <string>
+#include <ctime>
 
 /* - Client */
 #define SetFlush(x)		(x)->SetFlag(ECD_FLUSH)
