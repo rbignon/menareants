@@ -408,7 +408,7 @@ void TIA::FirstMovements()
 
 			if(!victim) continue; // étonnant !
 
-			if((*enti)->Case()->Delta(victim->Case()) <= (*enti)->Porty())
+			if((*enti)->Case()->Delta(victim->Case()) <= (*enti)->Porty() && (*enti)->CanAttaq(victim))
 			{
 				/* On sait pas si il peut se déployer ou non, alors on écrit ça car on sait jamais, et si il ne peut
 				 * pas se déployer c'est pas génant.
