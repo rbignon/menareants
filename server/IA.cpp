@@ -27,6 +27,7 @@
 #include "Units.h"
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 /********************************************************************************************
  *                         METHODES D'INTELLIGENCE ARTIFICIELLE                             *
@@ -298,6 +299,8 @@ void TIA::FirstMovements()
 		}
 
 	ents = Player()->Channel()->Map()->Entities()->List();
+	std::random_shuffle(ents.begin(), ents.end());
+
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		if((*enti)->IsZombie() || (*enti)->Locked() || !(*enti)->Owner() ||
