@@ -56,7 +56,7 @@ public:
 	uint NBwchan;
 	uint NBtotchan;
 
-	const char* ServerName() { return conf ? conf->ServerName().c_str() : ""; }
+	std::string ServerName() { return conf ? conf->ServerName() : ""; }
 
 	std::vector<EC_ACommand*> GetCommands() const { return Commands; }
 
