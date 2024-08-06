@@ -627,6 +627,8 @@ bool EChannel::ShowAnim(ECEvent* event)
 
 				ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
 
+				assert(upgrade != NULL);
+
 				/* On remet le niveau de vie au plus haut */
 				upgrade->SetNb(upgrade->InitNb());
 
@@ -657,16 +659,21 @@ static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase*
 	return entity;
 }
 
+typedef ECEntity* (*ECreateFuncType) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
 static struct
 {
-	ECEntity* (*func) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case);
+	ECreateFuncType func;
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
 
 ECEntity* CreateAnEntity(uint type, const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case)
 {
-	return entities_type[type].func (_name, _owner, _case);
+	ECreateFuncType func = entities_type[type].func;
+	if(!func)
+		return NULL;
+
+	return func (_name, _owner, _case);
 }
 
 /** Modification of an army.
@@ -844,7 +851,11 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			return Debug(W_DESYNCH, "ARM: Création d'une entité incorrecte");
 
 		const char *e_name = chan->FindEntityName(cl->Player());
-		entity = entities_type[type].func(e_name, cl->Player(), (*(chan->Map()))(x,y));
+		ECreateFuncType create_func = entities_type[type].func;
+		if(!create_func)
+			return Debug(W_DESYNCH, "ARM: Try to create a removed entity.");
+
+		entity = create_func(e_name, cl->Player(), (*(chan->Map()))(x,y));
 		if(!entity->CanBeCreated() || int(entity->Cost()) > cl->Player()->Money())
 		{
 			MyFree(entity);
@@ -946,6 +957,8 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			 *    GESTION DES UPGRADES   *
 			 *****************************/
 			ECEntity* upgrade = CreateAnEntity(entity->MyUpgrade(), entity->ID(), entity->Owner(), entity->Case());
+			assert(upgrade != NULL);
+
 			if(int(upgrade->Cost()) > cl->Player()->Money())
 				flags = 0;
 			else

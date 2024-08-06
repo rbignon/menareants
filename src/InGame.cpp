@@ -62,9 +62,11 @@ static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase*
 	return entity;
 }
 
+typedef ECEntity* (*ECreateFuncType) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
+
 static struct
 {
-	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
+	ECreateFuncType create;
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
@@ -230,7 +232,13 @@ int ARMCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				                                                            nick.c_str(), et_name.c_str(), ECEntity::E_END-1);
 				continue;
 			}
-			entity = entities_type[type].create(et_name.c_str(), pl, 0, nb, map);
+			ECreateFuncType create_func = entities_type[type].create;
+			if(!create_func)
+			{
+				Debug(W_DESYNCH|W_SEND, "ARM: %s!%s Received a removed entity", nick.c_str(), et_name.c_str());
+				continue;
+			}
+			entity = create_func(et_name.c_str(), pl, 0, nb, map);
 			map->AddAnEntity(entity);
 		}
 		else if(flags & ARM_TYPE && (int)type != entity->Type())
@@ -1555,6 +1563,9 @@ void TBarreLatIcons::SetList(std::vector<ECEntity*> list, TOnClickFunction func)
 	bool left = true;
 	for(std::vector<ECEntity*>::iterator it = list.begin(); it != list.end(); ++it, left = !left)
 	{
+		if(*it == 0)
+			continue;
+
 		TImage* i = AddComponent(new TImage(_x, _y, (*it)->Icon(), false));
 
 		if(i->Width() > _w) _w = i->Width();

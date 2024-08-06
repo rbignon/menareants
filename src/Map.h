@@ -407,7 +407,7 @@ public:
 		std::vector<ECEntity*> l;
 		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if(c->CanAttaq(*it))
+			if(*it && c->CanAttaq(*it))
 				l.push_back(*it);
 		return l;
 	}
@@ -417,7 +417,7 @@ public:
 		std::vector<ECEntity*> l;
 		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if(c->CanInvest(*it))
+			if(*it && c->CanInvest(*it))
 				l.push_back(*it);
 		return l;
 	}
@@ -428,7 +428,7 @@ public:
 		std::vector<ECEntity*> l;
 		if(!c) return l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if(c->CanCreate(*it) && (*it)->CanBeCreated(pl))
+			if(*it && c->CanCreate(*it) && (*it)->CanBeCreated(pl))
 				l.push_back(*it);
 		return l;
 	}
@@ -437,7 +437,7 @@ public:
 	{
 		std::vector<ECEntity*> l;
 		for(std::vector<ECEntity*>::const_iterator it = entities.begin(); it != entities.end(); ++it)
-			if((*it)->IsBuilding() && (!pl || (*it)->CanBeCreated(pl)))
+			if(*it && (*it)->IsBuilding() && (!pl || (*it)->CanBeCreated(pl)))
 				l.push_back(*it);
 		return l;
 	}

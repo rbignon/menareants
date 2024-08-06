@@ -52,9 +52,10 @@ static ECEntity* CreateEntity(const Entity_ID _name, ECBPlayer* _owner, ECBCase*
 	return t;
 }
 
+typedef ECEntity* (*ECreateFuncType) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
 static struct
 {
-	ECEntity* (*create) (const Entity_ID _name, ECBPlayer* _owner, ECBCase* _case, uint _nb, ECBMap* map);
+	ECreateFuncType create;
 } entities_type[] = {
 #include "lib/UnitsList.h"
 };
@@ -75,8 +76,11 @@ void EMap::VirtualAddUnit(std::string line)
 	y = StrToTyp<uint>(acaca);
 	std::string number = line;
 	if(type.empty() || owner.empty() || acaca.empty() || number.empty())
+	{
 		vDebug(W_ERR, "La déclaration d'une unité sur la map est invalide.",
 						VName(type) VName(owner) VName(acaca) VName(number));
+		return;
+	}
 
 	if (x >= Width() || y >= Height())
 		throw ECExcept(VIName(Width()) VIName(Height()) VIName(x) VIName(y), "Access à un element hors du tableau");
@@ -94,8 +98,13 @@ void EMap::VirtualAddUnit(std::string line)
 		}
 	}
 
-	ECEntity* entity = entities_type[StrToTyp<uint>(type)].create ("**", pl, map[ y * Width() + x ], StrToTyp<uint>(number),
-	                                                               this);
+	ECreateFuncType create_func = entities_type[StrToTyp<uint>(type)].create;
+	if(!create_func)
+	{
+		vDebug(W_ERR, "Contains a removed unit.", VName(type));
+		return;
+	}
+	ECEntity* entity = create_func("**", pl, map[ y * Width() + x ], StrToTyp<uint>(number), this);
 
 
 	AddAnEntity(entity);
@@ -472,8 +481,12 @@ void TMapEditor::OnClic(const Point2i& mouse, int button, bool&)
 		        (acase = Map->TestCase(mouse)))
 		{
 			EMapPlayer* owner = dynamic_cast<EMapPlayer*>(acase->Country()->Owner());
-			ECEntity* et = entities_type[entity->Type()].create ("**", owner, acase,
-			                     entity->Type() == ECEntity::E_ARMY ? 1000 : entity->InitNb(), map);
+
+			ECreateFuncType create_func = entities_type[entity->Type()].create;
+			if(!create_func)
+				return;
+
+			ECEntity* et = create_func("**", owner, acase, entity->Type() == ECEntity::E_ARMY ? 1000 : entity->InitNb(), map);
 			map->AddAnEntity(et);
 
 			BarreCase->UnSelect();

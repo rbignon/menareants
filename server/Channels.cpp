@@ -1268,12 +1268,23 @@ void EChannel::CheckReadys()
 						y = StrToTyp<uint>(acaca);
 						std::string number = line;
 						if(type.empty() || owner.empty() || acaca.empty() || number.empty())
+						{
 							vDebug(W_ERR, "La déclaration d'une unité sur la map est invalide.",
 							              VName(type) VName(owner) VName(acaca) VName(number));
+							continue;
+						}
 
 						const char *e_name = FindEntityName(pl == players.end() ? 0 : dynamic_cast<ECPlayer*>(*pl));
 						ECEntity* entity = CreateAnEntity(StrToTyp<uint>(type), e_name, pl == players.end() ? 0 : *pl,
 						                                  (*Map())(x,y));
+
+						if(!entity)
+						{
+							vDebug(W_ERR, "Try to create an unexistant entity.",
+							              VName(type));
+							continue;
+						}
+
 						entity->SetNb(StrToTyp<uint>(number));
 						Map()->AddAnEntity(entity);
 						if(entity->IsHidden())
