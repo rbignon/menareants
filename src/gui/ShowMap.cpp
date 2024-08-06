@@ -363,49 +363,57 @@ void TMap::DrawCountries(ECase* c)
 	 */
 
 	if((map->Channel() && (!c->MoveUp()->Country()->Owner() || !c->MoveUp()->Country()->Owner()->Player()
-	                       || c->MoveUp()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveUp()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveUp()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveUp()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), CASE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveDown()->Country()->Owner() || !c->MoveDown()->Country()->Owner()->Player()
-	                       || c->MoveDown()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveDown()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveDown()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveDown()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, CASE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveLeft()->Country()->Owner() || !c->MoveLeft()->Country()->Owner()->Player()
-	                       || c->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveLeft()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveRight()->Country()->Owner() || !c->MoveRight()->Country()->Owner()->Player()
-	                       || c->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveRight()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, CASE_HEIGHT),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveUp()->MoveRight()->Country()->Owner() || !c->MoveUp()->MoveRight()->Country()->Owner()->Player()
-	                       || c->MoveUp()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveUp()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveUp()->MoveRight()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveUp()->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveUp()->MoveLeft()->Country()->Owner() || !c->MoveUp()->MoveLeft()->Country()->Owner()->Player()
-	                       || c->MoveUp()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveUp()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveUp()->MoveLeft()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveUp()->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y(), LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveDown()->MoveRight()->Country()->Owner() || !c->MoveDown()->MoveRight()->Country()->Owner()->Player()
-	                       || c->MoveDown()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveDown()->MoveRight()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveDown()->MoveRight()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveDown()->MoveRight()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X() + CASE_WIDTH - LINE_WIDTH, c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
 
 	if((map->Channel() && (!c->MoveDown()->MoveLeft()->Country()->Owner() || !c->MoveDown()->MoveLeft()->Country()->Owner()->Player()
-	                       || c->MoveDown()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player()))
+	                       || (c->MoveDown()->MoveLeft()->Country()->Owner()->Player() != c->Country()->Owner()->Player() &&
+	                           !c->MoveDown()->MoveLeft()->Country()->Owner()->Player()->IsAllie(c->Country()->Owner()->Player()))))
 	   || (!map->Channel() && c->MoveDown()->MoveLeft()->Country() != c->Country()))
 		Window()->BoxColor(Rectanglei(c->Image()->X(), c->Image()->Y() + CASE_HEIGHT - LINE_WIDTH, LINE_WIDTH, LINE_WIDTH),
 		                   c->Country()->Owner() && c->Country()->Owner()->Player() ? color_eq[c->Country()->Owner()->Player()->Color()] : white_color);
