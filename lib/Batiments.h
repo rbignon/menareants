@@ -711,7 +711,6 @@ public:
 	virtual bool IsCity() const { return true; }
 
 	/* We DON'T allow someone to sell his airport, to prevent of selling when an enemy plane come on */
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
@@ -795,7 +794,6 @@ public:
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 200; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_NOISY); }
-	virtual bool CanBeSold() const { return false; }
 
 	virtual uint UnitaryCapacity() const { return 10000; }
 

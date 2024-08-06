@@ -160,7 +160,7 @@ protected:
 #define ARM_DATA        0x10000
 #define ARM_UPGRADE     0x20000
 #define ARM_INVEST      0x40000
-#define ARM_SELL        0x80000
+#define ARM_SELL        0x80000      /* Deprecated */
 #define ARM_PREUNION    (ARM_MOVE|ARM_LOCK)
 #define ARM_UNION       (ARM_MOVE|ARM_REMOVE)
 #define ARM_CREATE      (ARM_MOVE|ARM_TYPE|ARM_NUMBER)
@@ -263,7 +263,6 @@ public:
 	virtual bool IsTerrain() const { return false; }         /**< This is an "unit" who represents a special terrain */
 	virtual bool IsPlane() const { return false; }           /**< This entity is a plane */
 	virtual bool CanWalkOn(ECBCase*) const { return false; }
-	virtual bool CanBeSold() const { return false; }         /**< This entity can be sold */
 
 	virtual e_level Level() const
 	{

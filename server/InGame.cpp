@@ -823,8 +823,10 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			}
 			case '$':
 			{
+#if 0 /* Now forbidden */
 				if(entity && entity->CanBeSold())
 					flags |= ARM_SELL;
+#endif
 				break;
 			}
 			case '/':
@@ -928,12 +930,15 @@ int ARMCommand::Exec(TClient *cl, std::vector<std::string> parv)
 			 *  ----------------   *   ------------------
 			 *  entity->InitNb()               3
 			 */
+
+#if 0			/* That's now forbidden, so ignore */
 			cl->Player()->UpMoney((entity->Nb() * 2 * entity->Cost())/(3 * entity->InitNb()));
 
 			// L'utilisation de ARM_RECURSE fera que ça ne sera envoyé QUE à l'owner et aux alliés
 			chan->SendArm(0, entity, ARM_REMOVE|ARM_RECURSE);
 			entity->Lock();
 			entity->AddEvent(flags);
+#endif
 		}
 		if(flags & ARM_UPGRADE)
 		{
