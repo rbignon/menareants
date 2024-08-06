@@ -39,55 +39,6 @@
 #include "Channels.h"
 
 /********************************************************************************************
- *                               ECBTrain                                                   *
- ********************************************************************************************/
-class ECBTrain : public virtual ECBContainer
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_EMPTY_CONSTRUCTOR(ECBTrain) {}
-
-	ENTITY_CONSTRUCTOR(ECBTrain) {}
-
-/* Constantes */
-public:
-
-	virtual e_type Type() const { return E_TRAIN; }
-	virtual uint Cost() const { return 2000; }
-	virtual uint InitNb() const { return 5; }
-	virtual uint Step() const { return 8; }
-	virtual uint Visibility() const { return 4; }
-	virtual uint UnitaryCapacity() const { return 100; }
-
-	virtual bool CanContainThisEntity(const ECBEntity* et) const
-	{
-		if((!et->IsInfantry() && !et->IsVehicule()) || et->Type() == Type())
-			return false;
-		else
-			return true;
-	}
-
-	bool CanWalkOn(ECBCase* c) const
-	{
-		return (c->Entities()->Find(E_RAIL).empty() == false);
-	}
-	bool CanAttaq(const ECBEntity* e)
-	{
-		switch(e->Type())
-		{
-			case E_TRAIN:
-				return true;
-			default:
-				return false;
-		}
-	}
-	bool CanCreate(const ECBEntity*) { return false; }
-	virtual bool IsVehicule() const { return true; }
-	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
-};
-
-/********************************************************************************************
  *                               ECBBoat                                                    *
  ********************************************************************************************/
 /** This is a boat. */

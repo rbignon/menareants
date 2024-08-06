@@ -121,43 +121,6 @@ private:
 };
 
 /********************************************************************************************
- *                                ECTrain                                                   *
- ********************************************************************************************/
-#define TRAIN_VISUAL_STEP  3
-class ECTrain : public ECUnit, public ECBTrain
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_EMPTY_CONSTRUCTOR(ECTrain) {}
-
-	ENTITY_CONSTRUCTOR(ECTrain), ECUnit(TRAIN_VISUAL_STEP) {}
-
-	void UpdateImages()
-	{
-		PutImage(I_Up, Resources::Train_Dos());
-		PutImage(I_Down, Resources::Train_Face());
-		PutImage(I_Right, Resources::Train_Right());
-		PutImage(I_Left, Resources::Train_Left());
-		PutImage(I_Attaq, Resources::Brouillard());
-	}
-
-/* Infos */
-public:
-
-	virtual const char* Name() const { return _("Train"); }
-	virtual const char* Qual() const { return _("train"); }
-	virtual const char* Infos() const { return _("Ground vehicles and infantry troups carrier"); }
-	virtual const char* Description() const
-	{
-		return _("This infantry and vehicle carrier train needs rails to move on.");
-	}
-	virtual ECImage* Icon() const { return Resources::Train_Icon(); }
-
-	virtual std::string SpecialInfo();
-};
-
-/********************************************************************************************
  *                                ECBoat                                                    *
  ********************************************************************************************/
 #define BOAT_VISUAL_STEP  3

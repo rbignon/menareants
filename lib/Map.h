@@ -200,8 +200,8 @@ public:
 		/*17*/E_MCDO,
 		/*18*/E_TREES,
 		/*19*/E_MEGALOPOLE,
-		/*20*/E_RAIL,
-		/*21*/E_TRAIN,
+		/*20*/E_REMOVED_1,
+		/*21*/E_REMOVED_2,
 		/*22*/E_PLANE,
 		/*23*/E_JOUANO,
 		/*24*/E_BARBEDWIRE,
@@ -663,13 +663,7 @@ public:
 
 	virtual bool CanCreate(const ECBEntity* e)
 	{
-		switch(e->Type())
-		{
-			case ECBEntity::E_RAIL:
-				return true;
-			default:
-				return false;
-		}
+		return false;
 	}
 };
 

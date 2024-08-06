@@ -42,22 +42,6 @@ public:
 };
 
 /********************************************************************************************
- *                                        ECRail                                            *
- ********************************************************************************************/
-class ECRail : public ECEntity, public ECBRail
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_CONSTRUCTOR(ECRail) {}
-
-/* Methodes */
-public:
-
-	virtual void Union(ECEntity*) { return; }
-};
-
-/********************************************************************************************
  *                                        ECTrees                                           *
  ********************************************************************************************/
 class ECTrees : public ECEntity, public ECBTrees

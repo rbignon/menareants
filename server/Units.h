@@ -39,19 +39,6 @@ public:
 };
 
 /********************************************************************************************
- *                               ECTrain                                                    *
- ********************************************************************************************/
-class ECTrain : public EContainer, public ECUnit, public ECBTrain
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_CONSTRUCTOR(ECTrain) {}
-
-	virtual bool WantAttaq(uint x, uint y, bool) { return false; }
-};
-
-/********************************************************************************************
  *                               ECBoat                                                     *
  ********************************************************************************************/
 class ECBoat : public EContainer, public ECUnit, public ECBBoat

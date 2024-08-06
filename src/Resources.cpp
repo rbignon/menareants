@@ -245,15 +245,6 @@
 	R_RESOURCE(ECSpriteBase, Trees_Face,        "units/trees");
 	R_RESOURCE(ECImage,      Megalopole_Icon,   PKGDATADIR_PICS "units/megalopole_icon.png");
 	R_RESOURCE(ECSpriteBase, Megalopole_Face,   "units/megalopole");
-	R_RESOURCE(ECImage,      Rail_Icon,         PKGDATADIR_PICS "units/rail_icon.png");
-	R_RESOURCE(ECSpriteBase, Rail_Horiz,        "units/rail/horiz");
-	R_RESOURCE(ECSpriteBase, Rail_Verti,        "units/rail/verti");
-	R_RESOURCE(ECSpriteBase, Rail_Aiguillage,   "units/rail/aiguillage");
-	R_RESOURCE(ECImage,      Train_Icon,        PKGDATADIR_PICS "units/train_icon.png");
-	R_RESOURCE(ECSpriteBase, Train_Face,        "units/train/face");
-	R_RESOURCE(ECSpriteBase, Train_Left,        "units/train/left");
-	R_RESOURCE(ECSpriteBase, Train_Right,       "units/train/right");
-	R_RESOURCE(ECSpriteBase, Train_Dos,         "units/train/dos");
 	R_RESOURCE(ECImage,      Jouano_Icon,       PKGDATADIR_PICS "units/jouano_icon.png");
 	R_RESOURCE(ECSpriteBase, Jouano_Face,       "units/jouano/face");
 	R_RESOURCE(ECSpriteBase, Jouano_Fog,        "units/jouano/fog");

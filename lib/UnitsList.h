@@ -30,8 +30,8 @@ U_DECL(ECObelisk)
 U_DECL(ECMcDo)
 U_DECL(ECTrees)
 U_DECL(ECMegalopole)
-U_DECL(ECRail)
-U_DECL(ECTrain)
+U_DECL_REMOVED /* Former rails */
+U_DECL_REMOVED /* Former trains */
 U_DECL(ECPlane)
 U_DECL(ECJouano)
 U_DECL(ECBarbedWire)

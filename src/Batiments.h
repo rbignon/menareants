@@ -91,40 +91,6 @@ public:
 };
 
 /********************************************************************************************
- *                                         ECRail                                           *
- ********************************************************************************************/
-
-class ECRail : public ECBatiment, public ECBRail
-{
-/* Constructeur/Destructeur */
-public:
-
-	ENTITY_EMPTY_CONSTRUCTOR(ECRail) {}
-
-	ENTITY_CONSTRUCTOR(ECRail) {}
-
-	void UpdateImages() { PutImage(I_Down, (Resources::Rail_Horiz())); }
-
-	virtual void Created();
-
-/* Methodes */
-public:
-
-	void Played();
-	void FindMyImage(bool make_others = true);
-
-/* Infos */
-public:
-
-	virtual const char* Name() const { return _("Rail"); }
-	virtual const char* Infos() const { return _("Trains are only able to move on rails."); }
-	virtual const char* Qual() const { return _("rail"); }
-	virtual const char* Description() const { return Infos(); }
-	virtual ECImage* Icon() const { return Resources::Rail_Icon(); }
-	virtual bool CanBeSelected() const { return false; }
-};
-
-/********************************************************************************************
  *                                         ECTrees                                          *
  ********************************************************************************************/
 

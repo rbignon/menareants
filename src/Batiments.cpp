@@ -201,42 +201,6 @@ void ECBarbedWire::FindMyImage(bool others)
 }
 
 /********************************************************************************************
- *                                         ECRail                                           *
- ********************************************************************************************/
-void ECRail::Created()
-{
-	FindMyImage();
-}
-
-void ECRail::Played()
-{
-	FindMyImage();
-}
-
-void ECRail::FindMyImage(bool others)
-{
-	std::vector<ECBEntity*> entities;
-	int r = Case()->SearchAroundType(Type(), entities);
-
-	std::vector<ECBEntity*> null; /* On ne s'en sert pas, c'est uniquement l'argument */
-	r |= Case()->SearchAroundType(E_CHARFACT, null);
-
-	if(!r)
-		SetImage(Resources::Rail_Horiz());
-
-	if((r & C_UP || r & C_DOWN) && !(r & C_LEFT) && !(r & C_RIGHT))
-		SetImage(Resources::Rail_Verti());
-	else if((r & C_RIGHT || r & C_LEFT) && !(r & C_DOWN) && !(r & C_UP))
-		SetImage(Resources::Rail_Horiz());
-	else
-		SetImage(Resources::Rail_Aiguillage());
-
-	if(others)
-		FORit(ECBEntity*, entities, it)
-			dynamic_cast<ECRail*>(*it)->FindMyImage(false);
-}
-
-/********************************************************************************************
  *                                         ECMine                                           *
  ********************************************************************************************/
 
