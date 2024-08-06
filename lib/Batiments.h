@@ -119,7 +119,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_TREES; }
-	virtual uint Cost() const { return 5000; }
+	virtual uint Cost() const { return 1000; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 0; } /**< Elle ne voit rien du tout */
 
@@ -152,10 +152,10 @@ public:
 public:
 
 	virtual e_type Type() const { return E_MINE; }
-	virtual uint Cost() const { return 7000; }
+	virtual uint Cost() const { return 3000; }
 	virtual uint InitNb() const { return 1;}
 	virtual uint Visibility() const { return 1; } /**< Elle ne voit en effet pas bien loins... */
-	virtual bool IsTerrain() const { return true; } /**< C'est pour qu'on puisse en construire sur les rails ou arbres */
+	virtual bool IsTerrain() const { return true; } /**< C'est pour qu'on puisse en construire sur les arbres */
 
 	enum data_t {
 		DATA_RESTBUILD
@@ -198,9 +198,8 @@ public:
 public:
 
 	virtual e_type Type() const { return E_EIFFELTOWER; }
-	virtual uint Cost() const { return 70000; }
+	virtual uint Cost() const { return 40000; }
 	virtual uint InitNb() const { return 3000;}
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
@@ -231,9 +230,8 @@ public:
 public:
 
 	virtual e_type Type() const { return E_RADAR; }
-	virtual uint Cost() const { return 30000; }
+	virtual uint Cost() const { return 20000; }
 	virtual uint InitNb() const { return 1000;}
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 
@@ -269,9 +267,8 @@ public:
 public:
 
 	virtual e_type Type() const { return E_NUCLEARSEARCH; }
-	virtual uint Cost() const { return 50000; }
+	virtual uint Cost() const { return 20000; }
 	virtual uint InitNb() const { return 3000;}
-	virtual bool CanBeSold() const { return true; }
 
 	enum data_t {
 		DATA_NBMISSILES,
@@ -320,10 +317,9 @@ public:
 public:
 
 	virtual e_type Type() const { return E_SILO; }
-	virtual uint Cost() const { return 10000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 500;}
-	virtual uint Porty() const { return 10; }
-	virtual bool CanBeSold() const { return true; }
+	virtual uint Porty() const { return 15; }
 
 	enum data_t {
 		DATA_RESTBUILD
@@ -381,9 +377,8 @@ public:
 	};
 
 	virtual e_type Type() const { return E_GULAG; }
-	virtual uint Cost() const { return 20000; }
+	virtual uint Cost() const { return 30000; }
 	virtual uint InitNb() const { return 200; }
-	virtual bool CanBeSold() const { return true; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_URSS); }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
@@ -542,12 +537,11 @@ public:
 public:
 
 	virtual e_type Type() const { return E_DEFENSETOWER; }
-	virtual uint Cost() const { return 10000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1000; }
 	virtual uint Visibility() const { return 4; }
 	virtual uint Porty() const { return 3; }
 	virtual e_type MyUpgrade() const { return E_OBELISK; }
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
@@ -584,11 +578,10 @@ public:
 public:
 
 	virtual e_type Type() const { return E_OBELISK; }
-	virtual uint Cost() const { return 20000; }
+	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 2000; }
 	virtual uint Visibility() const { return 4; }
 	virtual uint Porty() const { return 5; }
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e)
 	{
@@ -623,10 +616,9 @@ public:
 public:
 
 	virtual e_type Type() const { return E_CHARFACT; }
-	virtual uint Cost() const { return 20000; }
+	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1000; }
 	virtual bool IsCity() const { return true; }
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
@@ -668,10 +660,9 @@ public:
 public:
 
 	virtual e_type Type() const { return E_CASERNE; }
-	virtual uint Cost() const { return 9000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 500; }
 	virtual bool IsCity() const { return true; }
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanBeCreated(ECBPlayer* pl) const { return false; }
 
@@ -758,9 +749,8 @@ public:
 public:
 
 	virtual e_type Type() const { return E_SHIPYARD; }
-	virtual uint Cost() const { return 4000; }
+	virtual uint Cost() const { return 2000; }
 	virtual uint InitNb() const { return 200; }
-	virtual bool CanBeSold() const { return true; }
 
 	virtual bool CanAttaq(const ECBEntity* e) { return false; }
 

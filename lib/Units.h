@@ -244,7 +244,7 @@ public:
 public:
 
 	virtual e_type Type() const { return E_MISSILAUNCHER; }
-	virtual uint Cost() const { return 6000; }
+	virtual uint Cost() const { return 1000; }
 	virtual uint InitNb() const { return 100; }
 	virtual uint Step() const { return 1; }
 	virtual uint Porty() const { return 8; }
@@ -318,9 +318,9 @@ public:
 public:
 
 	virtual e_type Type() const { return E_JOUANO; }
-	virtual uint Cost() const { return 10000; }
+	virtual uint Cost() const { return 5000; }
 	virtual uint InitNb() const { return 1; }
-	virtual uint Step() const { return 2; }
+	virtual uint Step() const { return 3; }
 	virtual uint Porty() const { return 2; }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
@@ -419,8 +419,8 @@ public:
 	virtual e_type Type() const { return E_TOURIST; }
 	virtual uint Cost() const { return 10000; }
 	virtual uint InitNb() const { return 1; }
-	virtual uint Step() const { return 4; }
-	virtual uint Visibility() const { return 4; }
+	virtual uint Step() const { return 6; }
+	virtual uint Visibility() const { return 6; }
 	virtual bool CanBeCreated(uint nation) const { return (nation == ECBPlayer::N_JAPON); }
 	virtual bool CanWalkOn(ECBCase* c) const { return (c->Flags() & (C_TERRE|C_PONT)) && c->Entities()->Find(E_BARBEDWIRE, ARM_TYPE).empty(); }
 
