@@ -304,7 +304,8 @@ void TIA::FirstMovements()
 	for(std::vector<ECBEntity*>::iterator enti = ents.begin(); enti != ents.end(); ++enti)
 	{
 		if((*enti)->IsZombie() || (*enti)->Locked() || !(*enti)->Owner() ||
-		   (!(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner()))
+		   (!(*enti)->Owner()->IsAllie(Player()) && Player() != (*enti)->Owner()) ||
+		   (*enti)->IsTerrain())
 			continue;
 		if((*enti)->IsBuilding())
 		{
