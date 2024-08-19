@@ -139,7 +139,7 @@ public:
 /* Attributs */
 public:
 
-	std::vector<ECase*> Cases() const { return cases; }
+	std::vector<ECase*>& Cases() { return cases; }
 	bool Empty() const { return cases.empty(); }
 	void AddCase(ECase* c, bool update = true) { c->Select(true); cases.push_back(c); if(update) Update(c); }
 	bool RemoveCase(ECase* c, bool update = true);

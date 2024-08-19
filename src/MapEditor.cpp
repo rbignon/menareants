@@ -722,7 +722,7 @@ void TBarreCaseIcons::SelectCase(TObject* o, void* e)
 	TMapEditor *me = dynamic_cast<TMapEditor*>(bc->Parent());
 
 	case_img_t* ci = static_cast<case_img_t*>(e);
-	std::vector<ECase*> cases = bc->Cases();
+	std::vector<ECase*>& cases = bc->Cases();
 	for(std::vector<ECase*>::iterator it = cases.begin(); it != cases.end(); ++it)
 		*it = bc->ChangeCaseType(*it, ci);
 
