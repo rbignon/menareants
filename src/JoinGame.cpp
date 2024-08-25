@@ -584,15 +584,19 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 				for(BCountriesVector::iterator ci = cv.begin(); ci != cv.end(); ++ci)
 					if(!strcmp((*ci)->ID(), ident))
 					{
+						std::string country_name = (*ci)->Name();
+						if(country_name.empty())
+							country_name = ident;
+
 						bool update = false;
 						ECBPlayer* last_owner = (*ci)->Owner() ? (*ci)->Owner()->Player() : 0;
 						if(InGameForm && last_owner == me->Player())
 						{
 							update = true;
 							if(add)
-								InGameForm->AddInfo(I_SHIT, StringF(_("%s has taken your country (%s)"), players[0]->GetNick(), ident));
+								InGameForm->AddInfo(I_SHIT, StringF(_("%s has taken your country (%s)"), players[0]->GetNick(), country_name.c_str()));
 							else
-								InGameForm->AddInfo(I_SHIT, StringF(_("Your country %s is now neutral!"), ident));
+								InGameForm->AddInfo(I_SHIT, StringF(_("Your country %s is now neutral!"), country_name.c_str()));
 						}
 
 						(*ci)->ChangeOwner(add ? players[0]->MapPlayer() : 0);
@@ -600,9 +604,9 @@ int SETCommand::Exec(PlayerList players, EC_Client *me, ParvList parv)
 						   (players[0]->IsMe() || players[0]->IsAllie(me->Player()) || (last_owner && last_owner->IsAllie(me->Player()))))
 						{
 							if(add)
-								InGameForm->AddInfo(I_INFO, StringF(_("%s is now owned by %s"), ident, players[0]->GetNick()));
+								InGameForm->AddInfo(I_INFO, StringF(_("%s is now owned by %s"), country_name.c_str(), players[0]->GetNick()));
 							else
-								InGameForm->AddInfo(I_INFO, StringF(_("%s is now neutral"), ident));
+								InGameForm->AddInfo(I_INFO, StringF(_("%s is now neutral"), country_name.c_str()));
 						}
 						if(InGameForm && chan->State() == EChannel::PLAYING)
 							// Il n'est pas nécessaire de mettre à jour la preview en ANIMING, car c'est fait automatiquement à la fin du tour
