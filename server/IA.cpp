@@ -406,12 +406,17 @@ void TIA::FirstMovements()
 				   ) &&
 				   (
 				       !victim ||
-				       d > (*enti)->Case()->Delta((*e)->Case())
+				       (*enti)->CanInvest(*e) ||
+				       (
+				           d > (*enti)->Case()->Delta((*e)->Case()) &&
+				           !(*enti)->CanInvest(victim)
+				       )
 				   ) &&
 				   (
 				       (*e)->Owner() != 0 ||
 				       !(*e)->IsCity() ||
-				       !(*enti)->Porty())
+				       !(*enti)->Porty()
+				   )
 				)
 				{
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
