@@ -400,10 +400,19 @@ void TIA::FirstMovements()
 				if(!(*e)->IsHidden() &&
 				   !(*e)->IsTerrain() &&
 				   !(*enti)->Like(*e) &&
-				   !(*e)->IsBuilding() && // don't want to attack buildings, that's not really useful
-				   ((*enti)->CanAttaq(*e) || ((*enti)->CanInvest(*e) && !(*enti)->Deployed())) &&
-				   (!victim || d > (*enti)->Case()->Delta((*e)->Case())) &&
-				   ((*e)->Owner() != 0 || !(*e)->IsCity() || !(*enti)->Porty()))
+				   (
+				       ((*enti)->CanAttaq(*e) && !(*e)->IsBuilding()) ||  // don't want to attack buildings, that's not really useful
+				       ((*enti)->CanInvest(*e) && !(*enti)->Deployed())
+				   ) &&
+				   (
+				       !victim ||
+				       d > (*enti)->Case()->Delta((*e)->Case())
+				   ) &&
+				   (
+				       (*e)->Owner() != 0 ||
+				       !(*e)->IsCity() ||
+				       !(*enti)->Porty())
+				)
 				{
 					victim = *e, d = (*enti)->Case()->Delta((*e)->Case());
 				}
