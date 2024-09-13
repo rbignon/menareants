@@ -406,7 +406,10 @@ void TIA::FirstMovements()
 				   ) &&
 				   (
 				       !victim ||
-				       (*enti)->CanInvest(*e) ||
+				       (
+				           (*enti)->CanInvest(*e) &&
+				           (*enti)->Case()->Delta((*e)->Case()) <= (*enti)->MyStep()
+				       ) ||
 				       (
 				           d > (*enti)->Case()->Delta((*e)->Case()) &&
 				           !(*enti)->CanInvest(victim)
