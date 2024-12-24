@@ -483,7 +483,7 @@ void EContainer::Union(ECEntity* entity)
 	if(!Containing())
 	{
 		Contain(container->Containing());
-		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_CONTENER);
+		Channel()->SendArm(0, dynamic_cast<ECEntity*>(Containing()), ARM_CONTENER);
 	}
 	else if(container->Containing())
 	{
