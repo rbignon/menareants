@@ -615,6 +615,7 @@ bool EChannel::ShowAnim(ECEvent* event)
 						    );
 						    ++fix
 						)
+							;
 
 					if(fix != fixed.end())
 					{
