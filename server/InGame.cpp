@@ -374,12 +374,22 @@ bool EChannel::ShowAnim(ECEvent* event)
 						std::vector<ECBEntity*> fixed = (*it)->Case()->Entities()->List();
 						std::vector<ECBEntity*>::iterator fix;
 						for(fix = fixed.begin();
-						        fix != fixed.end() && (*fix == *it || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != (*it)->Level() ||
-						        !(*fix)->Move()->Empty() || (*fix)->Type() != (*it)->Type() || (*fix)->Owner() != (*it)->Owner() ||
-						        (dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
-						        dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
-						        dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(*it)->Type()));
-						    ++fix)
+						    fix != fixed.end() && (
+						        *fix == *it ||
+						        (*fix)->IsZombie() ||
+						        (*fix)->Locked() ||
+						        (*fix)->Level() != (*it)->Level() ||
+						        !(*fix)->Move()->Empty() ||
+						        (*fix)->Type() != (*it)->Type() ||
+						        (*fix)->Owner() != (*it)->Owner() ||
+						        (
+						            dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(*it) &&
+						            dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(*it)->Containing() &&
+						            dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(*it)->Containing()->Type()
+						        )
+						    );
+						    ++fix
+						)
 							;
 
 						if(fix != fixed.end() && (*it)->Move()->Empty())
@@ -586,14 +596,25 @@ bool EChannel::ShowAnim(ECEvent* event)
 				{
 					std::vector<ECBEntity*> fixed = entity->Case()->Entities()->List();
 					std::vector<ECBEntity*>::iterator fix = fixed.end();
+
 					if(!fixed.empty())
 						for(fix = fixed.begin();
-							fix != fixed.end() && (*fix == entity || (*fix)->IsZombie() || (*fix)->Locked() || (*fix)->Level() != entity->Level() ||
-							!(*fix)->Move()->Empty() || (*fix)->Type() != entity->Type() || (*fix)->Owner() != entity->Owner() ||
-							(dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
-							dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(entity)->Containing() &&
-							dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(entity)->Type()));
-							++fix);
+						    fix != fixed.end() && (
+						        *fix == entity ||
+						        (*fix)->IsZombie() ||
+						        (*fix)->Locked() ||
+						        (*fix)->Level() != entity->Level() ||
+						        !(*fix)->Move()->Empty() ||
+						        (*fix)->Type() != entity->Type() ||
+						        (*fix)->Owner() != entity->Owner() ||
+						        (
+						            dynamic_cast<EContainer*>(*fix) && dynamic_cast<EContainer*>(entity) &&
+						            dynamic_cast<EContainer*>(*fix)->Containing() && dynamic_cast<EContainer*>(entity)->Containing() &&
+						            dynamic_cast<EContainer*>(*fix)->Containing()->Type() != dynamic_cast<EContainer*>(entity)->Containing()->Type()
+						        )
+						    );
+						    ++fix
+						)
 
 					if(fix != fixed.end())
 					{
