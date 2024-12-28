@@ -455,6 +455,8 @@ public:
 	virtual bool Contain(ECBEntity*);
 	virtual bool UnContain();
 
+	virtual void SetUnit(ECBEntity* e) { unit = e; }
+
 /* Attributs */
 public:
 

@@ -484,6 +484,7 @@ void EContainer::Union(ECEntity* entity)
 	{
 		Contain(container->Containing());
 		Channel()->SendArm(0, dynamic_cast<ECEntity*>(Containing()), ARM_CONTENER);
+		container->SetUnit(0);
 	}
 	else if(container->Containing())
 	{
@@ -491,6 +492,8 @@ void EContainer::Union(ECEntity* entity)
 		Channel()->SendArm(0, dynamic_cast<ECEntity*>(container->Containing()), ARM_REMOVE|ARM_INVEST);
 		if(Owner() && Owner()->Client())
 			Channel()->SendArm(Owner()->Client(), dynamic_cast<ECEntity*>(Containing()), ARM_NUMBER);
+		container->Containing()->SetParent(0);
+		container->SetUnit(0);
 	}
 }
 
