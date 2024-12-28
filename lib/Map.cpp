@@ -412,13 +412,17 @@ bool ECBEntity::CanBeCreated(ECBCase* c) const
 
 void ECBEntity::ChangeCase(ECBCase* new_case)
 {
+#if 0 /* Why? */
 	if(!Parent())
 	{
+#endif
 		if(acase)
 			acase->Entities()->Remove(this);
 		if(new_case)
 			new_case->Entities()->Add(this);
+#if 0
 	}
+#endif
 	acase = new_case;
 }
 
