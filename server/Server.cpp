@@ -193,7 +193,7 @@ int TClient::parsemsg(const ECMessage& cmdname, const std::vector<std::string>& 
 		vDebug(W_DESYNCH, "Commande incorrecte du client.", VSName(GetNick()) VCName(cmdname)
 		                         VPName(cmd) VIName(parv.size()-1) VIName((cmd ? cmd->Args() : 0)));
 		if(!IsAuth(this))
-			exit(MSG_MAJ, "-");
+			this->exit(MSG_MAJ, "-");
 		return 0;
 	}
 
@@ -208,7 +208,7 @@ int TClient::parsemsg(const ECMessage& cmdname, const std::vector<std::string>& 
 	catch(TECExcept &e)
 	{
 		vDebug(W_ERR, e.Message(), e.Vars());
-		exit(ERR_CMDS);
+		this->exit(ERR_CMDS);
 	}
 	return 0;
 }
